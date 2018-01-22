@@ -1,0 +1,26 @@
+graph {
+    fill-color: white;
+}
+node { size-mode: fit; shape: rounded-box; padding: 3px, 2px; }
+
+node.Input {
+	fill-color: green;
+}
+
+node.Output {
+	fill-color: orange;
+}
+
+node.Function {
+	fill-color: grey;
+}
+
+
+edge {
+    arrow-shape: arrow;
+    arrow-size: 6px, 4px;
+}
+
+node:clicked {
+    fill-color: blue;
+}

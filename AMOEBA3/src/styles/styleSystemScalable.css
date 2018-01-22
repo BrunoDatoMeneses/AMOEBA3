@@ -1,0 +1,63 @@
+graph {
+    fill-color: white;
+
+}
+node { shape: box; fill-color: white; stroke-mode: plain; padding: 3px, 2px; text-mode: hidden;}
+
+node.Center { size-mode: fit; shape: rounded-box; fill-color: white; stroke-mode: plain; padding: 3px, 2px; }
+
+node.scale 
+{ stroke-color: white; stroke-mode: none; stroke-width: 0px; size: 1000px; fill-mode: image-scaled; fill-image: url('/home/nigon/Téléchargements/Axes.png'); }
+
+node.Percept {
+	fill-color: green;
+}
+
+node.Controller {
+	fill-color: yellow;
+}
+
+node.Context {
+	fill-color: cyan;
+}
+
+node.Criterion {
+	fill-color: red;
+}
+
+node.ContextAwaked {
+	fill-color: orange;
+	}
+
+node.ContextSelected {
+	fill-color: red;
+	}
+	
+node.ContextColorDynamic {
+	fill-mode: dyn-plain;
+	fill-color: rgba(0,200,20,150),  rgba(0,0,255,155);
+}
+	
+	
+node.BestContextSelected {
+	fill-color: yellow;
+	}
+
+edge {
+    arrow-shape: arrow;
+    stroke-color: grey;
+    fill-color: grey;
+    arrow-size: 4px, 3px;
+}
+
+edge.validContext {
+		fill-color: green;
+	}
+	
+edge.validWorstContext {
+		fill-color: green;
+	}
+
+node:clicked {
+    fill-color: blue;
+}

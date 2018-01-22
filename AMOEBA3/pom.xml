@@ -1,0 +1,166 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>AMOEBA</groupId>
+	<artifactId>AMOEBA</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<dependencies>
+
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/forms-1.3.0.jar -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-forms</artifactId>
+			<version>1.9.0</version>
+		</dependency>
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/forms-1.3.0-src.zip -->
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/java-json.jar -->
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/jdom-2.0.5.jar -->
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.5</version>
+		</dependency>
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/log4j-1.2.17.jar -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/mqtt-client-1.7-uber.jar -->
+		<dependency>
+			<groupId>org.fusesource.mqtt-client</groupId>
+			<artifactId>mqtt-client-java1.4-uber</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/slf4j-api-1.7.22.jar -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.22</version>
+		</dependency>
+		<!-- /home/arcady/unisync/irit/AMOEBA2/AMOEBA/slf4j-log4j12-1.7.22.jar -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.22</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/asm-all-3.3.jar -->
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-all</artifactId>
+			<version>3.3</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/guava-18.0.jar -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/jdom.jar -->
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/junit-4.8.2.jar -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+		</dependency>
+		<!--/home/arcady/git/AMOEBA2/AMOEBA/src/jfreechart/jfreechart-1.0.19.jar -->
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.19</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/jfreechart/jcommon-1.0.23.jar -->
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jcommon</artifactId>
+			<version>1.0.23</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/gs-algo-1.3 -->
+		<dependency>
+			<groupId>org.graphstream</groupId>
+			<artifactId>gs-algo</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/gs-ui-1.3 -->
+		<dependency>
+			<groupId>org.graphstream</groupId>
+			<artifactId>gs-ui</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/src/Apache-Commons/commons-math3-3.5/commons-math3-3.5.jar -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.3</version>
+		</dependency>
+
+		<!-- /home/arcady/git/AMOEBA2/AMOEBA/MarioAI -->
+
+		<dependency>
+			<groupId>AIToolKit</groupId>
+			<artifactId>AIToolKit</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/AIToolKit.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>java-json</groupId>
+			<artifactId>java-json</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/java-json.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>MarioAI</groupId>
+			<artifactId>MarioAI</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/MarioAI.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+			<groupId>lx-plot</groupId>
+			<artifactId>lx-plot</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/lx-plot-standalone.jar</systemPath>
+		</dependency>
+
+	</dependencies>
+
+	
+
+	<build>
+		
+	
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory></directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	
+	<StartingAgents>
+	
+		<Sensor Name="px" Source="x"></Sensor>
+		<Sensor Name="py" Source="y"></Sensor>
+	
+	  	<Controller Name="Controller" Oracle="test"></Controller> 
+
+
+			
+	</StartingAgents>
+	
+	
+</System>
