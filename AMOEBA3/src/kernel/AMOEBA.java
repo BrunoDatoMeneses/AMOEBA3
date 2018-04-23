@@ -337,7 +337,7 @@ public class AMOEBA extends Thread {
 	 * @param s the s
 	 * @return the all valid context but
 	 */
-	public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values, String s) {
+	/*public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values, String s) {
 		ArrayList<ArrayList<Context>> contextsList = new ArrayList<ArrayList<Context>>();
 		ArrayList<Percept> percepts = scheduler.getVariables();
 		for (Percept p : percepts) {
@@ -346,21 +346,21 @@ public class AMOEBA extends Thread {
 			}
 		}
 		return World.getIntersection(contextsList);
-	}
+	}*/
 	
 	/**
 	 * Gets the studied system.
 	 *
 	 * @return the studied system
 	 */
-	public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values) {
+	/*public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values) {
 		ArrayList<ArrayList<Context>> contextsList = new ArrayList<ArrayList<Context>>();
 		ArrayList<Percept> percepts = scheduler.getVariables();
 		for (Percept p : percepts) {
 			contextsList.add(p.getContextIncluding(values.get(p.getSensor().getName())));
 		}
 		return World.getIntersection(contextsList);
-	}
+	}*/
 	
 	public StudiedSystem getStudiedSystem() {
 		return studiedSystem;

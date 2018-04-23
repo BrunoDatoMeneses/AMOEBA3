@@ -19,30 +19,16 @@ import blackbox.BlackBoxAgent;
  */
 public class Percept extends SystemAgent implements Serializable {
 
-	/** The old value. */
-	private double oldValue;
 	
-	/** The value. */
-	private double value;
-	
-	/** The sensor. */
 	private BlackBoxAgent sensor;
-	
-	/** The targets. */
 	protected ArrayList<Agent> targets = new ArrayList<Agent>();
-	
-	/** The activated context. */
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
 	
-
-	
-	/** The min. */
 	private double min = Double.MAX_VALUE;
-	
-	/** The max. */
 	private double max = Double.MIN_VALUE;
 	
-	/** The is enum. */
+	private double oldValue;
+	private double value;
 	private boolean isEnum = false;
 	
 	/**
@@ -90,6 +76,7 @@ public class Percept extends SystemAgent implements Serializable {
 			a.setMessagesBin(obj.messagesBin);
 			this.targets.add(obj);
 		}
+		
 		this.activatedContext = new ArrayList<Agent>();
 		for(Agent obj: p.activatedContext) {
 			Agent a = new Agent() {
@@ -128,23 +115,6 @@ public class Percept extends SystemAgent implements Serializable {
 	}	
 	
 	
-	/**
-	 * Gets the context including.
-	 *
-	 * @param v the v
-	 * @return the context including
-	 */
-	public ArrayList<Context> getContextIncluding(double v){
-		ArrayList<Context> contexts = new ArrayList<Context>();
-    	ArrayList<Range> list = new ArrayList<Range>();
-
-    	
-    	for (Range r : list) {
-    		contexts.add(r.getContext());
-    	}
-    	
-		return contexts;
-	}
 	
 	/* (non-Javadoc)
 	 * @see agents.Agent#computeAMessage(agents.messages.Message)
@@ -204,6 +174,14 @@ public class Percept extends SystemAgent implements Serializable {
 	public double getMinMaxDistance() {
 		if (min == Double.MAX_VALUE || max == Double.MIN_VALUE) return 0;
 		return Math.abs(max - min);
+	}
+	
+	public double getMin() {
+		return min;
+	}
+	
+	public double getMax() {
+		return max;
 	}
 
 	/**
