@@ -201,7 +201,7 @@ public class AMOEBA extends Thread {
 				if (studiedSystem != null) {
 					readInput();
 				}
-				scheduler.learn();
+				scheduler.run();
 				if (studiedSystem != null) {
 					if (scheduler.isUseOracle()) {
 						studiedSystem.playOneStep(Double.NaN);
@@ -229,7 +229,7 @@ public class AMOEBA extends Thread {
 	 */
 	public void learn(HashMap<String, Double> actions) {
 		updateOutputAgentsValues(actions);
-		scheduler.learn();
+		scheduler.run();
 	}
 	
 	
@@ -243,7 +243,7 @@ public class AMOEBA extends Thread {
 	public double request(HashMap<String, Double> actions) {
 		if(scheduler.isUseOracle()) scheduler.changeOracleConection();
 		updateOutputAgentsValues(actions);
-		scheduler.learn();
+		scheduler.run();
 		scheduler.changeOracleConection();
 		return scheduler.getAction();
 	}

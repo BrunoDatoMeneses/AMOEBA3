@@ -34,11 +34,11 @@ public class Scheduler implements Serializable{
 	transient private ArrayList<ScheduledItem> scheduled = new ArrayList<ScheduledItem>();
 	
 	/*List of agents according to their roles*/
-	private ArrayList<Percept> variables = new ArrayList<Percept>();
+	private ArrayList<Percept> percepts = new ArrayList<Percept>();
 	
 	private ArrayList<Agent> contexts = new ArrayList<Agent>();
 	private ArrayList<Agent> validContexts = new ArrayList<Agent>();
-	private ArrayList<Agent> controllers = new ArrayList<Agent>();
+	private ArrayList<Agent> heads = new ArrayList<Agent>();
 	private ArrayList<Agent> inputs = new ArrayList<Agent>();
 	private ArrayList<Agent> functions = new ArrayList<Agent>();
 	private ArrayList<Agent> outputs = new ArrayList<Agent>();
@@ -113,10 +113,10 @@ public class Scheduler implements Serializable{
 			}
 		} 
 		else if (a instanceof Percept) {
-			variables.add((Percept) a);
+			percepts.add((Percept) a);
 		} 
 		else if (a instanceof Head) {
-			controllers.add(a);
+			heads.add(a);
 		}
 		else if (a instanceof Input) {
 			inputs.add(a);
@@ -146,10 +146,10 @@ public class Scheduler implements Serializable{
 			}
 		} 
 		else if (a instanceof Percept) {
-			variables.remove((Percept) a);
+			percepts.remove((Percept) a);
 		} 
 		else if (a instanceof Head) {
-			controllers.remove(a);
+			heads.remove(a);
 		}
 		else if (a instanceof Input) {
 			inputs.remove(a);
@@ -176,7 +176,7 @@ public class Scheduler implements Serializable{
 	/**
 	 * Learn.
 	 */
-	public void learn() { // Name has to change must be "run"
+	public void run() { 
 
 		if (running) {//old launcher
 			
@@ -184,7 +184,6 @@ public class Scheduler implements Serializable{
 			killAgents();
 			playAllAgents();
 			scheduledItemsAndView();		
-			world.manageWorld(); //Only for Unity
 			ticksUpdate();
 			
 			
@@ -261,8 +260,8 @@ public class Scheduler implements Serializable{
 		}
 		//
 		
-		//Percepts
-		for (Agent agent : variables) {
+
+		for (Agent agent : percepts) {
 			agent.readMessage();
 			agent.play();
 		}
@@ -274,17 +273,14 @@ public class Scheduler implements Serializable{
 			
 		}
 
-		//Head
-		for (Agent agent : controllers) {
+		
+		for (Agent agent : heads) {
 			agent.readMessage();
 			agent.play();
 		}
 
 
-		//Act
-//		for (Agent agent : agents) {
-//			agent.play();
-//		}
+
 	}
 	
 	private void killAgents() {
@@ -480,7 +476,7 @@ public class Scheduler implements Serializable{
 	 */
 	public void changeOracleConection() {
 		useOracle = !useOracle ;
-		for (Agent agent : controllers) {
+		for (Agent agent : heads) {
 			((Head) agent).changeOracleConnection();
 		}		
 	}
@@ -547,7 +543,7 @@ public class Scheduler implements Serializable{
 	 */
 	//TODO Manage with many controller
 	public double getAction() {
-		return ((Head) controllers.get(0)).getAction();
+		return ((Head) heads.get(0)).getAction();
 	}
 	
 	/**
@@ -556,7 +552,7 @@ public class Scheduler implements Serializable{
 	 * @return the head agent
 	 */
 	public Head getHeadAgent() {
-		return ((Head) controllers.get(0));
+		return ((Head) heads.get(0));
 	}
 
 	/**
@@ -566,7 +562,7 @@ public class Scheduler implements Serializable{
 	 * @return the percept by name
 	 */
 	public Percept getPerceptByName(String name) {
-		for (Agent a : variables) {
+		for (Agent a : percepts) {
 			if (a.getName().equals(name)) return (Percept) a;
 		}
 		return null;
@@ -578,7 +574,7 @@ public class Scheduler implements Serializable{
 	 * @return the variables
 	 */
 	public ArrayList<Percept> getVariables() {
-		return variables;
+		return percepts;
 	}
 
 	/**
@@ -586,8 +582,8 @@ public class Scheduler implements Serializable{
 	 *
 	 * @param variables the new variables
 	 */
-	public void setVariables(ArrayList<Percept> variables) {
-		this.variables = variables;
+	public void setPercepts(ArrayList<Percept> percepts) {
+		this.percepts = percepts;
 	}
 
 	/**

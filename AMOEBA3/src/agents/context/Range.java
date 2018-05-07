@@ -455,7 +455,7 @@ public class Range implements Serializable, Comparable {
 	 * @return -1 if lower, +1 if higher, 0 if contained
 	 */
 	public int contains(Double d) {
-		if (((d > start || (d >= start && start_inclu)) && (d < end || (d <= end && end_inclu)))) {
+		if (  (d > start || (d >= start && start_inclu)) && (d < end || (d <= end && end_inclu))  ) {
 			return 0;
 		} else if (d <= start) {
 			return -1;

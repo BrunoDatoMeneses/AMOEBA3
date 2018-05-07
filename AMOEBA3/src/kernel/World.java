@@ -51,7 +51,6 @@ public class World implements Serializable {
 	private StudiedSystem studiedSystem;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	
-	private BufferedReader inputUnity;
 	private File fileToSerialize;
 	
 	private HashMap<String,SystemAgent> agents = new HashMap<String,SystemAgent>();
@@ -63,7 +62,6 @@ public class World implements Serializable {
 	private boolean learning; /*False -> Notify the World to load a preset of Context and to prevent creation of new context*/
 	private boolean creationOfNewContext;
 	private boolean loadPresetContext;
-	private boolean unity;
 	private boolean startSerialization = false;
 	
 	public int testValue = 0;
@@ -126,71 +124,8 @@ public class World implements Serializable {
 		    learning = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("allowed"));
 		    creationOfNewContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
 		    loadPresetContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
-		    unity = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("unity"));
 		    
-		    //Generate the XML file if the simulation was designed using the Unity tool
-		    if (unity) {
-		    	
-		    	InputStream input = this.getClass().getClassLoader().getResourceAsStream("src/ressources/unity.xml");
-				File file = new File("/tmp/unity.xml");
-				inputStreamToFile(input, file);
-
-		    	System.out.println("Folder : " + systemFile.getParentFile());
-				System.out.println("Init METADATA socket");
-			//	try {
-					System.out.println("Trying to connect to port : " + 15300);
-					Socket socket = new Socket(InetAddress.getByName(null), 15300);  //Loopback host
-					inputUnity = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					System.out.println("Tryning to read from socket...");
-					System.out.println(":::" + inputUnity.toString());
-					String s = inputUnity.readLine();
-					System.out.println("metadata : " + s);
-					String[] spl = s.split("##");
-					System.out.println(s);
-					int nProbes = Integer.parseInt(spl[0]);
-					
-					//racine.getChild("StartingAgents").removeContent();
-					//		<Sensor Name="percept_A" Source="outA"></Sensor>
-					//<Controller Name="Controller" Oracle="oracle"></Controller>
-					for (int i = 0 ; i < nProbes ; i++) {
-						if (i > 0) {
-							Element elem = new Element("Sensor");
-							Attribute attrName = new Attribute("Name", spl[1+i]);
-							Attribute attrSource = new Attribute("Source", "out_"+i);
-							elem.setAttribute(attrName);
-							elem.setAttribute(attrSource);
-							racine.getChild("StartingAgents").addContent(elem);
-						} else {
-							Element elem = new Element("Controller");
-							Attribute attrName = new Attribute("Name", "Controller");
-							Attribute attrSource = new Attribute("Oracle", "out_"+i);
-							elem.setAttribute(attrName);
-							elem.setAttribute(attrSource);
-							racine.getChild("StartingAgents").addContent(elem);
-						}
-
-					}
-					
-					// relaunch loading with new files
-					System.out.println("Relaunch blackbox building");
-					blackbox.setnProbes(nProbes);
-					//blackbox.buildBlackBoxFromFile(new File(System.getProperty("user.dir") + "/bin/ressources/unity.xml"));
-					blackbox.buildBlackBoxFromFile(file);
-					try {
-					    Thread.sleep(5000);
-					    file.delete();
-					} catch(InterruptedException ex) {
-					    Thread.currentThread().interrupt();
-					}
-
-		//		} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-			//		e.printStackTrace();
-			//	} catch (IOException e) {
-					// TODO Auto-generated catch block
-			//		e.printStackTrace();
-			//	}
-		    }
+		    
 		    
 		    // Initialize the sensor agents
 		    for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")){
@@ -325,20 +260,7 @@ public class World implements Serializable {
 		}
 	}
 	
-	/**
-	 * Manage world.
-	 */
-	public void manageWorld() {
-		if (unity) {
-			try {
-				String s = inputUnity.readLine();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-		}
-
-	}
+	
 	
 	
 	
