@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import agents.Agent;
-import agents.Percept;
-import agents.context.Context;
-import agents.localModel.TypeLocalModel;
-import init.amoeba.AMOEBAFactory;
-import kernel.AMOEBA;
+import MAS.agents.Agent;
+import MAS.agents.Percept;
+import MAS.agents.context.Context;
+import MAS.agents.localModel.TypeLocalModel;
+import MAS.init.amoeba.AMOEBAFactory;
+import MAS.kernel.AMOEBA;
 
 // TODO: Auto-generated Javadoc
 /**
