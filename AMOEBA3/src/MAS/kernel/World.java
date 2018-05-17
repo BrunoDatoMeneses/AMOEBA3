@@ -137,8 +137,6 @@ public class World implements Serializable {
 		    }
 
 		    
-		    // Initialize the controller agents
-		    //TODO
 		    
 		    //Initialize the controller agents
 	    for (Element element : racine.getChild("StartingAgents").getChildren("Controller")){
