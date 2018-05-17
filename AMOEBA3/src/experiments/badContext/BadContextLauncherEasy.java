@@ -2,9 +2,12 @@ package experiments.badContext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.SimpleTimeZone;
 
 import MAS.agents.Agent;
+import MAS.agents.ContextProjection;
 import MAS.agents.Percept;
 import MAS.agents.context.Context;
 import MAS.agents.localModel.TypeLocalModel;
@@ -41,6 +44,7 @@ public class BadContextLauncherEasy implements Serializable {
 		/* This is the initialization of the studied system. It's only for the sake of example, not a part of AMOEBA initialization*/
 		BadContextManager bcm = new BadContextManager();
 		bcm.setWorld(amoeba.getScheduler().getWorld());
+		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
 		for (int i = 0 ; i < 100 ; i++) {
 
@@ -49,7 +53,16 @@ public class BadContextLauncherEasy implements Serializable {
 			
 			/*This is a learning step of AMOEBA*/
 			amoeba.learn(new HashMap<String, Double>(bcm.getOutput()));
-			
+			percepts = amoeba.getScheduler().getWorld().getAllPercept();
+			for (Percept percept : percepts) {
+				System.out.println("Nbr of contexts "+percept.contextProjections.size());
+				Collection<ContextProjection> contextProjections = percept.contextProjections.values();
+				for(ContextProjection contextProjection : contextProjections) {
+					System.out.println(contextProjection.getRanges());
+				}
+				
+			}
+			System.out.println(" - - - - ");
 			try        
 			{
 			    Thread.sleep(100);
@@ -71,7 +84,7 @@ public class BadContextLauncherEasy implements Serializable {
 		ArrayList<Agent> A = AMOEBA_UI.getContexts(amoeba);
 		ArrayList<Context> C = AMOEBA_UI.getContextsAsContexts(amoeba);
 
-		System.out.println(C);
+		//System.out.println(C);
 		
 		Percept P0 = P.get(0);
 		Percept P1 = P.get(1);

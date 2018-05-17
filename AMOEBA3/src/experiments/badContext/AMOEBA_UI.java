@@ -113,5 +113,4 @@ public class AMOEBA_UI {
 		return message;
 	}
 	
-	
 }

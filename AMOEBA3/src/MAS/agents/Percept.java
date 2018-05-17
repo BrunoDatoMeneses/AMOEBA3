@@ -2,6 +2,7 @@ package MAS.agents;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import MAS.kernel.Config;
 import MAS.kernel.World;
@@ -23,6 +24,9 @@ public class Percept extends SystemAgent implements Serializable {
 	private BlackBoxAgent sensor;
 	protected ArrayList<Agent> targets = new ArrayList<Agent>();
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
+	
+	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
+	public ArrayList<Context> validContexteProjection = new ArrayList<Context>();
 	
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -99,6 +103,9 @@ public class Percept extends SystemAgent implements Serializable {
 		this.min = p.min;
 		this.max = p.max;
 		this.isEnum = p.isEnum;
+		
+		contextProjections = new HashMap<Context, ContextProjection>();
+		validContexteProjection = new ArrayList<Context>();
 	}
 
 
@@ -111,9 +118,24 @@ public class Percept extends SystemAgent implements Serializable {
 		oldValue = value;
 		value = sensor.getValue();
 		ajustMinMax(); 
+		computeContextProjectionValidity();
+		
 
 	}	
 	
+	public void computeContextProjectionValidity() {
+		validContexteProjection = new ArrayList<Context>();
+		for(ContextProjection contextProjection : contextProjections.values()) {
+			if(contextProjection.contains(this.value)) {
+				validContexteProjection.add(contextProjection.getContex());
+				System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
+			}
+		}
+		
+		for(Context context : validContexteProjection) {
+			context.setPerceptValidity(this);
+		}
+	}
 	
 	
 	/* (non-Javadoc)
@@ -293,6 +315,20 @@ public class Percept extends SystemAgent implements Serializable {
 	 */
 	public void setEnum(boolean isEnum) {
 		this.isEnum = isEnum;
+	}
+	
+	
+	public void addContextProjection(Context context) {
+		ContextProjection newContextProjection = new ContextProjection(this, context);
+		contextProjections.put(context, newContextProjection);
+	}
+	
+	public void deleteContextProjection(Context context) {
+		contextProjections.remove(context);
+	}
+	
+	public void updateContextProjection(Context context) {
+		contextProjections.get(context).update();
 	}
 
 	

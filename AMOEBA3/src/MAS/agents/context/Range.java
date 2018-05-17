@@ -113,13 +113,13 @@ public class Range implements Serializable, Comparable {
 		if (isPerceptEnum()) {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);
-			this.start = Math.round(p.getValue());
-			this.end = Math.round(p.getValue());
+			this.setStart( Math.round(p.getValue()));
+			this.setEnd( Math.round(p.getValue()));
 		} else {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);
-			this.start = start - Math.abs(extendedrangeatcreation * start);
-			this.end = end + Math.abs(extendedrangeatcreation * end);
+			this.setStart(start - Math.abs(extendedrangeatcreation * start));
+			this.setEnd( end + Math.abs(extendedrangeatcreation * end));
 		}
 		this.context = context;
 		id = maxid;
@@ -139,8 +139,8 @@ public class Range implements Serializable, Comparable {
 	 */
 	public Range(Range r) {
 		super();
-		this.start = r.start;
-		this.end = r.end;
+		this.setStart( r.start);
+		this.setEnd( r.end);
 		this.start_inclu = r.start_inclu;
 		this.end_inclu = r.end_inclu;
 		this.value = r.value;
@@ -169,10 +169,10 @@ public class Range implements Serializable, Comparable {
 	private boolean extend(double target, Percept p) {
 		int c = contains(target);
 		if (c == -1) {
-			start = target;
+			this.setStart(target);
 			return true;
 		} else if (c == 1) {
-			end = target;
+			this.setEnd(target);
 			return true;
 		} else {
 			return false;
@@ -218,9 +218,9 @@ public class Range implements Serializable, Comparable {
 	 */
 	private void adaptMaxWithoutAVT(Context c, double oracleValue) {
 		if (contains(oracleValue) == 0.0) {
-			end -= (end - start) * percent_down;
+			this.setEnd(end - ((end - start) * percent_down));
 		} else {
-			end += (end - start) * percent_up;
+			this.setEnd(end + ((end - start) * percent_up));
 		}
 	}
 
@@ -233,9 +233,9 @@ public class Range implements Serializable, Comparable {
 	private void adaptMinWithoutAVT(Context c, double oracleValue) {
 		if (contains(oracleValue) == 0.0) {
 
-			start += (end - start) * percent_up;
+			this.setStart(start + ((end - start) * percent_up));
 		} else {
-			start -= (end - start) * percent_down;
+			this.setStart(start - ((end - start) * percent_down));
 		}
 	}
 	
@@ -268,7 +268,7 @@ public class Range implements Serializable, Comparable {
 			} else {
 				AVT_deltaMax *= AVT_acceleration;
 			}
-			end -= AVT_deltaMax;
+			this.setEnd(end - AVT_deltaMax);
 
 			AVT_lastFeedbackMax = -1;
 
@@ -279,7 +279,7 @@ public class Range implements Serializable, Comparable {
 			} else {
 				AVT_deltaMax *= AVT_deceleration;
 			}
-			end += AVT_deltaMax;
+			this.setEnd(end + AVT_deltaMax);
 
 			AVT_lastFeedbackMax = 1;
 		}		
@@ -302,7 +302,7 @@ public class Range implements Serializable, Comparable {
 			} else {
 				AVT_deltaMin *= AVT_acceleration;
 			}
-			start += AVT_deltaMin;
+			this.setStart(start + AVT_deltaMin);
 
 			AVT_lastFeedbackMin = -1;
 
@@ -313,7 +313,7 @@ public class Range implements Serializable, Comparable {
 			} else {
 				AVT_deltaMin *= AVT_deceleration;
 			}
-			start -= AVT_deltaMin;
+			this.setStart(start - AVT_deltaMin);
 
 			AVT_lastFeedbackMin = 1;
 		}		
@@ -436,12 +436,12 @@ public class Range implements Serializable, Comparable {
 		} else {
 			if (Math.abs(r.getStart() - this.getEnd()) > Math.abs(r.getEnd() - this.getStart())) {
 				//Change min
-				start = r.getEnd();
+				this.setStart(r.getEnd());
 				this.setStart_inclu(!r.isEnd_inclu());
 				
 			} else {
 				//Change max
-				end = r.getStart();
+				this.setEnd( r.getStart());
 				this.setEnd_inclu(!r.isStart_inclu());
 			}
 		}
@@ -564,8 +564,8 @@ public class Range implements Serializable, Comparable {
 		if (getLenght() < v.getMinMaxDistance() * Range.minLenghtRatio) {
 			double distanceToAdd = (v.getMinMaxDistance() * Range.minLenghtRatio)
 					- getLenght();
-			start -= distanceToAdd / 2.0;
-			end += distanceToAdd / 2.0;
+			this.setStart(start - (distanceToAdd / 2.0));
+			this.setEnd(end + (distanceToAdd / 2.0));
 		}
 	}
 
@@ -575,8 +575,8 @@ public class Range implements Serializable, Comparable {
 	 * @param percent : percentage of the length
 	 */
 	private void addMargin(double percent) {
-		start -= this.getLenght() * percent;
-		end += this.getLenght() * percent;
+		this.setStart(start - (this.getLenght() * percent));
+		this.setEnd(end + (this.getLenght() * percent));
 	}
 
 	
@@ -643,6 +643,16 @@ public class Range implements Serializable, Comparable {
 	@Override
 	public int compareTo(Object o) {
 		return this.compareTo(o);
+	}
+	
+	private void setStart(double newStartValue) {
+		this.start = newStartValue;
+		if(this.context != null) this.percept.updateContextProjection(this.context);
+	}
+	
+	private void setEnd(double newEndValue) {
+		this.end = newEndValue;
+		if(this.context != null) this.percept.updateContextProjection(this.context);
 	}
 
 }

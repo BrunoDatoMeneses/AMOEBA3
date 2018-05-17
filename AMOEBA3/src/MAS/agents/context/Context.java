@@ -53,6 +53,8 @@ public class Context extends AbstractContext implements Serializable{
 	private boolean valid = false;
 	private boolean firstTimePeriod = true;
 	
+	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>(); 
+	
 
 	/**
 	 * The main constructor, used by AMOEBA to build new context agent.
@@ -62,6 +64,7 @@ public class Context extends AbstractContext implements Serializable{
 	public Context(World world, Head head) {
 		super(world);
 		buildContext(head);
+		
 	}
 	
 	
@@ -90,6 +93,8 @@ public class Context extends AbstractContext implements Serializable{
 			ranges.get(v).setValue(v.getValue());
 			sendExpressMessage(null, MessageType.REGISTER, v);
 			firstPoint.addDimension(v, v.getValue());
+			
+			v.addContextProjection(this);
 		}
 		localModel = this.world.buildLocalModel(this);
 		firstPoint.setProposition(this.controller.getOracleValue());
@@ -98,6 +103,11 @@ public class Context extends AbstractContext implements Serializable{
 		this.world.getScheduler().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 		this.world.startAgent(this);
+		
+		perceptValidities = new HashMap<Percept, Boolean>();
+		for(Percept percept : var) {
+			perceptValidities.put(percept, false);
+		}
 	}
 	
 	/**
@@ -228,15 +238,23 @@ public class Context extends AbstractContext implements Serializable{
 	public void play() {
 		super.play();
 		
+		if(computeValidityByPercepts()) {
+			System.out.println("Valid context by Percepts "+this.name);
+		}
+		
 		if (computeValidity()) {
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, controller);
 			Config.print("Message envoyé", 4);
+			System.out.println("Valid context by Context "+this.name);
 		}
 		
 		this.activations = 0;
 		this.valid = false;
 
-		
+		// Reset percepts validities
+		for(Percept percept : perceptValidities.keySet()) {
+			perceptValidities.put(percept, false);
+		}
 	}
 	
 //--------------------------------NCS Resolutions-----------------------------------------
@@ -803,11 +821,26 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @see agents.context.AbstractContext#die()
 	 */
 	public void die () {
+		for(Percept percept : perceptSenders) {
+			percept.deleteContextProjection(this);
+		}
+		
 		localModel.die();
 		super.die();
 	}
 	
 	
+	public void setPerceptValidity(Percept percept) {
+		perceptValidities.put(percept, true);
+	}
 	
+	public Boolean computeValidityByPercepts() {
+		Boolean test = true;
+		for(Percept percept : perceptValidities.keySet()) {
+			System.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
+			test = test && perceptValidities.get(percept);
+		}
+		return test;
+	}
 
 }
