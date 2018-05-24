@@ -182,7 +182,7 @@ public class GrapheBlackBoxPanel extends JPanel implements MouseInputListener, V
 		for (String name : blackBox.getBlackBoxAgents().keySet()) {
 			BlackBoxAgent bba = blackBox.getBlackBoxAgents().get(name);
 			//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleBlackBox.css')");
-			graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/VISUALIZATION/styles/styleBlackBox.css") + "')");
+			graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("styleBlackBox.css") + "')");
 			
 		/*	graph.addAttribute("ui.stylesheet", "node { stroke-mode: plain;"
 					+ "fill-color: red;"

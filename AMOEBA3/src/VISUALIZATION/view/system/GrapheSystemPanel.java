@@ -173,7 +173,7 @@ public class GrapheSystemPanel extends JPanel implements ViewerListener, MouseIn
 	public void setStandardStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystem.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/styles/styleSystem.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("/styles/styleSystem.css") + "')");
 		//"url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemSoft.css')"
 	}
 	
@@ -183,7 +183,7 @@ public class GrapheSystemPanel extends JPanel implements ViewerListener, MouseIn
 	public void setDarkStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemDark.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/styles/styleSystemDark.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("/styles/styleSystemDark.css") + "')");
 	}
 	
 	/**
@@ -192,7 +192,7 @@ public class GrapheSystemPanel extends JPanel implements ViewerListener, MouseIn
 	public void setSoftStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemSoft.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/styles/styleSystemSoft.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("/styles/styleSystemSoft.css") + "')");
 	}
 	
 	/**

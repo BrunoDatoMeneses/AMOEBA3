@@ -573,7 +573,7 @@ public class Scheduler implements Serializable{
 	 *
 	 * @return the variables
 	 */
-	public ArrayList<Percept> getVariables() {
+	public ArrayList<Percept> getPercepts() {
 		return percepts;
 	}
 

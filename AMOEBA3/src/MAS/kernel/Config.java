@@ -41,7 +41,7 @@ public class Config implements Serializable {
 	public static ImageIcon getIcon (String name) {
 		if (!icons.containsKey(name)) {
 			try {	
-				icons.put(name, new ImageIcon(ImageIO.read(Config.class.getResourceAsStream("/src/VISUALIZATION/icons/" + name))));
+				icons.put(name, new ImageIcon(ImageIO.read(Config.class.getResourceAsStream("/VISUALIZATION/icons/" + name))));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

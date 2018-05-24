@@ -31,7 +31,8 @@ public class BadContextLauncherEasy implements Serializable {
 	public static void launch(boolean viewer) {
 	
 		/*Here we create AMOEBA.*/
-		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer, "src/experiments/badContext/BadContext.xml","src/experiments/badContext/BadContext_solver.xml");
+//		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer, "/experiments/badContext/BadContext.xml","/experiments/badContext/BadContext_solver.xml");
+		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer, "BadContext.xml","BadContext_solver.xml");
 		
 		/* These method calls allow to setup AMOEBA*/
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
@@ -46,7 +47,7 @@ public class BadContextLauncherEasy implements Serializable {
 		bcm.setWorld(amoeba.getScheduler().getWorld());
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
-		for (int i = 0 ; i < 100 ; i++) {
+		for (int i = 0 ; i < 10 ; i++) {
 
 			/* This is the studied system part. Feel free to use any data source.*/
 			bcm.playOneStep(0);
@@ -65,7 +66,7 @@ public class BadContextLauncherEasy implements Serializable {
 			System.out.println(" - - - - ");
 			try        
 			{
-			    Thread.sleep(100);
+			    Thread.sleep(1000);
 			} 
 			catch(InterruptedException ex) 
 			{
@@ -79,6 +80,8 @@ public class BadContextLauncherEasy implements Serializable {
 		//	data.remove("test");
 			System.out.println("Test request : " + amoeba.request(data));
 		}*/
+		
+		AMOEBA_UI.launchOverlapDetection(amoeba);
 		
 		ArrayList<Percept> P = AMOEBA_UI.getAllPercepts(amoeba);
 		ArrayList<Agent> A = AMOEBA_UI.getContexts(amoeba);

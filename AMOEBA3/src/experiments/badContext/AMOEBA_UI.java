@@ -21,12 +21,12 @@ public class AMOEBA_UI {
 	public AMOEBA_UI(boolean viewer, String percepts){
 		
 		if(percepts.contentEquals("position")){
-			amoeba = AMOEBAFactory.createAMOEBA(viewer, "src/experiments/droneControl/DroneControl.xml",
-					"src/experiments/droneControl/DroneControl_solver.xml");
+			amoeba = AMOEBAFactory.createAMOEBA(viewer, "experiments/droneControl/DroneControl.xml",
+					"experiments/droneControl/DroneControl_solver.xml");
 		}
 		else if (percepts.contentEquals("speed")){
-			amoeba = AMOEBAFactory.createAMOEBA(viewer, "src/experiments/droneControl/DroneControlVariations.xml",
-					"src/experiments/droneControl/DroneControlVariations_solver.xml");
+			amoeba = AMOEBAFactory.createAMOEBA(viewer, "experiments/droneControl/DroneControlVariations.xml",
+					"experiments/droneControl/DroneControlVariations_solver.xml");
 		}
 	}
 	
@@ -113,4 +113,38 @@ public class AMOEBA_UI {
 		return message;
 	}
 	
+	
+	public static void launchOverlapDetection(AMOEBA usedAmoeba) {
+		for(Percept percept : getAllPercepts(usedAmoeba)) {
+			percept.overlapsDetection();
+			percept.overlapNotification();
+			System.out.println("********************************** PERCEPT **********************************");
+			System.out.println(percept.getName()+" overlaps "+percept.perceptOverlaps.size());
+			System.out.println("************************ START ************************");
+			for(Context cntxt : percept.sortedRanges.get("start")) {
+				System.out.println(cntxt.getRanges().get(percept).getStart());
+			}
+			
+			System.out.println("************************ END ************************");
+			for(Context cntxt : percept.sortedRanges.get("end")) {
+				System.out.println(cntxt.getRanges().get(percept).getEnd());
+			}
+
+		}
+		
+		for(Context context : getContextsAsContexts(usedAmoeba)) {
+			
+			context.computeOverlapsByPercepts();
+			System.out.println("********************************** CONTEXT **********************************");
+			System.out.println(context.getName()+" neighbours : "+context.neigbours.size());
+			
+			for(Context c: context.neigbours.keySet()){
+				
+				System.out.println(c.getName()+ " --> " + context.neigbours.get(c));
+				
+			}
+
+		}
+		
+	}
 }

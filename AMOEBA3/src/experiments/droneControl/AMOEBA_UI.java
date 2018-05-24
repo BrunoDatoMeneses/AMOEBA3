@@ -20,12 +20,12 @@ public class AMOEBA_UI {
 	public AMOEBA_UI(boolean viewer, String percepts){
 		
 		if(percepts.contentEquals("position")){
-			amoeba = AMOEBAFactory.createAMOEBA(viewer, "src/experiments/droneControl/DroneControl.xml",
-					"src/experiments/droneControl/DroneControl_solver.xml");
+			amoeba = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControl.xml",
+					"/experiments/droneControl/DroneControl_solver.xml");
 		}
 		else if (percepts.contentEquals("speed")){
-			amoeba = AMOEBAFactory.createAMOEBA(viewer, "src/experiments/droneControl/DroneControlVariations.xml",
-					"src/experiments/droneControl/DroneControlVariations_solver.xml");
+			amoeba = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControlVariations.xml",
+					"/experiments/droneControl/DroneControlVariations_solver.xml");
 		}
 	}
 	

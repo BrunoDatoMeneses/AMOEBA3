@@ -733,7 +733,7 @@ public class World implements Serializable {
 	 * @return the all percept
 	 */
 	public ArrayList<Percept> getAllPercept() {
-		return scheduler.getVariables();
+		return scheduler.getPercepts();
 	}
 
 	/**

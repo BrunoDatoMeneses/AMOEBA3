@@ -73,7 +73,7 @@ public class PanelParallelCoordinates extends JFXPanel{
         webEngine = browser.getEngine();
         //webEngine.load("file://" + System.getProperty( "user.dir") + "/bin/view/system/nDim/parallelCoordinates.html");
     
-        InputStream input = getClass().getClassLoader().getResourceAsStream("src/VISUALIZATION/view/system/nDim/parallelCoordinates.html");
+        InputStream input = getClass().getClassLoader().getResourceAsStream("parallelCoordinates.html");
         
 		File file = new File(System.getProperty( "user.dir") + "/tmp/parallelCoordinates.html");
 		

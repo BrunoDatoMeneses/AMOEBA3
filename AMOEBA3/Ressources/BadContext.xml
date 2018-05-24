@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BlackBox>
+
+	<Inputs>
+	</Inputs>
+		
+	<Outputs>
+		<Output Name="x" DefaultValue="0"></Output>	
+		<Output Name="y" DefaultValue="0"></Output>		
+		<Output Name="test" DefaultValue="0"></Output>			
+	</Outputs>
+	
+			
+
+			
+	<Functions>
+	</Functions>
+			
+</BlackBox>

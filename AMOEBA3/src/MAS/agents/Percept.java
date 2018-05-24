@@ -26,7 +26,11 @@ public class Percept extends SystemAgent implements Serializable {
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
 	
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	public ArrayList<Context> validContexteProjection = new ArrayList<Context>();
+	public ArrayList<Context> validContextProjection = new ArrayList<Context>();
+	public HashMap<String, PerceptOverlap> perceptOverlaps = new HashMap<String, PerceptOverlap>();
+	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
+	//public ArrayList<Context> sortedStartRanges = new ArrayList<Context>();
+	//public ArrayList<Context> sortedEndRanges = new ArrayList<Context>();
 	
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -104,8 +108,13 @@ public class Percept extends SystemAgent implements Serializable {
 		this.max = p.max;
 		this.isEnum = p.isEnum;
 		
-		contextProjections = new HashMap<Context, ContextProjection>();
-		validContexteProjection = new ArrayList<Context>();
+		this.contextProjections = new HashMap<Context, ContextProjection>();
+		this.validContextProjection = new ArrayList<Context>();
+		this.perceptOverlaps = new HashMap<String, PerceptOverlap>();
+		
+		this.sortedRanges.put("start", new ArrayList<Context>());
+		this.sortedRanges.put("end", new ArrayList<Context>());
+
 	}
 
 
@@ -124,17 +133,18 @@ public class Percept extends SystemAgent implements Serializable {
 	}	
 	
 	public void computeContextProjectionValidity() {
-		validContexteProjection = new ArrayList<Context>();
+		validContextProjection = new ArrayList<Context>();
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			if(contextProjection.contains(this.value)) {
-				validContexteProjection.add(contextProjection.getContex());
+				validContextProjection.add(contextProjection.getContex());
 				System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
 			}
 		}
 		
-		for(Context context : validContexteProjection) {
+		for(Context context : validContextProjection) {
 			context.setPerceptValidity(this);
 		}
+		
 	}
 	
 	
@@ -323,13 +333,162 @@ public class Percept extends SystemAgent implements Serializable {
 		contextProjections.put(context, newContextProjection);
 	}
 	
+	public void addContextSortedRanges(Context context) {
+		
+		if(sortedRanges.isEmpty()) {
+			sortedRanges.put("start", new ArrayList<Context>());
+			sortedRanges.put("end", new ArrayList<Context>());
+		}
+		if(sortedRanges.get("start").size()==0) {
+			sortedRanges.get("start").add(context);
+		}
+		else {
+			insertContextInSortedRanges(context, "start");
+		}
+		
+		if(sortedRanges.get("end").size()==0) {
+			sortedRanges.get("end").add(context);
+		}
+		else {
+			insertContextInSortedRanges(context, "end");
+		}
+		
+	}
+	
+	private void insertContextInSortedRanges(Context context, String range) {
+		
+		int i = 0;
+		boolean inserted = false;
+		while(i<sortedRanges.get(range).size() && !inserted) {
+			if(getRangeProjection(context, range) < getRangeProjection(sortedRanges.get(range).get(i), range)) {
+				sortedRanges.get(range).add(i, context);
+				inserted = true;
+			}
+			i+=1;		
+		}
+		if(i==sortedRanges.get(range).size() && !inserted) {
+			sortedRanges.get(range).add(context);
+		}
+		
+	}
+	
 	public void deleteContextProjection(Context context) {
 		contextProjections.remove(context);
+	}
+	
+	public void deleteContextRanges(Context context) {
+		sortedRanges.get("start").remove(context);
+		sortedRanges.get("end").remove(context);
 	}
 	
 	public void updateContextProjection(Context context) {
 		contextProjections.get(context).update();
 	}
-
 	
+	public void overlapNotification() {
+		for(PerceptOverlap perceptOverlap : perceptOverlaps.values()) {
+			ArrayList<Context> contexts = perceptOverlap.getContexts();
+			contexts.get(0).setPerceptOverlap(this, contexts.get(1));
+			contexts.get(1).setPerceptOverlap(this, contexts.get(0));
+		}
+	}
+
+	public void overlapsDetection() {
+		
+		ArrayList<Context> computedContexts = new ArrayList<Context>(); 
+		for(Context selectedContext : contextProjections.keySet()) {
+			
+			for(Context testedContext : contextProjections.keySet()) {
+				
+				if((testedContext != selectedContext) && (!computedContexts.contains(testedContext))){
+					if(overlapBetweenContexts(selectedContext, testedContext)) {
+						
+						String overlapName = selectedContext.getName() + testedContext.getName();						
+						HashMap<String, Double> overlapRanges = getOverlapRangesBetweenContexts(selectedContext, testedContext);
+						
+						PerceptOverlap overlap = new PerceptOverlap(selectedContext, testedContext, overlapRanges.get("start"), overlapRanges.get("end"), overlapName);
+						perceptOverlaps.put(overlapName, overlap);
+					}
+				}
+			}
+			
+			computedContexts.add(selectedContext);
+		}
+	}
+	
+	public boolean overlapBetweenContexts(Context context1, Context context2) {
+		
+		double contextStart1 = getStartRangeProjection(context1);
+		double contextStart2 = getStartRangeProjection(context2);
+		double contextEnd1 = getEndRangeProjection(context1);
+		double contextEnd2 = getEndRangeProjection(context2);
+		
+		return ( (contextStart1< contextStart2 && contextStart2 <contextEnd1) || ((contextStart1< contextEnd2 && contextEnd2 <contextEnd1)) ) ;
+		
+	}
+	
+	public double getRangeProjection(Context context, String range) {
+		if(range.equals("start")) {
+			return context.getRanges().get(this).getStart();
+		}
+		else if(range.equals("end")) {
+			return context.getRanges().get(this).getEnd();
+		}
+		else {
+			return 0;
+		}
+		
+	}
+	
+	public double getEndRangeProjection(Context context) {
+		return context.getRanges().get(this).getEnd();
+	}
+	
+	public double getStartRangeProjection(Context context) {
+		return context.getRanges().get(this).getStart();
+	}
+	
+	public HashMap<String, Double> getOverlapRangesBetweenContexts(Context context1, Context context2) {
+		
+		HashMap<String, Double> overlapRanges = new HashMap<String, Double>();	
+		
+		if( contextIncludedIn(context1, context2) ) {
+			overlapRanges.put("start", getStartRangeProjection(context1));
+			overlapRanges.put("end", getEndRangeProjection(context1));
+		}
+		else if(contextIncludedIn(context2, context1) ) {
+			overlapRanges.put("start", getStartRangeProjection(context2));
+			overlapRanges.put("end", getEndRangeProjection(context2));
+		}
+		else if(contextOrder(context1, context2)) {
+			overlapRanges.put("start", getStartRangeProjection(context2));
+			overlapRanges.put("end", getEndRangeProjection(context1));
+		}
+		else if(contextOrder(context2, context1)) {
+			overlapRanges.put("start", getStartRangeProjection(context1));
+			overlapRanges.put("end", getEndRangeProjection(context2));
+		}
+		
+		
+		return overlapRanges;
+	}
+	
+	public boolean contextIncludedIn(Context includedContext, Context includingContext) {
+		
+		double includedContextStart = getStartRangeProjection(includedContext);
+		double includingContextStart = getStartRangeProjection(includingContext);
+		double includedContextEnd = getEndRangeProjection(includedContext);
+		double includingContextEnd = getEndRangeProjection(includingContext);
+		
+		return ( (includingContextStart< includedContextStart && includedContextStart <includingContextEnd) && ((includingContextStart< includedContextEnd && includedContextEnd <includingContextEnd)) );
+	}
+	
+	public boolean contextOrder(Context context1, Context context2) {
+		
+	double contextStart1 = getStartRangeProjection(context1);
+	double contextStart2 = getStartRangeProjection(context2);
+	double contextEnd1 = getEndRangeProjection(context1);
+		
+		return  (contextStart1< contextStart2 && contextStart2 <contextEnd1)  ;
+	}
 }

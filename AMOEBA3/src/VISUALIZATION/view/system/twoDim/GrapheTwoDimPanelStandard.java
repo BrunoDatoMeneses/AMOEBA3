@@ -701,7 +701,7 @@ private void startPanelController() {
 	public void setStandardStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemScalable.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/VISUALIZATION/styles/styleSystemScalable.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("VISUALIZATION/styles/styleSystemScalable.css") + "')");
 	}
 	
 	/**
@@ -710,7 +710,7 @@ private void startPanelController() {
 	public void setDarkStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemDark.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/VISUALIZATION/styles/styleSystemDark.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("VISUALIZATION/styles/styleSystemDark.css") + "')");
 	}
 	
 	/**
@@ -719,7 +719,7 @@ private void startPanelController() {
 	public void setSoftStyle() {
 		graph.removeAttribute("ui.stylesheet");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleSystemSoft.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/VISUALIZATION/styles/styleSystemSoft.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("VISUALIZATION/styles/styleSystemSoft.css") + "')");
 	}
 
 	

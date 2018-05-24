@@ -73,7 +73,7 @@ public class PanelGraphAMOEBA extends JPanel implements ViewerListener, MouseInp
 		graph.addNode("jkuyg");
 		graph.addNode("rdrdufg");
 		//graph.addAttribute("ui.stylesheet", "url('file:"+System.getProperty("user.dir")+"/bin/styles/styleAMOEBA.css')");
-		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("src/styles/styleAMOEBA.css") + "')");
+		graph.addAttribute("ui.stylesheet", "url('" + this.getClass().getClassLoader().getResource("/styles/styleAMOEBA.css") + "')");
 		
 		
 	}

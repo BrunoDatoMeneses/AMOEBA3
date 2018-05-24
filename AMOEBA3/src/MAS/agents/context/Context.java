@@ -53,7 +53,9 @@ public class Context extends AbstractContext implements Serializable{
 	private boolean valid = false;
 	private boolean firstTimePeriod = true;
 	
-	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>(); 
+	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
+	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+	public HashMap<Context,String> neigbours = new HashMap<Context,String>();
 	
 
 	/**
@@ -95,6 +97,7 @@ public class Context extends AbstractContext implements Serializable{
 			firstPoint.addDimension(v, v.getValue());
 			
 			v.addContextProjection(this);
+			v.addContextSortedRanges(this);
 		}
 		localModel = this.world.buildLocalModel(this);
 		firstPoint.setProposition(this.controller.getOracleValue());
@@ -108,6 +111,10 @@ public class Context extends AbstractContext implements Serializable{
 		for(Percept percept : var) {
 			perceptValidities.put(percept, false);
 		}
+		
+		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+		
+		neigbours =  new HashMap<Context,String>();
 	}
 	
 	/**
@@ -834,12 +841,43 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		perceptValidities.put(percept, true);
 	}
 	
+	public void setPerceptOverlap(Percept percept, Context context) {
+		if(!contextOverlapsByPercept.keySet().contains(context)) {
+			contextOverlapsByPercept.put(context, new HashMap<Percept,Boolean>());
+			
+			for(Percept p : ranges.keySet()) {
+				contextOverlapsByPercept.get(context).put(p, false);
+			}
+		}
+		
+		contextOverlapsByPercept.get(context).put(percept, true);
+	}
+	
+	
+	
 	public Boolean computeValidityByPercepts() {
 		Boolean test = true;
 		for(Percept percept : perceptValidities.keySet()) {
 			System.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
 			test = test && perceptValidities.get(percept);
 		}
+		return test;
+	}
+	
+	public Boolean computeOverlapsByPercepts() {
+		Boolean test = true;
+		
+		for(Context context : contextOverlapsByPercept.keySet()) {
+			test = true;
+			for(Percept percept : ranges.keySet()) {
+				test = test && contextOverlapsByPercept.get(context).get(percept);
+			}
+			if(test) {
+				neigbours.put(context, "Overlap");
+			}
+		}
+		
+		
 		return test;
 	}
 
