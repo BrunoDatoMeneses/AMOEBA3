@@ -140,7 +140,7 @@ public class AMOEBA_UI {
 			
 			for(Context c: context.neigbours.keySet()){
 				
-				System.out.println(c.getName()+ " --> " + context.neigbours.get(c));
+				System.out.println(c.getName()+ " ---> " + context.neigbours.get(c));
 				
 			}
 
