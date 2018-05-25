@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
-import MAS.agents.context.Context;
-import MAS.agents.head.Head;
-import MAS.kernel.StudiedSystem;
-import MAS.kernel.World;
+import mas.agents.context.Context;
+import mas.agents.head.Head;
+import mas.kernel.StudiedSystem;
+import mas.kernel.World;
 
 // TODO: Auto-generated Javadoc
 /**

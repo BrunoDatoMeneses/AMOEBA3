@@ -3,12 +3,12 @@ package experiments.droneControl;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import MAS.agents.Agent;
-import MAS.agents.Percept;
-import MAS.agents.context.Range;
-import MAS.agents.localModel.TypeLocalModel;
-import MAS.init.amoeba.AMOEBAFactory;
-import MAS.kernel.AMOEBA;
+import mas.agents.Agent;
+import mas.agents.percept.Percept;
+import mas.agents.context.Range;
+import mas.agents.localModel.TypeLocalModel;
+import mas.init.amoeba.AMOEBAFactory;
+import mas.kernel.AMOEBA;
 
 public class AMOEBA_UI {
 

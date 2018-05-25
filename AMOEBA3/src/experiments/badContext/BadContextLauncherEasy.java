@@ -6,13 +6,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.SimpleTimeZone;
 
-import MAS.agents.Agent;
-import MAS.agents.ContextProjection;
-import MAS.agents.Percept;
-import MAS.agents.context.Context;
-import MAS.agents.localModel.TypeLocalModel;
-import MAS.init.amoeba.AMOEBAFactory;
-import MAS.kernel.AMOEBA;
+import mas.agents.Agent;
+import mas.agents.percept.ContextProjection;
+import mas.agents.percept.Percept;
+import mas.agents.context.Context;
+import mas.agents.localModel.TypeLocalModel;
+import mas.init.amoeba.AMOEBAFactory;
+import mas.kernel.AMOEBA;
 
 // TODO: Auto-generated Javadoc
 /**
