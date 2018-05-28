@@ -337,6 +337,18 @@ public class Percept extends SystemAgent implements Serializable {
 		return sortedRanges;
 	}
 	
+	public ArrayList<Context> getSortedRangesSubGroup(ArrayList<Context> subGroupOfContexts, String rangeString){
+		ArrayList<Context> sortedRangesSubGroup = new ArrayList<Context>();
+		
+		for(Context ctxt : sortedRanges.get(rangeString)) {
+			if(subGroupOfContexts.contains(ctxt)) {
+				sortedRangesSubGroup.add(ctxt);
+			}
+		}	
+		
+		return sortedRangesSubGroup;
+	}
+	
 	/*
 	 * Sorted Ranges methods
 	 */
@@ -384,6 +396,8 @@ public class Percept extends SystemAgent implements Serializable {
 		sortedRanges.get("start").remove(context);
 		sortedRanges.get("end").remove(context);
 	}
+	
+
 	
 	/*
 	 * Context projection methods

@@ -143,6 +143,24 @@ public class AMOEBA_UI {
 				System.out.println(c.getName()+ " ---> " + context.neigbours.get(c));
 				
 			}
+			
+			System.out.println("************************** SORTED NEIGHBOURS **************************");
+			
+			for(Percept percept : getAllPercepts(usedAmoeba)) {
+				System.out.println("**************************" + percept.getName() + "**************************");
+				
+				HashMap<String, ArrayList<Context>> neighbourscontextSortedContexts = context.getNearestNeighbour(percept, "start");
+				System.out.println("************************** START **************************");
+				for(Context cntxt : neighbourscontextSortedContexts.get("start")) {
+					System.out.println(cntxt.getName() + "--->" + cntxt.getRanges().get(percept).getStart());
+				}
+				System.out.println("************************** END **************************");
+				for(Context cntxt : neighbourscontextSortedContexts.get("end")) {
+					System.out.println(cntxt.getName() + "--->" + cntxt.getRanges().get(percept).getEnd());
+				}
+			}
+			
+			
 
 		}
 		

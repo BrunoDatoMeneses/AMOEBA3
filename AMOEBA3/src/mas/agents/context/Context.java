@@ -896,11 +896,12 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return test;
 	}
 	
-	public Context getNearestNeighbour(Percept percept, Range range) {
+	public HashMap<String , ArrayList<Context>> getNearestNeighbour(Percept percept, String rangeSide) {
 		Context nearestNeighbour;
 		
 		ArrayList<Percept> otherPercetps = new ArrayList<Percept>();; 
 		ArrayList<Context> contextOverlapedInOtherPercepts = new ArrayList<Context>();
+		boolean contextOverlapedInOtherPerceptsTest = true;
 		
 		for(Percept p : ranges.keySet()) {
 			if(p != percept) {
@@ -908,17 +909,23 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			}
 		}
 		
+		
 		for(Context ctxt : contextOverlapsByPercept.keySet()) {
+			contextOverlapedInOtherPerceptsTest = true;
 			for(Percept otherPctpt: otherPercetps) {
-				if(contextOverlapsByPercept.get(ctxt).get(otherPctpt)) {
-					contextOverlapedInOtherPercepts.add(ctxt);
-				}
+				contextOverlapedInOtherPerceptsTest = contextOverlapedInOtherPerceptsTest && contextOverlapsByPercept.get(ctxt).get(otherPctpt);
 			}
-			
+			if(contextOverlapedInOtherPerceptsTest) {
+				contextOverlapedInOtherPercepts.add(ctxt);
+			}
 		}
 		
+		 
+		 HashMap<String , ArrayList<Context>> sortedRangesSubGroup = new HashMap<String , ArrayList<Context>>();
+		 sortedRangesSubGroup.put("start", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "start"));
+		 sortedRangesSubGroup.put("end", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "end"));
 		
-		return nearestNeighbour;
+		 return sortedRangesSubGroup;
 	}
 
 }
