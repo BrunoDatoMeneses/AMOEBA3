@@ -55,15 +55,6 @@ public class BadContextLauncherEasy implements Serializable {
 			/*This is a learning step of AMOEBA*/
 			amoeba.learn(new HashMap<String, Double>(bcm.getOutput()));
 			percepts = amoeba.getScheduler().getWorld().getAllPercept();
-			for (Percept percept : percepts) {
-				System.out.println("Nbr of contexts "+percept.contextProjections.size());
-				Collection<ContextProjection> contextProjections = percept.contextProjections.values();
-				for(ContextProjection contextProjection : contextProjections) {
-					System.out.println(contextProjection.getRanges());
-				}
-				
-			}
-			System.out.println(" - - - - ");
 			try        
 			{
 			    Thread.sleep(1000);

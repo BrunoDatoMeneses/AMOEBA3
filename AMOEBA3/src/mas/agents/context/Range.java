@@ -647,12 +647,19 @@ public class Range implements Serializable, Comparable {
 	
 	private void setStart(double newStartValue) {
 		this.start = newStartValue;
-		if(this.context != null) this.percept.updateContextProjection(this.context);
+		if(this.context != null) {
+			this.percept.updateContextProjectionStart(this.context);
+			this.percept.updateSortedRanges(this.context, "start");
+		}
+		
 	}
 	
 	private void setEnd(double newEndValue) {
 		this.end = newEndValue;
-		if(this.context != null) this.percept.updateContextProjection(this.context);
+		if(this.context != null) {
+			this.percept.updateContextProjectionEnd(this.context);
+			this.percept.updateSortedRanges(this.context, "end");
+		}
 	}
 
 }

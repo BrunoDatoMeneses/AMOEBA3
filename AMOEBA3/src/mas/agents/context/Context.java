@@ -246,13 +246,13 @@ public class Context extends AbstractContext implements Serializable{
 		super.play();
 		
 		if(computeValidityByPercepts()) {
-			System.out.println("Valid context by Percepts "+this.name);
+			//System.out.println("Valid context by Percepts "+this.name);
 		}
 		
 		if (computeValidity()) {
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, controller);
-			Config.print("Message envoyÃ©", 4);
-			System.out.println("Valid context by Context "+this.name);
+			Config.print("Message envoyé", 4);
+			//System.out.println("Valid context by Context "+this.name);
 		}
 		
 		this.activations = 0;
@@ -858,7 +858,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public Boolean computeValidityByPercepts() {
 		Boolean test = true;
 		for(Percept percept : perceptValidities.keySet()) {
-			System.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
+			//System.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
 			test = test && perceptValidities.get(percept);
 		}
 		return test;
@@ -896,7 +896,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return test;
 	}
 	
-	public HashMap<String , ArrayList<Context>> getNearestNeighbour(Percept percept, String rangeSide) {
+	public HashMap<String , ArrayList<Context>> getSortedPossibleNeigbours(Percept percept) {
 		Context nearestNeighbour;
 		
 		ArrayList<Percept> otherPercetps = new ArrayList<Percept>();; 
@@ -927,5 +927,56 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		
 		 return sortedRangesSubGroup;
 	}
+	
+	public HashMap<Percept , HashMap<String, Context>> getNearestNeighbours(){
+		HashMap<Percept , HashMap<String, Context>> nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
+		
+		HashMap<Percept,  HashMap<String , ArrayList<Context>>> sortedPossibleNeigbours = new HashMap<Percept,  HashMap<String , ArrayList<Context>>>();
+		
+		
+		for(Percept p : ranges.keySet()) {
+			nearestNeighbours.put(p, new HashMap<String, Context>());
+			nearestNeighbours.get(p).put("start", null);
+			nearestNeighbours.get(p).put("end", null);
+			
+			sortedPossibleNeigbours.put(p,getSortedPossibleNeigbours(p));
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		return nearestNeighbours;
+	}
+	
+	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedContextbyRange, String range) {
+		int indexOfCurrentContext;
+		
+		if(range.equals("start")) {
+			indexOfCurrentContext = sortedContextbyRange.get("start").indexOf(this);
+			if(indexOfCurrentContext<sortedContextbyRange.get("start").size()-1) {
+				return sortedContextbyRange.get("start").get(indexOfCurrentContext +1);
+			}
+			else {
+				return null;
+			}
+			
+		}
+		else if(range.equals("end")) {
+			indexOfCurrentContext = sortedContextbyRange.get("end").indexOf(this);
+			if(indexOfCurrentContext>0) {
+				return sortedContextbyRange.get("start").get(indexOfCurrentContext -1);
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			return null;
+		}
+	} 
 
 }

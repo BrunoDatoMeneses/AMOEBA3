@@ -38,8 +38,11 @@ public class ContextProjection implements Serializable{
 		this.end = end;
 	}
 	
-	public void update() {
+	public void updateStart() {
 		this.start = context.getRanges().get(this.percept).getStart();
+	}
+	
+	public void updateEnd() {
 		this.end = context.getRanges().get(this.percept).getEnd();
 	}
 

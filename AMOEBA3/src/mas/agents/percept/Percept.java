@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.commons.math3.exception.OutOfRangeException;
+
 import mas.kernel.Config;
 import mas.kernel.World;
 import mas.agents.Agent;
@@ -139,7 +141,7 @@ public class Percept extends SystemAgent implements Serializable {
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			if(contextProjection.contains(this.value)) {
 				validContextProjection.add(contextProjection.getContex());
-				System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
+				//System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
 			}
 		}
 		
@@ -353,6 +355,95 @@ public class Percept extends SystemAgent implements Serializable {
 	 * Sorted Ranges methods
 	 */
 	
+	public void displaySortedRanges() {
+		System.out.println("########### SORTED RANGES DISPLAY " + this.getName() +" ###########");
+		System.out.println("########### START ###########");
+		for(Context cntxt : this.sortedRanges.get("start")) {
+			if(this.getName().contentEquals("px")) System.out.println(cntxt.getRanges().get(this).getStart());
+		}
+		
+		System.out.println("########### END ###########");
+		for(Context cntxt : this.sortedRanges.get("end")) {
+			System.out.println(cntxt.getRanges().get(this).getStart());
+		}
+	}
+	
+	public void updateSortedRanges(Context context, String range) {
+		int contextIndex = sortedRanges.get(range).indexOf(context);
+		boolean rightPlace = false;
+		
+		if(contextIndex<sortedRanges.get(range).size()-1) {
+			
+			if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) > getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
+				
+				while(contextIndex<sortedRanges.get(range).size()-1 && !rightPlace){
+					if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) > getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
+						swapListElements(sortedRanges.get(range), contextIndex);
+						contextIndex +=1;
+						
+						if(contextIndex<sortedRanges.get(range).size()-1) {
+							if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) < getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
+								rightPlace = true;
+							}
+						}
+						else {
+							rightPlace = true;
+						}
+						
+						
+					}
+						
+				}
+			}
+			
+			
+		}
+
+		if(contextIndex>0) {
+			
+			rightPlace = false;
+			
+			if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) < getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
+				
+				while(contextIndex> 0 && !rightPlace){
+					if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) < getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
+						swapListElements(sortedRanges.get(range), contextIndex -1);
+						contextIndex -=1;
+						
+						if(contextIndex> 0) {
+							if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) > getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
+								rightPlace = true;
+							}
+						}
+						else {
+							rightPlace = true;
+						}
+						
+						
+					}
+						
+				}
+			}
+		}
+		
+		
+		
+		
+	}
+		
+		
+	
+	
+	private void swapListElements(ArrayList<Context> list, int indexFirstElement) {
+		try {
+			list.add(indexFirstElement, list.get(indexFirstElement+1));
+			//System.out.println(list);
+			list.remove(indexFirstElement+2);
+		} catch (OutOfRangeException e) {
+			// TODO: handle exception
+		}
+	}
+	
 	public void addContextSortedRanges(Context context) {
 		
 		if(sortedRanges.isEmpty()) {
@@ -373,6 +464,8 @@ public class Percept extends SystemAgent implements Serializable {
 			insertContextInSortedRanges(context, "end");
 		}
 		
+		
+		//displaySortedRanges();
 	}
 	
 	private void insertContextInSortedRanges(Context context, String range) {
@@ -417,8 +510,12 @@ public class Percept extends SystemAgent implements Serializable {
 	
 	
 	
-	public void updateContextProjection(Context context) {
-		contextProjections.get(context).update();
+	public void updateContextProjectionStart(Context context) {
+		contextProjections.get(context).updateStart();
+	}
+	
+	public void updateContextProjectionEnd(Context context) {
+		contextProjections.get(context).updateEnd();
 	}
 	
 	public void overlapNotification() {

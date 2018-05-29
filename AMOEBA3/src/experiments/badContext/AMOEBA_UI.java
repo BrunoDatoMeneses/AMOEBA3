@@ -1,9 +1,11 @@
 package experiments.badContext;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import mas.agents.Agent;
+import mas.agents.percept.ContextProjection;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.context.Range;
@@ -115,10 +117,34 @@ public class AMOEBA_UI {
 	
 	
 	public static void launchOverlapDetection(AMOEBA usedAmoeba) {
+		
 		for(Percept percept : getAllPercepts(usedAmoeba)) {
 			percept.overlapsDetection();
 			percept.overlapNotification();
+		}
+		
+		//displayPerceptInfo(usedAmoeba);
+		
+		for(Context context : getContextsAsContexts(usedAmoeba)) {
+			
+			context.computeOverlapsByPercepts();
+		}
+		
+		displayContextInfo(usedAmoeba);
+		
+	}
+	
+	public static void displayPerceptInfo(AMOEBA usedAmoeba) {
+		for(Percept percept : getAllPercepts(usedAmoeba)) {
+			
 			System.out.println("********************************** PERCEPT **********************************");
+			
+			System.out.println("Nbr of contexts "+percept.contextProjections.size());
+			Collection<ContextProjection> contextProjections = percept.contextProjections.values();
+			for(ContextProjection contextProjection : contextProjections) {
+				System.out.println(contextProjection.getRanges());
+			}
+			
 			System.out.println(percept.getName()+" overlaps "+percept.perceptOverlaps.size());
 			System.out.println("************************ START ************************");
 			for(Context cntxt : percept.sortedRanges.get("start")) {
@@ -131,10 +157,12 @@ public class AMOEBA_UI {
 			}
 
 		}
+	}
+
+	public static void displayContextInfo(AMOEBA usedAmoeba) {
 		
 		for(Context context : getContextsAsContexts(usedAmoeba)) {
 			
-			context.computeOverlapsByPercepts();
 			System.out.println("********************************** CONTEXT **********************************");
 			System.out.println(context.getName()+" neighbours : "+context.neigbours.size());
 			
