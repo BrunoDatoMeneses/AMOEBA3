@@ -2,6 +2,8 @@ package mas.agents.context;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -56,6 +58,8 @@ public class Context extends AbstractContext implements Serializable{
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context,String> neigbours = new HashMap<Context,String>();
+	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
+	
 	
 
 	/**
@@ -113,6 +117,12 @@ public class Context extends AbstractContext implements Serializable{
 		}
 		
 		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
+		for(Percept p : ranges.keySet()) {
+			nearestNeighbours.put(p, new HashMap<String, Context>());
+			nearestNeighbours.get(p).put("start", null);
+			nearestNeighbours.get(p).put("end", null);
+		}
 		
 		neigbours =  new HashMap<Context,String>();
 	}
@@ -897,7 +907,6 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	}
 	
 	public HashMap<String , ArrayList<Context>> getSortedPossibleNeigbours(Percept percept) {
-		Context nearestNeighbour;
 		
 		ArrayList<Percept> otherPercetps = new ArrayList<Percept>();; 
 		ArrayList<Context> contextOverlapedInOtherPercepts = new ArrayList<Context>();
@@ -928,55 +937,94 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		 return sortedRangesSubGroup;
 	}
 	
-	public HashMap<Percept , HashMap<String, Context>> getNearestNeighbours(){
-		HashMap<Percept , HashMap<String, Context>> nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
+	public void getNearestNeighbours(){
 		
 		HashMap<Percept,  HashMap<String , ArrayList<Context>>> sortedPossibleNeigbours = new HashMap<Percept,  HashMap<String , ArrayList<Context>>>();
 		
 		
 		for(Percept p : ranges.keySet()) {
-			nearestNeighbours.put(p, new HashMap<String, Context>());
-			nearestNeighbours.get(p).put("start", null);
-			nearestNeighbours.get(p).put("end", null);
 			
 			sortedPossibleNeigbours.put(p,getSortedPossibleNeigbours(p));
+			sortedPossibleNeigbours.get(p).get("start").add(this);
+			sortedPossibleNeigbours.get(p).get("end").add(this);
+			
+			Collections.sort(sortedPossibleNeigbours.get(p).get("start"), p.customRangeComparators.get("start"));
+			Collections.sort(sortedPossibleNeigbours.get(p).get("end"), p.customRangeComparators.get("end"));
 			
 			
 		}
 		
+		for(Percept p : ranges.keySet()) {
+			
+			
+			
+			nearestNeighbours.get(p).put("end", getNearestContextBySortedPerceptAndRange(sortedPossibleNeigbours.get(p), p, "start"));
+			nearestNeighbours.get(p).put("start", getNearestContextBySortedPerceptAndRange(sortedPossibleNeigbours.get(p), p, "end"));
+		}
 		
-		
-		
-		
-		
-		return nearestNeighbours;
+	
 	}
 	
-	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedContextbyRange, String range) {
+	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedContextbyRange, Percept percept, String range) {
 		int indexOfCurrentContext;
+		int i;
 		
 		if(range.equals("start")) {
-			indexOfCurrentContext = sortedContextbyRange.get("start").indexOf(this);
-			if(indexOfCurrentContext<sortedContextbyRange.get("start").size()-1) {
-				return sortedContextbyRange.get("start").get(indexOfCurrentContext +1);
+			i=0;
+			while(sortedContextbyRange.get("start").get(i).getRanges().get(percept).getStart() < this.getRanges().get(percept).getStart() && (i<sortedContextbyRange.get("start").size())) {
+				i+=1;
 			}
-			else {
+			if(i==sortedContextbyRange.get("start").size()) {
 				return null;
 			}
-			
+			else {
+				return sortedContextbyRange.get("start").get(i);
+			}			
 		}
 		else if(range.equals("end")) {
-			indexOfCurrentContext = sortedContextbyRange.get("end").indexOf(this);
-			if(indexOfCurrentContext>0) {
-				return sortedContextbyRange.get("start").get(indexOfCurrentContext -1);
+			i=sortedContextbyRange.get("end").size()-1;
+			while(sortedContextbyRange.get("end").get(i).getRanges().get(percept).getEnd() > this.getRanges().get(percept).getEnd() && (i>0)) {
+				i-=1;
+			}
+			if(i==0) {
+				return null;
 			}
 			else {
-				return null;
+				return sortedContextbyRange.get("end").get(i);
 			}
 		}
 		else {
 			return null;
 		}
-	} 
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+	 
 
 }

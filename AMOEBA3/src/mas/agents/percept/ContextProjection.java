@@ -15,7 +15,13 @@ public class ContextProjection implements Serializable{
 	private double start;
 	private double end;
 	
-	
+	// For testing only //
+	public ContextProjection(double start, double end) {
+		this.percept = null;
+		this.context = null;
+		this.start = start;
+		this.end = end;
+	}
 	
 	
 	public ContextProjection(Percept percept, Context context) {
@@ -50,6 +56,18 @@ public class ContextProjection implements Serializable{
 		return "{" + start + " , " + end + "}";
 	}
 	
+	public double getRanges(String range) {
+		if(range.equals("start")) {
+			return this.start;
+		}
+		else if (range.equals("end")) {
+			return this.end;
+		}
+		else {
+			return 0;
+		}
+	}
+	
 	public boolean contains(Double value) {
 		return ((value > start)  && (value < end));
 	}
@@ -57,6 +75,10 @@ public class ContextProjection implements Serializable{
 	public Context getContex() {
 		return this.context;
 	}
+	
+	public String toString() {
+        return "{"+this.start+" , "+this.end+"}";
+    }
 	
 	
 }

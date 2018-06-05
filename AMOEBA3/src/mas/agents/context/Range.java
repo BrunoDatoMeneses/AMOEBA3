@@ -608,6 +608,18 @@ public class Range implements Serializable, Comparable {
 	public double getEnd() {
 		return end;
 	}
+	
+	public double getRange(String rangeType) {
+		if(rangeType.equals("start")) {
+			return start;
+		}
+		else if(rangeType.equals("end")) {
+			return end;
+		}
+		else {
+			return 0d;
+		}
+	}
 
 	/**
 	 * Gets the value.
@@ -659,6 +671,7 @@ public class Range implements Serializable, Comparable {
 		if(this.context != null) {
 			this.percept.updateContextProjectionEnd(this.context);
 			this.percept.updateSortedRanges(this.context, "end");
+			
 		}
 	}
 

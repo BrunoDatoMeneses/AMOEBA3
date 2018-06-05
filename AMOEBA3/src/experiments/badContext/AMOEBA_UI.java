@@ -123,14 +123,15 @@ public class AMOEBA_UI {
 			percept.overlapNotification();
 		}
 		
-		//displayPerceptInfo(usedAmoeba);
+		displayPerceptInfo(usedAmoeba);
 		
 		for(Context context : getContextsAsContexts(usedAmoeba)) {
 			
 			context.computeOverlapsByPercepts();
+			context.getNearestNeighbours();
 		}
 		
-		displayContextInfo(usedAmoeba);
+		//displayContextInfo(usedAmoeba);
 		
 	}
 	
@@ -146,15 +147,8 @@ public class AMOEBA_UI {
 			}
 			
 			System.out.println(percept.getName()+" overlaps "+percept.perceptOverlaps.size());
-			System.out.println("************************ START ************************");
-			for(Context cntxt : percept.sortedRanges.get("start")) {
-				System.out.println(cntxt.getRanges().get(percept).getStart());
-			}
-			
-			System.out.println("************************ END ************************");
-			for(Context cntxt : percept.sortedRanges.get("end")) {
-				System.out.println(cntxt.getRanges().get(percept).getEnd());
-			}
+			percept.displaySortedRanges();
+			percept.displaySortedRangesTreeSet();
 
 		}
 	}
@@ -166,9 +160,29 @@ public class AMOEBA_UI {
 			System.out.println("********************************** CONTEXT **********************************");
 			System.out.println(context.getName()+" neighbours : "+context.neigbours.size());
 			
+			System.out.println("*************************** NEAREST NEIGHBOURS ***************************");
+			for(Percept percept : getAllPercepts(usedAmoeba)) {
+				System.out.print(percept.getName());
+				if(context.nearestNeighbours.get(percept).get("start") != null) {
+					System.out.println(" " + "Start : " + context.nearestNeighbours.get(percept).get("start").getName());
+				}
+				else {
+					System.out.println(" " + "Start : null" );
+				}
+				
+				System.out.print(percept.getName());
+				if(context.nearestNeighbours.get(percept).get("end") != null) {
+					System.out.println(" " + "End : " + context.nearestNeighbours.get(percept).get("end").getName());
+				}
+				else {
+					System.out.println(" " + "End : null" );
+				}
+			}
+			
 			for(Context c: context.neigbours.keySet()){
 				
 				System.out.println(c.getName()+ " ---> " + context.neigbours.get(c));
+				
 				
 			}
 			
@@ -177,7 +191,7 @@ public class AMOEBA_UI {
 			for(Percept percept : getAllPercepts(usedAmoeba)) {
 				System.out.println("**************************" + percept.getName() + "**************************");
 				
-				HashMap<String, ArrayList<Context>> neighbourscontextSortedContexts = context.getNearestNeighbour(percept, "start");
+				HashMap<String, ArrayList<Context>> neighbourscontextSortedContexts = context.getSortedPossibleNeigbours(percept);
 				System.out.println("************************** START **************************");
 				for(Context cntxt : neighbourscontextSortedContexts.get("start")) {
 					System.out.println(cntxt.getName() + "--->" + cntxt.getRanges().get(percept).getStart());
@@ -186,6 +200,7 @@ public class AMOEBA_UI {
 				for(Context cntxt : neighbourscontextSortedContexts.get("end")) {
 					System.out.println(cntxt.getName() + "--->" + cntxt.getRanges().get(percept).getEnd());
 				}
+				
 			}
 			
 			

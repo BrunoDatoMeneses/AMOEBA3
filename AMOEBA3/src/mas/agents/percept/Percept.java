@@ -2,15 +2,22 @@ package mas.agents.percept;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.math3.exception.OutOfRangeException;
 
+import experiments.Tests.Bidon;
 import mas.kernel.Config;
 import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
+import mas.agents.context.CustomComparator;
 import mas.agents.context.Range;
 import mas.agents.messages.Message;
 import mas.agents.messages.MessageType;
@@ -33,8 +40,17 @@ public class Percept extends SystemAgent implements Serializable {
 	public ArrayList<Context> validContextProjection = new ArrayList<Context>();
 	public HashMap<String, PerceptOverlap> perceptOverlaps = new HashMap<String, PerceptOverlap>();
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
-	//public ArrayList<Context> sortedStartRanges = new ArrayList<Context>();
-	//public ArrayList<Context> sortedEndRanges = new ArrayList<Context>();
+	
+	
+	
+	public ArrayList<Context> sortedContextbyStartRanges = new ArrayList<Context>();
+	public ArrayList<Context> sortedContextbyEndRanges = new ArrayList<Context>();
+	
+	
+	public HashMap<String,CustomComparator> customRangeComparators = new  HashMap<String,CustomComparator>();
+	
+	private CustomComparator rangeStartComparator =  new CustomComparator(this, "start");
+	private CustomComparator rangeEndComparator =  new CustomComparator(this, "end");
 	
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -50,6 +66,13 @@ public class Percept extends SystemAgent implements Serializable {
 	 */
 	public Percept(World world) {
 		super(world);
+		
+		sortedRanges.put("start", new ArrayList<Context>());
+		sortedRanges.put("end", new ArrayList<Context>());
+		
+		
+		customRangeComparators.put("start", new CustomComparator(this, "start"));
+		customRangeComparators.put("end", new CustomComparator(this, "end"));
 	}
 	
 	/**
@@ -113,11 +136,23 @@ public class Percept extends SystemAgent implements Serializable {
 		this.isEnum = p.isEnum;
 		
 		this.contextProjections = new HashMap<Context, ContextProjection>();
+		
+
+		
 		this.validContextProjection = new ArrayList<Context>();
 		this.perceptOverlaps = new HashMap<String, PerceptOverlap>();
 		
 		this.sortedRanges.put("start", new ArrayList<Context>());
 		this.sortedRanges.put("end", new ArrayList<Context>());
+		
+		
+		
+		
+		
+		
+		
+		
+
 
 	}
 
@@ -359,12 +394,27 @@ public class Percept extends SystemAgent implements Serializable {
 		System.out.println("########### SORTED RANGES DISPLAY " + this.getName() +" ###########");
 		System.out.println("########### START ###########");
 		for(Context cntxt : this.sortedRanges.get("start")) {
-			if(this.getName().contentEquals("px")) System.out.println(cntxt.getRanges().get(this).getStart());
+			System.out.println(cntxt.getRanges().get(this).getStart());
 		}
 		
 		System.out.println("########### END ###########");
 		for(Context cntxt : this.sortedRanges.get("end")) {
-			System.out.println(cntxt.getRanges().get(this).getStart());
+			System.out.println(cntxt.getRanges().get(this).getEnd());
+		}
+	}
+	
+	public void displaySortedRangesTreeSet() {
+		System.out.println("########### SORTED RANGES DISPLAY TREE " + this.getName() +" ###########");
+		System.out.println(sortedContextbyStartRanges.size()+ " " + sortedContextbyEndRanges.size());
+		System.out.println("########### START ###########");
+		
+		for(Context ctxt: sortedContextbyStartRanges) {
+			System.out.println(ctxt.getRanges().get(this).getStart());
+		}
+		
+		System.out.println("########### END ###########");
+		for(Context ctxt: sortedContextbyEndRanges) {
+			System.out.println(ctxt.getRanges().get(this).getEnd());
 		}
 	}
 	
@@ -372,7 +422,18 @@ public class Percept extends SystemAgent implements Serializable {
 		int contextIndex = sortedRanges.get(range).indexOf(context);
 		boolean rightPlace = false;
 		
-		if(contextIndex<sortedRanges.get(range).size()-1) {
+		
+		Collections.sort(sortedContextbyEndRanges, rangeEndComparator);
+		Collections.sort(sortedContextbyStartRanges, rangeStartComparator);
+		Collections.sort(sortedRanges.get("end"), rangeEndComparator);
+		Collections.sort(sortedRanges.get("start"), rangeStartComparator);
+
+		
+		
+		
+		
+		
+		/*if(contextIndex<sortedRanges.get(range).size()-1) {
 			
 			if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) > getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
 				
@@ -424,7 +485,7 @@ public class Percept extends SystemAgent implements Serializable {
 						
 				}
 			}
-		}
+		}*/
 		
 		
 		
@@ -446,26 +507,25 @@ public class Percept extends SystemAgent implements Serializable {
 	
 	public void addContextSortedRanges(Context context) {
 		
-		if(sortedRanges.isEmpty()) {
-			sortedRanges.put("start", new ArrayList<Context>());
-			sortedRanges.put("end", new ArrayList<Context>());
-		}
-		if(sortedRanges.get("start").size()==0) {
-			sortedRanges.get("start").add(context);
-		}
-		else {
-			insertContextInSortedRanges(context, "start");
-		}
-		
-		if(sortedRanges.get("end").size()==0) {
-			sortedRanges.get("end").add(context);
-		}
-		else {
-			insertContextInSortedRanges(context, "end");
-		}
+
+		sortedRanges.get("start").add(context);
+		sortedRanges.get("end").add(context);
 		
 		
-		//displaySortedRanges();
+		sortedContextbyStartRanges.add(context);
+		sortedContextbyEndRanges.add(context);
+		
+		Collections.sort(sortedRanges.get("end"), rangeEndComparator);
+		Collections.sort(sortedRanges.get("start"), rangeStartComparator);
+		Collections.sort(sortedContextbyEndRanges, rangeEndComparator);
+		Collections.sort(sortedContextbyStartRanges, rangeStartComparator);
+		
+		
+		displaySortedRanges();
+		displaySortedRangesTreeSet();
+		
+		//System.out.println("----------------------AUTO PRINT");
+		//System.out.println(sortedEndRanges.size()+ " " + sortedStartRanges);
 	}
 	
 	private void insertContextInSortedRanges(Context context, String range) {
@@ -485,9 +545,14 @@ public class Percept extends SystemAgent implements Serializable {
 		
 	}
 	
+	
+	
 	public void deleteContextRanges(Context context) {
 		sortedRanges.get("start").remove(context);
 		sortedRanges.get("end").remove(context);
+		
+		sortedContextbyStartRanges.remove(context);
+		sortedContextbyStartRanges.remove(context);
 	}
 	
 
@@ -500,6 +565,11 @@ public class Percept extends SystemAgent implements Serializable {
 	public void addContextProjection(Context context) {
 		ContextProjection newContextProjection = new ContextProjection(this, context);
 		contextProjections.put(context, newContextProjection);
+		
+
+		
+
+
 	}
 	
 	
@@ -573,12 +643,12 @@ public class Percept extends SystemAgent implements Serializable {
 		
 	}
 	
-	public double getEndRangeProjection(Context context) {
-		return context.getRanges().get(this).getEnd();
+	public Double getEndRangeProjection(Context context) {
+		return new Double(context.getRanges().get(this).getEnd());
 	}
 	
-	public double getStartRangeProjection(Context context) {
-		return context.getRanges().get(this).getStart();
+	public Double getStartRangeProjection(Context context) {
+		return new Double(context.getRanges().get(this).getStart());
 	}
 	
 	public HashMap<String, Double> getOverlapRangesBetweenContexts(Context context1, Context context2) {

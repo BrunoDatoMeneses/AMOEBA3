@@ -70,7 +70,9 @@ public class World implements Serializable {
 	private double AVT_deceleration = 1./3.0;
 	private double AVT_percentAtStart = 0.2;
 	
-	
+	public World() {
+		
+	}
 	
 	/**
 	 * Instantiates a new world.
