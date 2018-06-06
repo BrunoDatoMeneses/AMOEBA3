@@ -617,5 +617,14 @@ public class Scheduler implements Serializable{
 		this.contexts = contexts;
 	}
 	
+	public Context getContextByName(String name) {
+		for(Agent agt: contexts) {
+			if(agt.getName().equals(name)) {
+				return (Context)agt;
+			}
+		}
+		return null;
+	}
+	
 	
 }

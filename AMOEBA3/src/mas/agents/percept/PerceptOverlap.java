@@ -27,4 +27,10 @@ public class PerceptOverlap {
 		contexts.add(context2);
 		return contexts;
 	}
+	
+	public String toString() {
+		String s = "";
+		s += "{ " + context1.getName() + " , " + context2.getName() + " }";
+		return s;
+	}
 }

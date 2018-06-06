@@ -131,7 +131,7 @@ public class AMOEBA_UI {
 			context.getNearestNeighbours();
 		}
 		
-		//displayContextInfo(usedAmoeba);
+		displayContextInfo(usedAmoeba);
 		
 	}
 	
@@ -147,8 +147,12 @@ public class AMOEBA_UI {
 			}
 			
 			System.out.println(percept.getName()+" overlaps "+percept.perceptOverlaps.size());
-			percept.displaySortedRanges();
-			percept.displaySortedRangesTreeSet();
+			for(String key : percept.perceptOverlaps.keySet()) {
+				System.out.println(percept.perceptOverlaps.get(key));
+			}
+			
+			//percept.displaySortedRanges();
+			//percept.displaySortedRangesTreeSet();
 
 		}
 	}
@@ -159,6 +163,22 @@ public class AMOEBA_UI {
 			
 			System.out.println("********************************** CONTEXT **********************************");
 			System.out.println(context.getName()+" neighbours : "+context.neigbours.size());
+			
+			
+			
+			System.out.println("*************************** OVERLAPS ***************************");
+			for(Context ctxt : context.contextOverlapsByPercept.keySet()) {
+				System.out.print(ctxt.getName() + " --> ");
+				for(Percept percept : getAllPercepts(usedAmoeba)) {
+					System.out.print(percept.getName() + "(" + context.contextOverlapsByPercept.get(ctxt).get(percept) + ") ");
+					
+				}
+				System.out.println("");
+			}
+			
+			
+			
+			
 			
 			System.out.println("*************************** NEAREST NEIGHBOURS ***************************");
 			for(Percept percept : getAllPercepts(usedAmoeba)) {

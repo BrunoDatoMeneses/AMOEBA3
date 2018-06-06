@@ -51,8 +51,9 @@ public class BadContextManager implements StudiedSystem, Serializable{
 	@Override
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
+		double size = 55;
 
-		result = (y > -55 && y < 55 && x < 55 && x > -55) ? 0.0 : 1.0;
+		result = (y > -size && y < size && x < size && x > -size) ? 0.0 : 1.0;
 	//	result = (x > 2*y) ? 0.0 : 1.0;
 		
 		out.put("x",x);

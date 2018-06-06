@@ -521,8 +521,8 @@ public class Percept extends SystemAgent implements Serializable {
 		Collections.sort(sortedContextbyStartRanges, rangeStartComparator);
 		
 		
-		displaySortedRanges();
-		displaySortedRangesTreeSet();
+		//displaySortedRanges();
+		//displaySortedRangesTreeSet();
 		
 		//System.out.println("----------------------AUTO PRINT");
 		//System.out.println(sortedEndRanges.size()+ " " + sortedStartRanges);
@@ -626,7 +626,7 @@ public class Percept extends SystemAgent implements Serializable {
 		double contextEnd1 = getEndRangeProjection(context1);
 		double contextEnd2 = getEndRangeProjection(context2);
 		
-		return ( (contextStart1< contextStart2 && contextStart2 <contextEnd1) || ((contextStart1< contextEnd2 && contextEnd2 <contextEnd1)) ) ;
+		return ( (contextStart1< contextStart2 && contextStart2 <contextEnd1) || ((contextStart1< contextEnd2 && contextEnd2 <contextEnd1)) ) || ( (contextStart2< contextStart1 && contextStart1 <contextEnd2) || ((contextStart2< contextEnd1 && contextEnd1 <contextEnd2)) ) ;
 		
 	}
 	

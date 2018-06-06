@@ -1202,6 +1202,7 @@ private void startPanelController() {
 
 					node.addAttribute("ui.class","ContextColorDynamic");
 					node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+					//node.setAttribute("ui.color", 0.5 );  
 				}
 
 			}
@@ -1223,6 +1224,55 @@ private void startPanelController() {
 //			graph.addAttribute("ui.screenshot", "'/home/nigon/Téléchargements/screen" + tick +".png");
 //		}
 
+	}
+	
+	
+	public void highlightContextNeighbours(Context context) {
+		
+		
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				double val = ((Context) a).getActionProposal();
+				if (val < min) {
+					min = val;
+				}
+				if (val > max) {
+					max = val;
+				}
+			}
+
+		}	
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				Context n = (Context)a;
+				Node node = graph.getNode(name);
+
+				node.addAttribute("ui.class","ContextColorDynamic");
+				
+				
+				node.setAttribute("ui.color", 0.1 ); 
+				
+				if(context.possibleNeighbours.contains(n)) {
+					node.setAttribute("ui.color", 0.5 ); 
+				}
+				if(context.neighbours.contains(n)){
+					node.setAttribute("ui.color", 1 );  
+				}
+				if(context.equals(n)) {
+					node.setAttribute("ui.color", 0.0 ); 
+				}
+				
+				
+ 
+			}
+
+		}
 	}
 		
 	
@@ -1274,12 +1324,16 @@ private void startPanelController() {
 		world.getAmoeba().getLogFile().messageToDebug("Push button", 5, new LogMessageType[] {LogMessageType.INFORMATION});
 		toolBarInfo.setVisible(true);
 		currentId = id;
+		
+		Context pushedContext = world.getScheduler().getContextByName(id);
+		
 		System.out.println("node pushed : " + id);
 		//String info = world.getAgents().get(id).toString();
 		//System.out.println(info);
 		
 		//JOptionPane.showMessageDialog(this, info, "Context : " + id, JOptionPane.PLAIN_MESSAGE);
 		if (currentId != null) {
+			highlightContextNeighbours(world.getScheduler().getContextByName(currentId));
 			setTextAreaInfo(currentId);
 			
 			if (sliderValue == currentTick || (!rememberState)) {
