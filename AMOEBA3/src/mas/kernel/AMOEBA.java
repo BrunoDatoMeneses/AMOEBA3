@@ -45,7 +45,7 @@ public class AMOEBA extends Thread {
 	private boolean viewer = true;
 	private boolean csv = true;
 	
-	private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
+	//private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
 	
 
 	/**
@@ -67,7 +67,7 @@ public class AMOEBA extends Thread {
 	 * @param blackBox the black box
 	 */
 	/* Create an AMOEBA from scheduler, world and blackbox */
-	public AMOEBA(Boolean viewer, Scheduler scheduler, World world, BlackBox blackBox) {
+	public AMOEBA(Boolean viewer, Scheduler scheduler, World world) {
 		
 		JFrame frame = null;
 		
@@ -95,7 +95,7 @@ public class AMOEBA extends Thread {
 
 			mainPanel.setAMOEBA(this);
 			mainPanel.setWorld(world);
-			mainPanel.setBlackBox(blackBox);
+			//mainPanel.setBlackBox(blackBox);
 			
 			frame.pack();
 			
@@ -255,7 +255,7 @@ public class AMOEBA extends Thread {
 	
 	private void updateOutputAgentsValues(HashMap<String, Double> perceptionsAndAction) {
 		for (String s : perceptionsAndAction.keySet()) {
-			perceptionsAndActionState.get(s).setValue(perceptionsAndAction.get(s));
+			//perceptionsAndActionState.get(s).setValue(perceptionsAndAction.get(s));
 		}
 	}
 	
@@ -275,7 +275,7 @@ public class AMOEBA extends Thread {
 	public void readInput() {
 		HashMap<String, Double> actions = studiedSystem.getOutput();
 		for (String s : actions.keySet()) {
-			perceptionsAndActionState.get(s).setValue(actions.get(s));
+			//perceptionsAndActionState.get(s).setValue(actions.get(s));
 		}
 	}
 
@@ -286,11 +286,11 @@ public class AMOEBA extends Thread {
 	 */
 	public void setScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
-			HashMap<String, BlackBoxAgent> outputList = scheduler.getWorld().getBlackbox().getBlackBoxAgents();
-			for (String s : outputList.keySet()) {
-				perceptionsAndActionState.put(outputList.get(s).getName(), (Output) outputList.get(s));
-				System.out.println("Name : " + outputList.get(s).getName());
-			}
+//			HashMap<String, BlackBoxAgent> outputList = scheduler.getWorld().getBlackbox().getBlackBoxAgents();
+//			for (String s : outputList.keySet()) {
+//				perceptionsAndActionState.put(outputList.get(s).getName(), (Output) outputList.get(s));
+//				System.out.println("Name : " + outputList.get(s).getName());
+//			}
 		
 	}
 

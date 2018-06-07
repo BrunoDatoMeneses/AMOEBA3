@@ -74,10 +74,10 @@ public class DefaultAMOEBAFactory {
 		inputStreamToFile(sourceXMLInput, sourceFile);
 		inputStreamToFile(agentsXMLInput, agentsFile);
 		
-		BlackBox blackBox = new BlackBox(scheduler, sourceFile);	
-		World world = new World(scheduler, agentsFile, blackBox);
+		//BlackBox blackBox = new BlackBox(scheduler, sourceFile);	
+		World world = new World(scheduler, agentsFile);
 		
-		AMOEBA amoeba = new AMOEBA(viewer, scheduler, world, blackBox);
+		AMOEBA amoeba = new AMOEBA(viewer, scheduler, world);
 		sourceFile.delete();
 		agentsFile.delete();
 		

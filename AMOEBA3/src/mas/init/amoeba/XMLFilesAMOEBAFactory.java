@@ -27,9 +27,9 @@ public class XMLFilesAMOEBAFactory {
 		File agentsXMLFile = new File(filePaths[1]);
 		
 		Scheduler scheduler = new Scheduler();
-		BlackBox blackBox = new BlackBox(scheduler, sourceXMLFile);	
-		World world = new World(scheduler, agentsXMLFile, blackBox);
-		return new AMOEBA(viewer, scheduler, world, blackBox);
+		//BlackBox blackBox = new BlackBox(scheduler, sourceXMLFile);	
+		World world = new World(scheduler, agentsXMLFile);
+		return new AMOEBA(viewer, scheduler, world);
 		
 	}
 

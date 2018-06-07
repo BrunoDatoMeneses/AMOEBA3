@@ -31,7 +31,6 @@ public class BadContextLauncherEasy implements Serializable {
 	public static void launch(boolean viewer) {
 	
 		/*Here we create AMOEBA.*/
-//		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer, "/experiments/badContext/BadContext.xml","/experiments/badContext/BadContext_solver.xml");
 		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer, "BadContext.xml","BadContext_solver.xml");
 		
 		/* These method calls allow to setup AMOEBA*/

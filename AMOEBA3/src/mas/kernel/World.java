@@ -46,7 +46,7 @@ public class World implements Serializable {
 
 
 	Scheduler scheduler;
-	BlackBox blackbox;
+	//BlackBox blackbox;
 	private transient AMOEBA amoeba;
 	private StudiedSystem studiedSystem;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
@@ -81,11 +81,11 @@ public class World implements Serializable {
 	 * @param systemFile the system file
 	 * @param blackbox the blackbox
 	 */
-	public World (Scheduler scheduler, File systemFile, BlackBox blackbox) {
+	public World (Scheduler scheduler, File systemFile) {
 		System.out.println("---Initialize the world---");
 		
 		this.scheduler = scheduler;
-		this.blackbox = blackbox;
+		//this.blackbox = blackbox;
 		
 		readRessourceFile(systemFile);
 		
@@ -135,7 +135,7 @@ public class World implements Serializable {
 		    	s.setName(element.getAttributeValue("Name"));
 		    	scheduler.registerAgent(s);	   
 		    	agents.put(s.getName(), s);
-		    	s.setSensor(blackbox.getBlackBoxAgents().get(element.getAttributeValue("Source")));
+		    	//s.setSensor(blackbox.getBlackBoxAgents().get(element.getAttributeValue("Source")));
 		    }
 
 		    
@@ -144,7 +144,7 @@ public class World implements Serializable {
 	    for (Element element : racine.getChild("StartingAgents").getChildren("Controller")){
 		    	Head a = new Head(this);
 		    	a.setName(element.getAttributeValue("Name"));
-		    	a.setOracle( blackbox.getBlackBoxAgents().get(element.getAttributeValue("Oracle")));
+		    	//a.setOracle( blackbox.getBlackBoxAgents().get(element.getAttributeValue("Oracle")));
 		    	System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
 		    	a.setNoCreation(!creationOfNewContext);
 		    	
@@ -289,18 +289,18 @@ public class World implements Serializable {
 	 *
 	 * @param blackbox the new black box
 	 */
-	public void setBlackBox(BlackBox blackbox) {
-		this.blackbox = blackbox;
-	}
+//	public void setBlackBox(BlackBox blackbox) {
+//		this.blackbox = blackbox;
+//	}
 
 	/**
 	 * Gets the blackbox.
 	 *
 	 * @return the blackbox
 	 */
-	public BlackBox getBlackbox() {
-		return blackbox;
-	}
+//	public BlackBox getBlackbox() {
+//		return blackbox;
+//	}
 
 	/**
 	 * Gets the agents.
@@ -325,9 +325,9 @@ public class World implements Serializable {
 	 *
 	 * @param blackbox the new blackbox
 	 */
-	public void setBlackbox(BlackBox blackbox) {
-		this.blackbox = blackbox;
-	}
+//	public void setBlackbox(BlackBox blackbox) {
+//		this.blackbox = blackbox;
+//	}
 	
 	/**
 	 * Gets the all agent instance of.

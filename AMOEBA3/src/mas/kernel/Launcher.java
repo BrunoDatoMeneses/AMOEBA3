@@ -59,21 +59,20 @@ public class Launcher implements Serializable {
 		
 		Scheduler scheduler = new Scheduler();
 
-		BlackBox blackBox = new BlackBox(scheduler, new File(System
-				.getProperty("user.dir")
-				+ "/bin/ressources/A+B+C.xml"));
+//		BlackBox blackBox = new BlackBox(scheduler, new File(System
+//				.getProperty("user.dir")
+//				+ "/bin/ressources/A+B+C.xml"));
 		World world = new World(scheduler,
 				new File(System.getProperty("user.dir")
-						+ "/bin/ressources/A+B+C_solver.xml"),
-						blackBox);
-		world.setBlackBox(blackBox);
+						+ "/bin/ressources/A+B+C_solver.xml"));
+		//world.setBlackBox(blackBox);
 
 		scheduler.getHeadAgent().setDataForErrorMargin(3, 1.2, 0.8, 0.0, 10, 100);
 		scheduler.getHeadAgent().setDataForInexactMargin(0.5, 1.2, 0.8, 0.0, 10, 100);
 		world.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		if (viewer) {
 			mainPanel.setWorld(world);
-			mainPanel.setBlackBox(blackBox);
+			//mainPanel.setBlackBox(blackBox);
 			frame.pack();
 		}
 		

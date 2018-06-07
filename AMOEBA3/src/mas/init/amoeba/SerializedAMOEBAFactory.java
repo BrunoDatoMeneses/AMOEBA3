@@ -48,9 +48,9 @@ public class SerializedAMOEBAFactory {
             
             Scheduler scheduler = new Scheduler();
     		scheduler = world.getScheduler();
-    		BlackBox blackBox = scheduler.getWorld().getBlackbox();
+    		//BlackBox blackBox = scheduler.getWorld().getBlackbox();
     		
-    		AMOEBA amoeba = new AMOEBA(viewer, scheduler, world, blackBox);
+    		AMOEBA amoeba = new AMOEBA(viewer, scheduler, world);
     		MainPanel mainPanel = amoeba.getMainPanel();
     		mainPanel.disableCheckBoxRememberState(rememberState);
     		mainPanel.setVisualization(obsList);

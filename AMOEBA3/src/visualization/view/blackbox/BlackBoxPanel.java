@@ -61,18 +61,18 @@ public class BlackBoxPanel extends JPanel{
 		Object[] entete = {"TYPE","NAME","ID","VALUE"};
 		tableModel.addRow(entete);
 		
-		BlackBox bb = world.getBlackbox();
-		HashMap<String, BlackBoxAgent> hashAgents = bb.getBlackBoxAgents();
-		for (String s : hashAgents.keySet()) {
-			BlackBoxAgent a = hashAgents.get(s);
-			Object[] data = {
-					a.getClass().getSimpleName(),
-					a.getName(),
-					a.getID(),
-					a.getValue()
-					};
-			tableModel.addRow(data);
-		}
+		//BlackBox bb = world.getBlackbox();
+		//HashMap<String, BlackBoxAgent> hashAgents = bb.getBlackBoxAgents();
+//		for (String s : hashAgents.keySet()) {
+//			BlackBoxAgent a = hashAgents.get(s);
+//			Object[] data = {
+//					a.getClass().getSimpleName(),
+//					a.getName(),
+//					a.getID(),
+//					a.getValue()
+//					};
+//			tableModel.addRow(data);
+//		}
 		
 		graphPanel.update();
 		
