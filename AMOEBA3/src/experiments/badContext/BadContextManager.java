@@ -64,9 +64,9 @@ public class BadContextManager implements StudiedSystem, Serializable{
 		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 0.0 : 1.0;
 	//	result = (x > 2*y) ? 0.0 : 1.0;
 		
-		out.put("x",x);
-		out.put("y",y);
-		out.put("test",result);
+		out.put("px",x);
+		out.put("py",y);
+		out.put("oracle",result);
 		return out;
 	}
 

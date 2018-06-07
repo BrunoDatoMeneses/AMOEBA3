@@ -45,9 +45,9 @@ public class BadContextLauncherEasy implements Serializable {
 //		amoeba.setAVT_percentAtStart(0.2);
 		
 		/* Custum */
-		amoeba.setAVT_acceleration(0.5);
-		amoeba.setAVT_deceleration(0.5);
-		amoeba.setAVT_percentAtStart(0.001);
+//		amoeba.setAVT_acceleration(0.5);
+//		amoeba.setAVT_deceleration(0.5);
+//		amoeba.setAVT_percentAtStart(0.001);
 		
 		amoeba.setRememberState(false);
 		amoeba.setGenerateCSV(false);

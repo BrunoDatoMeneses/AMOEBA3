@@ -140,7 +140,8 @@ public class Head extends AbstractHead {
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
 		oldOracleValue = oracleValue;
-		oracleValue = oracle.getValue();
+		//oracleValue = oracle.getValue();
+		oracleValue = this.getWorld().getScheduler().getPerceptionsOrAction("oracle");
 		
 		/*The head memorize last used context agent*/
 		lastUsedContext = bestContext;

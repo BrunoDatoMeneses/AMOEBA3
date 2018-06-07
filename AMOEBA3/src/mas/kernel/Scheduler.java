@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
 
@@ -43,6 +44,8 @@ public class Scheduler implements Serializable{
 	private ArrayList<Agent> functions = new ArrayList<Agent>();
 	private ArrayList<Agent> outputs = new ArrayList<Agent>();
 	private ArrayList<Context> alteredContexts = new ArrayList<Context>();
+	
+	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
 
 	private boolean running = false;
 	private boolean waitForGUIUpdate = false;
@@ -244,20 +247,20 @@ public class Scheduler implements Serializable{
 	
 	private void playAllAgents() {
 		//BB agents
-		for (Agent agent : inputs) {
-			agent.readMessage();
-			agent.play();
-		}
-		
-		for (Agent agent : functions) {
-			agent.readMessage();
-			agent.play();
-		}
-		
-		for (Agent agent : outputs) {
-			agent.readMessage();
-			agent.play();
-		}
+//		for (Agent agent : inputs) {
+//			agent.readMessage();
+//			agent.play();
+//		}
+//		
+//		for (Agent agent : functions) {
+//			agent.readMessage();
+//			agent.play();
+//		}
+//		
+//		for (Agent agent : outputs) {
+//			agent.readMessage();
+//			agent.play();
+//		}
 		//
 		
 
@@ -626,5 +629,11 @@ public class Scheduler implements Serializable{
 		return null;
 	}
 	
+	public void setPerceptionsAndActionState(HashMap<String,Double> perceptionsAndActions) {
+		this.perceptionsAndActionState = perceptionsAndActions;
+	}
 	
+	public Double getPerceptionsOrAction(String key) {
+		return this.perceptionsAndActionState.get(key);	
+	}
 }

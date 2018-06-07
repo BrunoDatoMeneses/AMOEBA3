@@ -381,13 +381,13 @@ private void amoebaAndAmalomControl(){
 			result = Double.parseDouble(tokensCommands[chanel]);
 
 			if (arg.contentEquals("position")){
-				out.put("x", dronePosition[0]);
-				out.put("y", dronePosition[1]);
-				out.put("z", dronePosition[2]);
+				out.put("px", dronePosition[0]);
+				out.put("py", dronePosition[1]);
+				out.put("pz", dronePosition[2]);
 			} else if (arg.contentEquals("velocity")){
-				out.put("x", droneVelocity[0]);
-				out.put("y", droneVelocity[1]);
-				out.put("z", droneVelocity[2]);
+				out.put("px", droneVelocity[0]);
+				out.put("py", droneVelocity[1]);
+				out.put("pz", droneVelocity[2]);
 			}
 			
 			//out.put("xaxis", Double.parseDouble(tokensAxis[0]));
@@ -395,7 +395,7 @@ private void amoebaAndAmalomControl(){
 			//out.put("sx", droneVelocity[0]);
 			//out.put("sy", droneVelocity[1]);
 			//out.put("sz", droneVelocity[2]);
-			out.put("axis", result);
+			out.put("oracle", result);
 			// System.out.println( position + axis);
 		
 		return out;

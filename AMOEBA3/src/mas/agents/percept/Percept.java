@@ -164,7 +164,9 @@ public class Percept extends SystemAgent implements Serializable {
 		super.play();
 				
 		oldValue = value;
-		value = sensor.getValue();
+		//value = sensor.getValue();
+		System.out.println(this.name);
+		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name);
 		ajustMinMax(); 
 		computeContextProjectionValidity();
 		

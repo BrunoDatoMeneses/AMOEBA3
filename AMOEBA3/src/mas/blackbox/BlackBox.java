@@ -39,10 +39,10 @@ public class BlackBox implements Serializable {
 	 * @param scheduler the scheduler
 	 * @param systemFile the system file
 	 */
-	public BlackBox(Scheduler scheduler, File systemFile) {
+	public BlackBox(Scheduler scheduler, File sourceFile) {
 		System.out.println("---Initialize the blackbox---");
 		this.scheduler = scheduler;
-		buildBlackBoxFromFile(systemFile);
+		buildBlackBoxFromFile(sourceFile);
 		System.out.println("---End initialize the blackbox---");
 	}
 	

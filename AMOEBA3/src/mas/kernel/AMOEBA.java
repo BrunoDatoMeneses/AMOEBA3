@@ -45,7 +45,7 @@ public class AMOEBA extends Thread {
 	private boolean viewer = true;
 	private boolean csv = true;
 	
-	private HashMap<String,Output> outputsAgents = new HashMap<String,Output>();
+	private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
 	
 
 	/**
@@ -227,8 +227,9 @@ public class AMOEBA extends Thread {
 	 *
 	 * @param actions the actions
 	 */
-	public void learn(HashMap<String, Double> actions) {
-		updateOutputAgentsValues(actions);
+	public void learn(HashMap<String, Double> perceptionsActionState) {
+		scheduler.setPerceptionsAndActionState(perceptionsActionState);
+		//updateOutputAgentsValues(perceptionsActionState);
 		scheduler.run();
 	}
 	
@@ -240,9 +241,10 @@ public class AMOEBA extends Thread {
 	 * @param actions the actions
 	 * @return the double
 	 */
-	public double request(HashMap<String, Double> actions) {
+	public double request(HashMap<String, Double> perceptionsActionState) {
 		if(scheduler.isUseOracle()) scheduler.changeOracleConection();
-		updateOutputAgentsValues(actions);
+		//updateOutputAgentsValues(actions);
+		scheduler.setPerceptionsAndActionState(perceptionsActionState);
 		scheduler.run();
 		scheduler.changeOracleConection();
 		return scheduler.getAction();
@@ -251,9 +253,9 @@ public class AMOEBA extends Thread {
 	
 	
 	
-	private void updateOutputAgentsValues(HashMap<String, Double> actions) {
-		for (String s : actions.keySet()) {
-			outputsAgents.get(s).setValue(actions.get(s));
+	private void updateOutputAgentsValues(HashMap<String, Double> perceptionsAndAction) {
+		for (String s : perceptionsAndAction.keySet()) {
+			perceptionsAndActionState.get(s).setValue(perceptionsAndAction.get(s));
 		}
 	}
 	
@@ -273,7 +275,7 @@ public class AMOEBA extends Thread {
 	public void readInput() {
 		HashMap<String, Double> actions = studiedSystem.getOutput();
 		for (String s : actions.keySet()) {
-			outputsAgents.get(s).setValue(actions.get(s));
+			perceptionsAndActionState.get(s).setValue(actions.get(s));
 		}
 	}
 
@@ -286,7 +288,7 @@ public class AMOEBA extends Thread {
 		this.scheduler = scheduler;
 			HashMap<String, BlackBoxAgent> outputList = scheduler.getWorld().getBlackbox().getBlackBoxAgents();
 			for (String s : outputList.keySet()) {
-				outputsAgents.put(outputList.get(s).getName(), (Output) outputList.get(s));
+				perceptionsAndActionState.put(outputList.get(s).getName(), (Output) outputList.get(s));
 				System.out.println("Name : " + outputList.get(s).getName());
 			}
 		
