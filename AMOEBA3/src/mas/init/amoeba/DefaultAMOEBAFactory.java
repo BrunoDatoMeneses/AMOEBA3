@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import mas.blackbox.BlackBox;
+//import mas.blackbox.BlackBox;
 import mas.init.Serialization;
 import mas.kernel.AMOEBA;
 import mas.kernel.Scheduler;

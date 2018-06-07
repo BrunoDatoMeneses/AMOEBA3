@@ -10,7 +10,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import visualization.view.JMainFrame;
 import visualization.view.system.MainPanel;
 import mas.agents.localModel.TypeLocalModel;
-import mas.blackbox.BlackBox;
+//import mas.blackbox.BlackBox;
 
 
 // TODO: Auto-generated Javadoc

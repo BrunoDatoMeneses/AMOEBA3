@@ -36,7 +36,7 @@ import mas.agents.localModel.LocalModelAverage;
 import mas.agents.localModel.LocalModelFirstExp;
 import mas.agents.localModel.LocalModelMillerRegression;
 import mas.agents.localModel.TypeLocalModel;
-import mas.blackbox.BlackBox;
+//import mas.blackbox.BlackBox;
 
 // TODO: Auto-generated Javadoc
 /**

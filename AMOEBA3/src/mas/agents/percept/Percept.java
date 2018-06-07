@@ -21,7 +21,7 @@ import mas.agents.context.CustomComparator;
 import mas.agents.context.Range;
 import mas.agents.messages.Message;
 import mas.agents.messages.MessageType;
-import mas.blackbox.BlackBoxAgent;
+//import mas.blackbox.BlackBoxAgent;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-import mas.blackbox.BlackBox;
+//import mas.blackbox.BlackBox;
 import mas.kernel.AMOEBA;
 import mas.kernel.Scheduler;
 import mas.kernel.World;

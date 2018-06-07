@@ -16,9 +16,9 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.head.Head;
-import mas.blackbox.BBFunction;
-import mas.blackbox.Input;
-import mas.blackbox.Output;
+//import mas.blackbox.BBFunction;
+//import mas.blackbox.Input;
+//import mas.blackbox.Output;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -121,15 +121,15 @@ public class Scheduler implements Serializable{
 		else if (a instanceof Head) {
 			heads.add(a);
 		}
-		else if (a instanceof Input) {
-			inputs.add(a);
-		}
-		else if (a instanceof BBFunction) {
-			functions.add(a);
-		} 
-		else if (a instanceof Output) {
-			outputs.add(a);
-		} 
+//		else if (a instanceof Input) {
+//			inputs.add(a);
+//		}
+//		else if (a instanceof BBFunction) {
+//			functions.add(a);
+//		} 
+//		else if (a instanceof Output) {
+//			outputs.add(a);
+//		} 
 		// System.out.println(a.getClass().toString());
 	}
 	
@@ -154,15 +154,15 @@ public class Scheduler implements Serializable{
 		else if (a instanceof Head) {
 			heads.remove(a);
 		}
-		else if (a instanceof Input) {
-			inputs.remove(a);
-		}
-		else if (a instanceof BBFunction) {
-			functions.remove(a);
-		} 
-		else if (a instanceof Output) {
-			outputs.remove(a);
-		} 
+//		else if (a instanceof Input) {
+//			inputs.remove(a);
+//		}
+//		else if (a instanceof BBFunction) {
+//			functions.remove(a);
+//		} 
+//		else if (a instanceof Output) {
+//			outputs.remove(a);
+//		} 
 		// System.out.println(a.getClass().toString());
 	}
 	

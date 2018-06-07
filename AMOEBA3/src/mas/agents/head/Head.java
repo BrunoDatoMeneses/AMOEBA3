@@ -11,7 +11,7 @@ import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.messages.Message;
 import mas.agents.messages.MessageType;
-import mas.blackbox.BlackBoxAgent;
+//import mas.blackbox.BlackBoxAgent;
 
 // TODO: Auto-generated Javadoc
 /**

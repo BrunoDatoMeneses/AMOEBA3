@@ -2,7 +2,7 @@ package mas.init.amoeba;
 
 import java.io.File;
 
-import mas.blackbox.BlackBox;
+//import mas.blackbox.BlackBox;
 import mas.init.Initialization;
 import mas.kernel.AMOEBA;
 import mas.kernel.Scheduler;
