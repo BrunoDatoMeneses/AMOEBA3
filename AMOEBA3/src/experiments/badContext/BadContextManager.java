@@ -27,9 +27,17 @@ public class BadContextManager implements StudiedSystem, Serializable{
 	/** The first step. */
 	boolean firstStep = true;
 	
+	double spaceSize;
+	
 	/** The world. */
 	World world;
 	Random generator;
+	
+	
+	public BadContextManager(double size) {
+		this.spaceSize= size;
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see kernel.StudiedSystem#playOneStep(double)
@@ -41,8 +49,8 @@ public class BadContextManager implements StudiedSystem, Serializable{
 		if (generator == null)	generator = new Random(29);
 			
 		
-		x = (generator.nextDouble() - 0.5) * 200;
-		y = (generator.nextDouble()- 0.5) * 200;
+		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
+		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
 	}
 
 	/* (non-Javadoc)
@@ -51,9 +59,9 @@ public class BadContextManager implements StudiedSystem, Serializable{
 	@Override
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
-		double size = 55;
 
-		result = (y > -size && y < size && x < size && x > -size) ? 0.0 : 1.0;
+
+		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 0.0 : 1.0;
 	//	result = (x > 2*y) ? 0.0 : 1.0;
 		
 		out.put("x",x);

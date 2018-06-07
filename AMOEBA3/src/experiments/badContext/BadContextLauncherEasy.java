@@ -39,11 +39,21 @@ public class BadContextLauncherEasy implements Serializable {
 		amoeba.setDataForErrorMargin(0.5, 1, 1, 0.4, 10, 100);
 		amoeba.setDataForInexactMargin(0.5, 1, 1, 0.4, 10, 100);
 		
+		/* Default */
+//		amoeba.setAVT_acceleration(2);
+//		amoeba.setAVT_deceleration(1./3.);
+//		amoeba.setAVT_percentAtStart(0.2);
+		
+		/* Custum */
+		amoeba.setAVT_acceleration(0.5);
+		amoeba.setAVT_deceleration(0.5);
+		amoeba.setAVT_percentAtStart(0.001);
+		
 		amoeba.setRememberState(false);
 		amoeba.setGenerateCSV(false);
 		
 		/* This is the initialization of the studied system. It's only for the sake of example, not a part of AMOEBA initialization*/
-		BadContextManager bcm = new BadContextManager();
+		BadContextManager bcm = new BadContextManager(50.0);
 		bcm.setWorld(amoeba.getScheduler().getWorld());
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
