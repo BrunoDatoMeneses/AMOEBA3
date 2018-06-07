@@ -26,7 +26,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	private World world;
 	
 	/** The black box panel. */
-	private BlackBoxPanel blackBoxPanel;
+	//private BlackBoxPanel blackBoxPanel;
 	
 	/** The system panel. */
 	private SystemPanel systemPanel;
@@ -72,7 +72,7 @@ public class MainTabbedPanel extends JTabbedPane{
 
 		
 		
-		blackBoxPanel = new BlackBoxPanel(world);
+		//blackBoxPanel = new BlackBoxPanel(world);
 		//systemPanel = new SystemPanel(world);
 		panelChart = new PanelChart(world);
 		//panelTwoDim = new GrapheTwoDimPanel(world);
@@ -82,7 +82,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		
 		world.getScheduler().addScheduledItem(panelChart);
 		
-		this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
 		this.addTab("Charts", new JScrollPane(panelChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("2-Dimensions", new JScrollPane(panelTwoDimStandard,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
@@ -98,7 +98,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	 * Update.
 	 */
 	public void update() {
-		blackBoxPanel.update();
+		//blackBoxPanel.update();
 	//	systemPanel.update();
 	//	panelTwoDim.update();
 		panelTwoDimStandard.update();
@@ -111,7 +111,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	 * @param blackBox the new black box
 	 */
 	public void setBlackBox(BlackBox blackBox) {
-		blackBoxPanel.setBlackBox(blackBox);
+		//blackBoxPanel.setBlackBox(blackBox);
 	}
 
 	/**

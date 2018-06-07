@@ -25,7 +25,7 @@ public class Head extends AbstractHead {
 	private Context newContext;
 	private String functionSelected;
 	
-	private BlackBoxAgent oracle;
+	//private BlackBoxAgent oracle;
 	
 	private ArrayList<Context> contexts = new ArrayList<Context>();
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
@@ -672,18 +672,18 @@ public class Head extends AbstractHead {
 	 *
 	 * @return the oracle
 	 */
-	public BlackBoxAgent getOracle() {
-		return oracle;
-	}
+//	public BlackBoxAgent getOracle() {
+//		return oracle;
+//	}
 
 	/**
 	 * Sets the oracle.
 	 *
 	 * @param oracle the new oracle
 	 */
-	public void setOracle(BlackBoxAgent oracle) {
-		this.oracle = oracle;
-	}
+//	public void setOracle(BlackBoxAgent oracle) {
+//		this.oracle = oracle;
+//	}
 
 	/**
 	 * Gets the oracle value.

@@ -32,7 +32,7 @@ import mas.blackbox.BlackBoxAgent;
 public class Percept extends SystemAgent implements Serializable {
 
 	
-	private BlackBoxAgent sensor;
+	//private BlackBoxAgent sensor;
 	protected ArrayList<Agent> targets = new ArrayList<Agent>();
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
 	
@@ -91,7 +91,7 @@ public class Percept extends SystemAgent implements Serializable {
 		
 		this.oldValue = p.oldValue;
 		this.value = p.value;
-		this.sensor = p.sensor;
+		//this.sensor = p.sensor;
 		
 		this.targets = new ArrayList<Agent>();
 		for(Agent obj: p.targets) {
@@ -298,18 +298,18 @@ public class Percept extends SystemAgent implements Serializable {
 	 *
 	 * @return the sensor
 	 */
-	public BlackBoxAgent getSensor() {
-		return sensor;
-	}
+//	public BlackBoxAgent getSensor() {
+//		return sensor;
+//	}
 
 	/**
 	 * Sets the sensor.
 	 *
 	 * @param sensor the new sensor
 	 */
-	public void setSensor(BlackBoxAgent sensor) {
-		this.sensor = sensor;
-	}
+//	public void setSensor(BlackBoxAgent sensor) {
+//		this.sensor = sensor;
+//	}
 
 	/* (non-Javadoc)
 	 * @see agents.SystemAgent#getTargets()
