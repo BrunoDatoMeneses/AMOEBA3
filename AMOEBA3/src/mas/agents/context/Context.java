@@ -285,8 +285,26 @@ public class Context extends AbstractContext implements Serializable{
 		for(Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
 		}
+		
+		NCSDetections();
+	}
+
+
+	private void NCSDetections() {
+		
+		NCSDetection_Overlap();
+
+		
 	}
 	
+	
+	private void NCSDetection_Overlap() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 //--------------------------------NCS Resolutions-----------------------------------------
 	
 	/**

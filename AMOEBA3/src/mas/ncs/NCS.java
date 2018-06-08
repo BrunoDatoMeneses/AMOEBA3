@@ -12,23 +12,20 @@ import mas.kernel.World;
 public enum NCS implements Serializable {
 
 	
-	/** The context conflict false. */
+
 	/*Context NCS*/
 	CONTEXT_CONFLICT_FALSE, 
- /** The context conflict inexact. */
- CONTEXT_CONFLICT_INEXACT, 
- /** The context uselessness. */
- CONTEXT_USELESSNESS, 
- /** The context concurrence. */
- CONTEXT_CONCURRENCE,
-		
-	/** The head incompetent. */
+	CONTEXT_CONFLICT_INEXACT, 
+	CONTEXT_USELESSNESS, 
+	CONTEXT_CONCURRENCE,
+	CONTEXT_OVERLAP_CONFLICT,
+	CONTEXT_OVERLAP_REDUNDANCY,	
+
 	/*Head NCS*/
 	HEAD_INCOMPETENT, 
- /** The head improductive. */
- HEAD_IMPRODUCTIVE, 
- /** The create new context. */
- CREATE_NEW_CONTEXT;
+	HEAD_IMPRODUCTIVE, 
+
+	CREATE_NEW_CONTEXT;
 	
 	public static boolean a = false;
 	
