@@ -1333,7 +1333,7 @@ private void startPanelController() {
 		
 		//JOptionPane.showMessageDialog(this, info, "Context : " + id, JOptionPane.PLAIN_MESSAGE);
 		if (currentId != null) {
-			highlightContextNeighbours(world.getScheduler().getContextByName(currentId));
+			//highlightContextNeighbours(world.getScheduler().getContextByName(currentId));
 			setTextAreaInfo(currentId);
 			
 			if (sliderValue == currentTick || (!rememberState)) {
@@ -1449,18 +1449,27 @@ private void startPanelController() {
 	 */
 	public void popupMenuForVisualization(String id) {
 		JPopupMenu popup = new JPopupMenu("Visualization");
+		JMenuItem itemShowContextNeighbours = new JMenuItem("Neighbours");
+		itemShowContextNeighbours.addActionListener(e -> {highlightNeighbours(id);});
 		JMenuItem itemShow2Dim = new JMenuItem("History of grapgh in 2 Dim");
 		itemShow2Dim.addActionListener(e -> {popupVisualization2Dim(id);});
 	    JMenuItem itemShowNDim = new JMenuItem("Graph Visualization in N Dim");
 	    itemShowNDim.addActionListener(e -> {popupVisualizationNDim(id);});
 	    JMenuItem itemShowAll = new JMenuItem("Both");
-	    itemShowAll.addActionListener( e -> {popupVisualization2Dim(id); popupVisualizationNDim(id);});
+	    
+	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id);});
+	    popup.add(itemShowContextNeighbours);
 	    popup.add(itemShow2Dim);
 	    popup.add(itemShowNDim);
 	    popup.add(itemShowAll);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 	}
 	
+	private void highlightNeighbours(String id) {
+		highlightContextNeighbours(world.getScheduler().getContextByName(id));
+		
+	}
+
 	/**
 	 * Popup visualization 2 dim.
 	 *
