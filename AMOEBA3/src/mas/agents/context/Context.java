@@ -57,7 +57,10 @@ public class Context extends AbstractContext implements Serializable{
 	
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
-	public HashMap<Context,String> neigbours = new HashMap<Context,String>();
+	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
+	public ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
+	
+	
 	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
 	
 	public HashMap<Percept , HashMap<String, ArrayList<Context>>> sortedPossibleNeighbours = new HashMap<Percept , HashMap<String, ArrayList<Context>>>();
@@ -137,7 +140,7 @@ public class Context extends AbstractContext implements Serializable{
 			
 		}
 		
-		neigbours =  new HashMap<Context,String>();
+		overlaps =  new HashMap<Context,String>();
 	}
 	
 	/**
@@ -299,7 +302,19 @@ public class Context extends AbstractContext implements Serializable{
 	
 	
 	private void NCSDetection_Overlap() {
-		// TODO Auto-generated method stub
+		
+
+		computeOverlapsByPercepts();
+		for(Context ctxt: overlaps.keySet()) {
+			ctxt.getOverlapType(this);
+		}
+		
+	}
+
+
+	private void getOverlapType(Context context) {
+		
+		
 		
 	}
 
@@ -965,7 +980,19 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 				test = test && contextOverlapsByPercept.get(context).get(percept);
 			}
 			if(test) {
-				neigbours.put(context, "Overlap");
+				
+				overlaps.put(context, "Overlap");
+				
+				HashMap<Percept,HashMap<String,Double>> overlapRanges = new HashMap<Percept,HashMap<String,Double>>();
+				for(Percept percept : ranges.keySet()) {
+					overlapRanges.put(percept, new HashMap<String,Double>());
+					double startRange = percept.getOverlapRangesBetweenContexts(this, context).get("start");
+					double endRange = percept.getOverlapRangesBetweenContexts(this, context).get("end");
+					overlapRanges.get(percept).put("start", startRange);
+					overlapRanges.get(percept).put("end", endRange);
+				}
+				
+				contextOverlaps.add(new ContextOverlap(this, context, overlapRanges));		
 			}
 		}
 		
@@ -981,7 +1008,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			test = test && contextOverlapsByPercept.get(context).get(percept);
 		}
 		if(test) {
-			neigbours.put(context, "Overlap");
+			//neigbours.put(context, "Overlap");
 		}
 		
 		

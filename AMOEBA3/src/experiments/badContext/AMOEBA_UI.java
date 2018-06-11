@@ -8,6 +8,7 @@ import mas.agents.Agent;
 import mas.agents.percept.ContextProjection;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 import mas.agents.context.Range;
 import mas.agents.localModel.TypeLocalModel;
 import mas.init.amoeba.AMOEBAFactory;
@@ -129,6 +130,12 @@ public class AMOEBA_UI {
 			
 			context.computeOverlapsByPercepts();
 			context.getNearestNeighbours();
+			
+			for(ContextOverlap contextOverlap : context.contextOverlaps) {
+				
+				usedAmoeba.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawRectangle(contextOverlap);
+				
+			}
 		}
 		
 		displayContextInfo(usedAmoeba);
@@ -162,7 +169,7 @@ public class AMOEBA_UI {
 		for(Context context : getContextsAsContexts(usedAmoeba)) {
 			
 			System.out.println("********************************** CONTEXT **********************************");
-			System.out.println(context.getName()+" neighbours : "+context.neigbours.size());
+			System.out.println(context.getName()+" neighbours : "+context.overlaps.size());
 			
 			
 			
@@ -199,9 +206,9 @@ public class AMOEBA_UI {
 				}
 			}
 			
-			for(Context c: context.neigbours.keySet()){
+			for(Context c: context.overlaps.keySet()){
 				
-				System.out.println(c.getName()+ " ---> " + context.neigbours.get(c));
+				System.out.println(c.getName()+ " ---> " + context.overlaps.get(c));
 				
 				
 			}

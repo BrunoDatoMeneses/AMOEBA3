@@ -171,4 +171,8 @@ public class MainTabbedPanel extends JTabbedPane{
 		return panelTwoDimStandard.getObservationList();
 	}
 	
+	public GrapheTwoDimPanelStandard getPanelTwoDimStandard() {
+		return panelTwoDimStandard;
+	}
+	
 }

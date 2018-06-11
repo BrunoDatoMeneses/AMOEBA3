@@ -599,6 +599,10 @@ public class MainPanel extends JPanel{
 	public ArrayList<Observation> getObservationList() {
 		return tabbedPanel.getObservationList();
 	}
+	
+	public MainTabbedPanel getTabbedPanel() {
+		return tabbedPanel;
+	}
 
 	
 

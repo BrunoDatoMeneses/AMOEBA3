@@ -56,6 +56,7 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 import mas.agents.context.Range;
 import mas.agents.head.Head;
 import visualization.graphView.GraphicVisualization2Dim;
@@ -924,15 +925,15 @@ private void startPanelController() {
 	 */
 	/* Get the min-max value of each percept and update graph visualization 2-Dim */
 	private void getPerceptMinMaxValues2Dim() {
-		ArrayList<Percept> perceptList = world.getAllPercept();
-		
+		ArrayList<Percept> perceps = world.getAllPercept();
+
 		for (int i=0; i<temporalGraph.get2DimGraphList().size(); i++) {
 			String contextID = temporalGraph.get2DimGraphList().get(i).getContextID();
 			if (world.getAgents().get(contextID) != null) {
 				Context c = (Context) world.getAgents().get(contextID);
-				for (int j=0; j<perceptList.size(); j++) {
-					double min = c.getRanges().get(perceptList.get(j)).getEnd();
-					double max = c.getRanges().get(perceptList.get(j)).getStart();
+				for (int j=0; j<perceps.size(); j++) {
+					double min = c.getRanges().get(perceps.get(j)).getEnd();
+					double max = c.getRanges().get(perceps.get(j)).getStart();
 					temporalGraph.get2DimGraphList().get(i).updateData(j*2, currentTick, min);
 					temporalGraph.get2DimGraphList().get(i).updateData((j*2)+1, currentTick, max);
 				}
@@ -1044,12 +1045,13 @@ private void startPanelController() {
 		}
 		
 		for (String name : world.getAgents().keySet()) {
-			SystemAgent a = world.getAgents().get(name);
-			if (a instanceof Context) {
-				Context n = (Context)a;
+			SystemAgent agent = world.getAgents().get(name);
+			if (agent instanceof Context) {
+				Context context = (Context)agent;
+			
 				// Store values into array list of context of observation
 				if (rememberState) {
-					obsEle.addContextList(new Context(n));
+					obsEle.addContextList(new Context(context));
 				}	
 				
 				Node node;
@@ -1059,30 +1061,21 @@ private void startPanelController() {
 					graph.addNode(name);
 					node = graph.getNode(name);
 					node.addAttribute("ui.class",
-							a.getClass().getSimpleName());
-					node.addAttribute("ui.label", a.getName());
+							agent.getClass().getSimpleName());
+					node.addAttribute("ui.label", agent.getName());
 				}
 
 				node.addAttribute("EXIST", true);
-				if (n.getRanges().size() > 0){
-				//	System.out.println(n.getRanges().get(world.getAgents().get("Sensor")).getStart() + " " + n.getRanges().get(world.getAgents().get("SensorPerturbation")).getStart());
-					
-					double lengthX = n.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getEnd() 
-							- n.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart();
-					double lengthY = n.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getEnd() 
-							- n.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart();
-					node.setAttribute("xyz", n.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart() + (0.5*lengthX),
-							n.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart() + (0.5*lengthY), 0);
-					
-				//	node.setAttribute("xyz", n.getRanges().get(world.getAgents().get("Sensor")).getValue(), n.getRanges().get(world.getAgents().get("SensorPerturbation")).getValue(), 0);
-				//	node.addAttribute("ui.size", "8px");
-					node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+				if (context.getRanges().size() > 0){
+					drawRectangle(node, context);
 				}
-				if (n.isBestContext()) {
+				
+				
+				if (context.isBestContext()) {
 					node.addAttribute("ui.class","BestContextSelected");				
-				} else if (n.getNSelection() > 0) {
+				} else if (context.getNSelection() > 0) {
 					node.addAttribute("ui.class","ContextAwaked");
-					if (n.getNSelection() == 3) {
+					if (context.getNSelection() == 3) {
 						node.addAttribute("ui.class","ContextSelected");				
 					}
 				}
@@ -1104,13 +1097,13 @@ private void startPanelController() {
 				}*/
 
 				//TODO
-				n.setnSelection(0);
+				context.setnSelection(0);
 			}
 			
-			if (a instanceof Head) {
-				Head n = (Head)a;
+			if (agent instanceof Head) {
+				Head head = (Head)agent;
 				
-				controller = n; //TODO dirty
+				controller = head; //TODO dirty
 				
 				Node node;
 				if (graph.getNode(name) != null) {
@@ -1211,6 +1204,9 @@ private void startPanelController() {
 
 		}
 		
+		
+		
+		
 		//---------------------------------------------------Add scale----------------------------------------------------
 	//	if (graph.getNode("scale") == null ) {
 	//		graph.addNode("scale");
@@ -1226,6 +1222,54 @@ private void startPanelController() {
 
 	}
 	
+	
+	public void drawRectangle(ContextOverlap contextOverlap){
+		Node node;
+		if (graph.getNode(contextOverlap.getName()) != null) {
+			node = graph.getNode(contextOverlap.getName());
+		} else {
+			graph.addNode(contextOverlap.getName());
+			node = graph.getNode(contextOverlap.getName());
+			node.addAttribute("ui.class", contextOverlap.getClass().getSimpleName());
+			node.addAttribute("ui.label", contextOverlap.getName());
+		}
+
+		node.addAttribute("EXIST", true);
+		
+		double lengthX = contextOverlap.getRanges(comboDimX.getSelectedItem()).get("end") 
+				- contextOverlap.getRanges(comboDimX.getSelectedItem()).get("start");
+		double lengthY = contextOverlap.getRanges(comboDimY.getSelectedItem()).get("end")
+				- contextOverlap.getRanges(comboDimY.getSelectedItem()).get("start");
+		
+		node.setAttribute("xyz", contextOverlap.getRanges(comboDimX.getSelectedItem()).get("start") + (0.5*lengthX),
+		contextOverlap.getRanges(comboDimY.getSelectedItem()).get("start") + (0.5*lengthY), 0);
+		
+		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		node.addAttribute("ui.class","Rectangle");
+		
+		node.addAttribute("ui.class","ContextColorDynamic");
+		node.setAttribute("ui.color", 100); 
+
+	}
+	
+	public void drawRectangle (Node node, Context context) {
+		
+//		System.out.println(n.getRanges().get(world.getAgents().get("Sensor")).getStart() + " " + n.getRanges().get(world.getAgents().get("SensorPerturbation")).getStart());
+		
+		double lengthX = context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getEnd() 
+				- context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart();
+		double lengthY = context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getEnd() 
+				- context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart();
+		
+		node.setAttribute("xyz", context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart() + (0.5*lengthX),
+				context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart() + (0.5*lengthY), 0);
+		
+	//	node.setAttribute("xyz", n.getRanges().get(world.getAgents().get("Sensor")).getValue(), n.getRanges().get(world.getAgents().get("SensorPerturbation")).getValue(), 0);
+	//	node.addAttribute("ui.size", "8px");
+		
+		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+
+	}
 	
 	public void highlightContextNeighbours(Context context) {
 		
