@@ -2,7 +2,9 @@ package mas.agents.context;
 
 import java.util.HashMap;
 
+import mas.agents.head.Head;
 import mas.agents.percept.Percept;
+import mas.ncs.NCS;
 
 public class ContextOverlap {
 
@@ -55,6 +57,28 @@ public class ContextOverlap {
 		
 		return s;
 		
+	}
+	
+	public double getMiddleValue(Percept percept) {
+		return (ranges.get(percept).get("end") - ranges.get(percept).get("start"))/2;
+	}
+	
+	public void solveNCS_Overlap(double conflictThreshold) {
+		double context1OverlapProposal = context1.getOverlapActionProposal(this) ;
+		double context2OverlapProposal = context2.getOverlapActionProposal(this) ;
+		
+		if(Math.abs(context2OverlapProposal-context1OverlapProposal) > conflictThreshold) {
+			solveNCS_OverlapConflict();
+		}
+	}
+	
+	private void solveNCS_OverlapConflict() {
+		if(context1.getConfidence()>context2.getConfidence()) {
+			context2.shrinkRangesToJoinBorders(context1);
+		}
+		else {
+			context1.shrinkRangesToJoinBorders(context2);
+		}
 	}
 	
 	

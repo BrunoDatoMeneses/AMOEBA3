@@ -339,7 +339,7 @@ public class Context extends AbstractContext implements Serializable{
 	 */
 	public void solveNCS_Concurrence(Head head) {
 		world.raiseNCS(NCS.CONTEXT_CONCURRENCE);
-		this.shrinkRangesToJoinBorders(head, head.getBestContext());
+		this.shrinkRangesToJoinBorders( head.getBestContext());
 	}
 	
 	/**
@@ -539,6 +539,10 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 */
 	public double getActionProposal() {
 		return localModel.getProposition(this);
+	}
+	
+	public double getOverlapActionProposal(ContextOverlap contextOverlap) {
+		return localModel.getProposition(this, contextOverlap);
 	}
 
 
@@ -911,7 +915,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @param head the head
 	 * @param c the c
 	 */
-	public void shrinkRangesToJoinBorders(Head head, Context c) {
+	public void shrinkRangesToJoinBorders(Context c) {
 		Set<Percept> var = ranges.keySet();
 		ArrayList<Percept> containingRanges = new ArrayList<Percept>();
 		
@@ -979,6 +983,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			for(Percept percept : ranges.keySet()) {
 				test = test && contextOverlapsByPercept.get(context).get(percept);
 			}
+			
 			if(test) {
 				
 				overlaps.put(context, "Overlap");
@@ -992,7 +997,9 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 					overlapRanges.get(percept).put("end", endRange);
 				}
 				
-				contextOverlaps.add(new ContextOverlap(this, context, overlapRanges));		
+				ContextOverlap overlap = new ContextOverlap(this, context, overlapRanges);
+				contextOverlaps.add(overlap);	
+				this.world.getScheduler().addContextOverlap(overlap);
 			}
 		}
 		

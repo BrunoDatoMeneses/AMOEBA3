@@ -5,6 +5,7 @@ import java.io.Serializable;
 import mas.kernel.World;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -54,6 +55,12 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	@Override
 	public void updateModel(Context context) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public double getProposition(Context context, ContextOverlap contextOverlap) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

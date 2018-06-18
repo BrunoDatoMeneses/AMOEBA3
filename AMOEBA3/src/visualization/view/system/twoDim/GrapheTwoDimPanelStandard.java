@@ -2,6 +2,7 @@ package visualization.view.system.twoDim;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.dnd.Autoscroll;
@@ -521,7 +522,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	private void updateGrapgh (int tick) {
 		// Update Information in the text area
 		if (currentId != null) {
-			setTextAreaInfo(currentId);
+			setContextTextAreaInfo(currentId);
 		}
 		
 		// Get the information from observation to update graph
@@ -1201,6 +1202,17 @@ private void startPanelController() {
 			}
 			
 			
+			for(Context context : world.getScheduler().getContextsAsContext()) {
+				
+				//context.computeOverlapsByPercepts();
+				context.getNearestNeighbours();
+				
+				for(ContextOverlap contextOverlap : context.contextOverlaps) {
+					
+					world.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawRectangle(contextOverlap);
+					
+				}
+			}
 
 		}
 		
@@ -1247,8 +1259,8 @@ private void startPanelController() {
 		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
 		node.addAttribute("ui.class","Rectangle");
 		
-		node.addAttribute("ui.class","ContextColorDynamic");
-		node.setAttribute("ui.color", 100); 
+		//node.addAttribute("ui.color", Color.RED);
+		node.addAttribute("ui.class","OverlapColor");
 
 	}
 	
@@ -1318,6 +1330,41 @@ private void startPanelController() {
 
 		}
 	}
+	
+	public void recolorAllContexts() {
+		
+		
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				double val = ((Context) a).getActionProposal();
+				if (val < min) {
+					min = val;
+				}
+				if (val > max) {
+					max = val;
+				}
+			}
+	
+		}		
+	
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				Context n = (Context)a;
+				Node node = graph.getNode(name);
+	
+				node.addAttribute("ui.class","ContextColorDynamic");
+				node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+				//node.setAttribute("ui.color", 0.5 );  
+			}
+	
+		}
+	
+	}
 		
 	
 	/**
@@ -1367,27 +1414,38 @@ private void startPanelController() {
 	public void buttonPushed(String id) {
 		world.getAmoeba().getLogFile().messageToDebug("Push button", 5, new LogMessageType[] {LogMessageType.INFORMATION});
 		toolBarInfo.setVisible(true);
-		currentId = id;
-		
-		Context pushedContext = world.getScheduler().getContextByName(id);
-		
 		System.out.println("node pushed : " + id);
-		//String info = world.getAgents().get(id).toString();
-		//System.out.println(info);
 		
-		//JOptionPane.showMessageDialog(this, info, "Context : " + id, JOptionPane.PLAIN_MESSAGE);
-		if (currentId != null) {
-			//highlightContextNeighbours(world.getScheduler().getContextByName(currentId));
-			setTextAreaInfo(currentId);
+		if(world.getScheduler().getContextByName(id)!=null) {
+			Context pushedContext = world.getScheduler().getContextByName(id);
+			setContextTextAreaInfo(id);
 			
 			if (sliderValue == currentTick || (!rememberState)) {
 				if (rightClick) {
-					popupMenuForVisualization(currentId);
+					popupMenuForContextVisualization(id);
+					rightClick = false;
+				}
+			}
+		}
+		else if(world.getScheduler().getContextOverlapByName(id)!=null) {
+			ContextOverlap pushedContextOverlap = world.getScheduler().getContextOverlapByName(id);
+			setContextOverlapTextAreaInfo(id);
+			
+			if (sliderValue == currentTick || (!rememberState)) {
+				if (rightClick) {
+					popupMenuForOverlapVisualization(id);
 					rightClick = false;
 				}
 			}
 			
 		}
+		
+		
+		//String info = world.getAgents().get(id).toString();
+		//System.out.println(info);
+		
+		//JOptionPane.showMessageDialog(this, info, "Context : " + id, JOptionPane.PLAIN_MESSAGE);
+
 
 
 /*		Node node = graph.getNode(id);
@@ -1401,8 +1459,8 @@ private void startPanelController() {
 	 *
 	 * @param id the new text area info
 	 */
-	private void setTextAreaInfo(String id) {
-		System.out.println("node pushed : " + id);
+	private void setContextTextAreaInfo(String id) {
+		System.out.println("Context pushed : " + id);
 		
 		String info = "";
 		if (rememberState) {
@@ -1423,6 +1481,36 @@ private void startPanelController() {
 		} else {
 			info = "State :" + currentTick + "\n";
 			info = info.concat(world.getAgents().get(id).toString());
+			info = info.replace("Current", "\nCurrent");
+			info = info.replace("AVT", "\nAVT");
+		}
+		
+		textarea.setText(info);
+		
+	}
+	
+	private void setContextOverlapTextAreaInfo(String id) {
+		System.out.println("Context Overlap pushed : " + id);
+		
+		String info = "";
+		if (rememberState) {
+			Observation o = getObservationByTick(sliderValue);
+			if (o != null) {
+				ContextOverlap contextOverlap = world.getScheduler().getContextOverlapByName(id);
+				if ( contextOverlap != null ) {
+					info = "State :" + sliderValue + "\n";
+					info = info.concat(contextOverlap.toString());
+					info = info.replace("Current", "\nCurrent");
+					info = info.replace("AVT", "\nAVT");
+				} else {
+					info = "No context";
+				}
+				
+			} 
+			
+		} else {
+			info = "State :" + currentTick + "\n";
+			info = info.concat(world.getScheduler().getContextOverlapByName(id).toString());
 			info = info.replace("Current", "\nCurrent");
 			info = info.replace("AVT", "\nAVT");
 		}
@@ -1491,7 +1579,22 @@ private void startPanelController() {
 	 *
 	 * @param id the id
 	 */
+	
+	
 	public void popupMenuForVisualization(String id) {
+		JPopupMenu popup = new JPopupMenu("Visualization");
+		JMenuItem itemRecolorAll = new JMenuItem("ReColorAll");
+		itemRecolorAll.addActionListener(e -> {recolorAllContexts();});
+		JMenuItem itemShowAll = new JMenuItem("Both");
+	    
+	    itemShowAll.addActionListener( e -> {recolorAllContexts();});
+	    popup.add(itemRecolorAll);
+	    popup.add(itemShowAll);
+	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
+	}
+	
+	
+	public void popupMenuForContextVisualization(String id) {
 		JPopupMenu popup = new JPopupMenu("Visualization");
 		JMenuItem itemShowContextNeighbours = new JMenuItem("Neighbours");
 		itemShowContextNeighbours.addActionListener(e -> {highlightNeighbours(id);});
@@ -1500,18 +1603,42 @@ private void startPanelController() {
 	    JMenuItem itemShowNDim = new JMenuItem("Graph Visualization in N Dim");
 	    itemShowNDim.addActionListener(e -> {popupVisualizationNDim(id);});
 	    JMenuItem itemShowAll = new JMenuItem("Both");
+	    JMenuItem itemRecolorAll = new JMenuItem("Recolor All Contexts");
+		itemRecolorAll.addActionListener(e -> {recolorAllContexts();});
+		JMenuItem itemUdateView = new JMenuItem("Update View");
+		itemUdateView.addActionListener(e -> {update();});
 	    
-	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id);});
+	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts();});
 	    popup.add(itemShowContextNeighbours);
 	    popup.add(itemShow2Dim);
 	    popup.add(itemShowNDim);
 	    popup.add(itemShowAll);
+	    popup.add(itemRecolorAll);
+	    popup.add(itemUdateView);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
+	}
+	
+	public void popupMenuForOverlapVisualization(String id) {
+		
+		JPopupMenu popup = new JPopupMenu("Visualization");
+		JMenuItem itemSolvsNCS = new JMenuItem("Solve NCS");
+		itemSolvsNCS.addActionListener(e -> {solveNCSByClick(id);});
+		JMenuItem itemUdateView = new JMenuItem("Update View");
+		itemUdateView.addActionListener(e -> {update();});
+ 
+	    popup.add(itemSolvsNCS);
+	    popup.add(itemUdateView);
+	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
+		
 	}
 	
 	private void highlightNeighbours(String id) {
 		highlightContextNeighbours(world.getScheduler().getContextByName(id));
 		
+	}
+	
+	public void solveNCSByClick(String id) {
+		this.world.getScheduler().getContextOverlapByName(id).solveNCS_Overlap(0.1d);
 	}
 
 	/**

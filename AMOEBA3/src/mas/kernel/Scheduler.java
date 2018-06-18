@@ -15,6 +15,7 @@ import visualization.view.system.ScheduledItem;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 import mas.agents.head.Head;
 //import mas.blackbox.BBFunction;
 //import mas.blackbox.Input;
@@ -46,6 +47,7 @@ public class Scheduler implements Serializable{
 	private ArrayList<Context> alteredContexts = new ArrayList<Context>();
 	
 	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
+	private ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
 
 	private boolean running = false;
 	private boolean waitForGUIUpdate = false;
@@ -629,6 +631,15 @@ public class Scheduler implements Serializable{
 		return null;
 	}
 	
+	public ContextOverlap getContextOverlapByName(String name) {
+		for(ContextOverlap contextOverlap: contextOverlaps) {
+			if(contextOverlap.getName().equals(name)) {
+				return contextOverlap;
+			}
+		}
+		return null;
+	}
+	
 	public void setPerceptionsAndActionState(HashMap<String,Double> perceptionsAndActions) {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
@@ -636,4 +647,19 @@ public class Scheduler implements Serializable{
 	public Double getPerceptionsOrAction(String key) {
 		return this.perceptionsAndActionState.get(key);	
 	}
+	
+	public void addContextOverlap(ContextOverlap contextOverlap) {
+		this.contextOverlaps.add(contextOverlap);
+	}
+	
+	public void removeContextOverlap(ContextOverlap contextOverlap) {
+		this.contextOverlaps.remove(contextOverlap);
+	}
+	
+	public ArrayList<ContextOverlap> getContextOverlap() {
+		return this.contextOverlaps;
+	}
+	
+	
+	
 }

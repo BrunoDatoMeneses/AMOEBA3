@@ -8,6 +8,7 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 import mas.agents.messages.Message;
 
 // TODO: Auto-generated Javadoc
@@ -48,6 +49,8 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context);
+	
+	public abstract double getProposition(Context context, ContextOverlap contextOverlap);
 	
 	/**
 	 * Version of getProposition for 2D display.
