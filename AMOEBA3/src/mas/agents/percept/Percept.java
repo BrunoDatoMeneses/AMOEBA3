@@ -17,6 +17,7 @@ import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
+import mas.agents.context.ContextOverlap;
 import mas.agents.context.CustomComparator;
 import mas.agents.context.Range;
 import mas.agents.messages.Message;
@@ -611,7 +612,7 @@ public class Percept extends SystemAgent implements Serializable {
 						String overlapName = selectedContext.getName() + testedContext.getName();						
 						HashMap<String, Double> overlapRanges = getOverlapRangesBetweenContexts(selectedContext, testedContext);
 						
-						PerceptOverlap overlap = new PerceptOverlap(selectedContext, testedContext, overlapRanges.get("start"), overlapRanges.get("end"), overlapName);
+						PerceptOverlap overlap = new PerceptOverlap(world, selectedContext, testedContext, overlapRanges.get("start"), overlapRanges.get("end"), overlapName);
 						perceptOverlaps.put(overlapName, overlap);
 					}
 				}
@@ -619,6 +620,10 @@ public class Percept extends SystemAgent implements Serializable {
 			
 			computedContexts.add(selectedContext);
 		}
+	}
+	
+	public void overlapDeletion(ContextOverlap contextOverlap) {
+		perceptOverlaps.remove(contextOverlap.getName()); 
 	}
 	
 	public boolean overlapBetweenContexts(Context context1, Context context2) {

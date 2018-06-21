@@ -78,7 +78,6 @@ public class Context extends AbstractContext implements Serializable{
 	public Context(World world, Head head) {
 		super(world);
 		buildContext(head);
-		
 	}
 	
 	
@@ -420,27 +419,56 @@ public class Context extends AbstractContext implements Serializable{
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
 		
-		for (Percept v : containingRanges) {
-			if (!ranges.get(v).isPerceptEnum()) {
-				Range r = c.getRanges().get(v);
-				if (!(r.getStart() <= ranges.get(v).getStart() && r.getEnd() >= ranges.get(v).getEnd())) {
-					if (ranges.get(v).getNearestLimit(v.getValue()) == false) {
-						vol = ranges.get(v).getEnd() - ranges.get(v).simulateNegativeAVTFeedbackMin(v.getValue());
+		for (Percept percept : containingRanges) {
+			if (!ranges.get(percept).isPerceptEnum()) {
+				Range r = c.getRanges().get(percept);
+				if (!(r.getStart() <= ranges.get(percept).getStart() && r.getEnd() >= ranges.get(percept).getEnd())) {
+					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
+						vol = ranges.get(percept).getEnd() - ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue());
 					} else {
-						vol = ranges.get(v).simulateNegativeAVTFeedbackMax(v.getValue()) - ranges.get(v).getStart();
+						vol = ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue()) - ranges.get(percept).getStart();
 					}
 
-				for (Percept v2 : ranges.keySet()) {
-					if (!ranges.get(v).isPerceptEnum() && v2 != v) {
-						vol *= ranges.get(v2).getLenght();
+				for (Percept p2 : ranges.keySet()) {
+					if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
+						vol *= ranges.get(p2).getLenght();
 					}
 				}
 				if (vol < volumeLost) {
 					volumeLost = vol;
-					p = v;
+					p = percept;
 				}
 			}
 		}
+		}
+		return p;
+	}
+	
+	private Percept getPerceptWithLesserImpactOnVolume(Context consideredContext, ContextOverlap contextOverlap) {
+		Percept p = null;
+		double volumeLost = Double.MAX_VALUE;
+		double vol;
+		
+		for (Percept percept : ranges.keySet()) {
+			
+			vol = 1.0;
+			
+			if (!ranges.get(percept).isPerceptEnum()) {
+				
+				vol *= contextOverlap.getLenghtByPercept(percept);
+
+				for (Percept p2 : ranges.keySet()) {
+					if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
+						
+						vol *= ranges.get(p2).getLenght();
+					}
+				}
+				
+				if (vol < volumeLost) {
+					volumeLost = vol;
+					p = percept;
+				}
+			}
 		}
 		return p;
 	}
@@ -915,24 +943,38 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @param head the head
 	 * @param c the c
 	 */
-	public void shrinkRangesToJoinBorders(Context c) {
-		Set<Percept> var = ranges.keySet();
+	public void shrinkRangesToJoinBorders(Context consideredContext) {
+		Set<Percept> percetList = ranges.keySet();
 		ArrayList<Percept> containingRanges = new ArrayList<Percept>();
 		
-		for (Percept v : var) {
-			boolean contain = ranges.get(v).contains(v.getValue()) == 0 ? true : false;
+		for (Percept percept : percetList) {
+			boolean contain = ranges.get(percept).contains(percept.getValue()) == 0 ? true : false;
 			if (contain) {
-				containingRanges.add(v);
+				containingRanges.add(percept);
 			}
 		}
 		
-		Percept p = getPerceptWithLesserImpactOnVolumeNotIncludedIn(containingRanges,c);
-		if (p == null) {
+		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolumeNotIncludedIn(containingRanges,consideredContext);
+		if (perceptWithLesserImpact == null) {
 			this.die();
 		}else {
-			ranges.get(p).matchBorderWith(c);
+			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
 		}
-	}	
+	}
+	
+	public void shrinkRangesToJoinBordersOnOverlap(Context consideredContext, ContextOverlap contextOverlap) {
+		ArrayList<Percept> percepts = new ArrayList<Percept>();
+		percepts.addAll(ranges.keySet());
+		
+		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolume(consideredContext, contextOverlap);
+		if (perceptWithLesserImpact == null) {
+			this.die();
+		}else {
+			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
+		}
+		
+		//perceptWithLesserImpact.overlapDeletion(contextOverlap);
+	}
 
 	
 	/* (non-Javadoc)
@@ -997,9 +1039,13 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 					overlapRanges.get(percept).put("end", endRange);
 				}
 				
-				ContextOverlap overlap = new ContextOverlap(this, context, overlapRanges);
-				contextOverlaps.add(overlap);	
-				this.world.getScheduler().addContextOverlap(overlap);
+				
+				if(!context.overlapComputed(this)) {
+					ContextOverlap overlap = new ContextOverlap(world, this, context, overlapRanges);
+					contextOverlaps.add(overlap);	
+					this.world.getScheduler().addContextOverlap(overlap);
+				}
+				
 			}
 		}
 		
@@ -1142,8 +1188,9 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		else {
 			return null;
 		}
+	
 
-		
+	
 			
 		
 		
@@ -1151,11 +1198,20 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 
 
 
+	public boolean overlapComputed(Context context) {
+		for(ContextOverlap contextOverlap : contextOverlaps) {
+			if(contextOverlap.overlapComputedBy(context)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 
-
-
+	public void deleteOverlap(ContextOverlap contextOverlap) {
+		contextOverlaps.remove(contextOverlap);
+	}
 
 
 

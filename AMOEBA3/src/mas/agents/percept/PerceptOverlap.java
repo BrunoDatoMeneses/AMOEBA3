@@ -1,10 +1,12 @@
 package mas.agents.percept;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import mas.agents.context.Context;
+import mas.kernel.World;
 
-public class PerceptOverlap {
+public class PerceptOverlap implements Serializable{
 
 	private double start;
 	private double end;
@@ -13,7 +15,7 @@ public class PerceptOverlap {
 	private String name;
 	
 	
-	public PerceptOverlap(Context context1, Context context2, double start, double end, String name) {
+	public PerceptOverlap(World world, Context context1, Context context2, double start, double end, String name) {
 		this.start = start;
 		this.end = end;
 		this.context1 = context1;

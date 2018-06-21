@@ -64,14 +64,14 @@ public class BadContextLauncherEasy implements Serializable {
 			/*This is a learning step of AMOEBA*/
 			amoeba.learn(new HashMap<String, Double>(bcm.getOutput()));
 			percepts = amoeba.getScheduler().getWorld().getAllPercept();
-			try        
-			{
-			    Thread.sleep(500);
-			} 
-			catch(InterruptedException ex) 
-			{
-			    Thread.currentThread().interrupt();
-			}
+//			try        
+//			{
+//			    Thread.sleep(500);
+//			} 
+//			catch(InterruptedException ex) 
+//			{
+//			    Thread.currentThread().interrupt();
+//			}
 		}
 		
 		/*for (int i = 0 ; i < 1000 ; i++) {

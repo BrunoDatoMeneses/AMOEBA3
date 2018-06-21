@@ -1621,13 +1621,19 @@ private void startPanelController() {
 	public void popupMenuForOverlapVisualization(String id) {
 		
 		JPopupMenu popup = new JPopupMenu("Visualization");
-		JMenuItem itemSolvsNCS = new JMenuItem("Solve NCS");
+		JMenuItem itemSolvsNCS = new JMenuItem("Solve Overlap NCS");
 		itemSolvsNCS.addActionListener(e -> {solveNCSByClick(id);});
+		JMenuItem itemSolveAllNCS = new JMenuItem("Solve All Overlaps NCS");
+		itemSolveAllNCS.addActionListener(e -> {solveAllNCSByClick(id);});
 		JMenuItem itemUdateView = new JMenuItem("Update View");
 		itemUdateView.addActionListener(e -> {update();});
+		JMenuItem itemUdateOverlapsAndNeighbours = new JMenuItem("Update Overlaps and Neighbours");
+		itemUdateOverlapsAndNeighbours.addActionListener(e -> {updateOverlapsAndNeighbours();});
  
 	    popup.add(itemSolvsNCS);
+	    popup.add(itemSolveAllNCS);
 	    popup.add(itemUdateView);
+	    popup.add(itemUdateOverlapsAndNeighbours);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 		
 	}
@@ -1637,8 +1643,44 @@ private void startPanelController() {
 		
 	}
 	
+	
+	
+	private void updateOverlapsAndNeighbours() {
+		
+		for(Percept percept : world.getScheduler().getPercepts()) {
+			percept.overlapsDetection();
+			percept.overlapNotification();
+		}
+		
+		for(Context context : world.getScheduler().getContextsAsContext()) {
+					
+					context.computeOverlapsByPercepts();
+					context.getNearestNeighbours();
+					
+				}
+		
+		update();
+	}
+	
+	public void solveAllNCSByClick(String id) {
+		//TODO ERREUR ICI car je supprime des éléments de la liste et je la lis je pense...
+		for(ContextOverlap contextOverlap : world.getScheduler().getContextOverlap()) {
+			contextOverlap.solveNCS_Overlap(0.1d);
+			System.out.println(contextOverlap.getName());
+			
+			try        
+			{
+			    Thread.sleep(500);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
+		}
+	}
+	
 	public void solveNCSByClick(String id) {
-		this.world.getScheduler().getContextOverlapByName(id).solveNCS_Overlap(0.1d);
+		world.getScheduler().getContextOverlapByName(id).solveNCS_Overlap(0.1d);
 	}
 
 	/**
