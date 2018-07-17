@@ -58,6 +58,7 @@ import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
+import mas.agents.context.ContextVoid;
 import mas.agents.context.Range;
 import mas.agents.head.Head;
 import visualization.graphView.GraphicVisualization2Dim;
@@ -156,8 +157,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	/** The y value. */
 	private JLabel yValue;
 
-	/** The view mode. */
-	private int viewMode = 0;
+
 	
 	/** The mouse event. */
 	private MouseEvent mouseEvent;
@@ -228,19 +228,19 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		
 		toolBar = new JToolBar(null, JToolBar.HORIZONTAL);
 
-		buttonShowDefault = new JButton(Config.getIcon("tag--plus.png"));
-		buttonShowDefault.addActionListener(e -> {showDefault();});
-		toolBar.add(buttonShowDefault);
-
-		buttonShowValue = new JButton(Config.getIcon("tag--exclamation.png"));
-		buttonShowValue.addActionListener(e -> {showValue();});
-		toolBar.add(buttonShowValue);
-
-		buttonShowName = new JButton(Config.getIcon("tag.png"));
-		buttonShowName.addActionListener(e -> {showName();});
-		toolBar.add(buttonShowName);
-		
-		toolBar.addSeparator();
+//		buttonShowDefault = new JButton(Config.getIcon("tag--plus.png"));
+//
+//		toolBar.add(buttonShowDefault);
+//
+//		buttonShowValue = new JButton(Config.getIcon("tag--exclamation.png"));
+//
+//		toolBar.add(buttonShowValue);
+//
+//		buttonShowName = new JButton(Config.getIcon("tag.png"));
+//
+//		toolBar.add(buttonShowName);
+//		
+//		toolBar.addSeparator();
 		
 		buttonSoftStyle = new JButton(Config.getIcon("flag-white.png"));
 		buttonSoftStyle.addActionListener(e -> {setSoftStyle();});
@@ -732,44 +732,11 @@ private void startPanelController() {
 		world.destroy(Context.class);  //TODO
 	}
 	
-	/**
-	 * Show value.
-	 */
-	public void showValue() {
-		viewMode = 1;
-		if (world != null) {
-//			for (String name : blackBox.getBlackBoxAgents().keySet()) {
-//				BlackBoxAgent bba = blackBox.getBlackBoxAgents().get(name);	
-//				graph.getNode(bba.getName()).setAttribute("ui.label", bba.getValue());		
-//			}
-		}
-	}
+
 	
-	/**
-	 * Show default.
-	 */
-	public void showDefault() {
-		viewMode = 0;
-		if (world != null) {
-//			for (String name : blackBox.getBlackBoxAgents().keySet()) {
-//				BlackBoxAgent bba = blackBox.getBlackBoxAgents().get(name);	
-//				graph.getNode(bba.getName()).setAttribute("ui.label", bba.getName() + " " + bba.getValue());		
-//			}
-		}
-	}
+
 	
-	/**
-	 * Show name.
-	 */
-	public void showName() {
-		viewMode = 2;
-		if (world != null) {
-//			for (String name : blackBox.getBlackBoxAgents().keySet()) {
-//				BlackBoxAgent bba = blackBox.getBlackBoxAgents().get(name);	
-//				graph.getNode(bba.getName()).setAttribute("ui.label", bba.getName());		
-//			}
-		}
-	}
+
 	
 	/**
 	 * Sets the world.
@@ -1009,20 +976,7 @@ private void startPanelController() {
 		getPerceptMinMaxValues2Dim();
 		getPerceptMinMaxValuesNDim();
 		
-		switch(viewMode) {
 		
-		case 0 : 
-			showDefault();
-			break;
-			
-		case 1 : 
-			showValue();
-			break;
-			
-		case 2 :
-			showName();
-			break;
-		}
 		
 		//TODO
 		xValue.setText(   String.valueOf( ( (((Percept) world.getAgents().get(comboDimX.getSelectedItem())).getValue()  )  )));
@@ -1047,6 +1001,7 @@ private void startPanelController() {
 		
 		for (String name : world.getAgents().keySet()) {
 			SystemAgent agent = world.getAgents().get(name);
+			
 			if (agent instanceof Context) {
 				Context context = (Context)agent;
 			
@@ -1085,19 +1040,6 @@ private void startPanelController() {
 					node.addAttribute("ui.class","Context");
 				}
 
-
-	/*			else if (n.getImpact() < 0) {
-					node.addAttribute("ui.class",a.getClass().getSimpleName());				
-				}
-				else if (n.getImpact() == 0) {
-					node.addAttribute("ui.class","stableNodexte");				
-				} 
-				else 
-				{
-					node.addAttribute("ui.class","NodexteBadImpact");				
-				}*/
-
-				//TODO
 				context.setnSelection(0);
 			}
 			
@@ -1128,31 +1070,7 @@ private void startPanelController() {
 			obsList.add(obsEle);
 		}
 
-		//Draw edge
-/*		for (String name : world.getAgents().keySet()) {
-			SystemAgent a = world.getAgents().get(name);
 
-			for (Agent target : a.getTargets()) {
-				String fullname = name + " " + target.getName();
-				if (graph.getEdge(fullname) == null) {
-					graph.addEdge(fullname, a.getName(), target.getName(), true);				
-				}
-				graph.getEdge(fullname).addAttribute("EXIST", true);
-				
-
-				if (a instanceof Nodexte) {
-					if ( ((Nodexte) a).getProposalTrust() > 0) {
-						graph.getEdge(fullname).addAttribute("ui.class", "validContext");
-						graph.getEdge(fullname).addAttribute("layout.weight", 0.5);
-					}
-					else {
-						graph.getEdge(fullname).removeAttribute("ui.class");
-						graph.getEdge(fullname).addAttribute("layout.weight", 1);
-					}
-				}
-			}
-
-		}*/
 		
 		for (Node node : graph) {
 			if (node.hasAttribute("EXIST")) {
@@ -1161,14 +1079,7 @@ private void startPanelController() {
 				graph.removeNode(node);
 			}
 		}
-		/*
-		for (Edge edge : graph.getEachEdge()) {
-			if (edge.hasAttribute("EXIST")) {
-				edge.removeAttribute("EXIST");
-			} else {
-				graph.removeEdge(edge);
-			}
-		}*/
+
 		if (colorIsDynamic) {
 			
 			double min = Double.POSITIVE_INFINITY;
@@ -1195,47 +1106,28 @@ private void startPanelController() {
 					Node node = graph.getNode(name);
 
 					node.addAttribute("ui.class","ContextColorDynamic");
-					node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
-					//node.setAttribute("ui.color", 0.5 );  
+					node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) );  
 				}
 
 			}
 			
 			
+			
 			for(Context context : world.getScheduler().getContextsAsContext()) {
-				
-				//context.computeOverlapsByPercepts();
-				context.getNearestNeighbours();
-				
 				for(ContextOverlap contextOverlap : context.contextOverlaps) {
-					
-					world.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawRectangle(contextOverlap);
-					
+					world.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawOverlap(contextOverlap);
 				}
 			}
 
 		}
 		
 		
-		
-		
-		//---------------------------------------------------Add scale----------------------------------------------------
-	//	if (graph.getNode("scale") == null ) {
-	//		graph.addNode("scale");
-	//		Node sc = graph.getNode("scale");
-	//		sc.addAttribute("ui.class", "scale");
-	//		sc.setAttribute("xyz", 0	,0, 100);
-	//	}
-		
-//		int tick = world.getScheduler().getTick();
-//		if (tick % 500 == 0 && tick > 0) {
-//			graph.addAttribute("ui.screenshot", "'/home/nigon/TÃ©lÃ©chargements/screen" + tick +".png");
-//		}
+	
 
 	}
 	
 	
-	public void drawRectangle(ContextOverlap contextOverlap){
+	public void drawOverlap(ContextOverlap contextOverlap){
 		Node node;
 		if (graph.getNode(contextOverlap.getName()) != null) {
 			node = graph.getNode(contextOverlap.getName());
@@ -1261,6 +1153,31 @@ private void startPanelController() {
 		
 		//node.addAttribute("ui.color", Color.RED);
 		node.addAttribute("ui.class","OverlapColor");
+
+	}
+	
+	public void drawVoid(ContextVoid contextVoid){
+		Node node;
+		if (graph.getNode(contextVoid.getName()) != null) {
+			node = graph.getNode(contextVoid.getName());
+		} else {
+			graph.addNode(contextVoid.getName());
+			node = graph.getNode(contextVoid.getName());
+			node.addAttribute("ui.class", contextVoid.getClass().getSimpleName());
+			node.addAttribute("ui.label", contextVoid.getName());
+		}
+
+		node.addAttribute("EXIST", true);
+		
+		
+		node.setAttribute("xyz", contextVoid.getPositionByString(comboDimX.getSelectedItem()) ,
+				contextVoid.getPositionByString(comboDimY.getSelectedItem()), 0);
+		
+		node.addAttribute("ui.style", "size: " + doubleFormat.format(5) + "gu, " + doubleFormat.format(5) +"gu;");
+		node.addAttribute("ui.class","Rectangle");
+		
+		//node.addAttribute("ui.color", Color.RED);
+		node.addAttribute("ui.class","VoidColor");
 
 	}
 	
@@ -1607,6 +1524,8 @@ private void startPanelController() {
 		itemRecolorAll.addActionListener(e -> {recolorAllContexts();});
 		JMenuItem itemUdateView = new JMenuItem("Update View");
 		itemUdateView.addActionListener(e -> {update();});
+		JMenuItem itemUdateOverlapsAndNeighbours = new JMenuItem("Update Overlaps and Neighbours");
+		itemUdateOverlapsAndNeighbours.addActionListener(e -> {updateOverlapsAndNeighbours();});
 	    
 	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts();});
 	    popup.add(itemShowContextNeighbours);
@@ -1615,6 +1534,7 @@ private void startPanelController() {
 	    popup.add(itemShowAll);
 	    popup.add(itemRecolorAll);
 	    popup.add(itemUdateView);
+	    popup.add(itemUdateOverlapsAndNeighbours);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 	}
 	
@@ -1653,30 +1573,25 @@ private void startPanelController() {
 		}
 		
 		for(Context context : world.getScheduler().getContextsAsContext()) {
-					
-					context.computeOverlapsByPercepts();
-					context.getNearestNeighbours();
-					
-				}
+			
+			context.computeOverlapsByPercepts();
+			context.getNearestNeighbours();
+		}
 		
 		update();
 	}
 	
 	public void solveAllNCSByClick(String id) {
 		//TODO ERREUR ICI car je supprime des éléments de la liste et je la lis je pense...
-		for(ContextOverlap contextOverlap : world.getScheduler().getContextOverlap()) {
+		for(ContextOverlap contextOverlap : world.getScheduler().getContextOverlaps()) {
 			contextOverlap.solveNCS_Overlap(0.1d);
 			System.out.println(contextOverlap.getName());
+	
 			
-			try        
-			{
-			    Thread.sleep(500);
-			} 
-			catch(InterruptedException ex) 
-			{
-			    Thread.currentThread().interrupt();
-			}
+			update();
 		}
+		
+		world.getScheduler().clearContextOverlaps();
 	}
 	
 	public void solveNCSByClick(String id) {

@@ -117,7 +117,7 @@ public class ContextOverlap implements Serializable{
 	private void die() {
 		context1.deleteOverlap(this);
 		context2.deleteOverlap(this);
-		world.getScheduler().removeContextOverlap(this);
+		//world.getScheduler().removeContextOverlap(this);
 	}
 	
 	public boolean overlapComputedBy(Context context) {

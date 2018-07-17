@@ -40,7 +40,11 @@ node.ContextColorDynamic {
 	
 node.OverlapColor {
 	fill-color: rgba(255,0,0,200);
-}	
+}
+
+node.VoidColor {
+	fill-color: rgba(255,255,0,200);
+}		
 	
 node.BestContextSelected {
 	fill-color: yellow;

@@ -16,6 +16,7 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
+import mas.agents.context.ContextVoid;
 import mas.agents.head.Head;
 //import mas.blackbox.BBFunction;
 //import mas.blackbox.Input;
@@ -48,6 +49,8 @@ public class Scheduler implements Serializable{
 	
 	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
 	private ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
+	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
+	private ArrayList<Context> lastModifiedContext = new ArrayList<Context>();
 
 	private boolean running = false;
 	private boolean waitForGUIUpdate = false;
@@ -59,6 +62,8 @@ public class Scheduler implements Serializable{
 	private int moduloMeasure = 1000;
 	
 	private long time;
+	
+	private int temporisation = 50;
 		
 	
 	/**
@@ -188,7 +193,9 @@ public class Scheduler implements Serializable{
 			addNewAgents();//scheduler acces to new agents
 			killAgents();
 			playAllAgents();
-			scheduledItemsAndView();		
+			scheduledItemsAndView();	
+			endogenousPlay();
+			
 			ticksUpdate();
 			
 			
@@ -247,6 +254,40 @@ public class Scheduler implements Serializable{
 		}
 	}
 	
+	
+	private void endogenousPlay() {
+		
+		
+		try        
+		{
+		    Thread.sleep(temporisation);
+		} 
+		catch(InterruptedException ex) 
+		{
+		    Thread.currentThread().interrupt();
+		}
+
+		
+		for(ContextOverlap contextOverlap : contextOverlaps) {
+			contextOverlap.solveNCS_Overlap(0.1d);
+			System.out.println(contextOverlap.getName());
+	
+			
+		}
+		
+		
+		scheduledItemsAndView();
+		
+		try        
+		{
+		    Thread.sleep(temporisation);
+		} 
+		catch(InterruptedException ex) 
+		{
+		    Thread.currentThread().interrupt();
+		}
+	}
+	
 	private void playAllAgents() {
 		//BB agents
 //		for (Agent agent : inputs) {
@@ -264,7 +305,8 @@ public class Scheduler implements Serializable{
 //			agent.play();
 //		}
 		//
-		
+		lastModifiedContext.clear();
+		clearContextOverlaps();
 
 		for (Agent agent : percepts) {
 			agent.readMessage();
@@ -283,6 +325,12 @@ public class Scheduler implements Serializable{
 			agent.readMessage();
 			agent.play();
 		}
+		
+		
+		
+		
+		
+		
 
 
 
@@ -652,14 +700,28 @@ public class Scheduler implements Serializable{
 		this.contextOverlaps.add(contextOverlap);
 	}
 	
+	
+	
 	public void removeContextOverlap(ContextOverlap contextOverlap) {
 		this.contextOverlaps.remove(contextOverlap);
 	}
 	
-	public ArrayList<ContextOverlap> getContextOverlap() {
+	public ArrayList<ContextOverlap> getContextOverlaps() {
 		return this.contextOverlaps;
 	}
 	
+	public void clearContextOverlaps() {
+		this.contextOverlaps.clear();
+	}
 	
+	public void addLastmodifiedContext(Context context) {
+		if(!lastModifiedContext.contains(context)) {
+			lastModifiedContext.add(context);
+		}
+	}
+	
+	public ArrayList<Context> getLastModifiedContexts(){
+		return lastModifiedContext;
+	}
 	
 }

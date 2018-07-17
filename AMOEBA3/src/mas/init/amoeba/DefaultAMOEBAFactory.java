@@ -59,26 +59,26 @@ public class DefaultAMOEBAFactory {
 		
 		Scheduler scheduler = new Scheduler();
 		
-		File sourceFile = new File("tmp/sourceXML.xml");
+		//File sourceFile = new File("tmp/sourceXML.xml");
 		File agentsFile = new File("tmp/agentsXML.xml");
 		
-		sourceFile.getParentFile().mkdirs();
+		//sourceFile.getParentFile().mkdirs();
 		try {
-			sourceFile.createNewFile();
+			//sourceFile.createNewFile();
 			agentsFile.createNewFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		inputStreamToFile(sourceXMLInput, sourceFile);
+		//inputStreamToFile(sourceXMLInput, sourceFile);
 		inputStreamToFile(agentsXMLInput, agentsFile);
 		
 		//BlackBox blackBox = new BlackBox(scheduler, sourceFile);	
 		World world = new World(scheduler, agentsFile);
 		
 		AMOEBA amoeba = new AMOEBA(viewer, scheduler, world);
-		sourceFile.delete();
+		//sourceFile.delete();
 		agentsFile.delete();
 		
 		return amoeba;

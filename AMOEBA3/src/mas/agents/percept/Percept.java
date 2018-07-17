@@ -162,6 +162,9 @@ public class Percept extends SystemAgent implements Serializable {
 	 * Most the other methods are remnant, used to use binary tree 
 	 */
 	public void play() {
+		
+		
+		
 		super.play();
 				
 		oldValue = value;
@@ -170,6 +173,10 @@ public class Percept extends SystemAgent implements Serializable {
 		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name);
 		ajustMinMax(); 
 		computeContextProjectionValidity();
+		
+		//ENDO
+		overlapsDetection();
+		overlapNotification();
 		
 
 	}	
@@ -601,6 +608,8 @@ public class Percept extends SystemAgent implements Serializable {
 
 	public void overlapsDetection() {
 		
+		perceptOverlaps.clear();
+		
 		ArrayList<Context> computedContexts = new ArrayList<Context>(); 
 		for(Context selectedContext : contextProjections.keySet()) {
 			
@@ -620,6 +629,8 @@ public class Percept extends SystemAgent implements Serializable {
 			
 			computedContexts.add(selectedContext);
 		}
+		
+		computedContexts.clear();
 	}
 	
 	public void overlapDeletion(ContextOverlap contextOverlap) {
@@ -632,7 +643,7 @@ public class Percept extends SystemAgent implements Serializable {
 		double contextStart2 = getStartRangeProjection(context2);
 		double contextEnd1 = getEndRangeProjection(context1);
 		double contextEnd2 = getEndRangeProjection(context2);
-		
+		System.out.println(context1.getName() + "  " + contextStart1 + "  " + contextEnd1 + "  " + context2.getName() + "  " + contextStart2 + "  " + contextEnd2);
 		return ( (contextStart1< contextStart2 && contextStart2 <contextEnd1) || ((contextStart1< contextEnd2 && contextEnd2 <contextEnd1)) ) || ( (contextStart2< contextStart1 && contextStart1 <contextEnd2) || ((contextStart2< contextEnd1 && contextEnd1 <contextEnd2)) ) ;
 		
 	}
@@ -678,7 +689,10 @@ public class Percept extends SystemAgent implements Serializable {
 			overlapRanges.put("start", getStartRangeProjection(context1));
 			overlapRanges.put("end", getEndRangeProjection(context2));
 		}
-		
+		else {
+			System.out.println("PROBLEM !!!!!!!!!!!!!!!!!" + context1.getName() + "  " + context2.getName());
+			return null;
+		}
 		
 		return overlapRanges;
 	}
@@ -699,6 +713,6 @@ public class Percept extends SystemAgent implements Serializable {
 	double contextStart2 = getStartRangeProjection(context2);
 	double contextEnd1 = getEndRangeProjection(context1);
 		
-		return  (contextStart1< contextStart2 && contextStart2 <contextEnd1)  ;
+		return  (contextStart1 <= contextStart2 && contextStart2 <= contextEnd1)  ;
 	}
 }

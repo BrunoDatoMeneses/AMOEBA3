@@ -662,6 +662,7 @@ public class Range implements Serializable, Comparable {
 		if(this.context != null) {
 			this.percept.updateContextProjectionStart(this.context);
 			this.percept.updateSortedRanges(this.context, "start");
+			context.getWorld().getScheduler().addLastmodifiedContext(context);
 		}
 		
 	}
@@ -671,6 +672,7 @@ public class Range implements Serializable, Comparable {
 		if(this.context != null) {
 			this.percept.updateContextProjectionEnd(this.context);
 			this.percept.updateSortedRanges(this.context, "end");
+			context.getWorld().getScheduler().addLastmodifiedContext(context);
 			
 		}
 	}

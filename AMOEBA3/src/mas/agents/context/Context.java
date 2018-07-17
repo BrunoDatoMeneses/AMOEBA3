@@ -57,8 +57,10 @@ public class Context extends AbstractContext implements Serializable{
 	
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
 	public ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
+	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
 	
 	
 	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
@@ -268,6 +270,11 @@ public class Context extends AbstractContext implements Serializable{
 	 * @see agents.SystemAgent#play()
 	 */
 	public void play() {
+		
+
+		
+		
+		
 		super.play();
 		
 		if(computeValidityByPercepts()) {
@@ -288,7 +295,18 @@ public class Context extends AbstractContext implements Serializable{
 			perceptValidities.put(percept, false);
 		}
 		
+		//ENDO
 		NCSDetections();
+		
+		for(Context ctxt : contextOverlapsByPercept.keySet()) {
+			contextOverlapsByPerceptSave.put(ctxt, new HashMap<Percept,Boolean>());
+			for(Percept p : ranges.keySet()) {
+				contextOverlapsByPerceptSave.get(ctxt).put(p, contextOverlapsByPercept.get(ctxt).get(p));
+			}
+		}
+
+		contextOverlapsByPercept.clear();
+		
 	}
 
 
@@ -302,11 +320,13 @@ public class Context extends AbstractContext implements Serializable{
 	
 	private void NCSDetection_Overlap() {
 		
-
 		computeOverlapsByPercepts();
-		for(Context ctxt: overlaps.keySet()) {
-			ctxt.getOverlapType(this);
-		}
+		getNearestNeighbours();
+		
+		
+//		for(Context ctxt: overlaps.keySet()) {
+//			ctxt.getOverlapType(this);
+//		}
 		
 	}
 
@@ -1020,31 +1040,34 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public Boolean computeOverlapsByPercepts() {
 		Boolean test = true;
 		
+		overlaps.clear();
+		contextOverlaps.clear();
+		//this.world.getScheduler().clearContextOverlaps();
+		
 		for(Context context : contextOverlapsByPercept.keySet()) {
 			test = true;
 			for(Percept percept : ranges.keySet()) {
 				test = test && contextOverlapsByPercept.get(context).get(percept);
 			}
 			
-			if(test) {
+			if(test && !context.overlapComputed(this)) {
+							
 				
 				overlaps.put(context, "Overlap");
 				
 				HashMap<Percept,HashMap<String,Double>> overlapRanges = new HashMap<Percept,HashMap<String,Double>>();
 				for(Percept percept : ranges.keySet()) {
 					overlapRanges.put(percept, new HashMap<String,Double>());
+					System.out.println("CONTEXT 1" + context.getName() + " CONTEXT2" + this.getName());
 					double startRange = percept.getOverlapRangesBetweenContexts(this, context).get("start");
 					double endRange = percept.getOverlapRangesBetweenContexts(this, context).get("end");
 					overlapRanges.get(percept).put("start", startRange);
 					overlapRanges.get(percept).put("end", endRange);
 				}
+				ContextOverlap overlap = new ContextOverlap(world, this, context, overlapRanges);
+				contextOverlaps.add(overlap);	
+				this.world.getScheduler().addContextOverlap(overlap);
 				
-				
-				if(!context.overlapComputed(this)) {
-					ContextOverlap overlap = new ContextOverlap(world, this, context, overlapRanges);
-					contextOverlaps.add(overlap);	
-					this.world.getScheduler().addContextOverlap(overlap);
-				}
 				
 			}
 		}
@@ -1107,6 +1130,13 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		
 		HashMap<Percept,  HashMap<String , ArrayList<Context>>> localSortedPossibleNeigbours = new HashMap<Percept,  HashMap<String , ArrayList<Context>>>();
 		
+		for(Percept p : ranges.keySet()) {
+			
+			sortedPossibleNeighbours.get(p).clear();
+			nearestNeighbours.get(p).clear();
+			neighbours.clear();
+			
+		}
 		
 		for(Percept p : ranges.keySet()) {
 			
@@ -1140,7 +1170,64 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			neighbours.add(endNeighbour);
 		}
 		
+		
+	}
 	
+	public void computeNearestNeighbour() {
+		
+		//System.out.println("VOISINS : " + neighbours.size());
+		for(Context context : neighbours) {
+			
+			if(context != null) {
+				voidDetection(context);
+			}
+			
+			
+		}
+		
+		
+	}
+	
+	
+	//Context void creation between this the current context on the one in arg
+	public void voidDetection(Context context) {
+		boolean noVoid = false;
+		HashMap<Percept,Double> voidPosition = new HashMap<Percept,Double>();
+		
+		for(Percept percept : ranges.keySet()) {	
+			
+			//System.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
+			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
+	
+				double ctxt1Start = this.getRanges().get(percept).getStart();
+				double ctxtEnd = this.getRanges().get(percept).getEnd();
+				double ctxt2Start = context.getRanges().get(percept).getStart();
+				double ctxt2End = context.getRanges().get(percept).getEnd();
+				double value = (ctxt1Start + ctxtEnd + ctxt2Start + ctxt2End)/4 ;
+				voidPosition.put(percept, value);
+				
+			}
+			else {
+				if(context.getRanges().get(percept).getEnd() + 5.0 < this.getRanges().get(percept).getStart()) {
+					double value = (context.getRanges().get(percept).getEnd() +  this.getRanges().get(percept).getStart())/2 ;
+					voidPosition.put(percept, value);
+				}
+				else if(this.getRanges().get(percept).getEnd() + 5.0 < context.getRanges().get(percept).getStart()) {
+					double value = (context.getRanges().get(percept).getEnd() +  this.getRanges().get(percept).getStart())/2 ;
+					voidPosition.put(percept, value);
+				}
+				else {
+					System.out.println("NO VOID !");
+					noVoid = true;
+				}
+			}
+			
+		}
+		if(!noVoid) {
+			ContextVoid currentVoid = new ContextVoid(world, this, context, voidPosition);
+			contextVoids.add(currentVoid);
+			getWorld().getScheduler().contextVoids.add(currentVoid);
+		}
 	}
 	
 	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedPossibleNeigbours, Percept percept, String range) {

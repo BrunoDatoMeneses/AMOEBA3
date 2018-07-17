@@ -9,6 +9,7 @@ import mas.agents.percept.ContextProjection;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
+import mas.agents.context.ContextVoid;
 import mas.agents.context.Range;
 import mas.agents.localModel.TypeLocalModel;
 import mas.init.amoeba.AMOEBAFactory;
@@ -119,26 +120,33 @@ public class AMOEBA_UI {
 	
 	public static void launchOverlapDetection(AMOEBA usedAmoeba) {
 		
-		for(Percept percept : getAllPercepts(usedAmoeba)) {
-			percept.overlapsDetection();
-			percept.overlapNotification();
-		}
-		
-		displayPerceptInfo(usedAmoeba);
+//		for(Percept percept : getAllPercepts(usedAmoeba)) {
+//			percept.overlapsDetection();
+//			percept.overlapNotification();
+//		}
+//		
+//		displayPerceptInfo(usedAmoeba);
 		
 		for(Context context : getContextsAsContexts(usedAmoeba)) {
 			
-			context.computeOverlapsByPercepts();
-			context.getNearestNeighbours();
+//			context.computeOverlapsByPercepts();
+//			context.getNearestNeighbours();
+//			
+//			for(ContextOverlap contextOverlap : context.contextOverlaps) {
+//				
+//				usedAmoeba.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawOverlap(contextOverlap);
+//				
+//			}
 			
-			for(ContextOverlap contextOverlap : context.contextOverlaps) {
-				
-				usedAmoeba.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawRectangle(contextOverlap);
-				
-			}
+			context.computeNearestNeighbour();
+			for(ContextVoid contextVoid : context.contextVoids) {
+			usedAmoeba.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawVoid(contextVoid);
+			
+		}
+			
 		}
 		
-		displayContextInfo(usedAmoeba);
+		//displayContextInfo(usedAmoeba);
 		
 	}
 	
