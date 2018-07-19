@@ -56,7 +56,7 @@ public class BadContextLauncherEasy implements Serializable {
 		bcm.setWorld(amoeba.getScheduler().getWorld());
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
-		for (int i = 0 ; i < 40 ; i++) {
+		for (int i = 0 ; i < 20 ; i++) {
 
 			/* This is the studied system part. Feel free to use any data source.*/
 			bcm.playOneStep(0);

@@ -1200,10 +1200,32 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
 	
 				double ctxt1Start = this.getRanges().get(percept).getStart();
-				double ctxtEnd = this.getRanges().get(percept).getEnd();
+				double ctxt1End = this.getRanges().get(percept).getEnd();
 				double ctxt2Start = context.getRanges().get(percept).getStart();
 				double ctxt2End = context.getRanges().get(percept).getEnd();
-				double value = (ctxt1Start + ctxtEnd + ctxt2Start + ctxt2End)/4 ;
+				
+				double value = 0d; 
+				
+				if( percept.contextIncludedIn(this, context) ) {
+					value = (ctxt1Start + ctxt1End) / 2 ;
+				}
+				else if( percept.contextIncludedIn(context, this) ) {
+					value = (ctxt2Start + ctxt2End) / 2 ;
+				}
+				else if( percept.contextOrder(this, context) ) {
+					value = (ctxt2Start + ctxt1End) / 2 ;
+				}
+				else if( percept.contextOrder(context, this) ) {
+					value = (ctxt1Start + ctxt2End) / 2 ;
+				}
+				else {
+					System.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
+				}
+				
+				
+				
+				
+				
 				voidPosition.put(percept, value);
 				
 			}
@@ -1213,7 +1235,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 					voidPosition.put(percept, value);
 				}
 				else if(this.getRanges().get(percept).getEnd() + 5.0 < context.getRanges().get(percept).getStart()) {
-					double value = (context.getRanges().get(percept).getEnd() +  this.getRanges().get(percept).getStart())/2 ;
+					double value = (this.getRanges().get(percept).getEnd() +  context.getRanges().get(percept).getStart())/2 ;
 					voidPosition.put(percept, value);
 				}
 				else {

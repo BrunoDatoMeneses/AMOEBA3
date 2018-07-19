@@ -63,7 +63,7 @@ public class Scheduler implements Serializable{
 	
 	private long time;
 	
-	private int temporisation = 50;
+	private int temporisation = 200;
 		
 	
 	/**
@@ -683,6 +683,15 @@ public class Scheduler implements Serializable{
 		for(ContextOverlap contextOverlap: contextOverlaps) {
 			if(contextOverlap.getName().equals(name)) {
 				return contextOverlap;
+			}
+		}
+		return null;
+	}
+	
+	public ContextVoid getContextVoidByName(String name) {
+		for(ContextVoid contextVoid: contextVoids) {
+			if(contextVoid.getName().equals(name)) {
+				return contextVoid;
 			}
 		}
 		return null;

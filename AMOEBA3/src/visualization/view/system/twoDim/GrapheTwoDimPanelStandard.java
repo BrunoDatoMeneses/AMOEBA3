@@ -1117,6 +1117,11 @@ private void startPanelController() {
 				for(ContextOverlap contextOverlap : context.contextOverlaps) {
 					world.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawOverlap(contextOverlap);
 				}
+				
+				for(ContextVoid contextVoid : context.contextVoids) {
+					world.getScheduler().getView().getTabbedPanel().getPanelTwoDimStandard().drawVoid(contextVoid);
+				}
+				
 			}
 
 		}
@@ -1248,6 +1253,76 @@ private void startPanelController() {
 		}
 	}
 	
+	public void highlightVoidContexts(ContextVoid contextVoid) {
+		
+		
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				double val = ((Context) a).getActionProposal();
+				if (val < min) {
+					min = val;
+				}
+				if (val > max) {
+					max = val;
+				}
+			}
+
+		}	
+		
+		for (Context ctxt :  contextVoid.getSurroundingContexts()) {
+
+				Node node = graph.getNode(ctxt.getName());
+				node.addAttribute("ui.class","ContextColorDynamic");
+				node.setAttribute("ui.color", 0.5 ); 
+		}
+	}
+	
+	public void highlightContexts(Context context) {
+		
+		
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				double val = ((Context) a).getActionProposal();
+				if (val < min) {
+					min = val;
+				}
+				if (val > max) {
+					max = val;
+				}
+			}
+
+		}	
+		
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				Context n = (Context)a;
+				Node node = graph.getNode(name);
+
+				node.addAttribute("ui.class","ContextColorDynamic");
+				
+				
+				node.setAttribute("ui.color", 0.1 ); 
+				
+				node.setAttribute("ui.color", 0.5 ); 
+
+
+				
+				
+ 
+			}
+
+		}
+	}
+	
 	public void recolorAllContexts() {
 		
 		
@@ -1356,6 +1431,18 @@ private void startPanelController() {
 			}
 			
 		}
+		else if(world.getScheduler().getContextVoidByName(id)!=null) {
+			ContextVoid pushedContextVoid = world.getScheduler().getContextVoidByName(id);
+			setContextVoidTextAreaInfo(id);
+			
+			if (sliderValue == currentTick || (!rememberState)) {
+				if (rightClick) {
+					popupMenuForVoidVisualization(id);
+					rightClick = false;
+				}
+			}
+			
+		}
 		
 		
 		//String info = world.getAgents().get(id).toString();
@@ -1428,6 +1515,36 @@ private void startPanelController() {
 		} else {
 			info = "State :" + currentTick + "\n";
 			info = info.concat(world.getScheduler().getContextOverlapByName(id).toString());
+			info = info.replace("Current", "\nCurrent");
+			info = info.replace("AVT", "\nAVT");
+		}
+		
+		textarea.setText(info);
+		
+	}
+	
+	private void setContextVoidTextAreaInfo(String id) {
+		System.out.println("Context Void pushed : " + id);
+		
+		String info = "";
+		if (rememberState) {
+			Observation o = getObservationByTick(sliderValue);
+			if (o != null) {
+				ContextVoid contextVoid = world.getScheduler().getContextVoidByName(id);
+				if ( contextVoid != null ) {
+					info = "State :" + sliderValue + "\n";
+					info = info.concat(contextVoid.toString());
+					info = info.replace("Current", "\nCurrent");
+					info = info.replace("AVT", "\nAVT");
+				} else {
+					info = "No context";
+				}
+				
+			} 
+			
+		} else {
+			info = "State :" + currentTick + "\n";
+			info = info.concat(world.getScheduler().getContextVoidByName(id).toString());
 			info = info.replace("Current", "\nCurrent");
 			info = info.replace("AVT", "\nAVT");
 		}
@@ -1538,6 +1655,18 @@ private void startPanelController() {
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 	}
 	
+	public void popupMenuForVoidVisualization(String id) {
+		JPopupMenu popup = new JPopupMenu("Visualization");
+		JMenuItem itemShowContextNeighbours = new JMenuItem("Contexts");
+		itemShowContextNeighbours.addActionListener(e -> {hightlightContextVoid(id);});
+		JMenuItem itemShowAll = new JMenuItem("Both");
+		
+	    itemShowAll.addActionListener( e -> {hightlightContextVoid(id);});
+	    popup.add(itemShowContextNeighbours);
+	    popup.add(itemShowAll);
+	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
+	}
+	
 	public void popupMenuForOverlapVisualization(String id) {
 		
 		JPopupMenu popup = new JPopupMenu("Visualization");
@@ -1563,6 +1692,9 @@ private void startPanelController() {
 		
 	}
 	
+	private void hightlightContextVoid(String id) {
+		highlightVoidContexts(world.getScheduler().getContextVoidByName(id));
+	}
 	
 	
 	private void updateOverlapsAndNeighbours() {

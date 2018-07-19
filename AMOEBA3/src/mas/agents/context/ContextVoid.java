@@ -21,7 +21,7 @@ public class ContextVoid implements Serializable{
 	public ContextVoid(World world, Context context1, Context context2, HashMap<Percept,Double> position) {
 		
 		this.world = world;
-		this.name = "[VOID]" + context1.getName() + context2.getName();
+		this.name = context1.getName() + context2.getName();
 		this.surroundingContexts.add(context1);
 		this.surroundingContexts.add(context2);
 		this.position = position;
@@ -79,6 +79,10 @@ public class ContextVoid implements Serializable{
 	
 	public boolean voidComputedBy(Context context) {
 		return surroundingContexts.contains(context);
+	}
+	
+	public ArrayList<Context> getSurroundingContexts(){
+		return surroundingContexts;
 	}
 	
 }
