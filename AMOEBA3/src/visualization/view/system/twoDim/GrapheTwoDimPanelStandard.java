@@ -1178,11 +1178,16 @@ private void startPanelController() {
 		node.setAttribute("xyz", contextVoid.getPositionByString(comboDimX.getSelectedItem()) ,
 				contextVoid.getPositionByString(comboDimY.getSelectedItem()), 0);
 		
-		node.addAttribute("ui.style", "size: " + doubleFormat.format(5) + "gu, " + doubleFormat.format(5) +"gu;");
+		double XWidth = contextVoid.getWidthByString(comboDimX.getSelectedItem());
+		double YWidth = contextVoid.getWidthByString(comboDimY.getSelectedItem());
+		
+		node.addAttribute("ui.style", "size: " + doubleFormat.format( XWidth - (XWidth*0.1)) + "gu, " + doubleFormat.format( YWidth - (YWidth*0.1)) +"gu;");
 		node.addAttribute("ui.class","Rectangle");
 		
 		//node.addAttribute("ui.color", Color.RED);
-		node.addAttribute("ui.class","VoidColor");
+		node.addAttribute("ui.class","VoidColorDynamic");
+		node.setAttribute("ui.color", 0.1 ); 
+		//node.addAttribute("ui.class","VoidColor");
 
 	}
 	
@@ -1251,6 +1256,23 @@ private void startPanelController() {
 			}
 
 		}
+		
+		
+		for(ContextVoid contextVoid : world.getScheduler().contextVoids) {
+			Node node = graph.getNode(contextVoid.getName());
+			node.addAttribute("ui.class","VoidColorDynamic");
+			
+			if(context.contextVoids.contains(contextVoid)) {
+				node.setAttribute("ui.color", 1 ); 
+			}
+			else {
+				node.setAttribute("ui.color", 0.1 ); 
+			}
+			
+			
+		}
+		
+		
 	}
 	
 	public void highlightVoidContexts(ContextVoid contextVoid) {
@@ -1352,6 +1374,11 @@ private void startPanelController() {
 				node.addAttribute("ui.class","ContextColorDynamic");
 				node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
 				//node.setAttribute("ui.color", 0.5 );  
+				for(ContextVoid contextVoid : n.contextVoids) {
+					Node node2 = graph.getNode(contextVoid.getName());
+					node2.addAttribute("ui.class","VoidColorDynamic");
+					node2.setAttribute("ui.color", 1 ); 
+				}
 			}
 	
 		}

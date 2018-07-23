@@ -37,6 +37,11 @@ node.ContextColorDynamic {
 	fill-mode: dyn-plain;
 	fill-color: rgba(0,200,20,150),  rgba(0,0,255,155);
 }
+
+node.VoidColorDynamic {
+	fill-mode: dyn-plain;
+	fill-color: rgba(255,255,0,200),  rgba(0,255,255,200);
+}
 	
 node.OverlapColor {
 	fill-color: rgba(255,0,0,200);

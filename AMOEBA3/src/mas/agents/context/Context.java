@@ -1176,12 +1176,18 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public void computeNearestNeighbour() {
 		
 		//System.out.println("VOISINS : " + neighbours.size());
-		for(Context context : neighbours) {
+		for(Context neighbourContext : neighbours) {
 			
-			if(context != null) {
-				voidDetection(context);
+			
+			if(neighbourContext != null){
+				ContextVoid computedVoid = neighbourContext.voidComputed(this);
+				if(computedVoid != null) {
+					contextVoids.add(computedVoid);
+				}
+				else {
+					voidDetection(neighbourContext);
+				}
 			}
-			
 			
 		}
 		
@@ -1193,50 +1199,66 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public void voidDetection(Context context) {
 		boolean noVoid = false;
 		HashMap<Percept,Double> voidPosition = new HashMap<Percept,Double>();
+		HashMap<Percept,Double> voidWidth = new HashMap<Percept,Double>();
+		
 		
 		for(Percept percept : ranges.keySet()) {	
+			
+			double thisStart = this.getRanges().get(percept).getStart();
+			double thisEnd = this.getRanges().get(percept).getEnd();
+			double ctxtStart = context.getRanges().get(percept).getStart();
+			double ctxtEnd = context.getRanges().get(percept).getEnd();
+			
+			double perceptPosition = 0d; 
+			double perceptWidth = 0d;
 			
 			//System.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
 			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
 	
-				double ctxt1Start = this.getRanges().get(percept).getStart();
-				double ctxt1End = this.getRanges().get(percept).getEnd();
-				double ctxt2Start = context.getRanges().get(percept).getStart();
-				double ctxt2End = context.getRanges().get(percept).getEnd();
 				
-				double value = 0d; 
+				
+				
 				
 				if( percept.contextIncludedIn(this, context) ) {
-					value = (ctxt1Start + ctxt1End) / 2 ;
+					perceptPosition = (thisStart + thisEnd) / 2 ;
+					perceptWidth = thisEnd - thisStart;
 				}
 				else if( percept.contextIncludedIn(context, this) ) {
-					value = (ctxt2Start + ctxt2End) / 2 ;
+					perceptPosition = (ctxtStart + ctxtEnd) / 2 ;
+					perceptWidth = ctxtEnd - ctxtStart;
 				}
 				else if( percept.contextOrder(this, context) ) {
-					value = (ctxt2Start + ctxt1End) / 2 ;
+					perceptPosition = (ctxtStart + thisEnd) / 2 ;
+					perceptWidth = thisEnd - ctxtStart;
 				}
 				else if( percept.contextOrder(context, this) ) {
-					value = (ctxt1Start + ctxt2End) / 2 ;
+					perceptPosition = (thisStart + ctxtEnd) / 2 ;
+					perceptWidth = ctxtEnd - thisStart;
 				}
 				else {
 					System.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
 				}
 				
-				
-				
-				
-				
-				voidPosition.put(percept, value);
+
+				voidPosition.put(percept, perceptPosition);
+				voidWidth.put(percept, perceptWidth);
 				
 			}
 			else {
-				if(context.getRanges().get(percept).getEnd() + 5.0 < this.getRanges().get(percept).getStart()) {
-					double value = (context.getRanges().get(percept).getEnd() +  this.getRanges().get(percept).getStart())/2 ;
-					voidPosition.put(percept, value);
+				
+				if(ctxtEnd + 1.0 < thisStart) {
+					perceptPosition = (ctxtEnd +  thisStart)/2 ;
+					perceptWidth = thisStart - ctxtEnd;
+					
+					voidPosition.put(percept, perceptPosition);
+					voidWidth.put(percept, perceptWidth);
 				}
-				else if(this.getRanges().get(percept).getEnd() + 5.0 < context.getRanges().get(percept).getStart()) {
-					double value = (this.getRanges().get(percept).getEnd() +  context.getRanges().get(percept).getStart())/2 ;
-					voidPosition.put(percept, value);
+				else if(thisEnd + 1.0 < ctxtStart) {
+					perceptPosition = (thisEnd +  ctxtStart)/2 ;
+					perceptWidth = ctxtStart - thisEnd;
+					
+					voidPosition.put(percept, perceptPosition);
+					voidWidth.put(percept, perceptWidth);
 				}
 				else {
 					System.out.println("NO VOID !");
@@ -1245,8 +1267,9 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			}
 			
 		}
+		
 		if(!noVoid) {
-			ContextVoid currentVoid = new ContextVoid(world, this, context, voidPosition);
+			ContextVoid currentVoid = new ContextVoid(world, this, context, voidPosition, voidWidth);
 			contextVoids.add(currentVoid);
 			getWorld().getScheduler().contextVoids.add(currentVoid);
 		}
@@ -1322,7 +1345,14 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		contextOverlaps.remove(contextOverlap);
 	}
 
-
+	public ContextVoid voidComputed(Context context) {
+		for(ContextVoid contextVoid : contextVoids) {
+			if(contextVoid.voidComputedBy(context)) {
+				return contextVoid;
+			}
+		}
+		return null;
+	}
 
 
 
