@@ -15,13 +15,9 @@ public class AMOEBAFactory {
 	
 	
 	/* Create an AMOEBA by default - providing relative path of xml files */
-	public static AMOEBA createAMOEBA(boolean viewer, String pathToSourceXML, String pathToAgentsXML) {
-		return new DefaultAMOEBAFactory().createAMOEBA(viewer, pathToSourceXML, pathToAgentsXML);
+	public static AMOEBA createAMOEBA(boolean viewer, String pathToAgentsXML) {
+		return new DefaultAMOEBAFactory().createAMOEBA(viewer, pathToAgentsXML);
 	}
 	
-	
-	/* Create an AMOEBA by selecting serialized file */
-	public static AMOEBA createAMOEBA(boolean viewer, String path) {
-		return new SerializedAMOEBAFactory().createAMOBA(viewer, path);
-	}
+
 }

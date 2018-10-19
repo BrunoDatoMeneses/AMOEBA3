@@ -63,7 +63,7 @@ public class Scheduler implements Serializable{
 	
 	private long time;
 	
-	private int temporisation = 200;
+	private int temporisation = 0;
 		
 	
 	/**
@@ -194,7 +194,7 @@ public class Scheduler implements Serializable{
 			killAgents();
 			playAllAgents();
 			scheduledItemsAndView();	
-			endogenousPlay();
+			//endogenousPlay();
 			
 			ticksUpdate();
 			
@@ -204,6 +204,15 @@ public class Scheduler implements Serializable{
 				world.setStartSerialization(false, null);
 				Config.print("End of the serialization", -100);
 			}*/
+			
+			try        
+			{
+			    Thread.sleep(temporisation);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
 
 			if (playOneStep) {
 				playOneStep = false;
@@ -258,14 +267,7 @@ public class Scheduler implements Serializable{
 	private void endogenousPlay() {
 		
 		
-		try        
-		{
-		    Thread.sleep(temporisation);
-		} 
-		catch(InterruptedException ex) 
-		{
-		    Thread.currentThread().interrupt();
-		}
+		
 
 		
 		for(ContextOverlap contextOverlap : contextOverlaps) {

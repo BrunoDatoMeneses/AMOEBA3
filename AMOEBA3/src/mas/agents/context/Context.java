@@ -296,7 +296,13 @@ public class Context extends AbstractContext implements Serializable{
 		}
 		
 		//ENDO
-		NCSDetections();
+		for (Percept v : ranges.keySet()) {
+			if (ranges.get(v).isTooSmall()){
+				solveNCS_Uselessness(controller);
+				break;
+			}
+		}
+		/*NCSDetections();
 		
 		for(Context ctxt : contextOverlapsByPercept.keySet()) {
 			contextOverlapsByPerceptSave.put(ctxt, new HashMap<Percept,Boolean>());
@@ -305,7 +311,7 @@ public class Context extends AbstractContext implements Serializable{
 			}
 		}
 
-		contextOverlapsByPercept.clear();
+		contextOverlapsByPercept.clear();*/
 		
 	}
 
@@ -682,9 +688,27 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public String toString() {
 		String s = "";
 		s += "Context : " + getName() + "\n";
+		s += "\n";
+		
+		s += "Model : ";
+		s += this.localModel.getCoefsFormula() + "\n";
+		//double[] coefs = ((LocalModelMillerRegression) this.localModel).getCoef();
+		//for (int i = 1 ; i < coefs.length ; i++) {
+			/*if (Double.isNaN(coefs[i])) {
+				s += "0.0" + "\t";	
+			}
+			else {
+				s += coefs[i] + "\t";				
+			}*/
+			//s += coefs[i] + "\t";
+		//}
+		//s += "\n";
+		s += "\n";
+		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
 			
+			s += "\n";
 			s += "Neighbours : \n";
 			
 			if(nearestNeighbours.get(v).get("start") != null) {
@@ -731,6 +755,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			
 
 		}
+		s += "\n";
 		s += "Number of activations : " + activations + "\n";
 		if (actionProposition != null) {
 			s += "Action proposed : " + this.actionProposition + "\n";
@@ -745,6 +770,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			s += "Local model : " + localModel.getFormula(this) + "\n";
 		}
 		
+		s += "\n";
 		s += "Possible neighbours : \n";
 		for(Context ctxt : possibleNeighbours) {
 			s += ctxt.getName() + "\n";
@@ -923,15 +949,15 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 *
 	 * @param ctrl the ctrl
 	 */
-	public void analyzeResults(Head ctrl) {
+	public void analyzeResults(Head head) {
 
-			if (ctrl.getCriticity(this) > ctrl.getErrorAllowed()) {
-				solveNCS_Conflict(ctrl);
+			if (head.getCriticity(this) > head.getErrorAllowed()) {
+				solveNCS_Conflict(head);
 				this.world.getScheduler().addAlteredContext(this);
 			}
 			else {		
-				if (ctrl.getCriticity(this) > ctrl.getInexactAllowed()) {
-					solveNCS_ConflictInexact(ctrl);
+				if (head.getCriticity(this) > head.getInexactAllowed()) {
+					solveNCS_ConflictInexact(head);
 				}
 				else {
 					confidence++;

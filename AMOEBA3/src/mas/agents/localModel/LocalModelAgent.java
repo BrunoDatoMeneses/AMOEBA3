@@ -71,6 +71,7 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	 * @return the formula
 	 */
 	public abstract String getFormula(Context context);
+	public abstract String getCoefsFormula();
 
 	/**
 	 * Update model.
@@ -78,6 +79,8 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	 * @param context the context
 	 */
 	public abstract void updateModel(Context context);
+	
+	public abstract double[] getCoef();
 	
 	/* (non-Javadoc)
 	 * @see agents.Agent#die()

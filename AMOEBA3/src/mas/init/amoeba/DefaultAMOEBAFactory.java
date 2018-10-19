@@ -26,14 +26,13 @@ public class DefaultAMOEBAFactory {
 	 * @param pathToAgentsXML the path to agents XML
 	 * @return the amoeba
 	 */
-	public AMOEBA createAMOEBA(boolean viewer, String pathToSourceXML, String pathToAgentsXML) {
+	public AMOEBA createAMOEBA(boolean viewer, String pathToAgentsXML) {
 		try {
-			InputStream sourceXMLInput = getClass().getClassLoader().getResourceAsStream(pathToSourceXML);
 			InputStream agentsXMLInput = getClass().getClassLoader().getResourceAsStream(pathToAgentsXML);
 			
-			if (sourceXMLInput.available() > 0 && agentsXMLInput.available() > 0) {
+			if ( agentsXMLInput.available() > 0) {
 								
-				return amoebaCreationWithSchedulerBlackBoxAndWorld(viewer, sourceXMLInput, agentsXMLInput);
+				return amoebaCreationWithSchedulerBlackBoxAndWorld(viewer, agentsXMLInput);
 				
 			} else {
 				XMLFilesAMOEBAFactory xmlFilesAMOEBA = new XMLFilesAMOEBAFactory();
@@ -55,7 +54,7 @@ public class DefaultAMOEBAFactory {
 	}
 	
 	
-	private AMOEBA amoebaCreationWithSchedulerBlackBoxAndWorld(boolean viewer, InputStream sourceXMLInput, InputStream agentsXMLInput) {
+	private AMOEBA amoebaCreationWithSchedulerBlackBoxAndWorld(boolean viewer, InputStream agentsXMLInput) {
 		
 		Scheduler scheduler = new Scheduler();
 		

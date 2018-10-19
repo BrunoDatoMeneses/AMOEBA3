@@ -36,7 +36,7 @@ public enum NCS implements Serializable {
 	 */
 	public void raiseNCS(World world) {
 		world.changeNCSNumber(1, this);
-		System.out.println(this);
+		//System.out.println(this);
 		if (this.equals(NCS.CONTEXT_CONFLICT_FALSE)) {
 			a = true;
 		}

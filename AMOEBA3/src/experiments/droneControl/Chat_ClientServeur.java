@@ -41,17 +41,12 @@ public class Chat_ClientServeur implements Runnable {
 	private int counter = 0;
 	private String message = "";
 
-	public AMOEBA amoebaX = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControl.xml",
-			"/experiments/droneControl/DroneControl_solver.xml");
-	public AMOEBA amoebaY = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControl.xml",
-			"/experiments/droneControl/DroneControl_solver.xml");
-	public AMOEBA amoebaZ = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControl.xml",
-			"/experiments/droneControl/DroneControl_solver.xml");
+	public AMOEBA amoebaX = AMOEBAFactory.createAMOEBA(viewer,"/experiments/droneControl/DroneControl_solver.xml");
+	public AMOEBA amoebaY = AMOEBAFactory.createAMOEBA(viewer,"/experiments/droneControl/DroneControl_solver.xml");
+	public AMOEBA amoebaZ = AMOEBAFactory.createAMOEBA(viewer,"/experiments/droneControl/DroneControl_solver.xml");
 	
-	public AMOEBA amoebaVX = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControlVariations.xml",
-			"/experiments/droneControl/DroneControlVariations_solver.xml");
-	public AMOEBA amoebaVZ = AMOEBAFactory.createAMOEBA(viewer, "/experiments/droneControl/DroneControlVariations.xml",
-			"/experiments/droneControl/DroneControlVariations_solver.xml");
+	public AMOEBA amoebaVX = AMOEBAFactory.createAMOEBA(viewer,"/experiments/droneControl/DroneControlVariations_solver.xml");
+	public AMOEBA amoebaVZ = AMOEBAFactory.createAMOEBA(viewer,"/experiments/droneControl/DroneControlVariations_solver.xml");
 	
 
 	public ControlModel controlModelVc = new ControlModel("Vc",0.5f);

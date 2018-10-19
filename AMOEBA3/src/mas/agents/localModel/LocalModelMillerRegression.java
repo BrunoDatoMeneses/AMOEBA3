@@ -198,6 +198,27 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		}
 
 	}
+	
+	public String getCoefsFormula() {
+		
+				
+		
+		String result = "" +coef[0];
+	//	System.out.println("Result 0" + " : " + result);
+		if (coef[0] == Double.NaN) System.exit(0);
+		
+		for (int i = 1 ; i < coef.length ; i++) {
+			if (Double.isNaN(coef[i])) coef[i] = 0;
+			
+			result += "\t" + coef[i];
+			
+		}
+		
+		return result;
+
+}
+	
+
 
 
 	/* (non-Javadoc)

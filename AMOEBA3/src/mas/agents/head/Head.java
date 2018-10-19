@@ -155,11 +155,16 @@ public class Head extends AbstractHead {
 		}
 		else {
 			playWithoutOracle();
-			updateStatisticalInformations(); ///regarder dans le d彋ail, possible que ce pas trop utile
+			//updateStatisticalInformations(); ///regarder dans le d彋ail, possible que ce pas trop utile
 		}
+		//中
+		updateStatisticalInformations(); ///regarder dans le d彋ail, possible que ce pas trop utile
 		
 		contexts.clear();
 		newContext = null;
+		
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error allowded :" + errorAllowed);
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Inexact allowded :" + inexactAllowed);
 	}
 	
 	
@@ -180,6 +185,7 @@ public class Head extends AbstractHead {
 
 		/*Compute the criticity. Will be used by context agents.*/
 		criticity = Math.abs(oracleValue - prediction);
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error :" + criticity);
 
 		/*If we have a bestcontext, send a selection message to it*/
 		if (bestContext != null) {
@@ -461,40 +467,61 @@ public class Head extends AbstractHead {
 			xLastCriticityValues.remove(0);
 		}
 		
-		if (criticity > errorAllowed) {
+		
+		
+		if (averagePredictionCriticity > errorAllowed) {
 			perfIndicator--;
 		} else {
 			perfIndicator++;
 		}
+		/*if (criticity > errorAllowed) {
+			perfIndicator--;
+		} else {
+			perfIndicator++;
+		}*/
+		System.out.println("中中中中中中中中中中中  PERF INDICATOR :" + perfIndicator);
 		
 		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
 			perfIndicator = 0;
 			errorAllowed *= augmentationFactorError;
+			System.out.println("中中中中中中中中中中中  augmentationFactorError :" + augmentationFactorError);
 		}
 		
 		if (perfIndicator >= nSuccessBeforeDiminution) {
 			perfIndicator = 0;
 			errorAllowed *= diminutionFactorError;
+			System.out.println("中中中中中中中中中中中  diminutionFactorError :" + diminutionFactorError);
 			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
 		}
 		
-		if (criticity > inexactAllowed) {
+		
+		if (averagePredictionCriticity > inexactAllowed) {
 			perfIndicatorInexact--;
 		} else {
 			perfIndicatorInexact++;
 		}
 		
+		/*if (criticity > inexactAllowed) {
+			perfIndicatorInexact--;
+		} else {
+			perfIndicatorInexact++;
+		}*/
+		System.out.println("中中中中中中中中中中中  PERF INDICATOR INEXACT :" + perfIndicator);
+		
 		if (perfIndicatorInexact <= nConflictBeforeInexactAugmentation * (-1)) {
 			perfIndicatorInexact = 0;
 			inexactAllowed *= augmentationInexactError;
+			System.out.println("中中中中中中中中中中中  augmentationInexactError :" + augmentationInexactError);
 		}
 		
 		if (perfIndicatorInexact >= nSuccessBeforeInexactDiminution) {
 			perfIndicatorInexact = 0;
 			inexactAllowed *= diminutionInexactError;
 			inexactAllowed = Math.max(minInexactAllowed, inexactAllowed);
+			System.out.println("中中中中中中中中中中中  diminutionInexactError :" + diminutionInexactError);
 
 		}
+		
 		//numberOfCriticityValuesForAverage
 	}
 

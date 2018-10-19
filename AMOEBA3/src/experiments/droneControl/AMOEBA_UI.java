@@ -20,8 +20,7 @@ public class AMOEBA_UI {
 	public AMOEBA_UI(boolean viewer, String percepts){
 		
 		if(percepts.contentEquals("position")){
-			amoeba = AMOEBAFactory.createAMOEBA(viewer, "DroneControl.xml",
-					"DroneControl_solver.xml");
+			amoeba = AMOEBAFactory.createAMOEBA(viewer,"DroneControl_solver.xml");
 		}
 		else if (percepts.contentEquals("speed")){
 			amoeba = AMOEBAFactory.createAMOEBA(viewer, "DroneControlVariations_solver.xml");

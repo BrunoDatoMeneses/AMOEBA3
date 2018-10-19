@@ -51,7 +51,7 @@ public class Range implements Serializable, Comparable {
 	public int id;
 
 	/** The Constant mininimalRange. */
-	public static final double mininimalRange = 0;
+	public static final double mininimalRange = 10;
 	
 	/** The Constant useAVT. */
 	private static final boolean useAVT = true;
@@ -361,6 +361,10 @@ public class Range implements Serializable, Comparable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
+		if((end - start) < mininimalRange && (end - start)>0) {
+			System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
+		}
+		
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
 	}
 

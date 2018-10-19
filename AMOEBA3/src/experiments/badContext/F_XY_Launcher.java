@@ -18,7 +18,7 @@ import mas.kernel.AMOEBA;
 /**
  * The Class BadContextLauncherEasy.
  */
-public class BadContextLauncherEasy implements Serializable {
+public class F_XY_Launcher implements Serializable {
 
 
 	public static final boolean viewer = true;
@@ -35,8 +35,10 @@ public class BadContextLauncherEasy implements Serializable {
 		
 		/* These method calls allow to setup AMOEBA*/
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.setDataForErrorMargin(10, 0.01, 0.01, 10, 5, 5);
-		amoeba.setDataForInexactMargin(0.1, 0.01, 0.01, 0.1, 5, 5);
+		
+		//Beau résultat
+		amoeba.setDataForErrorMargin(0.1, 5, 0.4, 0.1, 5, 10);
+		amoeba.setDataForInexactMargin(0.05, 2.5, 0.2, 0.05, 5, 10);
 		
 		/* Default */
 //		amoeba.setAVT_acceleration(2);
@@ -52,11 +54,11 @@ public class BadContextLauncherEasy implements Serializable {
 		amoeba.setGenerateCSV(false);
 		
 		/* This is the initialization of the studied system. It's only for the sake of example, not a part of AMOEBA initialization*/
-		BadContextManager bcm = new BadContextManager(50.0);
+		F_XY_Manager bcm = new F_XY_Manager(50.0);
 		bcm.setWorld(amoeba.getScheduler().getWorld());
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
-		for (int i = 0 ; i < 200 ; i++) {
+		for (int i = 0 ; i < 1000 ; i++) {
 
 			/* This is the studied system part. Feel free to use any data source.*/
 			bcm.playOneStep(0);

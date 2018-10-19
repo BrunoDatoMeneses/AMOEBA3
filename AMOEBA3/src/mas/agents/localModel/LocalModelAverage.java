@@ -52,6 +52,10 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 	public String getFormula(Context context) {
 		return  getProposition(context) +"";
 	}
+	
+	public String getCoefsFormula() {
+		return  "";
+	}
 
 	/* (non-Javadoc)
 	 * @see agents.localModel.LocalModelAgent#updateModel(agents.context.Context)
@@ -65,6 +69,10 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 	public double getProposition(Context context, ContextOverlap contextOverlap) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public double[] getCoef() {
+		return new double[1];
 	}
 
 }

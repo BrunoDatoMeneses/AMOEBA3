@@ -1181,7 +1181,7 @@ private void startPanelController() {
 		double XWidth = contextVoid.getWidthByString(comboDimX.getSelectedItem());
 		double YWidth = contextVoid.getWidthByString(comboDimY.getSelectedItem());
 		
-		node.addAttribute("ui.style", "size: " + doubleFormat.format( XWidth - (XWidth*0.1)) + "gu, " + doubleFormat.format( YWidth - (YWidth*0.1)) +"gu;");
+		node.addAttribute("ui.style", "size: " + doubleFormat.format( XWidth ) + "gu, " + doubleFormat.format( YWidth ) +"gu;");
 		node.addAttribute("ui.class","Rectangle");
 		
 		//node.addAttribute("ui.color", Color.RED);
