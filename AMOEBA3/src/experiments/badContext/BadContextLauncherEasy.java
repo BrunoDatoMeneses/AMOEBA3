@@ -35,8 +35,8 @@ public class BadContextLauncherEasy implements Serializable {
 		
 		/* These method calls allow to setup AMOEBA*/
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.setDataForErrorMargin(10, 0.01, 0.01, 10, 5, 5);
-		amoeba.setDataForInexactMargin(0.1, 0.01, 0.01, 0.1, 5, 5);
+		amoeba.setDataForErrorMargin(1, 0.01, 0.01, 1, 5, 5);
+		amoeba.setDataForInexactMargin(0.5, 0.01, 0.01, 0.5, 5, 5);
 		
 		/* Default */
 //		amoeba.setAVT_acceleration(2);

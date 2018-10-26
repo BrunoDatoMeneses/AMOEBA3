@@ -27,7 +27,9 @@ public class Head extends AbstractHead {
 	
 	//private BlackBoxAgent oracle;
 	
-	private ArrayList<Context> contexts = new ArrayList<Context>();
+	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
+	private ArrayList<Context> partialyActivatedContexts = new ArrayList<Context>();
+	private ArrayList<Pair<Context,Context>> sharedIncompetenceContextPairs = new ArrayList<Pair<Context,Context>>();
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
 
 	
@@ -43,6 +45,7 @@ public class Head extends AbstractHead {
 	private int perfIndicatorInexact = 0;
 	
 	private double prediction;
+	private double endogenousPrediction;
 	private double oracleValue;
 	private double oldOracleValue;
 	private double criticity;
@@ -126,8 +129,12 @@ public class Head extends AbstractHead {
 		// contexts.clear();
 
 		if (m.getType() == MessageType.PROPOSAL) { // Value useless
-			contexts.add((Context) m.getSender());
+			activatedContexts.add((Context) m.getSender());
 		}
+	}
+	
+	public void addPartiallyActivatedContext(Context partialyactivatedContext) {
+		partialyActivatedContexts.add(partialyactivatedContext);
 	}
 
 	/**
@@ -136,7 +143,7 @@ public class Head extends AbstractHead {
 	 */
 	public void play() {
 
-		nPropositionsReceived = contexts.size();
+		nPropositionsReceived = activatedContexts.size();
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
 		oldOracleValue = oracleValue;
@@ -158,9 +165,13 @@ public class Head extends AbstractHead {
 			//updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		}
 		//¤¤
+		
+		endogenousPlay();
+		
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		
-		contexts.clear();
+		activatedContexts.clear();
+		partialyActivatedContexts.clear();
 		newContext = null;
 		
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error allowded :" + errorAllowed);
@@ -171,7 +182,7 @@ public class Head extends AbstractHead {
 	
 	private void playWithOracle() {
 			
-		if (contexts.size() > 0) {
+		if (activatedContexts.size() > 0) {
 			selectBestContext(); //using highest confidence 
 		}
 
@@ -207,7 +218,7 @@ public class Head extends AbstractHead {
 	 */
 	private void playWithoutOracle() {
 		
-		Config.print("Nombre de contexte : " + contexts.size(), 1);
+		Config.print("Nombre de contextes activés: " + activatedContexts.size(), 1);
 		
 		selectBestContext();
 		if (bestContext != this.lastUsedContext) {
@@ -227,6 +238,63 @@ public class Head extends AbstractHead {
 		functionSelected = bestContext.getFunction().getFormula(bestContext);
 		criticity = Math.abs(oracleValue - prediction);
 	}
+	
+	private void endogenousPlay() {
+		
+		if(uniqueActivatedContext()) {
+			endogenousPrediction = activatedContexts.get(0).getActionProposal();
+		}
+		else {
+			endogenousPrediction = 0.0;
+		}
+		
+		
+		/*else if(severalActivatedContexts()){
+			NCS_EndogenousCompetition();
+		}
+		else {
+			if(surroundingContexts()) {
+				NCS_EndogenousSharedIncompetence();
+			}
+			else {
+				NCS_EndogenousIncompetence();
+			}
+		}*/
+	}
+	
+	
+	
+	private boolean uniqueActivatedContext() {
+		//Test if only one context is activated
+		return activatedContexts.size() == 1;
+	}
+	
+	private boolean severalActivatedContexts() {
+		//Test if several context are activated
+		return activatedContexts.size() > 1;
+	}
+	
+	private boolean surroundingContexts() {
+		//Test if there are surrounding contexts
+		
+		for(Context partiallyActivatedContext : partialyActivatedContexts) {
+			
+		}
+		return false;
+	}
+	
+	private void NCS_EndogenousCompetition() {
+		// Creation if twin contexts to give the endogenous prediction
+	}
+	
+	private void NCS_EndogenousSharedIncompetence() {
+		// Extrapolation of contexts by creating twin contexts that will give the prediction
+	}
+	
+	private void NCS_EndogenousIncompetence() {
+		// Extrapolation of contexts by creating twin contexts that will give the prediction
+	}
+	
 	
 	private void NCSDetection_Create_New_Context() {
 		/*Finally, head agent check the need for a new context agent*/
@@ -250,10 +318,10 @@ public class Head extends AbstractHead {
 	private void NCSDetection_Concurrence() {
 		/*If result is good, shrink redundant context (concurrence NCS)*/
 		if (bestContext != null && criticity <= this.errorAllowed) {
-			for (int i = 0 ; i < contexts.size() ; i++) {
-				if (contexts.get(i) != bestContext && !contexts.get(i).isDying() && this.getCriticity(contexts.get(i)) <= this.errorAllowed) {
+			for (int i = 0 ; i < activatedContexts.size() ; i++) {
+				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && this.getCriticity(activatedContexts.get(i)) <= this.errorAllowed) {
 			//		System.out.println("Shrink context " + contexts.get(i).getName());
-					contexts.get(i).solveNCS_Concurrence(this);
+					activatedContexts.get(i).solveNCS_Concurrence(this);
 				}
 			}
 		}
@@ -261,7 +329,7 @@ public class Head extends AbstractHead {
 	
 	private void NCSDetection_IncompetentHead() {
 		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
-		if (contexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())){
+		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())){
 			ArrayList<Agent> allContexts = world.getScheduler().getContexts();
 			
 			Context c = getNearestGoodContext(allContexts);
@@ -282,8 +350,8 @@ public class Head extends AbstractHead {
 	
 	private void selfAnalysationOfContexts() {
 		/*All context which proposed itself must analyze its proposition*/
-		for (int i = 0 ; i < contexts.size() ; i++) {
-				contexts.get(i).analyzeResults(this);
+		for (int i = 0 ; i < activatedContexts.size() ; i++) {
+			activatedContexts.get(i).analyzeResults(this);
 		}
 	}
 	
@@ -414,7 +482,7 @@ public class Head extends AbstractHead {
 	 */
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
-		for (Context c : contexts) {
+		for (Context c : activatedContexts) {
 			if (oracleValue - c.getActionProposal() < errorAllowed) {
 				b = true;
 			}
@@ -467,7 +535,7 @@ public class Head extends AbstractHead {
 			xLastCriticityValues.remove(0);
 		}
 		
-		
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
 		
 		if (averagePredictionCriticity > errorAllowed) {
 			perfIndicator--;
@@ -532,8 +600,8 @@ public class Head extends AbstractHead {
 	 *
 	 * @return the contexts
 	 */
-	public ArrayList<Context> getContexts() {
-		return contexts;
+	public ArrayList<Context> getActivatedContexts() {
+		return activatedContexts;
 	}
 
 	/**
@@ -541,8 +609,8 @@ public class Head extends AbstractHead {
 	 *
 	 * @param contexts the new contexts
 	 */
-	public void setContexts(ArrayList<Context> contexts) {
-		this.contexts = contexts;
+	public void setActivatesContexts(ArrayList<Context> contexts) {
+		this.activatedContexts = contexts;
 	}
 
 
@@ -552,14 +620,14 @@ public class Head extends AbstractHead {
 	private void selectBestContext() {
 		
 		Context bc;
-		if (contexts.isEmpty()) {
+		if (activatedContexts.isEmpty()) {
 			bc = lastUsedContext;
 		} else {
-			bc = contexts.get(0);
+			bc = activatedContexts.get(0);
 		}
 		double currentConfidence = Double.NEGATIVE_INFINITY;
 
-		for (Context context : contexts) {
+		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
 				bc  = context;
 				currentConfidence = bc.getConfidence();
@@ -591,17 +659,10 @@ public class Head extends AbstractHead {
 	 */
 	@Override
 	public ArrayList<? extends Agent> getTargets() {
-		return contexts;
+		return activatedContexts;
 	}
 
-	/**
-	 * Gets the active contexts.
-	 *
-	 * @return the active contexts
-	 */
-	public ArrayList<Context> getActiveContexts() {
-		return contexts;
-	}
+
 	
 	/**
 	 * Gets the criticity.

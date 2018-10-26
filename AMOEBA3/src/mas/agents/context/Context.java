@@ -35,7 +35,7 @@ public class Context extends AbstractContext implements Serializable{
 
 	ArrayList<Percept> perceptSenders = new ArrayList<Percept>();
 	
-	private Head controller;
+	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>(); /*If memory is a concern, their is room for improvements here*/
 	
@@ -88,15 +88,15 @@ public class Context extends AbstractContext implements Serializable{
 	 * Builds the context.
 	 *
 	 * @param world the world
-	 * @param controller the controller
+	 * @param headAgent the headAgent
 	 */
-	private void buildContext (Head controller) {
+	private void buildContext (Head headAgent) {
 		
 		ArrayList<Percept> var = world.getAllPercept();
 		Experiment firstPoint = new Experiment();
-		this.controller = controller;
+		this.headAgent = headAgent;
 		
-		action = this.controller.getOracleValue();
+		action = this.headAgent.getOracleValue();
 		maxActivationsRequired = var.size();
 		
 		for (Percept v : var) {
@@ -113,7 +113,7 @@ public class Context extends AbstractContext implements Serializable{
 			v.addContextSortedRanges(this);
 		}
 		localModel = this.world.buildLocalModel(this);
-		firstPoint.setProposition(this.controller.getOracleValue());
+		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
 		this.world.getScheduler().addAlteredContext(this);
@@ -163,7 +163,7 @@ public class Context extends AbstractContext implements Serializable{
 		   Range range = new Range(entry.getValue());
 		   this.ranges.put(percept, range);
 		}
-		this.controller = c.controller;
+		this.headAgent = c.headAgent;
 		this.action = c.action;
 		this.nSelection = c.nSelection;
 		this.bestContext = c.bestContext;
@@ -278,12 +278,12 @@ public class Context extends AbstractContext implements Serializable{
 		super.play();
 		
 		if(computeValidityByPercepts()) {
+			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
+			Config.print("Message envoyé", 4);
 			//System.out.println("Valid context by Percepts "+this.name);
 		}
 		
 		if (computeValidity()) {
-			sendMessage(getActionProposal(), MessageType.PROPOSAL, controller);
-			Config.print("Message envoyé", 4);
 			//System.out.println("Valid context by Context "+this.name);
 		}
 		
@@ -298,7 +298,7 @@ public class Context extends AbstractContext implements Serializable{
 		//ENDO
 		for (Percept v : ranges.keySet()) {
 			if (ranges.get(v).isTooSmall()){
-				solveNCS_Uselessness(controller);
+				solveNCS_Uselessness(headAgent);
 				break;
 			}
 		}
@@ -354,7 +354,7 @@ public class Context extends AbstractContext implements Serializable{
 	 */
 	public void solveNCS_IncompetentHead(Head head) {
 		world.raiseNCS(NCS.HEAD_INCOMPETENT);
-		growRanges(head);
+		growRanges();
 	}
 	
 	/**
@@ -640,7 +640,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @return the controler
 	 */
 	public Head getControler() {
-		return controller;
+		return headAgent;
 	}
 
 	/**
@@ -649,7 +649,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @param controler the new controler
 	 */
 	public void setControler(Head controler) {
-		this.controller = controler;
+		this.headAgent = controler;
 	}
 
 	/**
@@ -676,7 +676,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	@Override
 	public ArrayList<? extends Agent> getTargets() {
 		ArrayList<Agent> arrayList = new ArrayList<Agent>();
-		arrayList.add(controller);
+		arrayList.add(headAgent);
 		return arrayList;
 	}
 
@@ -931,7 +931,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		for (Percept v : var) {
 			exp.addDimension(v, v.getValue());
 		}
-		exp.setProposition(controller.getOracleValue());
+		exp.setProposition(headAgent.getOracleValue());
 		
 		experiments.add(exp);
 		this.world.getScheduler().addAlteredContext(this);
@@ -971,12 +971,12 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 *
 	 * @param head the head
 	 */
-	public void growRanges(Head head) {
-		ArrayList<Percept> var = world.getAllPercept();
-		for (Percept v : var) {
-			boolean contain = ranges.get(v).contains(v.getValue()) == 0 ? true : false;
+	public void growRanges() {
+		ArrayList<Percept> allPercepts = world.getAllPercept();
+		for (Percept pct : allPercepts) {
+			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ? true : false;
 			if (!contain) {
-				ranges.get(v).adapt(this, v.getValue(), v);
+				ranges.get(pct).adapt(this, pct.getValue(), pct);
 			}
 		}
 	}

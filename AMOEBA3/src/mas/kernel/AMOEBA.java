@@ -516,6 +516,12 @@ public class AMOEBA extends Thread {
 		scheduler.getWorld().setAVT_percentAtStart(aVT_percentAtStart);
 	}
 	
-
+	public double getAveragePredictionCriticity() {
+		return scheduler.getHeadAgent().getAveragePredictionCriticity();
+	}
+	
+	public double getNumberOfContextAgents() {
+		return scheduler.getContexts().size();
+	}
 
 }

@@ -11,6 +11,7 @@ import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
 import visualization.view.blackbox.BlackBoxPanel;
 import visualization.view.global.PanelChart;
+import visualization.view.global.PanelOneChart;
 import visualization.view.system.nDim.PanelParallelCoordinates;
 import visualization.view.system.twoDim.GrapheTwoDimPanelStandard;
 import mas.blackbox.BlackBox; 
@@ -33,6 +34,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	
 	/** The panel chart. */
 	private PanelChart panelChart;
+	private PanelOneChart exoVsEndoChart;
 	
 	/** The panel two dim standard. */
 	private GrapheTwoDimPanelStandard panelTwoDimStandard;
@@ -79,8 +81,10 @@ public class MainTabbedPanel extends JTabbedPane{
 		panelTwoDimStandard = new GrapheTwoDimPanelStandard(world);
 		panelParallelCoordinates = new PanelParallelCoordinates(world);
 		consolePanel = new ConsolePanel();
+		exoVsEndoChart = new PanelOneChart(world);
 		
 		world.getScheduler().addScheduledItem(panelChart);
+		world.getScheduler().addScheduledItem(exoVsEndoChart);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -90,6 +94,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	//	this.addTab("TwoDim", new JScrollPane(panelTwoDim,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 	//	this.addTab("TwoDim", panelTwoDim);
 		this.addTab("Console", new JScrollPane(consolePanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo VS endo", new JScrollPane(exoVsEndoChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		((Frame) this.getTopLevelAncestor()).pack();
 	}
