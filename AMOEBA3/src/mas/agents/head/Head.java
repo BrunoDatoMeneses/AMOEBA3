@@ -1,6 +1,8 @@
 package mas.agents.head;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import mas.ncs.NCS;
 import mas.kernel.Config;
@@ -9,8 +11,11 @@ import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
+import mas.agents.context.CustomComparator;
 import mas.agents.messages.Message;
 import mas.agents.messages.MessageType;
+import mas.agents.context.CustomComparator;
+
 //import mas.blackbox.BlackBoxAgent;
 
 // TODO: Auto-generated Javadoc
@@ -28,9 +33,14 @@ public class Head extends AbstractHead {
 	//private BlackBoxAgent oracle;
 	
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
-	private ArrayList<Context> partialyActivatedContexts = new ArrayList<Context>();
+	private HashMap<Percept,ArrayList<Context>> partialyActivatedContexts = new HashMap<Percept,ArrayList<Context>>();
+	private HashMap<Percept,Pair<Context,Context>> requestSurroundings = new HashMap<Percept,Pair<Context,Context>>();
 	private ArrayList<Pair<Context,Context>> sharedIncompetenceContextPairs = new ArrayList<Pair<Context,Context>>();
+	
+	
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
+	
+	
 
 	
 	private int nPropositionsReceived;
@@ -119,6 +129,11 @@ public class Head extends AbstractHead {
 	 */
 	public Head(World world) {
 		super(world);
+		
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			partialyActivatedContexts.put(pct, new ArrayList<Context>());
+			requestSurroundings.put(pct, new Pair<Context,Context>(null,null));
+			}
 	}
 
 	/* (non-Javadoc)
@@ -133,9 +148,10 @@ public class Head extends AbstractHead {
 		}
 	}
 	
-	public void addPartiallyActivatedContext(Context partialyactivatedContext) {
-		partialyActivatedContexts.add(partialyactivatedContext);
-	}
+	public void addPartiallyActivatedContext(Percept pct,Context partialyactivatedContext) {
+		partialyActivatedContexts.get(pct).add(partialyactivatedContext);
+		//System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
+	} 
 
 	/**
 	 * The core method of the head agent.
@@ -171,11 +187,16 @@ public class Head extends AbstractHead {
 		updateStatisticalInformations(); ///regarder dans le d彋ail, possible que ce pas trop utile
 		
 		activatedContexts.clear();
-		partialyActivatedContexts.clear();
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			partialyActivatedContexts.get(pct).clear();
+			
+		}
+		sharedIncompetenceContextPairs.clear();
+		
 		newContext = null;
 		
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error allowded :" + errorAllowed);
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Inexact allowded :" + inexactAllowed);
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error allowded :" + errorAllowed);
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Inexact allowded :" + inexactAllowed);
 	}
 	
 	
@@ -196,7 +217,7 @@ public class Head extends AbstractHead {
 
 		/*Compute the criticity. Will be used by context agents.*/
 		criticity = Math.abs(oracleValue - prediction);
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error :" + criticity);
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error :" + criticity);
 
 		/*If we have a bestcontext, send a selection message to it*/
 		if (bestContext != null) {
@@ -244,25 +265,31 @@ public class Head extends AbstractHead {
 		if(uniqueActivatedContext()) {
 			endogenousPrediction = activatedContexts.get(0).getActionProposal();
 		}
-		else {
-			endogenousPrediction = 0.0;
-		}
-		
-		
-		/*else if(severalActivatedContexts()){
+		else if(severalActivatedContexts()){
 			NCS_EndogenousCompetition();
+			endogenousPrediction = -1500.0;
 		}
 		else {
+			
 			if(surroundingContexts()) {
 				NCS_EndogenousSharedIncompetence();
+				endogenousPrediction = -1750.0;
 			}
-			else {
+			else if(noActivatedContext()) {
+				endogenousPrediction = -2000.0;
 				NCS_EndogenousIncompetence();
+			}	
+			else {
+				endogenousPrediction = -3000.0;
 			}
-		}*/
+		}
 	}
 	
 	
+	private boolean noActivatedContext() {
+		//Test if only one context is activated
+		return activatedContexts.size() == 0;
+	}
 	
 	private boolean uniqueActivatedContext() {
 		//Test if only one context is activated
@@ -277,18 +304,152 @@ public class Head extends AbstractHead {
 	private boolean surroundingContexts() {
 		//Test if there are surrounding contexts
 		
-		for(Context partiallyActivatedContext : partialyActivatedContexts) {
-			
+		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
+			requestSurroundings.get(pcpt).clear();
 		}
-		return false;
+		
+		System.out.println("SURROUNDING CONTEXTS ...");
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			
+			computeNearestContextsByPercept(pct);			
+				 
+			}
+		
+		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
+			System.out.println("SURROUNDING CONTEXTS ..." + pcpt.getName());
+			requestSurroundings.get(pcpt).print(pcpt);
+
+		}
+		
+		//System.out.println("Pairs " + sharedIncompetenceContextPairs.size());
+		return sharedIncompetenceContextPairs.size()>0;
+	}
+	
+	
+	private void diplayListRanges(ArrayList<Context> list,Percept prct, String range) {
+		
+		
+		
+		System.out.print(range + " ranges list" + "  ");
+		for(Context ctxt : list) {
+			System.out.print(ctxt.getRanges().get(prct).getRange(range) + "  ");
+		}
+		System.out.println(" ");
+		
+	}
+	
+	private void computeNearestContextsByPercept(Percept pct) {
+		Pair<Context,Context> nearestContexts = new Pair(null, null);
+		boolean startNeighbor = false;
+		boolean endNeighbor = false;
+		
+		
+		
+		ArrayList<Context> activatedContextInOtherPercepts = getAllActivatedContextsExeptForOnePercept(pct);
+		
+		
+		if(activatedContextInOtherPercepts.size()>0) {
+			
+				
+			System.out.println("Partially activated on other percepts than " + pct.getName() + " : " + activatedContextInOtherPercepts.size());			
+			System.out.println("Value " + pct.getValue());		 
+			
+			CustomComparator rangeStartComparator =  new CustomComparator(pct, "start");
+			Collections.sort(activatedContextInOtherPercepts, rangeStartComparator);
+			diplayListRanges(activatedContextInOtherPercepts, pct, "start");
+			
+			
+			for(Context ctxt : activatedContextInOtherPercepts) {
+				if(ctxt.getRanges().get(pct).getRange("start")>pct.getValue() && !startNeighbor) {
+					nearestContexts.setR(ctxt);
+					startNeighbor = true;
+				}
+
+			}
+			
+			
+			CustomComparator rangeEndComparator =  new CustomComparator(pct, "end");
+			Collections.sort(activatedContextInOtherPercepts, rangeEndComparator);
+			Collections.reverse(activatedContextInOtherPercepts);
+			diplayListRanges(activatedContextInOtherPercepts, pct, "end");
+			
+			
+
+			for(Context ctxt : activatedContextInOtherPercepts) {
+				if(ctxt.getRanges().get(pct).getRange("end")<pct.getValue() && !endNeighbor) {
+					nearestContexts.setL(ctxt);
+					endNeighbor = true;
+				}
+			}
+			
+			nearestContexts.print(pct);
+			requestSurroundings.put(pct, nearestContexts);
+			
+			if(nearestContexts.getL() != null && nearestContexts.getR() != null) {
+				sharedIncompetenceContextPairs.add(nearestContexts);
+			}
+		}
+		else {
+			//System.out.println("=====================================================");
+		}
+		
+			
+		
+		
+	}
+				
+			
+		
+	
+	private ArrayList<Context> getAllActivatedContextsExeptForOnePercept(Percept onePercept){
+		ArrayList<Context> activatedContexts = new ArrayList<Context>();
+		
+		Percept otherPercept = getDifferentePercept(onePercept);
+		
+		if(partialyActivatedContexts.get(otherPercept)!=null) {
+			for(Context ctxt : partialyActivatedContexts.get(otherPercept)) {
+				if(this.world.getScheduler().getPercepts().size()>2) {
+					if(contextActivateInOtherPerceptsThan(ctxt, onePercept, otherPercept)) {
+						activatedContexts.add(ctxt);
+					}
+				}
+				else {
+					activatedContexts.add(ctxt);
+				}
+				
+			}
+		}
+		
+		return activatedContexts;
+	}
+	
+	private Percept getDifferentePercept(Percept p) {
+		for(Percept pct : partialyActivatedContexts.keySet()) {
+			if(p != pct) {
+				return pct;
+			}
+		}
+		return null;
+	}
+	
+	private boolean contextActivateInOtherPerceptsThan(Context ctxt, Percept p1, Percept p2) {
+		boolean test = true;
+		for(Percept prct : partialyActivatedContexts.keySet()) {
+			if(prct != p1 && prct != p2) {
+				test = test & partialyActivatedContexts.get(prct).contains(ctxt);
+			}
+		}
+		return test;
 	}
 	
 	private void NCS_EndogenousCompetition() {
-		// Creation if twin contexts to give the endogenous prediction
+		// Creation of twin contexts to give the endogenous prediction
 	}
 	
 	private void NCS_EndogenousSharedIncompetence() {
 		// Extrapolation of contexts by creating twin contexts that will give the prediction
+		
+		
 	}
 	
 	private void NCS_EndogenousIncompetence() {
@@ -535,7 +696,7 @@ public class Head extends AbstractHead {
 			xLastCriticityValues.remove(0);
 		}
 		
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
 		
 		if (averagePredictionCriticity > errorAllowed) {
 			perfIndicator--;
@@ -547,18 +708,18 @@ public class Head extends AbstractHead {
 		} else {
 			perfIndicator++;
 		}*/
-		System.out.println("中中中中中中中中中中中  PERF INDICATOR :" + perfIndicator);
+		//System.out.println("中中中中中中中中中中中  PERF INDICATOR :" + perfIndicator);
 		
 		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
 			perfIndicator = 0;
 			errorAllowed *= augmentationFactorError;
-			System.out.println("中中中中中中中中中中中  augmentationFactorError :" + augmentationFactorError);
+			//System.out.println("中中中中中中中中中中中  augmentationFactorError :" + augmentationFactorError);
 		}
 		
 		if (perfIndicator >= nSuccessBeforeDiminution) {
 			perfIndicator = 0;
 			errorAllowed *= diminutionFactorError;
-			System.out.println("中中中中中中中中中中中  diminutionFactorError :" + diminutionFactorError);
+			//System.out.println("中中中中中中中中中中中  diminutionFactorError :" + diminutionFactorError);
 			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
 		}
 		
@@ -574,19 +735,19 @@ public class Head extends AbstractHead {
 		} else {
 			perfIndicatorInexact++;
 		}*/
-		System.out.println("中中中中中中中中中中中  PERF INDICATOR INEXACT :" + perfIndicator);
+		//System.out.println("中中中中中中中中中中中  PERF INDICATOR INEXACT :" + perfIndicator);
 		
 		if (perfIndicatorInexact <= nConflictBeforeInexactAugmentation * (-1)) {
 			perfIndicatorInexact = 0;
 			inexactAllowed *= augmentationInexactError;
-			System.out.println("中中中中中中中中中中中  augmentationInexactError :" + augmentationInexactError);
+			//System.out.println("中中中中中中中中中中中  augmentationInexactError :" + augmentationInexactError);
 		}
 		
 		if (perfIndicatorInexact >= nSuccessBeforeInexactDiminution) {
 			perfIndicatorInexact = 0;
 			inexactAllowed *= diminutionInexactError;
 			inexactAllowed = Math.max(minInexactAllowed, inexactAllowed);
-			System.out.println("中中中中中中中中中中中  diminutionInexactError :" + diminutionInexactError);
+			//System.out.println("中中中中中中中中中中中  diminutionInexactError :" + diminutionInexactError);
 
 		}
 		
@@ -1113,6 +1274,10 @@ public class Head extends AbstractHead {
 	public double getPrediction() {
 		return prediction;
 	}
+	
+	public double getEndogenousPrediction() {
+		return endogenousPrediction;
+	}
 
 	/**
 	 * Sets the prediction.
@@ -1124,7 +1289,26 @@ public class Head extends AbstractHead {
 	}
 
 	
+	public ArrayList<Context> getPartiallyActivatedContexts(Percept pct) {
+		return partialyActivatedContexts.get(pct);
+	}
 	
 	
+	public HashMap<Percept, Pair<Context, Context>> getRequestSurroundings() {
+		return requestSurroundings;
+	}
 	
+	
+	public boolean requestSurroundingContains(Context ctxt) {
+		
+
+		for(Percept pct : requestSurroundings.keySet()) {
+			//System.out.println("REQUEST SURROUNDINGS " +  requestSurroundings.get(pct).getL().getName() +  " ; " + requestSurroundings.get(pct).getR().getName());
+			if(requestSurroundings.get(pct).contains(ctxt)) {
+				return true;
+			}
+		}
+		return false;
+		
+	}
 }

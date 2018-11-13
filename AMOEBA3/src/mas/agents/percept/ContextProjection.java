@@ -72,7 +72,7 @@ public class ContextProjection implements Serializable{
 		return ((value > start)  && (value < end));
 	}
 	
-	public Context getContex() {
+	public Context getContext() {
 		return this.context;
 	}
 	

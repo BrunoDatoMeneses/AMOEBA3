@@ -11,7 +11,10 @@ import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
 import visualization.view.blackbox.BlackBoxPanel;
 import visualization.view.global.PanelChart;
+import visualization.view.global.PanelChart2;
 import visualization.view.global.PanelOneChart;
+import visualization.view.global.ScatterPlotExample;
+import visualization.view.global.PanelExoVSEndo;
 import visualization.view.system.nDim.PanelParallelCoordinates;
 import visualization.view.system.twoDim.GrapheTwoDimPanelStandard;
 import mas.blackbox.BlackBox; 
@@ -34,7 +37,8 @@ public class MainTabbedPanel extends JTabbedPane{
 	
 	/** The panel chart. */
 	private PanelChart panelChart;
-	private PanelOneChart exoVsEndoChart;
+	private PanelExoVSEndo exoVsEndoChart;
+	private ScatterPlotExample exoVsEndoChart2;
 	
 	/** The panel two dim standard. */
 	private GrapheTwoDimPanelStandard panelTwoDimStandard;
@@ -81,10 +85,12 @@ public class MainTabbedPanel extends JTabbedPane{
 		panelTwoDimStandard = new GrapheTwoDimPanelStandard(world);
 		panelParallelCoordinates = new PanelParallelCoordinates(world);
 		consolePanel = new ConsolePanel();
-		exoVsEndoChart = new PanelOneChart(world);
+		exoVsEndoChart = new PanelExoVSEndo(world);
+		exoVsEndoChart2 = new ScatterPlotExample("");
 		
 		world.getScheduler().addScheduledItem(panelChart);
 		world.getScheduler().addScheduledItem(exoVsEndoChart);
+		world.getScheduler().addScheduledItem(exoVsEndoChart2);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -95,6 +101,9 @@ public class MainTabbedPanel extends JTabbedPane{
 	//	this.addTab("TwoDim", panelTwoDim);
 		this.addTab("Console", new JScrollPane(consolePanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Exo VS endo", new JScrollPane(exoVsEndoChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Test", new JScrollPane(exoVsEndoChart2,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		
+		
 		
 		((Frame) this.getTopLevelAncestor()).pack();
 	}

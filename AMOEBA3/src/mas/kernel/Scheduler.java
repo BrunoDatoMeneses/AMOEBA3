@@ -10,6 +10,8 @@ import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
 
+import org.graphstream.ui.geom.Point3;
+
 import visualization.view.system.MainPanel;
 import visualization.view.system.ScheduledItem;
 import mas.agents.Agent;
@@ -65,6 +67,10 @@ public class Scheduler implements Serializable{
 	
 	private int temporisation = 0;
 		
+	private HashMap<String, Double> requestPosition;
+	private boolean manualRequest;
+	
+
 	
 	/**
 	 * Instantiates a new scheduler.
@@ -72,7 +78,8 @@ public class Scheduler implements Serializable{
 	public Scheduler() {
 		agents = new ArrayList<Agent>();
 		
-		
+		requestPosition = new HashMap<String, Double>();
+		manualRequest = false;
 	}
 	
 	/**
@@ -239,6 +246,7 @@ public class Scheduler implements Serializable{
 		
 		ArrayList <ScheduledItem> tempList = new ArrayList<ScheduledItem>(scheduled);
 		for (ScheduledItem item : tempList) {
+			
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
@@ -733,6 +741,29 @@ public class Scheduler implements Serializable{
 	
 	public ArrayList<Context> getLastModifiedContexts(){
 		return lastModifiedContext;
+	}
+	
+	public void setManualRequest(Point3 position){		
+		
+		
+		requestPosition.put("px",position.x);
+		requestPosition.put("py",position.y);
+		requestPosition.put("oracle",0.0);
+		
+		
+		manualRequest = true;
+		
+	}
+	
+	public HashMap<String, Double> getManualRequest(){				
+		
+		manualRequest = false;
+		
+		return requestPosition;
+	}
+	
+	public boolean requestAsked() {
+		return manualRequest;
 	}
 	
 }

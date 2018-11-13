@@ -185,8 +185,17 @@ public class Percept extends SystemAgent implements Serializable {
 		validContextProjection = new ArrayList<Context>();
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			if(contextProjection.contains(this.value)) {
-				validContextProjection.add(contextProjection.getContex());
+				validContextProjection.add(contextProjection.getContext());
 				//System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
+				
+				if(this.world.getScheduler().getHeadAgent().getPartiallyActivatedContexts(this)!=null) {
+					if(!this.world.getScheduler().getHeadAgent().getPartiallyActivatedContexts(this).contains(contextProjection.getContext())) {
+						this.world.getScheduler().getHeadAgent().addPartiallyActivatedContext(this,contextProjection.getContext());
+					}
+				}
+				
+				
+				
 			}
 		}
 		

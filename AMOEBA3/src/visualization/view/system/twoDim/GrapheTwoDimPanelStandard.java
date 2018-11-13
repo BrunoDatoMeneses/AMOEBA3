@@ -3,17 +3,25 @@ package visualization.view.system.twoDim;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.Robot;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
@@ -45,10 +53,16 @@ import visualization.observation.Observation;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.geom.Point3;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
+import org.graphstream.ui.j2dviewer.Camera;
+import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
+import org.jfree.chart.plot.XYPlot;
 
 import visualization.view.system.PanelController;
 import visualization.view.system.paving.Panel1DPaving;
@@ -64,6 +78,9 @@ import mas.agents.head.Head;
 import visualization.graphView.GraphicVisualization2Dim;
 import visualization.graphView.GraphicVisualizationNDim;
 import visualization.graphView.TemporalGraph;
+
+import org.graphstream.algorithm.Toolkit;
+
 
 // TODO: Auto-generated Javadoc
 /**
@@ -207,6 +224,8 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	
 	/** The percept name. */
 	private List<String> perceptName = new ArrayList<>();	
+	
+	private Point3 requestPosition;
 	
 	/**
 	 * Instantiates a new graphe two dim panel standard.
@@ -424,9 +443,18 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		textarea.setText("No context");
 		toolBarInfo.setVisible(false);
 		
+		
+		
+		
 		/* End of text area */
 		
 		createGraph();
+		
+
+		
+		
+		
+		
 	}
 	
 	/**
@@ -964,6 +992,17 @@ private void startPanelController() {
 		/* End of update slider */
 	}
 
+	private void setOrigin() {
+		Node originNode;
+		graph.addNode("origin");
+		originNode = graph.getNode("origin");
+		originNode.addAttribute("EXIST", true);
+		
+		originNode.setAttribute("xyz", 0, 0, 0);
+		
+		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(0.5) +"gu;");
+	}
+	
 	/**
 	 * Update.
 	 */
@@ -1106,8 +1145,15 @@ private void startPanelController() {
 					Node node = graph.getNode(name);
 
 					node.addAttribute("ui.class","ContextColorDynamic");
-					node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) );  
+					//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+					node.setAttribute("ui.color", 0.0 ); 
+					
+					if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
+						node.setAttribute("ui.color", 1.0 );
+					}
 				}
+				
+				
 
 			}
 			
@@ -1127,7 +1173,11 @@ private void startPanelController() {
 		}
 		
 		
-	
+		Node originNode;
+		originNode = graph.getNode("origin");
+		originNode.addAttribute("EXIST", true);
+		originNode.setAttribute("xyz", 0, 0, 0);
+		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
 
 	}
 	
@@ -1160,6 +1210,7 @@ private void startPanelController() {
 		node.addAttribute("ui.class","OverlapColor");
 
 	}
+	
 	
 	public void drawVoid(ContextVoid contextVoid){
 		Node node;
@@ -1208,6 +1259,31 @@ private void startPanelController() {
 		
 		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
 
+	}
+	
+	public HashMap<String, Double> request(Point3 position){
+		Node requestNode;
+		if (graph.getNode("request") != null) {
+			requestNode = graph.getNode("request");
+		} else {
+			graph.addNode("request");
+			requestNode = graph.getNode("request");
+		}
+
+		requestNode.addAttribute("EXIST", true);
+		
+		requestNode.setAttribute("xyz", position.x, position.y, position.z);
+		
+		requestNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
+		
+		
+		HashMap<String, Double> requestHashMap = new HashMap<String, Double>();
+		
+		requestHashMap.put("px",position.x);
+		requestHashMap.put("py",position.y);
+		requestHashMap.put("oracle",0.0);
+		
+		return requestHashMap;
 	}
 	
 	public void highlightContextNeighbours(Context context) {
@@ -1390,6 +1466,10 @@ private void startPanelController() {
 	 * Creates the graph.
 	 */
 	private void createGraph() {
+		
+		
+		
+		
 		System.out.println("Create graph system");
 		graph = new SingleGraph("SYSTEM");
 
@@ -1406,6 +1486,8 @@ private void startPanelController() {
         viewer.getDefaultView().setMinimumSize(new Dimension(400,400));
 		this.add(viewer.getDefaultView(),BorderLayout.CENTER);
 		setStandardStyle();
+		
+		setOrigin();
 	}
 	
 	/**
@@ -1434,7 +1516,7 @@ private void startPanelController() {
 		world.getAmoeba().getLogFile().messageToDebug("Push button", 5, new LogMessageType[] {LogMessageType.INFORMATION});
 		toolBarInfo.setVisible(true);
 		System.out.println("node pushed : " + id);
-		
+		//this.mous
 		if(world.getScheduler().getContextByName(id)!=null) {
 			Context pushedContext = world.getScheduler().getContextByName(id);
 			setContextTextAreaInfo(id);
@@ -1445,6 +1527,7 @@ private void startPanelController() {
 					rightClick = false;
 				}
 			}
+
 		}
 		else if(world.getScheduler().getContextOverlapByName(id)!=null) {
 			ContextOverlap pushedContextOverlap = world.getScheduler().getContextOverlapByName(id);
@@ -1469,6 +1552,12 @@ private void startPanelController() {
 				}
 			}
 			
+		}
+		else {
+			if (rightClick) {
+				popupMenuForVoidVisualization(id);
+				rightClick = false;
+			}
 		}
 		
 		
@@ -1714,6 +1803,16 @@ private void startPanelController() {
 		
 	}
 	
+
+//	private void displayMousePositionInChart() {
+//		Point2D p = graph.
+//				translateScreenToJava2D(mouseEvent.getPoint());
+//		Rectangle2D plotArea = chartPanel.getScreenDataArea();
+//		XYPlot plot = (XYPlot) chart.getPlot(); // your plot
+//		double chartX = plot.getDomainAxis().java2DToValue(p.getX(), plotArea, plot.getDomainAxisEdge());
+//		double chartY = plot.getRangeAxis().java2DToValue(p.getY(), plotArea, plot.getRangeAxisEdge());
+//	}
+	
 	private void highlightNeighbours(String id) {
 		highlightContextNeighbours(world.getScheduler().getContextByName(id));
 		
@@ -1809,10 +1908,20 @@ private void startPanelController() {
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 	 */
+	
+	
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		mouseEvent = e;
+		//System.out.println("getPoint " + mouseEvent.getPoint() + " " + this.getSize());
+		//graph.getNode("origin").
+		requestPosition = viewer.getDefaultView().getCamera().transformPxToGu(mouseEvent.getX(), mouseEvent.getY());
+		System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
+		
+		
 		if(SwingUtilities.isRightMouseButton(e)){
+			world.getScheduler().setManualRequest(requestPosition);
 			rightClick = true;
 			Robot bot;
 			try {
@@ -1827,6 +1936,10 @@ private void startPanelController() {
    
 		}
 		pipe.pump();
+		
+		
+		
+		//this.world.getAmoeba().request(request(requestPosition));
 	}
 
 	/* (non-Javadoc)
@@ -1882,4 +1995,9 @@ private void startPanelController() {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
+	
+
 }

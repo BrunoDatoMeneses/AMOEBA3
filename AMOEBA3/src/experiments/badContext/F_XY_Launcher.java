@@ -37,15 +37,15 @@ public class F_XY_Launcher implements Serializable {
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		
 		//Dynamic errors
-		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
-		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
+//		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
+//		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 		
 		//amoeba.setDataForErrorMargin(100, 5, 0.4, 0.1, 10000, 20000);
 		//amoeba.setDataForInexactMargin(50, 2.5, 0.2, 0.05, 10000, 20000);
 		
 		//Static errors
-		/*amoeba.setDataForErrorMargin(5, 5, 0.4, 200, 5000, 100000);
-		amoeba.setDataForInexactMargin(2.5, 2.5, 0.2, 100, 5000, 100000);*/
+		amoeba.setDataForErrorMargin(5, 5, 0.4, 200, 5000, 100000);
+		amoeba.setDataForInexactMargin(2.5, 2.5, 0.2, 100, 5000, 100000);
 		
 		//amoeba.setDataForErrorMargin(200, 5, 0.4, 200, 5000, 100000);
 		//amoeba.setDataForInexactMargin(100, 2.5, 0.2, 100, 5000, 100000);
@@ -78,6 +78,41 @@ public class F_XY_Launcher implements Serializable {
 			percepts = amoeba.getScheduler().getWorld().getAllPercept();
 		}
 		
+		
+		while(true) {
+			
+			try        
+			{
+			    Thread.sleep(1000);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
+			
+			if(amoeba.getScheduler().requestAsked()) {
+				System.out.println("MANUAL REQUEST");
+				amoeba.request(amoeba.getScheduler().getManualRequest());
+			}
+			
+		}
+		
+// 		for (int i = 0 ; i < 1000 ; i++) {
+//	 		bcm.playOneStep(0);
+//	 		HashMap<String, Double> data = new HashMap<String, Double>(bcm.getOutput());
+//	 		//data.remove("test");
+//	 		amoeba.request(data);
+//	 		
+//	 		try        
+//			{
+//			    Thread.sleep(1000);
+//			} 
+//			catch(InterruptedException ex) 
+//			{
+//			    Thread.currentThread().interrupt();
+//			}
+// 		}
+		
 		/*for (int i = 0 ; i < 1000 ; i++) {
 			bcm.playOneStep(0);
 			HashMap<String, Double> data = new HashMap<String, Double>(bcm.getOutput());
@@ -85,16 +120,16 @@ public class F_XY_Launcher implements Serializable {
 			System.out.println("Test request : " + amoeba.request(data));
 		}*/
 		
-		AMOEBA_UI.launchOverlapDetection(amoeba);
+		/*AMOEBA_UI.launchOverlapDetection(amoeba);
 		
 		ArrayList<Percept> P = AMOEBA_UI.getAllPercepts(amoeba);
 		ArrayList<Agent> A = AMOEBA_UI.getContexts(amoeba);
 		ArrayList<Context> C = AMOEBA_UI.getContextsAsContexts(amoeba);
 
-		//System.out.println(C);
+		System.out.println(C);
 		
 		Percept P0 = P.get(0);
-		Percept P1 = P.get(1);
+		Percept P1 = P.get(1);*/
 		
 		
 		
