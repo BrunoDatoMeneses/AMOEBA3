@@ -250,6 +250,15 @@ public class AMOEBA extends Thread {
 		return scheduler.getAction();
 	}
 	
+	public double request2(HashMap<String, Double> perceptionsActionState) {
+		if(scheduler.isUseOracle()) scheduler.changeOracleConection();
+		//updateOutputAgentsValues(actions);
+		scheduler.setPerceptionsAndActionState(perceptionsActionState);
+		scheduler.run();
+		scheduler.changeOracleConection();
+		return scheduler.getAction();
+	}
+	
 	
 	
 	

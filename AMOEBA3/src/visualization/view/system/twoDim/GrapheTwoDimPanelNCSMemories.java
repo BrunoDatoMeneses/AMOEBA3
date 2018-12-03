@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -46,6 +47,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
 
 import mas.kernel.Config;
+import mas.kernel.NCSMemory;
 import mas.kernel.Scheduler;
 import mas.kernel.World;
 import visualization.log.LogMessageType;
@@ -86,150 +88,56 @@ import org.graphstream.algorithm.Toolkit;
 /**
  * The Class GrapheTwoDimPanelStandard.
  */
-public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener, MouseInputListener{
+public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListener, MouseInputListener{
 	
 	/** The graph. */
 	Graph graph;
 	
-	/** The viewer. */
 	Viewer viewer;
 	
-	/** The world. */
 	World world;
 	
-	/** The pipe. */
-	/* ----Interaction with system----*/
 	ViewerPipe pipe;
 	
-	/** The right click. */
 	Boolean rightClick = false;
 
 	/** The tool bar. */
-	/* ----ToolBar Components----*/
 	private JToolBar toolBar;
-	
-	/** The tool bar slider. */
 	private JToolBar toolBarSlider;
-	
-	/** The tool bar info. */
 	private JToolBar toolBarInfo;
-	
-	/** The button show value. */
-	private JButton buttonShowValue;
-	
-	/** The button show default. */
-	private JButton buttonShowDefault;
-	
-	/** The button show name. */
-	private JButton buttonShowName;
-	
-	/** The button destroy context. */
-	private JButton buttonDestroyContext;
-	
-	/** The button soft style. */
-	private JButton buttonSoftStyle;
-	
-	/** The button standard style. */
-	private JButton buttonStandardStyle;
-	
-	/** The button dark style. */
-	private JButton buttonDarkStyle;
-	
-	/** The button enable auto layout. */
-	private JButton buttonEnableAutoLayout;
-	
-	/** The button disable auto layout. */
-	private JButton buttonDisableAutoLayout;
-	
-	/** The button show ctrl. */
-	private JButton buttonShowCtrl;
-	
-	/** The button show percept tree. */
-	private JButton buttonShowPerceptTree;
-	
-	/** The button create image map. */
-	private JButton buttonCreateImageMap;
-	
-	/** The button oracle. */
-	private JButton buttonOracle;
-	
-	/** The button show projection. */
-	private JButton buttonShowProjection;
-	
-	/** The button show selectable context. */
-	private JButton buttonShowSelectableContext;
+
 	
 	private JButton buttonSearchContext;
-	
-	/** The button color according to prediction. */
-	private JButton buttonColorAccordingToPrediction;
-	
-	/** The combo dim X. */
+	private JButton buttonUpdateMemory;
 	private JComboBox comboDimX;
-	
-	/** The combo dim Y. */
 	private JComboBox comboDimY;
-	
-	/** The x value. */
+	private JComboBox NCSsituations;
 	private JLabel xValue;
-	
-	/** The y value. */
 	private JLabel yValue;
-
 	private JLabel labelSearchContext = new JLabel("Search Context :");
 	private JTextField contextID = new JTextField("?");
 	
+	private JLabel labelDrawMemory = new JLabel("Memory tick :");
+	private JTextField memoryTick = new JTextField("?");
+	
 
-	
-	/** The mouse event. */
 	private MouseEvent mouseEvent;
-	
-	/** The double format. */
 	private NumberFormat doubleFormat;
-	
-	/** The controller. */
 	private Head controller; //TODO
-	
-	/** The color is dynamic. */
 	private boolean colorIsDynamic = true;
 	
-	/** The slider. */
-	/* ----Variables for slider and graph ---- */
 	private JSlider slider;
-	
-	/** The current step. */
 	private JTextField currentStep;
-	
-	/** The textarea. */
 	private JTextArea textarea;
-	
-	/** The position. */
 	private Hashtable<Integer, JLabel> position;
-	
-	/** The obs list. */
 	private ArrayList<Observation> obsList = new ArrayList<Observation>();
-	
-	/** The temporal graph. */
 	private TemporalGraph temporalGraph;
-	
-	/** The remember state. */
 	private boolean rememberState = false;
-	
-	/** The current tick. */
 	private int currentTick = 0;
-	
-	/** The slider value. */
 	private int sliderValue = 0;
-	
-	/** The max slider. */
 	private int maxSlider = 100;
-	
-	/** The current id. */
 	private String currentId;
-	
-	/** The percept name. */
 	private List<String> perceptName = new ArrayList<>();	
-	
 	private Point3 requestPosition;
 	
 	/**
@@ -237,7 +145,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	 *
 	 * @param world the world
 	 */
-	public GrapheTwoDimPanelStandard(World world) {
+	public GrapheTwoDimPanelNCSMemories(World world) {
 		setLayout(new BorderLayout());
 		
 		/*Format the double*/
@@ -252,87 +160,6 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		
 		toolBar = new JToolBar(null, JToolBar.HORIZONTAL);
 
-//		buttonShowDefault = new JButton(Config.getIcon("tag--plus.png"));
-//
-//		toolBar.add(buttonShowDefault);
-//
-//		buttonShowValue = new JButton(Config.getIcon("tag--exclamation.png"));
-//
-//		toolBar.add(buttonShowValue);
-//
-//		buttonShowName = new JButton(Config.getIcon("tag.png"));
-//
-//		toolBar.add(buttonShowName);
-//		
-//		toolBar.addSeparator();
-		
-		buttonSoftStyle = new JButton(Config.getIcon("flag-white.png"));
-		buttonSoftStyle.addActionListener(e -> {setSoftStyle();});
-		buttonSoftStyle.setToolTipText("Switch to soft style.");
-		toolBar.add(buttonSoftStyle);
-		
-		buttonStandardStyle = new JButton(Config.getIcon("flag-green.png"));
-		buttonStandardStyle.addActionListener(e -> {setStandardStyle();});
-		buttonStandardStyle.setToolTipText("Switch to standard style.");
-		toolBar.add(buttonStandardStyle);
-		
-		buttonDarkStyle = new JButton(Config.getIcon("flag-black.png"));
-		buttonDarkStyle.addActionListener(e -> {setDarkStyle();});
-		buttonDarkStyle.setToolTipText("Switch to dark style.");
-		toolBar.add(buttonDarkStyle);
-		
-		buttonColorAccordingToPrediction = new JButton(Config.getIcon("color.png"));
-		buttonColorAccordingToPrediction.addActionListener(e -> {colorIsDynamic = !colorIsDynamic;});
-		buttonColorAccordingToPrediction.setToolTipText("Set color according to prediction from context agent (doesn't work with regression)");
-		toolBar.add(buttonColorAccordingToPrediction);
-		
-		toolBar.addSeparator();
-		buttonDestroyContext = new JButton(Config.getIcon("eraser.png"));
-		buttonDestroyContext.addActionListener(e -> {destroyContext();});
-		toolBar.add(buttonDestroyContext);
-		
-		buttonEnableAutoLayout = new JButton(Config.getIcon("node-select-all.png"));
-		buttonEnableAutoLayout.addActionListener(e -> {enableAutoLayout();});
-		buttonEnableAutoLayout.setToolTipText("Enable auto layout.");
-		toolBar.add(buttonEnableAutoLayout);
-		
-		buttonDisableAutoLayout = new JButton(Config.getIcon("node.png"));
-		buttonDisableAutoLayout.addActionListener(e -> {disableAutoLayout();});
-		buttonDisableAutoLayout.setToolTipText("Disable auto layout.");
-		toolBar.add(buttonDisableAutoLayout);
-		
-		buttonShowCtrl = new JButton(Config.getIcon("bug.png"));
-		buttonShowCtrl.addActionListener(e -> {startPanelController();});
-		buttonShowCtrl.setToolTipText("Show controller informations");
-		toolBar.add(buttonShowCtrl);
-		
-	/*	buttonShowPerceptTree = new JButton(Config.getIcon("tree.png"));
-		buttonShowPerceptTree.addActionListener(e -> {showPerceptTree();});
-		buttonShowPerceptTree.setToolTipText("Show first percept tree");
-		toolBar.add(buttonShowPerceptTree);*/
-		
-		buttonOracle = new JButton(Config.getIcon("compass.png"));
-		buttonOracle.addActionListener(e -> {changeOracleConnection();});
-		buttonOracle.setToolTipText("Disconnect or connect the oracle");
-		toolBar.add(buttonOracle);
-
-		toolBar.addSeparator();
-
-		buttonCreateImageMap = new JButton(Config.getIcon("picture.png"));
-		buttonCreateImageMap.addActionListener(e -> {world.exportAsPicture(100,-1,1,(((Percept) world.getAgents().get(comboDimX.getSelectedItem()))  )  
-			,100,-1,1,(((Percept) world.getAgents().get(comboDimY.getSelectedItem()))  ), 0, 2  );});
-		buttonCreateImageMap.setToolTipText("Export an image of the prediction of the AMAS");
-		toolBar.add(buttonCreateImageMap);
-		
-		buttonShowProjection = new JButton(Config.getIcon("target.png"));
-		buttonShowProjection.addActionListener(e -> {showProjection();});
-		buttonShowProjection.setToolTipText("Show a window of the 2D projection");
-		toolBar.add(buttonShowProjection);
-		
-		buttonShowSelectableContext = new JButton(Config.getIcon("fruit.png"));
-		buttonShowSelectableContext.addActionListener(e -> {printSelectableContext();});
-		buttonShowSelectableContext.setToolTipText("Print in console the selectable contexts");
-		toolBar.add(buttonShowSelectableContext);
 		
 		comboDimX = new JComboBox();
 		comboDimY = new JComboBox();
@@ -356,6 +183,17 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		buttonSearchContext.setToolTipText("Highlight a context");
 		toolBar.add(buttonSearchContext);
 		
+		NCSsituations = new JComboBox();
+		toolBar.add(NCSsituations);
+		
+		
+		toolBar.add(labelDrawMemory);
+		toolBar.add(memoryTick);
+		buttonUpdateMemory = new JButton(Config.getIcon("arrow-circle-double-135.png"));
+		buttonUpdateMemory.addActionListener(e -> {drawMemory(getMemoryByTick(memoryTick.getText() ));;});
+		buttonUpdateMemory.setToolTipText("Draw memory"); 
+		toolBar.add(buttonUpdateMemory);
+		
 		toolBar.add(xValue);
 		toolBar.addSeparator();
 		toolBar.add(yValue);
@@ -365,84 +203,84 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		
 		this.add(toolBar,BorderLayout.NORTH);
 		
-		/* Add JSlider to show the graph of previous states */
-		toolBarSlider = new JToolBar(null, JToolBar.HORIZONTAL);
-		slider = new JSlider(JSlider.HORIZONTAL);
-		slider.setMinorTickSpacing(1);
-		slider.setMajorTickSpacing(1);
-		slider.setPaintTicks(true);
-		slider.setPaintLabels(true);
-		slider.setMaximum(maxSlider);
-		
-		// Add positions label in the slider
-		position = new Hashtable<Integer, JLabel>();
-		position.put(sliderValue, new JLabel(String.valueOf(sliderValue)));
-		slider.setValue(sliderValue);
-		slider.setLabelTable(position);
-		
-		// Add change listener to the slider
-		slider.addChangeListener(new ChangeListener() {
-			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				int valueTick = ((JSlider)e.getSource()).getValue();
-				
-				if (valueTick != sliderValue) {
-					if (valueTick < currentTick) {
-						sliderValue = valueTick;
-						updateSliderValue();
-						updateGrapgh(sliderValue);
-					} else {
-						if (valueTick > currentTick && sliderValue == currentTick) {
-							updateSliderValue();
-						} else {
-							sliderValue = currentTick;
-							updateSliderValue();
-							updateGrapgh(sliderValue);
-						}
-					}
-					
-				}
-				
-			}
-		});
-		
-		JButton btnPrev = new JButton(Config.getIcon("control-180.png"));
-		btnPrev.addActionListener(e -> { previousObservation(); });
-		btnPrev.setToolTipText("Previous");
-		
-		JButton btnNext = new JButton(Config.getIcon("control.png"));
-		btnNext.addActionListener(e -> { nextObservation(); });
-		btnNext.setToolTipText("Next");
-		
-		/* Add text field to show the current step */
-		currentStep = new JTextField(4);
-		Dimension d = currentStep.getPreferredSize();
-		d.width = 50;
-		currentStep.setMinimumSize(d);
-		currentStep.setMaximumSize(d);
-		currentStep.setHorizontalAlignment(JTextField.CENTER);
-		currentStep.setText(String.valueOf(sliderValue));
-		
-		currentStep.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                currentStepKeyPressed(evt);
-            }
-        });
-
-		
-		JButton btnGo = new JButton("Go");
-		btnGo.addActionListener(e -> { getTextValue(); }); 
-		
-		toolBarSlider.add(slider);
-		toolBarSlider.add(btnPrev);
-		toolBarSlider.add(btnNext);
-		toolBarSlider.add(currentStep);
-		toolBarSlider.add(btnGo);
-		this.add(toolBarSlider, BorderLayout.SOUTH);
-		
-		/* End of Slider */
+//		/* Add JSlider to show the graph of previous states */
+//		toolBarSlider = new JToolBar(null, JToolBar.HORIZONTAL);
+//		slider = new JSlider(JSlider.HORIZONTAL);
+//		slider.setMinorTickSpacing(1);
+//		slider.setMajorTickSpacing(1);
+//		slider.setPaintTicks(true);
+//		slider.setPaintLabels(true);
+//		slider.setMaximum(maxSlider);
+//		
+//		// Add positions label in the slider
+//		position = new Hashtable<Integer, JLabel>();
+//		position.put(sliderValue, new JLabel(String.valueOf(sliderValue)));
+//		slider.setValue(sliderValue);
+//		slider.setLabelTable(position);
+//		
+//		// Add change listener to the slider
+//		slider.addChangeListener(new ChangeListener() {
+//			
+//			@Override
+//			public void stateChanged(ChangeEvent e) {
+//				// TODO Auto-generated method stub
+//				int valueTick = ((JSlider)e.getSource()).getValue();
+//				
+//				if (valueTick != sliderValue) {
+//					if (valueTick < currentTick) {
+//						sliderValue = valueTick;
+//						updateSliderValue();
+//						updateGrapgh(sliderValue);
+//					} else {
+//						if (valueTick > currentTick && sliderValue == currentTick) {
+//							updateSliderValue();
+//						} else {
+//							sliderValue = currentTick;
+//							updateSliderValue();
+//							updateGrapgh(sliderValue);
+//						}
+//					}
+//					
+//				}
+//				
+//			}
+//		});
+//		
+//		JButton btnPrev = new JButton(Config.getIcon("control-180.png"));
+//		btnPrev.addActionListener(e -> { previousObservation(); });
+//		btnPrev.setToolTipText("Previous");
+//		
+//		JButton btnNext = new JButton(Config.getIcon("control.png"));
+//		btnNext.addActionListener(e -> { nextObservation(); });
+//		btnNext.setToolTipText("Next");
+//		
+//		/* Add text field to show the current step */
+//		currentStep = new JTextField(4);
+//		Dimension d = currentStep.getPreferredSize();
+//		d.width = 50;
+//		currentStep.setMinimumSize(d);
+//		currentStep.setMaximumSize(d);
+//		currentStep.setHorizontalAlignment(JTextField.CENTER);
+//		currentStep.setText(String.valueOf(sliderValue));
+//		
+//		currentStep.addKeyListener(new java.awt.event.KeyAdapter() {
+//            public void keyPressed(java.awt.event.KeyEvent evt) {
+//                currentStepKeyPressed(evt);
+//            }
+//        });
+//
+//		
+//		JButton btnGo = new JButton("Go");
+//		btnGo.addActionListener(e -> { getTextValue(); }); 
+//		
+//		toolBarSlider.add(slider);
+//		toolBarSlider.add(btnPrev);
+//		toolBarSlider.add(btnNext);
+//		toolBarSlider.add(currentStep);
+//		toolBarSlider.add(btnGo);
+//		this.add(toolBarSlider, BorderLayout.SOUTH);
+//		
+//		/* End of Slider */
 		
 		/* Add text area to display the info of context selected */
 		
@@ -471,6 +309,62 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		
 		
 		
+	}
+	
+	
+	private NCSMemory getMemoryByTick(String tick) {
+		return world.getScheduler().getHeadAgent().getMemoryByTick(Integer.parseInt(tick));
+	}
+	
+	public void drawMemory(NCSMemory ncsMemory) {
+		
+		
+		xValue.setText(   String.valueOf(( ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())).getValue()));
+		yValue.setText(   String.valueOf(( ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())).getValue()));
+		
+		for (Context ctxt : ncsMemory.getContexts()) {
+
+			String name = ctxt.getName();
+			Node node;
+			if (graph.getNode(name) != null) {
+				node = graph.getNode(name);
+			} else {
+				graph.addNode(name);
+				node = graph.getNode(name);
+				node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
+				node.addAttribute("ui.label", ctxt.getName());
+			}
+
+			node.addAttribute("EXIST", true);
+			if (ctxt.getRanges().size() > 0){
+				drawRectangle(node, ctxt);
+			}
+			
+			
+
+			node.addAttribute("ui.class","Context");
+
+
+			
+
+			node.addAttribute("ui.class","ContextColorDynamic");
+			//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+			node.setAttribute("ui.color", 0.0 ); 
+			
+		}
+	
+	Node originNode;
+	originNode = graph.getNode("origin");
+	originNode.addAttribute("EXIST", true);
+	originNode.setAttribute("xyz", 0, 0, 0);
+	originNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
+	
+	System.out.println("TSET");
+	
+	}
+	
+	public void addNCSmemomry(NCSMemory ncsMemory) {
+		NCSsituations.addItem(ncsMemory.getTick());
 	}
 	
 	/**
@@ -1022,6 +916,14 @@ private void startPanelController() {
 	/**
 	 * Update.
 	 */
+	public void updateMemories() {
+		ArrayList<NCSMemory> NCSMemories = world.getScheduler().getHeadAgent().getNCSMemories();
+		NCSsituations.removeAll();
+		for( NCSMemory ncsMemory : NCSMemories) {
+			addNCSmemomry(ncsMemory);
+		}
+	}
+	
 	public void update () {
 		
 		// Update information of slider

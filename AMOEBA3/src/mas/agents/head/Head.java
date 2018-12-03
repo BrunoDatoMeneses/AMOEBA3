@@ -7,6 +7,7 @@ import java.util.HashMap;
 import mas.ncs.NCS;
 import mas.kernel.Config;
 import mas.kernel.Launcher;
+import mas.kernel.NCSMemory;
 import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
@@ -22,7 +23,7 @@ import mas.agents.context.CustomComparator;
 /**
  * The Class Head.
  */
-public class Head extends AbstractHead {
+public class Head extends AbstractHead implements Cloneable{
 
 
 	private Context bestContext;
@@ -35,12 +36,14 @@ public class Head extends AbstractHead {
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	private HashMap<Percept,ArrayList<Context>> partialyActivatedContexts = new HashMap<Percept,ArrayList<Context>>();
 	private HashMap<Percept,Pair<Context,Context>> requestSurroundings = new HashMap<Percept,Pair<Context,Context>>();
-	private ArrayList<Pair<Context,Context>> sharedIncompetenceContextPairs = new ArrayList<Pair<Context,Context>>();
+	private HashMap<Percept,Pair<Context,Context>> sharedIncompetenceContextPairs = new HashMap<Percept,Pair<Context,Context>>();
+	
+	private ArrayList<Context> contextsInCompetition = new ArrayList<Context>();
 	
 	
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
 	
-	
+	public ArrayList<NCSMemory> NCSMemories = new ArrayList<NCSMemory>();
 
 	
 	private int nPropositionsReceived;
@@ -133,6 +136,7 @@ public class Head extends AbstractHead {
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			partialyActivatedContexts.put(pct, new ArrayList<Context>());
 			requestSurroundings.put(pct, new Pair<Context,Context>(null,null));
+			sharedIncompetenceContextPairs.put(pct, new Pair<Context,Context>(null,null));
 			}
 	}
 
@@ -191,7 +195,7 @@ public class Head extends AbstractHead {
 			partialyActivatedContexts.get(pct).clear();
 			
 		}
-		sharedIncompetenceContextPairs.clear();
+		//displayPartiallyActivatedContexts();
 		
 		newContext = null;
 		
@@ -262,26 +266,34 @@ public class Head extends AbstractHead {
 	
 	private void endogenousPlay() {
 		
+		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
+			requestSurroundings.get(pcpt).clear();
+			sharedIncompetenceContextPairs.get(pcpt).clear();
+		}
+		contextsInCompetition.clear();
+		
+		
 		if(uniqueActivatedContext()) {
 			endogenousPrediction = activatedContexts.get(0).getActionProposal();
 		}
 		else if(severalActivatedContexts()){
 			NCS_EndogenousCompetition();
-			endogenousPrediction = -1500.0;
 		}
 		else {
-			
-			if(surroundingContexts()) {
-				NCS_EndogenousSharedIncompetence();
-				endogenousPrediction = -1750.0;
-			}
-			else if(noActivatedContext()) {
-				endogenousPrediction = -2000.0;
-				NCS_EndogenousIncompetence();
-			}	
-			else {
-				endogenousPrediction = -3000.0;
-			}
+			endogenousPrediction = prediction;
+//			if(surroundingContexts()) {
+//				NCS_EndogenousSharedIncompetence();
+//			}
+//			else if(noActivatedContext()) {
+//				endogenousPrediction = -2000.0;
+//				NCS_EndogenousIncompetence();
+//			}	
+//			else {
+//				endogenousPrediction = -3000.0;
+//			}
+//			else {
+//				endogenousPrediction = prediction;
+//			}
 		}
 	}
 	
@@ -303,26 +315,33 @@ public class Head extends AbstractHead {
 	
 	private boolean surroundingContexts() {
 		//Test if there are surrounding contexts
+		boolean testSurroudingContext = false;
 		
-		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
-			requestSurroundings.get(pcpt).clear();
-		}
-		
-		System.out.println("SURROUNDING CONTEXTS ...");
+		//System.out.println("SURROUNDING CONTEXTS ...");
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			
 			computeNearestContextsByPercept(pct);			
 				 
 			}
 		
+		//displayPartiallyActivatedContexts();
+		//displayContexts();
+		
 		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
-			System.out.println("SURROUNDING CONTEXTS ..." + pcpt.getName());
+			//System.out.print("SURROUNDING CONTEXTS ... " + pcpt.getName() + " ");
 			requestSurroundings.get(pcpt).print(pcpt);
-
+			if(sharedIncompetenceContextPairs.get(pcpt) != null) {
+				if(sharedIncompetenceContextPairs.get(pcpt).containTwoContexts()) {
+					testSurroudingContext = true;
+				}
+			}
+			
+			
+			
 		}
 		
-		//System.out.println("Pairs " + sharedIncompetenceContextPairs.size());
-		return sharedIncompetenceContextPairs.size()>0;
+		//System.out.println("TEST SURROUNDING CONTEXTS ..." + testSurroudingContext);
+		return testSurroudingContext;
 	}
 	
 	
@@ -348,15 +367,16 @@ public class Head extends AbstractHead {
 		ArrayList<Context> activatedContextInOtherPercepts = getAllActivatedContextsExeptForOnePercept(pct);
 		
 		
+		
 		if(activatedContextInOtherPercepts.size()>0) {
 			
 				
-			System.out.println("Partially activated on other percepts than " + pct.getName() + " : " + activatedContextInOtherPercepts.size());			
-			System.out.println("Value " + pct.getValue());		 
+			//System.out.println("Partially activated on other percepts than " + pct.getName() + " : " + activatedContextInOtherPercepts.size());			
+			//System.out.println("Value " + pct.getValue());		 
 			
 			CustomComparator rangeStartComparator =  new CustomComparator(pct, "start");
 			Collections.sort(activatedContextInOtherPercepts, rangeStartComparator);
-			diplayListRanges(activatedContextInOtherPercepts, pct, "start");
+			//diplayListRanges(activatedContextInOtherPercepts, pct, "start");
 			
 			
 			for(Context ctxt : activatedContextInOtherPercepts) {
@@ -371,7 +391,7 @@ public class Head extends AbstractHead {
 			CustomComparator rangeEndComparator =  new CustomComparator(pct, "end");
 			Collections.sort(activatedContextInOtherPercepts, rangeEndComparator);
 			Collections.reverse(activatedContextInOtherPercepts);
-			diplayListRanges(activatedContextInOtherPercepts, pct, "end");
+			//diplayListRanges(activatedContextInOtherPercepts, pct, "end");
 			
 			
 
@@ -382,11 +402,11 @@ public class Head extends AbstractHead {
 				}
 			}
 			
-			nearestContexts.print(pct);
+			//nearestContexts.print(pct);
 			requestSurroundings.put(pct, nearestContexts);
 			
 			if(nearestContexts.getL() != null && nearestContexts.getR() != null) {
-				sharedIncompetenceContextPairs.add(nearestContexts);
+				sharedIncompetenceContextPairs.put(pct, nearestContexts);
 			}
 		}
 		else {
@@ -404,7 +424,7 @@ public class Head extends AbstractHead {
 	private ArrayList<Context> getAllActivatedContextsExeptForOnePercept(Percept onePercept){
 		ArrayList<Context> activatedContexts = new ArrayList<Context>();
 		
-		Percept otherPercept = getDifferentePercept(onePercept);
+		Percept otherPercept = getDifferentPercept(onePercept);
 		
 		if(partialyActivatedContexts.get(otherPercept)!=null) {
 			for(Context ctxt : partialyActivatedContexts.get(otherPercept)) {
@@ -416,14 +436,37 @@ public class Head extends AbstractHead {
 				else {
 					activatedContexts.add(ctxt);
 				}
-				
+//				if(!world.getScheduler().getContexts().contains(ctxt)) {
+//					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " + ctxt.getName());
+//				}
 			}
+			
 		}
 		
 		return activatedContexts;
 	}
 	
-	private Percept getDifferentePercept(Percept p) {
+	public void displayPartiallyActivatedContexts() {
+		System.out.println("PARTIALLY ACTIVATED CONTEXTS");
+		for(Percept pct : partialyActivatedContexts.keySet()) {
+			System.out.print(pct.getName() + " : ");
+			if(partialyActivatedContexts.get(pct).size()>0)
+			for(Context ctxt : partialyActivatedContexts.get(pct)) {
+				System.out.print(ctxt.getName() + " ; ");
+			}
+			System.out.println(" ");
+		}
+	}
+	
+	public void displayContexts() {
+		System.out.println("CONTEXTS");
+		for(Context ctxt : this.world.getScheduler().getContextsAsContext()) {
+			System.out.print(ctxt.getName() + " ; ");
+		}
+		System.out.println(" ");
+	}
+	
+	private Percept getDifferentPercept(Percept p) {
 		for(Percept pct : partialyActivatedContexts.keySet()) {
 			if(p != pct) {
 				return pct;
@@ -444,11 +487,108 @@ public class Head extends AbstractHead {
 	
 	private void NCS_EndogenousCompetition() {
 		// Creation of twin contexts to give the endogenous prediction
+		Context highestConfidenceContext = null;
+		Context secondHighestConfidenceContext = null;
+		HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			currentSituation.put(pct, pct.getValue());
+		}
+		
+		if(activatedContexts.get(0).getInfluence(currentSituation)>activatedContexts.get(1).getInfluence(currentSituation)) {
+			highestConfidenceContext = activatedContexts.get(0);
+			secondHighestConfidenceContext = activatedContexts.get(1);
+		}
+		else {
+			highestConfidenceContext = activatedContexts.get(1);
+			secondHighestConfidenceContext = activatedContexts.get(0);
+		}
+		
+		
+		for(int i=2; i<activatedContexts.size();i++) {
+			if(activatedContexts.get(i).getInfluence(currentSituation)>highestConfidenceContext.getInfluence(currentSituation)) {		
+				secondHighestConfidenceContext = highestConfidenceContext;
+				highestConfidenceContext = activatedContexts.get(i);
+			}
+			else if(activatedContexts.get(i).getInfluence(currentSituation)>secondHighestConfidenceContext.getInfluence(currentSituation)) {
+				secondHighestConfidenceContext = activatedContexts.get(i);
+			}
+		}
+		
+		contextsInCompetition.add(highestConfidenceContext);
+		contextsInCompetition.add(secondHighestConfidenceContext);
+		
+		//endogenousPrediction = (highestConfidenceContext.getActionProposal() + secondHighestConfidenceContext.getActionProposal()) / 2;
+		//endogenousPrediction = (highestConfidenceContext.getNormalizedConfidence()*highestConfidenceContext.getActionProposal() + secondHighestConfidenceContext.getNormalizedConfidence()*secondHighestConfidenceContext.getActionProposal()) / (highestConfidenceContext.getNormalizedConfidence() + secondHighestConfidenceContext.getNormalizedConfidence());
+		
+		
+		
+		
+		
+		double highestConfidenceContextInfluence = highestConfidenceContext.getInfluence(currentSituation);
+		double secondHighestConfidenceContextInfluence = secondHighestConfidenceContext.getInfluence(currentSituation);
+		
+		
+		endogenousPrediction = (highestConfidenceContextInfluence*highestConfidenceContext.getActionProposal() + secondHighestConfidenceContextInfluence*secondHighestConfidenceContext.getActionProposal()) / (highestConfidenceContextInfluence + secondHighestConfidenceContextInfluence);
+		
+		//System.out.println("EP " + endogenousPrediction + " I1 " + highestConfidenceContextInfluence + " AP1 " + highestConfidenceContext.getActionProposal() + " I2 " + secondHighestConfidenceContextInfluence + " AP2 " + secondHighestConfidenceContext.getActionProposal());
+		Double test = endogenousPrediction;
+//		if(test.isNaN() || test.isInfinite()) {
+//			System.out.println(highestConfidenceContext.getNormalizedConfidence() + " " + highestConfidenceContext.getActionProposal() + " " + secondHighestConfidenceContext.getNormalizedConfidence()+ " " +secondHighestConfidenceContext.getActionProposal());
+//			endogenousPrediction = prediction;
+//		}
+		
+		ArrayList<Context> concernContexts = new ArrayList<Context>();
+		concernContexts.add(highestConfidenceContext);
+		concernContexts.add(secondHighestConfidenceContext);
+		NCSMemories.add(new NCSMemory(world, concernContexts));
 	}
 	
 	private void NCS_EndogenousSharedIncompetence() {
 		// Extrapolation of contexts by creating twin contexts that will give the prediction
 		
+		;
+		
+		Pair<Context, Context> closestContexts = new Pair<Context,Context>(null, null);
+		double smallestDistanceBetweenContexts = Double.POSITIVE_INFINITY;
+		double currentDistance;
+		
+		for(Percept pct : sharedIncompetenceContextPairs.keySet()) {
+			if(sharedIncompetenceContextPairs.get(pct) != null) {
+				if(sharedIncompetenceContextPairs.get(pct).containTwoContexts()) {
+					currentDistance = sharedIncompetenceContextPairs.get(pct).rangeToRangeDistance(pct);
+					if(currentDistance < smallestDistanceBetweenContexts) {
+						closestContexts = sharedIncompetenceContextPairs.get(pct);
+						smallestDistanceBetweenContexts = currentDistance;
+					}
+				}
+			}
+		}
+		
+		HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
+		
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			currentSituation.put(pct, pct.getValue());
+		}
+		
+		double contextInfluenceL = closestContexts.getL().getInfluence(currentSituation);
+		double contextInfluenceR = closestContexts.getR().getInfluence(currentSituation);
+		
+		
+		endogenousPrediction = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
+		
+		
+//		double prediction = closestContexts.actionProposal(1.0);
+//		if(prediction == Double.NEGATIVE_INFINITY) {
+//			endogenousPrediction = - 1750.0;
+//		}
+//		else {
+//			endogenousPrediction = prediction;
+//		}
+		
+		ArrayList<Context> concernContexts = new ArrayList<Context>();
+		concernContexts.add(closestContexts.getL());
+		concernContexts.add(closestContexts.getR());
+		NCSMemories.add(new NCSMemory(world, concernContexts));
 		
 	}
 	
@@ -1311,4 +1451,36 @@ public class Head extends AbstractHead {
 		return false;
 		
 	}
+	
+	public ArrayList<Context> getContextsInCompetition(){
+		return contextsInCompetition;
+	}
+	
+	public Object clone() throws CloneNotSupportedException{
+		return (Head)super.clone();
+	}
+	
+	public ArrayList<NCSMemory> getNCSMemories() {
+		return NCSMemories;
+	}
+	
+	public NCSMemory getMemoryByTick(int tick) {
+		for(NCSMemory ncsMemory : NCSMemories) {
+			if(ncsMemory.getTick() == tick) {
+				return ncsMemory;
+			}
+		}
+		return null;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -30,7 +30,7 @@ import mas.agents.messages.MessageType;
  * Each Percept agent must be connected to one data source.
  *
  */
-public class Percept extends SystemAgent implements Serializable {
+public class Percept extends SystemAgent implements Serializable,Cloneable {
 
 	
 	//private BlackBoxAgent sensor;
@@ -174,12 +174,22 @@ public class Percept extends SystemAgent implements Serializable {
 		ajustMinMax(); 
 		computeContextProjectionValidity();
 		
+		
+		
 		//ENDO
 		//overlapsDetection();
 		//overlapNotification();
-		
+		//displayContextProjections();
 
 	}	
+	
+	public void displayContextProjections() {
+		System.out.println("CONTEXT PROJECTIONS " + this.getName());
+		for(Context ctxt : contextProjections.keySet()) {
+			System.out.print(ctxt.getName() + " ; ");
+		}
+		System.out.println(" ");
+	}
 	
 	public void computeContextProjectionValidity() {
 		validContextProjection = new ArrayList<Context>();
@@ -595,6 +605,10 @@ public class Percept extends SystemAgent implements Serializable {
 	
 	public void deleteContextProjection(Context context) {
 		contextProjections.remove(context);
+		//System.out.println("DELETION ------------------------------------------------------------------------------------------------------");
+		//System.out.println(context.getName());
+		//displayContextProjections();
+		//System.out.println("----------------------------------------------------------------------------------------------------------------");
 	}
 	
 	
@@ -725,5 +739,9 @@ public class Percept extends SystemAgent implements Serializable {
 	double contextEnd1 = getEndRangeProjection(context1);
 		
 		return  (contextStart1 <= contextStart2 && contextStart2 <= contextEnd1)  ;
+	}
+	
+	public Object clone() throws CloneNotSupportedException{
+		return (Percept)super.clone();
 	}
 }

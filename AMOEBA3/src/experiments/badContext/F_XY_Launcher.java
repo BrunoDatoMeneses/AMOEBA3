@@ -13,6 +13,8 @@ import mas.agents.context.Context;
 import mas.agents.localModel.TypeLocalModel;
 import mas.init.amoeba.AMOEBAFactory;
 import mas.kernel.AMOEBA;
+import mas.kernel.NCSMemory;
+import mas.ncs.NCS;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -37,15 +39,15 @@ public class F_XY_Launcher implements Serializable {
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		
 		//Dynamic errors
-//		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
-//		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
+		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
+		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 		
 		//amoeba.setDataForErrorMargin(100, 5, 0.4, 0.1, 10000, 20000);
 		//amoeba.setDataForInexactMargin(50, 2.5, 0.2, 0.05, 10000, 20000);
 		
 		//Static errors
-		amoeba.setDataForErrorMargin(5, 5, 0.4, 200, 5000, 100000);
-		amoeba.setDataForInexactMargin(2.5, 2.5, 0.2, 100, 5000, 100000);
+//		amoeba.setDataForErrorMargin(5, 5, 0.4, 200, 5000, 100000);
+//		amoeba.setDataForInexactMargin(2.5, 2.5, 0.2, 100, 5000, 100000);
 		
 		//amoeba.setDataForErrorMargin(200, 5, 0.4, 200, 5000, 100000);
 		//amoeba.setDataForInexactMargin(100, 2.5, 0.2, 100, 5000, 100000);
@@ -68,7 +70,7 @@ public class F_XY_Launcher implements Serializable {
 		F_XY_Manager bcm = new F_XY_Manager(50.0);
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
-		for (int i = 0 ; i < 10 ; i++) {
+		for (int i = 0 ; i < 100 ; i++) {
 
 			/* This is the studied system part. Feel free to use any data source.*/
 			bcm.playOneStep(0);
@@ -76,7 +78,14 @@ public class F_XY_Launcher implements Serializable {
 			/*This is a learning step of AMOEBA*/
 			amoeba.learn(new HashMap<String, Double>(bcm.getOutput()));
 			percepts = amoeba.getScheduler().getWorld().getAllPercept();
+			
+			
 		}
+		
+		for(NCSMemory ncsMemory : amoeba.getScheduler().getHeadAgent().NCSMemories) {
+			System.out.println(ncsMemory);
+		}
+		
 		
 		
 		while(true) {

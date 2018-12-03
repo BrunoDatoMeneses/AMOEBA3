@@ -16,6 +16,7 @@ import visualization.view.global.PanelOneChart;
 import visualization.view.global.ScatterPlotExample;
 import visualization.view.global.PanelExoVSEndo;
 import visualization.view.system.nDim.PanelParallelCoordinates;
+import visualization.view.system.twoDim.GrapheTwoDimPanelNCSMemories;
 import visualization.view.system.twoDim.GrapheTwoDimPanelStandard;
 import mas.blackbox.BlackBox; 
 import visualization.graphView.TemporalGraph;
@@ -42,6 +43,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	
 	/** The panel two dim standard. */
 	private GrapheTwoDimPanelStandard panelTwoDimStandard;
+	private GrapheTwoDimPanelNCSMemories panelTwoDimNCSMemories;
 	
 	/** The panel parallel coordinates. */
 	private PanelParallelCoordinates panelParallelCoordinates;
@@ -83,6 +85,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		panelChart = new PanelChart(world);
 		//panelTwoDim = new GrapheTwoDimPanel(world);
 		panelTwoDimStandard = new GrapheTwoDimPanelStandard(world);
+		panelTwoDimNCSMemories = new GrapheTwoDimPanelNCSMemories(world);
 		panelParallelCoordinates = new PanelParallelCoordinates(world);
 		consolePanel = new ConsolePanel();
 		exoVsEndoChart = new PanelExoVSEndo(world);
@@ -102,7 +105,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		this.addTab("Console", new JScrollPane(consolePanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Exo VS endo", new JScrollPane(exoVsEndoChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Test", new JScrollPane(exoVsEndoChart2,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		
+		this.addTab("NCS Memories", new JScrollPane(panelTwoDimNCSMemories,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		
 		((Frame) this.getTopLevelAncestor()).pack();
@@ -116,6 +119,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	//	systemPanel.update();
 	//	panelTwoDim.update();
 		panelTwoDimStandard.update();
+		panelTwoDimNCSMemories.updateMemories();
 		world.getScheduler().setWaitForGUIUpdate(false);
 	}
 	

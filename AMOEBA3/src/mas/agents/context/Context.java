@@ -31,7 +31,7 @@ import mas.agents.messages.MessageType;
  * 
  * 
  */
-public class Context extends AbstractContext implements Serializable{
+public class Context extends AbstractContext implements Serializable,Cloneable{
 
 	ArrayList<Percept> perceptSenders = new ArrayList<Percept>();
 	
@@ -385,7 +385,10 @@ public class Context extends AbstractContext implements Serializable{
 	 */
 	private void solveNCS_ConflictInexact(Head head) {
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
-		confidence--;
+		if(true) {
+			confidence--;
+		}
+		//confidence = confidence * 0.5;
 		updateExperiments();
 	}
 	
@@ -403,7 +406,11 @@ public class Context extends AbstractContext implements Serializable{
 		};
 		
 		//The conflict lowers confidence
-		confidence -= 2;
+		if(true) {
+			confidence -= 2;
+		}
+		
+		//confidence = confidence * 0.25;
 
 
 			ArrayList<Percept> percepts = new ArrayList();
@@ -777,6 +784,8 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 			s += ctxt.getName() + "\n";
 		}
 
+		
+		
 		return s;
 	}
 
@@ -910,6 +919,36 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return confidence;
 
 	}
+	
+	public double getNormalizedConfidence() {
+		return 1/(1+Math.exp(-confidence));
+	}
+	
+	public double getInfluence(HashMap<Percept,Double> situation) {
+		Double influence = 1.0;
+		
+		for(Percept pct : situation.keySet()) {
+			//System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
+		}
+		
+		return influence;
+	}
+	
+	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
+		double center = getCenterByPercept(pct);
+		double radius = getRadiusByPercept(pct);
+				
+		return getNormalizedConfidence()* Math.exp(- Math.pow(situation-center, 2)/(2*Math.pow(radius, 2)));
+	}
+	
+	public double getCenterByPercept(Percept pct) {
+		return (this.getRanges().get(pct).getEnd() + this.getRanges().get(pct).getStart()) /2;
+	}
+	
+	public double getRadiusByPercept(Percept pct) {
+		return (this.getRanges().get(pct).getEnd() - this.getRanges().get(pct).getStart()) /2;
+	}
 
 	/**
 	 * Sets the confidence.
@@ -962,6 +1001,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 				}
 				else {
 					confidence++;
+					//confidence = confidence * 2;
 				}
 			}
 
@@ -1028,10 +1068,10 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @see agents.context.AbstractContext#die()
 	 */
 	public void die () {
-		for(Percept percept : perceptSenders) {
+		for(Percept percept : world.getScheduler().getPercepts()) {
 			percept.deleteContextProjection(this);
 		}
-		
+		//System.out.println("DIED : " + this.getName());
 		localModel.die();
 		super.die();
 	}
@@ -1384,7 +1424,9 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 
 
 
-
+	public Object clone() throws CloneNotSupportedException{
+		return (Context)super.clone();
+	}
 
 
 
