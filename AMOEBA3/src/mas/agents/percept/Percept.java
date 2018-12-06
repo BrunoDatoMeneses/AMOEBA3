@@ -741,7 +741,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		return  (contextStart1 <= contextStart2 && contextStart2 <= contextEnd1)  ;
 	}
 	
-	public Object clone() throws CloneNotSupportedException{
+	public Percept clone() throws CloneNotSupportedException{
 		return (Percept)super.clone();
 	}
 }

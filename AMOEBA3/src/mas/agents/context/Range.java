@@ -3,13 +3,14 @@ package mas.agents.context;
 import java.io.Serializable;
 
 import mas.agents.percept.Percept;
+import mas.agents.Agent;
 import mas.agents.messages.MessageType;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Range.
  */
-public class Range implements Serializable, Comparable {
+public class Range implements Serializable, Comparable, Cloneable {
 
 	/** The start. */
 	private double start;
@@ -681,4 +682,8 @@ public class Range implements Serializable, Comparable {
 		}
 	}
 
+	public Range clone() throws CloneNotSupportedException{
+		return (Range)super.clone();
+	}
+	
 }

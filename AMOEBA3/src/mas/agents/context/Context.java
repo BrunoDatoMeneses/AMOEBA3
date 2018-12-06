@@ -159,9 +159,9 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.isDying = c.isDying;
 		
 		this.ranges = new HashMap<Percept, Range>();
-		for(Entry<Percept, Range> entry : c.ranges.entrySet()) {
-		   Percept percept = new Percept(entry.getKey());
-		   Range range = new Range(entry.getValue());
+		for(Percept pct : c.ranges.keySet()) {
+		   Percept percept = new Percept(pct);
+		   Range range = new Range(c.ranges.get(pct));
 		   this.ranges.put(percept, range);
 		}
 		this.headAgent = c.headAgent;
@@ -632,6 +632,15 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public HashMap<Percept, Range> getRanges() {
 		return ranges;
 	}
+	
+	public Range getRangeByPerceptName(String percetName) {
+		for(Percept prct : ranges.keySet()) {
+			if(prct.getName().equals(percetName)) {
+				return ranges.get(prct);
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Sets the ranges.
@@ -783,6 +792,40 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		for(Context ctxt : possibleNeighbours) {
 			s += ctxt.getName() + "\n";
 		}
+
+		
+		
+		return s;
+	}
+	
+	public String toStringReducted() {
+		String s = "";
+		s += "Context : " + getName() + "\n";
+		s += "Model : ";
+		s += this.localModel.getCoefsFormula() + "\n";
+;
+		s += "\n";
+		
+		for (Percept v : ranges.keySet()) {
+			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
+			
+		}
+		s += "\n";
+		s += "Number of activations : " + activations + "\n";
+		if (actionProposition != null) {
+			s += "Action proposed : " + this.actionProposition + "\n";
+		} else {
+			s += "Action proposed : " + this.getActionProposal() + "\n";
+		}
+		s += "Number of experiments : " + experiments.size() + "\n";
+		s += "Confidence : " + confidence + "\n";
+		if (formulaLocalModel != null) {
+			s += "Local model : " + this.formulaLocalModel + "\n";
+		} else {
+			s += "Local model : " + localModel.getFormula(this) + "\n";
+		}
+		
+		s += "\n";
 
 		
 		
@@ -1424,12 +1467,14 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 
 
 
-	public Object clone() throws CloneNotSupportedException{
+	public Context clone() throws CloneNotSupportedException{
 		return (Context)super.clone();
 	}
 
 
-
+	public LocalModelAgent getLocalModel() {
+		return localModel;
+	}
 
 
 

@@ -58,7 +58,7 @@ public class Head extends AbstractHead implements Cloneable{
 	private int perfIndicatorInexact = 0;
 	
 	private double prediction;
-	private double endogenousPrediction;
+	private Double endogenousPrediction;
 	private double oracleValue;
 	private double oldOracleValue;
 	private double criticity;
@@ -176,6 +176,8 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		super.play();
 
+		endogenousPlay();
+		
 		/* useOracle means that data are labeled*/
 		if (useOracle) {	
 			playWithOracle();
@@ -186,7 +188,9 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		//¤¤
 		
-		endogenousPlay();
+		if(endogenousPrediction == null) {
+			endogenousPrediction =  prediction;
+		}
 		
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		
@@ -266,6 +270,8 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void endogenousPlay() {
 		
+		endogenousPrediction = null;
+		
 		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
 			requestSurroundings.get(pcpt).clear();
 			sharedIncompetenceContextPairs.get(pcpt).clear();
@@ -280,10 +286,9 @@ public class Head extends AbstractHead implements Cloneable{
 			NCS_EndogenousCompetition();
 		}
 		else {
-			endogenousPrediction = prediction;
-//			if(surroundingContexts()) {
-//				NCS_EndogenousSharedIncompetence();
-//			}
+			if(surroundingContexts()) {
+				NCS_EndogenousSharedIncompetence();
+			}
 //			else if(noActivatedContext()) {
 //				endogenousPrediction = -2000.0;
 //				NCS_EndogenousIncompetence();
@@ -486,6 +491,7 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	private void NCS_EndogenousCompetition() {
+		System.out.println("NCS Comptetition " + world.getScheduler().getTick());
 		// Creation of twin contexts to give the endogenous prediction
 		Context highestConfidenceContext = null;
 		Context secondHighestConfidenceContext = null;
@@ -540,7 +546,7 @@ public class Head extends AbstractHead implements Cloneable{
 		ArrayList<Context> concernContexts = new ArrayList<Context>();
 		concernContexts.add(highestConfidenceContext);
 		concernContexts.add(secondHighestConfidenceContext);
-		NCSMemories.add(new NCSMemory(world, concernContexts));
+		NCSMemories.add(new NCSMemory(world, concernContexts,"Competition"));
 	}
 	
 	private void NCS_EndogenousSharedIncompetence() {
@@ -588,7 +594,7 @@ public class Head extends AbstractHead implements Cloneable{
 		ArrayList<Context> concernContexts = new ArrayList<Context>();
 		concernContexts.add(closestContexts.getL());
 		concernContexts.add(closestContexts.getR());
-		NCSMemories.add(new NCSMemory(world, concernContexts));
+		NCSMemories.add(new NCSMemory(world, concernContexts,"SharedIncompetence"));
 		
 	}
 	
@@ -1456,7 +1462,7 @@ public class Head extends AbstractHead implements Cloneable{
 		return contextsInCompetition;
 	}
 	
-	public Object clone() throws CloneNotSupportedException{
+	public Head clone() throws CloneNotSupportedException{
 		return (Head)super.clone();
 	}
 	

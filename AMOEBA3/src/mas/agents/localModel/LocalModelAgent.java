@@ -16,7 +16,7 @@ import mas.agents.messages.Message;
  * The abstract class of all agents in charge of the generation of the output from Context Agent.
  * For the sake of simplicity, it's not scheduled as agent like other of the system.
  */
-public abstract class LocalModelAgent extends SystemAgent implements Serializable{
+public abstract class LocalModelAgent extends SystemAgent implements Serializable, Cloneable{
 
 	/**
 	 * Instantiates a new local model agent.
@@ -88,6 +88,10 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	public void die() {
 		super.die();
 		world.kill(this);
+	}
+	
+	public LocalModelAgent clone() throws CloneNotSupportedException{
+		return (LocalModelAgent)super.clone();
 	}
 
 }

@@ -174,6 +174,13 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 					tick, normalizePositiveValues(100, 20, endoError));
 		}
 		
+//		if(!exoError.isNaN() && !endoError.isNaN()) {
+//			dataSetAgents.getSeries("Error Exo").add(
+//					tick,  exoError);
+//			dataSetAgents.getSeries("Error Endo").add(
+//					tick, endoError);
+//		}
+		
 		
 		//dataSetAgents.getSeries("Oracle").add(tick, world.getScheduler().getHeadAgent().getOracleValue());
 
@@ -190,7 +197,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		endoTotalError += endoError;
 		exoTotalError += exoError;
 		
-		System.out.println("EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError/world.getScheduler().getTick()) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError/world.getScheduler().getTick()) +" )");
+		//System.out.println("EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError/world.getScheduler().getTick()) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError/world.getScheduler().getTick()) +" )");
 	}
 	
 

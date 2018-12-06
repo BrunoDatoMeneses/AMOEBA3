@@ -73,3 +73,7 @@ edge.validWorstContext {
 node:clicked {
     fill-color: blue;
 }
+
+node.RGBAColor {
+	fill-mode: dyn-plain;
+}

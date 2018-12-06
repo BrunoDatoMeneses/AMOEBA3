@@ -3,13 +3,14 @@ package mas.agents;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import mas.agents.context.Context;
 import mas.kernel.World;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class SystemAgent.
  */
-public abstract class SystemAgent extends Agent implements Serializable {
+public abstract class SystemAgent extends Agent implements Serializable,Cloneable {
 
 
 	protected World world;
@@ -44,5 +45,7 @@ public abstract class SystemAgent extends Agent implements Serializable {
 		this.world = world;
 	}
 
-	
+	public SystemAgent clone() throws CloneNotSupportedException{
+		return (SystemAgent)super.clone();
+	}
 }

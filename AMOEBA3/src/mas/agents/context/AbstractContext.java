@@ -14,7 +14,7 @@ import mas.agents.messages.MessageType;
 /**
  * The Class AbstractContext.
  */
-public class AbstractContext extends SystemAgent implements Serializable{
+public class AbstractContext extends SystemAgent implements Serializable,Cloneable{
 
 
 	public AbstractContext(World world) {
@@ -47,5 +47,9 @@ public class AbstractContext extends SystemAgent implements Serializable{
 		}
 
 		world.kill(this);
+	}
+	
+	public AbstractContext clone() throws CloneNotSupportedException{
+		return (AbstractContext)super.clone();
 	}
 }

@@ -15,6 +15,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -93,6 +95,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	
 	/** The viewer. */
 	Viewer viewer;
+	private double zoomLevel = 1.0;
 	
 	/** The world. */
 	World world;
@@ -341,6 +344,10 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		for (Percept v : var) {
 			comboDimX.addItem(v.getName());
 			comboDimY.addItem(v.getName());
+		}
+		
+		if(var.size()>1) {
+			comboDimY.setSelectedIndex(1);
 		}
 		toolBar.add(comboDimX);
 		toolBar.add(comboDimY);
@@ -1161,18 +1168,76 @@ private void startPanelController() {
 					Context n = (Context)a;
 					Node node = graph.getNode(name);
 
-					node.addAttribute("ui.class","ContextColorDynamic");
+					//node.addAttribute("ui.class","ContextColorDynamic");
 					//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
-					node.setAttribute("ui.color", 0.0 ); 
+//					node.setAttribute("ui.color", 0.0 ); 
+					
+					Double r = 0.0;
+					Double g = 0.0;
+					Double b = 0.0;
+					double[] coefs = n.getLocalModel().getCoef();
+					//System.out.println("COEFS : " + coefs.length);
+					if(coefs.length>0) {
+						if(coefs.length==1) {
+							//System.out.println(coefs[0]);	
+							b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+							if(b.isNaN()) {
+								b = 0.0;
+							}
+						}
+						else if(coefs.length==2) {
+							//System.out.println(coefs[0] + " " + coefs[1]);
+							g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+							b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+							if(g.isNaN()) {
+								g = 0.0;
+							}
+							if(b.isNaN()) {
+								b = 0.0;
+							}
+						}
+						else if(coefs.length==3) {
+							//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+							r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+							g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+							b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+							if(r.isNaN()) {
+								r = 0.0;
+							}
+							if(g.isNaN()) {
+								g = 0.0;
+							}
+							if(b.isNaN()) {
+								b = 0.0;
+							}
+						}
+						else {
+							r = 255.0;
+							g = 255.0;
+							b = 255.0;
+						}
+					}
+					else {
+						r = 255.0;
+						g = 255.0;
+						b = 255.0;
+					}
+					
+					node.addAttribute("ui.class","RGBAColor");
+					//System.out.println("COLORS : " + r + " " + g + " " + b);
+					
+					node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
+					//node.addAttribute("ui.style", "fill-color: rgba(" + 255 + "," + 0 + "," + 0 +  "," + 10 +");");
+					//node.addAttribute("ui.style", "fill-color: rgb(255,0,0);");
 					
 					if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
-						node.setAttribute("ui.color", 1.0 );
+						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
 					}
 					if(world.getScheduler().getHeadAgent().getContextsInCompetition().contains(n)) {
-						node.setAttribute("ui.color", 1.0 );
+						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
 					}
 					if(world.getScheduler().getHeadAgent().getBestContext().equals(n)) {
-						node.setAttribute("ui.color", 1.0 );
+						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
 					}
 				}
 				
@@ -1497,6 +1562,23 @@ private void startPanelController() {
         pipe.addSink(graph);
 
         viewer.getDefaultView().setMinimumSize(new Dimension(400,400));
+        
+        viewer.getDefaultView().addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (e.getWheelRotation() == -1) {
+					zoomLevel = zoomLevel - 0.1;
+					if (zoomLevel < 0.1) {
+						zoomLevel = 0.1;
+					}
+					viewer.getDefaultView().getCamera().setViewPercent(zoomLevel);
+				}
+				if (e.getWheelRotation() == 1) {
+					zoomLevel = zoomLevel + 0.1;
+					viewer.getDefaultView().getCamera().setViewPercent(zoomLevel);
+				}
+			}
+		});
+        
 		this.add(viewer.getDefaultView(),BorderLayout.CENTER);
 		setStandardStyle();
 		
@@ -2010,7 +2092,9 @@ private void startPanelController() {
 	}
 	
 	
-	
+	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
+		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
+	}
 	
 
 }

@@ -11,10 +11,15 @@ import java.awt.PointerInfo;
 import java.awt.Robot;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -29,10 +34,12 @@ import java.util.Map.Entry;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -41,6 +48,7 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -111,7 +119,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	private JButton buttonUpdateMemory;
 	private JComboBox comboDimX;
 	private JComboBox comboDimY;
-	private JComboBox NCSsituations;
+	private JComboBox<NCSMemory> NCSsituations;
 	private JLabel xValue;
 	private JLabel yValue;
 	private JLabel labelSearchContext = new JLabel("Search Context :");
@@ -139,6 +147,9 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	private String currentId;
 	private List<String> perceptName = new ArrayList<>();	
 	private Point3 requestPosition;
+	
+	private ArrayList<Context> memoryContexts = new ArrayList<Context>();
+	private double zoomLevel = 1.0;
 	
 	/**
 	 * Instantiates a new graphe two dim panel standard.
@@ -169,6 +180,11 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			comboDimX.addItem(v.getName());
 			comboDimY.addItem(v.getName());
 		}
+		
+		if(var.size()>1) {
+			comboDimY.setSelectedIndex(1);
+		}
+		
 		toolBar.add(comboDimX);
 		toolBar.add(comboDimY);
 		
@@ -183,14 +199,36 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		buttonSearchContext.setToolTipText("Highlight a context");
 		toolBar.add(buttonSearchContext);
 		
-		NCSsituations = new JComboBox();
+		NCSsituations = new JComboBox<NCSMemory>();
+//		NCSsituations.addItemListener(new ItemListener () {
+//			@Override
+//			public void itemStateChanged(ItemEvent arg0) {
+//				drawMemory(getMemoryByTick((String) NCSsituations.getSelectedItem() ));
+//				
+//			}
+//		});
+		
+		NCSsituations.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(NCSsituations.getItemCount() > 0) {
+					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
+				}
+				
+				
+			}
+		});
+		
+		NCSsituations.setRenderer(new MyCellRenderer());
+		
 		toolBar.add(NCSsituations);
 		
 		
 		toolBar.add(labelDrawMemory);
 		toolBar.add(memoryTick);
 		buttonUpdateMemory = new JButton(Config.getIcon("arrow-circle-double-135.png"));
-		buttonUpdateMemory.addActionListener(e -> {drawMemory(getMemoryByTick(memoryTick.getText() ));;});
+		buttonUpdateMemory.addActionListener(e -> {drawMemory(getMemoryByTick(NCSsituations.getSelectedItem().toString()  ));;});
 		buttonUpdateMemory.setToolTipText("Draw memory"); 
 		toolBar.add(buttonUpdateMemory);
 		
@@ -203,84 +241,6 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		
 		this.add(toolBar,BorderLayout.NORTH);
 		
-//		/* Add JSlider to show the graph of previous states */
-//		toolBarSlider = new JToolBar(null, JToolBar.HORIZONTAL);
-//		slider = new JSlider(JSlider.HORIZONTAL);
-//		slider.setMinorTickSpacing(1);
-//		slider.setMajorTickSpacing(1);
-//		slider.setPaintTicks(true);
-//		slider.setPaintLabels(true);
-//		slider.setMaximum(maxSlider);
-//		
-//		// Add positions label in the slider
-//		position = new Hashtable<Integer, JLabel>();
-//		position.put(sliderValue, new JLabel(String.valueOf(sliderValue)));
-//		slider.setValue(sliderValue);
-//		slider.setLabelTable(position);
-//		
-//		// Add change listener to the slider
-//		slider.addChangeListener(new ChangeListener() {
-//			
-//			@Override
-//			public void stateChanged(ChangeEvent e) {
-//				// TODO Auto-generated method stub
-//				int valueTick = ((JSlider)e.getSource()).getValue();
-//				
-//				if (valueTick != sliderValue) {
-//					if (valueTick < currentTick) {
-//						sliderValue = valueTick;
-//						updateSliderValue();
-//						updateGrapgh(sliderValue);
-//					} else {
-//						if (valueTick > currentTick && sliderValue == currentTick) {
-//							updateSliderValue();
-//						} else {
-//							sliderValue = currentTick;
-//							updateSliderValue();
-//							updateGrapgh(sliderValue);
-//						}
-//					}
-//					
-//				}
-//				
-//			}
-//		});
-//		
-//		JButton btnPrev = new JButton(Config.getIcon("control-180.png"));
-//		btnPrev.addActionListener(e -> { previousObservation(); });
-//		btnPrev.setToolTipText("Previous");
-//		
-//		JButton btnNext = new JButton(Config.getIcon("control.png"));
-//		btnNext.addActionListener(e -> { nextObservation(); });
-//		btnNext.setToolTipText("Next");
-//		
-//		/* Add text field to show the current step */
-//		currentStep = new JTextField(4);
-//		Dimension d = currentStep.getPreferredSize();
-//		d.width = 50;
-//		currentStep.setMinimumSize(d);
-//		currentStep.setMaximumSize(d);
-//		currentStep.setHorizontalAlignment(JTextField.CENTER);
-//		currentStep.setText(String.valueOf(sliderValue));
-//		
-//		currentStep.addKeyListener(new java.awt.event.KeyAdapter() {
-//            public void keyPressed(java.awt.event.KeyEvent evt) {
-//                currentStepKeyPressed(evt);
-//            }
-//        });
-//
-//		
-//		JButton btnGo = new JButton("Go");
-//		btnGo.addActionListener(e -> { getTextValue(); }); 
-//		
-//		toolBarSlider.add(slider);
-//		toolBarSlider.add(btnPrev);
-//		toolBarSlider.add(btnNext);
-//		toolBarSlider.add(currentStep);
-//		toolBarSlider.add(btnGo);
-//		this.add(toolBarSlider, BorderLayout.SOUTH);
-//		
-//		/* End of Slider */
 		
 		/* Add text area to display the info of context selected */
 		
@@ -289,13 +249,12 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		textarea.setEditable(false);
 		JScrollPane pane = new JScrollPane(textarea);
 		Dimension dInfo = pane.getPreferredSize();
-		dInfo.width = 250;
+		dInfo.width = 400;
 		dInfo.height = 400;
 		pane.setPreferredSize(dInfo);
 		toolBarInfo.add(pane);
 		this.add(toolBarInfo, BorderLayout.EAST);
-		textarea.setText("No context");
-		toolBarInfo.setVisible(false);
+		textarea.setText("...");
 		
 		
 		
@@ -316,24 +275,39 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		return world.getScheduler().getHeadAgent().getMemoryByTick(Integer.parseInt(tick));
 	}
 	
+	private void clearMemory() {
+		memoryContexts.clear();
+	}
+	
 	public void drawMemory(NCSMemory ncsMemory) {
 		
+		double xValueDouble =  (ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())).getValue();
+		double yValueDouble =  (ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())).getValue();
 		
-		xValue.setText(   String.valueOf(( ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())).getValue()));
-		yValue.setText(   String.valueOf(( ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())).getValue()));
+		xValue.setText(String.valueOf(xValueDouble));
+		yValue.setText(String.valueOf(yValueDouble));
 		
+		//System.out.println("NODES before : " + graph.getNodeSet().size() );
+		for(Context ctxt : memoryContexts) {
+			System.out.println(ctxt.getName());
+			graph.removeNode(ctxt.getName());
+		}
+		clearMemory();
+		//System.out.println("NODES after : " + graph.getNodeSet().size() );
+		
+		//setView(2);
+		
+		//System.out.println("Ctxt to draw : " + ncsMemory.getContexts().size() );
 		for (Context ctxt : ncsMemory.getContexts()) {
 
 			String name = ctxt.getName();
 			Node node;
-			if (graph.getNode(name) != null) {
-				node = graph.getNode(name);
-			} else {
-				graph.addNode(name);
-				node = graph.getNode(name);
-				node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
-				node.addAttribute("ui.label", ctxt.getName());
-			}
+			memoryContexts.add(ctxt);
+			//System.out.println(name);
+			graph.addNode(name);
+			node = graph.getNode(name);
+			node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
+			node.addAttribute("ui.label", ctxt.getName());
 
 			node.addAttribute("EXIST", true);
 			if (ctxt.getRanges().size() > 0){
@@ -342,29 +316,164 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			
 			
 
-			node.addAttribute("ui.class","Context");
+			Double r = 0.0;
+			Double g = 0.0;
+			Double b = 0.0;
+			double[] coefs = ctxt.getLocalModel().getCoef();
+			//System.out.println("COEFS : " + coefs.length);
+			if(coefs.length>0) {
+				if(coefs.length==1) {
+					//System.out.println(coefs[0]);	
+					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length==2) {
+					//System.out.println(coefs[0] + " " + coefs[1]);
+					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length==3) {
+					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+					if(r.isNaN()) {
+						r = 0.0;
+					}
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else {
+					r = 255.0;
+					g = 255.0;
+					b = 255.0;
+				}
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+			
+			node.addAttribute("ui.class","RGBAColor");
+			//System.out.println("COLORS : " + r + " " + g + " " + b);
+			
+			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
+			
+		}
+		
+		for (Context ctxt : ncsMemory.getOtherContexts()) {
 
+			String name = ctxt.getName();
+			Node node;
+			memoryContexts.add(ctxt);
+			//System.out.println(name);
+			graph.addNode(name);
+			node = graph.getNode(name);
+			node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
+			node.addAttribute("ui.label", ctxt.getName());
 
+			node.addAttribute("EXIST", true);
+			if (ctxt.getRanges().size() > 0){
+				drawRectangle(node, ctxt);
+			}
+			
 			
 
-			node.addAttribute("ui.class","ContextColorDynamic");
-			//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
-			node.setAttribute("ui.color", 0.0 ); 
+			Double r = 0.0;
+			Double g = 0.0;
+			Double b = 0.0;
+			double[] coefs = ctxt.getLocalModel().getCoef();
+			//System.out.println("COEFS : " + coefs.length);
+			if(coefs.length>0) {
+				if(coefs.length==1) {
+					//System.out.println(coefs[0]);	
+					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length==2) {
+					//System.out.println(coefs[0] + " " + coefs[1]);
+					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length==3) {
+					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+					if(r.isNaN()) {
+						r = 0.0;
+					}
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else {
+					r = 255.0;
+					g = 255.0;
+					b = 255.0;
+				}
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+			
+			node.addAttribute("ui.class","RGBAColor");
+			//System.out.println("COLORS : " + r + " " + g + " " + b);
+			
+			node.addAttribute("ui.style", "fill-color: rgba(10,10,10,10);");
 			
 		}
 	
-	Node originNode;
-	originNode = graph.getNode("origin");
-	originNode.addAttribute("EXIST", true);
-	originNode.setAttribute("xyz", 0, 0, 0);
-	originNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
-	
-	System.out.println("TSET");
-	
+		
+		Node node;
+		String headName = ncsMemory.getHead().getName();
+		if (graph.getNode(headName) != null) {
+			node = graph.getNode(headName);
+			node.addAttribute("ui.label", xValueDouble + " , " + yValueDouble);
+
+		} else {
+			graph.addNode(headName);
+			node = graph.getNode(headName);
+			node.addAttribute("ui.class", "Center");
+		}
+
+		node.addAttribute("EXIST", true);
+		node.setAttribute("xyz", xValueDouble, yValueDouble, 0);
+		
+		//System.out.println("Drawn nodes : " + graph.getNodeSet().size() );
+		
+		textarea.setText(ncsMemory.toStringDetailled());
 	}
 	
 	public void addNCSmemomry(NCSMemory ncsMemory) {
-		NCSsituations.addItem(ncsMemory.getTick());
+		NCSsituations.addItem(ncsMemory);
+		
 	}
 	
 	/**
@@ -902,15 +1011,37 @@ private void startPanelController() {
 		/* End of update slider */
 	}
 
-	private void setOrigin() {
-		Node originNode;
-		graph.addNode("origin");
-		originNode = graph.getNode("origin");
-		originNode.addAttribute("EXIST", true);
-		
-		originNode.setAttribute("xyz", 0, 0, 0);
-		
-		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(0.5) +"gu;");
+	private void setView(double percent) {
+		viewer.getDefaultView().getCamera().setViewPercent(percent);
+//		double radius = 0.5;
+//		Node viewNode1;
+//		Node viewNode2;
+//		Node viewNode3;
+//		Node viewNode4;
+//		double xPosition1 = center + dispersion;
+//		double yPosition1 = center + dispersion;
+//		double xPosition2 = center + dispersion;
+//		double yPosition2 = center + dispersion;
+//		double xPosition3 = center + dispersion;
+//		double yPosition3 = center + dispersion;
+//		double xPosition4 = center + dispersion;
+//		double yPosition4 = center + dispersion;
+//		
+//		if (graph.getNode("view") != null) {
+//			viewNode1 = graph.getNode("view");
+//			viewNode1.addAttribute("ui.label", xPosition1 + " , " + yPosition1);
+//
+//		} else {
+//			graph.addNode("view");
+//			viewNode1 = graph.getNode("view");
+//			viewNode1.addAttribute("ui.class", "View");
+//		}
+//		
+//		viewNode1.addAttribute("EXIST", true);
+//		
+//		viewNode1.setAttribute("xyz", xPosition , yPosition);
+//		
+//		viewNode1.addAttribute("ui.style", "size: " + doubleFormat.format(xRadius) + "gu, " + doubleFormat.format(yRadius) +"gu;");
 	}
 	
 	/**
@@ -918,7 +1049,7 @@ private void startPanelController() {
 	 */
 	public void updateMemories() {
 		ArrayList<NCSMemory> NCSMemories = world.getScheduler().getHeadAgent().getNCSMemories();
-		NCSsituations.removeAll();
+		NCSsituations.removeAllItems();
 		for( NCSMemory ncsMemory : NCSMemories) {
 			addNCSmemomry(ncsMemory);
 		}
@@ -1171,19 +1302,19 @@ private void startPanelController() {
 		
 //		System.out.println(n.getRanges().get(world.getAgents().get("Sensor")).getStart() + " " + n.getRanges().get(world.getAgents().get("SensorPerturbation")).getStart());
 		
-		double lengthX = context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getEnd() 
-				- context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart();
-		double lengthY = context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getEnd() 
-				- context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart();
 		
-		node.setAttribute("xyz", context.getRanges().get(world.getAgents().get(comboDimX.getSelectedItem())).getStart() + (0.5*lengthX),
-				context.getRanges().get(world.getAgents().get(comboDimY.getSelectedItem())).getStart() + (0.5*lengthY), 0);
+		double lengthX = context.getRangeByPerceptName(world.getAgents().get(comboDimX.getSelectedItem()).getName()).getEnd() - context.getRangeByPerceptName(world.getAgents().get(comboDimX.getSelectedItem()).getName()).getStart();
+		double lengthY = context.getRangeByPerceptName(world.getAgents().get(comboDimY.getSelectedItem()).getName()).getEnd() - context.getRangeByPerceptName(world.getAgents().get(comboDimY.getSelectedItem()).getName()).getStart();
+		
+		node.setAttribute("xyz", context.getRangeByPerceptName(world.getAgents().get(comboDimX.getSelectedItem()).getName()).getStart() + (0.5*lengthX),
+				context.getRangeByPerceptName(world.getAgents().get(comboDimY.getSelectedItem()).getName()).getStart() + (0.5*lengthY), 0);
 		
 	//	node.setAttribute("xyz", n.getRanges().get(world.getAgents().get("Sensor")).getValue(), n.getRanges().get(world.getAgents().get("SensorPerturbation")).getValue(), 0);
 	//	node.addAttribute("ui.size", "8px");
 		
 		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
 
+		//System.out.println("Drawing : " + context.getName());
 	}
 	
 	public HashMap<String, Double> request(Point3 position){
@@ -1399,10 +1530,29 @@ private void startPanelController() {
         pipe.addSink(graph);
 
         viewer.getDefaultView().setMinimumSize(new Dimension(400,400));
+        
+  
+        
+        viewer.getDefaultView().addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (e.getWheelRotation() == -1) {
+					zoomLevel = zoomLevel - 0.1;
+					if (zoomLevel < 0.1) {
+						zoomLevel = 0.1;
+					}
+					viewer.getDefaultView().getCamera().setViewPercent(zoomLevel);
+				}
+				if (e.getWheelRotation() == 1) {
+					zoomLevel = zoomLevel + 0.1;
+					viewer.getDefaultView().getCamera().setViewPercent(zoomLevel);
+				}
+			}
+		});
+        
 		this.add(viewer.getDefaultView(),BorderLayout.CENTER);
 		setStandardStyle();
 		
-		setOrigin();
+		//setOrigin();
 	}
 	
 	/**
@@ -1912,7 +2062,59 @@ private void startPanelController() {
 	}
 	
 	
-	
+	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
+		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
+	}
 	
 
 }
+
+class MyCellRenderer extends JLabel implements ListCellRenderer<NCSMemory> {
+    public MyCellRenderer() {
+        setOpaque(true);
+    }
+
+    public Component getListCellRendererComponent(JList<? extends NCSMemory> list,
+    												NCSMemory value,
+                                                  int index,
+                                                  boolean isSelected,
+                                                  boolean cellHasFocus) {
+
+        setText(value.toString());
+
+        Color background;
+        Color foreground;
+
+        // check if this cell represents the current DnD drop location
+        JList.DropLocation dropLocation = list.getDropLocation();
+        //System.out.println("--------------------------------------------TEST COLOR " + value.getErrorLevel());
+        if (value.getErrorLevel()<0) {
+            background = Color.RED;
+            foreground = Color.WHITE;
+
+        // unselected, and not the DnD drop location
+        } else {
+            background = Color.WHITE;
+            foreground = Color.BLACK;
+        };
+
+        setBackground(background);
+        setForeground(foreground);
+
+        return this;
+    }
+}
+
+class ColorCellRenderer implements ListCellRenderer<NCSMemory> {
+	  protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+
+	  public Component getListCellRendererComponent(JList<? extends NCSMemory> list, NCSMemory value, int index,
+	      boolean isSelected, boolean cellHasFocus) {
+	    JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
+	        isSelected, cellHasFocus);
+	    if (value.getErrorLevel()<0) {
+	      renderer.setBackground(Color.red);
+	    }
+	    return renderer;
+	  }
+	}

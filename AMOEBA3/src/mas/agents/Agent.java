@@ -11,7 +11,7 @@ import mas.agents.messages.MessageType;
 /**
  * The Class Agent.
  */
-public abstract class Agent implements Serializable {
+public abstract class Agent implements Serializable, Cloneable {
 	
 
 	
@@ -118,6 +118,8 @@ public abstract class Agent implements Serializable {
 		this.isDying = isDying;
 	}
 
-	
+	public Agent clone() throws CloneNotSupportedException{
+		return (Agent)super.clone();
+	}
 
 }

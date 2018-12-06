@@ -70,7 +70,7 @@ public class F_XY_Launcher implements Serializable {
 		F_XY_Manager bcm = new F_XY_Manager(50.0);
 		ArrayList<Percept> percepts = new  ArrayList<Percept>();
 		
-		for (int i = 0 ; i < 100 ; i++) {
+		for (int i = 0 ; i < 179 ; i++) {
 
 			/* This is the studied system part. Feel free to use any data source.*/
 			bcm.playOneStep(0);
@@ -82,9 +82,9 @@ public class F_XY_Launcher implements Serializable {
 			
 		}
 		
-		for(NCSMemory ncsMemory : amoeba.getScheduler().getHeadAgent().NCSMemories) {
-			System.out.println(ncsMemory);
-		}
+//		for(NCSMemory ncsMemory : amoeba.getScheduler().getHeadAgent().NCSMemories) {
+//			System.out.println(ncsMemory);
+//		}
 		
 		
 		
