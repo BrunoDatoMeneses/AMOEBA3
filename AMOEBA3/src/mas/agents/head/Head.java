@@ -34,6 +34,7 @@ public class Head extends AbstractHead implements Cloneable{
 	//private BlackBoxAgent oracle;
 	
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
+	private ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
 	private HashMap<Percept,ArrayList<Context>> partialyActivatedContexts = new HashMap<Percept,ArrayList<Context>>();
 	private HashMap<Percept,Pair<Context,Context>> requestSurroundings = new HashMap<Percept,Pair<Context,Context>>();
 	private HashMap<Percept,Pair<Context,Context>> sharedIncompetenceContextPairs = new HashMap<Percept,Pair<Context,Context>>();
@@ -163,6 +164,7 @@ public class Head extends AbstractHead implements Cloneable{
 	 */
 	public void play() {
 
+		System.out.println("£££££££££££££££££££££££££££££££££££££££££ :" + activatedNeighborsContexts.size());
 		nPropositionsReceived = activatedContexts.size();
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
@@ -176,7 +178,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		super.play();
 
-		endogenousPlay();
+		
 		
 		/* useOracle means that data are labeled*/
 		if (useOracle) {	
@@ -195,6 +197,7 @@ public class Head extends AbstractHead implements Cloneable{
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		
 		activatedContexts.clear();
+		
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			partialyActivatedContexts.get(pct).clear();
 			
@@ -233,6 +236,9 @@ public class Head extends AbstractHead implements Cloneable{
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 
+		
+		endogenousPlay();
+		
 		selfAnalysationOfContexts();
 
 		NCSDetection_IncompetentHead();		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
@@ -263,7 +269,7 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		Config.print("Best context selected without oracle is : " + bestContext.getName(),0);
 	//	Config.print("With function : " + bestContext.getFunction().getFormula(bestContext), 0);
-		Config.print("BestContext : " + bestContext.toString() + " " + bestContext.getConfidence(), 2);
+		Config.print("BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence(), 2);
 		functionSelected = bestContext.getFunction().getFormula(bestContext);
 		criticity = Math.abs(oracleValue - prediction);
 	}
@@ -570,6 +576,9 @@ public class Head extends AbstractHead implements Cloneable{
 			}
 		}
 		
+		
+		
+		
 		HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
 		
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
@@ -579,8 +588,15 @@ public class Head extends AbstractHead implements Cloneable{
 		double contextInfluenceL = closestContexts.getL().getInfluence(currentSituation);
 		double contextInfluenceR = closestContexts.getR().getInfluence(currentSituation);
 		
+		System.out.println("--------------------------------------------------DIFFERENCE :" + compareClosestContextPair(closestContexts));
+		if(compareClosestContextPair(closestContexts)<10) {
+			endogenousPrediction = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
+		}
+		else {
+			endogenousPrediction = prediction;
+		}
 		
-		endogenousPrediction = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
+		
 		
 		
 //		double prediction = closestContexts.actionProposal(1.0);
@@ -595,6 +611,26 @@ public class Head extends AbstractHead implements Cloneable{
 		concernContexts.add(closestContexts.getL());
 		concernContexts.add(closestContexts.getR());
 		NCSMemories.add(new NCSMemory(world, concernContexts,"SharedIncompetence"));
+		
+	}
+	
+	private Double compareClosestContextPair(Pair<Context,Context> closestContexts) {
+		Double difference = 0.0;
+		
+		if(closestContexts.getL().getLocalModel().getCoef().length == closestContexts.getR().getLocalModel().getCoef().length) {
+			double[] coefL = closestContexts.getL().getLocalModel().getCoef();
+			double[] coefR = closestContexts.getR().getLocalModel().getCoef();
+			for(int i=0;i<closestContexts.getL().getLocalModel().getCoef().length;i++) {
+				difference += Math.abs(coefL[i] - coefR[i]);
+			}
+		}
+		
+		if(difference==0.0) {
+			return Double.POSITIVE_INFINITY;
+		}
+		else {
+			return difference;
+		}
 		
 	}
 	
@@ -1477,6 +1513,27 @@ public class Head extends AbstractHead implements Cloneable{
 			}
 		}
 		return null;
+	}
+	
+	
+	public void addRequestNeighbor(Context ctxt) {
+		System.out.println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤");
+		activatedNeighborsContexts.add(ctxt);
+	}
+	
+	public ArrayList<Context> getActivatedNeighborsContexts(){
+		return activatedNeighborsContexts;
+	}
+	
+	public void displayActivatedNeighborsContexts() {
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+		for(Context ctxt : activatedNeighborsContexts) {
+			System.out.println(ctxt.getName());
+		}
+	}
+	
+	public void clearActivatedNeighborsContexts(){
+		activatedNeighborsContexts.clear();
 	}
 }
 

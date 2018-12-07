@@ -1230,15 +1230,21 @@ private void startPanelController() {
 					//node.addAttribute("ui.style", "fill-color: rgba(" + 255 + "," + 0 + "," + 0 +  "," + 10 +");");
 					//node.addAttribute("ui.style", "fill-color: rgb(255,0,0);");
 					
-					if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
+//					if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
+//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
+//					}
+//					if(world.getScheduler().getHeadAgent().getContextsInCompetition().contains(n)) {
+//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
+//					}
+//					if(world.getScheduler().getHeadAgent().getBestContext().equals(n)) {
+//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
+//					}
+					
+					if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
 						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
 					}
-					if(world.getScheduler().getHeadAgent().getContextsInCompetition().contains(n)) {
-						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-					}
-					if(world.getScheduler().getHeadAgent().getBestContext().equals(n)) {
-						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-					}
+					System.out.println("도도도도도도도도도도도도도도도도도도도도도도� :" + world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
+					world.getScheduler().getHeadAgent().displayActivatedNeighborsContexts();
 				}
 				
 				
@@ -1684,7 +1690,7 @@ private void startPanelController() {
 				Context c = o.getContextById(id);
 				if ( c != null ) {
 					info = "State :" + sliderValue + "\n";
-					info = info.concat(o.getContextById(id).toString());
+					info = info.concat(o.getContextById(id).toStringFull());
 					info = info.replace("Current", "\nCurrent");
 					info = info.replace("AVT", "\nAVT");
 				} else {

@@ -39,6 +39,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	public ArrayList<Context> validContextProjection = new ArrayList<Context>();
+	public ArrayList<Context> validNeigborhoodContextProjection = new ArrayList<Context>();
 	public HashMap<String, PerceptOverlap> perceptOverlaps = new HashMap<String, PerceptOverlap>();
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
 	
@@ -141,6 +142,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 
 		
 		this.validContextProjection = new ArrayList<Context>();
+		this.validNeigborhoodContextProjection = new ArrayList<Context>();
 		this.perceptOverlaps = new HashMap<String, PerceptOverlap>();
 		
 		this.sortedRanges.put("start", new ArrayList<Context>());
@@ -193,6 +195,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	public void computeContextProjectionValidity() {
 		validContextProjection = new ArrayList<Context>();
+		validNeigborhoodContextProjection = new ArrayList<Context>();
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			if(contextProjection.contains(this.value)) {
 				validContextProjection.add(contextProjection.getContext());
@@ -207,10 +210,18 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 				
 				
 			}
+			
+			if(contextProjection.inNeighborhoodOf(this.value)){
+				validNeigborhoodContextProjection.add(contextProjection.getContext());
+			}
 		}
 		
 		for(Context context : validContextProjection) {
 			context.setPerceptValidity(this);
+		}
+		
+		for(Context context : validNeigborhoodContextProjection) {
+			context.setNeighborhoodPerceptValidity(this);
 		}
 		
 	}

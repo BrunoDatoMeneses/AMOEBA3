@@ -120,6 +120,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	private JComboBox comboDimX;
 	private JComboBox comboDimY;
 	private JComboBox<NCSMemory> NCSsituations;
+	private JComboBox<Context> NCScontexts;
 	private JLabel xValue;
 	private JLabel yValue;
 	private JLabel labelSearchContext = new JLabel("Search Context :");
@@ -200,6 +201,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		toolBar.add(buttonSearchContext);
 		
 		NCSsituations = new JComboBox<NCSMemory>();
+		NCScontexts = new JComboBox<Context>();
 //		NCSsituations.addItemListener(new ItemListener () {
 //			@Override
 //			public void itemStateChanged(ItemEvent arg0) {
@@ -208,11 +210,19 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 //			}
 //		});
 		
+		NCSsituations.setBounds(NCSsituations.getBounds().x, NCSsituations.getBounds().y, NCSsituations.getBounds().width, 800);
 		NCSsituations.addItemListener(new ItemListener() {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
+				
 				if(NCSsituations.getItemCount() > 0) {
+					
+					NCScontexts.removeAllItems();
+					NCScontexts.addItem(null);
+					for(Context ctxt : ((NCSMemory) NCSsituations.getSelectedItem()).getContexts()) {
+						NCScontexts.addItem(ctxt);
+					}
 					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
 				}
 				
@@ -220,9 +230,38 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			}
 		});
 		
+		
+		
+		
+		
 		NCSsituations.setRenderer(new MyCellRenderer());
 		
+		
+		
 		toolBar.add(NCSsituations);
+		
+		NCScontexts.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				
+				
+				
+				if(NCSsituations.getItemCount() > 0) {
+					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
+				}
+				
+				if(NCScontexts.getSelectedItem()!=null) {
+					Node node = graph.getNode(((Context) NCScontexts.getSelectedItem()).getName());
+					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
+				}
+				
+				
+				
+			}
+		});
+		
+		toolBar.add(NCScontexts);
 		
 		
 		toolBar.add(labelDrawMemory);
@@ -281,6 +320,9 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	
 	public void drawMemory(NCSMemory ncsMemory) {
 		
+		
+		
+		
 		double xValueDouble =  (ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())).getValue();
 		double yValueDouble =  (ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())).getValue();
 		
@@ -289,7 +331,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		
 		//System.out.println("NODES before : " + graph.getNodeSet().size() );
 		for(Context ctxt : memoryContexts) {
-			System.out.println(ctxt.getName());
+			//System.out.println(ctxt.getName());
 			graph.removeNode(ctxt.getName());
 		}
 		clearMemory();
@@ -390,58 +432,6 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 				drawRectangle(node, ctxt);
 			}
 			
-			
-
-			Double r = 0.0;
-			Double g = 0.0;
-			Double b = 0.0;
-			double[] coefs = ctxt.getLocalModel().getCoef();
-			//System.out.println("COEFS : " + coefs.length);
-			if(coefs.length>0) {
-				if(coefs.length==1) {
-					//System.out.println(coefs[0]);	
-					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length==2) {
-					//System.out.println(coefs[0] + " " + coefs[1]);
-					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length==3) {
-					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
-					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
-					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
-					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
-					if(r.isNaN()) {
-						r = 0.0;
-					}
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else {
-					r = 255.0;
-					g = 255.0;
-					b = 255.0;
-				}
-			}
-			else {
-				r = 255.0;
-				g = 255.0;
-				b = 255.0;
-			}
 			
 			node.addAttribute("ui.class","RGBAColor");
 			//System.out.println("COLORS : " + r + " " + g + " " + b);
@@ -1654,7 +1644,7 @@ private void startPanelController() {
 				Context c = o.getContextById(id);
 				if ( c != null ) {
 					info = "State :" + sliderValue + "\n";
-					info = info.concat(o.getContextById(id).toString());
+					info = info.concat(o.getContextById(id).toStringFull());
 					info = info.replace("Current", "\nCurrent");
 					info = info.replace("AVT", "\nAVT");
 				} else {
@@ -2066,6 +2056,10 @@ private void startPanelController() {
 		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
 	}
 	
+	public double normalize(double lowerBound, double upperBound, double dispersion, double value) {
+		return lowerBound + (upperBound - lowerBound)/(1+Math.exp(-value/dispersion));
+	}
+	
 
 }
 
@@ -2088,12 +2082,18 @@ class MyCellRenderer extends JLabel implements ListCellRenderer<NCSMemory> {
         // check if this cell represents the current DnD drop location
         JList.DropLocation dropLocation = list.getDropLocation();
         //System.out.println("--------------------------------------------TEST COLOR " + value.getErrorLevel());
-        if (value.getErrorLevel()<0) {
-            background = Color.RED;
+        if (value.getErrorLevel()<-0.01) {
+        	
+            background = new Color((int)normalize(0,255,10,-value.getErrorLevel()), 0, 0);
             foreground = Color.WHITE;
 
         // unselected, and not the DnD drop location
-        } else {
+        }
+        else if(value.getErrorLevel()>0.01) {
+        	background = new Color(0, (int)normalize(0,255,10,value.getErrorLevel()), 0);
+            foreground = Color.WHITE;
+        }
+        else {
             background = Color.WHITE;
             foreground = Color.BLACK;
         };
@@ -2103,6 +2103,10 @@ class MyCellRenderer extends JLabel implements ListCellRenderer<NCSMemory> {
 
         return this;
     }
+    
+    public double normalize(double lowerBound, double upperBound, double dispersion, double value) {
+		return lowerBound + (upperBound - lowerBound)/(1+Math.exp(-value/dispersion));
+	}
 }
 
 class ColorCellRenderer implements ListCellRenderer<NCSMemory> {

@@ -56,6 +56,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private boolean firstTimePeriod = true;
 	
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
+	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<Percept, Boolean>();
+	
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
@@ -124,6 +126,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		perceptValidities = new HashMap<Percept, Boolean>();
 		for(Percept percept : var) {
 			perceptValidities.put(percept, false);
+			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
 		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
@@ -284,6 +287,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			//System.out.println("Valid context by Percepts "+this.name);
 		}
 		
+		if(computeNeighborhoodValidityByPercepts()) {
+			System.out.println("*****************************************************************************************************");
+			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
+		}
+		
 		if (computeValidity()) {
 			//System.out.println("Valid context by Context "+this.name);
 		}
@@ -294,6 +302,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		// Reset percepts validities
 		for(Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
+			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
 		//ENDO
@@ -702,7 +711,11 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	
 	public String toString() {
+		return "Context :" + this.getName();
+	}
+	public String toStringFull() {
 		String s = "";
 		s += "Context : " + getName() + "\n";
 		s += "\n";
@@ -798,19 +811,18 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return s;
 	}
 	
-	public String toStringReducted() {
+	public String toStringReducted(HashMap<Percept,Double> situation) {
 		String s = "";
 		s += "Context : " + getName() + "\n";
 		s += "Model : ";
 		s += this.localModel.getCoefsFormula() + "\n";
 ;
-		s += "\n";
 		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
 			
 		}
-		s += "\n";
+
 		s += "Number of activations : " + activations + "\n";
 		if (actionProposition != null) {
 			s += "Action proposed : " + this.actionProposition + "\n";
@@ -819,6 +831,8 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		}
 		s += "Number of experiments : " + experiments.size() + "\n";
 		s += "Confidence : " + confidence + "\n";
+		s += "Normalized confidence : " + getNormalizedConfidence() + "\n";
+		s += "Influnce :" + getInfluence(situation) + "\n";
 		if (formulaLocalModel != null) {
 			s += "Local model : " + this.formulaLocalModel + "\n";
 		} else {
@@ -986,11 +1000,11 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	}
 	
 	public double getCenterByPercept(Percept pct) {
-		return (this.getRanges().get(pct).getEnd() + this.getRanges().get(pct).getStart()) /2;
+		return (this.getRangeByPerceptName(pct.getName()).getEnd() + this.getRangeByPerceptName(pct.getName()).getStart()) /2;
 	}
 	
 	public double getRadiusByPercept(Percept pct) {
-		return (this.getRanges().get(pct).getEnd() - this.getRanges().get(pct).getStart()) /2;
+		return (this.getRangeByPerceptName(pct.getName()).getEnd() - this.getRangeByPerceptName(pct.getName()).getStart()) /2;
 	}
 
 	/**
@@ -1124,6 +1138,12 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		perceptValidities.put(percept, true);
 	}
 	
+	public void setNeighborhoodPerceptValidity(Percept percept) {
+		perceptNeighborhoodValidities.put(percept, true);
+	}
+	
+	
+	
 	public void setPerceptOverlap(Percept percept, Context context) {
 		if(!contextOverlapsByPercept.keySet().contains(context)) {
 			contextOverlapsByPercept.put(context, new HashMap<Percept,Boolean>());
@@ -1146,6 +1166,18 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		}
 		return test;
 	}
+	
+	public Boolean computeNeighborhoodValidityByPercepts() {
+		Boolean test = true;
+		for(Percept percept : perceptNeighborhoodValidities.keySet()) {
+			//System.out.println(percept.getName()+"--->"+perceptNeighborhoodValidities.get(percept));
+			test = test && perceptNeighborhoodValidities.get(percept);
+		}
+		return test;
+	}
+	
+	
+	
 	
 	public Boolean computeOverlapsByPercepts() {
 		Boolean test = true;

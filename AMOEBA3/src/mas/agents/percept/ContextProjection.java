@@ -72,6 +72,10 @@ public class ContextProjection implements Serializable{
 		return ((value > start)  && (value < end));
 	}
 	
+	public boolean inNeighborhoodOf(Double value) {
+		return ((value > start - getNeighboorhood())  && (value < end + getNeighboorhood()));
+	}
+	
 	public Context getContext() {
 		return this.context;
 	}
@@ -80,5 +84,12 @@ public class ContextProjection implements Serializable{
         return "{"+this.start+" , "+this.end+"}";
     }
 	
+	public double getRadius() {
+		return end - start;
+	}
+	
+	public double getNeighboorhood() {
+		return getRadius()/2;
+	}
 	
 }

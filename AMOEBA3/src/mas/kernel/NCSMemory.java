@@ -1,6 +1,7 @@
 package mas.kernel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import mas.agents.context.Context;
 import mas.agents.head.Head;
@@ -15,12 +16,14 @@ public class NCSMemory {
 	private int tick;
 	private World world;
 	private String type;
+	private Context bestContextExo;
+	
 	
 	
 	public NCSMemory(World wrld, ArrayList<Context> concernContexts, String NCSType) {
 		world = wrld;
 		type = NCSType;
-		
+		bestContextExo = new Context(world.getScheduler().getHeadAgent().getBestContext());
 		try {
 			for(Percept pct : world.getScheduler().getPercepts()) {
 				percepts.add( new Percept(pct));
@@ -55,19 +58,29 @@ public class NCSMemory {
 	public String toStringDetailled() {
 		String string = "";
 		
-		string += "Tick :" + tick + "\n";
+		string += "Tick :" + tick + "\n\n";
 		
+		HashMap<Percept,Double> situation = new HashMap<Percept,Double>();
 		for(Percept prct : percepts) {
 			string += prct.getName() + " : " + prct.getValue() + "\n";
+			situation.put(prct, prct.getValue());
 		}
 		
+		string += "\n";
+		
+		
+		
+		
 		for(Context ctxt : contexts) {
-			string += ctxt.toStringReducted();
+			if(ctxt.getName().equals(bestContextExo.getName())) {
+				string += "BEST CONTEXT EXO\n";
+			}
+			string += ctxt.toStringReducted(situation);
 		}
 		
 		string += "Predictions -> EXO :" + head.getPrediction()  + "\n";
 		string += "Predictions -> ENDO :" + head.getEndogenousPrediction() + "\n";
-		string += "Predictions -> ORACLE :" + head.getOracleValue() + "\n";
+		string += "Predictions -> ORACLE :" + head.getOracleValue() + "\n\n";
 
 		double exoError = Math.abs(head.getPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
 		double endoError = Math.abs(head.getEndogenousPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
