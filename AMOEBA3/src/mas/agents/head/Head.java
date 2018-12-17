@@ -33,8 +33,11 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	//private BlackBoxAgent oracle;
 	
+	HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
+	
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	private ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
+	private ArrayList<Context> contextsNeighborsByInfluence = new ArrayList<Context>();
 	private HashMap<Percept,ArrayList<Context>> partialyActivatedContexts = new HashMap<Percept,ArrayList<Context>>();
 	private HashMap<Percept,Pair<Context,Context>> requestSurroundings = new HashMap<Percept,Pair<Context,Context>>();
 	private HashMap<Percept,Pair<Context,Context>> sharedIncompetenceContextPairs = new HashMap<Percept,Pair<Context,Context>>();
@@ -59,7 +62,9 @@ public class Head extends AbstractHead implements Cloneable{
 	private int perfIndicatorInexact = 0;
 	
 	private double prediction;
-	private Double endogenousPrediction;
+	private Double endogenousPrediction2Contexts;
+	private Double endogenousPredictionNContexts;
+	private Double endogenousPredictionNContextsByInfluence;
 	private double oracleValue;
 	private double oldOracleValue;
 	private double criticity;
@@ -81,6 +86,9 @@ public class Head extends AbstractHead implements Cloneable{
 	private boolean firstContext = false;
 	private boolean newContextWasCreated = false;
 	private boolean contextFromPropositionWasSelected = false;
+	
+	Double maxConfidence;
+	Double minConfidence;
 	
 	//Endogenous feedback
 	private boolean noBestContext;
@@ -134,6 +142,9 @@ public class Head extends AbstractHead implements Cloneable{
 	public Head(World world) {
 		super(world);
 		
+		maxConfidence = Double.NEGATIVE_INFINITY;
+		minConfidence = Double.POSITIVE_INFINITY;
+		
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			partialyActivatedContexts.put(pct, new ArrayList<Context>());
 			requestSurroundings.put(pct, new Pair<Context,Context>(null,null));
@@ -164,7 +175,17 @@ public class Head extends AbstractHead implements Cloneable{
 	 */
 	public void play() {
 
-		System.out.println("£££££££££££££££££££££££££££££££££££££££££ :" + activatedNeighborsContexts.size());
+		if(world.getScheduler().getTick() == 119) {
+			System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TICK 119");
+			for(Context ctxt : activatedContexts) {
+				System.out.println(ctxt.getName());
+			}
+		}
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			currentSituation.put(pct, pct.getValue());
+		}
+		
+		System.out.println("HEAD ACTIVATED CONTEXT :" + activatedContexts.size());
 		nPropositionsReceived = activatedContexts.size();
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
@@ -190,18 +211,22 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		//¤¤
 		
-		if(endogenousPrediction == null) {
-			endogenousPrediction =  prediction;
+		if(endogenousPrediction2Contexts == null) {
+			endogenousPrediction2Contexts =  prediction;
 		}
+		
+		if(endogenousPredictionNContexts == null) {
+			endogenousPredictionNContexts =  prediction;
+		}
+		
+		if(endogenousPredictionNContextsByInfluence == null) {
+			endogenousPredictionNContextsByInfluence =  prediction;
+		}
+		
 		
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		
-		activatedContexts.clear();
 		
-		for(Percept pct : this.world.getScheduler().getPercepts()) {
-			partialyActivatedContexts.get(pct).clear();
-			
-		}
 		//displayPartiallyActivatedContexts();
 		
 		newContext = null;
@@ -272,11 +297,15 @@ public class Head extends AbstractHead implements Cloneable{
 		Config.print("BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence(), 2);
 		functionSelected = bestContext.getFunction().getFormula(bestContext);
 		criticity = Math.abs(oracleValue - prediction);
+		
+		endogenousPlay();
 	}
 	
 	private void endogenousPlay() {
 		
-		endogenousPrediction = null;
+		endogenousPrediction2Contexts = null;
+		endogenousPredictionNContexts = null;
+		endogenousPredictionNContextsByInfluence = null;
 		
 		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
 			requestSurroundings.get(pcpt).clear();
@@ -285,8 +314,10 @@ public class Head extends AbstractHead implements Cloneable{
 		contextsInCompetition.clear();
 		
 		
+		// Endogenous prediction 2 contexts //
 		if(uniqueActivatedContext()) {
-			endogenousPrediction = activatedContexts.get(0).getActionProposal();
+			endogenousPrediction2Contexts = activatedContexts.get(0).getActionProposal();
+			//NCSMemories.add(new NCSMemory(world, activatedContexts,"Unique Context"));
 		}
 		else if(severalActivatedContexts()){
 			NCS_EndogenousCompetition();
@@ -294,6 +325,12 @@ public class Head extends AbstractHead implements Cloneable{
 		else {
 			if(surroundingContexts()) {
 				NCS_EndogenousSharedIncompetence();
+			}
+			else if(activatedContexts.size()>0){
+				//NCSMemories.add(new NCSMemory(world, activatedContexts,"Other activated"));
+			}
+			else if(activatedContexts.size()==0) {
+				//NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"Other non activated"));
 			}
 //			else if(noActivatedContext()) {
 //				endogenousPrediction = -2000.0;
@@ -305,6 +342,52 @@ public class Head extends AbstractHead implements Cloneable{
 //			else {
 //				endogenousPrediction = prediction;
 //			}
+		}
+		
+		// Endogenous prediction N contexts //
+		
+		Double endogenousSumTerm = 0.0;
+		Double endogenousNormalizationTerm = 0.0;
+		System.out.println("NEIGHBORS : " + activatedNeighborsContexts.size());
+		for(Context ctxt :activatedNeighborsContexts) {
+			endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
+			endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+		}
+		endogenousPredictionNContexts = endogenousSumTerm/endogenousNormalizationTerm;
+		System.out.println("ENDO PRED N CTXT : " + endogenousPredictionNContexts);
+		
+		// Endogenous prediction N contexts by influence //
+		
+		System.out.println("é~~é~~é~~é~~é~~é~~é~~é~~é~~é~~é~~~ INFLUENCES" + currentSituation);
+		
+		maxConfidence = Double.NEGATIVE_INFINITY;
+		minConfidence = Double.POSITIVE_INFINITY;
+		
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			
+			if(ctxt.getConfidence() > maxConfidence) {
+				maxConfidence = ctxt.getConfidence();
+			}
+			if(ctxt.getConfidence() < minConfidence) {
+				minConfidence = ctxt.getConfidence();
+			}
+			
+			if(ctxt.getInfluence(currentSituation)> 0.5) {
+				contextsNeighborsByInfluence.add(ctxt);
+				System.out.println(ctxt);
+			}
+		}
+		System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + minConfidence + " ; " + maxConfidence + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		
+		endogenousSumTerm = 0.0;
+		endogenousNormalizationTerm = 0.0;
+		if(contextsNeighborsByInfluence.size()>0) {
+			for(Context ctxt : contextsNeighborsByInfluence) {
+				endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
+				endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+			}
+			
+			endogenousPredictionNContextsByInfluence = endogenousSumTerm/endogenousNormalizationTerm;
 		}
 	}
 	
@@ -501,58 +584,58 @@ public class Head extends AbstractHead implements Cloneable{
 		// Creation of twin contexts to give the endogenous prediction
 		Context highestConfidenceContext = null;
 		Context secondHighestConfidenceContext = null;
-		HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
-		for(Percept pct : this.world.getScheduler().getPercepts()) {
-			currentSituation.put(pct, pct.getValue());
-		}
-		
-		if(activatedContexts.get(0).getInfluence(currentSituation)>activatedContexts.get(1).getInfluence(currentSituation)) {
-			highestConfidenceContext = activatedContexts.get(0);
-			secondHighestConfidenceContext = activatedContexts.get(1);
-		}
-		else {
-			highestConfidenceContext = activatedContexts.get(1);
-			secondHighestConfidenceContext = activatedContexts.get(0);
-		}
 		
 		
-		for(int i=2; i<activatedContexts.size();i++) {
-			if(activatedContexts.get(i).getInfluence(currentSituation)>highestConfidenceContext.getInfluence(currentSituation)) {		
-				secondHighestConfidenceContext = highestConfidenceContext;
-				highestConfidenceContext = activatedContexts.get(i);
-			}
-			else if(activatedContexts.get(i).getInfluence(currentSituation)>secondHighestConfidenceContext.getInfluence(currentSituation)) {
-				secondHighestConfidenceContext = activatedContexts.get(i);
-			}
-		}
-		
-		contextsInCompetition.add(highestConfidenceContext);
-		contextsInCompetition.add(secondHighestConfidenceContext);
-		
-		//endogenousPrediction = (highestConfidenceContext.getActionProposal() + secondHighestConfidenceContext.getActionProposal()) / 2;
-		//endogenousPrediction = (highestConfidenceContext.getNormalizedConfidence()*highestConfidenceContext.getActionProposal() + secondHighestConfidenceContext.getNormalizedConfidence()*secondHighestConfidenceContext.getActionProposal()) / (highestConfidenceContext.getNormalizedConfidence() + secondHighestConfidenceContext.getNormalizedConfidence());
-		
-		
-		
-		
-		
-		double highestConfidenceContextInfluence = highestConfidenceContext.getInfluence(currentSituation);
-		double secondHighestConfidenceContextInfluence = secondHighestConfidenceContext.getInfluence(currentSituation);
-		
-		
-		endogenousPrediction = (highestConfidenceContextInfluence*highestConfidenceContext.getActionProposal() + secondHighestConfidenceContextInfluence*secondHighestConfidenceContext.getActionProposal()) / (highestConfidenceContextInfluence + secondHighestConfidenceContextInfluence);
-		
-		//System.out.println("EP " + endogenousPrediction + " I1 " + highestConfidenceContextInfluence + " AP1 " + highestConfidenceContext.getActionProposal() + " I2 " + secondHighestConfidenceContextInfluence + " AP2 " + secondHighestConfidenceContext.getActionProposal());
-		Double test = endogenousPrediction;
-//		if(test.isNaN() || test.isInfinite()) {
-//			System.out.println(highestConfidenceContext.getNormalizedConfidence() + " " + highestConfidenceContext.getActionProposal() + " " + secondHighestConfidenceContext.getNormalizedConfidence()+ " " +secondHighestConfidenceContext.getActionProposal());
-//			endogenousPrediction = prediction;
+		// 2 CTXT
+//		if(activatedContexts.get(0).getInfluence(currentSituation)>activatedContexts.get(1).getInfluence(currentSituation)) {
+//			highestConfidenceContext = activatedContexts.get(0);
+//			secondHighestConfidenceContext = activatedContexts.get(1);
 //		}
+//		else {
+//			highestConfidenceContext = activatedContexts.get(1);
+//			secondHighestConfidenceContext = activatedContexts.get(0);
+//		}
+//		
+//		
+//		for(int i=2; i<activatedContexts.size();i++) {
+//			if(activatedContexts.get(i).getInfluence(currentSituation)>highestConfidenceContext.getInfluence(currentSituation)) {		
+//				secondHighestConfidenceContext = highestConfidenceContext;
+//				highestConfidenceContext = activatedContexts.get(i);
+//			}
+//			else if(activatedContexts.get(i).getInfluence(currentSituation)>secondHighestConfidenceContext.getInfluence(currentSituation)) {
+//				secondHighestConfidenceContext = activatedContexts.get(i);
+//			}
+//		}
+//		
+//		contextsInCompetition.add(highestConfidenceContext);
+//		contextsInCompetition.add(secondHighestConfidenceContext);
+//		
+//		double highestConfidenceContextInfluence = highestConfidenceContext.getInfluence(currentSituation);
+//		double secondHighestConfidenceContextInfluence = secondHighestConfidenceContext.getInfluence(currentSituation);
+//		
+//		
+//		endogenousPrediction2Contexts = (highestConfidenceContextInfluence*highestConfidenceContext.getActionProposal() + secondHighestConfidenceContextInfluence*secondHighestConfidenceContext.getActionProposal()) / (highestConfidenceContextInfluence + secondHighestConfidenceContextInfluence);
+//		
+//		ArrayList<Context> concernContexts = new ArrayList<Context>();
+//		concernContexts.add(highestConfidenceContext);
+//		concernContexts.add(secondHighestConfidenceContext);
 		
+		
+		// N CTXT
+		Double endogenousSumTerm = 0.0;
+		Double endogenousNormalizationTerm = 0.0;
 		ArrayList<Context> concernContexts = new ArrayList<Context>();
-		concernContexts.add(highestConfidenceContext);
-		concernContexts.add(secondHighestConfidenceContext);
+		for(Context ctxt :activatedContexts) {
+			endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
+			endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+			concernContexts.add(ctxt);
+		}
+		endogenousPrediction2Contexts = endogenousSumTerm/endogenousNormalizationTerm;
+		
+		
 		NCSMemories.add(new NCSMemory(world, concernContexts,"Competition"));
+		
+		
 	}
 	
 	private void NCS_EndogenousSharedIncompetence() {
@@ -579,21 +662,17 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		
 		
-		HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
-		
-		for(Percept pct : this.world.getScheduler().getPercepts()) {
-			currentSituation.put(pct, pct.getValue());
-		}
+
 		
 		double contextInfluenceL = closestContexts.getL().getInfluence(currentSituation);
 		double contextInfluenceR = closestContexts.getR().getInfluence(currentSituation);
 		
 		System.out.println("--------------------------------------------------DIFFERENCE :" + compareClosestContextPair(closestContexts));
 		if(compareClosestContextPair(closestContexts)<10) {
-			endogenousPrediction = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
+			endogenousPrediction2Contexts = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
 		}
 		else {
-			endogenousPrediction = prediction;
+			endogenousPrediction2Contexts = prediction;
 		}
 		
 		
@@ -1457,8 +1536,16 @@ public class Head extends AbstractHead implements Cloneable{
 		return prediction;
 	}
 	
-	public double getEndogenousPrediction() {
-		return endogenousPrediction;
+	public Double getEndogenousPrediction2Contexts() {
+		return endogenousPrediction2Contexts;
+	}
+	
+	public Double getEndogenousPredictionNContexts() {
+		return endogenousPredictionNContexts;
+	}
+	
+	public Double getEndogenousPredictionNContextsByInfluence() {
+		return endogenousPredictionNContextsByInfluence;
 	}
 
 	/**
@@ -1517,7 +1604,6 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	
 	public void addRequestNeighbor(Context ctxt) {
-		System.out.println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤");
 		activatedNeighborsContexts.add(ctxt);
 	}
 	
@@ -1525,8 +1611,11 @@ public class Head extends AbstractHead implements Cloneable{
 		return activatedNeighborsContexts;
 	}
 	
+	public ArrayList<Context> getContextNeighborsByInfluence(){
+		return contextsNeighborsByInfluence;
+	}
+	
 	public void displayActivatedNeighborsContexts() {
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 		for(Context ctxt : activatedNeighborsContexts) {
 			System.out.println(ctxt.getName());
 		}
@@ -1535,6 +1624,22 @@ public class Head extends AbstractHead implements Cloneable{
 	public void clearActivatedNeighborsContexts(){
 		activatedNeighborsContexts.clear();
 	}
+	
+	public void clearContextdNeighborsByInfluence(){
+		contextsNeighborsByInfluence.clear();
+	}
+	
+	public void clearAllUseableContextLists() {
+		
+		activatedContexts.clear();
+		activatedNeighborsContexts.clear();
+		contextsNeighborsByInfluence.clear();
+		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			partialyActivatedContexts.get(pct).clear();
+			
+		}
+	}
+	
 }
 
 

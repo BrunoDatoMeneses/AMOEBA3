@@ -48,4 +48,10 @@ public abstract class SystemAgent extends Agent implements Serializable,Cloneabl
 	public SystemAgent clone() throws CloneNotSupportedException{
 		return (SystemAgent)super.clone();
 	}
+
+
+	public String toStringFull() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

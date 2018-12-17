@@ -23,7 +23,12 @@ public class NCSMemory {
 	public NCSMemory(World wrld, ArrayList<Context> concernContexts, String NCSType) {
 		world = wrld;
 		type = NCSType;
-		bestContextExo = new Context(world.getScheduler().getHeadAgent().getBestContext());
+		if(world.getScheduler().getHeadAgent().getBestContext() != null) {
+			bestContextExo = new Context(world.getScheduler().getHeadAgent().getBestContext());
+		}
+		else {
+			bestContextExo = null;
+		}
 		try {
 			for(Percept pct : world.getScheduler().getPercepts()) {
 				percepts.add( new Percept(pct));
@@ -72,21 +77,45 @@ public class NCSMemory {
 		
 		
 		for(Context ctxt : contexts) {
-			if(ctxt.getName().equals(bestContextExo.getName())) {
-				string += "BEST CONTEXT EXO\n";
+			if(bestContextExo != null) {
+				if(ctxt.getName().equals(bestContextExo.getName())) {
+					string += "BEST CONTEXT EXO\n";
+				}
 			}
 			string += ctxt.toStringReducted(situation);
 		}
 		
 		string += "Predictions -> EXO :" + head.getPrediction()  + "\n";
-		string += "Predictions -> ENDO :" + head.getEndogenousPrediction() + "\n";
+		if(head.getEndogenousPrediction2Contexts() != null) {
+			string += "Predictions -> ENDO 2 CTXT :" + head.getEndogenousPrediction2Contexts() + "\n";
+		}
+		else {
+			string += "Predictions -> ENDO 2 CTXT : - \n";
+		}
+		
+		if(head.getEndogenousPredictionNContexts() != null) {
+			string += "Predictions -> ENDO N CTXT :" + head.getEndogenousPredictionNContexts() + "\n";
+		}
+		else {
+			string += "Predictions -> ENDO N CTXT : - \n";
+		}
+		
 		string += "Predictions -> ORACLE :" + head.getOracleValue() + "\n\n";
 
 		double exoError = Math.abs(head.getPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
-		double endoError = Math.abs(head.getEndogenousPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
-		
 		string += "Error -> EXO :" + exoError  + "\n";
-		string += "Error -> ENDO :" + endoError  + "\n";
+		
+		if(head.getEndogenousPrediction2Contexts() != null) {
+			double endoError2Ctxt = Math.abs(head.getEndogenousPrediction2Contexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
+			string += "Error -> ENDO 2 CTXT :" + endoError2Ctxt  + "\n";
+		}
+		
+		if(head.getEndogenousPredictionNContexts() != null) {
+			double endoErrorNCtxt = Math.abs(head.getEndogenousPredictionNContexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
+			string += "Error -> ENDO N CTXT :" + endoErrorNCtxt  + "\n";
+		}
+		
+		
 		
 		
 		
@@ -123,11 +152,16 @@ public class NCSMemory {
 		return null;
 	}
 	
-	public double getErrorLevel() {
+	public Double getErrorLevelEndo2Ctxt() {
 		double exoError = Math.abs(head.getPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
 		
-		double endoError = Math.abs(head.getEndogenousPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
-		
-		return exoError - endoError;
+		if(head.getEndogenousPrediction2Contexts() != null) {
+			double endoError2Ctxt = Math.abs(head.getEndogenousPrediction2Contexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
+			
+			return exoError - endoError2Ctxt;
+		}
+		else {
+			return null;
+		}
 	}
 }

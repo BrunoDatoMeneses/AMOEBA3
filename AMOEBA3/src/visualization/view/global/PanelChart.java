@@ -183,9 +183,9 @@ public class PanelChart extends JPanel implements ScheduledItem {
 		int tick = world.getScheduler().getTick();
 		
 		dataSetAgents.getSeries("Context").add(
-				tick, world.getNumberOfAgents().get("Context"));
+				tick, world.getScheduler().getContexts().size());
 		dataSetAgents.getSeries("Percept").add(
-				tick, world.getNumberOfAgents().get("Percept"));
+				tick, world.getScheduler().getPercepts().size());
 
 
 		

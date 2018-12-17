@@ -76,6 +76,14 @@ public class ContextProjection implements Serializable{
 		return ((value > start - getNeighboorhood())  && (value < end + getNeighboorhood()));
 	}
 	
+	public double distance(ContextProjection ctxtPrjct) {
+		double contextCenter1 = this.getCenter();
+		double contextCenter2 = ctxtPrjct.getCenter();
+		double contextRadius1 = this.getRadius();
+		double contextRadius2 = ctxtPrjct.getRadius();
+		return Math.abs(contextCenter1 - contextCenter2) - contextRadius1 - contextRadius2;
+	}
+	
 	public Context getContext() {
 		return this.context;
 	}
@@ -85,11 +93,15 @@ public class ContextProjection implements Serializable{
     }
 	
 	public double getRadius() {
-		return end - start;
+		return (end - start)/2;
+	}
+	
+	public double getCenter() {
+		return (end + start)/2;
 	}
 	
 	public double getNeighboorhood() {
-		return getRadius()/2;
+		return getRadius();
 	}
 	
 }

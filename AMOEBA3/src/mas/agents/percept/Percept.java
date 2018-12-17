@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.math3.exception.OutOfRangeException;
 
-import experiments.Tests.Bidon;
+
 import mas.kernel.Config;
 import mas.kernel.World;
 import mas.agents.Agent;
@@ -198,6 +198,9 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		validNeigborhoodContextProjection = new ArrayList<Context>();
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			if(contextProjection.contains(this.value)) {
+				if(world.getScheduler().getTick() == 119) {
+					System.out.println("PERCEPT  VALIDITY :" + this.getName() + " " + contextProjection.getContext().getName());
+				}
 				validContextProjection.add(contextProjection.getContext());
 				//System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
 				
@@ -213,6 +216,19 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 			
 			if(contextProjection.inNeighborhoodOf(this.value)){
 				validNeigborhoodContextProjection.add(contextProjection.getContext());
+			}
+			
+			for(ContextProjection ctxtPrjct : contextProjections.values()) {
+				double distance = contextProjection.distance(ctxtPrjct);
+				
+				if(contextProjection.getContext().getContextDistanceUpdateTick(ctxtPrjct.getContext(), this) != null){
+					
+					if(contextProjection.getContext().getContextDistanceUpdateTick(ctxtPrjct.getContext(), this) !=  world.getScheduler().getTick()) {
+						
+						contextProjection.getContext().addContextDistance(ctxtPrjct.getContext(), this, distance);
+						ctxtPrjct.getContext().addContextDistance(contextProjection.getContext(), this, distance);
+					}
+				}
 			}
 		}
 		
