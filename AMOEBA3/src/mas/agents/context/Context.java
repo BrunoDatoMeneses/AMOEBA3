@@ -58,23 +58,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private boolean firstTimePeriod = true;
 	
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
-	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<Percept, Boolean>();
-	
-	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
-	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
-	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
-	public ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
-	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
 	
 	
-	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
-	
-	public HashMap<Context , HashMap<Percept, Pair<Double,Integer>>> otherContextsDistancesByPercept;
-	
-	public HashMap<Percept , HashMap<String, ArrayList<Context>>> sortedPossibleNeighbours = new HashMap<Percept , HashMap<String, ArrayList<Context>>>();
-	
-	public ArrayList<Context> possibleNeighbours = new  ArrayList<Context>();
-	public ArrayList<Context> neighbours = new ArrayList<Context>();
 	
 	
 
@@ -106,10 +91,6 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		action = this.headAgent.getOracleValue();
 		maxActivationsRequired = var.size();
 		
-		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
-			
-			ctxt.addContext(this);
-		}
 		
 		for (Percept v : var) {
 			Range r;
@@ -122,7 +103,6 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			firstPoint.addDimension(v, v.getValue());
 			
 			v.addContextProjection(this);
-			v.addContextSortedRanges(this);
 		}
 		localModel = this.world.buildLocalModel(this);
 		firstPoint.setProposition(this.headAgent.getOracleValue());
@@ -135,28 +115,9 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		perceptValidities = new HashMap<Percept, Boolean>();
 		for(Percept percept : var) {
 			perceptValidities.put(percept, false);
-			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
-		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
-		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
-		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
-		
-		for(Percept p : ranges.keySet()) {
-			nearestNeighbours.put(p, new HashMap<String, Context>());
-			
-			sortedPossibleNeighbours.put(p, new HashMap<String, ArrayList<Context>>());
-			
-			nearestNeighbours.get(p).put("start", null);
-			nearestNeighbours.get(p).put("end", null);
-			
-			sortedPossibleNeighbours.get(p).put("start", new ArrayList<Context>() );
-			sortedPossibleNeighbours.get(p).put("end", new ArrayList<Context>() );
-			
-			
-		}
-		
-		overlaps =  new HashMap<Context,String>();
+
 	}
 	
 	/**
@@ -286,105 +247,38 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 */
 	public void play() {
 		
-
-		
-		
-		
 		super.play();
 		
 		if(computeValidityByPercepts()) {
-			if(world.getScheduler().getTick() == 119) {
-				System.out.println("CONTEXT NEW VALIDITY :" + this.getName());
-			}
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
 			Config.print("Message envoyé", 4);
-			//System.out.println("Valid context by Percepts "+this.name);
 		}
 		
-		if(computeNeighborhoodValidityByPercepts()) {
-			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
-		}
-		
-		if (computeValidity()) {
-			if(world.getScheduler().getTick() == 119) {
-				System.out.println("CONTEXT OLD VALIDITY :" + this.getName());
-			}
-				
-			
-			//System.out.println("Valid context by Context "+this.name);
-			
-			
-		}
-		
+	
 		this.activations = 0;
 		this.valid = false;
 
 		
-		
-		
 		// Reset percepts validities
 		for(Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
-			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
-		//ENDO
+		//Kill small contexts
 		for (Percept v : ranges.keySet()) {
 			if (ranges.get(v).isTooSmall()){
 				solveNCS_Uselessness(headAgent);
 				break;
 			}
 		}
-		/*NCSDetections();
-		
-		for(Context ctxt : contextOverlapsByPercept.keySet()) {
-			contextOverlapsByPerceptSave.put(ctxt, new HashMap<Percept,Boolean>());
-			for(Percept p : ranges.keySet()) {
-				contextOverlapsByPerceptSave.get(ctxt).put(p, contextOverlapsByPercept.get(ctxt).get(p));
-			}
-		}
-
-		contextOverlapsByPercept.clear();*/
-		
-	}
-
-
-	private void NCSDetections() {
-		
-		NCSDetection_Overlap();
 
 		
 	}
+
+
+
 	
-	public void displayOtherContextsDistances() {
-		System.out.println("Other Context Distances : " + this.getName());
-		for(Context ctxt :otherContextsDistancesByPercept.keySet()) {
-			System.out.print(ctxt.getName() + " ");
-			for(Percept pct : otherContextsDistancesByPercept.get(ctxt).keySet()) {
-				System.out.print(pct.getName() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getFirst() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond() + " ");
-			}
-			System.out.println(" ");
-		}
-	}
 	
-	private void NCSDetection_Overlap() {
-		
-		computeOverlapsByPercepts();
-		getNearestNeighbours();
-		
-		
-//		for(Context ctxt: overlaps.keySet()) {
-//			ctxt.getOverlapType(this);
-//		}
-		
-	}
-
-
-	private void getOverlapType(Context context) {
-		
-		
-		
-	}
 
 
 
@@ -520,34 +414,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		return p;
 	}
 	
-	private Percept getPerceptWithLesserImpactOnVolume(Context consideredContext, ContextOverlap contextOverlap) {
-		Percept p = null;
-		double volumeLost = Double.MAX_VALUE;
-		double vol;
-		
-		for (Percept percept : ranges.keySet()) {
-			
-			vol = 1.0;
-			
-			if (!ranges.get(percept).isPerceptEnum()) {
-				
-				vol *= contextOverlap.getLenghtByPercept(percept);
-
-				for (Percept p2 : ranges.keySet()) {
-					if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-						
-						vol *= ranges.get(p2).getLenght();
-					}
-				}
-				
-				if (vol < volumeLost) {
-					volumeLost = vol;
-					p = percept;
-				}
-			}
-		}
-		return p;
-	}
+	
 	
 	
 
@@ -645,9 +512,6 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return localModel.getProposition(this);
 	}
 	
-	public double getOverlapActionProposal(ContextOverlap contextOverlap) {
-		return localModel.getProposition(this, contextOverlap);
-	}
 
 
 	/**
@@ -768,57 +632,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		//s += "\n";
 		s += "\n";
 		
-		for (Percept v : ranges.keySet()) {
-			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
-			
-			s += "\n";
-			s += "Neighbours : \n";
-			
-			if(nearestNeighbours.get(v).get("start") != null) {
-				s+= "START :" + nearestNeighbours.get(v).get("start").getName() + "\n";
-			}
-			else {
-				s+= "START : \n";
-			}
-			s += "Sorted start possible neighbours :\n";
-			if(sortedPossibleNeighbours.get(v).get("start").size()>0) {
-				for(Context ctxt : sortedPossibleNeighbours.get(v).get("start")) {
-					
-					if(ctxt.equals(this)) {
-						s += "# " + ctxt.getName() + " --> " + ctxt.getRanges().get(v).getStart() + "\n";
-					}
-					else {
-						s += ctxt.getName() + " ---> " + ctxt.getRanges().get(v).getStart() + "\n";
-					}
-						
-					
-				}
-			}
-			s += "Sorted end possible neighbours :\n";
-			if(sortedPossibleNeighbours.get(v).get("end").size()>0) {
-				for(Context ctxt : sortedPossibleNeighbours.get(v).get("start")) {
-					
-					if(ctxt.equals(this)) {
-						s += "# " +ctxt.getName()+ " --> " + ctxt.getRanges().get(v).getEnd() + "\n";
-					}
-					else {
-						s += ctxt.getName() + " ---> " + ctxt.getRanges().get(v).getEnd() + "\n";
-					}
-					
-				}
-			}
-			
-			if(nearestNeighbours.get(v).get("end") != null) {
-				s+= "END :" + nearestNeighbours.get(v).get("end").getName() + "\n";
-			}
-			else {
-				s+= "END : \n";
-			}
-			
-			
-
-		}
-		s += "\n";
+		
 		s += "Number of activations : " + activations + "\n";
 		if (actionProposition != null) {
 			s += "Action proposed : " + this.actionProposition + "\n";
@@ -835,9 +649,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		
 		s += "\n";
 		s += "Possible neighbours : \n";
-		for(Context ctxt : possibleNeighbours) {
-			s += ctxt.getName() + "\n";
-		}
+
 
 		
 		
@@ -1144,28 +956,13 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		}
 	}
 	
-	public void shrinkRangesToJoinBordersOnOverlap(Context consideredContext, ContextOverlap contextOverlap) {
-		ArrayList<Percept> percepts = new ArrayList<Percept>();
-		percepts.addAll(ranges.keySet());
-		
-		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolume(consideredContext, contextOverlap);
-		if (perceptWithLesserImpact == null) {
-			this.die();
-		}else {
-			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
-		}
-		
-		//perceptWithLesserImpact.overlapDeletion(contextOverlap);
-	}
+	
 
 	
 	/* (non-Javadoc)
 	 * @see agents.context.AbstractContext#die()
 	 */
 	public void die () {
-		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
-			ctxt.removeContext(this);
-		}
 		for(Percept percept : world.getScheduler().getPercepts()) {
 			percept.deleteContextProjection(this);
 		}
@@ -1179,24 +976,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		perceptValidities.put(percept, true);
 	}
 	
-	public void setNeighborhoodPerceptValidity(Percept percept) {
-		perceptNeighborhoodValidities.put(percept, true);
-	}
-	
-	
-	
-	public void setPerceptOverlap(Percept percept, Context context) {
-		if(!contextOverlapsByPercept.keySet().contains(context)) {
-			contextOverlapsByPercept.put(context, new HashMap<Percept,Boolean>());
-			
-			for(Percept p : ranges.keySet()) {
-				contextOverlapsByPercept.get(context).put(p, false);
-			}
-		}
-		
-		contextOverlapsByPercept.get(context).put(percept, true);
-	}
-	
+
 	
 	
 	public Boolean computeValidityByPercepts() {
@@ -1208,336 +988,10 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return test;
 	}
 	
-	public Boolean computeNeighborhoodValidityByPercepts() {
-		Boolean test = true;
-		for(Percept percept : perceptNeighborhoodValidities.keySet()) {
-			//System.out.println(percept.getName()+"--->"+perceptNeighborhoodValidities.get(percept));
-			test = test && perceptNeighborhoodValidities.get(percept);
-		}
-		return test;
-	}
-	
-	
-	
-	
-	public Boolean computeOverlapsByPercepts() {
-		Boolean test = true;
-		
-		overlaps.clear();
-		contextOverlaps.clear();
-		//this.world.getScheduler().clearContextOverlaps();
-		
-		for(Context context : contextOverlapsByPercept.keySet()) {
-			test = true;
-			for(Percept percept : ranges.keySet()) {
-				test = test && contextOverlapsByPercept.get(context).get(percept);
-			}
-			
-			if(test && !context.overlapComputed(this)) {
-							
-				
-				overlaps.put(context, "Overlap");
-				
-				HashMap<Percept,HashMap<String,Double>> overlapRanges = new HashMap<Percept,HashMap<String,Double>>();
-				for(Percept percept : ranges.keySet()) {
-					overlapRanges.put(percept, new HashMap<String,Double>());
-					System.out.println("CONTEXT 1" + context.getName() + " CONTEXT2" + this.getName());
-					double startRange = percept.getOverlapRangesBetweenContexts(this, context).get("start");
-					double endRange = percept.getOverlapRangesBetweenContexts(this, context).get("end");
-					overlapRanges.get(percept).put("start", startRange);
-					overlapRanges.get(percept).put("end", endRange);
-				}
-				ContextOverlap overlap = new ContextOverlap(world, this, context, overlapRanges);
-				contextOverlaps.add(overlap);	
-				this.world.getScheduler().addContextOverlap(overlap);
-				
-				
-			}
-		}
-		
-		
-		return test;
-	}
-	
-	public Boolean computeOverlapsBySelectedPercepts(ArrayList<Percept> selectedPercepts, Context context) {
-		Boolean test = true;
-		
-		test = true;
-		for(Percept percept : selectedPercepts) {
-			test = test && contextOverlapsByPercept.get(context).get(percept);
-		}
-		if(test) {
-			//neigbours.put(context, "Overlap");
-		}
-		
-		
-		return test;
-	}
-	
-	public HashMap<String , ArrayList<Context>> getSortedPossibleNeigbours(Percept percept) {
-		
-		ArrayList<Percept> otherPercetps = new ArrayList<Percept>();; 
-		ArrayList<Context> contextOverlapedInOtherPercepts = new ArrayList<Context>();
-		boolean contextOverlapedInOtherPerceptsTest = true;
-		
-		for(Percept p : ranges.keySet()) {
-			if(p != percept) {
-				otherPercetps.add(p);
-			}
-		}
-		
-		
-		for(Context ctxt : contextOverlapsByPercept.keySet()) {
-			contextOverlapedInOtherPerceptsTest = true;
-			for(Percept otherPctpt: otherPercetps) {
-				contextOverlapedInOtherPerceptsTest = contextOverlapedInOtherPerceptsTest && contextOverlapsByPercept.get(ctxt).get(otherPctpt);
-			}
-			if(contextOverlapedInOtherPerceptsTest) {
-				contextOverlapedInOtherPercepts.add(ctxt);
-				if(!possibleNeighbours.contains(ctxt)) {
-					possibleNeighbours.add(ctxt);
-				}
-				
-			}
-		}
-		
-		 
-		 HashMap<String , ArrayList<Context>> sortedRangesSubGroup = new HashMap<String , ArrayList<Context>>();
-		 sortedRangesSubGroup.put("start", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "start"));
-		 sortedRangesSubGroup.put("end", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "end"));
-		
-		 return sortedRangesSubGroup;
-	}
-	
-	public void getNearestNeighbours(){
-		
-		HashMap<Percept,  HashMap<String , ArrayList<Context>>> localSortedPossibleNeigbours = new HashMap<Percept,  HashMap<String , ArrayList<Context>>>();
-		
-		for(Percept p : ranges.keySet()) {
-			
-			sortedPossibleNeighbours.get(p).clear();
-			nearestNeighbours.get(p).clear();
-			neighbours.clear();
-			
-		}
-		
-		for(Percept p : ranges.keySet()) {
-			
-			localSortedPossibleNeigbours.put(p,getSortedPossibleNeigbours(p));
-			localSortedPossibleNeigbours.get(p).get("start").add(this);
-			localSortedPossibleNeigbours.get(p).get("end").add(this);
-			
-			
-			
-			Collections.sort(localSortedPossibleNeigbours.get(p).get("start"), p.customRangeComparators.get("start"));
-			Collections.sort(localSortedPossibleNeigbours.get(p).get("end"), p.customRangeComparators.get("end"));
-			
-			sortedPossibleNeighbours.get(p).put("start", localSortedPossibleNeigbours.get(p).get("start"));
-			sortedPossibleNeighbours.get(p).put("end", localSortedPossibleNeigbours.get(p).get("end"));
-			
-			
-			
-		}
-		
-		for(Percept p : ranges.keySet()) {
-			
-			
-			Context startNeighbour = getNearestContextBySortedPerceptAndRange(localSortedPossibleNeigbours.get(p), p, "start");
-			Context endNeighbour = getNearestContextBySortedPerceptAndRange(localSortedPossibleNeigbours.get(p), p, "end");
-			
-			
-			nearestNeighbours.get(p).put("end", startNeighbour);
-			nearestNeighbours.get(p).put("start", endNeighbour);
-			
-			neighbours.add(startNeighbour);
-			neighbours.add(endNeighbour);
-		}
-		
-		
-	}
-	
-	public void computeNearestNeighbour() {
-		
-		//System.out.println("VOISINS : " + neighbours.size());
-		for(Context neighbourContext : neighbours) {
-			
-			
-			if(neighbourContext != null){
-				ContextVoid computedVoid = neighbourContext.voidComputed(this);
-				if(computedVoid != null) {
-					contextVoids.add(computedVoid);
-				}
-				else {
-					voidDetection(neighbourContext);
-				}
-			}
-			
-		}
-		
-		
-	}
-	
-	
-	//Context void creation between this the current context on the one in arg
-	public void voidDetection(Context context) {
-		boolean noVoid = false;
-		HashMap<Percept,Double> voidPosition = new HashMap<Percept,Double>();
-		HashMap<Percept,Double> voidWidth = new HashMap<Percept,Double>();
-		
-		
-		for(Percept percept : ranges.keySet()) {	
-			
-			double thisStart = this.getRanges().get(percept).getStart();
-			double thisEnd = this.getRanges().get(percept).getEnd();
-			double ctxtStart = context.getRanges().get(percept).getStart();
-			double ctxtEnd = context.getRanges().get(percept).getEnd();
-			
-			double perceptPosition = 0d; 
-			double perceptWidth = 0d;
-			
-			//System.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
-			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
-	
-				
-				
-				
-				
-				if( percept.contextIncludedIn(this, context) ) {
-					perceptPosition = (thisStart + thisEnd) / 2 ;
-					perceptWidth = thisEnd - thisStart;
-				}
-				else if( percept.contextIncludedIn(context, this) ) {
-					perceptPosition = (ctxtStart + ctxtEnd) / 2 ;
-					perceptWidth = ctxtEnd - ctxtStart;
-				}
-				else if( percept.contextOrder(this, context) ) {
-					perceptPosition = (ctxtStart + thisEnd) / 2 ;
-					perceptWidth = thisEnd - ctxtStart;
-				}
-				else if( percept.contextOrder(context, this) ) {
-					perceptPosition = (thisStart + ctxtEnd) / 2 ;
-					perceptWidth = ctxtEnd - thisStart;
-				}
-				else {
-					System.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
-				}
-				
-
-				voidPosition.put(percept, perceptPosition);
-				voidWidth.put(percept, perceptWidth);
-				
-			}
-			else {
-				
-				if(ctxtEnd + 1.0 < thisStart) {
-					perceptPosition = (ctxtEnd +  thisStart)/2 ;
-					perceptWidth = thisStart - ctxtEnd;
-					
-					voidPosition.put(percept, perceptPosition);
-					voidWidth.put(percept, perceptWidth);
-				}
-				else if(thisEnd + 1.0 < ctxtStart) {
-					perceptPosition = (thisEnd +  ctxtStart)/2 ;
-					perceptWidth = ctxtStart - thisEnd;
-					
-					voidPosition.put(percept, perceptPosition);
-					voidWidth.put(percept, perceptWidth);
-				}
-				else {
-					System.out.println("NO VOID !");
-					noVoid = true;
-				}
-			}
-			
-		}
-		
-		if(!noVoid) {
-			ContextVoid currentVoid = new ContextVoid(world, this, context, voidPosition, voidWidth);
-			contextVoids.add(currentVoid);
-			getWorld().getScheduler().contextVoids.add(currentVoid);
-		}
-	}
-	
-	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedPossibleNeigbours, Percept percept, String range) {
-		
-		
-		int indexOfCurrentContext = sortedPossibleNeigbours.get(range).indexOf(this);
-		
-		if(sortedPossibleNeigbours.get(range).size()>1) {
-			
-			if((indexOfCurrentContext > 0) && ( indexOfCurrentContext < sortedPossibleNeigbours.get(range).size()-1)) {
-				if(range.equals("start")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext+1);
-				}
-				else if(range.equals("end")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext-1);
-				}
-				else {
-					return null;
-				}
-			}
-			
-			else if(indexOfCurrentContext == 0 ) {
-				if(range.equals("start")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext+1);
-				}
-				else {
-					return null;
-				}
-			}
-			
-			else if( indexOfCurrentContext == sortedPossibleNeigbours.get(range).size()-1)  {
-				if(range.equals("end")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext-1);
-				}
-				else {
-					return null;
-				}
-			}
-			
-			else {
-				return null;
-			}
-			
-		}
-		else {
-			return null;
-		}
-	
 
 	
-			
-		
-		
-	}
-
-
-
-	public boolean overlapComputed(Context context) {
-		for(ContextOverlap contextOverlap : contextOverlaps) {
-			if(contextOverlap.overlapComputedBy(context)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-
-	public void deleteOverlap(ContextOverlap contextOverlap) {
-		contextOverlaps.remove(contextOverlap);
-	}
-
-	public ContextVoid voidComputed(Context context) {
-		for(ContextVoid contextVoid : contextVoids) {
-			if(contextVoid.voidComputedBy(context)) {
-				return contextVoid;
-			}
-		}
-		return null;
-	}
-
-
+	
+	
 
 
 	public Context clone() throws CloneNotSupportedException{
@@ -1550,45 +1004,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	}
 
 	
-	public void addContext(Context ctxt) {
-		if(ctxt != this) {
-			otherContextsDistancesByPercept.put(ctxt, new HashMap<Percept,Pair<Double,Integer>>());
-		}
-		for(Percept pct : world.getScheduler().getPercepts()) {
-			otherContextsDistancesByPercept.get(ctxt).put(pct, new Pair<>(null,world.getScheduler().getTick()));
-		}
-		
-	}
 	
-	public void addContextDistance(Context ctxt, Percept percept, double distance) {
-		
-
-		if(ctxt != this) {
-			
-			if(otherContextsDistancesByPercept.get(ctxt) == null) {
-				addContext(ctxt);
-			}
-			otherContextsDistancesByPercept.get(ctxt).put(percept, new Pair<>(distance,world.getScheduler().getTick()));
-		}
-
-	}
-
-	public void removeContext(Context ctxt) {
-		otherContextsDistancesByPercept.remove(ctxt);
-	}
-
-	public Integer getContextDistanceUpdateTick(Context ctxt, Percept pct) {
-		if(otherContextsDistancesByPercept.get(ctxt) != null) {
-			if(otherContextsDistancesByPercept.get(ctxt).get(pct) != null) {
-				return otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond();
-			}
-			
-		}
-		return null;
-	}
-
-	
-
 
 
 	 

@@ -17,8 +17,6 @@ import visualization.view.system.ScheduledItem;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
-import mas.agents.context.ContextVoid;
 import mas.agents.head.Head;
 //import mas.blackbox.BBFunction;
 //import mas.blackbox.Input;
@@ -50,8 +48,6 @@ public class Scheduler implements Serializable{
 	private ArrayList<Context> alteredContexts = new ArrayList<Context>();
 	
 	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
-	private ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
-	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
 	private ArrayList<Context> lastModifiedContext = new ArrayList<Context>();
 
 	private boolean running = false;
@@ -275,31 +271,7 @@ public class Scheduler implements Serializable{
 	}
 	
 	
-	private void endogenousPlay() {
-		
-		
-		
-
-		
-		for(ContextOverlap contextOverlap : contextOverlaps) {
-			contextOverlap.solveNCS_Overlap(0.1d);
-			System.out.println(contextOverlap.getName());
 	
-			
-		}
-		
-		
-		scheduledItemsAndView();
-		
-		try        
-		{
-		    Thread.sleep(temporisation);
-		} 
-		catch(InterruptedException ex) 
-		{
-		    Thread.currentThread().interrupt();
-		}
-	}
 	
 	private void playAllAgents() {
 		//BB agents
@@ -319,7 +291,7 @@ public class Scheduler implements Serializable{
 //		}
 		//
 		lastModifiedContext.clear();
-		clearContextOverlaps();
+
 
 		for (Agent agent : percepts) {
 			agent.readMessage();
@@ -692,23 +664,7 @@ public class Scheduler implements Serializable{
 		return null;
 	}
 	
-	public ContextOverlap getContextOverlapByName(String name) {
-		for(ContextOverlap contextOverlap: contextOverlaps) {
-			if(contextOverlap.getName().equals(name)) {
-				return contextOverlap;
-			}
-		}
-		return null;
-	}
 	
-	public ContextVoid getContextVoidByName(String name) {
-		for(ContextVoid contextVoid: contextVoids) {
-			if(contextVoid.getName().equals(name)) {
-				return contextVoid;
-			}
-		}
-		return null;
-	}
 	
 	public void setPerceptionsAndActionState(HashMap<String,Double> perceptionsAndActions) {
 		this.perceptionsAndActionState = perceptionsAndActions;
@@ -718,23 +674,15 @@ public class Scheduler implements Serializable{
 		return this.perceptionsAndActionState.get(key);	
 	}
 	
-	public void addContextOverlap(ContextOverlap contextOverlap) {
-		this.contextOverlaps.add(contextOverlap);
-	}
 	
 	
 	
-	public void removeContextOverlap(ContextOverlap contextOverlap) {
-		this.contextOverlaps.remove(contextOverlap);
-	}
 	
-	public ArrayList<ContextOverlap> getContextOverlaps() {
-		return this.contextOverlaps;
-	}
 	
-	public void clearContextOverlaps() {
-		this.contextOverlaps.clear();
-	}
+	
+	
+	
+	
 	
 	public void addLastmodifiedContext(Context context) {
 		if(!lastModifiedContext.contains(context)) {

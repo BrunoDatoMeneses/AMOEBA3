@@ -53,13 +53,9 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 	
 	
-	int exoWasRight;
-	int endoWasRight;
 	
-	double endoTotalError;
 	double exoTotalError;
 	
-	String endoType;
 	
 	/** The world. */
 	World world;
@@ -73,7 +69,6 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 		this.setLayout(new FlowLayout());
 		this.world = world;
-		this.endoType = typeOfEndo;
 
 		/* Create Agent chart */
 		dataSetAgents = createDataSetAgents();
@@ -89,8 +84,6 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		
 		this.add(chartPanelAgents);
 
-		endoWasRight = 0;
-		endoTotalError = 0;
 		exoTotalError = 0;
 
 	}
@@ -112,8 +105,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 		XYSeriesCollection collection = new XYSeriesCollection();
 
-		collection.addSeries(new XYSeries("Error Exo"));
-		collection.addSeries(new XYSeries(endoType));
+		collection.addSeries(new XYSeries("Error Predictions"));
 		
 		
 		//collection.addSeries(new XYSeries("Oracle"));
@@ -138,7 +130,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		renderer.setSeriesPaint(1, new Color(0, 0, 200)); 
 		renderer.setSeriesPaint(2, new Color(0, 200, 0)); 
 		renderer.setSeriesPaint(3, new Color(200, 200, 0)); 
-		final NumberAxis rangeAxis1 = new NumberAxis(endoType);
+		final NumberAxis rangeAxis1 = new NumberAxis("Error Predictions");
 		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer);
 		subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
 ;
@@ -153,7 +145,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		plot.setOrientation(PlotOrientation.VERTICAL);
 
 		// return a new chart containing the overlaid plot...
-		return new JFreeChart(endoType,
+		return new JFreeChart("Error Predictions",
 				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 	}
 
@@ -166,49 +158,18 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 	public void update() {
 
 		int tick = world.getScheduler().getTick();
-		Double endoError = 0.0;
 		Double exoError = 0.0;
 		
 		exoError = Math.abs(world.getScheduler().getHeadAgent().getPrediction() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
 		if(!exoError.isNaN()) {
-			dataSetAgents.getSeries("Error Exo").add(tick, normalizePositiveValues(100, 20, exoError));
+			dataSetAgents.getSeries("Error Predictions").add(tick, normalizePositiveValues(100, 20, exoError));
 		}
 		
 		
-		if(endoType.equals("Error Endo 2 Ctxt")) {
-			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPrediction2Contexts() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-		}
-		else if(endoType.equals("Error Endo N Ctxt")) {
-			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPredictionNContexts() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-		}
-		else if(endoType.equals("Error Endo N Ctxt by Influence")){
-			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPredictionNContextsByInfluence() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-		}
-		
-		
-		if(!endoError.isNaN()) {
-			dataSetAgents.getSeries(endoType).add(tick, normalizePositiveValues(100, 20, endoError));
-		}
-		else {
-			dataSetAgents.getSeries(endoType).add(tick, -10.0);
-		}
 		
 
-
-		if( endoError != exoError) {
-			if(endoError > exoError) {
-				exoWasRight ++;
-			}
-			else if(endoError < exoError )  {
-				endoWasRight ++;
-			}
-		}
-		
-		
-		endoTotalError += endoError;
 		exoTotalError += exoError;
 		
-		System.out.println(endoType + " -> EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError) +" )");
 	}
 	
 

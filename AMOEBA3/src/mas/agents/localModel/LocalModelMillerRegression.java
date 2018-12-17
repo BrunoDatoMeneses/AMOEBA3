@@ -7,7 +7,6 @@ import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
 import mas.agents.context.Experiment;
 import mas.agents.messages.Message;
 
@@ -248,42 +247,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 	}
 
-	@Override
-	public double getProposition(Context context, ContextOverlap contextOverlap) {
-		
-			ArrayList<Percept> var = world.getAllPercept();
-			
-			if (context.getExperiments().size() == 1) {
-				return context.getExperiments().get(0).getProposition();
-			}
-			
-
-			//
-		/*	for (int i = 0 ; i < coef.length ; i++ ) {
-				System.out.print(coef[i] + "   " );
-			}
-			System.out.println();*/
-			
-			
-			double result = coef[0];
-		//	System.out.println("Result 0" + " : " + result);
-			if (coef[0] == Double.NaN) System.exit(0);
-			
-			for (int i = 1 ; i < coef.length ; i++) {
-				if (Double.isNaN(coef[i])) coef[i] = 0;
-				
-				result += coef[i] * contextOverlap.getMiddleValue(var.get(i-1));
-				
-		//		System.out.println("Result " + i + " : " + result);
-		//		System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
-			}
-//			System.out.println("Result final" + " : " + result);
-
-
-			
-			return result;
-
-	}
+	
 	
 
 }

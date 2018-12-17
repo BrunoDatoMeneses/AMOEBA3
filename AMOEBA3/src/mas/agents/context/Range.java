@@ -362,9 +362,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < mininimalRange && (end - start)>0) {
-			System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
-		}
 		
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
 	}
@@ -666,7 +663,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 		this.start = newStartValue;
 		if(this.context != null) {
 			this.percept.updateContextProjectionStart(this.context);
-			this.percept.updateSortedRanges(this.context, "start");
 			context.getWorld().getScheduler().addLastmodifiedContext(context);
 		}
 		
@@ -676,7 +672,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 		this.end = newEndValue;
 		if(this.context != null) {
 			this.percept.updateContextProjectionEnd(this.context);
-			this.percept.updateSortedRanges(this.context, "end");
 			context.getWorld().getScheduler().addLastmodifiedContext(context);
 			
 		}

@@ -81,8 +81,6 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
-import mas.agents.context.ContextVoid;
 import mas.agents.context.Range;
 import mas.agents.head.Head;
 import visualization.graphView.GraphicVisualization2Dim;
@@ -116,12 +114,11 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 
 	
 	private JButton buttonSearchContext;
-	private JButton buttonUpdateMemory;
 	private JComboBox comboDimX;
 	private JComboBox comboDimY;
-	private JComboBox<NCSMemory> NCSsituations;
-	private JComboBox<NCSMemory> NCSsituations2;
-	private JComboBox<Context> NCScontexts;
+	
+
+	//private JComboBox<Context> NCScontexts;
 	private JLabel xValue;
 	private JLabel yValue;
 	private JLabel labelSearchContext = new JLabel("Search Context :");
@@ -201,97 +198,37 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		buttonSearchContext.setToolTipText("Highlight a context");
 		toolBar.add(buttonSearchContext);
 		
-		NCSsituations = new JComboBox<NCSMemory>();
-		NCSsituations2 = new JComboBox<NCSMemory>();
-		NCScontexts = new JComboBox<Context>();
-//		NCSsituations.addItemListener(new ItemListener () {
+
+		//NCScontexts = new JComboBox<Context>();
+
+		
+		
+//		NCScontexts.addItemListener(new ItemListener() {
+//			
 //			@Override
-//			public void itemStateChanged(ItemEvent arg0) {
-//				drawMemory(getMemoryByTick((String) NCSsituations.getSelectedItem() ));
+//			public void itemStateChanged(ItemEvent e) {
+//				
+//				
+//				
+//				if(NCSsituations.getItemCount() > 0) {
+//					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
+//				}
+//				
+//				
+//				
+//				if(NCScontexts.getSelectedItem()!=null) {
+//					Node node = graph.getNode(((Context) NCScontexts.getSelectedItem()).getName());
+//					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
+//				}
+//				
+//				
 //				
 //			}
 //		});
 		
-		NCSsituations.setBounds(NCSsituations.getBounds().x, NCSsituations.getBounds().y, NCSsituations.getBounds().width, 800);
-		NCSsituations.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				
-				if(NCSsituations.getItemCount() > 0) {
-					
-					
-					NCScontexts.removeAllItems();
-					NCScontexts.addItem(null);
-					for(Context ctxt : ((NCSMemory) NCSsituations.getSelectedItem()).getContexts()) {
-						NCScontexts.addItem(ctxt);
-					}
-					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
-				}
-				
-				
-			}
-		});
-		
-		NCSsituations2.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				
-				if(NCSsituations2.getItemCount() > 0) {
-
-					
-					
-					
-					NCScontexts.removeAllItems();
-					NCScontexts.addItem(null);
-					for(Context ctxt : ((NCSMemory) NCSsituations2.getSelectedItem()).getContexts()) {
-						NCScontexts.addItem(ctxt);
-					}
-					drawMemory((NCSMemory) NCSsituations2.getSelectedItem());
-				}
-				
-				
-			}
-		});
 		
 		
-		
-		
-		
-		NCSsituations.setRenderer(new MyCellRenderer());
-		NCSsituations2.setRenderer(new MyCellRendererForActivatedContexts());
-		
-		
-		toolBar.add(NCSsituations);
-		toolBar.add(NCSsituations2);
-		
-		NCScontexts.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				
-				
-				
-				if(NCSsituations.getItemCount() > 0) {
-					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
-				}
-				
-				
-				
-				if(NCScontexts.getSelectedItem()!=null) {
-					Node node = graph.getNode(((Context) NCScontexts.getSelectedItem()).getName());
-					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
-				}
-				
-				
-				
-			}
-		});
-		
-		
-		
-		toolBar.add(NCScontexts);
+		//toolBar.add(NCScontexts);
 		
 		
 		toolBar.add(labelDrawMemory);
