@@ -1,6 +1,8 @@
 package visualization.view.global;
 
 import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
@@ -26,6 +28,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -50,13 +53,13 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 	
 	
-	int endoWasRight;
 	int exoWasRight;
+	int endoWasRight;
 	
 	double endoTotalError;
 	double exoTotalError;
 	
-
+	String endoType;
 	
 	/** The world. */
 	World world;
@@ -66,21 +69,27 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 	 *
 	 * @param world the world
 	 */
-	public PanelExoVSEndo(World world) {
+	public PanelExoVSEndo(World world, String typeOfEndo) {
 
 		this.setLayout(new FlowLayout());
 		this.world = world;
+		this.endoType = typeOfEndo;
 
 		/* Create Agent chart */
 		dataSetAgents = createDataSetAgents();
 		JFreeChart chart = createChart();
 		chartPanelAgents = new ChartPanel(chart);
-		chartPanelAgents.setPreferredSize(new java.awt.Dimension(1800, 1000));
+		chartPanelAgents.setPreferredSize(new java.awt.Dimension(2560, 1440));
+//		chartPanelAgents.setMinimumDrawHeight(0);
+//		chartPanelAgents.setMinimumDrawWidth(0);
+//		chartPanelAgents.setMaximumDrawHeight(1440);
+//		chartPanelAgents.setMaximumDrawWidth(2560);
+//		chartPanelAgents.setMouseWheelEnabled(true);
+//		chartPanelAgents.setMinimumSize(new Dimension(1920, 1080));
+		
 		this.add(chartPanelAgents);
 
 		endoWasRight = 0;
-		exoWasRight = 0;
-		
 		endoTotalError = 0;
 		exoTotalError = 0;
 
@@ -104,7 +113,9 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		XYSeriesCollection collection = new XYSeriesCollection();
 
 		collection.addSeries(new XYSeries("Error Exo"));
-		collection.addSeries(new XYSeries("Error Endo"));
+		collection.addSeries(new XYSeries(endoType));
+		
+		
 		//collection.addSeries(new XYSeries("Oracle"));
 
 		return collection;
@@ -122,11 +133,16 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 		// create subplot 1...
 		final XYDataset data1 = dataSetAgents;
-		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
-		final NumberAxis rangeAxis1 = new NumberAxis("ERRORS EXO AND ENDO");
-		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
+		final XYItemRenderer renderer = new StandardXYItemRenderer();
+		renderer.setSeriesPaint(0, new Color(200, 0, 0)); 
+		renderer.setSeriesPaint(1, new Color(0, 0, 200)); 
+		renderer.setSeriesPaint(2, new Color(0, 200, 0)); 
+		renderer.setSeriesPaint(3, new Color(200, 200, 0)); 
+		final NumberAxis rangeAxis1 = new NumberAxis(endoType);
+		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer);
 		subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
-
+;
+		
 		// parent plot...
 		final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(
 				new NumberAxis("Tick"));
@@ -137,7 +153,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		plot.setOrientation(PlotOrientation.VERTICAL);
 
 		// return a new chart containing the overlaid plot...
-		return new JFreeChart("ERRORS EXO AND ENDO",
+		return new JFreeChart(endoType,
 				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 	}
 
@@ -150,54 +166,49 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 	public void update() {
 
 		int tick = world.getScheduler().getTick();
-		Double endoError;
-		Double exoError;
+		Double endoError = 0.0;
+		Double exoError = 0.0;
 		
-		//double exoError = 100*Math.abs(world.getScheduler().getHeadAgent().getPrediction() - world.getScheduler().getHeadAgent().getOracleValue())/Math.abs(world.getScheduler().getHeadAgent().getOracleValue()) ;
 		exoError = Math.abs(world.getScheduler().getHeadAgent().getPrediction() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-		//double endoError =  100*Math.abs(world.getScheduler().getHeadAgent().getEndogenousPrediction() - world.getScheduler().getHeadAgent().getOracleValue())/Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-		endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPrediction() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
-//		if(exoError==0.0) {
-//			endoError = 300;
-//		}
-//		else if(exoError < endoError) {
-//			endoError = normalize(100, 200, endoError/exoError);
-//		}
-//		else {
-//			endoError = 100*endoError/exoError;
-//		}
-		
-		if(!exoError.isNaN() && !endoError.isNaN()) {
-			dataSetAgents.getSeries("Error Exo").add(
-					tick, normalizePositiveValues(100, 20, exoError));
-			dataSetAgents.getSeries("Error Endo").add(
-					tick, normalizePositiveValues(100, 20, endoError));
+		if(!exoError.isNaN()) {
+			dataSetAgents.getSeries("Error Exo").add(tick, normalizePositiveValues(100, 20, exoError));
 		}
 		
-//		if(!exoError.isNaN() && !endoError.isNaN()) {
-//			dataSetAgents.getSeries("Error Exo").add(
-//					tick,  exoError);
-//			dataSetAgents.getSeries("Error Endo").add(
-//					tick, endoError);
-//		}
+		
+		if(endoType.equals("Error Endo 2 Ctxt")) {
+			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPrediction2Contexts() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
+		}
+		else if(endoType.equals("Error Endo N Ctxt")) {
+			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPredictionNContexts() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
+		}
+		else if(endoType.equals("Error Endo N Ctxt by Influence")){
+			endoError = Math.abs(world.getScheduler().getHeadAgent().getEndogenousPredictionNContextsByInfluence() - world.getScheduler().getHeadAgent().getOracleValue()) / Math.abs(world.getScheduler().getHeadAgent().getOracleValue());
+		}
 		
 		
-		//dataSetAgents.getSeries("Oracle").add(tick, world.getScheduler().getHeadAgent().getOracleValue());
+		if(!endoError.isNaN()) {
+			dataSetAgents.getSeries(endoType).add(tick, normalizePositiveValues(100, 20, endoError));
+		}
+		else {
+			dataSetAgents.getSeries(endoType).add(tick, -10.0);
+		}
+		
 
 
 		if( endoError != exoError) {
-			if(endoError>exoError) {
+			if(endoError > exoError) {
 				exoWasRight ++;
 			}
-			else {
+			else if(endoError < exoError )  {
 				endoWasRight ++;
 			}
 		}
 		
+		
 		endoTotalError += endoError;
 		exoTotalError += exoError;
 		
-		//System.out.println("EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError/world.getScheduler().getTick()) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError/world.getScheduler().getTick()) +" )");
+		System.out.println(endoType + " -> EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError) +" )");
 	}
 	
 

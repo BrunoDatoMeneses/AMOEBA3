@@ -686,4 +686,11 @@ public class Range implements Serializable, Comparable, Cloneable {
 		return (Range)super.clone();
 	}
 	
+	public double getCenter() {
+		return (end + start)/2;
+	}
+	
+	public double getRadius() {
+		return (end - start)/2;
+	}
 }

@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.math3.util.Pair;
+
 import mas.kernel.Config;
 import mas.kernel.World;
 import mas.ncs.NCS;
@@ -67,6 +69,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
 	
+	public HashMap<Context , HashMap<Percept, Pair<Double,Integer>>> otherContextsDistancesByPercept;
+	
 	public HashMap<Percept , HashMap<String, ArrayList<Context>>> sortedPossibleNeighbours = new HashMap<Percept , HashMap<String, ArrayList<Context>>>();
 	
 	public ArrayList<Context> possibleNeighbours = new  ArrayList<Context>();
@@ -102,6 +106,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		action = this.headAgent.getOracleValue();
 		maxActivationsRequired = var.size();
 		
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			
+			ctxt.addContext(this);
+		}
+		
 		for (Percept v : var) {
 			Range r;
 
@@ -131,6 +140,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
 		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
+		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
+		
 		for(Percept p : ranges.keySet()) {
 			nearestNeighbours.put(p, new HashMap<String, Context>());
 			
@@ -282,23 +293,35 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		super.play();
 		
 		if(computeValidityByPercepts()) {
+			if(world.getScheduler().getTick() == 119) {
+				System.out.println("CONTEXT NEW VALIDITY :" + this.getName());
+			}
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
 			Config.print("Message envoyé", 4);
 			//System.out.println("Valid context by Percepts "+this.name);
 		}
 		
 		if(computeNeighborhoodValidityByPercepts()) {
-			System.out.println("*****************************************************************************************************");
 			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
 		}
 		
 		if (computeValidity()) {
+			if(world.getScheduler().getTick() == 119) {
+				System.out.println("CONTEXT OLD VALIDITY :" + this.getName());
+			}
+				
+			
 			//System.out.println("Valid context by Context "+this.name);
+			
+			
 		}
 		
 		this.activations = 0;
 		this.valid = false;
 
+		
+		
+		
 		// Reset percepts validities
 		for(Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
@@ -333,6 +356,16 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	}
 	
+	public void displayOtherContextsDistances() {
+		System.out.println("Other Context Distances : " + this.getName());
+		for(Context ctxt :otherContextsDistancesByPercept.keySet()) {
+			System.out.print(ctxt.getName() + " ");
+			for(Percept pct : otherContextsDistancesByPercept.get(ctxt).keySet()) {
+				System.out.print(pct.getName() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getFirst() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond() + " ");
+			}
+			System.out.println(" ");
+		}
+	}
 	
 	private void NCSDetection_Overlap() {
 		
@@ -979,6 +1012,11 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	
 	public double getNormalizedConfidence() {
 		return 1/(1+Math.exp(-confidence));
+		//return getParametrizedNormalizedConfidence(20.0);
+	}
+	
+	public double getParametrizedNormalizedConfidence(double dispersion) {
+		return 1/(1+Math.exp(-confidence/dispersion));
 	}
 	
 	public double getInfluence(HashMap<Percept,Double> situation) {
@@ -1125,6 +1163,9 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	 * @see agents.context.AbstractContext#die()
 	 */
 	public void die () {
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			ctxt.removeContext(this);
+		}
 		for(Percept percept : world.getScheduler().getPercepts()) {
 			percept.deleteContextProjection(this);
 		}
@@ -1508,10 +1549,43 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return localModel;
 	}
 
+	
+	public void addContext(Context ctxt) {
+		if(ctxt != this) {
+			otherContextsDistancesByPercept.put(ctxt, new HashMap<Percept,Pair<Double,Integer>>());
+		}
+		for(Percept pct : world.getScheduler().getPercepts()) {
+			otherContextsDistancesByPercept.get(ctxt).put(pct, new Pair<>(null,world.getScheduler().getTick()));
+		}
+		
+	}
+	
+	public void addContextDistance(Context ctxt, Percept percept, double distance) {
+		
 
+		if(ctxt != this) {
+			
+			if(otherContextsDistancesByPercept.get(ctxt) == null) {
+				addContext(ctxt);
+			}
+			otherContextsDistancesByPercept.get(ctxt).put(percept, new Pair<>(distance,world.getScheduler().getTick()));
+		}
 
+	}
 
+	public void removeContext(Context ctxt) {
+		otherContextsDistancesByPercept.remove(ctxt);
+	}
 
+	public Integer getContextDistanceUpdateTick(Context ctxt, Percept pct) {
+		if(otherContextsDistancesByPercept.get(ctxt) != null) {
+			if(otherContextsDistancesByPercept.get(ctxt).get(pct) != null) {
+				return otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond();
+			}
+			
+		}
+		return null;
+	}
 
 	
 

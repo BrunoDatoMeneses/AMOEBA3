@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import org.jfree.data.xy.XYSeries;
+
 import mas.kernel.World;
 import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
@@ -38,8 +40,9 @@ public class MainTabbedPanel extends JTabbedPane{
 	
 	/** The panel chart. */
 	private PanelChart panelChart;
-	private PanelExoVSEndo exoVsEndoChart;
-	private ScatterPlotExample exoVsEndoChart2;
+	private PanelExoVSEndo exoVsEndo2CtxtChart;
+	private PanelExoVSEndo exoVsEndoNCtxtChart;
+	private PanelExoVSEndo exoVsEndoNCtxtByInfluenceChart;
 	
 	/** The panel two dim standard. */
 	private GrapheTwoDimPanelStandard panelTwoDimStandard;
@@ -88,12 +91,19 @@ public class MainTabbedPanel extends JTabbedPane{
 		panelTwoDimNCSMemories = new GrapheTwoDimPanelNCSMemories(world);
 		panelParallelCoordinates = new PanelParallelCoordinates(world);
 		consolePanel = new ConsolePanel();
-		exoVsEndoChart = new PanelExoVSEndo(world);
-		exoVsEndoChart2 = new ScatterPlotExample("");
+		
+		exoVsEndo2CtxtChart = new PanelExoVSEndo(world, "Error Endo 2 Ctxt");
+		exoVsEndoNCtxtChart = new PanelExoVSEndo(world, "Error Endo N Ctxt");
+		exoVsEndoNCtxtByInfluenceChart = new PanelExoVSEndo(world, "Error Endo N Ctxt by Influence");
+		
+		
+		
+		
 		
 		world.getScheduler().addScheduledItem(panelChart);
-		world.getScheduler().addScheduledItem(exoVsEndoChart);
-		world.getScheduler().addScheduledItem(exoVsEndoChart2);
+		world.getScheduler().addScheduledItem(exoVsEndo2CtxtChart);
+		world.getScheduler().addScheduledItem(exoVsEndoNCtxtChart);
+		world.getScheduler().addScheduledItem(exoVsEndoNCtxtByInfluenceChart);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -103,8 +113,9 @@ public class MainTabbedPanel extends JTabbedPane{
 	//	this.addTab("TwoDim", new JScrollPane(panelTwoDim,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 	//	this.addTab("TwoDim", panelTwoDim);
 		this.addTab("Console", new JScrollPane(consolePanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		this.addTab("Exo VS endo", new JScrollPane(exoVsEndoChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		this.addTab("Test", new JScrollPane(exoVsEndoChart2,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo VS endo 2 ctxt", new JScrollPane(exoVsEndo2CtxtChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo VS endo N ctxt by distance", new JScrollPane(exoVsEndoNCtxtChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo VS endo N ctxt by influence", new JScrollPane(exoVsEndoNCtxtByInfluenceChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("NCS Memories", new JScrollPane(panelTwoDimNCSMemories,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		

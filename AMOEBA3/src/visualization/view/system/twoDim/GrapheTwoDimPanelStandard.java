@@ -1003,7 +1003,7 @@ private void startPanelController() {
 		String info = "";
 		if (world.getAgents().get(currentId) != null) {
 			info = "State: " + currentTick + "\n";
-			info = info.concat(world.getAgents().get(currentId).toString());
+			info = info.concat(world.getAgents().get(currentId).toStringFull());
 			info = info.replace("Current", "\nCurrent");
 			info = info.replace("AVT", "\nAVT");
 			
@@ -1162,6 +1162,7 @@ private void startPanelController() {
 
 			}		
 
+
 			for (String name : world.getAgents().keySet()) {
 				SystemAgent a = world.getAgents().get(name);
 				if (a instanceof Context) {
@@ -1224,27 +1225,15 @@ private void startPanelController() {
 					}
 					
 					node.addAttribute("ui.class","RGBAColor");
-					//System.out.println("COLORS : " + r + " " + g + " " + b);
 					
 					node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
-					//node.addAttribute("ui.style", "fill-color: rgba(" + 255 + "," + 0 + "," + 0 +  "," + 10 +");");
-					//node.addAttribute("ui.style", "fill-color: rgb(255,0,0);");
+
 					
-//					if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
-//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-//					}
-//					if(world.getScheduler().getHeadAgent().getContextsInCompetition().contains(n)) {
-//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-//					}
-//					if(world.getScheduler().getHeadAgent().getBestContext().equals(n)) {
-//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-//					}
-					
-					if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
+					if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
 						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
 					}
-					System.out.println("도도도도도도도도도도도도도도도도도도도도도도� :" + world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
-					world.getScheduler().getHeadAgent().displayActivatedNeighborsContexts();
+					
+					
 				}
 				
 				
@@ -1482,21 +1471,64 @@ private void startPanelController() {
 				Context n = (Context)a;
 				Node node = graph.getNode(name);
 
-				node.addAttribute("ui.class","ContextColorDynamic");
-				//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
-				node.setAttribute("ui.color", 0.0 ); 
+				Double r = 0.0;
+				Double g = 0.0;
+				Double b = 0.0;
+				double[] coefs = n.getLocalModel().getCoef();
+				//System.out.println("COEFS : " + coefs.length);
+				if(coefs.length>0) {
+					if(coefs.length==1) {
+						//System.out.println(coefs[0]);	
+						b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else if(coefs.length==2) {
+						//System.out.println(coefs[0] + " " + coefs[1]);
+						g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+						b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+						if(g.isNaN()) {
+							g = 0.0;
+						}
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else if(coefs.length==3) {
+						//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+						r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+						g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+						b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+						if(r.isNaN()) {
+							r = 0.0;
+						}
+						if(g.isNaN()) {
+							g = 0.0;
+						}
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else {
+						r = 255.0;
+						g = 255.0;
+						b = 255.0;
+					}
+				}
+				else {
+					r = 255.0;
+					g = 255.0;
+					b = 255.0;
+				}
 				
-				if(world.getScheduler().getHeadAgent().requestSurroundingContains(n)) {
-					node.setAttribute("ui.color", 1.0 );
-				}
-				if(world.getScheduler().getHeadAgent().getContextsInCompetition().contains(n)) {
-					node.setAttribute("ui.color", 1.0 );
-				}
-				if(world.getScheduler().getHeadAgent().getBestContext().equals(n)) {
-					node.setAttribute("ui.color", 1.0 );
-				}
+				node.addAttribute("ui.class","RGBAColor");
+				
+				node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",50);");
+
+
 				if(context.equals(n)) {
-					node.setAttribute("ui.color", 0.5 );
+					node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",200);");
 				}
 			}
 			
@@ -1701,7 +1733,7 @@ private void startPanelController() {
 			
 		} else {
 			info = "State :" + currentTick + "\n";
-			info = info.concat(world.getAgents().get(id).toString());
+			info = info.concat(world.getAgents().get(id).toStringFull());
 			info = info.replace("Current", "\nCurrent");
 			info = info.replace("AVT", "\nAVT");
 		}

@@ -120,6 +120,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	private JComboBox comboDimX;
 	private JComboBox comboDimY;
 	private JComboBox<NCSMemory> NCSsituations;
+	private JComboBox<NCSMemory> NCSsituations2;
 	private JComboBox<Context> NCScontexts;
 	private JLabel xValue;
 	private JLabel yValue;
@@ -201,6 +202,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		toolBar.add(buttonSearchContext);
 		
 		NCSsituations = new JComboBox<NCSMemory>();
+		NCSsituations2 = new JComboBox<NCSMemory>();
 		NCScontexts = new JComboBox<Context>();
 //		NCSsituations.addItemListener(new ItemListener () {
 //			@Override
@@ -218,6 +220,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 				
 				if(NCSsituations.getItemCount() > 0) {
 					
+					
 					NCScontexts.removeAllItems();
 					NCScontexts.addItem(null);
 					for(Context ctxt : ((NCSMemory) NCSsituations.getSelectedItem()).getContexts()) {
@@ -230,15 +233,38 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			}
 		});
 		
+		NCSsituations2.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				
+				if(NCSsituations2.getItemCount() > 0) {
+
+					
+					
+					
+					NCScontexts.removeAllItems();
+					NCScontexts.addItem(null);
+					for(Context ctxt : ((NCSMemory) NCSsituations2.getSelectedItem()).getContexts()) {
+						NCScontexts.addItem(ctxt);
+					}
+					drawMemory((NCSMemory) NCSsituations2.getSelectedItem());
+				}
+				
+				
+			}
+		});
+		
 		
 		
 		
 		
 		NCSsituations.setRenderer(new MyCellRenderer());
-		
+		NCSsituations2.setRenderer(new MyCellRendererForActivatedContexts());
 		
 		
 		toolBar.add(NCSsituations);
+		toolBar.add(NCSsituations2);
 		
 		NCScontexts.addItemListener(new ItemListener() {
 			
@@ -251,6 +277,8 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 					drawMemory((NCSMemory) NCSsituations.getSelectedItem());
 				}
 				
+				
+				
 				if(NCScontexts.getSelectedItem()!=null) {
 					Node node = graph.getNode(((Context) NCScontexts.getSelectedItem()).getName());
 					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
@@ -260,6 +288,8 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 				
 			}
 		});
+		
+		
 		
 		toolBar.add(NCScontexts);
 		
@@ -463,7 +493,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	
 	public void addNCSmemomry(NCSMemory ncsMemory) {
 		NCSsituations.addItem(ncsMemory);
-		
+		NCSsituations2.addItem(ncsMemory);
 	}
 	
 	/**
@@ -1040,6 +1070,7 @@ private void startPanelController() {
 	public void updateMemories() {
 		ArrayList<NCSMemory> NCSMemories = world.getScheduler().getHeadAgent().getNCSMemories();
 		NCSsituations.removeAllItems();
+		NCSsituations2.removeAllItems();
 		for( NCSMemory ncsMemory : NCSMemories) {
 			addNCSmemomry(ncsMemory);
 		}
@@ -2082,16 +2113,23 @@ class MyCellRenderer extends JLabel implements ListCellRenderer<NCSMemory> {
         // check if this cell represents the current DnD drop location
         JList.DropLocation dropLocation = list.getDropLocation();
         //System.out.println("--------------------------------------------TEST COLOR " + value.getErrorLevel());
-        if (value.getErrorLevel()<-0.01) {
-        	
-            background = new Color((int)normalize(0,255,10,-value.getErrorLevel()), 0, 0);
-            foreground = Color.WHITE;
+        
+        if(value.getErrorLevelEndo2Ctxt() != null) {
+        	if (value.getErrorLevelEndo2Ctxt()<-0.01) {
+            	
+                background = new Color((int)normalize(0,255,10,-value.getErrorLevelEndo2Ctxt()), 0, 0);
+                foreground = Color.WHITE;
 
-        // unselected, and not the DnD drop location
-        }
-        else if(value.getErrorLevel()>0.01) {
-        	background = new Color(0, (int)normalize(0,255,10,value.getErrorLevel()), 0);
-            foreground = Color.WHITE;
+            // unselected, and not the DnD drop location
+            }
+            else if(value.getErrorLevelEndo2Ctxt()>0.01) {
+            	background = new Color(0, (int)normalize(0,255,10,value.getErrorLevelEndo2Ctxt()), 0);
+                foreground = Color.WHITE;
+            }
+            else {
+                background = Color.WHITE;
+                foreground = Color.BLACK;
+            };
         }
         else {
             background = Color.WHITE;
@@ -2109,6 +2147,63 @@ class MyCellRenderer extends JLabel implements ListCellRenderer<NCSMemory> {
 	}
 }
 
+class MyCellRendererForActivatedContexts extends JLabel implements ListCellRenderer<NCSMemory> {
+    public MyCellRendererForActivatedContexts() {
+        setOpaque(true);
+    }
+
+    public Component getListCellRendererComponent(JList<? extends NCSMemory> list,
+    												NCSMemory value,
+                                                  int index,
+                                                  boolean isSelected,
+                                                  boolean cellHasFocus) {
+
+        setText(value.toString());
+
+        Color background;
+        Color foreground;
+
+        // check if this cell represents the current DnD drop location
+        JList.DropLocation dropLocation = list.getDropLocation();
+        //System.out.println("--------------------------------------------TEST COLOR " + value.getErrorLevel());
+        if (value.getContexts().size()==1) {
+        	
+            background = new Color(0, 200, 0);
+            foreground = Color.WHITE;
+
+        // unselected, and not the DnD drop location
+        }
+        else if (value.getContexts().size()==2) {
+        	
+            background = new Color(0, 0, 200);
+            foreground = Color.WHITE;
+
+        // unselected, and not the DnD drop location
+        }
+        else if (value.getContexts().size()>2) {
+        	
+            background = new Color(200, 0, 0);
+            foreground = Color.WHITE;
+
+        // unselected, and not the DnD drop location
+        }
+        else {
+            background = Color.WHITE;
+            foreground = Color.BLACK;
+        };
+
+        setBackground(background);
+        setForeground(foreground);
+
+        return this;
+    }
+    
+    public double normalize(double lowerBound, double upperBound, double dispersion, double value) {
+		return lowerBound + (upperBound - lowerBound)/(1+Math.exp(-value/dispersion));
+	}
+}
+
+
 class ColorCellRenderer implements ListCellRenderer<NCSMemory> {
 	  protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
@@ -2116,7 +2211,7 @@ class ColorCellRenderer implements ListCellRenderer<NCSMemory> {
 	      boolean isSelected, boolean cellHasFocus) {
 	    JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
 	        isSelected, cellHasFocus);
-	    if (value.getErrorLevel()<0) {
+	    if (value.getErrorLevelEndo2Ctxt()<0) {
 	      renderer.setBackground(Color.red);
 	    }
 	    return renderer;

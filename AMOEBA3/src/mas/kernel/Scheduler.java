@@ -228,7 +228,7 @@ public class Scheduler implements Serializable{
 			
 			alteredContexts.clear();
 			
-			getHeadAgent().clearActivatedNeighborsContexts();
+			getHeadAgent().clearAllUseableContextLists();
 		}
 		
 	//	System.out.println("Step : " + tick + " with " + world.getNumberOfAgents() + " agents.");

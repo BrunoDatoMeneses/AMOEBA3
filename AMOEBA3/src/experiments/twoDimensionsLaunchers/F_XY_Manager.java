@@ -1,19 +1,15 @@
-package experiments.badContext;
+package experiments.twoDimensionsLaunchers;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
-
-import mas.agents.context.Context;
-import mas.agents.head.Head;
 import mas.kernel.StudiedSystem;
-import mas.kernel.World;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class BadContextManager.
  */
-public class F_XY_ManagerSphere implements StudiedSystem, Serializable{
+public class F_XY_Manager implements StudiedSystem, Serializable{
 
 	/** The x. */
 	double x = 0;
@@ -33,7 +29,7 @@ public class F_XY_ManagerSphere implements StudiedSystem, Serializable{
 	Random generator;
 	
 	
-	public F_XY_ManagerSphere(double size) {
+	public F_XY_Manager(double size) {
 		this.spaceSize= size;
 	}
 	
@@ -49,7 +45,7 @@ public class F_XY_ManagerSphere implements StudiedSystem, Serializable{
 			
 		
 		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
-		y = (generator.nextDouble() - 0.5) * spaceSize * 4;
+		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
 	}
 
 	/* (non-Javadoc)
@@ -59,8 +55,8 @@ public class F_XY_ManagerSphere implements StudiedSystem, Serializable{
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = (Math.sqrt(x*x + y*y) < spaceSize) ? 2*x + y : 5*x - 8*y;
-		//result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+
+		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
 		//result = (2*x) + (4*y) + x*y;
 	//	result = (x > 2*y) ? 0.0 : 1.0;
 		
