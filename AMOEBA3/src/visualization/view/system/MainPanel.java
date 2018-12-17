@@ -28,7 +28,6 @@ import visualization.observation.Observation;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.head.Head;
-import mas.blackbox.BlackBox;
 import visualization.graphView.TemporalGraph;
 
 // TODO: Auto-generated Javadoc
@@ -487,14 +486,7 @@ public class MainPanel extends JPanel{
 	}
 
 	
-	/**
-	 * Sets the black box.
-	 *
-	 * @param blackBox the new black box
-	 */
-	public void setBlackBox(BlackBox blackBox) {
-		if (!minimalDisplay) tabbedPanel.setBlackBox(blackBox);
-	}
+
 	
 	/**
 	 * Update.

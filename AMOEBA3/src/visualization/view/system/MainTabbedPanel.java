@@ -9,7 +9,6 @@ import javax.swing.JTabbedPane;
 import mas.kernel.World;
 import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
-import visualization.view.blackbox.BlackBoxPanel;
 import visualization.view.global.PanelChart;
 import visualization.view.global.PanelChart2;
 import visualization.view.global.PanelOneChart;
@@ -18,7 +17,6 @@ import visualization.view.global.PanelExoVSEndo;
 import visualization.view.system.nDim.PanelParallelCoordinates;
 import visualization.view.system.twoDim.GrapheTwoDimPanelNCSMemories;
 import visualization.view.system.twoDim.GrapheTwoDimPanelStandard;
-import mas.blackbox.BlackBox; 
 import visualization.graphView.TemporalGraph;
 
 // TODO: Auto-generated Javadoc
@@ -123,14 +121,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		world.getScheduler().setWaitForGUIUpdate(false);
 	}
 	
-	/**
-	 * Sets the black box.
-	 *
-	 * @param blackBox the new black box
-	 */
-	public void setBlackBox(BlackBox blackBox) {
-		//blackBoxPanel.setBlackBox(blackBox);
-	}
+
 
 	/**
 	 * Update N dimension.
