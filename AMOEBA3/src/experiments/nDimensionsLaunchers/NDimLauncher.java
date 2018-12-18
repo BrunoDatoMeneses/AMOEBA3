@@ -1,4 +1,4 @@
-package experiments.twoDimensionsLaunchers;
+package experiments.nDimensionsLaunchers;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -10,11 +10,13 @@ import mas.kernel.AMOEBA;
 /**
  * The Class BadContextLauncherEasy.
  */
-public class F_XY_Launcher implements Serializable {
+public class NDimLauncher implements Serializable {
 
 
 	public static final boolean viewer = true;
 	public static final boolean verboseriticity = true;
+	
+	static HashMap<String,Double> output;
 
 	public static void main(String[] args) {
 		launch(viewer);
@@ -23,7 +25,7 @@ public class F_XY_Launcher implements Serializable {
 	public static void launch(boolean viewer) {
 	
 		/*Here we create AMOEBA.*/
-		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer,"twoDimensionsLauncher.xml");
+		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer,"threeDimensionsLauncher.xml");
 		
 		/* These method calls allow to setup AMOEBA*/
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
@@ -36,17 +38,19 @@ public class F_XY_Launcher implements Serializable {
 		amoeba.setRememberState(false);
 		amoeba.setGenerateCSV(false);
 		
-
-		F_XY_Manager f_XY_Manager = new F_XY_Manager(50.0);
+		// Dimension 3
+		NDimManager f_XY_Manager = new NDimManager(50.0, 3);
 
 		
-		for (int i = 0 ; i < 1000 ; i++) {
+		for (int i = 0 ; i < 500 ; i++) {
 
 			/*Random samples of the studied system */
 			f_XY_Manager.playOneStep(0);
 			
+			output = f_XY_Manager.getOutput();
+			
 			/*This is a learning step of AMOEBA*/
-			amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
+			amoeba.learn(output);
 						
 		}		
 	}
