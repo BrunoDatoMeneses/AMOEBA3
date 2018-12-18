@@ -7,7 +7,6 @@ import java.util.HashMap;
 import mas.ncs.NCS;
 import mas.kernel.Config;
 import mas.kernel.Launcher;
-import mas.kernel.NCSMemory;
 import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
@@ -167,17 +166,12 @@ public class Head extends AbstractHead implements Cloneable{
 	 */
 	public void play() {
 
-		if(world.getScheduler().getTick() == 119) {
-			System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TICK 119");
-			for(Context ctxt : activatedContexts) {
-				System.out.println(ctxt.getName());
-			}
-		}
+
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}
 		
-		System.out.println("HEAD ACTIVATED CONTEXT :" + activatedContexts.size());
+
 		nPropositionsReceived = activatedContexts.size();
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		

@@ -235,6 +235,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	
 	private Point3 requestPosition;
 	
+	
 	/**
 	 * Instantiates a new graphe two dim panel standard.
 	 *
@@ -373,8 +374,10 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 				
 							
 				if(contexts.getSelectedItem()!=null) {
-					Node node = graph.getNode(((Context) contexts.getSelectedItem()).getName());
-					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
+					highlightContexts((Context) contexts.getSelectedItem());
+				}
+				else {
+					update();
 				}
 				
 				
@@ -1074,6 +1077,15 @@ private void startPanelController() {
 			obsEle.setTick(world.getScheduler().getTick());
 		}
 		
+		
+		// Update context comboBox
+		contexts.removeAllItems();
+		contexts.addItem(null);
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			contexts.addItem(ctxt);
+		}
+		
+		
 		// Store values into array list of percept of observation
 		ArrayList<Percept> perceptList = world.getAllPercept();
 		
@@ -1220,7 +1232,7 @@ private void startPanelController() {
 								b = 0.0;
 							}
 						}
-						else if(coefs.length==3) {
+						else if(coefs.length>=3) {
 							//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
 							r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
 							g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
@@ -1328,53 +1340,7 @@ private void startPanelController() {
 		return requestHashMap;
 	}
 	
-	public void highlightContextNeighbours(Context context) {
-		
-		
-		double min = Double.POSITIVE_INFINITY;
-		double max = Double.NEGATIVE_INFINITY;
-		
-		for (String name : world.getAgents().keySet()) {
-			SystemAgent a = world.getAgents().get(name);
-			if (a instanceof Context) {
-				double val = ((Context) a).getActionProposal();
-				if (val < min) {
-					min = val;
-				}
-				if (val > max) {
-					max = val;
-				}
-			}
-
-		}	
-		
-		for (String name : world.getAgents().keySet()) {
-			SystemAgent a = world.getAgents().get(name);
-			if (a instanceof Context) {
-				Context n = (Context)a;
-				Node node = graph.getNode(name);
-
-				node.addAttribute("ui.class","ContextColorDynamic");
-				
-				
-				node.setAttribute("ui.color", 0.1 ); 
-				
-				
-				if(context.equals(n)) {
-					node.setAttribute("ui.color", 0.0 ); 
-				}
-				
-				
- 
-			}
-
-		}
-		
-		
-		
-		
-		
-	}
+	
 	
 	
 	
@@ -1411,7 +1377,7 @@ private void startPanelController() {
 							b = 0.0;
 						}
 					}
-					else if(coefs.length==3) {
+					else if(coefs.length>=3) {
 						//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
 						r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
 						g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
@@ -1711,8 +1677,6 @@ private void startPanelController() {
 	
 	public void popupMenuForContextVisualization(String id) {
 		JPopupMenu popup = new JPopupMenu("Visualization");
-		JMenuItem itemShowContextNeighbours = new JMenuItem("Neighbours");
-		itemShowContextNeighbours.addActionListener(e -> {highlightNeighbours(id);});
 		JMenuItem itemShow2Dim = new JMenuItem("History of grapgh in 2 Dim");
 		itemShow2Dim.addActionListener(e -> {popupVisualization2Dim(id);});
 	    JMenuItem itemShowNDim = new JMenuItem("Graph Visualization in N Dim");
@@ -1723,8 +1687,7 @@ private void startPanelController() {
 		JMenuItem itemUdateView = new JMenuItem("Update View");
 		itemUdateView.addActionListener(e -> {update();});
 	    
-	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts();});
-	    popup.add(itemShowContextNeighbours);
+	    itemShowAll.addActionListener( e -> {popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts();});
 	    popup.add(itemShow2Dim);
 	    popup.add(itemShowNDim);
 	    popup.add(itemShowAll);
@@ -1760,10 +1723,7 @@ private void startPanelController() {
 //		double chartY = plot.getRangeAxis().java2DToValue(p.getY(), plotArea, plot.getRangeAxisEdge());
 //	}
 	
-	private void highlightNeighbours(String id) {
-		highlightContextNeighbours(world.getScheduler().getContextByName(id));
-		
-	}
+
 	
 	
 
