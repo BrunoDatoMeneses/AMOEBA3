@@ -12,6 +12,8 @@ import java.awt.Robot;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -180,7 +182,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	private JLabel labelSearchContext = new JLabel("Search Context :");
 	private JTextField contextID = new JTextField("?");
 	
-
+	private JComboBox<Context> contexts;
 	
 	/** The mouse event. */
 	private MouseEvent mouseEvent;
@@ -360,6 +362,29 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		buttonSearchContext.addActionListener(e -> {highlightContexts(world.getScheduler().getContextByName(contextID.getText()));;});
 		buttonSearchContext.setToolTipText("Highlight a context");
 		toolBar.add(buttonSearchContext);
+		
+		
+		contexts = new JComboBox<Context>();
+		
+		contexts.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				
+							
+				if(contexts.getSelectedItem()!=null) {
+					Node node = graph.getNode(((Context) contexts.getSelectedItem()).getName());
+					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
+				}
+				
+				
+				
+			}
+		});
+		
+		
+		
+		toolBar.add(contexts);
 		
 		toolBar.add(xValue);
 		toolBar.addSeparator();
