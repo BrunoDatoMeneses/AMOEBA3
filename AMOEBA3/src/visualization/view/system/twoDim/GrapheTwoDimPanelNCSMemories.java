@@ -412,7 +412,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 						b = 0.0;
 					}
 				}
-				else if(coefs.length==3) {
+				else if(coefs.length>=3) {
 					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
 					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
 					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
