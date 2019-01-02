@@ -23,7 +23,6 @@ public class XMLFilesAMOEBAFactory {
 		
 		boolean viewer = true;
 		String[] filePaths = Initialization.initializationFiles();
-		File sourceXMLFile = new File(filePaths[0]);
 		File agentsXMLFile = new File(filePaths[1]);
 		
 		Scheduler scheduler = new Scheduler();

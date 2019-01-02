@@ -32,24 +32,15 @@ public class Initialization {
 	public static String[] initializationFiles() {
 		String[] filePaths = new String[2];
 		final JFrame frame = new JFrame();
-		JButton btnOK, btnCancel, btnSourceFile, btnAgentsFile;
+		JButton btnOK, btnCancel, btnAgentsFile;
 		JPanel panel;
-		JLabel label1, label2;
-		final JTextField pathFile1, pathFile2;
+		JLabel label2;
+		final JTextField pathFile2;
 		
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		panel = new JPanel();
 		panel.setLayout(null);
-		
-		label1 = new JLabel("Source XML: ");
-		label1.setBounds(10, 20, 90, 25);
-		
-		pathFile1 = new JTextField(50);
-		pathFile1.setBounds(110, 20, 360, 25);
-		
-		btnSourceFile = new JButton("Choose File");
-		btnSourceFile.setBounds(480, 20, 100, 25);
 		
 		label2 = new JLabel("Agents XML: ");
 		label2.setBounds(10, 50, 90, 25);
@@ -66,13 +57,9 @@ public class Initialization {
 		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(310, 90, 80, 25);
 		
-		btnSourceFile.addActionListener(e -> { popupFileChooser("Source File XML", pathFile1);});
 		btnAgentsFile.addActionListener(e -> { popupFileChooser("Agents File XML", pathFile2);});
-		btnOK.addActionListener(e -> { getFiles(frame, pathFile1, pathFile2); });
+		btnOK.addActionListener(e -> { getFiles(frame, pathFile2); });
 		btnCancel.addActionListener(e -> { System.exit(0); });
-		panel.add(label1);
-		panel.add(pathFile1);
-		panel.add(btnSourceFile);
 		panel.add(label2);
 		panel.add(pathFile2);
 		panel.add(btnAgentsFile);
@@ -135,13 +122,11 @@ public class Initialization {
 	 * @param pathFile2 the path file 2
 	 * @return the files
 	 */
-	static void getFiles(JFrame frame, JTextField pathFile1, JTextField pathFile2) {
-		String path1 = pathFile1.getText();
+	static void getFiles(JFrame frame, JTextField pathFile2) {
 		String path2 = pathFile2.getText();
-		if (path1 == null || path2 == null || path1.isEmpty() || path2.isEmpty()) {
+		if (path2 == null || path2.isEmpty()) {
 			JOptionPane.showMessageDialog(frame, "Please choose your file(s)!");
 		} else {
-			sourceXMLPath = path1;
 			agentsXMLPath = path2;
 			frame.setVisible(false); 
 			frame.dispose();

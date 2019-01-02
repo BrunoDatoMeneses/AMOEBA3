@@ -22,8 +22,7 @@ public class DefaultAMOEBAFactory {
 	 * Creates a new DefaultAMOEBA object.
 	 *
 	 * @param viewer the viewer
-	 * @param pathToSourceXML the path to source XML
-	 * @param pathToAgentsXML the path to agents XML
+	 * @param pathToAgentsXML the path to agent XML
 	 * @return the amoeba
 	 */
 	public AMOEBA createAMOEBA(boolean viewer, String pathToAgentsXML) {
