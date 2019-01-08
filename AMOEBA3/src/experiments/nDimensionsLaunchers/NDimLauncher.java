@@ -42,7 +42,7 @@ public class NDimLauncher implements Serializable {
 		NDimManager f_XY_Manager = new NDimManager(50.0, 3);
 
 		
-		for (int i = 0 ; i < 500 ; i++) {
+		for (int i = 0 ; i < 2000 ; i++) {
 
 			/*Random samples of the studied system */
 			f_XY_Manager.playOneStep(0);

@@ -81,12 +81,14 @@ public class NDimManager implements StudiedSystem, Serializable{
 		
 		for(int i = 0; i<dim; i++) {
 
-			if(x[0] > 0) {
-				result = getModelResult(1);
-			}
-			else {
-				result = getModelResult(2);
-			}
+			result = getModelResult(1);
+			
+//			if(x[0] > 0) {
+//				result = getModelResult(1);
+//			}
+//			else {
+//				result = getModelResult(2);
+//			}
 			
 			out.put("px" + (i + 1),x[i]);
 			

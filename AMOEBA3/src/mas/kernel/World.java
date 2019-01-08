@@ -70,6 +70,8 @@ public class World implements Serializable {
 	private double AVT_deceleration = 1./3.0;
 	private double AVT_percentAtStart = 0.2;
 	
+	private double growingPercent = 0.1;
+	
 	
 	
 	public World() {
@@ -247,7 +249,7 @@ public class World implements Serializable {
 				
 				for(int j = 0 ; j < start.length ; j++) {
 					double pas = (end[j]-start[j])/n[j];
-					Range r = new Range(null, start[j] + (pas * newpos[j]), start[j] + (pas * (newpos[j] + 1)), 0, true, true, (Percept) agents.get(percepts[j]));
+					Range r = new Range(null, start[j] + (pas * newpos[j]), start[j] + (pas * (newpos[j] + 1)), 0, true, true, (Percept) agents.get(percepts[j]), this);
 					ranges.put((Percept) agents.get(percepts[j]), r);
 					
 				}
@@ -830,5 +832,8 @@ public class World implements Serializable {
 		AVT_percentAtStart = aVT_percentAtStart;
 	}
 
+	public double getContextGrowingPercent() {
+		return growingPercent;
+	}
 	
 }

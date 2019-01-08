@@ -40,7 +40,7 @@ public class F_XY_Launcher implements Serializable {
 		F_XY_Manager f_XY_Manager = new F_XY_Manager(50.0);
 
 		
-		for (int i = 0 ; i < 1000 ; i++) {
+		for (int i = 0 ; i < 2000 ; i++) {
 
 			/*Random samples of the studied system */
 			f_XY_Manager.playOneStep(0);

@@ -115,7 +115,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			Range r;
 
 			double length = Math.abs(v.getMinMaxDistance()) / 4.0;
-			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v);
+			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v, world);
 			ranges.put(v, r);
 			ranges.get(v).setValue(v.getValue());
 			sendExpressMessage(null, MessageType.REGISTER, v);
@@ -1110,7 +1110,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	public void growRanges() {
 		ArrayList<Percept> allPercepts = world.getAllPercept();
 		for (Percept pct : allPercepts) {
-			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ? true : false;
+			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
 			if (!contain) {
 				ranges.get(pct).adapt(this, pct.getValue(), pct);
 			}

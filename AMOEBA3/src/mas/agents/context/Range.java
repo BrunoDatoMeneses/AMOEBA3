@@ -3,6 +3,7 @@ package mas.agents.context;
 import java.io.Serializable;
 
 import mas.agents.percept.Percept;
+import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.messages.MessageType;
 
@@ -38,6 +39,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	/** The old value. */
 	private double oldValue;
+	
+	private World world;
 	
 	/** The context. */
 	private Context context;
@@ -103,8 +106,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public Range(Context context, double start, double end,
 			double extendedrangeatcreation, boolean start_inclu,
-			boolean end_inclu, Percept p) {
+			boolean end_inclu, Percept p, World wrld) {
 		super();
+		
+		world= wrld;
 		
 		AVT_deceleration = context.getWorld().getAVT_deceleration();
 		AVT_acceleration = context.getWorld().getAVT_acceleration();
@@ -189,11 +194,13 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public void adapt(Context c, double oracleValue, Percept p) {
 		if (!isPerceptEnum()) {
-			if (Range.useAVT) {
-				adaptUsingAVT(c, oracleValue);
-			} else {
-				adaptWithoutAVT(c, oracleValue);
-			}
+			
+			adaptWithoutAVT(c, oracleValue);
+//			if (Range.useAVT) {
+//				adaptUsingAVT(c, oracleValue);
+//			} else {
+//				adaptWithoutAVT(c, oracleValue);
+//			}
 		}
 	}
 	
@@ -254,6 +261,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 	}
 	
+	private void staticAdapt(Context c, double oracleValue) {
+		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
+			adaptEnd(c, oracleValue);
+		} else {
+			adaptStart(c, oracleValue);
+		}
+	}
+	
 	/**
 	 * Adapt max using AVT.
 	 *
@@ -287,6 +302,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 
 	}
+	
+	private void adaptEnd(Context c, double oracleValue) {
+
+		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
+
+			this.setEnd(end + (world.getContextGrowingPercent()*this.getRadius()));
+		} 	
+
+
+	}
 
 	/**
 	 * Adapt min using AVT.
@@ -317,6 +342,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 			this.setStart(start - AVT_deltaMin);
 
 			AVT_lastFeedbackMin = 1;
+		}		
+
+	}
+	
+	private void adaptStart(Context c, double oracleValue) {
+
+		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
+
+			this.setStart(start - (world.getContextGrowingPercent()*this.getRadius()));
+
 		}		
 
 	}
