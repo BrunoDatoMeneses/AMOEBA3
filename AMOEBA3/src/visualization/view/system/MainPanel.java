@@ -209,7 +209,7 @@ public class MainPanel extends JPanel{
 		toolBar.addSeparator();
 		
 		buttonPauseStart = new JButton(Config.getIcon("control.png"));
-		buttonPauseStart.addActionListener(e -> {getValueCheckBox(); togglePause(!world.getScheduler().isRunning());});
+		buttonPauseStart.addActionListener(e -> {getValueCheckBox(); togglePause(!world.getAmoeba().isRunning());});
 		buttonPauseStart.setToolTipText("Pause/Start");
 		toolBar.add(buttonPauseStart);
 
@@ -425,7 +425,7 @@ public class MainPanel extends JPanel{
 	 */
 	public void oneStep() {
 		togglePause(false);
-		amoeba.playOneStep();
+		amoeba.setPlayOneStep(true);
 	}
 	
 	/**

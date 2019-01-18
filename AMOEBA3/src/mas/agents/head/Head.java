@@ -47,12 +47,22 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
 	
+	private ArrayList<Double> xLastCriticityValuesCopy = new ArrayList<Double>();
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlaps = new ArrayList<Double>();
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence = new ArrayList<Double>();
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence = new ArrayList<Double>();
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = new ArrayList<Double>();
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume = new ArrayList<Double>();
+	
+	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsSharedIncompetence = new ArrayList<Double>();
+	
 	public ArrayList<NCSMemory> NCSMemories = new ArrayList<NCSMemory>();
 
 	
 	private int nPropositionsReceived;
 	private int averagePredictionCriticityWeight = 0;
 	private int numberOfCriticityValuesForAverage = 100;
+	private int numberOfCriticityValuesForAverageforVizualisation = 300;
 	
 	private int nConflictBeforeAugmentation = 1;
 	private int nSuccessBeforeDiminution = 50;
@@ -62,14 +72,32 @@ public class Head extends AbstractHead implements Cloneable{
 	private int perfIndicatorInexact = 0;
 	
 	private double prediction;
-	private Double endogenousPrediction2Contexts;
+	private Double endogenousPredictionActivatedContextsOverlaps;
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence;
+	
+	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence;
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+	
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+	
+	private Double endogenousPredictionActivatedContextsSharedIncompetence;
 	private Double endogenousPredictionNContexts;
 	private Double endogenousPredictionNContextsByInfluence;
+	
 	private double oracleValue;
 	private double oldOracleValue;
 	private double criticity;
 	private double oldCriticity;
 	private double averagePredictionCriticity;
+	
+	private double averagePredictionCriticityCopy;
+	private double averagePredictionCriticityEndoActivatedContextsOverlaps;
+	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence;
+	private double averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence;
+	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+	private double averagePredictionCriticityEndoActivatedContextsSharedIncompetence;
+	
 	
 	private double errorAllowed  = 1.0;
 	private double augmentationFactorError = 1.05;
@@ -211,17 +239,6 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		//¤¤
 		
-		if(endogenousPrediction2Contexts == null) {
-			endogenousPrediction2Contexts =  prediction;
-		}
-		
-		if(endogenousPredictionNContexts == null) {
-			endogenousPredictionNContexts =  prediction;
-		}
-		
-		if(endogenousPredictionNContextsByInfluence == null) {
-			endogenousPredictionNContextsByInfluence =  prediction;
-		}
 		
 		
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
@@ -303,8 +320,15 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void endogenousPlay() {
 		
-		endogenousPrediction2Contexts = null;
-		endogenousPredictionNContexts = null;
+		endogenousPredictionActivatedContextsOverlaps = null;
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = null;
+		
+		endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = null ;
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = null;
+		
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = null;
+		
+		endogenousPredictionActivatedContextsSharedIncompetence = null;
 		endogenousPredictionNContextsByInfluence = null;
 		
 		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
@@ -314,9 +338,14 @@ public class Head extends AbstractHead implements Cloneable{
 		contextsInCompetition.clear();
 		
 		
-		// Endogenous prediction 2 contexts //
+
 		if(uniqueActivatedContext()) {
-			endogenousPrediction2Contexts = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsOverlaps = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsSharedIncompetence = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = activatedContexts.get(0).getActionProposal();
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = activatedContexts.get(0).getActionProposal();
 			//NCSMemories.add(new NCSMemory(world, activatedContexts,"Unique Context"));
 		}
 		else if(severalActivatedContexts()){
@@ -350,8 +379,8 @@ public class Head extends AbstractHead implements Cloneable{
 		Double endogenousNormalizationTerm = 0.0;
 		System.out.println("NEIGHBORS : " + activatedNeighborsContexts.size());
 		for(Context ctxt :activatedNeighborsContexts) {
-			endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
-			endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+			endogenousSumTerm += ctxt.getInfluenceWithConfidence(currentSituation)*ctxt.getActionProposal();
+			endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
 		}
 		endogenousPredictionNContexts = endogenousSumTerm/endogenousNormalizationTerm;
 		System.out.println("ENDO PRED N CTXT : " + endogenousPredictionNContexts);
@@ -372,7 +401,7 @@ public class Head extends AbstractHead implements Cloneable{
 				minConfidence = ctxt.getConfidence();
 			}
 			
-			if(ctxt.getInfluence(currentSituation)> 0.5) {
+			if(ctxt.getInfluenceWithConfidence(currentSituation)> 0.5) {
 				contextsNeighborsByInfluence.add(ctxt);
 				System.out.println(ctxt);
 			}
@@ -383,11 +412,43 @@ public class Head extends AbstractHead implements Cloneable{
 		endogenousNormalizationTerm = 0.0;
 		if(contextsNeighborsByInfluence.size()>0) {
 			for(Context ctxt : contextsNeighborsByInfluence) {
-				endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
-				endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+				endogenousSumTerm += ctxt.getInfluenceWithConfidence(currentSituation)*ctxt.getActionProposal();
+				endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
 			}
 			
 			endogenousPredictionNContextsByInfluence = endogenousSumTerm/endogenousNormalizationTerm;
+		}
+		
+		
+		
+		if(endogenousPredictionActivatedContextsOverlaps == null) {
+			endogenousPredictionActivatedContextsOverlaps =  prediction;
+		}
+		
+		if(endogenousPredictionActivatedContextsOverlapsWorstDimInfluence == null) {
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluence =  prediction;
+		}
+		
+		
+		if(endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence == null) {
+			endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence =  prediction;
+		}
+		
+		if(endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence == null) {
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence =  prediction;
+		}
+		
+		
+		if(endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume == null) {
+			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume =  prediction;
+		}
+		
+		if(endogenousPredictionActivatedContextsSharedIncompetence == null) {
+			endogenousPredictionActivatedContextsSharedIncompetence =  prediction;
+		}
+		
+		if(endogenousPredictionNContextsByInfluence == null) {
+			endogenousPredictionNContextsByInfluence =  prediction;
 		}
 	}
 	
@@ -397,17 +458,17 @@ public class Head extends AbstractHead implements Cloneable{
 		return activatedContexts.size() == 0;
 	}
 	
-	private boolean uniqueActivatedContext() {
+	public boolean uniqueActivatedContext() {
 		//Test if only one context is activated
 		return activatedContexts.size() == 1;
 	}
 	
-	private boolean severalActivatedContexts() {
+	public boolean severalActivatedContexts() {
 		//Test if several context are activated
 		return activatedContexts.size() > 1;
 	}
 	
-	private boolean surroundingContexts() {
+	public boolean surroundingContexts() {
 		//Test if there are surrounding contexts
 		boolean testSurroudingContext = false;
 		
@@ -582,9 +643,7 @@ public class Head extends AbstractHead implements Cloneable{
 	private void NCS_EndogenousCompetition() {
 		System.out.println("NCS Comptetition " + world.getScheduler().getTick());
 		// Creation of twin contexts to give the endogenous prediction
-		Context highestConfidenceContext = null;
-		Context secondHighestConfidenceContext = null;
-		
+
 		
 		// 2 CTXT
 //		if(activatedContexts.get(0).getInfluence(currentSituation)>activatedContexts.get(1).getInfluence(currentSituation)) {
@@ -624,13 +683,48 @@ public class Head extends AbstractHead implements Cloneable{
 		// N CTXT
 		Double endogenousSumTerm = 0.0;
 		Double endogenousNormalizationTerm = 0.0;
+		
+		Double endogenousSumTerm2 = 0.0;
+		Double endogenousNormalizationTerm2 = 0.0;
+		
+		Double endogenousSumTerm3 = 0.0;
+		Double endogenousNormalizationTerm3 = 0.0;
+		
+		Double endogenousSumTerm4 = 0.0;
+		Double endogenousNormalizationTerm4 = 0.0;
+		
+		Double endogenousSumTerm5 = 0.0;
+		Double endogenousNormalizationTerm5 = 0.0;
+		
 		ArrayList<Context> concernContexts = new ArrayList<Context>();
 		for(Context ctxt :activatedContexts) {
-			endogenousSumTerm += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
-			endogenousNormalizationTerm += ctxt.getInfluence(currentSituation);
+			endogenousSumTerm += ctxt.getInfluenceWithConfidence(currentSituation)*ctxt.getActionProposal();
+			endogenousSumTerm2 += ctxt.getWorstInfluenceWithConfidence(currentSituation)*ctxt.getActionProposal();
+			//endogenousSumTerm3 += ctxt.getInfluence(currentSituation)*ctxt.getActionProposal();
+			endogenousSumTerm3 += ctxt.getInfluenceWithConfidenceAndVolume(currentSituation)*ctxt.getActionProposal();
+			endogenousSumTerm4 += ctxt.getWorstInfluence(currentSituation)*ctxt.getActionProposal();
+			endogenousSumTerm5 += ctxt.getWorstInfluenceWithVolume(currentSituation)*ctxt.getActionProposal();
+			//endogenousSumTerm5 += ctxt.getWorstInfluenceWithWorstRange(currentSituation)*ctxt.getActionProposal();
+			
+			
+			endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
+			endogenousNormalizationTerm2 += ctxt.getWorstInfluenceWithConfidence(currentSituation);
+			//endogenousNormalizationTerm3 += ctxt.getInfluence(currentSituation);
+			endogenousNormalizationTerm3 += ctxt.getInfluenceWithConfidenceAndVolume(currentSituation);
+			endogenousNormalizationTerm4 += ctxt.getWorstInfluence(currentSituation);
+			endogenousNormalizationTerm5 += ctxt.getWorstInfluenceWithVolume(currentSituation);
+			//endogenousNormalizationTerm5 += ctxt.getWorstInfluenceWithWorstRange(currentSituation);
+			
+			
 			concernContexts.add(ctxt);
 		}
-		endogenousPrediction2Contexts = endogenousSumTerm/endogenousNormalizationTerm;
+		endogenousPredictionActivatedContextsOverlaps = endogenousSumTerm/endogenousNormalizationTerm;
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = endogenousSumTerm2/endogenousNormalizationTerm2;
+		
+		endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = endogenousSumTerm3/endogenousNormalizationTerm3;
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = endogenousSumTerm4/endogenousNormalizationTerm4;
+		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = endogenousSumTerm5/endogenousNormalizationTerm5;
+		
 		
 		
 		NCSMemories.add(new NCSMemory(world, concernContexts,"Competition"));
@@ -664,15 +758,16 @@ public class Head extends AbstractHead implements Cloneable{
 		
 
 		
-		double contextInfluenceL = closestContexts.getL().getInfluence(currentSituation);
-		double contextInfluenceR = closestContexts.getR().getInfluence(currentSituation);
+		double contextInfluenceL = closestContexts.getL().getInfluenceWithConfidence(currentSituation);
+		double contextInfluenceR = closestContexts.getR().getInfluenceWithConfidence(currentSituation);
 		
-		System.out.println("--------------------------------------------------DIFFERENCE :" + compareClosestContextPair(closestContexts));
-		if(compareClosestContextPair(closestContexts)<10) {
-			endogenousPrediction2Contexts = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
+		System.out.println("--------------------------------------------------DIFFERENCE :" + compareClosestContextPairModels(closestContexts));
+		
+		if(compareClosestContextPairModels(closestContexts)<10) {
+			endogenousPredictionActivatedContextsSharedIncompetence = (contextInfluenceL*closestContexts.getL().getActionProposal() + contextInfluenceR*closestContexts.getR().getActionProposal()) / (contextInfluenceL + contextInfluenceR);
 		}
 		else {
-			endogenousPrediction2Contexts = prediction;
+			endogenousPredictionActivatedContextsSharedIncompetence = prediction;
 		}
 		
 		
@@ -693,7 +788,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	}
 	
-	private Double compareClosestContextPair(Pair<Context,Context> closestContexts) {
+	private Double compareClosestContextPairModels(Pair<Context,Context> closestContexts) {
 		Double difference = 0.0;
 		
 		if(closestContexts.getL().getLocalModel().getCoef().length == closestContexts.getR().getLocalModel().getCoef().length) {
@@ -944,18 +1039,93 @@ public class Head extends AbstractHead implements Cloneable{
 	 */
 	private void updateStatisticalInformations() {
 		xLastCriticityValues.add(criticity);
-	//	averagePredictionCriticity = ((averagePredictionCriticity * averagePredictionCriticityWeight) + criticity) / (averagePredictionCriticityWeight + 1);
-	//	averagePredictionCriticityWeight++;
-		
 		averagePredictionCriticity = 0;
 		for (Double d : xLastCriticityValues) {
 			averagePredictionCriticity += d;
 		}
 		averagePredictionCriticity /= xLastCriticityValues.size();
-		
 		if (xLastCriticityValues.size() >= numberOfCriticityValuesForAverage) {
 			xLastCriticityValues.remove(0);
 		}
+		
+		if(severalActivatedContexts()) {
+			xLastCriticityValuesCopy.add(criticity);
+			xLastCriticityValuesEndoActivatedContextsOverlaps.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps));
+			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
+			xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
+			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
+			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
+			xLastCriticityValuesEndoActivatedContextsSharedIncompetence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence));
+			
+
+		//	averagePredictionCriticity = ((averagePredictionCriticity * averagePredictionCriticityWeight) + criticity) / (averagePredictionCriticityWeight + 1);
+		//	averagePredictionCriticityWeight++;
+			
+			
+			averagePredictionCriticityCopy = 0;
+			averagePredictionCriticityEndoActivatedContextsOverlaps= 0;
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence= 0;
+			averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence= 0;
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence= 0;
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume = 0;
+			averagePredictionCriticityEndoActivatedContextsSharedIncompetence= 0;
+			
+			for (Double d : xLastCriticityValuesCopy) {
+				averagePredictionCriticityCopy += d;
+			}
+			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlaps) {
+				averagePredictionCriticityEndoActivatedContextsOverlaps += d;
+			}
+			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence) {
+				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence += d;
+			}
+			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence) {
+				averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence += d;
+			}
+			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence) {
+				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence += d;
+			}
+			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume) {
+				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume += d;
+			}
+			
+			for (Double d : xLastCriticityValuesEndoActivatedContextsSharedIncompetence) {
+				averagePredictionCriticityEndoActivatedContextsSharedIncompetence += d;
+			}
+			
+			averagePredictionCriticityCopy /= xLastCriticityValuesCopy.size();
+			averagePredictionCriticityEndoActivatedContextsOverlaps /= xLastCriticityValuesEndoActivatedContextsOverlaps.size();
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.size();
+			averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence /= xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.size();
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.size();
+			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.size();
+			averagePredictionCriticityEndoActivatedContextsSharedIncompetence /= xLastCriticityValuesEndoActivatedContextsSharedIncompetence.size();
+			
+
+			if (xLastCriticityValuesCopy.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesCopy.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsOverlaps.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsOverlaps.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.remove(0);
+			}
+			if (xLastCriticityValuesEndoActivatedContextsSharedIncompetence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
+				xLastCriticityValuesEndoActivatedContextsSharedIncompetence.remove(0);
+			}
+		}
+		
+		
 		
 		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
 		
@@ -1275,7 +1445,32 @@ public class Head extends AbstractHead implements Cloneable{
 	public double getAveragePredictionCriticity() {
 		return averagePredictionCriticity;
 	}
+	public double getAveragePredictionCriticityCopy() {
+		return averagePredictionCriticityCopy;
+	}
+	public double getAveragePredictionCriticityEndoActivatedContextsOverlaps() {
+		return averagePredictionCriticityEndoActivatedContextsOverlaps;
+	}
+	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence() {
+		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence;
+	}
+	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence() {
+		return averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence;
+	}
+	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() {
+		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+	}
+	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume() {
+		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+	}
+	
+	
+	public double getAveragePredictionCriticityEndoActivatedContextsSharedIncompetence() {
+		return averagePredictionCriticityEndoActivatedContextsSharedIncompetence;
+	}
 
+
+	
 	/**
 	 * Sets the average prediction criticity.
 	 *
@@ -1536,17 +1731,61 @@ public class Head extends AbstractHead implements Cloneable{
 		return prediction;
 	}
 	
-	public Double getEndogenousPrediction2Contexts() {
-		return endogenousPrediction2Contexts;
+	public Double getEndogenousPredictionActivatedContextsOverlaps() {
+		return endogenousPredictionActivatedContextsOverlaps;
 	}
 	
-	public Double getEndogenousPredictionNContexts() {
-		return endogenousPredictionNContexts;
+	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluence() {
+		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluence;
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence() {
+		return endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence;
+	}
+	
+	public Double getendogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() {
+		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+	}
+	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume() {
+		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+	}
+	
+	
+	public Double getEndogenousPredictionActivatedContextsSharedIncompetence() {
+		return endogenousPredictionActivatedContextsSharedIncompetence;
 	}
 	
 	public Double getEndogenousPredictionNContextsByInfluence() {
 		return endogenousPredictionNContextsByInfluence;
 	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps);
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence);
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidenceCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence);
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidenceCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence);
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumeCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume);
+	}
+	
+	public Double getEndogenousPredictionActivatedContextsSharedIncompetenceCriticity() {
+		return Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence);
+	}
+	
+	
+
+	
 
 	/**
 	 * Sets the prediction.

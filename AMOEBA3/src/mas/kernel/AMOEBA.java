@@ -103,7 +103,6 @@ public class AMOEBA extends Thread {
 			scheduler.setWorld(world);
 			this.setScheduler(scheduler);
 			this.start(false);
-			scheduler.setRunning(true);
 			
 			mainPanel.setAMOEBA(this);
 			mainPanel.setTemporalGraph(temporalGraph);
@@ -121,7 +120,6 @@ public class AMOEBA extends Thread {
 			scheduler.setWorld(world);
 			this.setScheduler(scheduler);
 			this.start(false);
-			scheduler.setRunning(true);
 			
 		}
 		
@@ -177,50 +175,11 @@ public class AMOEBA extends Thread {
 	 * @param running the running
 	 */
 	public void start(boolean running) {
-		scheduler.start(running);
 		this.running = running;
 		super.start();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
-	public void run() {
-		System.out.println("starting run");
-		while(true){
-			
-			if (!running) {
-			    try {
-			        Thread.sleep(0);
-			    } catch (InterruptedException ignore) {
-			    }
-			}
-			
-			while (running) {
-
-				if (studiedSystem != null) {
-					readInput();
-				}
-				scheduler.run();
-				if (studiedSystem != null) {
-					if (scheduler.isUseOracle()) {
-						studiedSystem.playOneStep(Double.NaN);
-					} else {
-				//		System.out.println(scheduler.getAction());
-						studiedSystem.playOneStep(scheduler.getAction());
-					}
-				}
-				
-				if (playOneStep) {
-					setRunning(false);
-					playOneStep = false;
-					getLogFile().messageToDebug("Play one step", 5, new LogMessageType[] {LogMessageType.INFORMATION});
-				}
-				
-			}
-			
-		}
-	}
+	
 	
 	/**
 	 * Learn.
@@ -319,16 +278,20 @@ public class AMOEBA extends Thread {
 	 */
 	public void setRunning(boolean running) {
 		this.running = running;
-		scheduler.setRunning(running);
 	}
 	
 	/**
 	 * Play one step.
 	 */
-	public void playOneStep() {
-		setRunning(true);
-		playOneStep = true;
+	public void setPlayOneStep(boolean value) {
+		playOneStep = value;
 	}
+	
+	public boolean getPlayOneStep() {
+		return playOneStep;
+	}
+	
+	
 
 	/**
 	 * Change control.

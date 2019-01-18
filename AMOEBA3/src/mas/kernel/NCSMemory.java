@@ -86,18 +86,47 @@ public class NCSMemory {
 		}
 		
 		string += "Predictions -> EXO :" + head.getPrediction()  + "\n";
-		if(head.getEndogenousPrediction2Contexts() != null) {
-			string += "Predictions -> ENDO 2 CTXT :" + head.getEndogenousPrediction2Contexts() + "\n";
+		
+		if(head.getEndogenousPredictionActivatedContextsOverlaps() != null) {
+			string += "Predictions -> ENDO FULL DIM + CONF :" + head.getEndogenousPredictionActivatedContextsOverlaps() + "\n";
 		}
 		else {
-			string += "Predictions -> ENDO 2 CTXT : - \n";
+			string += "Predictions -> ENDO FULL DIM + CONf : - \n";
 		}
 		
-		if(head.getEndogenousPredictionNContexts() != null) {
-			string += "Predictions -> ENDO N CTXT :" + head.getEndogenousPredictionNContexts() + "\n";
+		if(head.getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluence() != null) {
+			string += "Predictions -> ENDO WORST DIM + CONf :" + head.getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluence() + "\n";
 		}
 		else {
-			string += "Predictions -> ENDO N CTXT : - \n";
+			string += "Predictions -> ENDO WORST DIM + CONf : - \n";
+		}
+		
+		if(head.getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence() != null) {
+			string += "Predictions -> ENDO FULL DIM :" + head.getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence() + "\n";
+		}
+		else {
+			string += "Predictions -> ENDO FULL DIM : - \n";
+		}
+		
+		if(head.getendogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() != null) {
+			string += "Predictions -> ENDO WORST DIM :" + head.getendogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() + "\n";
+		}
+		else {
+			string += "Predictions -> ENDO WORST DIM : - \n";
+		}
+		
+		if(head.getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume() != null) {
+			string += "Predictions -> ENDO WORST DIM + VOL :" + head.getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume() + "\n";
+		}
+		else {
+			string += "Predictions -> ENDO WORST DIM + VOL : - \n";
+		}
+		
+		if(head.getEndogenousPredictionActivatedContextsSharedIncompetence() != null) {
+			string += "Predictions -> EndogenousPredictionActivatedContextsSharedIncompetence :" + head.getEndogenousPredictionActivatedContextsSharedIncompetence() + "\n";
+		}
+		else {
+			string += "Predictions -> EndogenousPredictionActivatedContextsSharedIncompetence : -  \n";
 		}
 		
 		string += "Predictions -> ORACLE :" + head.getOracleValue() + "\n\n";
@@ -105,14 +134,14 @@ public class NCSMemory {
 		double exoError = Math.abs(head.getPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
 		string += "Error -> EXO :" + exoError  + "\n";
 		
-		if(head.getEndogenousPrediction2Contexts() != null) {
-			double endoError2Ctxt = Math.abs(head.getEndogenousPrediction2Contexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
-			string += "Error -> ENDO 2 CTXT :" + endoError2Ctxt  + "\n";
+		if(head.getEndogenousPredictionActivatedContextsOverlaps() != null) {
+			double endoError2Ctxt = Math.abs(head.getEndogenousPredictionActivatedContextsOverlaps() - head.getOracleValue()) / (Math.abs(head.getOracleValue()) +1 );
+			string += "Error -> EndogenousPredictionActivatedContextsOverlaps :" + endoError2Ctxt  + "\n";
 		}
 		
-		if(head.getEndogenousPredictionNContexts() != null) {
-			double endoErrorNCtxt = Math.abs(head.getEndogenousPredictionNContexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
-			string += "Error -> ENDO N CTXT :" + endoErrorNCtxt  + "\n";
+		if(head.getEndogenousPredictionActivatedContextsSharedIncompetence() != null) {
+			double endoErrorNCtxt = Math.abs(head.getEndogenousPredictionActivatedContextsSharedIncompetence() - head.getOracleValue()) / Math.abs(head.getOracleValue());
+			string += "Error -> getEndogenousPredictionActivatedContextsSharedIncompetence :" + endoErrorNCtxt  + "\n";
 		}
 		
 		
@@ -155,8 +184,13 @@ public class NCSMemory {
 	public Double getErrorLevelEndo2Ctxt() {
 		double exoError = Math.abs(head.getPrediction() - head.getOracleValue()) / Math.abs(head.getOracleValue());
 		
-		if(head.getEndogenousPrediction2Contexts() != null) {
-			double endoError2Ctxt = Math.abs(head.getEndogenousPrediction2Contexts() - head.getOracleValue()) / Math.abs(head.getOracleValue());
+		if(head.getEndogenousPredictionActivatedContextsOverlaps() != null) {
+			double endoError2Ctxt = Math.abs(head.getEndogenousPredictionActivatedContextsOverlaps() - head.getOracleValue()) / (Math.abs(head.getOracleValue() ) );
+			
+			return exoError - endoError2Ctxt;
+		}
+		else if(head.getEndogenousPredictionActivatedContextsSharedIncompetence() != null) {
+			double endoError2Ctxt = Math.abs(head.getEndogenousPredictionActivatedContextsSharedIncompetence() - head.getOracleValue()) / (Math.abs(head.getOracleValue() ) );
 			
 			return exoError - endoError2Ctxt;
 		}

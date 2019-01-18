@@ -70,7 +70,10 @@ public class World implements Serializable {
 	private double AVT_deceleration = 1./3.0;
 	private double AVT_percentAtStart = 0.2;
 	
-	private double growingPercent = 0.1;
+	private double growingPercent = 0.2;
+	
+	private int xGraphSize = 1600;
+	private int yGraphSize = 900;
 	
 	
 	
@@ -834,6 +837,14 @@ public class World implements Serializable {
 
 	public double getContextGrowingPercent() {
 		return growingPercent;
+	}
+	
+	public int getXgraphSize() {
+		return xGraphSize;
+	}
+	
+	public int getYgraphSize() {
+		return yGraphSize;
 	}
 	
 }

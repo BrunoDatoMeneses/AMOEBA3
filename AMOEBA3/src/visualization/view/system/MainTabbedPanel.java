@@ -9,6 +9,7 @@ import javax.swing.JTabbedPane;
 import org.jfree.data.xy.XYSeries;
 
 import mas.kernel.World;
+import visualization.view.system.PanelController;
 import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
 import visualization.view.global.PanelChart;
@@ -38,9 +39,10 @@ public class MainTabbedPanel extends JTabbedPane{
 	
 	/** The panel chart. */
 	private PanelChart panelChart;
-	private PanelExoVSEndo exoVsEndo2CtxtChart;
-	private PanelExoVSEndo exoVsEndoNCtxtChart;
-	private PanelExoVSEndo exoVsEndoNCtxtByInfluenceChart;
+	private PanelExoVSEndo exoVsEndoOverlapNCSChart;
+	private PanelExoVSEndo exoVsEndoSharedIncompetenceNCSChart;
+	private PanelExoVSEndo exoVsEndoIncompetenceNCSChart;
+	private PanelController panelController;
 	
 	/** The panel two dim standard. */
 	private GrapheTwoDimPanelStandard panelTwoDimStandard;
@@ -90,18 +92,20 @@ public class MainTabbedPanel extends JTabbedPane{
 		panelParallelCoordinates = new PanelParallelCoordinates(world);
 		consolePanel = new ConsolePanel();
 		
-		exoVsEndo2CtxtChart = new PanelExoVSEndo(world, "Error Endo 2 Ctxt");
-		exoVsEndoNCtxtChart = new PanelExoVSEndo(world, "Error Endo N Ctxt");
-		exoVsEndoNCtxtByInfluenceChart = new PanelExoVSEndo(world, "Error Endo N Ctxt by Influence");
+		exoVsEndoOverlapNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Overlap NCS");
+		exoVsEndoSharedIncompetenceNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Shared Incompetence NCS");
+		exoVsEndoIncompetenceNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Incompetence NCS");
+		panelController = new PanelController(world.getScheduler().getHeadAgent(), world);
 		
 		
 		
 		
 		
 		world.getScheduler().addScheduledItem(panelChart);
-		world.getScheduler().addScheduledItem(exoVsEndo2CtxtChart);
-		world.getScheduler().addScheduledItem(exoVsEndoNCtxtChart);
-		world.getScheduler().addScheduledItem(exoVsEndoNCtxtByInfluenceChart);
+		world.getScheduler().addScheduledItem(exoVsEndoOverlapNCSChart);
+		world.getScheduler().addScheduledItem(exoVsEndoSharedIncompetenceNCSChart);
+		world.getScheduler().addScheduledItem(exoVsEndoIncompetenceNCSChart);
+		world.getScheduler().addScheduledItem(panelController);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -111,10 +115,11 @@ public class MainTabbedPanel extends JTabbedPane{
 	//	this.addTab("TwoDim", new JScrollPane(panelTwoDim,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 	//	this.addTab("TwoDim", panelTwoDim);
 		this.addTab("Console", new JScrollPane(consolePanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		this.addTab("Exo VS endo 2 ctxt", new JScrollPane(exoVsEndo2CtxtChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		this.addTab("Exo VS endo N ctxt by distance", new JScrollPane(exoVsEndoNCtxtChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
-		this.addTab("Exo VS endo N ctxt by influence", new JScrollPane(exoVsEndoNCtxtByInfluenceChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo Vs Endo Overlap NCS", new JScrollPane(exoVsEndoOverlapNCSChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo Vs Endo Shared Incompetence NCS", new JScrollPane(exoVsEndoSharedIncompetenceNCSChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Exo Vs Endo Incompetence NCS", new JScrollPane(exoVsEndoIncompetenceNCSChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("NCS Memories", new JScrollPane(panelTwoDimNCSMemories,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Marges", new JScrollPane(panelController,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		
 		((Frame) this.getTopLevelAncestor()).pack();

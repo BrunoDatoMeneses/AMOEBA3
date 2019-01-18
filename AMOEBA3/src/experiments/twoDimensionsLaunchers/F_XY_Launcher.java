@@ -39,15 +39,36 @@ public class F_XY_Launcher implements Serializable {
 
 		F_XY_Manager f_XY_Manager = new F_XY_Manager(50.0);
 
-		
-		for (int i = 0 ; i < 2000 ; i++) {
-
-			/*Random samples of the studied system */
-			f_XY_Manager.playOneStep(0);
+		int i = 0;
+		while(i<10000) {
 			
-			/*This is a learning step of AMOEBA*/
-			amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
-						
-		}		
+			System.out.println("Running :" + amoeba.isRunning());
+			
+			if(amoeba.isRunning()) {
+				
+				/*Random samples of the studied system */
+				f_XY_Manager.playOneStep(0);
+				
+				/*This is a learning step of AMOEBA*/
+				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
+				
+				i++;
+			}
+			else if(amoeba.getPlayOneStep()) {
+				
+				/*Random samples of the studied system */
+				f_XY_Manager.playOneStep(0);
+				
+				/*This is a learning step of AMOEBA*/
+				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
+				
+				i++;
+				
+				amoeba.setPlayOneStep(false);
+			}
+			
+		}
+		
+	
 	}
 }

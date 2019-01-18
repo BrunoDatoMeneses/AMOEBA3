@@ -54,9 +54,7 @@ public class Scheduler implements Serializable{
 	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
 	private ArrayList<Context> lastModifiedContext = new ArrayList<Context>();
 
-	private boolean running = false;
 	private boolean waitForGUIUpdate = false;
-	private boolean playOneStep = false;
 	private boolean useOracle = true;
 	
 	private int tick;
@@ -93,14 +91,7 @@ public class Scheduler implements Serializable{
 	//	if (graphSystemPanel != null) graphSystemPanel.newAgent(a);
 	}
 	
-	/**
-	 * Start.
-	 *
-	 * @param running the running
-	 */
-	public void start(boolean running) {
-		setRunning(running);
-	}
+
 	
 	/**
 	 * Adds the new agents.
@@ -195,7 +186,7 @@ public class Scheduler implements Serializable{
 	 */
 	public void run() { 
 
-		if (running) {//old launcher
+		//if (running) {//old launcher
 			
 			addNewAgents();//scheduler acces to new agents
 			killAgents();
@@ -221,10 +212,7 @@ public class Scheduler implements Serializable{
 			    Thread.currentThread().interrupt();
 			}
 
-			if (playOneStep) {
-				playOneStep = false;
-				running = false;
-			}
+			
 			
 			alteredContexts.clear();
 			
@@ -233,7 +221,7 @@ public class Scheduler implements Serializable{
 		
 	//	System.out.println("Step : " + tick + " with " + world.getNumberOfAgents() + " agents.");
 
-	}
+	//}
 	
 	private void ticksUpdate() {
 		tick++;
@@ -388,23 +376,9 @@ public class Scheduler implements Serializable{
 		this.agents = agents;
 	}
 
-	/**
-	 * Checks if is running.
-	 *
-	 * @return true, if is running
-	 */
-	public boolean isRunning() {
-		return running;
-	}
 
-	/**
-	 * Sets the running.
-	 *
-	 * @param running the new running
-	 */
-	public void setRunning(boolean running) {
-		this.running = running;
-	}
+
+
 
 	/**
 	 * Gets the tick.

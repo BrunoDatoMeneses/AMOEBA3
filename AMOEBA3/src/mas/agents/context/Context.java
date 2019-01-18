@@ -865,7 +865,21 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		s += "Number of experiments : " + experiments.size() + "\n";
 		s += "Confidence : " + confidence + "\n";
 		s += "Normalized confidence : " + getNormalizedConfidence() + "\n";
-		s += "Influnce :" + getInfluence(situation) + "\n";
+		s += "Influence :" + getInfluence(situation) + "\n";
+		s += "Worst Influence :" + getWorstInfluence(situation) + "\n";
+		s += "Worst Influence + Conf :" + getWorstInfluenceWithConfidence(situation) + "\n";
+		s += "Worst Influence + Vol :" + getWorstInfluenceWithVolume(situation) + "\n";
+		for (Percept pct : situation.keySet()) {
+			s += "Influence " +pct.getName() +  " : " + getInfluenceByPerceptSituation(pct, situation.get(pct)) + "\n";
+			
+		}
+		s += "Global Influence * Confidence :" + getInfluenceWithConfidence(situation) + "\n";
+		for (Percept pct : situation.keySet()) {
+			s += "Influence * Confidence " +pct.getName() + " : " + getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct)) + "\n";
+			
+		}
+		
+		
 		if (formulaLocalModel != null) {
 			s += "Local model : " + this.formulaLocalModel + "\n";
 		} else {
@@ -1019,6 +1033,21 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return 1/(1+Math.exp(-confidence/dispersion));
 	}
 	
+	public double getInfluenceWithConfidence(HashMap<Percept,Double> situation) {
+		Double influence = 1.0;
+		
+		for(Percept pct : situation.keySet()) {
+			//System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			influence *= getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
+		}
+		
+		return influence;
+	}
+	
+	public double getInfluenceWithConfidenceAndVolume(HashMap<Percept,Double> situation) {	
+		return getVolume()*getInfluenceWithConfidence(situation);
+	}
+	
 	public double getInfluence(HashMap<Percept,Double> situation) {
 		Double influence = 1.0;
 		
@@ -1030,11 +1059,56 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 		return influence;
 	}
 	
+	public double getWorstInfluenceWithConfidence(HashMap<Percept,Double> situation) {
+		Double worstInfluence = Double.POSITIVE_INFINITY;
+		Double currentInfluence = 0.0;
+		
+		for(Percept pct : situation.keySet()) {
+			//System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			currentInfluence = getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
+			if(currentInfluence < worstInfluence) {
+				worstInfluence = currentInfluence;
+			}
+		}
+		
+		return worstInfluence;
+	}
+	
+	public double getWorstInfluence(HashMap<Percept,Double> situation) {
+		Double worstInfluence = Double.POSITIVE_INFINITY;
+		Double currentInfluence = 0.0;
+		
+		for(Percept pct : situation.keySet()) {
+			//System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			currentInfluence = getInfluenceByPerceptSituation(pct, situation.get(pct));
+			if(currentInfluence < worstInfluence) {
+				worstInfluence = currentInfluence;
+			}
+		}
+		
+		return worstInfluence;
+	}
+	
+	public double getWorstInfluenceWithVolume(HashMap<Percept,Double> situation) {
+		
+		return getVolume()*getWorstInfluence(situation);
+	}
+	
+	public double getWorstInfluenceWithWorstRange(HashMap<Percept,Double> situation) {
+		
+		return getWorstRange()*getWorstInfluence(situation);
+	}
+	
 	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
 		double center = getCenterByPercept(pct);
 		double radius = getRadiusByPercept(pct);
 				
-		return getNormalizedConfidence()* Math.exp(- Math.pow(situation-center, 2)/(2*Math.pow(radius, 2)));
+		return  Math.exp(- Math.pow(situation-center, 2)/(2*Math.pow(radius, 2)));
+	}
+	
+	public double getInfluenceByPerceptSituationWithConfidence(Percept pct, double situation) {
+				
+		return  getNormalizedConfidence()* getInfluenceByPerceptSituation(pct, situation);
 	}
 	
 	public double getCenterByPercept(Percept pct) {
@@ -1043,6 +1117,27 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	
 	public double getRadiusByPercept(Percept pct) {
 		return (this.getRangeByPerceptName(pct.getName()).getEnd() - this.getRangeByPerceptName(pct.getName()).getStart()) /2;
+	}
+	
+	public double getVolume() {
+		double volume = 1.0;
+		
+		for(Percept pct: getRanges().keySet()) {
+			volume *= 2*getRadiusByPercept(pct);
+		}
+		return volume;
+	}
+	
+	public double getWorstRange() {
+		Double volume = Double.POSITIVE_INFINITY;
+		
+		for(Percept pct: getRanges().keySet()) {
+			//volume *= 2*getRadiusByPercept(pct);
+			if(getRadiusByPercept(pct)<volume) {
+				volume = getRadiusByPercept(pct);
+			}
+		}
+		return volume;
 	}
 
 	/**

@@ -65,14 +65,14 @@ public class PanelChart extends JPanel implements ScheduledItem {
 		dataSetAgents = createDataSetAgents();
 		JFreeChart chart = createChart();
 		chartPanelAgents = new ChartPanel(chart);
-		chartPanelAgents.setPreferredSize(new java.awt.Dimension(600, 400));
+		chartPanelAgents.setPreferredSize(new java.awt.Dimension(world.getXgraphSize(), world.getYgraphSize()));
 		this.add(chartPanelAgents);
 
 		/* Create NCS chart */
 		dataSetNCS = createDataSetNCS();
 		JFreeChart chartNCS = createChartNCS();
 		chartPanelNCS = new ChartPanel(chartNCS);
-		chartPanelNCS.setPreferredSize(new java.awt.Dimension(600, 400));
+		chartPanelNCS.setPreferredSize(new java.awt.Dimension(world.getXgraphSize(), world.getYgraphSize()));
 		this.add(chartPanelNCS);
 
 	}

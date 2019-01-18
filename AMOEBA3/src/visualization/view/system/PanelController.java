@@ -79,10 +79,10 @@ public class PanelController extends JPanel implements ScheduledItem {
 	World world;
 	
 	/** The size X. */
-	private final int sizeX = 400;
+	private int sizeX ;
 	
 	/** The size Y. */
-	private final int sizeY = 300;
+	private int sizeY ;
 	
 	/** The tool bar. */
 	private JToolBar toolBar;
@@ -98,6 +98,9 @@ public class PanelController extends JPanel implements ScheduledItem {
 	 */
 	public PanelController(Head controller, World world) {
 
+		this.sizeX = world.getXgraphSize();
+		this.sizeY = world.getYgraphSize();
+		
 		this.setLayout(new FlowLayout());
 		this.controller = controller;
 		this.world = world;

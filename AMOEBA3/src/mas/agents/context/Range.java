@@ -195,7 +195,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 	public void adapt(Context c, double oracleValue, Percept p) {
 		if (!isPerceptEnum()) {
 			
-			adaptWithoutAVT(c, oracleValue);
+			adaptUsingAVT(c, oracleValue);
+			//adaptWithoutAVT(c, oracleValue);
+			//staticAdapt(c, oracleValue);
 //			if (Range.useAVT) {
 //				adaptUsingAVT(c, oracleValue);
 //			} else {
@@ -307,7 +309,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			this.setEnd(end + (world.getContextGrowingPercent()*this.getRadius()));
+			this.setEnd(end + (world.getContextGrowingPercent()*2*this.getRadius()));
 		} 	
 
 
@@ -350,7 +352,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			this.setStart(start - (world.getContextGrowingPercent()*this.getRadius()));
+			this.setStart(start - (world.getContextGrowingPercent()*2*this.getRadius()));
 
 		}		
 
