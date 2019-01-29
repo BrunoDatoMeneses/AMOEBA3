@@ -1,10 +1,9 @@
-package agents;
+package agents.percept;
 
-import fr.irit.smac.amak.CommunicatingAgent;
+import agents.AmoebaAgent;
 import kernel.AMOEBA;
-import kernel.World;
 
-public class Percept extends CommunicatingAgent<AMOEBA, World> {
+public class Percept extends AmoebaAgent {
 
 	public Percept(AMOEBA amas) {
 		super(amas);

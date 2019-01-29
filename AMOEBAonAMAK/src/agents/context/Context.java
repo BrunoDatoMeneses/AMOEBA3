@@ -1,10 +1,9 @@
-package agents;
+package agents.context;
 
-import fr.irit.smac.amak.CommunicatingAgent;
+import agents.AmoebaAgent;
 import kernel.AMOEBA;
-import kernel.World;
 
-public class Context extends CommunicatingAgent<AMOEBA, World> {
+public class Context extends AmoebaAgent {
 
 	public Context(AMOEBA amas) {
 		super(amas);

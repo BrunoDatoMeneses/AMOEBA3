@@ -1,10 +1,9 @@
-package agents;
+package agents.head;
 
-import fr.irit.smac.amak.CommunicatingAgent;
+import agents.AmoebaAgent;
 import kernel.AMOEBA;
-import kernel.World;
 
-public class Head extends CommunicatingAgent<AMOEBA, World> {
+public class Head extends AmoebaAgent {
 
 	public Head(AMOEBA amas) {
 		super(amas);
