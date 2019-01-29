@@ -15,5 +15,22 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	public AmoebaAgent(AMOEBA amas) {
 		super(amas);
 	}
+	
+	@Override
+	protected void onDecide() {
+		for(AmoebaMessage m : getReceivedMessagesGivenType(AmoebaMessage.class) ) {
+			computeAMessage(m);
+		}
+	}
+	
+	public abstract void computeAMessage(AmoebaMessage m);
+	
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }
