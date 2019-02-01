@@ -72,10 +72,13 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
-	private int xGraphSize = 1600;
-	private int yGraphSize = 900;
+	private int xGraphSize = 2500;
+	private int yGraphSize = 1500;
 	
+	public double increment_up = 0.05;
+	public double increment_down = 0.05;
 	
+	public int tickThreshol = 100;
 	
 	public World() {
 		
@@ -845,6 +848,15 @@ public class World implements Serializable {
 	
 	public int getYgraphSize() {
 		return yGraphSize;
+	}
+	
+	public void setIncrements(double value) {
+		increment_up = value;
+		increment_down = value;
+	}
+	
+	public double getIncrements() {
+		return increment_up ;
 	}
 	
 }

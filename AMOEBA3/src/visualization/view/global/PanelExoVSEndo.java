@@ -387,7 +387,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 			endoTotalError += endoError;
 			exoTotalError += exoError;
 			
-			System.out.println(endoType + " -> EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError) +" )");
+			//system.out.println(endoType + " -> EXO :" + exoWasRight + " ( " + exoError + " , " + (exoTotalError) +" )"  + " ENDO :" + endoWasRight + " ( " + endoError + " , "  + (endoTotalError) +" )");
 		}
 		
 		
@@ -399,7 +399,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 
 	@Override
 	public void chartMouseClicked(ChartMouseEvent event) {
-		//System.out.println("getPoint " + mouseEvent.getPoint() + " " + this.getSize());
+		////system.out.println("getPoint " + mouseEvent.getPoint() + " " + this.getSize());
 		//graph.getNode("origin").
 		
 		Point2D p = chartPanelErrors.translateScreenToJava2D(event.getTrigger().getPoint());
@@ -409,7 +409,7 @@ public class PanelExoVSEndo extends JPanel implements ScheduledItem, ChartMouseL
 		double chartY = plot.getRangeAxis().java2DToValue(p.getY(), plotArea, plot.getRangeAxisEdge());
 		
 		
-		System.out.println("{ "+ chartX + " ; " + chartY +" } ");
+		//system.out.println("{ "+ chartX + " ; " + chartY +" } ");
 		
 		
 		

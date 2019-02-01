@@ -117,6 +117,8 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 	
 	private JButton buttonSearchContext;
 	private JButton buttonUpdateMemory;
+	private JButton nextMemory;
+	private JButton previousMemory;
 	private JComboBox comboDimX;
 	private JComboBox comboDimY;
 	private JComboBox<NCSMemory> NCSsituations;
@@ -294,6 +296,8 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		toolBar.add(NCScontexts);
 		
 		
+		
+		
 		toolBar.add(labelDrawMemory);
 		toolBar.add(memoryTick);
 		buttonUpdateMemory = new JButton(Config.getIcon("arrow-circle-double-135.png"));
@@ -306,7 +310,15 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		toolBar.add(yValue);
 		
 		
+		previousMemory = new JButton(Config.getIcon("control-stop-180.png"));
+		previousMemory.addActionListener(e -> {drawPreviousMemory();});
+		previousMemory.setToolTipText("Previous memory");
+		toolBar.add(previousMemory);
 		
+		nextMemory = new JButton(Config.getIcon("control-stop.png"));
+		nextMemory.addActionListener(e -> {drawNextMemory();});
+		nextMemory.setToolTipText("Next memory");
+		toolBar.add(nextMemory);
 		
 		this.add(toolBar,BorderLayout.NORTH);
 		
@@ -339,6 +351,18 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		
 	}
 	
+	private void drawPreviousMemory() {
+		
+		int previousMemoryIndex = NCSsituations.getSelectedIndex()-1;
+		drawMemory(NCSsituations.getItemAt(previousMemoryIndex));
+		NCSsituations.setSelectedIndex(previousMemoryIndex);
+	}
+	
+	private void drawNextMemory() {
+		int nextMemoryIndex = NCSsituations.getSelectedIndex()+1;
+		drawMemory(NCSsituations.getItemAt(nextMemoryIndex));
+		NCSsituations.setSelectedIndex(nextMemoryIndex);
+	}
 	
 	private NCSMemory getMemoryByTick(String tick) {
 		return world.getScheduler().getHeadAgent().getMemoryByTick(Integer.parseInt(tick));
@@ -442,7 +466,7 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			node.addAttribute("ui.class","RGBAColor");
 			//System.out.println("COLORS : " + r + " " + g + " " + b);
 			
-			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
+			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",150);");
 			
 		}
 		
@@ -463,10 +487,61 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 			}
 			
 			
+			Double r = 0.0;
+			Double g = 0.0;
+			Double b = 0.0;
+			double[] coefs = ctxt.getLocalModel().getCoef();
+			//System.out.println("COEFS : " + coefs.length);
+			if(coefs.length>0) {
+				if(coefs.length==1) {
+					//System.out.println(coefs[0]);	
+					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length==2) {
+					//System.out.println(coefs[0] + " " + coefs[1]);
+					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else if(coefs.length>=3) {
+					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+					if(r.isNaN()) {
+						r = 0.0;
+					}
+					if(g.isNaN()) {
+						g = 0.0;
+					}
+					if(b.isNaN()) {
+						b = 0.0;
+					}
+				}
+				else {
+					r = 255.0;
+					g = 255.0;
+					b = 255.0;
+				}
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+			
 			node.addAttribute("ui.class","RGBAColor");
 			//System.out.println("COLORS : " + r + " " + g + " " + b);
 			
-			node.addAttribute("ui.style", "fill-color: rgba(10,10,10,10);");
+			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",50);");
 			
 		}
 	

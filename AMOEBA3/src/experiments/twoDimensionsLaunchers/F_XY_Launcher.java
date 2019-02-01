@@ -42,7 +42,15 @@ public class F_XY_Launcher implements Serializable {
 		int i = 0;
 		while(i<10000) {
 			
-			System.out.println("Running :" + amoeba.isRunning());
+			//System.out.println("Running :" + amoeba.isRunning());
+			try        
+			{
+			    Thread.sleep(1);
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
 			
 			if(amoeba.isRunning()) {
 				

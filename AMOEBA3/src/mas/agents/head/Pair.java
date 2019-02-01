@@ -19,19 +19,19 @@ public class Pair<Context1,Context2> {
     
     public void print(Percept p) {
     	if(l!=null && r!=null) {
-    		System.out.println("< " + "("+l.getName()+") " +l.getRanges().get(p).getEnd() + " ; " + "("+r.getName()+") " +r.getRanges().get(p).getStart() + " >");
+    		//System.out.println("< " + "("+l.getName()+") " +l.getRanges().get(p).getEnd() + " ; " + "("+r.getName()+") " +r.getRanges().get(p).getStart() + " >");
     	}
     	else if(l==null && r==null) {
-    		System.out.println("< " + "-" + " ; " + "-" + " >");
+    		//System.out.println("< " + "-" + " ; " + "-" + " >");
     	}
     	else if(l==null) {
-    		System.out.println("< " + "-" + " ; " + "("+r.getName()+") " +r.getRanges().get(p).getStart() + " >");
+    		//System.out.println("< " + "-" + " ; " + "("+r.getName()+") " +r.getRanges().get(p).getStart() + " >");
     	}
     	else if(r==null) {
-    		System.out.println("< " + "("+l.getName()+") " +l.getRanges().get(p).getEnd() + " ; " + "-" + " >");
+    		//System.out.println("< " + "("+l.getName()+") " +l.getRanges().get(p).getEnd() + " ; " + "-" + " >");
     	}
     	else {
-    		System.out.println("ERROR PAIR");
+    		//System.out.println("ERROR PAIR");
     	}
     	
     }

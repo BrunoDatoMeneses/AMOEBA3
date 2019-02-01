@@ -57,7 +57,7 @@ public class Scheduler implements Serializable{
 	private boolean waitForGUIUpdate = false;
 	private boolean useOracle = true;
 	
-	private int tick;
+	private int tick = 0;
 	private int nextID = 0;
 	private int moduloMeasure = 1000;
 	
@@ -329,7 +329,10 @@ public class Scheduler implements Serializable{
 		
 		
 		
-		
+//		for (Context context : getContextsAsContext()) {
+//			context.updateAVT();
+//			
+//		}
 		
 		
 

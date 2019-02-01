@@ -2,6 +2,8 @@ package mas.agents.context;
 
 import java.io.Serializable;
 
+import org.hamcrest.core.IsNull;
+
 import mas.agents.percept.Percept;
 import mas.kernel.World;
 import mas.agents.Agent;
@@ -13,84 +15,58 @@ import mas.agents.messages.MessageType;
  */
 public class Range implements Serializable, Comparable, Cloneable {
 
-	/** The start. */
-	private double start;
+	private double start = 0;
+	private double end = 0;
 	
-	/** The end. */
-	private double end;
-	
-	/** The start inclu. */
 	private boolean start_inclu;
-	
-	/** The end inclu. */
 	private boolean end_inclu;
 
-	/** The value. */
 	private double value;
+	private double oldValue;
 	
-	/** The alpha factor. */
 	private double alphaFactor; 
- /** The Constant minLenghtRatio. */
+	
+	private int lastStartTickModification = 0;
+	private int lastEndTickModification = 0;
+ /** The Constant startLenghtRatio. */
  /*
 								 * The weight in an interpolation : the impact
 								 * on action for a +1 change in this range value
 								 */
 	private final static double minLenghtRatio = 0;
 
-	/** The old value. */
-	private double oldValue;
 	
 	private World world;
-	
-	/** The context. */
 	private Context context;
-	
-	/** The percept. */
 	private Percept percept;
 	
-	/** The maxid. */
 	public static int maxid = 0; // TODO for debug purposes
-	
-	/** The id. */
 	public int id;
-
-	/** The Constant mininimalRange. */
-	public static final double mininimalRange = 10;
-	
-	/** The Constant useAVT. */
+	public static final double mininimalRange = 1;
 	private static final boolean useAVT = true;
 	
-	/** The AV T delta min. */
+
 	/*---------------AVT---------------*/
-	private double AVT_deltaMin = 0.5;
+	private double AVT_deltaStart = 0.5;
+	private double AVT_deltaEnd = 0.5;
 	
-	/** The AV T delta max. */
-	private double AVT_deltaMax = 0.5;
+	private int AVT_lastFeedbackStart = 1;
+	private int AVT_lastFeedbackEnd = 1;
 	
-	/** The AV T last feedback min. */
-	private int AVT_lastFeedbackMin = 1;
-	
-	/** The AV T last feedback max. */
-	private int AVT_lastFeedbackMax = 1;
-	
-	/** The AV T acceleration. */
 	private double AVT_acceleration;
-	
-	/** The AV T deceleration. */
 	private double AVT_deceleration;
 	
-	/** The AV T start ratio. */
-	private double AVT_startRatio;
+	private double AVT_minRatio;
 	/*---------------------------------*/
 	
 	/*------------Percent--------------*/
-	/** The percent up. */
 	//Only used if useAVT == false
 	static public double percent_up = 0.2;
-	
-	/** The percent down. */
 	static public double percent_down = 0.1;
 	/*---------------------------------*/
+	
+	public double increment_up = 0.05;
+	public double increment_down = 0.05;
 
 	
 	/**
@@ -113,7 +89,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		
 		AVT_deceleration = context.getWorld().getAVT_deceleration();
 		AVT_acceleration = context.getWorld().getAVT_acceleration();
-		AVT_startRatio = context.getWorld().getAVT_percentAtStart();
+		AVT_minRatio = context.getWorld().getAVT_percentAtStart();
 
 		this.percept = p;
 		if (isPerceptEnum()) {
@@ -132,8 +108,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 		maxid++;
 		
 		/*Initialization of AVT : a better way to do that should be developped*/
-		this.AVT_deltaMin = (end - start) * AVT_startRatio + 0.0001;
-		this.AVT_deltaMax = (end - start) * AVT_startRatio + 0.0001;
+//		this.AVT_deltaStart = (end - start) * AVT_minRatio + 0.0001;
+//		this.AVT_deltaEnd = (end - start) * AVT_minRatio + 0.0001;
+		this.AVT_deltaStart = getLenght() * 0.2 + 0.0001;
+		this.AVT_deltaEnd = getLenght() * 0.2 + 0.0001;
+		System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "START" + "\t" + AVT_deltaStart);
+		System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "END" + "\t" + AVT_deltaEnd);
 		
 
 	}
@@ -157,10 +137,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 		this.id = r.id;
 		this.AVT_acceleration = r.AVT_acceleration;
 		this.AVT_deceleration = r.AVT_deceleration;
-		this.AVT_deltaMax = r.AVT_deltaMax;
-		this.AVT_deltaMin = r.AVT_deltaMin;
-		this.AVT_lastFeedbackMax = r.AVT_lastFeedbackMax;
-		this.AVT_lastFeedbackMin = r.AVT_lastFeedbackMin;
+		this.AVT_deltaEnd = r.AVT_deltaEnd;
+		this.AVT_deltaStart = r.AVT_deltaStart;
+		this.AVT_lastFeedbackEnd = r.AVT_lastFeedbackEnd;
+		this.AVT_lastFeedbackStart = r.AVT_lastFeedbackStart;
 		
 	}
 
@@ -172,16 +152,33 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @param p the p
 	 * @return true if the context was extended, false else.
 	 */
-	private boolean extend(double target, Percept p) {
+	public boolean extend(double target, Percept p) {
 		int c = contains(target);
-		if (c == -1) {
+		if (c == -1) {	
+//			AVT_deltaStart = Math.abs(target-getStart());
+//			AVT_lastFeedbackStart = 1;
 			this.setStart(target);
 			return true;
 		} else if (c == 1) {
+//			AVT_deltaEnd = Math.abs(target-getEnd());
+//			AVT_lastFeedbackStart = 1;
 			this.setEnd(target);
 			return true;
 		} else {
 			return false;
+		}
+		
+		
+		
+	}
+	
+	public void shrink(double target, Percept p) {
+
+		if(Math.abs(getStart() - target) < Math.abs(getEnd() - target)) {
+			this.setStart(target + this.getRadius()*0.02);
+		}
+		else {
+			this.setEnd(target - this.getRadius()*0.02);
 		}
 	}
 
@@ -192,12 +189,15 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @param oracleValue the oracle value
 	 * @param p the p
 	 */
-	public void adapt(Context c, double oracleValue, Percept p) {
+	public void adapt(Double oracleValue) {
 		if (!isPerceptEnum()) {
+	
 			
-			adaptUsingAVT(c, oracleValue);
+			staticAdapt(oracleValue);
+			
+			//adaptUsingAVT(c, oracleValue);
 			//adaptWithoutAVT(c, oracleValue);
-			//staticAdapt(c, oracleValue);
+			
 //			if (Range.useAVT) {
 //				adaptUsingAVT(c, oracleValue);
 //			} else {
@@ -214,19 +214,19 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	private void adaptWithoutAVT(Context c, double oracleValue) {
 		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
-			adaptMaxWithoutAVT(c, oracleValue);
+			adaptEndWithoutAVT(c, oracleValue);
 		} else {
-			adaptMinWithoutAVT(c, oracleValue);
+			adaptStartWithoutAVT(c, oracleValue);
 		}		
 	}
 
 	/**
-	 * Adapt max without AVT.
+	 * Adapt End without AVT.
 	 *
 	 * @param c the c
 	 * @param oracleValue the oracle value
 	 */
-	private void adaptMaxWithoutAVT(Context c, double oracleValue) {
+	private void adaptEndWithoutAVT(Context c, double oracleValue) {
 		if (contains(oracleValue) == 0.0) {
 			this.setEnd(end - ((end - start) * percent_down));
 		} else {
@@ -235,12 +235,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	/**
-	 * Adapt min without AVT.
+	 * Adapt start without AVT.
 	 *
 	 * @param c the c
 	 * @param oracleValue the oracle value
 	 */
-	private void adaptMinWithoutAVT(Context c, double oracleValue) {
+	private void adaptStartWithoutAVT(Context c, double oracleValue) {
 		if (contains(oracleValue) == 0.0) {
 
 			this.setStart(start + ((end - start) * percent_up));
@@ -255,137 +255,235 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @param c the c
 	 * @param oracleValue the oracle value
 	 */
-	private void adaptUsingAVT(Context c, double oracleValue) {
+	private void adaptUsingAVT(Context c, Double oracleValue) {
+		
 		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
-			adaptMaxUsingAVT(c, oracleValue);
+			adaptEndUsingAVT(c, oracleValue);
 		} else {
-			adaptMinUsingAVT(c, oracleValue);
+			adaptStartUsingAVT(c, oracleValue);
 		}
+		
+		
 	}
 	
-	private void staticAdapt(Context c, double oracleValue) {
+	
+	
+	private void staticAdapt(double oracleValue) {
 		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
-			adaptEnd(c, oracleValue);
+			adaptEnd(oracleValue);
 		} else {
-			adaptStart(c, oracleValue);
+			adaptStart(oracleValue);
 		}
 	}
 	
 	/**
-	 * Adapt max using AVT.
+	 * Adapt End using AVT.
 	 *
 	 * @param c the c
 	 * @param oracleValue the oracle value
 	 */
-	private void adaptMaxUsingAVT(Context c, double oracleValue) {
+	private void adaptEndUsingAVT(Context c, double oracleValue) {
 
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		
 		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			if (AVT_lastFeedbackMax == 1) {
-				AVT_deltaMax *= AVT_deceleration;
-			} else {
-				AVT_deltaMax *= AVT_acceleration;
-			}
-			this.setEnd(end - AVT_deltaMax);
+			System.out.print( "\tContained : True" );
 
-			AVT_lastFeedbackMax = -1;
+			if (AVT_lastFeedbackEnd == 1) {
+				AVT_deltaEnd *= AVT_deceleration;
+				System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			} else {
+				AVT_deltaEnd *= AVT_acceleration;
+				System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			}
+			this.setEnd(end - AVT_deltaEnd);
+
+			
+			System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+			AVT_lastFeedbackEnd = -1;
+			System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
 
 		} else {
-
-			if (AVT_lastFeedbackMax == 1) {
-				AVT_deltaMax *= AVT_acceleration;
+			System.out.print( "\tContained : False" );
+			if (AVT_lastFeedbackEnd == 1) {
+				AVT_deltaEnd *= AVT_acceleration;
+				System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			} else {
-				AVT_deltaMax *= AVT_deceleration;
+				AVT_deltaEnd *= AVT_deceleration;
+				System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			}
-			this.setEnd(end + AVT_deltaMax);
+			this.setEnd(end + AVT_deltaEnd);
 
-			AVT_lastFeedbackMax = 1;
+			System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+			AVT_lastFeedbackEnd = 1;
+			System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
 		}		
 
-
+		
 	}
 	
-	private void adaptEnd(Context c, double oracleValue) {
+	public void endogenousAdaptEndUsingAVT() {
+
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		
+		AVT_deltaEnd *= AVT_deceleration;
+		System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+		
+		System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+		AVT_lastFeedbackEnd = 0;
+		System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
+
+		
+	}
+	
+	public void endogenousAdaptStartUsingAVT() {
+
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		
+		AVT_deltaStart *= AVT_deceleration;
+		System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+		
+		System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+		AVT_lastFeedbackStart = 0;
+		System.out.print("\t" + AVT_lastFeedbackStart + "\n");
+
+		
+	}
+	
+	private void adaptEnd(double oracleValue) {
 
 		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			this.setEnd(end + (world.getContextGrowingPercent()*2*this.getRadius()));
-		} 	
+			//this.setEnd(end + (world.getContextGrowingPercent()*2*this.getRadius()));
+			
+			if(world.getScheduler().getTick()>world.tickThreshol) {
+				this.setEnd(end + world.getIncrements()*percept.getMinMaxDistance()*getLenght()); 
+			}
+			else {
+				this.setEnd(end + world.getIncrements()*percept.getMinMaxDistance()); 
+			}
+			
+		} 
+		else {
+			if(world.getScheduler().getTick()>world.tickThreshol) {
+				this.setEnd(end - world.getIncrements()*percept.getMinMaxDistance()*getLenght());
+			}
+			else {
+				this.setEnd(end - world.getIncrements()*percept.getMinMaxDistance());
+			}
+			
+		}
 
 
 	}
 
 	/**
-	 * Adapt min using AVT.
+	 * Adapt start using AVT.
 	 *
 	 * @param c the c
 	 * @param oracleValue the oracle value
 	 */
-	private void adaptMinUsingAVT(Context c, double oracleValue) {
+	private void adaptStartUsingAVT(Context c, double oracleValue) {
 
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptStartUsingAVT");
+		
+		
 		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			if (AVT_lastFeedbackMin == 1) {
-				AVT_deltaMin *= AVT_deceleration;
+			System.out.print( "\tContained : True" );
+			if (AVT_lastFeedbackStart == 1) {
+				AVT_deltaStart *= AVT_deceleration;
+				System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			} else {
-				AVT_deltaMin *= AVT_acceleration;
+				AVT_deltaStart *= AVT_acceleration;
+				System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			}
-			this.setStart(start + AVT_deltaMin);
+			this.setStart(start + AVT_deltaStart);
 
-			AVT_lastFeedbackMin = -1;
+			System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+			AVT_lastFeedbackStart = -1;
+			System.out.print("\t" + AVT_lastFeedbackStart + "\n");
 
 		} else {
 
-			if (AVT_lastFeedbackMin == 1) {
-				AVT_deltaMin *= AVT_acceleration;
+			System.out.print( "\tContained : False" );
+			if (AVT_lastFeedbackStart == 1) {
+				AVT_deltaStart *= AVT_acceleration;
+				System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			} else {
-				AVT_deltaMin *= AVT_deceleration;
+				AVT_deltaStart *= AVT_deceleration;
+				System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			}
-			this.setStart(start - AVT_deltaMin);
+			this.setStart(start - AVT_deltaStart);
 
-			AVT_lastFeedbackMin = 1;
+			System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+			AVT_lastFeedbackStart = 1;
+			System.out.print("\t" + AVT_lastFeedbackStart + "\n");
 		}		
 
 	}
 	
-	private void adaptStart(Context c, double oracleValue) {
+	private void adaptStart(double oracleValue) {
 
 		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			this.setStart(start - (world.getContextGrowingPercent()*2*this.getRadius()));
+			//this.setStart(start - (world.getContextGrowingPercent()*2*this.getRadius()));
+			if(world.getScheduler().getTick()>world.tickThreshol) {
+				this.setStart(start - world.getIncrements()*percept.getMinMaxDistance()*getLenght());
+			}
+			else {
+				this.setStart(start - world.getIncrements()*percept.getMinMaxDistance());
+			}
+			
 
-		}		
+		}else {
+			if(world.getScheduler().getTick()>world.tickThreshol) {
+				this.setStart(start + world.getIncrements()*percept.getMinMaxDistance()*getLenght());
+			}
+			else {
+				this.setStart(start + world.getIncrements()*percept.getMinMaxDistance());
+			}
+			
+		}
+			
 
 	}
 	
 	/**
-	 * Simulate negative AVT feedback min.
+	 * Simulate negative AVT feedback start.
 	 *
 	 * @param oracleValue the oracle value
 	 * @return the double
 	 */
-	public double simulateNegativeAVTFeedbackMin(double oracleValue) {
+	public double simulateNegativeAVTFeedbackStart(double oracleValue) {
 		
-		if (AVT_lastFeedbackMin == 1) {
-			return start + (AVT_deltaMin * AVT_deceleration);
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
+		if (AVT_lastFeedbackStart == 1) {
+			System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_deceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			return start + (AVT_deltaStart * AVT_deceleration);
 		} else {
-			return start + (AVT_deltaMin * AVT_acceleration);
+			System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_acceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			return start + (AVT_deltaStart * AVT_acceleration);
 		}
 
 	}
 	
 	/**
-	 * Simulate negative AVT feedback max.
+	 * Simulate negative AVT feedback End.
 	 *
 	 * @param oracleValue the oracle value
 	 * @return the double
 	 */
-	public double simulateNegativeAVTFeedbackMax(double oracleValue) {
+	public double simulateNegativeAVTFeedbackEnd(double oracleValue) {
 		
-		if (AVT_lastFeedbackMax == 1) {
-			return end - (AVT_deltaMax * AVT_deceleration);
+		System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
+		if (AVT_lastFeedbackEnd == 1) {
+			System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_deceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			return end - (AVT_deltaEnd * AVT_deceleration);
 		} else {
-			return end - (AVT_deltaMax * AVT_acceleration);
+			System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_acceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			return end - (AVT_deltaEnd * AVT_acceleration);
 		}
 
 	}
@@ -430,8 +528,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	public String toString() {
 		return ((start_inclu ? "[" : "]") + start + "," + end
 				+ (!end_inclu ? "[" : "]") + "  Current value : " + percept.getValue()
-				+ "  AVT_MIN : " + AVT_deltaMin
-				+ "  AVT_MAX : " + AVT_deltaMax );
+				+ "  AVT_Start : " + AVT_deltaStart
+				+ "  AVT_End : " + AVT_deltaEnd );
 	}
 
 	/**
@@ -455,14 +553,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 	/**
 	 * Gets the AV twill to reduce.
 	 *
-	 * @param max the max
+	 * @param End the End
 	 * @return the AV twill to reduce
 	 */
-	public double getAVTwillToReduce(boolean max) {
-		if (max) {
-			return this.AVT_lastFeedbackMax * this.AVT_deltaMax;
+	public double getAVTwillToReduce(boolean End) {
+		if (End) {
+			return this.AVT_lastFeedbackEnd * this.AVT_deltaEnd;
 		} else {
-			return this.AVT_lastFeedbackMin * this.AVT_deltaMin;
+			return this.AVT_lastFeedbackStart * this.AVT_deltaStart;
 		}	 
 	}
 	
@@ -477,17 +575,66 @@ public class Range implements Serializable, Comparable, Cloneable {
 			this.context.die();
 		} else {
 			if (Math.abs(r.getStart() - this.getEnd()) > Math.abs(r.getEnd() - this.getStart())) {
-				//Change min
+				//Change start
+//				AVT_deltaStart = Math.abs(r.getEnd()-getStart());
+//				AVT_lastFeedbackStart = 1;
 				this.setStart(r.getEnd());
 				this.setStart_inclu(!r.isEnd_inclu());
 				
 			} else {
-				//Change max
+				//Change End
+//				AVT_deltaEnd = Math.abs(r.getStart()-getEnd());
+//				AVT_lastFeedbackEnd = 1;
 				this.setEnd( r.getStart());
 				this.setEnd_inclu(!r.isStart_inclu());
 			}
 		}
 
+	}
+	
+	public void adaptTowardsBorder(Context bestContext) {
+		
+		System.out.println("Adapt towards border " + percept.getName());
+		
+		Range bestContextRanges = bestContext.getRanges().get(percept);
+		
+		if (bestContextRanges.getStart() <= this.start &&  this.end <= bestContextRanges.getEnd() ) {
+			
+			System.out.println(context.getName() + " DIES");
+			this.context.die();
+			
+		} else {
+			
+			if (Math.abs(bestContextRanges.getStart() - this.getEnd()) >= Math.abs(bestContextRanges.getEnd() - this.getStart())) {
+		
+				adaptOnOverlap(bestContextRanges, bestContextRanges.getEnd());
+			} else {
+				adaptOnOverlap(bestContextRanges, bestContextRanges.getStart());
+			}
+		}
+
+	}
+	
+	
+	private void adaptOnOverlap(Range bestContextRanges, double border) {
+		
+		if(overlapDistance(bestContextRanges) > nonOverlapDistance(bestContextRanges)) {
+			
+			if (Math.abs(end - border) > Math.abs(border - start)) {
+				adaptEnd(border);
+			} else {
+				adaptStart(border);
+			}
+			
+		}
+		else {
+			if (Math.abs(end - border) < Math.abs(border - start)) {
+				adaptEnd(border);
+			} else {
+				adaptStart(border);
+			}
+		}
+		
 	}
 
 	/**
@@ -627,10 +774,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * Gets the nearest limit.
 	 *
 	 * @param d the d
-	 * @return max is true, min is false
+	 * @return End is true, start is false
 	 */
 	public boolean getNearestLimit(double d) {
-		return (d - start < end - d) ? false : true;
+		return (Math.abs(d - start) < Math.abs(end - d)) ? false : true;
 	}
 
 	/**
@@ -700,7 +847,15 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	private void setStart(double newStartValue) {
+		if(context !=null && percept !=null) {
+			System.out.println(context.getName() + " " + percept.getName() + " START " + (Math.abs(newStartValue-this.start)));
+		}
 		this.start = newStartValue;
+		if(world != null) {
+			lastStartTickModification = world.getScheduler().getTick();
+		}
+		
+
 		if(this.context != null) {
 			this.percept.updateContextProjectionStart(this.context);
 			this.percept.updateSortedRanges(this.context, "start");
@@ -710,7 +865,17 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	private void setEnd(double newEndValue) {
+		if(context !=null && percept !=null ) {
+			System.out.println(context.getName() + " " + percept.getName() + " END " + (Math.abs(newEndValue-this.end)));
+		}
+		
 		this.end = newEndValue;
+
+		if(world != null) {
+			lastEndTickModification = world.getScheduler().getTick();
+		}
+		
+
 		if(this.context != null) {
 			this.percept.updateContextProjectionEnd(this.context);
 			this.percept.updateSortedRanges(this.context, "end");
@@ -729,5 +894,43 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public double getRadius() {
 		return (end - start)/2;
+	}
+	
+	public int getLastStartTickModification() {
+		return lastStartTickModification;
+	}
+	
+	public int getLastEndTickModification() {
+		return lastEndTickModification;
+	}
+	
+	private double distance(Range otherRange) {
+		return Math.abs(this.getCenter() - otherRange.getCenter()) - this.getRadius() - otherRange.getRadius();
+	}
+	
+	private double overlapDistance(Range otherRange) {
+		
+		double distanceBetweenRanges = distance(otherRange);
+		if (distanceBetweenRanges<0) {
+			return Math.abs(distanceBetweenRanges);
+		}
+		else {
+			return 0.0;
+		}
+	}
+	
+	private double nonOverlapDistance(Range otherRange) {
+		return this.getLenght() - overlapDistance(otherRange);
+	}
+	
+	private double voidDistance(Range otherRange) {
+		
+		double distanceBetweenRanges = distance(otherRange);
+		if (distanceBetweenRanges>0) {
+			return distanceBetweenRanges;
+		}
+		else {
+			return 0.0;
+		}
 	}
 }
