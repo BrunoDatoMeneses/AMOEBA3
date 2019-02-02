@@ -347,7 +347,7 @@ public class AMOEBA extends Amas<World> {
 	 */
 	//TODO same for percept
 	public Percept getPerceptByName(String name) {
-		for (Agent a : percepts) {
+		for (AmoebaAgent a : percepts) {
 			if (a.getName().equals(name)) return (Percept) a;
 		}
 		return null;
@@ -376,7 +376,7 @@ public class AMOEBA extends Amas<World> {
 	 *
 	 * @return the contexts
 	 */
-	public ArrayList<Agent> getContexts() {
+	public ArrayList<AmoebaAgent> getContexts() {
 		return contexts;
 	}
 	
@@ -388,7 +388,7 @@ public class AMOEBA extends Amas<World> {
 	//TODO same for context
 	public ArrayList<Context> getContextsAsContext() {
 		ArrayList<Context>  c = new ArrayList<Context>();
-		for (Agent a : contexts) {
+		for (AmoebaAgent a : contexts) {
 			c.add((Context)a);
 		}
 		return c;
@@ -399,12 +399,12 @@ public class AMOEBA extends Amas<World> {
 	 *
 	 * @param contexts the new contexts
 	 */
-	public void setContexts(ArrayList<Agent> contexts) {
+	public void setContexts(ArrayList<AmoebaAgent> contexts) {
 		this.contexts = contexts;
 	}
 	
 	public Context getContextByName(String name) {
-		for(Agent agt: contexts) {
+		for(AmoebaAgent agt: contexts) {
 			if(agt.getName().equals(name)) {
 				return (Context)agt;
 			}
@@ -429,7 +429,7 @@ public class AMOEBA extends Amas<World> {
 	 */
 	public void changeOracleConection() {
 		useOracle = !useOracle ;
-		for (Agent agent : heads) {
+		for (AmoebaAgent agent : heads) {
 			((Head) agent).changeOracleConnection();
 		}		
 	}
