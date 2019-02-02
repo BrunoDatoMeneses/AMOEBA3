@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-import agents.Agent;
 import agents.head.Head;
+import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.localModel.TypeLocalModel;
 import agents.percept.Percept;
@@ -14,9 +14,9 @@ import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
 
 public class AMOEBA extends Amas<World> {
-	private ArrayList<Agent> agents = new ArrayList<Agent>();
-	private ArrayList<Agent> heads = new ArrayList<Agent>();
-	private ArrayList<Agent> contexts = new ArrayList<Agent>();
+	private ArrayList<AmoebaAgent> agents = new ArrayList<AmoebaAgent>();
+	private ArrayList<AmoebaAgent> heads = new ArrayList<AmoebaAgent>();
+	private ArrayList<AmoebaAgent> contexts = new ArrayList<AmoebaAgent>();
 	private ArrayList<Percept> percepts = new ArrayList<Percept>();
 	
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
