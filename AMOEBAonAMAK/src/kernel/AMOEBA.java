@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import agents.head.Head;
 import agents.AmoebaAgent;
 import agents.context.Context;
-import agents.localModel.TypeLocalModel;
+import agents.context.localModel.TypeLocalModel;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
@@ -81,53 +81,6 @@ public class AMOEBA extends Amas<World> {
 	public void setLocalModel(TypeLocalModel model) {
 		localModel=model;
 	}
-		
-	/**
-	 * Start.
-	 *
-	 * @param running the running
-	 */
-	public void start(boolean running) {
-		//scheduler.start(running);
-		this.running = running;
-		super.start();
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
-	public void run() {
-		System.out.println("starting run");
-		while(true){
-			
-			if (!running) {
-			    try {
-			        Thread.sleep(0);
-			    } catch (InterruptedException ignore) {
-			    }
-			}
-			
-			while (running) {
-
-				//scheduler.run();//TODO
-				if (studiedSystem != null) {
-					if (isUseOracle()) {
-						studiedSystem.playOneStep(Double.NaN);
-					} else {
-				//		System.out.println(scheduler.getAction());
-						studiedSystem.playOneStep(getAction());
-					}
-				}
-				
-				if (playOneStep) {
-					setRunning(false);
-					playOneStep = false;
-				}
-				
-			}
-			
-		}
-	}
 	
 	/**
 	 * Learn.
@@ -136,11 +89,8 @@ public class AMOEBA extends Amas<World> {
 	 */
 	public void learn(HashMap<String, Double> perceptionsActionState) {
 		setPerceptionsAndActionState(perceptionsActionState);
-		//updateOutputAgentsValues(perceptionsActionState);//TODO
-		//scheduler.run(); 
+		scheduler.run(); 
 	}
-	
-	
 	
 	/**
 	 * Request.
@@ -150,168 +100,46 @@ public class AMOEBA extends Amas<World> {
 	 */
 	public double request(HashMap<String, Double> perceptionsActionState) {
 		if(isUseOracle()) changeOracleConection();
-		//updateOutputAgentsValues(actions);//TODO
 		setPerceptionsAndActionState(perceptionsActionState);
 		//scheduler.run();//TODO Maybe use to play agent => see in amak
 		changeOracleConection();
 		return getAction();
 	}
 	
-	public double request2(HashMap<String, Double> perceptionsActionState) {
-		if(isUseOracle()) changeOracleConection();
-		//updateOutputAgentsValues(actions);//TODO
-		setPerceptionsAndActionState(perceptionsActionState);
-		//scheduler.run();//TODO//Maybe use to play agent => see in amak
-		changeOracleConection();
-		return getAction();
-	}
-	
 	//Part scheduler TODO => see utility
-	
-	
-	/**
-	 * Gets the scheduler.
-	 *
-	 * @return the scheduler
-	 */
-	/*public Scheduler getScheduler() {
-		return scheduler;
-	}*/
-	
-	
+	//getScheduler
+	//setScheduler
 
-	/**
-	 * Sets the scheduler.
-	 *
-	 * @param scheduler the new scheduler
-	 */
-	//TODO
-	/*public void setScheduler(Scheduler scheduler) {
-		this.scheduler = scheduler;
-//			HashMap<String, BlackBoxAgent> outputList = scheduler.getWorld().getBlackbox().getBlackBoxAgents();
-//			for (String s : outputList.keySet()) {
-//				perceptionsAndActionState.put(outputList.get(s).getName(), (Output) outputList.get(s));
-//				System.out.println("Name : " + outputList.get(s).getName());
-//			}
-		
-	}*/
-	
-	
+	//isRunning used by visualization, removed (for now)
 
-	/**
-	 * Checks if is running.
-	 *
-	 * @return true, if is running
-	 */
-	public boolean isRunning() {
-		return running;
-	}
+	//setRunning used by visualization, removed (for now)
+	
+	//playOneStep used by visualization, removed (for now)
 
-	/**
-	 * Sets the running.
-	 *
-	 * @param running the new running
-	 */
-	public void setRunning(boolean running) {
-		this.running = running;
-		//scheduler.setRunning(running);//TODO see in amak
-	}
+	//changeControl used by visualization, removed (for now)
 	
-	/**
-	 * Play one step.
-	 */
-	public void playOneStep() {
-		setRunning(true);
-		playOneStep = true;
-	}
-
-	/**
-	 * Change control.
-	 */
-	public void changeControl() {
-		System.out.println("switch control mode to " + !controlMode);
-		controlMode = !controlMode;
-		studiedSystem.switchControlMode();
-	}
-	
-	
-	
-	/**
-	 * Gets the all valid context but.
-	 *
-	 * @param values the values
-	 * @param s the s
-	 * @return the all valid context but
-	 *///TODO world into function => see in amak
-	/*public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values, String s) {
-		ArrayList<ArrayList<Context>> contextsList = new ArrayList<ArrayList<Context>>();
-		ArrayList<Percept> percepts = scheduler.getVariables();
-		for (Percept p : percepts) {
-			if (!p.getSensor().getName().equals(s)) {
-				contextsList.add(p.getContextIncluding(values.get(p.getSensor().getName())));
-			}
-		}
-		return World.getIntersection(contextsList);
-	}*/
-	
-	/**
-	 * Gets the studied system.
-	 *
-	 * @return the studied system
-	 *///TODO same as before
-	/*public ArrayList<Context> getAllValidContextBut(HashMap<String, Double> values) {
-		ArrayList<ArrayList<Context>> contextsList = new ArrayList<ArrayList<Context>>();
-		ArrayList<Percept> percepts = scheduler.getVariables();
-		for (Percept p : percepts) {
-			contextsList.add(p.getContextIncluding(values.get(p.getSensor().getName())));
-		}
-		return World.getIntersection(contextsList);
-	}*/
-	
+	//TODO check usefulness in amak
 	public StudiedSystem getStudiedSystem() {
 		return studiedSystem;
 	}
 
-	/**
-	 * Sets the studied system.
-	 *
-	 * @param studiedSystem the new studied system
-	 */
-	public void setStudiedSystem(StudiedSystem studiedSystem) {
-		this.studiedSystem = studiedSystem;
-	}
+	//setStudiedSystem never used -> removed
 	
 	
 	//TODO see world interaction
-	/**
-	 * Sets the AV T acceleration.
-	 *
-	 * @param aVT_acceleration the new AV T acceleration
-	 */
 	/*public void setAVT_acceleration(double aVT_acceleration) {
 		scheduler.getWorld().setAVT_acceleration(aVT_acceleration);
 	}*/
 
-	/**
-	 * Sets the AV T deceleration.
-	 *
-	 * @param aVT_deceleration the new AV T deceleration
-	 */
 	/*public void setAVT_deceleration(double aVT_deceleration) {
 		scheduler.getWorld().setAVT_deceleration(aVT_deceleration);
 	}*/
 
-	/**
-	 * Sets the AV T percent at start.
-	 *
-	 * @param aVT_percentAtStart the new AV T percent at start
-	 */
 	/*
 	public void setAVT_percentAtStart(double aVT_percentAtStart) {
 		scheduler.getWorld().setAVT_percentAtStart(aVT_percentAtStart);
 	}*/
 	
-	//TODO add functions in head
 	public double getAveragePredictionCriticity() {
 		return getHeadAgent().getAveragePredictionCriticity();
 	}
@@ -325,7 +153,6 @@ public class AMOEBA extends Amas<World> {
 	 *
 	 * @return the action
 	 */
-	//TODO Manage with many controller
 	public double getAction() {
 		return ((Head) heads.get(0)).getAction();
 	}
