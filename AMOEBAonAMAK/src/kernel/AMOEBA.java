@@ -2,45 +2,36 @@ package kernel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.JFrame;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import agents.head.Head;
-import agents.AmoebaAgent;
-import agents.context.Context;
 import agents.context.localModel.TypeLocalModel;
+import agents.head.Head;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
-import mas.agents.context.Range;
 
 public class AMOEBA extends Amas<World> {
 	
 	private Head head;
 	
+	//TODO use strategy instead
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	
 	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
-	private ArrayList<Context> lastModifiedContext = new ArrayList<Context>();
 
 	private StudiedSystem studiedSystem;
 	
-	private boolean running = false;
-	private boolean playOneStep = false;
-	private boolean controlMode = false;
 	private boolean useOracle = true;
 	
 	// Imported from World -----------
-	private HashMap<String,Integer> numberOfAgents = new HashMap<String,Integer>();
 	private boolean creationOfNewContext;
 	private boolean loadPresetContext;
+	public int testValue = 0;
 	//--------------------------------
 	
 	private File ressourceFile;
@@ -91,13 +82,12 @@ public class AMOEBA extends Amas<World> {
 		getHeadAgent().setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
 	
-	/**
-	 * Sets the local model.
-	 *
-	 * @param model the new local model
-	 */
 	public void setLocalModel(TypeLocalModel model) {
 		localModel=model;
+	}
+	
+	public TypeLocalModel getLocalModel() {
+		return localModel;
 	}
 	
 	/**
@@ -107,7 +97,7 @@ public class AMOEBA extends Amas<World> {
 	 */
 	public void learn(HashMap<String, Double> perceptionsActionState) {
 		setPerceptionsAndActionState(perceptionsActionState);
-		scheduler.run(); 
+		getScheduler().step();
 	}
 	
 	/**
@@ -117,16 +107,12 @@ public class AMOEBA extends Amas<World> {
 	 * @return the double
 	 */
 	public double request(HashMap<String, Double> perceptionsActionState) {
-		if(isUseOracle()) head.changeOracleConection();
+		if(isUseOracle()) head.changeOracleConnection();
 		setPerceptionsAndActionState(perceptionsActionState);
-		scheduler.run();
-		head.changeOracleConection();
+		getScheduler().step();
+		head.changeOracleConnection();
 		return getAction();
 	}
-	
-	//Part scheduler TODO => see utility
-	//getScheduler
-	//setScheduler
 
 	//isRunning used by visualization, removed (for now)
 
@@ -153,15 +139,6 @@ public class AMOEBA extends Amas<World> {
 	
 	public Head getHeadAgent() {
 		return head;
-	}
-
-	public Context getContextByName(String name) {
-		for(AmoebaAgent agt: contexts) {
-			if(agt.getName().equals(name)) {
-				return (Context)agt;
-			}
-		}
-		return null;
 	}
 	
 	public boolean isUseOracle() {
@@ -239,7 +216,7 @@ public class AMOEBA extends Amas<World> {
 				    }
 				    action = Double.parseDouble(element.getAttributeValue("Action"));
 			    	
-				   Head c = ((Head) agents.get(element.getAttributeValue("Controller")));
+				   Head c = head;
 				    
 				   createPresetContext(start,end,n,new int[0],0,action,c,percepts);
 			    }
@@ -251,36 +228,11 @@ public class AMOEBA extends Amas<World> {
 	}
 	
 	private void createPresetContext(double[] start, double[] end, int[] n, int[] pos, int iteration, double action, Head controller, String[] percepts) {
-		for (int i = 0 ; i < pos.length ; i++) {
-			System.out.print("  " + pos[i]) ;
-		}		
-		
-		int[] newpos = new int[pos.length+1];
-		
-		for (int i = 0 ; i < pos.length ; i++) {
-			newpos[i] = pos[i];
-		}
-		newpos[pos.length] = 0;
-		
-		for (int i = 0 ; i < n[iteration] ; i++) {
-			if (iteration < n.length - 1) {
-				createPresetContext(start, end,n, newpos, iteration+1,action,controller, percepts);
-				newpos[pos.length]++;
-			}
-			else
-			{
-				newpos[pos.length]++;
-				HashMap<Percept,Range> ranges = new HashMap<Percept,Range>();
-				
-				
-				for(int j = 0 ; j < start.length ; j++) {
-					double pas = (end[j]-start[j])/n[j];
-					Range r = new Range(null, start[j] + (pas * newpos[j]), start[j] + (pas * (newpos[j] + 1)), 0, true, true, (Percept) agents.get(percepts[j]));
-					ranges.put((Percept) agents.get(percepts[j]), r);
-					
-				}
-			}
-		}
+		/*TODO Hugo says : There was some code here without impact, there was a comment saying "broken by criterion".
+		 * I was not able to fix it, so I put an error message.
+		 * If you need this, please check the original project (AMOEBA3)
+		 */
+		System.err.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import agents.AmoebaAgent;
 import agents.AmoebaMessage;
-import agents.MessageType;
 import agents.context.Context;
 import kernel.AMOEBA;
 
@@ -19,8 +18,8 @@ public class Percept extends AmoebaAgent {
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
 	
-	private double oldValue;
 	private double value;
+	private boolean isEnum = false;
 	
 	public Percept(AMOEBA amas) {
 		super(amas);
@@ -30,8 +29,7 @@ public class Percept extends AmoebaAgent {
 	
 	@Override
 	protected void onAct() { //play
-		oldValue = value;
-		value = 0; //TODO getPerceptionsOrAction(this.name) in world or in scheduler ?
+		value = amas.getPerceptionsOrAction(name);
 		ajustMinMax();
 		computeContextProjectionValidity();
 	}
@@ -69,7 +67,7 @@ public class Percept extends AmoebaAgent {
 	
 	@Override
 	public void computeAMessage(AmoebaMessage m) {
-		//TODO the original code has no use, I don't know what it was supposed to do
+		//TODO Hugo say : the original code has no use, I don't know what it was supposed to do
 		// We may want to add things here in the future.
 	}
 	
@@ -110,9 +108,23 @@ public class Percept extends AmoebaAgent {
 	
 	//setOldValue never used -> removed
 	
-	//isEnum use isEnum (a class variable), which is never updated -> removed
-	
-	//setEnum nerver used -> removed
+	/**
+	 * Checks if is enum.
+	 *
+	 * @return true, if is enum
+	 */
+	public boolean isEnum() {
+		return isEnum;
+	}
+
+	/**
+	 * Sets the enum.
+	 *
+	 * @param isEnum the new enum
+	 */
+	public void setEnum(boolean isEnum) {
+		this.isEnum = isEnum;
+	}
 	
 	//swapListElements never used -> removed
 	

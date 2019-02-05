@@ -58,7 +58,6 @@ public class Context extends AmoebaAgent {
 			double length = Math.abs(v.getMinMaxDistance()) / 4.0;
 			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v);
 			ranges.put(v, r);
-			ranges.get(v).setValue(v.getValue());
 			sendExpressMessage(null, MessageType.REGISTER, v); //TODO check if amak support express message
 			firstPoint.addDimension(v, v.getValue());
 			

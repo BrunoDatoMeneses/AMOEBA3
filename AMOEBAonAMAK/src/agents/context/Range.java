@@ -2,7 +2,6 @@ package agents.context;
 
 import agents.percept.Percept;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Range.
  */
@@ -20,21 +19,6 @@ public class Range implements Comparable, Cloneable {
 	/** The end inclu. */
 	private boolean end_inclu;
 
-	/** The value. */
-	private double value;
-	
-	/** The alpha factor. */
-	private double alphaFactor; 
- /** The Constant minLenghtRatio. */
- /*
-								 * The weight in an interpolation : the impact
-								 * on action for a +1 change in this range value
-								 */
-	private final static double minLenghtRatio = 0;
-
-	/** The old value. */
-	private double oldValue;
-	
 	/** The context. */
 	private Context context;
 	
@@ -102,9 +86,9 @@ public class Range implements Comparable, Cloneable {
 			boolean end_inclu, Percept p) {
 		super();
 		
-		AVT_deceleration = context.getWorld().getAVT_deceleration();
-		AVT_acceleration = context.getWorld().getAVT_acceleration();
-		AVT_startRatio = context.getWorld().getAVT_percentAtStart();
+		AVT_deceleration = context.getAmas().getEnvironment().getAVT_deceleration();
+		AVT_acceleration = context.getAmas().getEnvironment().getAVT_acceleration();
+		AVT_startRatio = context.getAmas().getEnvironment().getAVT_percentAtStart();
 
 		this.percept = p;
 		if (isPerceptEnum()) {
@@ -129,52 +113,7 @@ public class Range implements Comparable, Cloneable {
 
 	}
 	
-	/**
-	 * Instantiates a new range.
-	 *
-	 * @param r the r
-	 */
-	public Range(Range r) {
-		super();
-		this.setStart( r.start);
-		this.setEnd( r.end);
-		this.start_inclu = r.start_inclu;
-		this.end_inclu = r.end_inclu;
-		this.value = r.value;
-		this.alphaFactor = r.alphaFactor;
-		this.oldValue = r.oldValue;
-		this.context = r.context;
-		this.percept = new Percept(r.percept);
-		this.id = r.id;
-		this.AVT_acceleration = r.AVT_acceleration;
-		this.AVT_deceleration = r.AVT_deceleration;
-		this.AVT_deltaMax = r.AVT_deltaMax;
-		this.AVT_deltaMin = r.AVT_deltaMin;
-		this.AVT_lastFeedbackMax = r.AVT_lastFeedbackMax;
-		this.AVT_lastFeedbackMin = r.AVT_lastFeedbackMin;
-		
-	}
-
-
-	/**
-	 * Extends the range to the specified target value.
-	 *
-	 * @param target : value to be included
-	 * @param p the p
-	 * @return true if the context was extended, false else.
-	 */
-	private boolean extend(double target, Percept p) {
-		int c = contains(target);
-		if (c == -1) {
-			this.setStart(target);
-			return true;
-		} else if (c == 1) {
-			this.setEnd(target);
-			return true;
-		} else {
-			return false;
-		}
-	}
+	//TODO copy constructor
 
 	/**
 	 * Method called by the context agent. Allow the range to adapt itself.
@@ -362,24 +301,6 @@ public class Range implements Comparable, Cloneable {
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
 	}
 
-	/**
-	 * Gets the old value.
-	 *
-	 * @return the old value
-	 */
-	public double getOldValue() {
-		return oldValue;
-	}
-
-	/**
-	 * Sets the old value.
-	 *
-	 * @param oldValue the new old value
-	 */
-	public void setOldValue(double oldValue) {
-		this.oldValue = oldValue;
-	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -397,15 +318,6 @@ public class Range implements Comparable, Cloneable {
 	 */
 	public Context getContext() {
 		return context;
-	}
-
-	/**
-	 * Sets the context.
-	 *
-	 * @param context the new context
-	 */
-	public void setContext(Context context) {
-		this.context = context;
 	}
 	
 	/**
@@ -461,52 +373,6 @@ public class Range implements Comparable, Cloneable {
 			return 1;
 		}
 	}
-	
-	
-
-	/**
-	 * Compare to.
-	 *
-	 * @param i the i
-	 * @return the int
-	 */
-	public int compareTo(Range i) {
-		// TODO
-
-		if (i.getStart() > this.getStart())
-			return -1;
-		if (i.getStart() < this.getStart())
-			return 1;
-		if (i.getStart() == this.getStart()) {
-			if (i.isStart_inclu() == this.isStart_inclu()) {
-				return 0;
-			} else if (i.isStart_inclu()) {
-				return 1;
-			} else {
-				return -1;
-			}
-		}
-		return 0;
-
-	}
-
-	/**
-	 * Gets the alpha factor.
-	 *
-	 * @return the alpha factor
-	 */
-	public double getAlphaFactor() {
-		return alphaFactor;
-	}
-
-	/**
-	 * Sets the alpha factor.
-	 *
-	 * @param alphaFactor the new alpha factor
-	 */
-	public void setAlphaFactor(double alphaFactor) {
-		this.alphaFactor = alphaFactor;
-	}
 
 	/**
 	 * Checks if is end inclu.
@@ -552,32 +418,6 @@ public class Range implements Comparable, Cloneable {
 	public double getLenght() {
 		return end - start;
 	}
-
-	/**
-	 * Sets the minimum size.
-	 *
-	 * @param v the new minimum size
-	 */
-	public void setMinimumSize(Percept v) {
-		if (getLenght() < v.getMinMaxDistance() * Range.minLenghtRatio) {
-			double distanceToAdd = (v.getMinMaxDistance() * Range.minLenghtRatio)
-					- getLenght();
-			this.setStart(start - (distanceToAdd / 2.0));
-			this.setEnd(end + (distanceToAdd / 2.0));
-		}
-	}
-
-	/**
-	 * Add a margin based on a percentage of the lenght of the range.
-	 *
-	 * @param percent : percentage of the length
-	 */
-	private void addMargin(double percent) {
-		this.setStart(start - (this.getLenght() * percent));
-		this.setEnd(end + (this.getLenght() * percent));
-	}
-
-	
 	
 	/**
 	 * Gets the nearest limit.
@@ -606,37 +446,6 @@ public class Range implements Comparable, Cloneable {
 	public double getEnd() {
 		return end;
 	}
-	
-	public double getRange(String rangeType) {
-		if(rangeType.equals("start")) {
-			return start;
-		}
-		else if(rangeType.equals("end")) {
-			return end;
-		}
-		else {
-			return 0d;
-		}
-	}
-
-	/**
-	 * Gets the value.
-	 *
-	 * @return the value
-	 */
-	public double getValue() {
-		return value;
-	}
-
-	/**
-	 * Sets the value.
-	 *
-	 * @param value the new value
-	 */
-	public void setValue(double value) {
-		this.oldValue = this.value;
-		this.value = value;
-	}
 
 	/**
 	 * Checks if is percept enum.
@@ -659,7 +468,6 @@ public class Range implements Comparable, Cloneable {
 		this.start = newStartValue;
 		if(this.context != null) {
 			this.percept.updateContextProjectionStart(this.context);
-			context.getWorld().getScheduler().addLastmodifiedContext(context);
 		}
 		
 	}
@@ -667,21 +475,11 @@ public class Range implements Comparable, Cloneable {
 	private void setEnd(double newEndValue) {
 		this.end = newEndValue;
 		if(this.context != null) {
-			this.percept.updateContextProjectionEnd(this.context);
-			context.getWorld().getScheduler().addLastmodifiedContext(context);
-			
+			this.percept.updateContextProjectionEnd(this.context);			
 		}
 	}
 
 	public Range clone() throws CloneNotSupportedException{
 		return (Range)super.clone();
-	}
-	
-	public double getCenter() {
-		return (end + start)/2;
-	}
-	
-	public double getRadius() {
-		return (end - start)/2;
 	}
 }
