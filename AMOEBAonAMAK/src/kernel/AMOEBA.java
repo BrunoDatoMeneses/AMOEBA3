@@ -1,9 +1,16 @@
 package kernel;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import agents.head.Head;
 import agents.AmoebaAgent;
@@ -12,12 +19,11 @@ import agents.context.localModel.TypeLocalModel;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
+import mas.agents.context.Range;
 
 public class AMOEBA extends Amas<World> {
-	private ArrayList<AmoebaAgent> agents = new ArrayList<AmoebaAgent>();
-	private ArrayList<AmoebaAgent> heads = new ArrayList<AmoebaAgent>();
-	private ArrayList<AmoebaAgent> contexts = new ArrayList<AmoebaAgent>();
-	private ArrayList<Percept> percepts = new ArrayList<Percept>();
+	
+	private Head head;
 	
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	
@@ -31,7 +37,13 @@ public class AMOEBA extends Amas<World> {
 	private boolean controlMode = false;
 	private boolean useOracle = true;
 	
+	// Imported from World -----------
+	private HashMap<String,Integer> numberOfAgents = new HashMap<String,Integer>();
+	private boolean creationOfNewContext;
+	private boolean loadPresetContext;
+	//--------------------------------
 	
+	private File ressourceFile;
 	
 
 	/**
@@ -40,9 +52,15 @@ public class AMOEBA extends Amas<World> {
 	 * @param studiedSystem the studied system
 	 */
 	/* Create an AMOEBA coupled with a studied system */
-	public AMOEBA(StudiedSystem studiedSystem, World environment) {
+	public AMOEBA(StudiedSystem studiedSystem, World environment, File ressourceFile) {
 		super(environment, Scheduling.DEFAULT);
 		this.studiedSystem = studiedSystem;
+		this.ressourceFile = ressourceFile;
+	}
+	
+	@Override
+	protected void onInitialAgentsCreation() {
+		readRessourceFile(ressourceFile);
 	}
 	
 	/**
@@ -99,10 +117,10 @@ public class AMOEBA extends Amas<World> {
 	 * @return the double
 	 */
 	public double request(HashMap<String, Double> perceptionsActionState) {
-		if(isUseOracle()) changeOracleConection();
+		if(isUseOracle()) head.changeOracleConection();
 		setPerceptionsAndActionState(perceptionsActionState);
-		//scheduler.run();//TODO Maybe use to play agent => see in amak
-		changeOracleConection();
+		scheduler.run();
+		head.changeOracleConection();
 		return getAction();
 	}
 	
@@ -125,111 +143,18 @@ public class AMOEBA extends Amas<World> {
 
 	//setStudiedSystem never used -> removed
 	
-	
-	//TODO see world interaction
-	/*public void setAVT_acceleration(double aVT_acceleration) {
-		scheduler.getWorld().setAVT_acceleration(aVT_acceleration);
-	}*/
-
-	/*public void setAVT_deceleration(double aVT_deceleration) {
-		scheduler.getWorld().setAVT_deceleration(aVT_deceleration);
-	}*/
-
-	/*
-	public void setAVT_percentAtStart(double aVT_percentAtStart) {
-		scheduler.getWorld().setAVT_percentAtStart(aVT_percentAtStart);
-	}*/
-	
 	public double getAveragePredictionCriticity() {
 		return getHeadAgent().getAveragePredictionCriticity();
 	}
 	
-	public double getNumberOfContextAgents() {
-		return getContexts().size();
-	}
-	
-	/**
-	 * Gets the action.
-	 *
-	 * @return the action
-	 */
 	public double getAction() {
-		return ((Head) heads.get(0)).getAction();
+		return head.getAction();
 	}
 	
-	/**
-	 * Gets the head agent.
-	 *
-	 * @return the head agent
-	 */
 	public Head getHeadAgent() {
-		return ((Head) heads.get(0));
+		return head;
 	}
 
-	/**
-	 * Gets the percept by name.
-	 *
-	 * @param name the name
-	 * @return the percept by name
-	 */
-	//TODO same for percept
-	public Percept getPerceptByName(String name) {
-		for (AmoebaAgent a : percepts) {
-			if (a.getName().equals(name)) return (Percept) a;
-		}
-		return null;
-	}
-
-	/**
-	 * Gets the variables.
-	 *
-	 * @return the variables
-	 */
-	public ArrayList<Percept> getPercepts() {
-		return percepts;
-	}
-
-	/**
-	 * Sets the variables.
-	 *
-	 * @param variables the new variables
-	 */
-	public void setPercepts(ArrayList<Percept> percepts) {
-		this.percepts = percepts;
-	}
-
-	/**
-	 * Gets the contexts.
-	 *
-	 * @return the contexts
-	 */
-	public ArrayList<AmoebaAgent> getContexts() {
-		return contexts;
-	}
-	
-	/**
-	 * Gets the contexts as context.
-	 *
-	 * @return the contexts as context
-	 */
-	//TODO same for context
-	public ArrayList<Context> getContextsAsContext() {
-		ArrayList<Context>  c = new ArrayList<Context>();
-		for (AmoebaAgent a : contexts) {
-			c.add((Context)a);
-		}
-		return c;
-	}
-
-	/**
-	 * Sets the contexts.
-	 *
-	 * @param contexts the new contexts
-	 */
-	public void setContexts(ArrayList<AmoebaAgent> contexts) {
-		this.contexts = contexts;
-	}
-	
 	public Context getContextByName(String name) {
 		for(AmoebaAgent agt: contexts) {
 			if(agt.getName().equals(name)) {
@@ -252,13 +177,110 @@ public class AMOEBA extends Amas<World> {
 	}
 	
 	/**
-	 * Change oracle conection.
+	 * Read resource file and generate the AMOEBA described.
+	 *
+	 * @param systemFile the file XML file describing the AMOEBA.
 	 */
-	public void changeOracleConection() {
-		useOracle = !useOracle ;
-		for (AmoebaAgent agent : heads) {
-			((Head) agent).changeOracleConnection();
+	private void readRessourceFile(File systemFile) {
+	      SAXBuilder sxb = new SAXBuilder();
+	      Document document;
+		try {
+			document = sxb.build(systemFile);
+		    Element racine = document.getRootElement();
+		    System.out.println(racine.getName());
+		    
+		    //learning = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("allowed")); never used -> removed
+		    creationOfNewContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
+		    loadPresetContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
+		    
+		    
+		    
+		    // Initialize the sensor agents
+		    for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")){
+		    	Percept s = new Percept(this);
+		    	s.setName(element.getAttributeValue("Name"));	   
+		    }
+
+		    
+		    
+		    //Initialize the controller agents
+		    for (Element element : racine.getChild("StartingAgents").getChildren("Controller")){
+		    	Head a = new Head(this);
+		    	a.setName(element.getAttributeValue("Name"));
+		    	System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
+		    	a.setNoCreation(!creationOfNewContext);
+		    	this.head = a;
+		    }
+
+		    
+		    /*Load preset context if no learning required*/
+			if (loadPresetContext) {
+				
+			    for (Element element : racine.getChild("PresetContexts").getChildren("Context")){
+			    	
+			    	double[] start, end;
+			    	int[] n;
+			    	String[] percepts;
+			    			
+			    	double action;
+			    	start = new double[element.getChildren("Range").size()];
+			    	end = new double[element.getChildren("Range").size()];
+			    	n = new int[element.getChildren("Range").size()];
+			    	percepts = new String[element.getChildren("Range").size()];
+	
+			    	
+			    	int i = 0;
+				    for (Element elem : element.getChildren("Range")){
+				    	start[i] = Double.parseDouble(elem.getAttributeValue("start"));
+				    	end  [i] = Double.parseDouble(elem.getAttributeValue("end"));
+				    	n    [i] = Integer.parseInt(elem.getAttributeValue("n"));
+				    	percepts[i] = elem.getAttributeValue("Name");
+				    	i++;
+				    }
+				    action = Double.parseDouble(element.getAttributeValue("Action"));
+			    	
+				   Head c = ((Head) agents.get(element.getAttributeValue("Controller")));
+				    
+				   createPresetContext(start,end,n,new int[0],0,action,c,percepts);
+			    }
+				
+			}
+		} catch (JDOMException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void createPresetContext(double[] start, double[] end, int[] n, int[] pos, int iteration, double action, Head controller, String[] percepts) {
+		for (int i = 0 ; i < pos.length ; i++) {
+			System.out.print("  " + pos[i]) ;
 		}		
+		
+		int[] newpos = new int[pos.length+1];
+		
+		for (int i = 0 ; i < pos.length ; i++) {
+			newpos[i] = pos[i];
+		}
+		newpos[pos.length] = 0;
+		
+		for (int i = 0 ; i < n[iteration] ; i++) {
+			if (iteration < n.length - 1) {
+				createPresetContext(start, end,n, newpos, iteration+1,action,controller, percepts);
+				newpos[pos.length]++;
+			}
+			else
+			{
+				newpos[pos.length]++;
+				HashMap<Percept,Range> ranges = new HashMap<Percept,Range>();
+				
+				
+				for(int j = 0 ; j < start.length ; j++) {
+					double pas = (end[j]-start[j])/n[j];
+					Range r = new Range(null, start[j] + (pas * newpos[j]), start[j] + (pas * (newpos[j] + 1)), 0, true, true, (Percept) agents.get(percepts[j]));
+					ranges.put((Percept) agents.get(percepts[j]), r);
+					
+				}
+			}
+		}
 	}
 
 }
