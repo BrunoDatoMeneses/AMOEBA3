@@ -9,16 +9,17 @@ import agents.MessageType;
 import agents.context.Context;
 import agents.percept.Percept;
 import kernel.AMOEBA;
+import ncs.NCS;
 
 /**
  * The Class Head.
  */
-public class Head extends AbstractHead {
+public class Head extends AmoebaAgent {
 
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
-	private String functionSelected;
+	// functionSelected value never used -> removed
 
 	HashMap<Percept, Double> currentSituation = new HashMap<>();
 
@@ -26,7 +27,7 @@ public class Head extends AbstractHead {
 
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<>();
 
-	private int nPropositionsReceived;
+	// nPropositionsReceived value never used -> removed
 	// averagePredictionCriticityWeight never used -> removed
 	private int numberOfCriticityValuesForAverage = 100;
 
@@ -56,14 +57,13 @@ public class Head extends AbstractHead {
 	private boolean noCreation = true;
 	private boolean useOracle = true;
 	private boolean firstContext = false;
-	private boolean newContextWasCreated = false;
+	// newContextWasCreated value never used -> removed
 	private boolean contextFromPropositionWasSelected = false;
 
 	Double maxConfidence;
 	Double minConfidence;
 
-	// Endogenous feedback
-	private boolean noBestContext;
+	// noBestContext value never used -> removed
 
 	/**
 	 * Instantiates a new head.
@@ -148,14 +148,13 @@ public class Head extends AbstractHead {
 	 */
 	@Override
 	protected void onAct() { // play
-		for (Percept pct : this.world.getScheduler().getPercepts()) {// TODO what became World ?
+		for (Percept pct : this.amas.getScheduler().getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}
 
-		nPropositionsReceived = activatedContexts.size();
-		newContextWasCreated = false;
+		activatedContexts.size();
 		setContextFromPropositionWasSelected(false);
-		oracleValue = this.getWorld().getScheduler().getPerceptionsOrAction("oracle"); // TODO what became World ?
+		oracleValue = this.amas.getScheduler().getPerceptionsOrAction("oracle");
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -170,7 +169,7 @@ public class Head extends AbstractHead {
 			playWithoutOracle();
 		}
 
-		updateStatisticalInformations(); /// TODO regarder dans le détail, possible que ce soit pas trop utile
+		updateStatisticalInformations();
 
 		newContext = null;
 	}
@@ -197,7 +196,7 @@ public class Head extends AbstractHead {
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
-			functionSelected = bestContext.getFunction().getFormula(bestContext);
+			bestContext.getFunction().getFormula(bestContext);
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 
@@ -215,25 +214,17 @@ public class Head extends AbstractHead {
 	 * Play without oracle.
 	 */
 	private void playWithoutOracle() {
-		// TODO : Is it usefull to print that way?
-		// Config.print("Nombre de contextes activés: " + activatedContexts.size(), 1);
 
 		selectBestContext();
 		if (bestContext != this.lastUsedContext) {
-			noBestContext = false;
 			prediction = bestContext.getActionProposal();
 		} else {
-			noBestContext = true;
-			ArrayList<AmoebaAgent> allContexts = world.getScheduler().getContexts(); // TODO what becomes World?
+			ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
 			Context nearestContext = this.getNearestContext(allContexts);
 			prediction = nearestContext.getActionProposal();
 			bestContext = nearestContext;
 		}
-		// Config.print("Best context selected without oracle is : " +
-		// bestContext.getName(),0);
-		// Config.print("BestContext : " + bestContext.toStringFull() + " " +
-		// bestContext.getConfidence(), 2);
-		functionSelected = bestContext.getFunction().getFormula(bestContext);
+		bestContext.getFunction().getFormula(bestContext);
 		criticity = Math.abs(oracleValue - prediction);
 	}
 
@@ -241,7 +232,7 @@ public class Head extends AbstractHead {
 		/* Finally, head agent check the need for a new context agent */
 
 		boolean newContextCreated = false;
-		ArrayList<AmoebaAgent> allContexts = world.getScheduler().getContexts(); // TODO : What becames World ?
+		ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
 		if (getDistanceToNearestGoodContext(allContexts) > 0) {
 			Context context = createNewContext();
 
@@ -273,7 +264,7 @@ public class Head extends AbstractHead {
 		 * incompetent. It needs help from a context.
 		 */
 		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())) {
-			ArrayList<AmoebaAgent> allContexts = world.getScheduler().getContexts(); // TODO What becames World ?
+			ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
 
 			Context c = getNearestGoodContext(allContexts);
 			if (c != null)
@@ -302,7 +293,7 @@ public class Head extends AbstractHead {
 	}
 
 	private void getNearestContextAsBestContext() {
-		ArrayList<AmoebaAgent> allContexts = world.getScheduler().getContexts(); // TODO What becames world ?
+		ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
 		Context nearestContext = this.getNearestContext(allContexts);
 
 		if (nearestContext != null) {
@@ -386,7 +377,7 @@ public class Head extends AbstractHead {
 	 */
 	private double getExternalDistanceToContext(Context context) {
 		double d = 0.0;
-		ArrayList<Percept> percepts = world.getAllPercept();
+		ArrayList<Percept> percepts = amas.getEnvironment().getAllPercept();
 		for (Percept p : percepts) {
 
 			// isEnum deleted -> see Percept.java (here deletion of an if branch)
@@ -424,16 +415,12 @@ public class Head extends AbstractHead {
 	 * @return the context
 	 */
 	private Context createNewContext() {
-		newContextWasCreated = true;
-		world.raiseNCS(NCS.CREATE_NEW_CONTEXT); // TODO : What becames World ?
+		amas.getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
 		Context context;
 		if (firstContext) {
-			context = new Context(world, this); // TODO : What becames World ?
-
-			// TODO Is it usefull ?
-			// Config.print("new context agent", 3);
+			context = new Context(amas, this);
 		} else {
-			context = new Context(world, this); // TODO : What becames World ?
+			context = new Context(amas, this);
 			firstContext = true;
 		}
 
@@ -492,25 +479,6 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Gets the contexts.
-	 *
-	 * @return the contexts
-	 */
-	public ArrayList<Context> getActivatedContexts() {
-		return activatedContexts;
-	}
-
-	/**
-	 * Sets the contexts.
-	 *
-	 * @param contexts
-	 *            the new contexts
-	 */
-	public void setActivatesContexts(ArrayList<Context> contexts) {
-		this.activatedContexts = contexts;
-	}
-
-	/**
 	 * Select best context.
 	 */
 	private void selectBestContext() {
@@ -542,26 +510,6 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Sets the best context.
-	 *
-	 * @param bestContext
-	 *            the new best context
-	 */
-	public void setBestContext(Context bestContext) {
-		this.bestContext = bestContext;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see agents.head.AbstractHead#getTargets()
-	 */
-	@Override
-	public ArrayList<? extends AmoebaAgent> getTargets() {
-		return activatedContexts;
-	}
-
-	/**
 	 * Gets the criticity.
 	 *
 	 * @return the criticity
@@ -584,50 +532,12 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Sets the criticity.
-	 *
-	 * @param criticity
-	 *            the new criticity
-	 */
-	public void setCriticity(double criticity) {
-		this.criticity = criticity;
-	}
-
-	/**
 	 * Gets the action.
 	 *
 	 * @return the action
 	 */
 	public double getAction() {
 		return prediction;
-	}
-
-	/**
-	 * Sets the action.
-	 *
-	 * @param action
-	 *            the new action
-	 */
-	public void setAction(double action) {
-		this.prediction = action;
-	}
-
-	/**
-	 * Gets the last used context.
-	 *
-	 * @return the last used context
-	 */
-	public Context getLastUsedContext() {
-		return lastUsedContext;
-	}
-
-	/**
-	 * Checks if is no creation.
-	 *
-	 * @return true, if is no creation
-	 */
-	public boolean isNoCreation() {
-		return noCreation;
 	}
 
 	/**
@@ -650,16 +560,6 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Sets the oracle value.
-	 *
-	 * @param oracleValue
-	 *            the new oracle value
-	 */
-	public void setOracleValue(double oracleValue) {
-		this.oracleValue = oracleValue;
-	}
-
-	/**
 	 * Gets the error allowed.
 	 *
 	 * @return the error allowed
@@ -669,32 +569,12 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Sets the error allowed.
-	 *
-	 * @param errorAllowed
-	 *            the new error allowed
-	 */
-	public void setErrorAllowed(double errorAllowed) {
-		this.errorAllowed = errorAllowed;
-	}
-
-	/**
 	 * Gets the average prediction criticity.
 	 *
 	 * @return the average prediction criticity
 	 */
 	public double getAveragePredictionCriticity() {
 		return averagePredictionCriticity;
-	}
-
-	/**
-	 * Sets the average prediction criticity.
-	 *
-	 * @param averagePredictionCriticity
-	 *            the new average prediction criticity
-	 */
-	public void setAveragePredictionCriticity(double averagePredictionCriticity) {
-		this.averagePredictionCriticity = averagePredictionCriticity;
 	}
 
 	/**
@@ -724,173 +604,12 @@ public class Head extends AbstractHead {
 	}
 
 	/**
-	 * Gets the function selected.
-	 *
-	 * @return the function selected
-	 */
-	public String getFunctionSelected() {
-		return functionSelected;
-	}
-
-	/**
-	 * Sets the function selected.
-	 *
-	 * @param functionSelected
-	 *            the new function selected
-	 */
-	public void setFunctionSelected(String functionSelected) {
-		this.functionSelected = functionSelected;
-	}
-
-	/**
 	 * Gets the inexact allowed.
 	 *
 	 * @return the inexact allowed
 	 */
 	public double getInexactAllowed() {
 		return inexactAllowed;
-	}
-
-	/**
-	 * Sets the inexact allowed.
-	 *
-	 * @param inexactAllowed
-	 *            the new inexact allowed
-	 */
-	public void setInexactAllowed(double inexactAllowed) {
-		this.inexactAllowed = inexactAllowed;
-	}
-
-	/**
-	 * Gets the augmentation factor error.
-	 *
-	 * @return the augmentation factor error
-	 */
-	public double getAugmentationFactorError() {
-		return augmentationFactorError;
-	}
-
-	/**
-	 * Sets the augmentation factor error.
-	 *
-	 * @param augmentationFactorError
-	 *            the new augmentation factor error
-	 */
-	public void setAugmentationFactorError(double augmentationFactorError) {
-		this.augmentationFactorError = augmentationFactorError;
-	}
-
-	/**
-	 * Gets the diminution factor error.
-	 *
-	 * @return the diminution factor error
-	 */
-	public double getDiminutionFactorError() {
-		return diminutionFactorError;
-	}
-
-	/**
-	 * Sets the diminution factor error.
-	 *
-	 * @param diminutionFactorError
-	 *            the new diminution factor error
-	 */
-	public void setDiminutionFactorError(double diminutionFactorError) {
-		this.diminutionFactorError = diminutionFactorError;
-	}
-
-	/**
-	 * Gets the min error allowed.
-	 *
-	 * @return the min error allowed
-	 */
-	public double getMinErrorAllowed() {
-		return minErrorAllowed;
-	}
-
-	/**
-	 * Sets the min error allowed.
-	 *
-	 * @param minErrorAllowed
-	 *            the new min error allowed
-	 */
-	public void setMinErrorAllowed(double minErrorAllowed) {
-		this.minErrorAllowed = minErrorAllowed;
-	}
-
-	/**
-	 * Gets the augmentation inexact error.
-	 *
-	 * @return the augmentation inexact error
-	 */
-	public double getAugmentationInexactError() {
-		return augmentationInexactError;
-	}
-
-	/**
-	 * Sets the augmentation inexact error.
-	 *
-	 * @param augmentationInexactError
-	 *            the new augmentation inexact error
-	 */
-	public void setAugmentationInexactError(double augmentationInexactError) {
-		this.augmentationInexactError = augmentationInexactError;
-	}
-
-	/**
-	 * Gets the diminution inexact error.
-	 *
-	 * @return the diminution inexact error
-	 */
-	public double getDiminutionInexactError() {
-		return diminutionInexactError;
-	}
-
-	/**
-	 * Sets the diminution inexact error.
-	 *
-	 * @param diminutionInexactError
-	 *            the new diminution inexact error
-	 */
-	public void setDiminutionInexactError(double diminutionInexactError) {
-		this.diminutionInexactError = diminutionInexactError;
-	}
-
-	/**
-	 * Gets the min inexact allowed.
-	 *
-	 * @return the min inexact allowed
-	 */
-	public double getMinInexactAllowed() {
-		return minInexactAllowed;
-	}
-
-	/**
-	 * Sets the min inexact allowed.
-	 *
-	 * @param minInexactAllowed
-	 *            the new min inexact allowed
-	 */
-	public void setMinInexactAllowed(double minInexactAllowed) {
-		this.minInexactAllowed = minInexactAllowed;
-	}
-
-	/**
-	 * Gets the n propositions received.
-	 *
-	 * @return the n propositions received
-	 */
-	public int getnPropositionsReceived() {
-		return nPropositionsReceived;
-	}
-
-	/**
-	 * Checks if is new context was created.
-	 *
-	 * @return true, if is new context was created
-	 */
-	public boolean isNewContextWasCreated() {
-		return newContextWasCreated;
 	}
 
 	/**
@@ -912,32 +631,7 @@ public class Head extends AbstractHead {
 		this.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
 	}
 
-	/**
-	 * Gets the prediction.
-	 *
-	 * @return the prediction
-	 */
-	public double getPrediction() {
-		return prediction;
-	}
-
-	/**
-	 * Sets the prediction.
-	 *
-	 * @param prediction
-	 *            the new prediction
-	 */
-	public void setPrediction(double prediction) {
-		this.prediction = prediction;
-	}
-
-	// TODO check if usefull
 	public Head clone() throws CloneNotSupportedException {
 		return (Head) super.clone();
 	}
-
-	public void clearAllUseableContextLists() {
-		activatedContexts.clear();
-	}
-
 }

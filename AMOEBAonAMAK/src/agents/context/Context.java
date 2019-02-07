@@ -29,6 +29,7 @@ public class Context extends AmoebaAgent {
 	private int activations = 0;
 	
 	private boolean valid = false;
+	private boolean isDying = false;
 	
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 
@@ -538,4 +539,7 @@ public class Context extends AmoebaAgent {
 	
 	//getLocalModel used in visualization, removed (for now)
 	
+	public boolean isDying() {
+		return isDying;
+	}
 }
