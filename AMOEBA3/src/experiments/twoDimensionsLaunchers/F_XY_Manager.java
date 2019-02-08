@@ -56,7 +56,7 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
 		//result = (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
-		 result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
 		//	result = (2*x) + (4*y) + x*y;
 		//	result = (x > 2*y) ? 0.0 : 1.0;
 		

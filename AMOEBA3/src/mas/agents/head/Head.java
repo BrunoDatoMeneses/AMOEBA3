@@ -9,6 +9,7 @@ import mas.kernel.Config;
 import mas.kernel.Launcher;
 import mas.kernel.NCSMemory;
 import mas.kernel.World;
+import mas.agents.AbstractPair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
@@ -273,12 +274,14 @@ public class Head extends AbstractHead implements Cloneable{
 
 		/*If we have a bestcontext, send a selection message to it*/
 		if (bestContext != null) {
-			functionSelected = bestContext.getFunction().getFormula(bestContext);
+			//functionSelected = bestContext.getFunction().getFormula(bestContext);
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 
 		
 		endogenousPlay();
+		
+		
 		
 		selfAnalysationOfContexts();
 
@@ -311,7 +314,7 @@ public class Head extends AbstractHead implements Cloneable{
 		Config.print("Best context selected without oracle is : " + bestContext.getName(),0);
 	//	Config.print("With function : " + bestContext.getFunction().getFormula(bestContext), 0);
 		Config.print("BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence(), 2);
-		functionSelected = bestContext.getFunction().getFormula(bestContext);
+		//functionSelected = bestContext.getFunction().getFormula(bestContext);
 		criticity = Math.abs(oracleValue - prediction);
 		
 		endogenousPlay();
@@ -818,9 +821,18 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		boolean newContextCreated = false;
 		ArrayList<Agent> allContexts = world.getScheduler().getContexts();
-		if (getDistanceToNearestGoodContext(allContexts) > 0) {
+		AbstractPair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(allContexts);
+		if (nearestGoodContext.getB() > 0) {
 			//system.out.println(world.getScheduler().getTick() + "Create_New_Context");
-			Context context = createNewContext();
+			
+			Context context;
+			if(nearestGoodContext.getA() != null) {
+				context = createNewContext(nearestGoodContext.getA());
+			}else {
+				context = createNewContext();
+			}
+			//context = createNewContext();
+			
 
 			bestContext = context;
 			newContext = context;
@@ -931,17 +943,19 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param allContext the all context
 	 * @return the distance to nearest good context
 	 */
-	private double getDistanceToNearestGoodContext(ArrayList<Agent> allContext) {
+	private AbstractPair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Agent> allContext) {
 		double d = Double.MAX_VALUE;
+		Context nearestGoodContext = null;
 		for (Agent a : allContext) {
 			Context c = (Context) a;
 			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
 				if (getExternalDistanceToContext(c) < d ) {
 					d = getExternalDistanceToContext(c);
+					nearestGoodContext = c;
 				}
 			}
 		}
-		return d;
+		return new AbstractPair<Context, Double>(nearestGoodContext,d);
 		
 	}
 	
@@ -1042,6 +1056,27 @@ public class Head extends AbstractHead implements Cloneable{
 
 		return context;
 	}
+	
+	private Context createNewContext(Context bestNearestCtxt) {
+		//	//system.out.println("Creation d'un nouveau contexte : " + contexts.size());
+			newContextWasCreated = true;
+//			if (contexts.size() != 0) {
+//				System.exit(0);
+//			}
+			world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
+			Context context;
+			if (firstContext) {
+				System.out.println(bestNearestCtxt.toStringFull());
+				context = new Context(world, this, bestNearestCtxt);
+				Config.print("new context agent", 3);
+			}
+			else {
+				context = new Context(world, this);
+				firstContext = true;
+			}
+
+			return context;
+		}
 
 	/**
 	 * Update statistical informations.
@@ -1142,13 +1177,13 @@ public class Head extends AbstractHead implements Cloneable{
 			perfIndicator--;
 		} else {
 			perfIndicator++;
-		}
-		/*if (criticity > errorAllowed) {
-			perfIndicator--;
+		}		
+		
+		if (averagePredictionCriticity > inexactAllowed) {
+			perfIndicatorInexact--;
 		} else {
-			perfIndicator++;
-		}*/
-		////system.out.println("いいいいいいいいいいい  PERF INDICATOR :" + perfIndicator);
+			perfIndicatorInexact++;
+		}
 		
 		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
 			perfIndicator = 0;
@@ -1163,20 +1198,6 @@ public class Head extends AbstractHead implements Cloneable{
 			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
 		}
 		
-		
-		if (averagePredictionCriticity > inexactAllowed) {
-			perfIndicatorInexact--;
-		} else {
-			perfIndicatorInexact++;
-		}
-		
-		/*if (criticity > inexactAllowed) {
-			perfIndicatorInexact--;
-		} else {
-			perfIndicatorInexact++;
-		}*/
-		////system.out.println("いいいいいいいいいいい  PERF INDICATOR INEXACT :" + perfIndicator);
-		
 		if (perfIndicatorInexact <= nConflictBeforeInexactAugmentation * (-1)) {
 			perfIndicatorInexact = 0;
 			inexactAllowed *= augmentationInexactError;
@@ -1190,6 +1211,9 @@ public class Head extends AbstractHead implements Cloneable{
 			////system.out.println("いいいいいいいいいいい  diminutionInexactError :" + diminutionInexactError);
 
 		}
+		
+//		inexactAllowed = averagePredictionCriticity / 2;
+//		errorAllowed = 3 * inexactAllowed;
 		
 		//numberOfCriticityValuesForAverage
 	}
@@ -1887,6 +1911,25 @@ public class Head extends AbstractHead implements Cloneable{
 			partialyActivatedContexts.get(pct).clear();
 			
 		}
+	}
+	
+	public Double getMaxRadiusForContextCreation(Percept pct) {
+		double maxRadius = Double.POSITIVE_INFINITY;
+		double currentRadius = 0;
+		for(Context ctxt:activatedNeighborsContexts) {
+			currentRadius = ctxt.getRanges().get(pct).distance(pct.getValue());
+			if(currentRadius<maxRadius) {
+				maxRadius = currentRadius;
+			}
+		}
+		
+		if(maxRadius==Double.POSITIVE_INFINITY) {
+			return null;
+		}else {
+			return maxRadius;
+		}
+		
+		
 	}
 	
 }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,6 +53,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private int nSelection = 0;
 	private int maxActivationsRequired = 0;
 	private int activations = 0;
+	private int tickCreation;
 
 	private boolean bestContext = false;
 	private boolean valid = false;
@@ -88,9 +90,121 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		buildContext(head);
 	}
 	
+	public Context(World world, Head head, Context bestNearestContext) {
+		super(world);
+		buildContext(head, bestNearestContext);
+		System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
+		System.out.println(this.toStringFull());
+		System.out.println(bestNearestContext.toStringFull());
+	}
 	
-	
-	
+	private void buildContext (Head headAgent, Context bestNearestContext) {
+		
+		
+		this.tickCreation = world.getScheduler().getTick();
+		
+		ArrayList<Percept> var = world.getAllPercept();
+		Experiment firstPoint = new Experiment();
+		this.headAgent = headAgent;
+		
+		action = this.headAgent.getOracleValue();
+		maxActivationsRequired = var.size();
+		
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			
+			ctxt.addContext(this);
+		}
+		
+		for (Percept v : var) {
+			Range r;
+			Double maxRadius = world.getScheduler().getHeadAgent().getMaxRadiusForContextCreation(v);
+			Double length;
+			if(maxRadius!= null) {
+				length = 2*maxRadius;
+			}
+			else {
+				length = Math.abs(v.getMinMaxDistance()) * 0.2;
+			}
+			
+			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v, world);
+			ranges.put(v, r);
+			ranges.get(v).setValue(v.getValue());
+			sendExpressMessage(null, MessageType.REGISTER, v);
+			firstPoint.addDimension(v, v.getValue());
+			
+			v.addContextProjection(this);
+			v.addContextSortedRanges(this);
+		}
+
+
+		
+		this.confidence = bestNearestContext.confidence;	
+		if (bestNearestContext.world.getLocalModel() == TypeLocalModel.MILLER_REGRESSION) {
+			
+			this.localModel = new LocalModelMillerRegression(world);
+			//this.formulaLocalModel = ((LocalModelMillerRegression) bestNearestContext.localModel).getFormula(bestNearestContext);
+			double[] coef = ((LocalModelMillerRegression) bestNearestContext.localModel).getCoef();
+			((LocalModelMillerRegression) this.localModel).setCoef(coef);
+			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel).getProposition(bestNearestContext);
+			
+		} else if (bestNearestContext.world.getLocalModel() == TypeLocalModel.FIRST_EXPERIMENT) {
+			
+			this.localModel = new LocalModelFirstExp(bestNearestContext.world);
+			//this.formulaLocalModel = ((LocalModelFirstExp) bestNearestContext.localModel).getFormula(bestNearestContext);
+			this.actionProposition = ((LocalModelFirstExp) bestNearestContext.localModel).getProposition(bestNearestContext);
+			
+		} else if (bestNearestContext.world.getLocalModel() == TypeLocalModel.AVERAGE) {
+			
+			this.localModel = new LocalModelAverage(bestNearestContext.world);
+			//this.formulaLocalModel = ((LocalModelAverage) bestNearestContext.localModel).getFormula(bestNearestContext);
+			this.actionProposition = ((LocalModelAverage) bestNearestContext.localModel).getProposition(bestNearestContext);
+			
+		}
+
+		this.experiments = new ArrayList<Experiment>();
+		for(Experiment obj: bestNearestContext.experiments) {
+			Experiment exp = new Experiment();
+			exp.setProposition(obj.getProposition());
+			LinkedHashMap<Percept, Double> values = new LinkedHashMap<Percept, Double>();
+			for(Entry<Percept, Double> entry : obj.getValues().entrySet()) {
+				Percept percept = new Percept(entry.getKey());
+				Double value = new Double(entry.getValue());
+				values.put(percept, value);
+			}
+			exp.setValues(values);
+			this.experiments.add(exp);
+		}
+		
+		this.world.getScheduler().addAlteredContext(this);
+		this.setName(String.valueOf(this.hashCode()));
+		this.world.startAgent(this);
+		
+		perceptValidities = new HashMap<Percept, Boolean>();
+		for(Percept percept : var) {
+			perceptValidities.put(percept, false);
+			perceptNeighborhoodValidities.put(percept, false);
+		}
+		
+		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
+		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
+		
+		for(Percept p : ranges.keySet()) {
+			nearestNeighbours.put(p, new HashMap<String, Context>());
+			
+			sortedPossibleNeighbours.put(p, new HashMap<String, ArrayList<Context>>());
+			
+			nearestNeighbours.get(p).put("start", null);
+			nearestNeighbours.get(p).put("end", null);
+			
+			sortedPossibleNeighbours.get(p).put("start", new ArrayList<Context>() );
+			sortedPossibleNeighbours.get(p).put("end", new ArrayList<Context>() );
+			
+			
+		}
+		
+		overlaps =  new HashMap<Context,String>();
+	}
 	/**
 	 * Builds the context.
 	 *
@@ -98,6 +212,9 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 * @param headAgent the headAgent
 	 */
 	private void buildContext (Head headAgent) {
+		
+		
+		this.tickCreation = world.getScheduler().getTick();
 		
 		ArrayList<Percept> var = world.getAllPercept();
 		Experiment firstPoint = new Experiment();
@@ -114,7 +231,14 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		for (Percept v : var) {
 			Range r;
 
-			double length = Math.abs(v.getMinMaxDistance()) * 0.1;
+			Double maxRadius = world.getScheduler().getHeadAgent().getMaxRadiusForContextCreation(v);
+			Double length;
+			if(maxRadius!= null) {
+				length = 2*maxRadius;
+			}
+			else {
+				length = Math.abs(v.getMinMaxDistance()) * 0.2;
+			}
 			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v, world);
 			ranges.put(v, r);
 			ranges.get(v).setValue(v.getValue());
@@ -166,6 +290,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 */
 	public Context(Context c) {
 		super(c.world);
+		this.tickCreation = c.tickCreation;
 		this.ID = c.ID;
 		this.name = c.name;
 		this.messages = c.messages;
@@ -193,17 +318,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.confidence = c.confidence;	
 		if (c.world.getLocalModel() == TypeLocalModel.MILLER_REGRESSION) {
 			this.localModel = new LocalModelMillerRegression(c.world);
-			this.formulaLocalModel = ((LocalModelMillerRegression) c.localModel).getFormula(c);
+			//this.formulaLocalModel = ((LocalModelMillerRegression) c.localModel).getFormula(c);
 			double[] coef = ((LocalModelMillerRegression) c.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) c.localModel).getProposition(c);
 		} else if (c.world.getLocalModel() == TypeLocalModel.FIRST_EXPERIMENT) {
 			this.localModel = new LocalModelFirstExp(c.world);
-			this.formulaLocalModel = ((LocalModelFirstExp) c.localModel).getFormula(c);
+			//this.formulaLocalModel = ((LocalModelFirstExp) c.localModel).getFormula(c);
 			this.actionProposition = ((LocalModelFirstExp) c.localModel).getProposition(c);
 		} else if (c.world.getLocalModel() == TypeLocalModel.AVERAGE) {
 			this.localModel = new LocalModelAverage(c.world);
-			this.formulaLocalModel = ((LocalModelAverage) c.localModel).getFormula(c);
+			//this.formulaLocalModel = ((LocalModelAverage) c.localModel).getFormula(c);
 			this.actionProposition = ((LocalModelAverage) c.localModel).getProposition(c);
 		}
 
@@ -305,16 +430,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
 		}
 		
-		if (computeValidity()) {
-			if(world.getScheduler().getTick() == 119) {
-				//system.out.println("CONTEXT OLD VALIDITY :" + this.getName());
-			}
-				
-			
-			////system.out.println("Valid context by Context "+this.name);
-			
-			
-		}
+		
 		
 		this.activations = 0;
 		this.valid = false;
@@ -345,6 +461,16 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 
 		contextOverlapsByPercept.clear();*/
+		
+		
+		Random rand = new Random();
+		
+//		if( this.getConfidence()  <= 0 && tickCreation + 125 < world.getScheduler().getTick() ) {
+//			System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
+//			world.raiseNCS(NCS.CONTEXT_USELESSNESS);
+//			this.die();
+//		}
+		
 		
 	}
 
@@ -1059,11 +1185,11 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		}
 		s += "Number of experiments : " + experiments.size() + "\n";
 		s += "Confidence : " + confidence + "\n";
-		if (formulaLocalModel != null) {
-			s += "Local model : " + this.formulaLocalModel + "\n";
-		} else {
-			s += "Local model : " + localModel.getFormula(this) + "\n";
-		}
+//		if (formulaLocalModel != null) {
+//			s += "Local model : " + this.formulaLocalModel + "\n";
+//		} else {
+//			s += "Local model : " + localModel.getFormula(this) + "\n";
+//		}
 		
 		s += "\n";
 		s += "Possible neighbours : \n";
@@ -1497,7 +1623,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 			System.out.println(world.getScheduler().getTick() + "shrinkRangesToJoinBordersAndDie");
 			this.die();
 		}else {
-			//ranges.get(perceptWithLesserImpact).matchBorderWith(bestContext);
+			//ranges.get(perceptWithLesserImpact).matchBorderWithBestContext(bestContext);
 			ranges.get(perceptWithLesserImpact).adaptTowardsBorder(bestContext);
 		}
 	}

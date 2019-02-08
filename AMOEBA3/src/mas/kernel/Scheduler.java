@@ -68,6 +68,13 @@ public class Scheduler implements Serializable{
 	private HashMap<String, Double> requestPosition;
 	private boolean manualRequest;
 	
+	public long perceptsExecutionTime;
+	public long contextsExecutionTime;
+	public long headExecutionTime;
+	public long agentsExecutionTime;
+	public long UIExecutionTime = (long) 0;
+	public long previousUIExecutionTime = (long) 0;
+	
 
 	
 	/**
@@ -190,8 +197,13 @@ public class Scheduler implements Serializable{
 			
 			addNewAgents();//scheduler acces to new agents
 			killAgents();
+			
 			playAllAgents();
+			
+			previousUIExecutionTime = UIExecutionTime;
+			UIExecutionTime = System.currentTimeMillis();
 			scheduledItemsAndView();	
+			UIExecutionTime = System.currentTimeMillis() - UIExecutionTime;
 			//endogenousPlay();
 			
 			ticksUpdate();
@@ -309,24 +321,32 @@ public class Scheduler implements Serializable{
 		lastModifiedContext.clear();
 		clearContextOverlaps();
 
+		
+		agentsExecutionTime = System.currentTimeMillis();
+		
+		perceptsExecutionTime = System.currentTimeMillis();
 		for (Agent agent : percepts) {
 			agent.readMessage();
 			agent.play();
 		}
+		perceptsExecutionTime = System.currentTimeMillis() - perceptsExecutionTime;
 		
-		
+		contextsExecutionTime = System.currentTimeMillis();
 		for (Agent agent : contexts) {
 			agent.readMessage();
 			agent.play();
 			
 		}
+		contextsExecutionTime = System.currentTimeMillis() - contextsExecutionTime;
 
-		
+		headExecutionTime = System.currentTimeMillis();
 		for (Agent agent : heads) {
 			agent.readMessage();
 			agent.play();
 		}
+		headExecutionTime = System.currentTimeMillis() - headExecutionTime;
 		
+		agentsExecutionTime = System.currentTimeMillis() - agentsExecutionTime;
 		
 		
 //		for (Context context : getContextsAsContext()) {

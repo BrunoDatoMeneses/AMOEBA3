@@ -73,7 +73,7 @@ public class ContextProjection implements Serializable{
 	}
 	
 	public boolean inNeighborhoodOf(Double value) {
-		return ((value > start - getNeighboorhood())  && (value < end + getNeighboorhood()));
+		return Math.abs(value - this.getCenter())< 2*getNeighboorhood();
 	}
 	
 	public double distance(ContextProjection ctxtPrjct) {

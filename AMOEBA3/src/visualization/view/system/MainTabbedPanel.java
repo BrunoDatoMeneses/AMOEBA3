@@ -16,6 +16,7 @@ import visualization.view.global.PanelChart;
 import visualization.view.global.PanelChart2;
 import visualization.view.global.PanelOneChart;
 import visualization.view.global.ScatterPlotExample;
+import visualization.view.global.TimeExecutionCharts;
 import visualization.view.global.PanelExoVSEndo;
 import visualization.view.system.nDim.PanelParallelCoordinates;
 import visualization.view.system.twoDim.GrapheTwoDimPanelNCSMemories;
@@ -42,6 +43,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	private PanelExoVSEndo exoVsEndoOverlapNCSChart;
 	private PanelExoVSEndo exoVsEndoSharedIncompetenceNCSChart;
 	private PanelExoVSEndo exoVsEndoIncompetenceNCSChart;
+	private TimeExecutionCharts timeExecutionChart;
 	private PanelController panelController;
 	
 	/** The panel two dim standard. */
@@ -96,6 +98,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		exoVsEndoSharedIncompetenceNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Shared Incompetence NCS");
 		exoVsEndoIncompetenceNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Incompetence NCS");
 		panelController = new PanelController(world.getScheduler().getHeadAgent(), world);
+		timeExecutionChart = new TimeExecutionCharts(world, "Time Execution");
 		
 		
 		
@@ -106,6 +109,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		world.getScheduler().addScheduledItem(exoVsEndoSharedIncompetenceNCSChart);
 		world.getScheduler().addScheduledItem(exoVsEndoIncompetenceNCSChart);
 		world.getScheduler().addScheduledItem(panelController);
+		world.getScheduler().addScheduledItem(timeExecutionChart);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -120,6 +124,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		this.addTab("Exo Vs Endo Incompetence NCS", new JScrollPane(exoVsEndoIncompetenceNCSChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("NCS Memories", new JScrollPane(panelTwoDimNCSMemories,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Marges", new JScrollPane(panelController,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Time Execution", new JScrollPane(timeExecutionChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		
 		((Frame) this.getTopLevelAncestor()).pack();

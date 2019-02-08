@@ -178,6 +178,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		
 		
 		
+		
 		//ENDO
 		//overlapsDetection();
 		//overlapNotification();
@@ -196,12 +197,14 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	public void computeContextProjectionValidity() {
 		validContextProjection = new ArrayList<Context>();
 		validNeigborhoodContextProjection = new ArrayList<Context>();
+		
+		
 		for(ContextProjection contextProjection : contextProjections.values()) {
+			
 			if(contextProjection.contains(this.value)) {
-				if(world.getScheduler().getTick() == 119) {
-					//system.out.println("PERCEPT  VALIDITY :" + this.getName() + " " + contextProjection.getContext().getName());
-				}
+
 				validContextProjection.add(contextProjection.getContext());
+				contextProjection.getContext().setPerceptValidity(this);
 				////system.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
 				
 				if(this.world.getScheduler().getHeadAgent().getPartiallyActivatedContexts(this)!=null) {
@@ -216,6 +219,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 			
 			if(contextProjection.inNeighborhoodOf(this.value)){
 				validNeigborhoodContextProjection.add(contextProjection.getContext());
+				contextProjection.getContext().setNeighborhoodPerceptValidity(this);
 			}
 			
 			for(ContextProjection ctxtPrjct : contextProjections.values()) {
@@ -232,13 +236,8 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 			}
 		}
 		
-		for(Context context : validContextProjection) {
-			context.setPerceptValidity(this);
-		}
 		
-		for(Context context : validNeigborhoodContextProjection) {
-			context.setNeighborhoodPerceptValidity(this);
-		}
+
 		
 	}
 	
@@ -644,11 +643,17 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		//system.out.println(context.getName());
 		//system.out.println(contextProjections.get(context));
 		//system.out.println(contextProjections.size() + " " + world.getScheduler().getContextsAsContext().size());
-		contextProjections.get(context).updateStart();
+		if(!context.isDying()) {
+			contextProjections.get(context).updateStart();
+		}
+		
 	}
 	
 	public void updateContextProjectionEnd(Context context) {
-		contextProjections.get(context).updateEnd();
+		if(!context.isDying()) {
+			contextProjections.get(context).updateEnd();
+		}
+		
 	}
 	
 	public void overlapNotification() {

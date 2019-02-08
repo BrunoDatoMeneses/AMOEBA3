@@ -72,13 +72,22 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
-	private int xGraphSize = 2500;
-	private int yGraphSize = 1500;
+//	private int xGraphSize = 2500;
+//	private int yGraphSize = 1500;
+	
+	
+	//BUREAU
+	private int xGraphSize = 1600;
+	private int yGraphSize = 800;
+	
+	//REUNION
+//	private int xGraphSize = 1200;
+//	private int yGraphSize = 600;
 	
 	public double increment_up = 0.05;
 	public double increment_down = 0.05;
 	
-	public int tickThreshol = 100;
+	public int tickThreshol = 10000;
 	
 	public World() {
 		
