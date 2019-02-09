@@ -1,7 +1,5 @@
 package agents.context.localModel;
 
-import java.io.Serializable;
-
 import org.apache.commons.math3.stat.regression.MillerUpdatingRegression;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 

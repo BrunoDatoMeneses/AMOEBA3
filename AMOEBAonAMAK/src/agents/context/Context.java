@@ -35,17 +35,16 @@ public class Context extends AmoebaAgent {
 
 	public Context(AMOEBA amas, Head head) {
 		super(amas);
-		buildContext(head);
+		buildContext(head,amas);
 	}
 	
-	@Override
 	protected int computeExecutionOrderLayer() {
 		return 1;
 	}
 	
-	private void buildContext (Head headAgent) {
+	private void buildContext (Head headAgent, AMOEBA amoeba) {
 		
-		ArrayList<Percept> var = world.getAllPercept();
+		ArrayList<Percept> var = amoeba.getPercept();
 		Experiment firstPoint = new Experiment();
 		this.headAgent = headAgent;
 		
@@ -64,13 +63,13 @@ public class Context extends AmoebaAgent {
 			
 			v.addContextProjection(this);
 		}
-		localModel = this.world.buildLocalModel(this);
+		localModel = amoeba.buildLocalModel(this);
 		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
-		this.world.getScheduler().addAlteredContext(this);
+		this.world.getScheduler().addAlteredContext(this);//je ne sais pas a quoi ça correspond
 		this.setName(String.valueOf(this.hashCode()));
-		this.world.startAgent(this);
+		this.world.startAgent(this);//a regarder
 		
 		perceptValidities = new HashMap<Percept, Boolean>();
 		for(Percept percept : var) {
@@ -82,7 +81,6 @@ public class Context extends AmoebaAgent {
 	
 	//getValueActionProposition only used by visualization -> removed (for now)
 	
-	@Override
 	public void computeAMessage(AmoebaMessage m) {
 
 		if (m.getType() == MessageType.VALIDATE) {
@@ -110,14 +108,14 @@ public class Context extends AmoebaAgent {
 					System.exit(-2);
 				}
 				if (valid) {
-					world.getScheduler().removeValidContextFromList(this);
+					world.getScheduler().removeValidContextFromList(this);//to see
 					valid = false;
 				}
 			}
 				
 			if (activations == maxActivationsRequired) {
 				valid = true;
-				world.getScheduler().registerAgent(this);
+				world.getScheduler().registerAgent(this);//to see
 			}
 		}
 	}
@@ -126,11 +124,11 @@ public class Context extends AmoebaAgent {
 		nSelection++;
 	}
 	
-	@Override
+	
 	protected void onAct() {
 		if(computeValidityByPercepts()) {
-			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
-			Config.print("Message envoyé", 4);
+			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);//Send message
+			Config.print("Message envoyé", 4);//Un print dans un config
 		}
 		
 	
@@ -281,8 +279,8 @@ public class Context extends AmoebaAgent {
 	
 	//getPerceptWithLargerImpactOnAVT never used -> removed
 	
-	public double getActionProposal() {
-		return localModel.getProposition(this);
+	public double getActionProposal(AMOEBA amoeba) {
+		return localModel.getProposition(amoeba, this);
 	}
 	
 	//computeValidity never used -> removed
@@ -291,7 +289,7 @@ public class Context extends AmoebaAgent {
 		return ranges;
 	}
 	
-	public Range getRangeByPerceptName(String percetName) {
+	public Range getRangeByPerceptName(String percetName) {//Percept name
 		for(Percept prct : ranges.keySet()) {
 			if(prct.getName().equals(percetName)) {
 				return ranges.get(prct);
@@ -312,13 +310,15 @@ public class Context extends AmoebaAgent {
 	
 	//getTargets used in visualization, removed (for now)
 	
+	//String to see use
+	
 	public String toString() {
-		return "Context :" + this.getName();
+		return "Context :" + this.getName();//Percept name
 	}
 	
 	public String toStringFull() {
 		String s = "";
-		s += "Context : " + getName() + "\n";
+		s += "Context : " + getName() + "\n";//Percept name
 		s += "\n";
 		
 		s += "Model : ";
@@ -453,8 +453,8 @@ public class Context extends AmoebaAgent {
 		return (this.getRangeByPerceptName(pct.getName()).getEnd() - this.getRangeByPerceptName(pct.getName()).getStart()) /2;
 	}
 	
-	private void updateExperiments() {
-		ArrayList<Percept> var = world.getAllPercept();
+	private void updateExperiments(AMOEBA amoeba) {
+		ArrayList<Percept> var = amoeba.getPercept();
 		maxActivationsRequired = var.size();
 		Experiment exp = new Experiment();
 		for (Percept v : var) {
@@ -463,7 +463,7 @@ public class Context extends AmoebaAgent {
 		exp.setProposition(headAgent.getOracleValue());
 		
 		experiments.add(exp);
-		this.world.getScheduler().addAlteredContext(this);
+		this.world.getScheduler().addAlteredContext(this);//Scheduler
 		localModel.updateModel(this);
 	}
 	
@@ -471,7 +471,7 @@ public class Context extends AmoebaAgent {
 
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			solveNCS_Conflict(head);
-			this.world.getScheduler().addAlteredContext(this);
+			this.world.getScheduler().addAlteredContext(this);//Scheduler
 		}
 		else {		
 			if (head.getCriticity(this) > head.getInexactAllowed()) {
@@ -488,8 +488,8 @@ public class Context extends AmoebaAgent {
 	 * Grow every ranges allowing to includes current situation.
 	 *
 	 */
-	public void growRanges() {
-		ArrayList<Percept> allPercepts = world.getAllPercept();
+	public void growRanges(AMOEBA amoeba) {
+		ArrayList<Percept> allPercepts = amoeba.getPercept();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ? true : false;
 			if (!contain) {
@@ -517,8 +517,8 @@ public class Context extends AmoebaAgent {
 		}
 	}
 	
-	public void die () {
-		for(Percept percept : world.getScheduler().getPercepts()) {
+	public void die (AMOEBA amoeba) {
+		for(Percept percept : amoeba.getPercept()) { // see if is compatible //Pred: world.getScheduler().getPercepts()
 			percept.deleteContextProjection(this);
 		}
 		localModel.die();

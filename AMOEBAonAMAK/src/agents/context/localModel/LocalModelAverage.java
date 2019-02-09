@@ -3,6 +3,7 @@ package agents.context.localModel;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
+import kernel.AMOEBA;
 
 /**
  * A simple local model which computes the average of all Context Agents experiments.
@@ -10,8 +11,7 @@ import agents.percept.Percept;
  */
 public class LocalModelAverage extends LocalModel {
 
-	@Override
-	public double getProposition(Context context) {
+	public double getProposition(AMOEBA amoeba,Context context) {
 		double average = 0.0;
 		for (Experiment exp : context.getExperiments()) {
 			average += exp.getProposition();
@@ -20,15 +20,13 @@ public class LocalModelAverage extends LocalModel {
 	}
 
 
-	@Override
-	public double getProposition(Context context, Percept p1, Percept p2,
+	public double getProposition(AMOEBA amoeba,Context context, Percept p1, Percept p2,
 			double v1, double v2) {
 		return 0;
 	}
 
-	@Override
-	public String getFormula(Context context) {
-		return  getProposition(context) +"";
+	public String getFormula(AMOEBA amoeba,Context context) {
+		return  getProposition(amoeba,context) +"";
 	}
 	
 	public String getCoefsFormula() {
