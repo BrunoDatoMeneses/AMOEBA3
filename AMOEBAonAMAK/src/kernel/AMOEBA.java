@@ -2,7 +2,9 @@ package kernel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -12,8 +14,14 @@ import org.jdom2.input.SAXBuilder;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
+import agents.context.Context;
+import agents.context.localModel.LocalModel;
+import agents.context.localModel.LocalModelAverage;
+import agents.context.localModel.LocalModelFirstExp;
+import agents.context.localModel.LocalModelMillerRegression;
 
 public class AMOEBA extends Amas<World> {
 	
@@ -233,6 +241,31 @@ public class AMOEBA extends Amas<World> {
 		 * If you need this, please check the original project (AMOEBA3)
 		 */
 		System.err.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
+	}
+	
+	public  ArrayList<Percept> getPercept(){
+		ArrayList<Percept> percept = new ArrayList<>();
+		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if((agent instanceof Percept)) {
+				percept.add((Percept)agent);
+			}
+		}
+		return percept;
+		
+	}
+	
+	public LocalModel buildLocalModel(Context context) {
+		
+		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
+			return new LocalModelMillerRegression(this);
+		}
+		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
+			return new LocalModelFirstExp();
+		}
+		if (localModel == TypeLocalModel.AVERAGE) {
+			return new LocalModelAverage();
+		}
+		return null;
 	}
 
 }
