@@ -75,42 +75,6 @@ public class AMOEBA extends Amas<World> {
 	}
 	
 	/**
-	 * Sets the data for error margin.
-	 *
-	 * @param errorAllowed the error allowed
-	 * @param augmentationFactorError the augmentation factor error
-	 * @param diminutionFactorError the diminution factor error
-	 * @param minErrorAllowed the min error allowed
-	 * @param nConflictBeforeAugmentation the n conflict before augmentation
-	 * @param nSuccessBeforeDiminution the n success before diminution
-	 */
-	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError, double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		getHeadAgent().setDataForErrorMargin(errorAllowed,augmentationFactorError,diminutionFactorError,minErrorAllowed,nConflictBeforeAugmentation,nSuccessBeforeDiminution);
-	}
-	
-	/**
-	 * Sets the data for inexact margin.
-	 *
-	 * @param inexactAllowed the inexact allowed
-	 * @param augmentationInexactError the augmentation inexact error
-	 * @param diminutionInexactError the diminution inexact error
-	 * @param minInexactAllowed the min inexact allowed
-	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact augmentation
-	 * @param nSuccessBeforeInexactDiminution the n success before inexact diminution
-	 */
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError, double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation, int nSuccessBeforeInexactDiminution) {
-		getHeadAgent().setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
-	}
-	
-	public void setLocalModel(TypeLocalModel model) {
-		localModel=model;
-	}
-	
-	public TypeLocalModel getLocalModel() {
-		return localModel;
-	}
-	
-	/**
 	 * Learn.
 	 *
 	 * @param actions the actions
@@ -148,10 +112,6 @@ public class AMOEBA extends Amas<World> {
 	}
 
 	//setStudiedSystem never used -> removed
-	
-	public double getAveragePredictionCriticity() {
-		return getHeadAgent().getAveragePredictionCriticity();
-	}
 	
 	public double getAction() {
 		return head.getAction();
@@ -256,7 +216,7 @@ public class AMOEBA extends Amas<World> {
 		System.err.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
 	}
 	
-	public  ArrayList<Percept> getPercepts(){
+	public ArrayList<Percept> getPercepts(){
 		ArrayList<Percept> percepts = new ArrayList<>();
 		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
 			if((agent instanceof Percept)) {
