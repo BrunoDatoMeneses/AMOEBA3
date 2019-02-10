@@ -148,13 +148,13 @@ public class Head extends AmoebaAgent {
 	 */
 	@Override
 	protected void onAct() { // play
-		for (Percept pct : this.amas.getScheduler().getPercepts()) {
+		for (Percept pct : this.amas.getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}
 
 		activatedContexts.size();
 		setContextFromPropositionWasSelected(false);
-		oracleValue = this.amas.getScheduler().getPerceptionsOrAction("oracle");
+		oracleValue = this.amas.getPerceptionsOrAction("oracle");
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -219,7 +219,7 @@ public class Head extends AmoebaAgent {
 		if (bestContext != this.lastUsedContext) {
 			prediction = bestContext.getActionProposal();
 		} else {
-			ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
+			ArrayList<Context> allContexts = amas.getContexts();
 			Context nearestContext = this.getNearestContext(allContexts);
 			prediction = nearestContext.getActionProposal();
 			bestContext = nearestContext;
@@ -232,7 +232,7 @@ public class Head extends AmoebaAgent {
 		/* Finally, head agent check the need for a new context agent */
 
 		boolean newContextCreated = false;
-		ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
+		ArrayList<Context> allContexts = amas.getContexts();
 		if (getDistanceToNearestGoodContext(allContexts) > 0) {
 			Context context = createNewContext();
 
@@ -264,7 +264,7 @@ public class Head extends AmoebaAgent {
 		 * incompetent. It needs help from a context.
 		 */
 		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())) {
-			ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
+			ArrayList<Context> allContexts = amas.getContexts();
 
 			Context c = getNearestGoodContext(allContexts);
 			if (c != null)
@@ -293,7 +293,7 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void getNearestContextAsBestContext() {
-		ArrayList<AmoebaAgent> allContexts = amas.getScheduler().getContexts();
+		ArrayList<Context> allContexts = amas.getContexts();
 		Context nearestContext = this.getNearestContext(allContexts);
 
 		if (nearestContext != null) {
@@ -312,7 +312,7 @@ public class Head extends AmoebaAgent {
 	 *            the all context
 	 * @return the nearest good context
 	 */
-	private Context getNearestGoodContext(ArrayList<AmoebaAgent> allContext) {
+	private Context getNearestGoodContext(ArrayList<Context> allContext) {
 		Context nearest = null;
 		for (AmoebaAgent a : allContext) {
 			Context c = (Context) a;
@@ -332,7 +332,7 @@ public class Head extends AmoebaAgent {
 	 *            the all context
 	 * @return the distance to nearest good context
 	 */
-	private double getDistanceToNearestGoodContext(ArrayList<AmoebaAgent> allContext) {
+	private double getDistanceToNearestGoodContext(ArrayList<Context> allContext) {
 		double d = Double.MAX_VALUE;
 		for (AmoebaAgent a : allContext) {
 			Context c = (Context) a;
@@ -352,7 +352,7 @@ public class Head extends AmoebaAgent {
 	 *            the all context
 	 * @return the nearest context
 	 */
-	private Context getNearestContext(ArrayList<AmoebaAgent> allContext) {
+	private Context getNearestContext(ArrayList<Context> allContext) {
 		Context nearest = null;
 		double distanceToNearest = Double.MAX_VALUE;
 		for (AmoebaAgent a : allContext) {
@@ -377,7 +377,7 @@ public class Head extends AmoebaAgent {
 	 */
 	private double getExternalDistanceToContext(Context context) {
 		double d = 0.0;
-		ArrayList<Percept> percepts = amas.getEnvironment().getAllPercept();
+		ArrayList<Percept> percepts = amas.getPercepts();
 		for (Percept p : percepts) {
 
 			// isEnum deleted -> see Percept.java (here deletion of an if branch)

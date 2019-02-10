@@ -33,4 +33,14 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	@Deprecated
+	public void sendExpressMessage(Object object, MessageType type, AmoebaAgent a) {
+		a.receiveExpressMessage(new AmoebaMessage(object,type,this));
+	}
+
+	@Deprecated
+	private void receiveExpressMessage(AmoebaMessage message) {
+		computeAMessage(message);
+	}
 }

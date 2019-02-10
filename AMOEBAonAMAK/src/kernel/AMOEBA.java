@@ -243,15 +243,24 @@ public class AMOEBA extends Amas<World> {
 		System.err.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
 	}
 	
-	public  ArrayList<Percept> getPercept(){
-		ArrayList<Percept> percept = new ArrayList<>();
+	public  ArrayList<Percept> getPercepts(){
+		ArrayList<Percept> percepts = new ArrayList<>();
 		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
 			if((agent instanceof Percept)) {
-				percept.add((Percept)agent);
+				percepts.add((Percept)agent);
 			}
 		}
-		return percept;
-		
+		return percepts;
+	}
+	
+	public  ArrayList<Context> getContexts(){
+		ArrayList<Context> contexts = new ArrayList<>();
+		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if((agent instanceof Context)) {
+				contexts.add((Context)agent);
+			}
+		}
+		return contexts;
 	}
 	
 	public LocalModel buildLocalModel(Context context) {

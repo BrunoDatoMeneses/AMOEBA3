@@ -46,7 +46,7 @@ public abstract class LocalModel implements Cloneable{
 	 * @param context the context
 	 * @return the formula
 	 */
-	public abstract String getFormula(AMOEBA amoeba,Context context);
+	public abstract String getFormula(Context context);
 	public abstract String getCoefsFormula();
 
 	/**

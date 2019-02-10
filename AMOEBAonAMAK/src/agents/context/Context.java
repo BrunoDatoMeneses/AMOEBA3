@@ -44,7 +44,7 @@ public class Context extends AmoebaAgent {
 	
 	private void buildContext (Head headAgent, AMOEBA amoeba) {
 		
-		ArrayList<Percept> var = amoeba.getPercept();
+		ArrayList<Percept> var = amoeba.getPercepts();
 		Experiment firstPoint = new Experiment();
 		this.headAgent = headAgent;
 		
@@ -127,7 +127,8 @@ public class Context extends AmoebaAgent {
 	
 	protected void onAct() {
 		if(computeValidityByPercepts()) {
-			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);//Send message
+			AmoebaMessage message = new AmoebaMessage(getActionProposal(), MessageType.PROPOSAL, this);
+			sendMessage(message, headAgent.getAID());
 			Config.print("Message envoyé", 4);//Un print dans un config
 		}
 		
@@ -154,22 +155,22 @@ public class Context extends AmoebaAgent {
 	//--------------------------------NCS Resolutions-----------------------------------------
 	
 	public void solveNCS_IncompetentHead(Head head) {
-		world.raiseNCS(NCS.HEAD_INCOMPETENT);
+		amas.getEnvironment().raiseNCS(NCS.HEAD_INCOMPETENT);
 		growRanges();
 	}
 	
 	public void solveNCS_Concurrence(Head head) {
-		world.raiseNCS(NCS.CONTEXT_CONCURRENCE);
+		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONCURRENCE);
 		this.shrinkRangesToJoinBorders( head.getBestContext());
 	}
 	
 	private void solveNCS_Uselessness(Head head) {
-		world.raiseNCS(NCS.CONTEXT_USELESSNESS);
+		amas.getEnvironment().raiseNCS(NCS.CONTEXT_USELESSNESS);
 		this.die();
 	}
 	
 	private void solveNCS_ConflictInexact(Head head) {
-		world.raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
+		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
 		if(true) {
 			confidence--;
 		}
@@ -178,7 +179,7 @@ public class Context extends AmoebaAgent {
 	
 	private void solveNCS_Conflict(Head head) {
 
-		world.raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
+		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
 		
 		if (head.getNewContext() == this) {
 			head.setNewContext(null);
@@ -194,14 +195,14 @@ public class Context extends AmoebaAgent {
 		Percept p;
 		if (head.isContextFromPropositionWasSelected() &&
 				head.getCriticity() <= head.getErrorAllowed()){
-				p = this.getPerceptWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
+				p = this.getPerceptsWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
 			if (p == null) {
 				this.die();
 			}else {		
 			ranges.get(p).matchBorderWith(head.getBestContext());
 			}
 		} else {
-			p = this.getPerceptWithLesserImpactOnVolume(percepts);
+			p = this.getPerceptsWithLesserImpactOnVolume(percepts);
 			ranges.get(p).adapt(this, p.getValue(), p);
 		}
 
@@ -215,7 +216,7 @@ public class Context extends AmoebaAgent {
 	
 	//-----------------------------------------------------------------------------------------------
 	
-	private Percept getPerceptWithLesserImpactOnVolumeNotIncludedIn(ArrayList<Percept> containingRanges, Context c) {
+	private Percept getPerceptsWithLesserImpactOnVolumeNotIncludedIn(ArrayList<Percept> containingRanges, Context c) {
 		Percept p = null;
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
@@ -245,7 +246,7 @@ public class Context extends AmoebaAgent {
 		return p;
 	}
 	
-	private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containingRanges) {
+	private Percept getPerceptsWithLesserImpactOnVolume(ArrayList<Percept> containingRanges) {
 		Percept p = null;
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
@@ -275,12 +276,12 @@ public class Context extends AmoebaAgent {
 		return p;
 	}
 	
-	//getPerceptWithLesserImpactOnAVT never used -> removed
+	//getPerceptsWithLesserImpactOnAVT never used -> removed
 	
-	//getPerceptWithLargerImpactOnAVT never used -> removed
+	//getPerceptsWithLargerImpactOnAVT never used -> removed
 	
-	public double getActionProposal(AMOEBA amoeba) {
-		return localModel.getProposition(amoeba, this);
+	public double getActionProposal() {
+		return localModel.getProposition(amas, this);
 	}
 	
 	//computeValidity never used -> removed
@@ -454,7 +455,7 @@ public class Context extends AmoebaAgent {
 	}
 	
 	private void updateExperiments(AMOEBA amoeba) {
-		ArrayList<Percept> var = amoeba.getPercept();
+		ArrayList<Percept> var = amoeba.getPercepts();
 		maxActivationsRequired = var.size();
 		Experiment exp = new Experiment();
 		for (Percept v : var) {
@@ -489,7 +490,7 @@ public class Context extends AmoebaAgent {
 	 *
 	 */
 	public void growRanges(AMOEBA amoeba) {
-		ArrayList<Percept> allPercepts = amoeba.getPercept();
+		ArrayList<Percept> allPercepts = amoeba.getPercepts();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ? true : false;
 			if (!contain) {
@@ -509,7 +510,7 @@ public class Context extends AmoebaAgent {
 			}
 		}
 		
-		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolumeNotIncludedIn(containingRanges,consideredContext);
+		Percept perceptWithLesserImpact = getPerceptsWithLesserImpactOnVolumeNotIncludedIn(containingRanges,consideredContext);
 		if (perceptWithLesserImpact == null) {
 			this.die();
 		}else {
@@ -517,12 +518,12 @@ public class Context extends AmoebaAgent {
 		}
 	}
 	
-	public void die (AMOEBA amoeba) {
-		for(Percept percept : amoeba.getPercept()) { // see if is compatible //Pred: world.getScheduler().getPercepts()
+	public void die () {
+		isDying = true;
+		for(Percept percept : amas.getPercepts()) { // see if is compatible //Pred: world.getScheduler().getPerceptss()
 			percept.deleteContextProjection(this);
 		}
-		localModel.die();
-		super.die();
+		amas._removeAgent(this);
 	}
 	
 	public void setPerceptValidity(Percept percept) {
