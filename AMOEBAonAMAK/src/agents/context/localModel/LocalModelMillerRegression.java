@@ -33,7 +33,7 @@ public class LocalModelMillerRegression extends LocalModel {
 	 * @param world the world
 	 */
 	public LocalModelMillerRegression(AMOEBA amoeba) {
-		ArrayList<Percept> var = amoeba.getPercept();
+		ArrayList<Percept> var = amoeba.getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
 	}
@@ -63,21 +63,15 @@ public class LocalModelMillerRegression extends LocalModel {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see agents.localModel.LocalModelAgent#computeAMessage(agents.messages.Message)
-	 */
-	@Override
-	public void computeAMessage(Message m) {
-	}
 
 	/* (non-Javadoc)
 	 * @see agents.localModel.LocalModelAgent#getProposition(agents.context.Context)
 	 */
-	public double getProposition(AMOEBA amoeba,Context context) {
+	public double getProposition(Context context) {
 		
 	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
 		
-		ArrayList<Percept> var = amoeba.getPercept();
+		ArrayList<Percept> var = context.getAmas().getPercepts();
 		
 		if (context.getExperiments().size() == 1) {
 			return context.getExperiments().get(0).getProposition();
@@ -111,12 +105,12 @@ public class LocalModelMillerRegression extends LocalModel {
 	/* (non-Javadoc)
 	 * @see agents.localModel.LocalModelAgent#getProposition(agents.context.Context, agents.Percept, agents.Percept, double, double)
 	 */
-	public double getProposition(AMOEBA amoeba,Context context, Percept p1, Percept p2, double v1, double v2) {
+	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		
 	//	System.out.println("get proposition");
 	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
 		
-		ArrayList<Percept> var = amoeba.getPercept();
+		ArrayList<Percept> var = context.getAmas().getPercepts();
 		
 		if (context.getExperiments().size() == 1) {
 			return context.getExperiments().get(0).getProposition();
@@ -159,7 +153,7 @@ public class LocalModelMillerRegression extends LocalModel {
 	/* (non-Javadoc)
 	 * @see agents.localModel.LocalModelAgent#getFormula(agents.context.Context)
 	 */
-	public String getFormula(AMOEBA amoeba,Context context) {
+	public String getFormula(Context context) {
 		String s = "";
 		if (context.getExperiments().size() == 1) {
 			return ""+context.getExperiments().get(0).getProposition();
@@ -168,7 +162,7 @@ public class LocalModelMillerRegression extends LocalModel {
 			if (regression == null) updateModel(context);
 			double[] coef = regression.regress().getParameterEstimates();
 			
-			ArrayList<Percept> var = amoeba.getPercept();
+			ArrayList<Percept> var = context.getAmas().getPercepts();
 			
 			if (coef[0] == Double.NaN) System.exit(0);
 			for (int i = 1 ; i < coef.length ; i++) {

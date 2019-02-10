@@ -2,7 +2,6 @@ package agents.context.localModel;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import kernel.AMOEBA;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,7 +24,7 @@ public abstract class LocalModel implements Cloneable{
 	 * @param context the context
 	 * @return the proposition
 	 */
-	public abstract double getProposition(AMOEBA amoeba,Context context);
+	public abstract double getProposition(Context context);
 	
 	
 	/**
@@ -38,7 +37,7 @@ public abstract class LocalModel implements Cloneable{
 	 * @param v2 the v 2
 	 * @return the proposition
 	 */
-	public abstract double getProposition(AMOEBA amoeba,Context context, Percept p1, Percept p2, double v1, double v2);
+	public abstract double getProposition(Context context, Percept p1, Percept p2, double v1, double v2);
 
 	/**
 	 * Gets the formula.
