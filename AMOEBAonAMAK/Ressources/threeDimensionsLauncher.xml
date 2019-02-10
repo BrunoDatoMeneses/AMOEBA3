@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	
+	<StartingAgents>
+	
+		<Sensor Name="px1" Source="x1"></Sensor>
+		<Sensor Name="px2" Source="x2"></Sensor>
+		<Sensor Name="px3" Source="x3"></Sensor>
+	
+	  	<Controller Name="Controller" Oracle="test"></Controller> 
+
+
+			
+	</StartingAgents>
+	
+	
+</System>

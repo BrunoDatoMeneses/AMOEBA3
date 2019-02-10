@@ -160,8 +160,6 @@ public class Head extends AmoebaAgent {
 		lastUsedContext = bestContext;
 		bestContext = null;
 
-		super.onAct();
-
 		/* useOracle means that data are labeled */
 		if (useOracle) {
 			playWithOracle();
@@ -196,7 +194,7 @@ public class Head extends AmoebaAgent {
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
-			bestContext.getFunction().getFormula(bestContext);
+			System.out.println("Best formula : "+bestContext.getFunction().getFormula(bestContext)); //TODO proper print
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 

@@ -51,15 +51,27 @@ public class AMOEBA extends Amas<World> {
 	 * @param studiedSystem the studied system
 	 */
 	/* Create an AMOEBA coupled with a studied system */
-	public AMOEBA(StudiedSystem studiedSystem, World environment, File ressourceFile) {
-		super(environment, Scheduling.DEFAULT);
-		this.studiedSystem = studiedSystem;
-		this.ressourceFile = ressourceFile;
+	public AMOEBA(World environment, StudiedSystem studiedSystem, File ressourceFile) {
+		super(environment, Scheduling.DEFAULT, studiedSystem, ressourceFile);
+	}
+	
+	@Override
+	protected void onInitialConfiguration() {
+		studiedSystem = (StudiedSystem) params[0];
+		ressourceFile = (File) params[1];
 	}
 	
 	@Override
 	protected void onInitialAgentsCreation() {
 		readRessourceFile(ressourceFile);
+	}
+	
+	@Override
+	protected void onSystemCycleBegin() {
+		if(studiedSystem != null) {
+			studiedSystem.playOneStep();
+			perceptionsAndActionState = studiedSystem.getOutput();
+		}
 	}
 	
 	/**
@@ -170,6 +182,7 @@ public class AMOEBA extends Amas<World> {
 	      SAXBuilder sxb = new SAXBuilder();
 	      Document document;
 		try {
+			System.out.println(systemFile);
 			document = sxb.build(systemFile);
 		    Element racine = document.getRootElement();
 		    System.out.println(racine.getName());

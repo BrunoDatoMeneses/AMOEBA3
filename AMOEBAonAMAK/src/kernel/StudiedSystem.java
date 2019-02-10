@@ -11,9 +11,8 @@ public interface StudiedSystem {
 
 	/**
 	 * When the scheduler of AMOEBA has run one cycle, playOneStep is called to allow the studied system to perform it's own cycle.
-	 * @param action : output action of AMOEBA.
 	 */
-	public void playOneStep(double action);
+	public void playOneStep();
 	
 	/**
 	 * Gets the output.
