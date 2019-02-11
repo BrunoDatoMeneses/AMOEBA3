@@ -9,7 +9,8 @@ import kernel.World;
 public class Main {
 
 	public static void main(String[] args) {
-		File f = new File("D:\\hugor\\Documents\\AMOEBA3\\AMOEBAonAMAK\\Ressources\\twoDimensionsLauncher.xml");
+		
+		File f = new File("Ressources\\twoDimensionsLauncher.xml");
 		System.out.println(f);
 		World w = new World();
 		StudiedSystem s = new F_XY_System(50.0);

@@ -286,7 +286,10 @@ public class Head extends AmoebaAgent {
 	private void selfAnalysationOfContexts() {
 		/* All context which proposed itself must analyze its proposition */
 		for (int i = 0; i < activatedContexts.size(); i++) {
-			activatedContexts.get(i).analyzeResults(this);
+			if(activatedContexts.get(i).isDying()) {
+				activatedContexts.remove(i);
+			}else
+				activatedContexts.get(i).analyzeResults(this);
 		}
 	}
 
@@ -632,4 +635,5 @@ public class Head extends AmoebaAgent {
 	public Head clone() throws CloneNotSupportedException {
 		return (Head) super.clone();
 	}
+	
 }
