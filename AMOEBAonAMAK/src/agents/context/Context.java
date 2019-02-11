@@ -64,6 +64,7 @@ public class Context extends AmoebaAgent {
 			v.addContextProjection(this);
 		}
 		localModel = amoeba.buildLocalModel(this);
+		//TODO see if possible to message 
 		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
@@ -163,6 +164,7 @@ public class Context extends AmoebaAgent {
 
 		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
 		
+		//TODO see if possible to message 
 		if (head.getNewContext() == this) {
 			head.setNewContext(null);
 		};
@@ -172,6 +174,7 @@ public class Context extends AmoebaAgent {
 			confidence -= 2;
 		}
 		
+		//TODO see if possible to message 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
 		Percept p;
@@ -203,6 +206,7 @@ public class Context extends AmoebaAgent {
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
 		
+		//TODO see if possible to message 
 		for (Percept percept : containingRanges) {
 			if (!ranges.get(percept).isPerceptEnum()) {
 				Range r = c.getRanges().get(percept);
@@ -232,7 +236,7 @@ public class Context extends AmoebaAgent {
 		Percept p = null;
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
-		
+		//TODO see if possible to message 
 		for (Percept v : containingRanges) {
 			if (!ranges.get(v).isPerceptEnum()) {
 
@@ -272,9 +276,10 @@ public class Context extends AmoebaAgent {
 		return ranges;
 	}
 	
-	public Range getRangeByPerceptName(String percetName) {//Percept name
+	public Range getRangeByPerceptName(String perceptName) {
+		//TODO see if possible to message 
 		for(Percept prct : ranges.keySet()) {
-			if(prct.getName().equals(percetName)) {
+			if(prct.getName().equals(perceptName)) {
 				return ranges.get(prct);
 			}
 		}
@@ -443,6 +448,7 @@ public class Context extends AmoebaAgent {
 		ArrayList<Percept> var = amas.getPercepts();
 		maxActivationsRequired = var.size();
 		Experiment exp = new Experiment();
+		//TODO see if possible to message 
 		for (Percept v : var) {
 			exp.addDimension(v, v.getValue());
 		}
@@ -455,6 +461,7 @@ public class Context extends AmoebaAgent {
 	
 	public void analyzeResults(Head head) {
 
+		//TODO see if possible to message 
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			solveNCS_Conflict(head);
 			//TODO this.world.getScheduler().addAlteredContext(this);//visualization

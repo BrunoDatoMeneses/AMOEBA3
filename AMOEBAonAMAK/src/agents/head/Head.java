@@ -289,7 +289,7 @@ public class Head extends AmoebaAgent {
 			if(activatedContexts.get(i).isDying()) {
 				activatedContexts.remove(i);
 			}else
-				activatedContexts.get(i).analyzeResults(this);
+				activatedContexts.get(i).analyzeResults(this);//message TODO
 		}
 	}
 
@@ -298,7 +298,7 @@ public class Head extends AmoebaAgent {
 		Context nearestContext = this.getNearestContext(allContexts);
 
 		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();
+			prediction = nearestContext.getActionProposal();//message TODO
 		} else {
 			prediction = 0;
 		}
@@ -382,6 +382,8 @@ public class Head extends AmoebaAgent {
 		for (Percept p : percepts) {
 
 			// isEnum deleted -> see Percept.java (here deletion of an if branch)
+			
+			//TODO see if possible to message 
 			double min = context.getRanges().get(p).getStart();
 			double max = context.getRanges().get(p).getEnd();
 
@@ -401,6 +403,7 @@ public class Head extends AmoebaAgent {
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
+			//TODO see if possible to message 
 			if (oracleValue - c.getActionProposal() < errorAllowed) {
 				b = true;
 			}
@@ -495,6 +498,7 @@ public class Head extends AmoebaAgent {
 		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
 				bc = context;
+				//TODO see if possible to message 
 				currentConfidence = bc.getConfidence();
 			}
 		}

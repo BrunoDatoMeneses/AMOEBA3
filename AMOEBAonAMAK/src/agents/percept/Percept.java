@@ -45,6 +45,7 @@ public class Percept extends AmoebaAgent {
 			}
 		}
 		
+		//TODO see if possible to message 
 		for(Context context : validContextProjection) {
 			context.setPerceptValidity(this); //TODO we may want to use a message instead
 		}
@@ -142,10 +143,12 @@ public class Percept extends AmoebaAgent {
 	}
 	
 	public void updateContextProjectionStart(Context context) {
+		//TODO see if possible to message 
 		contextProjections.get(context).updateStart();
 	}
 	
 	public void updateContextProjectionEnd(Context context) {
+		//TODO see if possible to message 
 		contextProjections.get(context).updateEnd();
 	}
 	
