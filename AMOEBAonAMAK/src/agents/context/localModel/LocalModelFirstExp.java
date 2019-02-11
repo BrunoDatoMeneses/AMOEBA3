@@ -3,7 +3,6 @@ package agents.context.localModel;
 import agents.context.Context;
 import agents.percept.Percept;
 
-// TODO: Auto-generated Javadoc
 /**
  * A simple local model which uses only the value of the first experiment.
  * Useful for output like integer.

@@ -486,7 +486,6 @@ public class Head extends AmoebaAgent {
 	 * Select best context.
 	 */
 	private void selectBestContext() {
-
 		Context bc;
 		if (activatedContexts.isEmpty()) {
 			bc = lastUsedContext;
@@ -571,15 +570,6 @@ public class Head extends AmoebaAgent {
 	 */
 	public double getErrorAllowed() {
 		return errorAllowed;
-	}
-
-	/**
-	 * Gets the average prediction criticity.
-	 *
-	 * @return the average prediction criticity
-	 */
-	public double getAveragePredictionCriticity() {
-		return averagePredictionCriticity;
 	}
 
 	/**

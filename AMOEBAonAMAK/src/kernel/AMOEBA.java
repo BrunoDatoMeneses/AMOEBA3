@@ -116,10 +116,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return head.getAction();
 	}
 	
-	public Head getHeadAgent() {
-		return head;
-	}
-	
 	public boolean isUseOracle() {
 		return useOracle;
 	}

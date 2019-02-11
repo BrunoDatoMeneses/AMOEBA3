@@ -109,8 +109,6 @@ public class Range implements Comparable<Object>, Cloneable {
 		/*Initialization of AVT : a better way to do that should be developped*/
 		this.AVT_deltaMin = (end - start) * AVT_startRatio + 0.0001;
 		this.AVT_deltaMax = (end - start) * AVT_startRatio + 0.0001;
-		
-
 	}
 	
 	//TODO copy constructor

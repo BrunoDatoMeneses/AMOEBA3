@@ -1,11 +1,9 @@
 package agents.context;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import agents.percept.Percept;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Experiment.
  */
@@ -17,31 +15,6 @@ public class Experiment {
 	/** The proposition. */
 	private double proposition;
 
-	
-	/**
-	 * Instantiates a new experiment.
-	 */
-	public Experiment() {
-		
-	}
-
-	/**
-	 * Gets the ranges.
-	 *
-	 * @return the ranges
-	 */
-	public HashMap<Percept, Double> getRanges() {
-		return values;
-	}
-
-	/**
-	 * Sets the values.
-	 *
-	 * @param ranges the ranges
-	 */
-	public void setValues(LinkedHashMap<Percept, Double> ranges) {
-		this.values = ranges;
-	}
 	
 	/**
 	 * Gets the values.
@@ -98,7 +71,4 @@ public class Experiment {
 		
 		return tab;
 	}
-	
-	
-	
 }

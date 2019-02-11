@@ -6,9 +6,8 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
 import kernel.AMOEBA;
-import agents.AmoebaAgent;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class LocalModelMillerRegression.
  */
@@ -30,18 +29,9 @@ public class LocalModelMillerRegression extends LocalModel {
 	 * @param world the world
 	 */
 	public LocalModelMillerRegression(AMOEBA amoeba) {
-		ArrayList<Percept> var = amoeba.getPercepts();
-		this.nParameters = var.size();
+		ArrayList<Percept> percepts = amoeba.getPercepts();
+		this.nParameters = percepts.size();
 		regression = new Regression(nParameters,true);
-	}
-	
-	/**
-	 * Sets the coef.
-	 *
-	 * @param coef the new coef
-	 */
-	public void setCoef(double[] coef) {
-		this.coef = coef.clone();
 	}
 	
 	/**
@@ -51,13 +41,6 @@ public class LocalModelMillerRegression extends LocalModel {
 	 */
 	public double[] getCoef() {
 		return coef;
-	}
-
-	/* (non-Javadoc)
-	 * @see agents.localModel.LocalModelAgent#getTargets()
-	 */
-	public ArrayList<? extends AmoebaAgent> getTargets() {
-		return null;
 	}
 
 
@@ -73,7 +56,6 @@ public class LocalModelMillerRegression extends LocalModel {
 		if (context.getExperiments().size() == 1) {
 			return context.getExperiments().get(0).getProposition();
 		}
-		
 
 		//
 	/*	for (int i = 0 ; i < coef.length ; i++ ) {
@@ -92,8 +74,6 @@ public class LocalModelMillerRegression extends LocalModel {
 	//		System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
 		}
 //		System.out.println("Result final" + " : " + result);
-
-
 		
 		return result;
 	}
@@ -141,18 +121,20 @@ public class LocalModelMillerRegression extends LocalModel {
 	public String getFormula(Context context) {
 		String s = "";
 		if (context.getExperiments().size() == 1) {
-			return ""+context.getExperiments().get(0).getProposition();
+			return "" + context.getExperiments().get(0).getProposition();
 		}
 		else {
-			if (regression == null) updateModel(context);
+			if (regression == null) {
+				updateModel(context);
+			}
 			double[] coef = regression.regress().getParameterEstimates();
 			
-			ArrayList<Percept> var = context.getAmas().getPercepts();
+			ArrayList<Percept> percepts = context.getAmas().getPercepts();
 			
 			if (coef[0] == Double.NaN) System.exit(0);
 			for (int i = 1 ; i < coef.length ; i++) {
 				if (Double.isNaN(coef[i])) coef[i] = 0;
-				s += coef[i] + "*" + var.get(i-1).getName();
+				s += coef[i] + "*" + percepts.get(i-1).getName();
 				
 				if (i < coef.length - 1) s += " + ";
 			}
@@ -161,7 +143,7 @@ public class LocalModelMillerRegression extends LocalModel {
 			
 			for (int i = 1 ; i < coef.length ; i++) {
 				if (Double.isNaN(coef[i])) coef[i] = 0;
-				s += var.get(i-1).getName() + " = " + var.get(i-1).getValue();
+				s += percepts.get(i-1).getName() + " = " + percepts.get(i-1).getValue();
 				s += ", ";
 			}
 			

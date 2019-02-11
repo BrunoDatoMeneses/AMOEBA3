@@ -12,8 +12,8 @@ public class Percept extends AmoebaAgent {
 
 	//protected ArrayList<Agent> activatedContext = new ArrayList<Agent>(); never updated -> removed (see get/setActivatedContext)
 	
-	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	public ArrayList<Context> validContextProjection = new ArrayList<Context>();
+	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
+	private ArrayList<Context> validContextProjection = new ArrayList<Context>();
 	
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -56,14 +56,18 @@ public class Percept extends AmoebaAgent {
 	 * Allow the percept to record the lower and higher value perceived.
 	 */
 	public void ajustMinMax() {
-		if (value < min) min = value;
-		if (value > max) max = value;
+		if (value < min) {
+			min = value;
+		}
+		if (value > max) {
+			max = value;
+		}
 		
 		/* In order to avoid big gap in min-max value in order to adapt with the system dynamic
 		 * It's also a warranty to avoid to flaw AVT with flawed value */
 		double dist = max - min;
-		min += 0.05*dist;
-		max -= 0.05*dist;
+		min += 0.05 * dist;
+		max -= 0.05 * dist;
 	}
 	
 	@Override
@@ -117,15 +121,6 @@ public class Percept extends AmoebaAgent {
 	public boolean isEnum() {
 		return isEnum;
 	}
-
-	/**
-	 * Sets the enum.
-	 *
-	 * @param isEnum the new enum
-	 */
-	public void setEnum(boolean isEnum) {
-		this.isEnum = isEnum;
-	}
 	
 	//swapListElements never used -> removed
 	
@@ -170,5 +165,4 @@ public class Percept extends AmoebaAgent {
 	protected int computeExecutionOrderLayer() {
 		return 0;
 	}
-
 }

@@ -25,7 +25,7 @@ public class LocalModelAverage extends LocalModel {
 	}
 
 	public String getFormula(Context context) {
-		return  getProposition(context) +"";
+		return  getProposition(context) + "";
 	}
 	
 	public String getCoefsFormula() {

@@ -4,7 +4,6 @@ import org.apache.commons.math3.stat.regression.MillerUpdatingRegression;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 
 
-// TODO: Auto-generated Javadoc
 /**
  * Class needed for serialization.
  */

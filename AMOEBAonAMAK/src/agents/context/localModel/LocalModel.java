@@ -3,7 +3,6 @@ package agents.context.localModel;
 import agents.context.Context;
 import agents.percept.Percept;
 
-// TODO: Auto-generated Javadoc
 /**
  * The abstract class of all agents in charge of the generation of the output from Context Agent.
  * For the sake of simplicity, it's not scheduled as agent like other of the system.

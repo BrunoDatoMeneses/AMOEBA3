@@ -21,9 +21,9 @@ public class Context extends AmoebaAgent {
 	
 	private LocalModel localModel;
 	
+	// Note Labbeti : keep these attributes for now. (according to Steven)
 	private double action = -1.0;
 	private double confidence = 0;
-	
 	private int nSelection = 0;
 	private int maxActivationsRequired = 0;
 	private int activations = 0;
@@ -38,6 +38,7 @@ public class Context extends AmoebaAgent {
 		buildContext(head,amas);
 	}
 	
+	@Override
 	protected int computeExecutionOrderLayer() {
 		return 1;
 	}
@@ -304,7 +305,7 @@ public class Context extends AmoebaAgent {
 		return "Context :" + this.getName();//Percept name
 	}
 	
-	//TODO
+	//TODO : keep these debug function for display datas ?
 	/*
 	public String toStringFull() {
 		String s = "";
@@ -332,9 +333,6 @@ public class Context extends AmoebaAgent {
 		
 		s += "\n";
 		s += "Possible neighbours : \n";
-
-
-		
 		
 		return s;
 	}
@@ -344,8 +342,6 @@ public class Context extends AmoebaAgent {
 		s += "Context : " + getName() + "\n";
 		s += "Model : ";
 		s += this.localModel.getCoefsFormula() + "\n";
-;
-		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
 			
@@ -369,8 +365,6 @@ public class Context extends AmoebaAgent {
 		
 		s += "\n";
 
-		
-		
 		return s;
 	}
 	*/
@@ -378,10 +372,8 @@ public class Context extends AmoebaAgent {
 	//getNSelection used in visualization, removed (for now)
 	
 	//setnSelection used in visualization, removed (for now)
-	
-	public boolean isValid() {
-		return valid;
-	}
+
+	//isValid never used -> removed
 	
 	//setValid never used -> removed
 	
@@ -510,7 +502,7 @@ public class Context extends AmoebaAgent {
 		}
 	}
 	
-	public void die () {
+	public void die() {
 		isDying = true;
 		for(Percept percept : amas.getPercepts()) { // see if is compatible //Pred: world.getScheduler().getPerceptss()
 			percept.deleteContextProjection(this);
