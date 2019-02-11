@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
-import fr.irit.smac.amak.Agent;
 import kernel.AMOEBA;
-import kernel.World;
 import agents.AmoebaAgent;
-import agents.AmoebaMessage;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -107,11 +104,6 @@ public class LocalModelMillerRegression extends LocalModel {
 	 */
 	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		
-	//	System.out.println("get proposition");
-	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
-		
-		ArrayList<Percept> var = context.getAmas().getPercepts();
-		
 		if (context.getExperiments().size() == 1) {
 			return context.getExperiments().get(0).getProposition();
 		}
@@ -122,28 +114,21 @@ public class LocalModelMillerRegression extends LocalModel {
 
 			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { //TODO : to improve
 			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getProposition());
-		}
+			}
 		}
 
 		
 		double[] coef = regression.regress().getParameterEstimates();
 		
-		//
-	//	for (int i = 0 ; i < coef.length ; i++ ) {
-	//		System.out.print(var.get(i).getName() + " coef : " + coef[i] + "   " );
-	//	}
-	//	System.out.println();
 		
 		double[] tabv = {v1,v2};
 		
 		double result = coef[0];
-	//	System.out.println("Result 0" + " : " + result);
 		if (coef[0] == Double.NaN) System.exit(0);
 		for (int i = 1 ; i < coef.length ; i++) {
 			if (Double.isNaN(coef[i])) coef[i] = 0;
 			result += coef[i]*tabv[i-1];
 		}
-//		System.out.println("Result final" + " : " + result);
 		return result;
 
 	

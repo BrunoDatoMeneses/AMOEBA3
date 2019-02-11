@@ -5,7 +5,7 @@ import agents.percept.Percept;
 /**
  * The Class Range.
  */
-public class Range implements Comparable, Cloneable {
+public class Range implements Comparable<Object>, Cloneable {
 
 	/** The start. */
 	private double start;

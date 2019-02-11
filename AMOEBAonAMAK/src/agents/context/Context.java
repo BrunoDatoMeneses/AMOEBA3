@@ -172,7 +172,7 @@ public class Context extends AmoebaAgent {
 			confidence -= 2;
 		}
 		
-		ArrayList<Percept> percepts = new ArrayList();
+		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
 		Percept p;
 		if (head.isContextFromPropositionWasSelected() &&
