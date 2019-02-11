@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,7 +22,7 @@ import agents.context.localModel.LocalModelAverage;
 import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 
-public class AMOEBA extends Amas<World> {
+public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private Head head;
 	
@@ -250,4 +249,21 @@ public class AMOEBA extends Amas<World> {
 		return null;
 	}
 
+	@Override
+	public void setLocalModel(TypeLocalModel localModel) {
+		this.localModel = localModel;
+	}
+
+	@Override
+	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
+			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
+		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed, nConflictBeforeAugmentation, nSuccessBeforeDiminution);
+	}
+
+	@Override
+	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
+			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
+			int nSuccessBeforeInexactDiminution) {
+		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+	}
 }

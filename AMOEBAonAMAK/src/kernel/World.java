@@ -37,18 +37,6 @@ public class World extends Environment {
 		}
 	}
 	
-	public HashMap<NCS, Integer> getAllNCS() {
-		return allNCS;
-	}
-	
-	public HashMap<NCS, Integer> getThisLoopNCS() {
-		return thisLoopNCS;
-	}
-	
-	public HashMap<NCS,Integer> getNumberOfNCS() {
-		return numberOfNCS;
-	}
-	
 	public void raiseNCS(NCS ncs) {
 		thisLoopNCS.put(ncs, thisLoopNCS.get(ncs) + 1);
 		
@@ -69,24 +57,12 @@ public class World extends Environment {
 		return AVT_acceleration;
 	}
 
-	public void setAVT_acceleration(double aVT_acceleration) {
-		AVT_acceleration = aVT_acceleration;
-	}
-
 	public double getAVT_deceleration() {
 		return AVT_deceleration;
 	}
 
-	public void setAVT_deceleration(double aVT_deceleration) {
-		AVT_deceleration = aVT_deceleration;
-	}
-
 	public double getAVT_percentAtStart() {
 		return AVT_percentAtStart;
-	}
-
-	public void setAVT_percentAtStart(double aVT_percentAtStart) {
-		AVT_percentAtStart = aVT_percentAtStart;
 	}
 }
 
