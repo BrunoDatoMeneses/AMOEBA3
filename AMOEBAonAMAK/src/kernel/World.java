@@ -3,6 +3,7 @@ import java.util.HashMap;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.lxplot.LxPlot;
 import ncs.NCS;
 
 /**
@@ -63,6 +64,27 @@ public class World extends Environment {
 
 	public double getAVT_percentAtStart() {
 		return AVT_percentAtStart;
+	}
+	
+	public void preCycleActions() {
+		for(NCS ncs : NCS.values()) {
+			allNCS.put(ncs, allNCS.get(ncs)+thisLoopNCS.get(ncs));
+			thisLoopNCS.put(ncs, 0);
+		}
+	}
+	
+	public void updatePlot(int cycle) {
+		cycle -= 1; //We want to start plot at 0
+		int totalNCS = 0;
+		int thisLoopNCSs = 0;
+		for(NCS ncs : NCS.values()) {
+			totalNCS += allNCS.get(ncs);
+			thisLoopNCSs += thisLoopNCS.get(ncs);
+			LxPlot.getChart("This loop NCS").add(ncs.name(),cycle, thisLoopNCS.get(ncs));
+			LxPlot.getChart("All time NCS").add(ncs.name(),cycle, allNCS.get(ncs));
+		}
+		LxPlot.getChart("This loop NCS").add("Total",cycle, thisLoopNCSs);
+		LxPlot.getChart("All time NCS").add("Total",cycle, totalNCS);
 	}
 }
 

@@ -71,6 +71,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			studiedSystem.playOneStep();
 			perceptionsAndActionState = studiedSystem.getOutput();
 		}
+		environment.preCycleActions();
 	}
 	
 	/**
@@ -261,5 +262,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
 			int nSuccessBeforeInexactDiminution) {
 		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+	}
+	
+	@Override
+	protected void onUpdateRender() {
+		environment.updatePlot(cycle);
 	}
 }
