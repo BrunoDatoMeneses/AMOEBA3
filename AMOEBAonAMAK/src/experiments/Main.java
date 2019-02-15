@@ -14,6 +14,8 @@ public class Main {
 		World world = new World();
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		
-		new AMOEBA(world, studiedSystem, file);
+		AMOEBA amoeba = new AMOEBA(world, studiedSystem, file);
+		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
+		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 	}
 }

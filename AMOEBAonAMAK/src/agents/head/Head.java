@@ -194,7 +194,6 @@ public class Head extends AmoebaAgent {
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
-			System.out.println("Best formula : "+bestContext.getFunction().getFormula(bestContext)); //TODO proper print
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 

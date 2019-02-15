@@ -74,17 +74,10 @@ public class World extends Environment {
 	}
 	
 	public void updatePlot(int cycle) {
-		cycle -= 1; //We want to start plot at 0
-		int totalNCS = 0;
-		int thisLoopNCSs = 0;
 		for(NCS ncs : NCS.values()) {
-			totalNCS += allNCS.get(ncs);
-			thisLoopNCSs += thisLoopNCS.get(ncs);
 			LxPlot.getChart("This loop NCS").add(ncs.name(),cycle, thisLoopNCS.get(ncs));
 			LxPlot.getChart("All time NCS").add(ncs.name(),cycle, allNCS.get(ncs));
 		}
-		LxPlot.getChart("This loop NCS").add("Total",cycle, thisLoopNCSs);
-		LxPlot.getChart("All time NCS").add("Total",cycle, totalNCS);
 	}
 }
 

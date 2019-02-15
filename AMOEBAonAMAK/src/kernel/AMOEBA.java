@@ -3,7 +3,11 @@ package kernel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Vector;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -16,6 +20,9 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.lxplot.LxPlot;
+import fr.irit.smac.lxplot.commons.ChartType;
+import fr.irit.smac.lxplot.server.LxPlotChart;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelAverage;
@@ -43,6 +50,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private File ressourceFile;
 	
+	// Statistic ---------------------
+	private Vector<Double> lastErrors = new Vector<>();
+	//--------------------------------
+	
 
 	/**
 	 * Instantiates a new amoeba.
@@ -52,6 +63,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/* Create an AMOEBA coupled with a studied system */
 	public AMOEBA(World environment, StudiedSystem studiedSystem, File ressourceFile) {
 		super(environment, Scheduling.DEFAULT, studiedSystem, ressourceFile);
+		//this.getScheduler().stop();
 	}
 	
 	@Override
@@ -266,6 +278,30 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onUpdateRender() {
+		
 		environment.updatePlot(cycle);
+		
+		LxPlot.getChart("Number of agents").add("Percepts", cycle, getPercepts().size());
+		LxPlot.getChart("Number of agents").add("Contexts", cycle, getContexts().size());
+		
+		double error = getPerceptionsOrAction("oracle")-head.getAction();
+		if(cycle < 20) {
+			lastErrors.add(Math.abs(error));
+		} else {
+			lastErrors.remove(0);
+			lastErrors.add(Math.abs(error));
+		}
+		double meanError = 0;
+		for (double v : lastErrors) {
+			meanError += v;
+		}
+		meanError /= lastErrors.size();
+		LxPlot.getChart("Error", ChartType.LINE, 100).add("Mean error", cycle, meanError);
+		Vector<Double> sortedErrors = new Vector<>(lastErrors);
+		Collections.sort(sortedErrors);
+		LxPlot.getChart("Error", ChartType.LINE, 100).add("Median error", cycle, sortedErrors.get(sortedErrors.size()/2));
+		
+		LxPlot.getChart("Hyperparameters").add("Error Allowed",cycle, head.getErrorAllowed());
+		LxPlot.getChart("Hyperparameters").add("Inexact Allowed",cycle, head.getInexactAllowed());
 	}
 }
