@@ -23,7 +23,9 @@ import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.lxplot.LxPlot;
 import fr.irit.smac.lxplot.commons.ChartType;
+import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
 import fr.irit.smac.lxplot.server.LxPlotChart;
+import ncs.NCS;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelAverage;
@@ -50,11 +52,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	//--------------------------------
 	
 	private File ressourceFile;
-	
-	// Statistic ---------------------
-	private Vector<Double> lastErrors = new Vector<>();
-	//--------------------------------
-	
 
 	/**
 	 * Instantiates a new amoeba.
@@ -279,32 +276,28 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
 	
-	@Override
 	protected void onUpdateRender() {
-		
-		environment.updatePlot(cycle);
-		
-		LxPlot.getChart("Number of agents").add("Percepts", cycle, getPercepts().size());
-		LxPlot.getChart("Number of agents").add("Contexts", cycle, getContexts().size());
-		
-		double error = getPerceptionsOrAction("oracle")-head.getAction();
-		if(cycle < 20) {
-			lastErrors.add(Math.abs(error));
-		} else {
-			lastErrors.remove(0);
-			lastErrors.add(Math.abs(error));
+		HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
+		HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
+		ILxPlotChart loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);
+		ILxPlotChart allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
+		for(NCS ncs : NCS.values()) {
+			loopNCS.add(ncs.name(),cycle, thisLoopNCS.get(ncs));
+			allNCS.add(ncs.name(),cycle, allTimeNCS.get(ncs));
 		}
-		double meanError = 0;
-		for (double v : lastErrors) {
-			meanError += v;
-		}
-		meanError /= lastErrors.size();
-		LxPlot.getChart("Error", ChartType.LINE, 100).add("Mean error", cycle, meanError);
-		Vector<Double> sortedErrors = new Vector<>(lastErrors);
+		
+		ILxPlotChart nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
+		nbAgent.add("Percepts", cycle, getPercepts().size());
+		nbAgent.add("Contexts", cycle, getContexts().size());
+		
+		ILxPlotChart errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
+		errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());		
+		errors.add("Error Allowed",cycle, head.getErrorAllowed());
+		errors.add("Inexact Allowed",cycle, head.getInexactAllowed());
+		Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 		Collections.sort(sortedErrors);
-		LxPlot.getChart("Error", ChartType.LINE, 100).add("Median error", cycle, sortedErrors.get(sortedErrors.size()/2));
+		errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size()/2));
 		
-		LxPlot.getChart("Hyperparameters").add("Error Allowed",cycle, head.getErrorAllowed());
-		LxPlot.getChart("Hyperparameters").add("Inexact Allowed",cycle, head.getInexactAllowed());
+		//System.out.println("Oracle : "+getPerceptionsOrAction("oracle")+"  Prediction : "+head.getAction());
 	}
 }

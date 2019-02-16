@@ -629,4 +629,12 @@ public class Head extends AmoebaAgent {
 		return (Head) super.clone();
 	}
 	
+	public double getAveragePredictionCriticity() {
+		return averagePredictionCriticity;
+	}
+	
+	public ArrayList<Double> getxLastCriticityValues() {
+		return xLastCriticityValues;
+	}
+	
 }
