@@ -13,7 +13,7 @@ import ncs.NCS;
 public class World extends Environment {
 	
 	private HashMap<NCS,Integer> numberOfNCS = new HashMap<NCS,Integer>();
-	private HashMap<NCS,Integer> allNCS = new HashMap<NCS,Integer>();
+	private HashMap<NCS,Integer> allTimeNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> thisLoopNCS = new HashMap<NCS,Integer>();
 	
 	private double AVT_acceleration = 2;
@@ -33,7 +33,7 @@ public class World extends Environment {
 
 		
 		for (NCS ncs : NCS.values()) {
-			allNCS.put(ncs, 0);
+			allTimeNCS.put(ncs, 0);
 			thisLoopNCS.put(ncs, 0);
 		}
 	}
@@ -68,16 +68,17 @@ public class World extends Environment {
 	
 	public void preCycleActions() {
 		for(NCS ncs : NCS.values()) {
-			allNCS.put(ncs, allNCS.get(ncs)+thisLoopNCS.get(ncs));
+			allTimeNCS.put(ncs, allTimeNCS.get(ncs)+thisLoopNCS.get(ncs));
 			thisLoopNCS.put(ncs, 0);
 		}
 	}
 	
-	public void updatePlot(int cycle) {
-		for(NCS ncs : NCS.values()) {
-			LxPlot.getChart("This loop NCS").add(ncs.name(),cycle, thisLoopNCS.get(ncs));
-			LxPlot.getChart("All time NCS").add(ncs.name(),cycle, allNCS.get(ncs));
-		}
+	public HashMap<NCS, Integer> getThisLoopNCS() {
+		return thisLoopNCS;
+	}
+	
+	public HashMap<NCS, Integer> getAllTimeNCS() {
+		return allTimeNCS;
 	}
 }
 
