@@ -20,6 +20,7 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.lxplot.LxPlot;
 import fr.irit.smac.lxplot.commons.ChartType;
 import fr.irit.smac.lxplot.server.LxPlotChart;
@@ -68,6 +69,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onInitialConfiguration() {
+		VUI.get().setDefaultView(200, 0, 0);
 		studiedSystem = (StudiedSystem) params[0];
 		ressourceFile = (File) params[1];
 	}
@@ -75,6 +77,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onInitialAgentsCreation() {
 		readRessourceFile(ressourceFile);
+		
 	}
 	
 	@Override
