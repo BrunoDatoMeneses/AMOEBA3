@@ -10,6 +10,7 @@ import mas.agents.percept.Percept;
 public class NCSMemory {
 
 	private ArrayList<Context> contexts = new ArrayList<Context>();
+	private ArrayList<Context> partiallyActivatedContexts = new ArrayList<Context>();
 	private ArrayList<Context> otherContexts = new ArrayList<Context>();
 	private ArrayList<Percept> percepts = new ArrayList<Percept>();;
 	private Head head;
@@ -36,8 +37,17 @@ public class NCSMemory {
 			for(Context ctxt : concernContexts) {
 				contexts.add(new Context(ctxt));
 			}
+			
+			for(Percept pct : world.getScheduler().getPercepts()) {
+				for(Context ctxt : world.getScheduler().getHeadAgent().getPartiallyActivatedContexts(pct)) {
+					partiallyActivatedContexts.add(new Context(ctxt));
+				}
+			}
+			
+			
+			
 			for(Context ctx : world.getScheduler().getContextsAsContext()) {
-				if(!concernContexts.contains(ctx)) {
+				if((!concernContexts.contains(ctx)) && (!partiallyActivatedContexts.contains(ctx))) {
 					otherContexts.add(new Context(ctx));
 				}
 			}
@@ -165,6 +175,10 @@ public class NCSMemory {
 	
 	public ArrayList<Context> getOtherContexts(){
 		return otherContexts;
+	}
+	
+	public ArrayList<Context> getPartiallyActivatedContexts(){
+		return partiallyActivatedContexts;
 	}
 	
 	public ArrayList<Percept> getPercepts(){

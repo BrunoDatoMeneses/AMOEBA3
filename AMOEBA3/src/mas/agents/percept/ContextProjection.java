@@ -69,7 +69,12 @@ public class ContextProjection implements Serializable{
 	}
 	
 	public boolean contains(Double value) {
-		return ((value > start)  && (value < end));
+		return Math.abs(value - getCenter()) < getRadius() ;
+	}
+	
+	public boolean contains(Double value, Double neighborhood) {
+		System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
+		return Math.abs(value - getCenter()) < (getRadius() + neighborhood );
 	}
 	
 	public boolean inNeighborhoodOf(Double value) {

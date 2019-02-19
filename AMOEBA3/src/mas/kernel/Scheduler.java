@@ -242,7 +242,7 @@ public class Scheduler implements Serializable{
 		}
 	}
 	
-	private void scheduledItemsAndView() {
+	public void scheduledItemsAndView() {
 		//Scheduled item
 		if (scheduled == null) scheduled = new ArrayList<ScheduledItem>();
 		
@@ -355,7 +355,9 @@ public class Scheduler implements Serializable{
 //		}
 		
 		
-
+		for(Context ctxt : getContextsAsContext()) {
+			ctxt.clearNonValidPerceptNeighbors();
+		}
 
 
 	}

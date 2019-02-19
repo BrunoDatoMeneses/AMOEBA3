@@ -2,8 +2,8 @@ package mas.agents;
 
 public class AbstractPair<A,B> {
 
-	public final A a;
-    public final B b;
+	public  A a;
+    public  B b;
 
     public AbstractPair(A a, B b) {
         this.a = a;
@@ -17,6 +17,14 @@ public class AbstractPair<A,B> {
     public B getB() {
     	return b;
     }
+    
+    public void setA(A a) {
+    	 this.a = a;
+    }
+    
+    public void setB(B b) {
+   	 this.b = b;
+   }
 }
 
 

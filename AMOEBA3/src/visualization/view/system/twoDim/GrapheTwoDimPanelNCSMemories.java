@@ -386,7 +386,10 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		//System.out.println("NODES before : " + graph.getNodeSet().size() );
 		for(Context ctxt : memoryContexts) {
 			//System.out.println(ctxt.getName());
-			graph.removeNode(ctxt.getName());
+			if(graph.getNode(ctxt.getName())!=null) {
+				graph.removeNode(ctxt.getName());
+			}
+			
 		}
 		clearMemory();
 		//System.out.println("NODES after : " + graph.getNodeSet().size() );
@@ -394,154 +397,23 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		//setView(2);
 		
 		//System.out.println("Ctxt to draw : " + ncsMemory.getContexts().size() );
-		for (Context ctxt : ncsMemory.getContexts()) {
-
-			String name = ctxt.getName();
-			Node node;
-			memoryContexts.add(ctxt);
-			//System.out.println(name);
-			graph.addNode(name);
-			node = graph.getNode(name);
-			node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
-			node.addAttribute("ui.label", ctxt.getName());
-
-			node.addAttribute("EXIST", true);
-			if (ctxt.getRanges().size() > 0){
-				drawRectangle(node, ctxt);
-			}
-			
-			
-
-			Double r = 0.0;
-			Double g = 0.0;
-			Double b = 0.0;
-			double[] coefs = ctxt.getLocalModel().getCoef();
-			//System.out.println("COEFS : " + coefs.length);
-			if(coefs.length>0) {
-				if(coefs.length==1) {
-					//System.out.println(coefs[0]);	
-					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length==2) {
-					//System.out.println(coefs[0] + " " + coefs[1]);
-					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length>=3) {
-					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
-					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
-					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
-					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
-					if(r.isNaN()) {
-						r = 0.0;
-					}
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else {
-					r = 255.0;
-					g = 255.0;
-					b = 255.0;
-				}
-			}
-			else {
-				r = 255.0;
-				g = 255.0;
-				b = 255.0;
-			}
-			
-			node.addAttribute("ui.class","RGBAColor");
-			//System.out.println("COLORS : " + r + " " + g + " " + b);
-			
-			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",150);");
-			
-		}
+		
 		
 		for (Context ctxt : ncsMemory.getOtherContexts()) {
 
-			String name = ctxt.getName();
-			Node node;
-			memoryContexts.add(ctxt);
-			//System.out.println(name);
-			graph.addNode(name);
-			node = graph.getNode(name);
-			node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
-			node.addAttribute("ui.label", ctxt.getName());
+			drawContexts(ctxt, 50);
+			
+		}
+		
+		for (Context ctxt : ncsMemory.getContexts()) {
 
-			node.addAttribute("EXIST", true);
-			if (ctxt.getRanges().size() > 0){
-				drawRectangle(node, ctxt);
-			}
+			drawContexts(ctxt, 150);
 			
-			
-			Double r = 0.0;
-			Double g = 0.0;
-			Double b = 0.0;
-			double[] coefs = ctxt.getLocalModel().getCoef();
-			//System.out.println("COEFS : " + coefs.length);
-			if(coefs.length>0) {
-				if(coefs.length==1) {
-					//System.out.println(coefs[0]);	
-					b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length==2) {
-					//System.out.println(coefs[0] + " " + coefs[1]);
-					g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-					b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else if(coefs.length>=3) {
-					//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
-					r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
-					g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
-					b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
-					if(r.isNaN()) {
-						r = 0.0;
-					}
-					if(g.isNaN()) {
-						g = 0.0;
-					}
-					if(b.isNaN()) {
-						b = 0.0;
-					}
-				}
-				else {
-					r = 255.0;
-					g = 255.0;
-					b = 255.0;
-				}
-			}
-			else {
-				r = 255.0;
-				g = 255.0;
-				b = 255.0;
-			}
-			
-			node.addAttribute("ui.class","RGBAColor");
-			//System.out.println("COLORS : " + r + " " + g + " " + b);
-			
-			node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",50);");
+		}
+		
+		for (Context ctxt : ncsMemory.getPartiallyActivatedContexts()) {
+
+			drawContexts(ctxt, 150);
 			
 		}
 	
@@ -564,6 +436,85 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		//System.out.println("Drawn nodes : " + graph.getNodeSet().size() );
 		
 		textarea.setText(ncsMemory.toStringDetailled());
+	}
+	
+	
+	private void drawContexts(Context ctxt, int transparence) {
+		
+		String name = ctxt.getName();
+		Node node;
+		memoryContexts.add(ctxt);
+		//System.out.println(name);
+		if(graph.getNode(name)==null) {
+			graph.addNode(name);
+		}
+		
+		node = graph.getNode(name);
+		node.addAttribute("ui.class", ctxt.getClass().getSimpleName());
+		node.addAttribute("ui.label", ctxt.getName());
+
+		node.addAttribute("EXIST", true);
+		if (ctxt.getRanges().size() > 0){
+			drawRectangle(node, ctxt);
+		}
+		
+		
+		Double r = 0.0;
+		Double g = 0.0;
+		Double b = 0.0;
+		double[] coefs = ctxt.getLocalModel().getCoef();
+		//System.out.println("COEFS : " + coefs.length);
+		if(coefs.length>0) {
+			if(coefs.length==1) {
+				//System.out.println(coefs[0]);	
+				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else if(coefs.length==2) {
+				//System.out.println(coefs[0] + " " + coefs[1]);
+				g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+				if(g.isNaN()) {
+					g = 0.0;
+				}
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else if(coefs.length>=3) {
+				//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+				r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+				g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+				b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+				if(r.isNaN()) {
+					r = 0.0;
+				}
+				if(g.isNaN()) {
+					g = 0.0;
+				}
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+		}
+		else {
+			r = 255.0;
+			g = 255.0;
+			b = 255.0;
+		}
+		
+		node.addAttribute("ui.class","RGBAColor");
+		//System.out.println("COLORS : " + r + " " + g + " " + b);
+		
+		node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + "," + transparence + ");");
+		
 	}
 	
 	public void addNCSmemomry(NCSMemory ncsMemory) {
@@ -1325,11 +1276,17 @@ private void startPanelController() {
 		}
 		
 		
-		Node originNode;
-		originNode = graph.getNode("origin");
-		originNode.addAttribute("EXIST", true);
-		originNode.setAttribute("xyz", 0, 0, 0);
-		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
+		Node originNode1;
+		originNode1 = graph.getNode("origin1");
+		originNode1.addAttribute("EXIST", true);
+		originNode1.setAttribute("xyz", 0, 0, 0);
+		originNode1.addAttribute("ui.style", "size: " + doubleFormat.format(1) + "gu, " + doubleFormat.format(3) +"gu;");
+		
+		Node originNode2;
+		originNode2 = graph.getNode("origin2");
+		originNode2.addAttribute("EXIST", true);
+		originNode2.setAttribute("xyz", 0, 0, 0);
+		originNode2.addAttribute("ui.style", "size: " + doubleFormat.format(3) + "gu, " + doubleFormat.format(1) +"gu;");
 
 	}
 	
@@ -1744,28 +1701,29 @@ private void startPanelController() {
 		System.out.println("Context pushed : " + id);
 		
 		String info = "";
-		if (rememberState) {
-			Observation o = getObservationByTick(sliderValue);
-			if (o != null) {
-				Context c = o.getContextById(id);
-				if ( c != null ) {
-					info = "State :" + sliderValue + "\n";
-					info = info.concat(o.getContextById(id).toStringFull());
-					info = info.replace("Current", "\nCurrent");
-					info = info.replace("AVT", "\nAVT");
-				} else {
-					info = "No context";
-				}
-				
-			} 
-			
-		} else {
-			info = "State :" + currentTick + "\n";
-			info = info.concat(world.getAgents().get(id).toString());
-			info = info.replace("Current", "\nCurrent");
-			info = info.replace("AVT", "\nAVT");
-		}
+//		if (rememberState) {
+//			Observation o = getObservationByTick(sliderValue);
+//			if (o != null) {
+//				Context c = o.getContextById(id);
+//				if ( c != null ) {
+//					info = "State :" + sliderValue + "\n";
+//					info = info.concat(o.getContextById(id).toStringFull());
+//					info = info.replace("Current", "\nCurrent");
+//					info = info.replace("AVT", "\nAVT");
+//				} else {
+//					info = "No context";
+//				}
+//				
+//			} 
+//			
+//		} else {
+//			info = "State :" + currentTick + "\n";
+//			info = info.concat(world.getAgents().get(id).toString());
+//			info = info.replace("Current", "\nCurrent");
+//			info = info.replace("AVT", "\nAVT");
+//		}
 		
+		info += world.getScheduler().getContextByName(id).toStringFull();
 		textarea.setText(info);
 		
 	}

@@ -16,6 +16,7 @@ import org.apache.commons.math3.util.Pair;
 import mas.kernel.Config;
 import mas.kernel.World;
 import mas.ncs.NCS;
+import mas.agents.AbstractPair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.head.Head;
@@ -62,6 +63,10 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<Percept, Boolean>();
 	
+	private ArrayList<Percept> nonValidPercepts = new ArrayList<Percept>();
+	private ArrayList<Percept> nonValidNeightborPercepts = new ArrayList<Percept>();
+	
+	
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
@@ -93,9 +98,9 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	public Context(World world, Head head, Context bestNearestContext) {
 		super(world);
 		buildContext(head, bestNearestContext);
-		System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
-		System.out.println(this.toStringFull());
-		System.out.println(bestNearestContext.toStringFull());
+		//System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
+		//System.out.println(this.toStringFull());
+		//System.out.println(bestNearestContext.toStringFull());
 	}
 	
 	private void buildContext (Head headAgent, Context bestNearestContext) {
@@ -115,18 +120,15 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			ctxt.addContext(this);
 		}
 		
+		
+		
 		for (Percept v : var) {
 			Range r;
-			Double maxRadius = world.getScheduler().getHeadAgent().getMaxRadiusForContextCreation(v);
-			Double length;
-			if(maxRadius!= null) {
-				length = 2*maxRadius;
-			}
-			else {
-				length = Math.abs(v.getMinMaxDistance()) * 0.2;
-			}
 			
-			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v, world);
+			
+			Double radius = getMaxRadiusForContextCreation(v);
+			
+			r = new Range(this, v.getValue() - radius, v.getValue() + radius, 0, true, true, v, world);
 			ranges.put(v, r);
 			ranges.get(v).setValue(v.getValue());
 			sendExpressMessage(null, MessageType.REGISTER, v);
@@ -205,6 +207,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		overlaps =  new HashMap<Context,String>();
 	}
+	
+	
+	
+	Double getMaxRadiusForContextCreation(Percept pct) {
+		Double maxRadius = world.getScheduler().getHeadAgent().getMaxRadiusForContextCreation(pct);
+		//System.out.println("MAX RADIUS FOR CONTEXT CREATION "  + pct.getName() + " " + maxRadius + " / " + (maxRadius/pct.getRadiusContextForCreation()));
+		return maxRadius;
+		
+		//return Math.abs(pct.getMinMaxDistance()) * world.contextCreationPercentage;
+	}
+	
 	/**
 	 * Builds the context.
 	 *
@@ -228,18 +241,65 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			ctxt.addContext(this);
 		}
 		
+		HashMap<Percept,Double> maxRadiusesForContextCreation = new HashMap<Percept,Double>();
+		AbstractPair<Percept, Double> betterRadius = new AbstractPair<Percept, Double>(null,Double.NEGATIVE_INFINITY);
+		AbstractPair<Percept, Double> worstRadius = new AbstractPair<Percept, Double>(null,Double.POSITIVE_INFINITY);
+		
+		for(Percept pct : var) {
+			double maxRadius = getMaxRadiusForContextCreation(pct);
+			double maxRadiusRatio = maxRadius / pct.getRadiusContextForCreation();
+			maxRadiusesForContextCreation.put(pct, maxRadiusRatio);
+			
+			if(maxRadiusRatio > betterRadius.getB()) {
+				betterRadius.setA(pct);
+				betterRadius.setB(maxRadiusRatio);
+			}
+			if(maxRadiusRatio < worstRadius.getB()) {
+				worstRadius.setA(pct);
+				worstRadius.setB(maxRadiusRatio);
+			}
+		}
+		
+		
+		
 		for (Percept v : var) {
 			Range r;
-
-			Double maxRadius = world.getScheduler().getHeadAgent().getMaxRadiusForContextCreation(v);
-			Double length;
-			if(maxRadius!= null) {
-				length = 2*maxRadius;
+			Double radius;
+			
+			
+			if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size() == 1) {
+				if(betterRadius.getB() < 1.0 ) {
+					if(betterRadius.getA() == v){
+						radius = maxRadiusesForContextCreation.get(v)*v.getRadiusContextForCreation();
+					}
+					else {
+						radius = v.getRadiusContextForCreation();
+					}
+				}
+				else {
+					radius = maxRadiusesForContextCreation.get(v)*v.getRadiusContextForCreation();
+				}
 			}
 			else {
-				length = Math.abs(v.getMinMaxDistance()) * 0.2;
+				if(worstRadius.getA() == v){
+					radius = maxRadiusesForContextCreation.get(v)*v.getRadiusContextForCreation();
+				}
+				else {
+					radius = v.getRadiusContextForCreation();
+				}
 			}
-			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v, world);
+
+
+			//System.out.println("MAX RADIUS FOR CONTEXT CREATION AFTER TEST"  + v.getName() + " " + radius + " / " + (radius/v.getRadiusContextForCreation()));
+
+			AbstractPair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			
+			System.out.println("MAX RADIUS FOR CONTEXT CREATION "  + v.getName() + " < " + radiuses.getA() + " , "  + radiuses.getB() + " > / < " + (radiuses.getA()/v.getRadiusContextForCreation()) + " , " + (radiuses.getB()/v.getRadiusContextForCreation()) + " >");
+			
+			r = new Range(this, v.getValue() - radiuses.getA(), v.getValue() + radiuses.getB(), 0, true, true, v, world);
+			
+			
+			//r = new Range(this, v.getValue() - radius, v.getValue() + radius, 0, true, true, v, world);
 			ranges.put(v, r);
 			ranges.get(v).setValue(v.getValue());
 			sendExpressMessage(null, MessageType.REGISTER, v);
@@ -248,6 +308,10 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			v.addContextProjection(this);
 			v.addContextSortedRanges(this);
 		}
+		
+		displayRanges();
+		expand();
+		
 		localModel = this.world.buildLocalModel(this);
 		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
@@ -281,6 +345,180 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 		
 		overlaps =  new HashMap<Context,String>();
+		
+		System.out.println("NEW CONTEXT " + this.getName());
+		displayRanges();
+		
+	}
+	
+	public void displayRanges() {
+		for(Percept pct : ranges.keySet()) {
+			System.out.println(pct.getName() + " [ " + ranges.get(pct).getStart() + " , " + ranges.get(pct).getEnd() + " ]");
+		}
+	}
+	
+	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors, Percept pctDirection){
+		ArrayList<Context> contexts = new ArrayList<Context>();
+		
+		boolean test = true;
+		for(Context ctxtNeigbor: contextNeighbors) {
+			for(Percept pct : ranges.keySet()) {
+				if(pct!=pctDirection) {
+					test = test && ( this.ranges.get(pct).distance(ctxtNeigbor.getRanges().get(pct))<0);
+				}
+				
+				
+			}
+			if(test) {
+				contexts.add(ctxtNeigbor);
+			}
+		}
+		
+		
+		return contexts;
+	}
+	
+	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors, Percept pctDirection, SpatialContext expandingContext){
+		ArrayList<Context> contexts = new ArrayList<Context>();
+		
+		boolean test = true;
+		for(Context ctxtNeigbor: contextNeighbors) {
+			for(Percept pct : ranges.keySet()) {
+				if(pct!=pctDirection) {
+					System.out.println("DISTANCE " + ctxtNeigbor.getName()+ " " + pct.getName()+ " " +  expandingContext.distance(pct, ctxtNeigbor.getRanges().get(pct)) + " " + ( expandingContext.distance(pct, ctxtNeigbor.getRanges().get(pct))<0)) ;
+					test = test && ( expandingContext.distance(pct, ctxtNeigbor.getRanges().get(pct))<-0.0001);
+				}
+				
+				
+			}
+			if(test) {
+				contexts.add(ctxtNeigbor);
+			}
+			
+			test = true;
+		}
+		
+		
+		return contexts;
+	}
+	
+	public void expand() {
+		
+		ArrayList<Context> neighborsOnOneDirection;
+		HashMap<Percept,SpatialContext>  alternativeContexts = new HashMap<Percept,SpatialContext>();
+		double maxVolume = this.getVolume();
+		double currentVolume;
+		SpatialContext maxVolumeSpatialContext = null;
+
+		for(Percept fixedPct: ranges.keySet()) {
+			alternativeContexts.put(fixedPct, new SpatialContext(this));
+
+			System.out.println("FIXED PERCEPT :"  + fixedPct.getName());
+			
+			for(Percept pctDirectionForExpanding: ranges.keySet()) {
+
+				
+				if(pctDirectionForExpanding != fixedPct) {
+					
+					System.out.println("DIRECTION PERCEPT :"  + pctDirectionForExpanding.getName());
+					
+					System.out.println("ALL NEIGHBORS");
+					for(Context ct : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+						System.out.println(ct.getName());
+					}
+					
+					neighborsOnOneDirection = getContextsOnAPerceptDirectionFromContextsNeighbors(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts(), pctDirectionForExpanding, alternativeContexts.get(fixedPct));
+					
+					
+					System.out.println("NEIGHBORS THROUGH " + pctDirectionForExpanding.getName());
+					for(Context ct : neighborsOnOneDirection) {
+						System.out.println(ct.getName());
+					}
+					
+					
+					AbstractPair<Double,Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(neighborsOnOneDirection, pctDirectionForExpanding);
+					System.out.println("START : " + expandingRadiuses.getA() + " END " + expandingRadiuses.getB());
+					alternativeContexts.get(fixedPct).expandEnd(pctDirectionForExpanding, expandingRadiuses.getB());
+					alternativeContexts.get(fixedPct).expandStart(pctDirectionForExpanding, expandingRadiuses.getA());
+				}
+			}
+			
+			currentVolume = alternativeContexts.get(fixedPct).getVolume();
+			if(currentVolume>maxVolume) {
+				maxVolume = currentVolume;
+				maxVolumeSpatialContext = alternativeContexts.get(fixedPct);
+			}
+			
+		}
+		if(maxVolumeSpatialContext != null) {
+			matchSpatialContextRanges(maxVolumeSpatialContext);
+		}
+		
+		
+	}
+	
+	public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
+		
+		for(Percept pct : ranges.keySet()) {
+			
+			double startExpansion = Math.abs(ranges.get(pct).getStart()-biggerContextForCreation.getStart(pct));
+			double endExpansion = Math.abs(ranges.get(pct).getEnd()-biggerContextForCreation.getEnd(pct));
+			System.out.println("EXPANSION "  + pct.getName() +" < " + startExpansion + " , "  + endExpansion + " > / < " +pct.getMin() + " , " +pct.getMax() + " >");
+			
+			ranges.get(pct).setStart(biggerContextForCreation.getStart(pct));
+			ranges.get(pct).setEnd(biggerContextForCreation.getEnd(pct));
+			
+		}
+		
+	}
+	
+	public AbstractPair<Double,Double> getMaxExpansionsForContextExpansionAfterCreation(ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
+		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
+		AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(Math.abs(pct.getMin()- ranges.get(pct).getStart()),Math.abs(pct.getMax()-ranges.get(pct).getEnd()));
+
+		//System.out.println("EXPANSION MIN MAX "  + pct.getName() +" " + pct.getValue() + " < " + pct.getMin() + " , "  + pct.getMax() + " > / < " + Math.abs(pct.getMin()- pct.getValue()) + " , " + Math.abs(pct.getMax()-pct.getValue()) + " >");
+		
+		double currentStartExpansion;
+		double currentEndExpansion;
+		
+			
+		//for(Context ctxt:partialNeighborContexts.get(pct)) {
+		for(Context ctxt: contextNeighborsInOneDirection) {			
+			
+			System.out.println("DISTANCE " + pct.getName() + " " + ctxt.getRanges().get(pct).centerDistance(pct.getValue()));
+			if(ctxt.getRanges().get(pct).centerDistance(pct.getValue()) < 0) {
+				// End radius
+				
+				currentEndExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
+				System.out.println("DISTANCE 2 " + pct.getName() + " " + ctxt.getRanges().get(pct).distance(ranges.get(pct)));
+				//System.out.println(ctxt.getName() + " " + pct.getName() + " " + currentRadius + " " + maxRadius);
+				if(currentEndExpansion < maxExpansions.getB() && currentEndExpansion >= -0.00001 ) {
+					if(Math.abs(currentEndExpansion)<0.0001) {
+						currentEndExpansion = 0.0;
+					}
+					maxExpansions.setB(currentEndExpansion); 
+				}
+			}
+			
+			if(ctxt.getRanges().get(pct).centerDistance(pct.getValue()) > 0) {
+				// Start radius
+				currentStartExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
+				//System.out.println(ctxt.getName() + " " + pct.getName() + " " + currentRadius + " " + maxRadius);
+				if(currentStartExpansion < maxExpansions.getA() && currentStartExpansion >= -0.00001 ) {
+					if(Math.abs(currentStartExpansion)<0.0001) {
+						currentEndExpansion = 0.0;
+					}
+					maxExpansions.setA(currentStartExpansion); 
+				}
+			}
+
+			
+			
+		}
+		
+		return maxExpansions;
+		
+		
 	}
 	
 	/**
@@ -385,7 +623,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				activations--;
 
 				if (activations < 0)  {
-					//system.out.println("Activation lower than 0 : exit");
+					////System.out.println("Activation lower than 0 : exit");
 					System.exit(-2);
 				}
 				if (valid) {
@@ -417,19 +655,41 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		super.play();
 		
-		if(computeValidityByPercepts()) {
-			if(world.getScheduler().getTick() == 119) {
-				//system.out.println("CONTEXT NEW VALIDITY :" + this.getName());
-			}
+		System.out.println("}}}}}}}}}}}}}}}}}}}}}}}}}}} NON VALIDITY");
+		for(Percept pct : nonValidPercepts) {
+			System.out.println(pct.getName());
+		}
+		
+		if(nonValidPercepts.size() == 0) {
+
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
 			Config.print("Message envoyé", 4);
-			////system.out.println("Valid context by Percepts "+this.name);
+			//////System.out.println("Valid context by Percepts "+this.name);
+		}
+		else if(nonValidPercepts.size() == 1){
+			world.getScheduler().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
 		}
 		
-		if(computeNeighborhoodValidityByPercepts()) {
+		
+		if(nonValidNeightborPercepts.size() == 0) {
+			
+			//System.out.println("VALID NEIGHBOR : " + this.getName());
+
+			System.out.println(world.getScheduler().getTick() + " " + this.getName() + " " + "VALID");
 			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
 		}
+		else if(nonValidNeightborPercepts.size() == 1){
+			world.getScheduler().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0),this);
+			System.out.println(world.getScheduler().getTick() + " " + this.getName() + " " + "PARTIALLY VALID" + " " + nonValidNeightborPercepts.get(0).getName());
+		}
 		
+		
+
+		
+
+		
+
+		//assert computeValidityByPercepts() == (nonValidPercepts.size() == 0) : "Erreur Valid Non Valid";
 		
 		
 		this.activations = 0;
@@ -443,6 +703,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			perceptValidities.put(percept, false);
 			perceptNeighborhoodValidities.put(percept, false);
 		}
+		
+		
+		
+		nonValidPercepts.clear();
+		//nonValidNeightborPercepts.clear();
 		
 		//ENDO
 //		for (Percept v : ranges.keySet()) {
@@ -466,14 +731,47 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		Random rand = new Random();
 		
 //		if( this.getConfidence()  <= 0 && tickCreation + 125 < world.getScheduler().getTick() ) {
-//			System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
+//			//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
 //			world.raiseNCS(NCS.CONTEXT_USELESSNESS);
 //			this.die();
 //		}
 		
 		
 	}
+	
+	public void updateRequestNeighborState(){ //faire le update dans le head attention partial et full
+		
+		if(nonValidNeightborPercepts.size() == 0) {
+			
+			//System.out.println("VALID NEIGHBOR : " + this.getName());
 
+			
+			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
+		}
+		else {
+			world.getScheduler().getHeadAgent().removeRequestNeighbor(this);
+		}
+		
+	}
+	
+	public void updateActivatedContexts(){ //faire le update dans le head attention partial et full
+		
+		if(nonValidPercepts.size() == 0) {
+			
+			//System.out.println("VALID NEIGHBOR : " + this.getName());
+
+			
+			world.getScheduler().getHeadAgent().addActivatedContext(this);
+		}
+		else {
+			world.getScheduler().getHeadAgent().removeActivatedContext(this);
+		}
+		
+	}
+
+	public void clearNonValidPerceptNeighbors() {
+		nonValidNeightborPercepts.clear();
+	}
 
 	private void NCSDetections() {
 		
@@ -483,13 +781,13 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	}
 	
 	public void displayOtherContextsDistances() {
-		//system.out.println("Other Context Distances : " + this.getName());
+		////System.out.println("Other Context Distances : " + this.getName());
 		for(Context ctxt :otherContextsDistancesByPercept.keySet()) {
 			//system.out.print(ctxt.getName() + " ");
 			for(Percept pct : otherContextsDistancesByPercept.get(ctxt).keySet()) {
 				//system.out.print(pct.getName() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getFirst() + " " + otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond() + " ");
 			}
-			//system.out.println(" ");
+			////System.out.println(" ");
 		}
 	}
 	
@@ -522,7 +820,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 * @param head the head
 	 */
 	public void solveNCS_IncompetentHead(Head head) {
-		System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " +"solveNCS_IncompetentHead");
+		//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " +"solveNCS_IncompetentHead");
 		world.raiseNCS(NCS.HEAD_INCOMPETENT);
 		growRanges();
 	}
@@ -533,7 +831,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 * @param head the head
 	 */
 	public void solveNCS_Concurrence(Head head) {
-		System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Concurrence");
+		//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Concurrence");
 		world.raiseNCS(NCS.CONTEXT_CONCURRENCE);
 		this.shrinkRangesToJoinBorders( head.getBestContext());
 	}
@@ -544,7 +842,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 * @param head the head
 	 */
 	private void solveNCS_Uselessness(Head head) {
-		System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
+		//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
 		world.raiseNCS(NCS.CONTEXT_USELESSNESS);
 		this.die();
 	}
@@ -555,7 +853,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 * @param head the head
 	 */
 	private void solveNCS_ConflictInexact(Head head) {
-		System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_ConflictInexact");
+		//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_ConflictInexact");
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
 		if(true) {
 			confidence--;
@@ -571,7 +869,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	 */
 	private void solveNCS_Conflict(Head head) {
 
-		System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Conflict");
+		//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Conflict");
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
 		
 		if (head.getNewContext() == this) {
@@ -589,19 +887,19 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			//Percept p = getPerceptWithLargerImpactOnAVT(percepts);
 			//Percept p = getPerceptWithLesserImpactOnAVT(percepts);
 			Percept p;
-			//system.out.println((head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) + "head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()");
+			////System.out.println((head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) + "head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()");
 			if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()){
 				
 					p = this.getPerceptWithLesserImpactOnVolumeNotIncludedIn2(percepts, head.getBestContext());
 
 				
-				//system.out.println((p == null) + "p == null");
+				////System.out.println((p == null) + "p == null");
 					
 				if (p == null) {
-					System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_ConflictAndDie");
+					//System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_ConflictAndDie");
 					this.die();
 				}else {	
-					//system.out.println(p.getName());
+					////System.out.println(p.getName());
 					//ranges.get(p).matchBorderWith(head.getBestContext());
 					ranges.get(p).adaptTowardsBorder(head.getBestContext());
 				}
@@ -645,7 +943,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		double volumeLost = Double.MAX_VALUE;
 		double vol = 1.0;
 		
-		System.out.println("PerceptWithLesserImpactOnVolumeNotIncludedIn ...");
+		//System.out.println("PerceptWithLesserImpactOnVolumeNotIncludedIn ...");
 		for (Percept percept : containingRanges) {
 			
 
@@ -654,28 +952,28 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				
 				if (!(otherRanges.getStart() <= ranges.get(percept).getStart() &&   ranges.get(percept).getEnd() <= otherRanges.getEnd())) {
 					
-					System.out.println(percept.getName());
+					//System.out.println(percept.getName());
 					
 					
 					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
-						System.out.println("end simu : " + ranges.get(percept).simulateNegativeAVTFeedbackEnd(percept.getValue()) + " start : " + ranges.get(percept).getStart());
+						//System.out.println("end simu : " + ranges.get(percept).simulateNegativeAVTFeedbackEnd(percept.getValue()) + " start : " + ranges.get(percept).getStart());
 						vol = ranges.get(percept).simulateNegativeAVTFeedbackEnd(percept.getValue()) - ranges.get(percept).getStart();
 					} else {
-						System.out.println("end : " + ranges.get(percept).getEnd() + " start simu : " + ranges.get(percept).simulateNegativeAVTFeedbackStart(percept.getValue()));
+						//System.out.println("end : " + ranges.get(percept).getEnd() + " start simu : " + ranges.get(percept).simulateNegativeAVTFeedbackStart(percept.getValue()));
 						vol = ranges.get(percept).getEnd() - ranges.get(percept).simulateNegativeAVTFeedbackStart(percept.getValue());
 					}
 					
 					
-					System.out.println("Vol1 : " + vol);
+					//System.out.println("Vol1 : " + vol);
 					
 					for (Percept p2 : ranges.keySet()) {
 						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							System.out.println(p2.getName());
+							//System.out.println(p2.getName());
 							vol *= ranges.get(p2).getLenght();
-							System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
+							//System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
 						}
 					}
-					System.out.println("Vol2 : " + vol);
+					//System.out.println("Vol2 : " + vol);
 					
 					
 					if (vol < volumeLost) {
@@ -684,7 +982,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					}
 					
 					
-					System.out.println("Vol lost : " + volumeLost + "percept " + p.getName());
+					//System.out.println("Vol lost : " + volumeLost + "percept " + p.getName());
 					
 				}
 				
@@ -703,7 +1001,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		double volumeLost = Double.MAX_VALUE;
 		double vol = 1.0;
 		
-		//system.out.println("LESSER ...");
+		////System.out.println("LESSER ...");
 		for (Percept percept : containingRanges) {
 			
 
@@ -712,29 +1010,29 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				
 				if (!(otherRanges.getStart() <= ranges.get(percept).getStart() &&   ranges.get(percept).getEnd() <= otherRanges.getEnd())) {
 					
-					//system.out.println(percept.getName());
+					////System.out.println(percept.getName());
 					
 					
 					vol = Math.abs( Math.abs(otherRanges.getCenter() - ranges.get(percept).getCenter()) - otherRanges.getRadius() - ranges.get(percept).getRadius());
 //					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
-//						//system.out.println("end simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue()) + " start : " + ranges.get(percept).getStart());
+//						////System.out.println("end simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue()) + " start : " + ranges.get(percept).getStart());
 //						vol = percept.getValue() - ranges.get(percept).getStart();
 //					} else {
-//						//system.out.println("end : " + ranges.get(percept).getEnd() + " start simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue()));
+//						////System.out.println("end : " + ranges.get(percept).getEnd() + " start simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue()));
 //						vol = ranges.get(percept).getEnd() - percept.getValue();
 //					}
 					
 					
-					//system.out.println("Vol1 : " + vol);
+					////System.out.println("Vol1 : " + vol);
 					
 					for (Percept p2 : ranges.keySet()) {
 						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							//system.out.println(p2.getName());
+							////System.out.println(p2.getName());
 							vol *= ranges.get(p2).getLenght();
-							//system.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
+							////System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
 						}
 					}
-					//system.out.println("Vol2 : " + vol);
+					////System.out.println("Vol2 : " + vol);
 					
 					
 					if (vol < volumeLost) {
@@ -743,7 +1041,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					}
 					
 					
-					//system.out.println("Vol lost : " + volumeLost);
+					////System.out.println("Vol lost : " + volumeLost);
 					
 				}
 				
@@ -762,7 +1060,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		double volumeLost3 = Double.MAX_VALUE;
 		double vol3 = 1.0;
 		
-		System.out.println("LESSER ...");
+		//System.out.println("LESSER ...");
 		for (Percept percept : containingRanges) {
 			
 
@@ -771,7 +1069,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				
 				if (!(otherRanges.getStart() <= ranges.get(percept).getStart() &&   ranges.get(percept).getEnd() <= otherRanges.getEnd())) {
 					
-					System.out.println(percept.getName());
+					//System.out.println(percept.getName());
 					
 					
 					if(percept.contextOrder(this, otherContext)) {
@@ -780,17 +1078,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					else if(percept.contextOrder(otherContext, this)) {
 						vol3 = Math.abs(percept.getEndRangeProjection(otherContext) - percept.getStartRangeProjection(this));
 					}
-					System.out.println("vol3 : " + vol3);
+					//System.out.println("vol3 : " + vol3);
 					
 					
 					for (Percept p2 : ranges.keySet()) {
 						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							//system.out.println(p2.getName());
+							////System.out.println(p2.getName());
 							vol3 *= ranges.get(p2).getLenght();
-							//system.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
+							////System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " " + getName());
 						}
 					}
-					//system.out.println("vol3 : " + vol3);
+					////System.out.println("vol3 : " + vol3);
 					
 					
 					if (vol3 < volumeLost3) {
@@ -798,7 +1096,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 						p3 = percept;
 					}
 					
-					//system.out.println("Vol3 lost : " + volumeLost3);
+					////System.out.println("Vol3 lost : " + volumeLost3);
 					
 				}
 				
@@ -807,7 +1105,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 			
 		}
-		if(p3 != null) {System.out.println("p3 : " + p3.getName());
+		if(p3 != null) {//System.out.println("p3 : " + p3.getName());
 
 		}
 		
@@ -877,7 +1175,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				}
 			}
 		}
-		//system.out.println("percept " + p.getName());
+		////System.out.println("percept " + p.getName());
 		return p;
 	}
 	
@@ -916,7 +1214,7 @@ private Percept getPerceptWithLesserImpactOnVolume(ArrayList<Percept> containing
 	}
 
 }
-	//system.out.println("percept " + p.getName());
+	////System.out.println("percept " + p.getName());
 	return p;
 }
 
@@ -938,7 +1236,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	}
 
 }
-	//system.out.println("percept " + p.getName());
+	////System.out.println("percept " + p.getName());
 	return p;
 }
 
@@ -1241,7 +1539,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		if (formulaLocalModel != null) {
 			s += "Local model : " + this.formulaLocalModel + "\n";
 		} else {
-			s += "Local model : " + localModel.getFormula(this) + "\n";
+			//s += "Local model : " + localModel.getFormula(this) + "\n"; // Provoque erreur pas assez de données (0 lignes) pour 3 prédicteurs
 		}
 		
 		s += "\n";
@@ -1395,7 +1693,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		Double influence = 1.0;
 		
 		for(Percept pct : situation.keySet()) {
-			////system.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			//////System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
 			influence *= getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
 		}
 		
@@ -1410,7 +1708,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		Double influence = 1.0;
 		
 		for(Percept pct : situation.keySet()) {
-			////system.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			//////System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
 			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
 		}
 		
@@ -1422,7 +1720,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		Double currentInfluence = 0.0;
 		
 		for(Percept pct : situation.keySet()) {
-			////system.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			//////System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
 			currentInfluence = getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
 			if(currentInfluence < worstInfluence) {
 				worstInfluence = currentInfluence;
@@ -1437,7 +1735,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		Double currentInfluence = 0.0;
 		
 		for(Percept pct : situation.keySet()) {
-			////system.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
+			//////System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct, situation.get(pct)));
 			currentInfluence = getInfluenceByPerceptSituation(pct, situation.get(pct));
 			if(currentInfluence < worstInfluence) {
 				worstInfluence = currentInfluence;
@@ -1486,6 +1784,8 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		return volume;
 	}
 	
+
+	
 	public double getWorstRange() {
 		Double volume = Double.POSITIVE_INFINITY;
 		
@@ -1512,7 +1812,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	 * Update experiments.
 	 */
 	private void updateExperiments() {
-	//	//system.out.println("Update experiments");
+	//	////System.out.println("Update experiments");
 		ArrayList<Percept> var = world.getAllPercept();
 		maxActivationsRequired = var.size();
 		Experiment exp = new Experiment();
@@ -1586,11 +1886,11 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	 * @param head the head
 	 */
 	public void growRanges() {
-		//system.out.println("Grow " + this.getName() );
+		////System.out.println("Grow " + this.getName() );
 		ArrayList<Percept> allPercepts = world.getAllPercept();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
-			//system.out.println(pct.getName() + " " + contain);
+			////System.out.println(pct.getName() + " " + contain);
 			if (!contain) {
 				ranges.get(pct).adapt(pct.getValue());
 				//ranges.get(pct).extend(pct.getValue(), pct);
@@ -1620,7 +1920,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolumeNotIncludedIn2(containingRanges,bestContext);
 		//Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolumeNotIncludedIn2(containingRanges,bestContext);
 		if (perceptWithLesserImpact == null) {
-			System.out.println(world.getScheduler().getTick() + "shrinkRangesToJoinBordersAndDie");
+			//System.out.println(world.getScheduler().getTick() + "shrinkRangesToJoinBordersAndDie");
 			this.die();
 		}else {
 			//ranges.get(perceptWithLesserImpact).matchBorderWithBestContext(bestContext);
@@ -1651,7 +1951,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 			ctxt.removeContext(this);
 		}
 		
-		////system.out.println("DIED : " + this.getName());
+		//////System.out.println("DIED : " + this.getName());
 		localModel.die();
 		super.die();
 		
@@ -1688,22 +1988,53 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	public Boolean computeValidityByPercepts() {
 		Boolean test = true;
 		for(Percept percept : perceptValidities.keySet()) {
-			////system.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
+			//////System.out.println(percept.getName()+"--->"+perceptValidities.get(percept));
 			test = test && perceptValidities.get(percept);
 		}
 		return test;
 	}
 	
+	
+
+	
 	public Boolean computeNeighborhoodValidityByPercepts() {
 		Boolean test = true;
 		for(Percept percept : perceptNeighborhoodValidities.keySet()) {
-			////system.out.println(percept.getName()+"--->"+perceptNeighborhoodValidities.get(percept));
+			//////System.out.println(percept.getName()+"--->"+perceptNeighborhoodValidities.get(percept));
 			test = test && perceptNeighborhoodValidities.get(percept);
 		}
 		return test;
 	}
 	
 	
+	public void addNonValidPercept(Percept pct) {
+		nonValidPercepts.add(pct);
+	}
+	
+	public ArrayList<Percept> getNonValidPercepts() {
+		return nonValidPercepts;
+	}
+	
+	public void removeNonValidPercept(Percept pct) {
+		nonValidPercepts.remove(pct);
+	}
+	
+	
+	
+	public void addNonValidNeighborPercept(Percept pct) {
+		
+		nonValidNeightborPercepts.add(pct);
+		
+	}
+	
+	public ArrayList<Percept> getNonValidNeighborPercepts() {
+		
+		return nonValidNeightborPercepts;
+	}
+
+	public void removeNonValidNeighborPercept(Percept pct) {
+		nonValidNeightborPercepts.remove(pct);
+	}
 	
 	
 	public Boolean computeOverlapsByPercepts() {
@@ -1727,7 +2058,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 				HashMap<Percept,HashMap<String,Double>> overlapRanges = new HashMap<Percept,HashMap<String,Double>>();
 				for(Percept percept : ranges.keySet()) {
 					overlapRanges.put(percept, new HashMap<String,Double>());
-					//system.out.println("CONTEXT 1" + context.getName() + " CONTEXT2" + this.getName());
+					////System.out.println("CONTEXT 1" + context.getName() + " CONTEXT2" + this.getName());
 					double startRange = percept.getOverlapRangesBetweenContexts(this, context).get("start");
 					double endRange = percept.getOverlapRangesBetweenContexts(this, context).get("end");
 					overlapRanges.get(percept).put("start", startRange);
@@ -1844,7 +2175,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	
 	public void computeNearestNeighbour() {
 		
-		////system.out.println("VOISINS : " + neighbours.size());
+		//////System.out.println("VOISINS : " + neighbours.size());
 		for(Context neighbourContext : neighbours) {
 			
 			
@@ -1881,7 +2212,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 			double perceptPosition = 0d; 
 			double perceptWidth = 0d;
 			
-			////system.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
+			//////System.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
 			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
 	
 				
@@ -1905,7 +2236,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 					perceptWidth = ctxtEnd - thisStart;
 				}
 				else {
-					//system.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
+					////System.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
 				}
 				
 
@@ -1930,7 +2261,7 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 					voidWidth.put(percept, perceptWidth);
 				}
 				else {
-					//system.out.println("NO VOID !");
+					////System.out.println("NO VOID !");
 					noVoid = true;
 				}
 			}
@@ -2074,7 +2405,9 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	}
 
 	
-
+	public double distance(Percept pct, double value) {
+		return this.ranges.get(pct).distance(value);
+	}
 
 
 	 

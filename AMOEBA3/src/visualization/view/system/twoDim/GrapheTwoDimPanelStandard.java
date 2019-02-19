@@ -12,6 +12,8 @@ import java.awt.Robot;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -48,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
 
 import mas.kernel.Config;
+import mas.kernel.NCSMemory;
 import mas.kernel.Scheduler;
 import mas.kernel.World;
 import visualization.log.LogMessageType;
@@ -182,6 +185,7 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	private JLabel labelSearchContext = new JLabel("Search Context :");
 	private JTextField contextID = new JTextField("?");
 	
+	private JComboBox<Context> Contexts;
 
 	
 	/** The mouse event. */
@@ -354,6 +358,34 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 		
 		xValue = new JLabel();
 		yValue = new JLabel();
+		
+		Contexts = new JComboBox<Context>();
+		Contexts.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				
+				
+				
+				recolorContexts();
+				
+				
+				if(Contexts.getSelectedItem()!=null) {
+					
+					Node node = graph.getNode(((Context) Contexts.getSelectedItem()).getName());
+					node.addAttribute("ui.style", "fill-color: rgba(0,255,0,150);");
+				}
+
+				
+				
+				
+			}
+		});
+		
+		
+		
+		toolBar.add(Contexts);
+		
 		
 		toolBar.add(labelSearchContext);
 		contextID.setSize(new Dimension(50,30));
@@ -1016,14 +1048,29 @@ private void startPanelController() {
 	}
 
 	private void setOrigin() {
-		Node originNode;
-		graph.addNode("origin");
-		originNode = graph.getNode("origin");
-		originNode.addAttribute("EXIST", true);
+
 		
-		originNode.setAttribute("xyz", 0, 0, 0);
+		Node originNode1;
 		
-		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(0.5) +"gu;");
+		graph.addNode("origin1");
+		originNode1 = graph.getNode("origin1");
+		originNode1.addAttribute("EXIST", true);
+		originNode1.setAttribute("xyz", 0, 0, 0);
+		originNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.2) + "gu, " + doubleFormat.format(4) +"gu;");
+		originNode1.addAttribute("ui.class","RGBAColor");
+		
+		originNode1.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
+		
+		Node originNode2;
+		
+		graph.addNode("origin2");
+		originNode2 = graph.getNode("origin2");
+		originNode2.addAttribute("EXIST", true);
+		originNode2.setAttribute("xyz", 0, 0, 0);
+		originNode2.addAttribute("ui.style", "size: " + doubleFormat.format(4) + "gu, " + doubleFormat.format(0.2) +"gu;");
+		originNode2.addAttribute("ui.class","RGBAColor");
+		
+		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
 	}
 	
 	/**
@@ -1163,83 +1210,8 @@ private void startPanelController() {
 			}		
 
 
-			for (String name : world.getAgents().keySet()) {
-				SystemAgent a = world.getAgents().get(name);
-				if (a instanceof Context) {
-					Context n = (Context)a;
-					Node node = graph.getNode(name);
-
-					//node.addAttribute("ui.class","ContextColorDynamic");
-					//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
-//					node.setAttribute("ui.color", 0.0 ); 
-					
-					Double r = 0.0;
-					Double g = 0.0;
-					Double b = 0.0;
-					double[] coefs = n.getLocalModel().getCoef();
-					//System.out.println("COEFS : " + coefs.length);
-					if(coefs.length>0) {
-						if(coefs.length==1) {
-							//System.out.println(coefs[0]);	
-							b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-							if(b.isNaN()) {
-								b = 0.0;
-							}
-						}
-						else if(coefs.length==2) {
-							//System.out.println(coefs[0] + " " + coefs[1]);
-							g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-							b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-							if(g.isNaN()) {
-								g = 0.0;
-							}
-							if(b.isNaN()) {
-								b = 0.0;
-							}
-						}
-						else if(coefs.length>=3) {
-							//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
-							r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
-							g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
-							b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
-							if(r.isNaN()) {
-								r = 0.0;
-							}
-							if(g.isNaN()) {
-								g = 0.0;
-							}
-							if(b.isNaN()) {
-								b = 0.0;
-							}
-						}
-						else {
-							r = 255.0;
-							g = 255.0;
-							b = 255.0;
-						}
-					}
-					else {
-						r = 255.0;
-						g = 255.0;
-						b = 255.0;
-					}
-					
-					node.addAttribute("ui.class","RGBAColor");
-					
-					node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
-
-					
-					if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
-						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
-					}
-					
-					
-				}
-				
-				
-
-			}
 			
+			recolorContexts();
 			
 			
 			for(Context context : world.getScheduler().getContextsAsContext()) {
@@ -1256,12 +1228,131 @@ private void startPanelController() {
 		}
 		
 		
-		Node originNode;
-		originNode = graph.getNode("origin");
-		originNode.addAttribute("EXIST", true);
-		originNode.setAttribute("xyz", 0, 0, 0);
-		originNode.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(2) +"gu;");
+		Node originNode1;
+		originNode1 = graph.getNode("origin1");
+		originNode1.addAttribute("EXIST", true);
+		originNode1.setAttribute("xyz", 0, 0, 0);
+		originNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(2) +"gu;");
+		originNode1.addAttribute("ui.class","RGBAColor");
+		
+		originNode1.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
+		
+		Node originNode2;
+		originNode2 = graph.getNode("origin2");
+		originNode2.addAttribute("EXIST", true);
+		originNode2.setAttribute("xyz", 0, 0, 0);
+		originNode2.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(0.5) +"gu;");
+		originNode2.addAttribute("ui.class","RGBAColor");
+		
+		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
+		
+		
+		Contexts.removeAllItems();
+		Contexts.addItem(null);
+		for(Context ctxt : world.getScheduler().getContextsAsContext()) {
+			Contexts.addItem(ctxt);
+		}
 
+	}
+	
+	public void recolorContexts() {
+		for (String name : world.getAgents().keySet()) {
+			SystemAgent a = world.getAgents().get(name);
+			if (a instanceof Context) {
+				Context n = (Context)a;
+				Node node = graph.getNode(name);
+
+				//node.addAttribute("ui.class","ContextColorDynamic");
+				//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+//				node.setAttribute("ui.color", 0.0 ); 
+				
+				Double r = 0.0;
+				Double g = 0.0;
+				Double b = 0.0;
+				double[] coefs = n.getLocalModel().getCoef();
+				//System.out.println("COEFS : " + coefs.length);
+				if(coefs.length>0) {
+					if(coefs.length==1) {
+						//System.out.println(coefs[0]);	
+						b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else if(coefs.length==2) {
+						//System.out.println(coefs[0] + " " + coefs[1]);
+						g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+						b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+						if(g.isNaN()) {
+							g = 0.0;
+						}
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else if(coefs.length>=3) {
+						//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
+						r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+						g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+						b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+						if(r.isNaN()) {
+							r = 0.0;
+						}
+						if(g.isNaN()) {
+							g = 0.0;
+						}
+						if(b.isNaN()) {
+							b = 0.0;
+						}
+					}
+					else {
+						r = 255.0;
+						g = 255.0;
+						b = 255.0;
+					}
+				}
+				else {
+					r = 255.0;
+					g = 255.0;
+					b = 255.0;
+				}
+				
+				node.addAttribute("ui.class","RGBAColor");
+				
+				node.addAttribute("ui.style", "fill-color: rgba(" + r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100);");
+
+				
+				
+				
+				
+				
+//				for(Percept pct : world.getScheduler().getPercepts()) {
+//					if(world.getScheduler().getHeadAgent().getPartiallyActivatedNeighborContexts(pct).contains(n)) {
+//						node.addAttribute("ui.style", "fill-color: rgba(0,255,255,150);");
+//					}
+//				}
+			
+//				for(Percept pct : world.getScheduler().getPercepts()) {
+//					if(world.getScheduler().getHeadAgent().getPartiallyActivatedContexts(pct).contains(n)) {
+//						node.addAttribute("ui.style", "fill-color: rgba(0,0,255,150);");
+//					}
+//				}
+//				
+				//System.out.println(world.getScheduler().getTick() + " Neighbor size "+ world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
+				if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
+					node.addAttribute("ui.style", "fill-color: rgba(255,0,255,200);");
+				}
+//				
+				if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
+					node.addAttribute("ui.style", "fill-color: rgba(255,0,0,200);");
+				}
+
+				
+			}
+			
+			
+
+		}
 	}
 	
 	

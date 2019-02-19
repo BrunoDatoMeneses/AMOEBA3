@@ -64,6 +64,7 @@ public class F_XY_Launcher implements Serializable {
 			}
 			else if(amoeba.getPlayOneStep()) {
 				
+				amoeba.setPlayOneStep(false);
 				/*Random samples of the studied system */
 				f_XY_Manager.playOneStep(0);
 				
@@ -72,7 +73,7 @@ public class F_XY_Launcher implements Serializable {
 				
 				i++;
 				
-				amoeba.setPlayOneStep(false);
+				
 			}
 			
 		}

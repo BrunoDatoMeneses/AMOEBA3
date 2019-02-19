@@ -89,8 +89,14 @@ public class World implements Serializable {
 	
 	public int tickThreshol = 10000;
 	
+	private double contextCreationPercentage = 0.2;
+	
 	public World() {
 		
+	}
+	
+	public double getContextCreationPercentage() {
+		return contextCreationPercentage;
 	}
 	
 	/**
@@ -866,6 +872,11 @@ public class World implements Serializable {
 	
 	public double getIncrements() {
 		return increment_up ;
+	}
+	
+	public double getNeighborhood(Context ctxt, Percept pct) {
+		return 2*ctxt.getRanges().get(pct).getRadius();
+		
 	}
 	
 }

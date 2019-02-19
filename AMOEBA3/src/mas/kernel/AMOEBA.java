@@ -495,5 +495,28 @@ public class AMOEBA extends Thread {
 	public double getNumberOfContextAgents() {
 		return scheduler.getContexts().size();
 	}
+	
+	public void PAUSE(String message) {
+		System.out.println(message);
+		
+		if(!isRunning()) {
+			while(!getPlayOneStep()) {
+				scheduler.scheduledItemsAndView();
+
+				try        
+				{
+				    Thread.sleep(100);
+				} 
+				catch(InterruptedException ex) 
+				{
+				    Thread.currentThread().interrupt();
+				}
+				//System.out.println(getPlayOneStep());
+			}
+			setPlayOneStep(false);
+		}
+		
+	}
+
 
 }
