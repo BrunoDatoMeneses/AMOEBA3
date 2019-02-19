@@ -3,6 +3,7 @@ import java.util.HashMap;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.lxplot.LxPlot;
 import ncs.NCS;
 
 /**
@@ -12,7 +13,7 @@ import ncs.NCS;
 public class World extends Environment {
 	
 	private HashMap<NCS,Integer> numberOfNCS = new HashMap<NCS,Integer>();
-	private HashMap<NCS,Integer> allNCS = new HashMap<NCS,Integer>();
+	private HashMap<NCS,Integer> allTimeNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> thisLoopNCS = new HashMap<NCS,Integer>();
 	
 	private double AVT_acceleration = 2;
@@ -32,7 +33,7 @@ public class World extends Environment {
 
 		
 		for (NCS ncs : NCS.values()) {
-			allNCS.put(ncs, 0);
+			allTimeNCS.put(ncs, 0);
 			thisLoopNCS.put(ncs, 0);
 		}
 	}
@@ -63,6 +64,21 @@ public class World extends Environment {
 
 	public double getAVT_percentAtStart() {
 		return AVT_percentAtStart;
+	}
+	
+	public void preCycleActions() {
+		for(NCS ncs : NCS.values()) {
+			allTimeNCS.put(ncs, allTimeNCS.get(ncs)+thisLoopNCS.get(ncs));
+			thisLoopNCS.put(ncs, 0);
+		}
+	}
+	
+	public HashMap<NCS, Integer> getThisLoopNCS() {
+		return thisLoopNCS;
+	}
+	
+	public HashMap<NCS, Integer> getAllTimeNCS() {
+		return allTimeNCS;
 	}
 }
 

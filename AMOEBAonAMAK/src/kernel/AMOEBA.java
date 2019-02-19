@@ -3,7 +3,11 @@ package kernel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Vector;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -16,6 +20,13 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.drawables.Drawable;
+import fr.irit.smac.lxplot.LxPlot;
+import fr.irit.smac.lxplot.commons.ChartType;
+import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
+import fr.irit.smac.lxplot.server.LxPlotChart;
+import ncs.NCS;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelAverage;
@@ -43,6 +54,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private File ressourceFile;
 	
+	private Drawable point;
 
 	/**
 	 * Instantiates a new amoeba.
@@ -52,10 +64,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/* Create an AMOEBA coupled with a studied system */
 	public AMOEBA(World environment, StudiedSystem studiedSystem, File ressourceFile) {
 		super(environment, Scheduling.DEFAULT, studiedSystem, ressourceFile);
+		//this.getScheduler().stop();
 	}
 	
 	@Override
 	protected void onInitialConfiguration() {
+		VUI.get().setDefaultView(200, 0, 0);
 		studiedSystem = (StudiedSystem) params[0];
 		ressourceFile = (File) params[1];
 	}
@@ -63,6 +77,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onInitialAgentsCreation() {
 		readRessourceFile(ressourceFile);
+		
 	}
 	
 	@Override
@@ -71,6 +86,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			studiedSystem.playOneStep();
 			perceptionsAndActionState = studiedSystem.getOutput();
 		}
+		environment.preCycleActions();
+		head.clearAllUseableContextLists();
 	}
 	
 	/**
@@ -261,5 +278,40 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
 			int nSuccessBeforeInexactDiminution) {
 		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+	}
+	
+	@Override
+	protected void onRenderingInitialization() {
+		// TODO Auto-generated method stub
+		super.onRenderingInitialization();
+		point = VUI.get().createPoint(0, 0);
+	}
+	
+	protected void onUpdateRender() {
+		ArrayList<Percept> percepts = getPercepts();
+		point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
+		
+		HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
+		HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
+		ILxPlotChart loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);
+		ILxPlotChart allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
+		for(NCS ncs : NCS.values()) {
+			loopNCS.add(ncs.name(),cycle, thisLoopNCS.get(ncs));
+			allNCS.add(ncs.name(),cycle, allTimeNCS.get(ncs));
+		}
+		
+		ILxPlotChart nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
+		nbAgent.add("Percepts", cycle, getPercepts().size());
+		nbAgent.add("Contexts", cycle, getContexts().size());
+		
+		ILxPlotChart errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
+		errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());		
+		errors.add("Error Allowed",cycle, head.getErrorAllowed());
+		errors.add("Inexact Allowed",cycle, head.getInexactAllowed());
+		Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
+		Collections.sort(sortedErrors);
+		errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size()/2));
+		
+		//System.out.println("Oracle : "+getPerceptionsOrAction("oracle")+"  Prediction : "+head.getAction());
 	}
 }

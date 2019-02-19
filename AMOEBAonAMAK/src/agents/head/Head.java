@@ -173,7 +173,6 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void playWithOracle() {
-
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); // using highest confidence
 		}
@@ -194,7 +193,6 @@ public class Head extends AmoebaAgent {
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
-			System.out.println("Best formula : "+bestContext.getFunction().getFormula(bestContext)); //TODO proper print
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
 
@@ -630,4 +628,15 @@ public class Head extends AmoebaAgent {
 		return (Head) super.clone();
 	}
 	
+	public double getAveragePredictionCriticity() {
+		return averagePredictionCriticity;
+	}
+	
+	public ArrayList<Double> getxLastCriticityValues() {
+		return xLastCriticityValues;
+	}
+	
+	public void clearAllUseableContextLists() {	
+		activatedContexts.clear();
+	}	
 }
