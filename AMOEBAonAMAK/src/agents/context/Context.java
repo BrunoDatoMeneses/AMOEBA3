@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.print.attribute.standard.PrinterIsAcceptingJobs;
+
 import agents.AmoebaAgent;
 import agents.AmoebaMessage;
 import agents.MessageType;
@@ -13,6 +15,7 @@ import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
 import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.drawables.DrawablePoint;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import kernel.AMOEBA;
 import ncs.NCS;
@@ -531,10 +534,12 @@ public class Context extends AmoebaAgent {
 		Iterator<Percept> iter = sP.iterator();
 		Percept p1 = iter.next();
 		Percept p2 = iter.next();
-
-		drawable.move(ranges.get(p1).getStart(), ranges.get(p2).getStart());
+		double x = ranges.get(p1).getStart()+(ranges.get(p1).getLenght()/2);
+		double y = ranges.get(p2).getStart()+(ranges.get(p2).getLenght()/2);
+		drawable.move(x, y);
 		drawable.setWidth(ranges.get(p1).getLenght());
 		drawable.setHeight(ranges.get(p2).getLenght());
+		
 
 		// Normalization of the color
 		double min = Double.POSITIVE_INFINITY;
