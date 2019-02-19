@@ -40,8 +40,8 @@ public class F_XY_System implements StudiedSystem {
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
-		
+		//result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+		result = x+y;
 		out.put("px", x);
 		out.put("py", y);
 		out.put("oracle", result);

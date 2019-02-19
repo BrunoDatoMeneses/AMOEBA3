@@ -21,6 +21,7 @@ import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.lxplot.LxPlot;
 import fr.irit.smac.lxplot.commons.ChartType;
 import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
@@ -52,6 +53,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	//--------------------------------
 	
 	private File ressourceFile;
+	
+	private Drawable point;
 
 	/**
 	 * Instantiates a new amoeba.
@@ -84,6 +87,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			perceptionsAndActionState = studiedSystem.getOutput();
 		}
 		environment.preCycleActions();
+		head.clearAllUseableContextLists();
 	}
 	
 	/**
@@ -276,7 +280,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
 	
+	@Override
+	protected void onRenderingInitialization() {
+		// TODO Auto-generated method stub
+		super.onRenderingInitialization();
+		point = VUI.get().createPoint(0, 0);
+	}
+	
 	protected void onUpdateRender() {
+		ArrayList<Percept> percepts = getPercepts();
+		point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
+		
 		HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 		HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 		ILxPlotChart loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);

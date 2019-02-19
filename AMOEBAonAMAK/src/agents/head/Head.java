@@ -173,7 +173,6 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void playWithOracle() {
-
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); // using highest confidence
 		}
@@ -637,4 +636,7 @@ public class Head extends AmoebaAgent {
 		return xLastCriticityValues;
 	}
 	
+	public void clearAllUseableContextLists() {	
+		activatedContexts.clear();
+	}	
 }
