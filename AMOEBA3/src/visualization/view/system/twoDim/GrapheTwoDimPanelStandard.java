@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -1073,6 +1074,33 @@ private void startPanelController() {
 		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
 	}
 	
+	private void setMinMax() {
+
+		
+		Node xMin;
+		Node xMax;
+		Node yMin;
+		Node yMax;
+		
+		graph.addNode("xMin");
+		graph.addNode("xMax");
+		graph.addNode("yMin");
+		graph.addNode("yMax");
+		
+		xMin = graph.getNode("xMin");
+		xMax = graph.getNode("xMax");
+		yMin = graph.getNode("yMin");
+		yMax = graph.getNode("yMax");
+		
+		xMin.addAttribute("EXIST", true);
+		xMax.addAttribute("EXIST", true);
+		yMin.addAttribute("EXIST", true);
+		yMax.addAttribute("EXIST", true);
+		
+		drawXMinMax(xMin, xMax, (Percept)world.getAgents().get(comboDimX.getSelectedItem()), (Percept)world.getAgents().get(comboDimY.getSelectedItem()));
+		drawYMinMax(yMin, yMax, (Percept)world.getAgents().get(comboDimY.getSelectedItem()), (Percept)world.getAgents().get(comboDimX.getSelectedItem()));
+	}
+	
 	/**
 	 * Update.
 	 */
@@ -1267,6 +1295,25 @@ private void startPanelController() {
 		
 		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
 		
+		Node xMin;
+		Node xMax;
+		Node yMin;
+		Node yMax;
+		
+		
+		xMin = graph.getNode("xMin");
+		xMax = graph.getNode("xMax");
+		yMin = graph.getNode("yMin");
+		yMax = graph.getNode("yMax");
+		
+		xMin.addAttribute("EXIST", true);
+		xMax.addAttribute("EXIST", true);
+		yMin.addAttribute("EXIST", true);
+		yMax.addAttribute("EXIST", true);
+		
+		drawXMinMax(xMin, xMax, (Percept)world.getAgents().get(comboDimX.getSelectedItem()), (Percept)world.getAgents().get(comboDimY.getSelectedItem()));
+		drawYMinMax(yMin, yMax, (Percept)world.getAgents().get(comboDimY.getSelectedItem()), (Percept)world.getAgents().get(comboDimX.getSelectedItem()));
+		
 		
 		Contexts.removeAllItems();
 		Contexts.addItem(null);
@@ -1453,6 +1500,62 @@ private void startPanelController() {
 	//	node.addAttribute("ui.size", "8px");
 		
 		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+
+	}
+	
+	public void drawXMinMax (Node nodeMin, Node nodeMax, Percept pct, Percept otherPercept) {
+		
+		
+		double lengthX = 1.0;
+		double lengthY = (world.getScheduler().getTick()>0 ) ? otherPercept.getMax() - otherPercept.getMin() : 1;
+		
+		double xMinPosition = (world.getScheduler().getTick()>0 ) ? pct.getMin() : 0;
+		double xMaxPosition = (world.getScheduler().getTick()>0 ) ? pct.getMax() : 0;
+		
+		double yMinPosition = (world.getScheduler().getTick()>0 ) ? (otherPercept.getMax() + otherPercept.getMin())/2 : 1;
+		double yMaxPosition = (world.getScheduler().getTick()>0 ) ? (otherPercept.getMax() + otherPercept.getMin())/2 : 1;
+		
+		
+		nodeMin.setAttribute("xyz", xMinPosition, yMinPosition, 0);
+		nodeMax.setAttribute("xyz", xMaxPosition, yMaxPosition, 0);
+		
+		
+		nodeMin.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		nodeMax.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		
+		nodeMin.addAttribute("ui.class","RGBAColor");
+		nodeMin.addAttribute("ui.style", "fill-color: rgba(0,0,0,100);");
+		
+		nodeMax.addAttribute("ui.class","RGBAColor");
+		nodeMax.addAttribute("ui.style", "fill-color: rgba(0,0,0,100);");
+
+	}
+	
+	public void drawYMinMax (Node nodeMin, Node nodeMax, Percept pct, Percept otherPercept) {
+		
+		
+		double lengthY = 1.0;
+		double lengthX = (world.getScheduler().getTick()>0 ) ? otherPercept.getMax() - otherPercept.getMin() : 1;
+		
+		double yMinPosition = (world.getScheduler().getTick()>0 ) ? pct.getMin() : 0;
+		double yMaxPosition = (world.getScheduler().getTick()>0 ) ? pct.getMax() : 0;
+		
+		double xMinPosition = (world.getScheduler().getTick()>0 ) ? (otherPercept.getMax() + otherPercept.getMin())/2 : 1;
+		double xMaxPosition = (world.getScheduler().getTick()>0 ) ? (otherPercept.getMax() + otherPercept.getMin())/2 : 1;
+		
+		
+		nodeMin.setAttribute("xyz", xMinPosition, yMinPosition, 0);
+		nodeMax.setAttribute("xyz", xMaxPosition, yMaxPosition, 0);
+		
+		
+		nodeMin.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		nodeMax.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		
+		nodeMin.addAttribute("ui.class","RGBAColor");
+		nodeMin.addAttribute("ui.style", "fill-color: rgba(0,0,0,100);");
+		
+		nodeMax.addAttribute("ui.class","RGBAColor");
+		nodeMax.addAttribute("ui.style", "fill-color: rgba(0,0,0,100);");
 
 	}
 	
@@ -1733,6 +1836,7 @@ private void startPanelController() {
 		setStandardStyle();
 		
 		setOrigin();
+		setMinMax();
 	}
 	
 	/**

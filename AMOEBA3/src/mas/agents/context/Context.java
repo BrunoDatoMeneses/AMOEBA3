@@ -479,7 +479,12 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	}
 	
 	public AbstractPair<Double,Double> getMaxExpansionsForContextExpansionAfterCreation(ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
-		AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
+		AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(
+				Math.min(pct.getRadiusContextForCreation(), 
+						Math.abs(pct.getMin()- ranges.get(pct).getStart())),
+				Math.min(pct.getRadiusContextForCreation(), 
+						Math.abs(pct.getMax()-ranges.get(pct).getEnd())));
+		//AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
 		//AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(Math.abs(pct.getMin()- ranges.get(pct).getStart()),Math.abs(pct.getMax()-ranges.get(pct).getEnd()));
 
 		////System.out.println("EXPANSION MIN MAX "  + pct.getName() +" " + pct.getValue() + " < " + pct.getMin() + " , "  + pct.getMax() + " > / < " + Math.abs(pct.getMin()- pct.getValue()) + " , " + Math.abs(pct.getMax()-pct.getValue()) + " >");
@@ -873,14 +878,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		updateExperiments();
 	}
 	
-	/**
-	 * Solve NC S conflict.
-	 *
-	 * @param head the head
-	 */
+	
+	
 	private void solveNCS_Conflict(Head head) {
 
-		////System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Conflict");
+
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
 		
 		if (head.getNewContext() == this) {
@@ -889,43 +891,34 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		confidence -= 2;
 
+		ArrayList<Percept> percepts = new ArrayList();
+		percepts.addAll(ranges.keySet());
+		Percept p;
+		p = this.getPerceptWithLesserImpactOnVolume2(percepts);
+		ranges.get(p).adapt(p.getValue()); 
 		
-		//confidence = confidence * 0.25;
+//		if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()){
+//			
+//			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//			
+//				p = this.getPerceptWithLesserImpactOnVolumeNotIncludedIn2(percepts, head.getBestContext());
+//
+//			if (p == null) {
+//				this.die();
+//			}else {	
+//				ranges.get(p).adaptTowardsBorder(head.getBestContext());
+//			}
+//		} else {
+//			p = this.getPerceptWithLesserImpactOnVolume2(percepts);
+//			ranges.get(p).adapt(p.getValue()); 
+//		}
 
-
-			ArrayList<Percept> percepts = new ArrayList();
-			percepts.addAll(ranges.keySet());
-			//Percept p = getPerceptWithLargerImpactOnAVT(percepts);
-			//Percept p = getPerceptWithLesserImpactOnAVT(percepts);
-			Percept p;
-			//////System.out.println((head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) + "head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()");
-			if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()){
-				
-					p = this.getPerceptWithLesserImpactOnVolumeNotIncludedIn2(percepts, head.getBestContext());
-
-				
-				//////System.out.println((p == null) + "p == null");
-					
-				if (p == null) {
-					////System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_ConflictAndDie");
-					this.die();
-				}else {	
-					//////System.out.println(p.getName());
-					//ranges.get(p).matchBorderWith(head.getBestContext());
-					ranges.get(p).adaptTowardsBorder(head.getBestContext());
-				}
-			} else {
-				p = this.getPerceptWithLesserImpactOnVolume2(percepts);
-				ranges.get(p).adapt(p.getValue()); 
-				//ranges.get(p).shrink(p.getValue(), p); 
+		for (Percept v : ranges.keySet()) {
+			if (ranges.get(v).isTooSmall()){
+				solveNCS_Uselessness(head);
+				break;
 			}
-
-			for (Percept v : ranges.keySet()) {
-				if (ranges.get(v).isTooSmall()){
-					solveNCS_Uselessness(head);
-					break;
-				}
-			}
+		}
 	}
 	
 	public void updateAVT() {
@@ -1850,23 +1843,23 @@ private Percept getPerceptWithLesserImpactOnVolume2(ArrayList<Percept> containin
 	 */
 	public void analyzeResults(Head head) {
 
-		
-		
-			if (head.getCriticity(this) > head.getErrorAllowed()) {
-				solveNCS_Conflict(head);
-				this.world.getScheduler().addAlteredContext(this);
-			}
-			else {		
-				if (head.getCriticity(this) > head.getInexactAllowed()) {
-					solveNCS_ConflictInexact(head);
-				}
-				else {
-					confidence++;
-					//confidence = confidence * 2;
-				}
-			}
 
+		
+		if (head.getCriticity(this) > head.getErrorAllowed()) {
+			solveNCS_Conflict(head);
+			this.world.getScheduler().addAlteredContext(this);
 		}
+		else {		
+			if (head.getCriticity(this) > head.getInexactAllowed()) {
+				solveNCS_ConflictInexact(head);
+			}
+			else {
+				confidence++;
+				//confidence = confidence * 2;
+			}
+		}
+
+	}
 	
 	public void analyzeResults2(Head head) {
 

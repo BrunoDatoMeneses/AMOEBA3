@@ -228,7 +228,6 @@ public class Head extends AbstractHead implements Cloneable{
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
 		oldOracleValue = oracleValue;
-		//oracleValue = oracle.getValue();
 		oracleValue = this.getWorld().getScheduler().getPerceptionsOrAction("oracle");
 		
 		/*The head memorize last used context agent*/
@@ -274,14 +273,19 @@ public class Head extends AbstractHead implements Cloneable{
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); //using highest confidence 
 		}
+		else {
+			bestContext = lastUsedContext;
+		}
 
 		if (bestContext != null) {
 			setContextFromPropositionWasSelected(true);
 			prediction = bestContext.getActionProposal();
 
-		} else if (!noCreation) { /*noCreation is only used to disable creation of contexts, for research purposes*/
-			getNearestContextAsBestContext();
+		} else { // happens only at the beginning
+			setNearestContextAsBestContext();
 		}
+		
+		
 
 		/*Compute the criticity. Will be used by context agents.*/
 		criticity = Math.abs(oracleValue - prediction);
@@ -909,7 +913,7 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 	}
 	
-	private void getNearestContextAsBestContext() {
+	private void setNearestContextAsBestContext() {
 		ArrayList<Agent> allContexts = world.getScheduler().getContexts();
 		Context nearestContext = this.getNearestContext(allContexts);
 
@@ -919,7 +923,7 @@ public class Head extends AbstractHead implements Cloneable{
 			prediction = 0;
 		}
 
-		bestContext = nearestContext;
+		bestContext =  nearestContext;
 	}
 	
 	
@@ -1281,12 +1285,10 @@ public class Head extends AbstractHead implements Cloneable{
 	private void selectBestContext() {
 		
 		Context bc;
-		if (activatedContexts.isEmpty()) {
-			bc = lastUsedContext;
-		} else {
-			bc = activatedContexts.get(0);
-		}
-		double currentConfidence = Double.NEGATIVE_INFINITY;
+		
+
+		bc = activatedContexts.get(0);
+		double currentConfidence = bc.getConfidence();
 
 		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
@@ -2000,7 +2002,12 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	public AbstractPair<Double,Double> getMaxRadiusesForContextCreation(Percept pct) {
-		AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
+		AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(
+				Math.min(pct.getRadiusContextForCreation(), 
+						Math.abs(pct.getMin()- pct.getValue())),
+				Math.min(pct.getRadiusContextForCreation(), 
+						Math.abs(pct.getMax()-pct.getValue())));
+		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
 		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(Math.abs(pct.getMin()- pct.getValue()),Math.abs(pct.getMax()-pct.getValue()));
 
 		//System.out.println("MIN MAX "  + pct.getName() +" " + pct.getValue() + " < " + pct.getMin() + " , "  + pct.getMax() + " > / < " + Math.abs(pct.getMin()- pct.getValue()) + " , " + Math.abs(pct.getMax()-pct.getValue()) + " >");
@@ -2008,6 +2015,7 @@ public class Head extends AbstractHead implements Cloneable{
 		double currentStartRadius;
 		double currentEndRadius;
 		
+
 			
 		//for(Context ctxt:partialNeighborContexts.get(pct)) {
 		for(Context ctxt:activatedNeighborsContexts) {			
