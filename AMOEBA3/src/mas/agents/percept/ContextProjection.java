@@ -1,12 +1,16 @@
 package mas.agents.percept;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import mas.agents.context.Context;
 import mas.kernel.World;
 
 public class ContextProjection implements Serializable{
 	
+	
+	World world;
 	
 	private Percept percept;
 	private Context context;
@@ -24,7 +28,8 @@ public class ContextProjection implements Serializable{
 	}
 	
 	
-	public ContextProjection(Percept percept, Context context) {
+	public ContextProjection(World wrld, Percept percept, Context context) {
+		world = wrld;
 		this.percept = percept;
 		this.context = context;
 		this.start = context.getRanges().get(this.percept).getStart();
@@ -69,11 +74,12 @@ public class ContextProjection implements Serializable{
 	}
 	
 	public boolean contains(Double value) {
+		world.trace(new ArrayList<String>(Arrays.asList(context.getName(),percept.getName(), ""+value, ""+(getCenter()-getRadius()), ""+ (getCenter() + getRadius()))));
 		return Math.abs(value - getCenter()) < getRadius() ;
 	}
 	
 	public boolean contains(Double value, Double neighborhood) {
-		System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
+		//System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
 		return Math.abs(value - getCenter()) < (getRadius() + neighborhood );
 	}
 	

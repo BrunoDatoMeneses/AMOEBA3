@@ -407,13 +407,13 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		
 		for (Context ctxt : ncsMemory.getContexts()) {
 
-			drawContexts(ctxt, 150);
+			drawContexts(ctxt, 200);
 			
 		}
 		
 		for (Context ctxt : ncsMemory.getPartiallyActivatedContexts()) {
 
-			drawContexts(ctxt, 150);
+			drawContexts(ctxt, 50);
 			
 		}
 	

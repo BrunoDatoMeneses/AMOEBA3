@@ -1170,7 +1170,28 @@ private void startPanelController() {
 
 				node.addAttribute("EXIST", true);
 				node.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				node.addAttribute("ui.style", "size: " + doubleFormat.format(1) + "gu, " + doubleFormat.format(10) +"gu;");
+				node.addAttribute("ui.class","RGBAColor");
 				
+				node.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+				
+				Node node2;
+				if (graph.getNode(name+"2") != null) {
+					node2 = graph.getNode(name+"2");
+					node2.addAttribute("ui.label", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue() + " , " + ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue());
+
+				} else {
+					graph.addNode(name+"2");
+					node2 = graph.getNode(name+"2");
+					node2.addAttribute("ui.class", "Center");
+				}
+				
+				node2.addAttribute("EXIST", true);
+				node2.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				node2.addAttribute("ui.style", "size: " + doubleFormat.format(10) + "gu, " + doubleFormat.format(1) +"gu;");
+				node2.addAttribute("ui.class","RGBAColor");
+				
+				node2.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
 			}
 			
 		}
@@ -1343,9 +1364,9 @@ private void startPanelController() {
 					node.addAttribute("ui.style", "fill-color: rgba(255,0,255,200);");
 				}
 //				
-				if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
-					node.addAttribute("ui.style", "fill-color: rgba(255,0,0,200);");
-				}
+//				if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
+//					node.addAttribute("ui.style", "fill-color: rgba(255,0,127,200);");
+//				}
 
 				
 			}

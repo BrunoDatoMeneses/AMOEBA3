@@ -65,6 +65,27 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		out.put("oracle",result);
 		return out;
 	}
+	
+	
+	public HashMap<String, Double> getOutputRequest(HashMap<String, Double> values) {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		double xValue = values.get("px");
+		double yValue = values.get("py");
+		
+		//result = (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		result = (yValue > -spaceSize && yValue < spaceSize && xValue < spaceSize && xValue > -spaceSize) ? 2*xValue + yValue : 5*xValue - 8*yValue;
+		if(Math.abs(yValue) > 3 * spaceSize && Math.abs(xValue) > 3 * spaceSize) {
+			result = 1000*xValue + 500*yValue;
+		}
+		//	result = (2*x) + (4*y) + x*y;
+		//	result = (x > 2*y) ? 0.0 : 1.0;
+		
+		out.put("px",xValue);
+		out.put("py",yValue);
+		out.put("oracle",result);
+		return out;
+	}
 
 	/* (non-Javadoc)
 	 * @see kernel.StudiedSystem#switchControlMode()

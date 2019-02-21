@@ -14,9 +14,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import mas.kernel.AMOEBA;
@@ -112,6 +115,14 @@ public class MainPanel extends JPanel{
 	
 	/** The first get value check box. */
 	private boolean firstGetValueCheckBox = false;
+	
+	static final int SPEED_MIN = 0;
+	static final int SPEED_MAX = 2000;
+	static final int SPEED_INIT = 200;    //initial frames per second
+
+	private JSlider simulationSpeedSlider; 
+	
+	public int speed=200;
 	
 	/**
 	 * Instantiates a new main panel.
@@ -274,6 +285,32 @@ public class MainPanel extends JPanel{
 		rememberStateCheckBox.setSelected(false);
 		toolBar.add(rememberStateCheckBox);
 		
+		
+		simulationSpeedSlider = new JSlider(JSlider.HORIZONTAL,
+		                                      SPEED_MIN, SPEED_MAX, SPEED_INIT);
+		
+		class SliderListener implements ChangeListener {
+		    public void stateChanged(ChangeEvent e) {
+		        JSlider source = (JSlider)e.getSource();
+		        if (!source.getValueIsAdjusting()) {
+		            speed = (int)source.getValue()+1;
+		            world.getAmoeba().temporisation = (int)source.getValue()+1;
+
+		        }    
+		    }
+		}
+		
+		simulationSpeedSlider.addChangeListener(new SliderListener());
+
+		
+		
+		//Turn on labels at major tick marks.
+		simulationSpeedSlider.setMajorTickSpacing(500);
+		simulationSpeedSlider.setMinorTickSpacing(100);
+		simulationSpeedSlider.setPaintTicks(true);
+		simulationSpeedSlider.setPaintLabels(true);
+		
+		toolBar.add(simulationSpeedSlider);
 	}
 
 	

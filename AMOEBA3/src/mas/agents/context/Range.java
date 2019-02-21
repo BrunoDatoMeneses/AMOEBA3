@@ -112,8 +112,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 //		this.AVT_deltaEnd = (end - start) * AVT_minRatio + 0.0001;
 		this.AVT_deltaStart = getLenght() * 0.2 + 0.0001;
 		this.AVT_deltaEnd = getLenght() * 0.2 + 0.0001;
-		//System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "START" + "\t" + AVT_deltaStart);
-		//System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "END" + "\t" + AVT_deltaEnd);
+		////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "START" + "\t" + AVT_deltaStart);
+		////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "END" + "\t" + AVT_deltaEnd);
 		
 
 	}
@@ -449,10 +449,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 		
 		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
 		if (AVT_lastFeedbackStart == 1) {
-			//System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_deceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_deceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			return start + (AVT_deltaStart * AVT_deceleration);
 		} else {
-			//System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_acceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_acceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			return start + (AVT_deltaStart * AVT_acceleration);
 		}
 
@@ -468,10 +468,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 		
 		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
 		if (AVT_lastFeedbackEnd == 1) {
-			//System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_deceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_deceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			return end - (AVT_deltaEnd * AVT_deceleration);
 		} else {
-			//System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_acceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_acceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			return end - (AVT_deltaEnd * AVT_acceleration);
 		}
 
@@ -487,7 +487,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public boolean isTooSmall() {
 		if((end - start) < mininimalRange && (end - start)>0) {
-			//System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
+			////System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
 		}
 		
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
@@ -582,13 +582,13 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	public void matchBorderWithBestContext(Context bestContext) {
-		//System.out.println("Match border " + percept.getName());
+		////System.out.println("Match border " + percept.getName());
 		
 		Range bestContextRanges = bestContext.getRanges().get(percept);
 		
 		if (bestContextRanges.getStart() <= this.start &&  this.end <= bestContextRanges.getEnd() ) {
 			
-			//System.out.println(context.getName() + " DIES");
+			////System.out.println(context.getName() + " DIES");
 			this.context.die();
 			
 		} else {
@@ -605,13 +605,13 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public void adaptTowardsBorder(Context bestContext) {
 		
-		//System.out.println("Adapt towards border " + percept.getName());
+		////System.out.println("Adapt towards border " + percept.getName());
 		
 		Range bestContextRanges = bestContext.getRanges().get(percept);
 		
 		if (bestContextRanges.getStart() <= this.start &&  this.end <= bestContextRanges.getEnd() ) {
 			
-			//System.out.println(context.getName() + " DIES");
+			////System.out.println(context.getName() + " DIES");
 			this.context.die();
 			
 		} else {
@@ -880,7 +880,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public void setStart(double newStartValue) {
 		if(context !=null && percept !=null) {
-			//System.out.println(context.getName() + " " + percept.getName() + " START " + (Math.abs(newStartValue-this.start)));
+			////System.out.println(context.getName() + " " + percept.getName() + " START " + (Math.abs(newStartValue-this.start)));
 		}
 		this.start = newStartValue;
 		if(world != null) {
@@ -927,7 +927,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public void setEnd(double newEndValue) {
 		if(context !=null && percept !=null ) {
-			//System.out.println(context.getName() + " " + percept.getName() + " END " + (Math.abs(newEndValue-this.end)));
+			////System.out.println(context.getName() + " " + percept.getName() + " END " + (Math.abs(newEndValue-this.end)));
 		}
 		
 		this.end = newEndValue;
@@ -967,12 +967,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 				}
 			}
 		
-		this.context.updateActivatedContexts();
+			this.context.updateActivatedContexts();
 		}
 	}
 	
 	public boolean contains(Double value, Double neighborhood) {
-		System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
+		//System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
 		return Math.abs(value - getCenter()) < (getRadius() + neighborhood );
 	}
 	

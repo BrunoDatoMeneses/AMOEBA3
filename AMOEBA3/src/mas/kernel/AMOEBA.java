@@ -45,6 +45,9 @@ public class AMOEBA extends Thread {
 	private boolean viewer = true;
 	private boolean csv = true;
 	
+	public int temporisation;
+	public boolean manual = false;
+	
 	//private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
 	
 
@@ -499,13 +502,13 @@ public class AMOEBA extends Thread {
 	public void PAUSE(String message) {
 		System.out.println(message);
 		
-		if(!isRunning()) {
+		if(!isRunning() && manual == false) {
 			while(!getPlayOneStep()) {
 				scheduler.scheduledItemsAndView();
 
 				try        
 				{
-				    Thread.sleep(100);
+				    Thread.sleep(200);
 				} 
 				catch(InterruptedException ex) 
 				{
@@ -514,6 +517,16 @@ public class AMOEBA extends Thread {
 				//System.out.println(getPlayOneStep());
 			}
 			setPlayOneStep(false);
+		}
+		else {
+//			try        
+//			{
+//			    Thread.sleep(1000);
+//			} 
+//			catch(InterruptedException ex) 
+//			{
+//			    Thread.currentThread().interrupt();
+//			}
 		}
 		
 	}

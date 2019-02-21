@@ -171,7 +171,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 				
 		oldValue = value;
 		//value = sensor.getValue();
-		//////System.out.println(this.name);
+		////////System.out.println(this.name);
 		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name);
 		ajustMinMax(); 
 		computeContextProjectionValidity();
@@ -187,11 +187,11 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	}	
 	
 	public void displayContextProjections() {
-		////System.out.println("CONTEXT PROJECTIONS " + this.getName());
+		//////System.out.println("CONTEXT PROJECTIONS " + this.getName());
 		for(Context ctxt : contextProjections.keySet()) {
 			//system.out.print(ctxt.getName() + " ; ");
 		}
-		////System.out.println(" ");
+		//////System.out.println(" ");
 	}
 	
 	public void computeContextProjectionValidity() {
@@ -201,7 +201,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			
-			
+			System.out.println(contextProjection.contains(this.value));
 			if(!contextProjection.contains(this.value)) {
 
 				contextProjection.getContext().addNonValidPercept(this);	
@@ -210,10 +210,10 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 			
 			//if(!contextProjection.contains(this.value, getRadiusContextForCreation())) {
 			if(!contextProjection.contains(this.value, world.getNeighborhood(contextProjection.getContext(), this))) {
-				////System.out.println(contextProjection.getContext().getName() + " " + this.getName() + " non valid");
+				//////System.out.println(contextProjection.getContext().getName() + " " + this.getName() + " non valid");
 				contextProjection.getContext().addNonValidNeighborPercept(this);
 				
-				System.out.println(world.getScheduler().getTick() + " " + contextProjection.getContext().getName() + " " + this.getName() + " " + "NON VALID" + " " + getRadiusContextForCreation());
+				//System.out.println(world.getScheduler().getTick() + " " + contextProjection.getContext().getName() + " " + this.getName() + " " + "NON VALID" + " " + getRadiusContextForCreation());
 			}
 			
 			
@@ -224,7 +224,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 
 				validContextProjection.add(contextProjection.getContext());
 				contextProjection.getContext().setPerceptValidity(this);
-				//////System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
+				////////System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
 				
 								
 			}
@@ -465,30 +465,30 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	 */
 	
 	public void displaySortedRanges() {
-		////System.out.println("########### SORTED RANGES DISPLAY " + this.getName() +" ###########");
-		////System.out.println("########### START ###########");
+		//////System.out.println("########### SORTED RANGES DISPLAY " + this.getName() +" ###########");
+		//////System.out.println("########### START ###########");
 		for(Context cntxt : this.sortedRanges.get("start")) {
-			////System.out.println(cntxt.getRanges().get(this).getStart());
+			//////System.out.println(cntxt.getRanges().get(this).getStart());
 		}
 		
-		////System.out.println("########### END ###########");
+		//////System.out.println("########### END ###########");
 		for(Context cntxt : this.sortedRanges.get("end")) {
-			////System.out.println(cntxt.getRanges().get(this).getEnd());
+			//////System.out.println(cntxt.getRanges().get(this).getEnd());
 		}
 	}
 	
 	public void displaySortedRangesTreeSet() {
-		////System.out.println("########### SORTED RANGES DISPLAY TREE " + this.getName() +" ###########");
-		////System.out.println(sortedContextbyStartRanges.size()+ " " + sortedContextbyEndRanges.size());
-		////System.out.println("########### START ###########");
+		//////System.out.println("########### SORTED RANGES DISPLAY TREE " + this.getName() +" ###########");
+		//////System.out.println(sortedContextbyStartRanges.size()+ " " + sortedContextbyEndRanges.size());
+		//////System.out.println("########### START ###########");
 		
 		for(Context ctxt: sortedContextbyStartRanges) {
-			////System.out.println(ctxt.getRanges().get(this).getStart());
+			//////System.out.println(ctxt.getRanges().get(this).getStart());
 		}
 		
-		////System.out.println("########### END ###########");
+		//////System.out.println("########### END ###########");
 		for(Context ctxt: sortedContextbyEndRanges) {
-			////System.out.println(ctxt.getRanges().get(this).getEnd());
+			//////System.out.println(ctxt.getRanges().get(this).getEnd());
 		}
 	}
 	
@@ -572,7 +572,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	private void swapListElements(ArrayList<Context> list, int indexFirstElement) {
 		try {
 			list.add(indexFirstElement, list.get(indexFirstElement+1));
-			//////System.out.println(list);
+			////////System.out.println(list);
 			list.remove(indexFirstElement+2);
 		} catch (OutOfRangeException e) {
 			// TODO: handle exception
@@ -598,8 +598,8 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		//displaySortedRanges();
 		//displaySortedRangesTreeSet();
 		
-		//////System.out.println("----------------------AUTO PRINT");
-		//////System.out.println(sortedEndRanges.size()+ " " + sortedStartRanges);
+		////////System.out.println("----------------------AUTO PRINT");
+		////////System.out.println(sortedEndRanges.size()+ " " + sortedStartRanges);
 	}
 	
 	private void insertContextInSortedRanges(Context context, String range) {
@@ -637,7 +637,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	
 	public void addContextProjection(Context context) {
-		ContextProjection newContextProjection = new ContextProjection(this, context);
+		ContextProjection newContextProjection = new ContextProjection(world, this, context);
 		contextProjections.put(context, newContextProjection);
 		
 
@@ -650,18 +650,18 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	public void deleteContextProjection(Context context) {
 		contextProjections.remove(context);
-		////System.out.println("DELETION ------------------------------------------------------------------------------------------------------" + world.getScheduler().getTick());
-		////System.out.println(context.getName());
+		//////System.out.println("DELETION ------------------------------------------------------------------------------------------------------" + world.getScheduler().getTick());
+		//////System.out.println(context.getName());
 		displayContextProjections();
-		////System.out.println("----------------------------------------------------------------------------------------------------------------");
+		//////System.out.println("----------------------------------------------------------------------------------------------------------------");
 	}
 	
 	
 	
 	public void updateContextProjectionStart(Context context) {
-		////System.out.println(context.getName());
-		////System.out.println(contextProjections.get(context));
-		////System.out.println(contextProjections.size() + " " + world.getScheduler().getContextsAsContext().size());
+		//////System.out.println(context.getName());
+		//////System.out.println(contextProjections.get(context));
+		//////System.out.println(contextProjections.size() + " " + world.getScheduler().getContextsAsContext().size());
 		if(!context.isDying()) {
 			contextProjections.get(context).updateStart();
 		}
@@ -720,7 +720,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		double contextStart2 = getStartRangeProjection(context2);
 		double contextEnd1 = getEndRangeProjection(context1);
 		double contextEnd2 = getEndRangeProjection(context2);
-		//////System.out.println(context1.getName() + "  " + contextStart1 + "  " + contextEnd1 + "  " + context2.getName() + "  " + contextStart2 + "  " + contextEnd2);
+		////////System.out.println(context1.getName() + "  " + contextStart1 + "  " + contextEnd1 + "  " + context2.getName() + "  " + contextStart2 + "  " + contextEnd2);
 		return ( (contextStart1< contextStart2 && contextStart2 <contextEnd1) || ((contextStart1< contextEnd2 && contextEnd2 <contextEnd1)) ) || ( (contextStart2< contextStart1 && contextStart1 <contextEnd2) || ((contextStart2< contextEnd1 && contextEnd1 <contextEnd2)) ) ;
 		
 	}
@@ -767,7 +767,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 			overlapRanges.put("end", getEndRangeProjection(context2));
 		}
 		else {
-			//////System.out.println("PROBLEM !!!!!!!!!!!!!!!!! " + context1.getName() + "  " + getStartRangeProjection(context1) + "  " + getEndRangeProjection(context1) + "  " + context2.getName()  + "  " + getStartRangeProjection(context2) + "  " + getEndRangeProjection(context2));
+			////////System.out.println("PROBLEM !!!!!!!!!!!!!!!!! " + context1.getName() + "  " + getStartRangeProjection(context1) + "  " + getEndRangeProjection(context1) + "  " + context2.getName()  + "  " + getStartRangeProjection(context2) + "  " + getEndRangeProjection(context2));
 			overlapRanges.put("start", -1.0);
 			overlapRanges.put("end", 1.0);
 			//return null;
@@ -800,6 +800,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	}
 	
 	public double getRadiusContextForCreation() {
+		//return 200*world.getContextCreationPercentage();
 		return getMinMaxDistance()*world.getContextCreationPercentage();
 	}
 }

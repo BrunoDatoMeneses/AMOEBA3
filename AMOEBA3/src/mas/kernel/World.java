@@ -77,12 +77,12 @@ public class World implements Serializable {
 	
 	
 	//BUREAU
-	private int xGraphSize = 1600;
-	private int yGraphSize = 800;
+//	private int xGraphSize = 1600;
+//	private int yGraphSize = 800;
 	
 	//REUNION
-//	private int xGraphSize = 1200;
-//	private int yGraphSize = 600;
+	private int xGraphSize = 1200;
+	private int yGraphSize = 600;
 	
 	public double increment_up = 0.05;
 	public double increment_down = 0.05;
@@ -97,6 +97,14 @@ public class World implements Serializable {
 	
 	public double getContextCreationPercentage() {
 		return contextCreationPercentage;
+	}
+	
+	public void trace(ArrayList<String> infos) {
+		String message = "" +this.getScheduler().getTick();
+		for(String info : infos) {
+			message += " " + info;
+		}
+		System.out.println(message);
 	}
 	
 	/**
@@ -875,8 +883,8 @@ public class World implements Serializable {
 	}
 	
 	public double getNeighborhood(Context ctxt, Percept pct) {
-		return 2*ctxt.getRanges().get(pct).getRadius();
-		
+		//return 2*ctxt.getRanges().get(pct).getRadius();
+		return pct.getRadiusContextForCreation();
 	}
 	
 }

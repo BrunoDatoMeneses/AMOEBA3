@@ -357,6 +357,7 @@ public class Scheduler implements Serializable{
 		
 		for(Context ctxt : getContextsAsContext()) {
 			ctxt.clearNonValidPerceptNeighbors();
+			ctxt.clearNonValidPercepts();
 		}
 
 

@@ -45,14 +45,20 @@ public class F_XY_Launcher implements Serializable {
 			//System.out.println("Running :" + amoeba.isRunning());
 			try        
 			{
-			    Thread.sleep(1);
+			    Thread.sleep(amoeba.temporisation);
 			} 
 			catch(InterruptedException ex) 
 			{
 			    Thread.currentThread().interrupt();
 			}
 			
-			if(amoeba.isRunning()) {
+			
+			if(amoeba.getScheduler().requestAsked()) {
+				amoeba.manual = true;
+				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputRequest(amoeba.getScheduler().getManualRequest())));
+				amoeba.manual = false;
+				
+			}else if(amoeba.isRunning()) {
 				
 				/*Random samples of the studied system */
 				f_XY_Manager.playOneStep(0);
@@ -75,6 +81,7 @@ public class F_XY_Launcher implements Serializable {
 				
 				
 			}
+ 
 			
 		}
 		
