@@ -3,7 +3,6 @@ import java.util.HashMap;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
-import fr.irit.smac.lxplot.LxPlot;
 import ncs.NCS;
 
 /**

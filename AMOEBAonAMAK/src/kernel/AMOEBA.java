@@ -33,8 +33,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	private Head head;
-
-	// TODO use strategy instead
+	
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();

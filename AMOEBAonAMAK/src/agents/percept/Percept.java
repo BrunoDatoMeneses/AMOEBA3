@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import agents.AmoebaAgent;
-import agents.AmoebaMessage;
 import agents.context.Context;
 import kernel.AMOEBA;
 
 public class Percept extends AmoebaAgent {
-
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private ArrayList<Context> validContextProjection = new ArrayList<Context>();
 
@@ -37,11 +35,9 @@ public class Percept extends AmoebaAgent {
 			if (contextProjection.contains(this.value)) {
 				validContextProjection.add(contextProjection.getContext());
 			}
-		}
-
-		// TODO see if possible to message
-		for (Context context : validContextProjection) {
-			context.setPerceptValidity(this); // TODO we may want to use a message instead
+		} 
+		for(Context context : validContextProjection) {
+			context.setPerceptValidity(this);
 		}
 
 	}
@@ -65,14 +61,8 @@ public class Percept extends AmoebaAgent {
 		min += 0.05 * dist;
 		max -= 0.05 * dist;
 	}
-
-	@Override
-	public void computeAMessage(AmoebaMessage m) {
-		// TODO Hugo say : the original code has no use, I don't know what it was
-		// supposed to do
-		// We may want to add things here in the future.
-	}
-
+	
+	
 	/**
 	 * Gets the min max distance.
 	 *
@@ -83,7 +73,7 @@ public class Percept extends AmoebaAgent {
 			return 0;
 		return Math.abs(max - min);
 	}
-
+	
 	/**
 	 * Gets the value.
 	 *
@@ -92,7 +82,7 @@ public class Percept extends AmoebaAgent {
 	public double getValue() {
 		return value;
 	}
-
+	
 	/**
 	 * Checks if is enum.
 	 *
@@ -115,15 +105,14 @@ public class Percept extends AmoebaAgent {
 	}
 
 	public void updateContextProjectionStart(Context context) {
-		// TODO see if possible to message
 		contextProjections.get(context).updateStart();
 	}
 
 	public void updateContextProjectionEnd(Context context) {
-		// TODO see if possible to message
 		contextProjections.get(context).updateEnd();
 	}
-
+	
+	
 	@Override
 	protected int computeExecutionOrderLayer() {
 		return 0;

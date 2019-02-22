@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import agents.AmoebaAgent;
-import agents.AmoebaMessage;
-import agents.MessageType;
 import agents.context.Context;
 import agents.percept.Percept;
 import kernel.AMOEBA;
@@ -116,11 +114,9 @@ public class Head extends AmoebaAgent {
 		this.nSuccessBeforeInexactDiminution = nSuccessBeforeInexactDiminution;
 	}
 
-	@Override
-	public void computeAMessage(AmoebaMessage m) {
-		if (m.getType() == MessageType.PROPOSAL) { // Value useless
-			activatedContexts.add((Context) m.getSender());
-		}
+	
+	public void proposition(Context c) {
+		activatedContexts.add(c);
 	}
 
 	/**
@@ -172,10 +168,6 @@ public class Head extends AmoebaAgent {
 		/* Compute the criticity. Will be used by context agents. */
 		criticity = Math.abs(oracleValue - prediction);
 
-		/* If we have a bestcontext, send a selection message to it */
-		if (bestContext != null) {
-			sendExpressMessage(this, MessageType.SELECTION, bestContext);
-		}
 
 		selfAnalysationOfContexts();
 
@@ -267,9 +259,8 @@ public class Head extends AmoebaAgent {
 		for (int i = 0; i < activatedContexts.size(); i++) {
 			if (activatedContexts.get(i).isDying()) {
 				activatedContexts.remove(i);
-			} else {
-				activatedContexts.get(i).analyzeResults(this);// message TODO
-			}
+			}else
+				activatedContexts.get(i).analyzeResults(this);
 		}
 	}
 
@@ -278,7 +269,7 @@ public class Head extends AmoebaAgent {
 		Context nearestContext = this.getNearestContext(allContexts);
 
 		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();// message TODO
+			prediction = nearestContext.getActionProposal();
 		} else {
 			prediction = 0;
 		}
@@ -356,13 +347,8 @@ public class Head extends AmoebaAgent {
 		double d = 0.0;
 		ArrayList<Percept> percepts = amas.getPercepts();
 		for (Percept p : percepts) {
-
-			// isEnum deleted -> see Percept.java (here deletion of an if branch)
-
-			// TODO see if possible to message
 			double min = context.getRanges().get(p).getStart();
 			double max = context.getRanges().get(p).getEnd();
-
 			if (min > p.getValue() || max < p.getValue()) {
 				d += Math.min(Math.abs(p.getValue() - min), Math.abs(p.getValue() - max));
 			}
@@ -379,7 +365,6 @@ public class Head extends AmoebaAgent {
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
-			// TODO see if possible to message
 			if (oracleValue - c.getActionProposal() < errorAllowed) {
 				b = true;
 			}
@@ -473,7 +458,6 @@ public class Head extends AmoebaAgent {
 		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
 				bc = context;
-				// TODO see if possible to message
 				currentConfidence = bc.getConfidence();
 			}
 		}

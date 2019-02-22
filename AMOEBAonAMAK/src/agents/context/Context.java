@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import agents.AmoebaAgent;
-import agents.AmoebaMessage;
-import agents.MessageType;
 import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
@@ -25,14 +23,8 @@ public class Context extends AmoebaAgent {
 
 	private LocalModel localModel;
 
-	// Note Labbeti : keep these attributes for now. (according to Steven)
-	private double action = -1.0;
 	private double confidence = 0;
-	private int nSelection = 0;
-	private int maxActivationsRequired = 0;
-	private int activations = 0;
 
-	private boolean valid = false;
 	private boolean isDying = false;
 
 	private DrawableRectangle drawable;
@@ -55,22 +47,17 @@ public class Context extends AmoebaAgent {
 		Experiment firstPoint = new Experiment();
 		this.headAgent = headAgent;
 
-		action = this.headAgent.getOracleValue();
-		maxActivationsRequired = var.size();
-
 		for (Percept v : var) {
 			Range r;
 
 			double length = Math.abs(v.getMinMaxDistance()) / 4.0;
 			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v);
 			ranges.put(v, r);
-			sendExpressMessage(null, MessageType.REGISTER, v); // TODO check if amak support express message
 			firstPoint.addDimension(v, v.getValue());
 
 			v.addContextProjection(this);
 		}
 		localModel = amoeba.buildLocalModel(this);
-		// TODO see if possible to message
 		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
@@ -82,40 +69,10 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	public void computeAMessage(AmoebaMessage m) {
-
-		if (m.getType() == MessageType.VALIDATE) {
-
-			computeAMessageTypeValidate(m);
-
-		} else if (m.getType() == MessageType.SELECTION) { // ++ number of selection only
-
-			computeAMessageTypeSelection(m);
-		}
-	}
-
-	private void computeAMessageTypeValidate(AmoebaMessage m) {
-
-		if (m.getSender() instanceof Percept) {
-			boolean activate = (boolean) m.getContent();
-			if (activate) {
-				activations++;
-			}
-		}
-	}
-
-	private void computeAMessageTypeSelection(AmoebaMessage m) {
-		nSelection++;
-	}
-
 	protected void onAct() {
 		if (computeValidityByPercepts()) {
-			AmoebaMessage message = new AmoebaMessage(getActionProposal(), MessageType.PROPOSAL, this);
-			sendMessage(message, headAgent.getAID());
+			headAgent.proposition(this);
 		}
-
-		this.activations = 0;
-		this.valid = false;
 
 		// Reset percepts validities
 		for (Percept percept : perceptValidities.keySet()) {
@@ -161,7 +118,6 @@ public class Context extends AmoebaAgent {
 
 		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);
 
-		// TODO see if possible to message
 		if (head.getNewContext() == this) {
 			head.setNewContext(null);
 		}
@@ -172,7 +128,6 @@ public class Context extends AmoebaAgent {
 			confidence -= 2;
 		}
 
-		// TODO see if possible to message
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
 		Percept p;
@@ -203,7 +158,6 @@ public class Context extends AmoebaAgent {
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
 
-		// TODO see if possible to message
 		for (Percept percept : containingRanges) {
 			if (!ranges.get(percept).isPerceptEnum()) {
 				Range r = c.getRanges().get(percept);
@@ -235,7 +189,7 @@ public class Context extends AmoebaAgent {
 		Percept p = null;
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
-		// TODO see if possible to message
+		
 		for (Percept v : containingRanges) {
 			if (!ranges.get(v).isPerceptEnum()) {
 
@@ -270,7 +224,6 @@ public class Context extends AmoebaAgent {
 	}
 
 	public Range getRangeByPerceptName(String perceptName) {
-		// TODO see if possible to message
 		for (Percept prct : ranges.keySet()) {
 			if (prct.getName().equals(perceptName)) {
 				return ranges.get(prct);
@@ -282,48 +235,6 @@ public class Context extends AmoebaAgent {
 	public String toString() {
 		return "Context :" + this.getName();// Percept name
 	}
-
-	// TODO : keep these debug function for display datas ?
-	/*
-	 * public String toStringFull() { String s = ""; s += "Context : " + getName() +
-	 * "\n";//Percept name s += "\n";
-	 * 
-	 * s += "Model : "; s += this.localModel.getCoefsFormula() + "\n"; s += "\n";
-	 * 
-	 * 
-	 * s += "Number of activations : " + activations + "\n"; if (actionProposition
-	 * != null) { s += "Action proposed : " + this.actionProposition + "\n"; } else
-	 * { s += "Action proposed : " + this.getActionProposal() + "\n"; } s +=
-	 * "Number of experiments : " + experiments.size() + "\n"; s += "Confidence : "
-	 * + confidence + "\n"; if (formulaLocalModel != null) { s += "Local model : " +
-	 * this.formulaLocalModel + "\n"; } else { s += "Local model : " +
-	 * localModel.getFormula(this) + "\n"; }
-	 * 
-	 * s += "\n"; s += "Possible neighbours : \n";
-	 * 
-	 * return s; }
-	 * 
-	 * public String toStringReducted(HashMap<Percept,Double> situation) { String s
-	 * = ""; s += "Context : " + getName() + "\n"; s += "Model : "; s +=
-	 * this.localModel.getCoefsFormula() + "\n"; for (Percept v : ranges.keySet()) {
-	 * s += v.getName() + " : " + ranges.get(v).toString() + "\n";
-	 * 
-	 * }
-	 * 
-	 * s += "Number of activations : " + activations + "\n"; if (actionProposition
-	 * != null) { s += "Action proposed : " + this.actionProposition + "\n"; } else
-	 * { s += "Action proposed : " + this.getActionProposal() + "\n"; } s +=
-	 * "Number of experiments : " + experiments.size() + "\n"; s += "Confidence : "
-	 * + confidence + "\n"; s += "Normalized confidence : " +
-	 * getNormalizedConfidence() + "\n"; s += "Influnce :" + getInfluence(situation)
-	 * + "\n"; if (formulaLocalModel != null) { s += "Local model : " +
-	 * this.formulaLocalModel + "\n"; } else { s += "Local model : " +
-	 * localModel.getFormula(this) + "\n"; }
-	 * 
-	 * s += "\n";
-	 * 
-	 * return s; }
-	 */
 
 	public LocalModel getFunction() {
 		return localModel;
@@ -373,12 +284,10 @@ public class Context extends AmoebaAgent {
 	}
 
 	private void updateExperiments() {
-		ArrayList<Percept> percepts = amas.getPercepts();
-		maxActivationsRequired = percepts.size();
+		ArrayList<Percept> var = amas.getPercepts();
 		Experiment exp = new Experiment();
-		// TODO see if possible to message
-		for (Percept percept : percepts) {
-			exp.addDimension(percept, percept.getValue());
+		for (Percept v : var) {
+			exp.addDimension(v, v.getValue());
 		}
 		exp.setProposition(headAgent.getOracleValue());
 
@@ -387,9 +296,9 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void analyzeResults(Head head) {
-		// TODO see if possible to message
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			solveNCS_Conflict(head);
+			
 		} else {
 			if (head.getCriticity(this) > head.getInexactAllowed()) {
 				solveNCS_ConflictInexact(head);

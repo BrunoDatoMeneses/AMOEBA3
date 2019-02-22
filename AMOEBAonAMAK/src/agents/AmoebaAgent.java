@@ -18,12 +18,8 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	
 	@Override
 	protected void onDecide() {
-		for (AmoebaMessage m : getReceivedMessagesGivenType(AmoebaMessage.class) ) {
-			computeAMessage(m);
-		}
 	}
 	
-	public abstract void computeAMessage(AmoebaMessage m);
 	
 
 	public String getName() {
@@ -34,13 +30,5 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 		this.name = name;
 	}
 	
-	@Deprecated
-	public void sendExpressMessage(Object object, MessageType type, AmoebaAgent a) {
-		a.receiveExpressMessage(new AmoebaMessage(object,type,this));
-	}
-
-	@Deprecated
-	private void receiveExpressMessage(AmoebaMessage message) {
-		computeAMessage(message);
-	}
 }
+	
