@@ -19,7 +19,6 @@ public class Head extends AmoebaAgent {
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
-	// functionSelected value never used -> removed
 
 	HashMap<Percept, Double> currentSituation = new HashMap<>();
 
@@ -27,8 +26,6 @@ public class Head extends AmoebaAgent {
 
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<>();
 
-	// nPropositionsReceived value never used -> removed
-	// averagePredictionCriticityWeight never used -> removed
 	private int numberOfCriticityValuesForAverage = 100;
 
 	private int nConflictBeforeAugmentation = 1;
@@ -40,9 +37,7 @@ public class Head extends AmoebaAgent {
 
 	private double prediction;
 	private double oracleValue;
-	// oldOracleValue never used -> removed
 	private double criticity;
-	// oldCriticity never used -> removed
 	private double averagePredictionCriticity;
 
 	private double errorAllowed = 1.0;
@@ -57,19 +52,15 @@ public class Head extends AmoebaAgent {
 	private boolean noCreation = true;
 	private boolean useOracle = true;
 	private boolean firstContext = false;
-	// newContextWasCreated value never used -> removed
 	private boolean contextFromPropositionWasSelected = false;
 
 	Double maxConfidence;
 	Double minConfidence;
 
-	// noBestContext value never used -> removed
-
 	/**
 	 * Instantiates a new head.
 	 *
-	 * @param world
-	 *            the world
+	 * @param world the world
 	 */
 	public Head(AMOEBA amas) {
 		super(amas);
@@ -85,18 +76,12 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Sets the data for error margin.
 	 *
-	 * @param errorAllowed
-	 *            the error allowed
-	 * @param augmentationFactorError
-	 *            the augmentation factor error
-	 * @param diminutionFactorError
-	 *            the diminution factor error
-	 * @param minErrorAllowed
-	 *            the min error allowed
-	 * @param nConflictBeforeAugmentation
-	 *            the n conflict before augmentation
-	 * @param nSuccessBeforeDiminution
-	 *            the n success before diminution
+	 * @param errorAllowed                the error allowed
+	 * @param augmentationFactorError     the augmentation factor error
+	 * @param diminutionFactorError       the diminution factor error
+	 * @param minErrorAllowed             the min error allowed
+	 * @param nConflictBeforeAugmentation the n conflict before augmentation
+	 * @param nSuccessBeforeDiminution    the n success before diminution
 	 */
 	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
 			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
@@ -111,18 +96,14 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Sets the data for inexact margin.
 	 *
-	 * @param inexactAllowed
-	 *            the inexact allowed
-	 * @param augmentationInexactError
-	 *            the augmentation inexact error
-	 * @param diminutionInexactError
-	 *            the diminution inexact error
-	 * @param minInexactAllowed
-	 *            the min inexact allowed
-	 * @param nConflictBeforeInexactAugmentation
-	 *            the n conflict before inexact augmentation
-	 * @param nSuccessBeforeInexactDiminution
-	 *            the n success before inexact diminution
+	 * @param inexactAllowed                     the inexact allowed
+	 * @param augmentationInexactError           the augmentation inexact error
+	 * @param diminutionInexactError             the diminution inexact error
+	 * @param minInexactAllowed                  the min inexact allowed
+	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact
+	 *                                           augmentation
+	 * @param nSuccessBeforeInexactDiminution    the n success before inexact
+	 *                                           diminution
 	 */
 	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
 			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
@@ -284,10 +265,11 @@ public class Head extends AmoebaAgent {
 	private void selfAnalysationOfContexts() {
 		/* All context which proposed itself must analyze its proposition */
 		for (int i = 0; i < activatedContexts.size(); i++) {
-			if(activatedContexts.get(i).isDying()) {
+			if (activatedContexts.get(i).isDying()) {
 				activatedContexts.remove(i);
-			}else
-				activatedContexts.get(i).analyzeResults(this);//message TODO
+			} else {
+				activatedContexts.get(i).analyzeResults(this);// message TODO
+			}
 		}
 	}
 
@@ -296,7 +278,7 @@ public class Head extends AmoebaAgent {
 		Context nearestContext = this.getNearestContext(allContexts);
 
 		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();//message TODO
+			prediction = nearestContext.getActionProposal();// message TODO
 		} else {
 			prediction = 0;
 		}
@@ -307,8 +289,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Gets the nearest good context.
 	 *
-	 * @param allContext
-	 *            the all context
+	 * @param allContext the all context
 	 * @return the nearest good context
 	 */
 	private Context getNearestGoodContext(ArrayList<Context> allContext) {
@@ -327,8 +308,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Gets the distance to nearest good context.
 	 *
-	 * @param allContext
-	 *            the all context
+	 * @param allContext the all context
 	 * @return the distance to nearest good context
 	 */
 	private double getDistanceToNearestGoodContext(ArrayList<Context> allContext) {
@@ -347,8 +327,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Gets the nearest context.
 	 *
-	 * @param allContext
-	 *            the all context
+	 * @param allContext the all context
 	 * @return the nearest context
 	 */
 	private Context getNearestContext(ArrayList<Context> allContext) {
@@ -370,8 +349,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Gets the external distance to context.
 	 *
-	 * @param context
-	 *            the context
+	 * @param context the context
 	 * @return the external distance to context
 	 */
 	private double getExternalDistanceToContext(Context context) {
@@ -380,8 +358,8 @@ public class Head extends AmoebaAgent {
 		for (Percept p : percepts) {
 
 			// isEnum deleted -> see Percept.java (here deletion of an if branch)
-			
-			//TODO see if possible to message 
+
+			// TODO see if possible to message
 			double min = context.getRanges().get(p).getStart();
 			double max = context.getRanges().get(p).getEnd();
 
@@ -401,7 +379,7 @@ public class Head extends AmoebaAgent {
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
-			//TODO see if possible to message 
+			// TODO see if possible to message
 			if (oracleValue - c.getActionProposal() < errorAllowed) {
 				b = true;
 			}
@@ -495,7 +473,7 @@ public class Head extends AmoebaAgent {
 		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
 				bc = context;
-				//TODO see if possible to message 
+				// TODO see if possible to message
 				currentConfidence = bc.getConfidence();
 			}
 		}
@@ -520,13 +498,10 @@ public class Head extends AmoebaAgent {
 		return criticity;
 	}
 
-	// getNoBestContext never used -> removed
-
 	/**
 	 * Gets the criticity.
 	 *
-	 * @param context
-	 *            the context
+	 * @param context the context
 	 * @return the criticity
 	 */
 	public double getCriticity(Context context) {
@@ -545,8 +520,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Sets the no creation.
 	 *
-	 * @param noCreation
-	 *            the new no creation
+	 * @param noCreation the new no creation
 	 */
 	public void setNoCreation(boolean noCreation) {
 		this.noCreation = noCreation;
@@ -582,8 +556,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Sets the new context.
 	 *
-	 * @param newContext
-	 *            the new new context
+	 * @param newContext the new new context
 	 */
 	public void setNewContext(Context newContext) {
 		this.newContext = newContext;
@@ -617,8 +590,8 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Sets the context from proposition was selected.
 	 *
-	 * @param contextFromPropositionWasSelected
-	 *            the new context from proposition was selected
+	 * @param contextFromPropositionWasSelected the new context from proposition was
+	 *                                          selected
 	 */
 	public void setContextFromPropositionWasSelected(boolean contextFromPropositionWasSelected) {
 		this.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
@@ -627,16 +600,16 @@ public class Head extends AmoebaAgent {
 	public Head clone() throws CloneNotSupportedException {
 		return (Head) super.clone();
 	}
-	
+
 	public double getAveragePredictionCriticity() {
 		return averagePredictionCriticity;
 	}
-	
+
 	public ArrayList<Double> getxLastCriticityValues() {
 		return xLastCriticityValues;
 	}
-	
-	public void clearAllUseableContextLists() {	
+
+	public void clearAllUseableContextLists() {
 		activatedContexts.clear();
-	}	
+	}
 }

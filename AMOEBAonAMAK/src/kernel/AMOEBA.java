@@ -3,9 +3,7 @@ package kernel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -25,7 +23,6 @@ import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.lxplot.LxPlot;
 import fr.irit.smac.lxplot.commons.ChartType;
 import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
-import fr.irit.smac.lxplot.server.LxPlotChart;
 import ncs.NCS;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
@@ -34,62 +31,61 @@ import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 
 public class AMOEBA extends Amas<World> implements IAMOEBA {
-	
+
 	private Head head;
-	
-	//TODO use strategy instead
+
+	// TODO use strategy instead
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
-	
-	private HashMap<String,Double> perceptionsAndActionState = new HashMap<String,Double>();
+
+	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
 
 	private StudiedSystem studiedSystem;
-	
+
 	private boolean useOracle = true;
-	
+
 	// Imported from World -----------
 	private boolean creationOfNewContext;
 	private boolean loadPresetContext;
 	public int testValue = 0;
-	//--------------------------------
-	
+	// --------------------------------
+
 	private File ressourceFile;
-	
+
 	private Drawable point;
 
 	/**
-	 * Instantiates a new amoeba.
+	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
 	 *
 	 * @param studiedSystem the studied system
 	 */
-	/* Create an AMOEBA coupled with a studied system */
 	public AMOEBA(World environment, StudiedSystem studiedSystem, File ressourceFile) {
 		super(environment, Scheduling.DEFAULT, studiedSystem, ressourceFile);
-		//this.getScheduler().stop();
+		// this.getScheduler().stop();
 	}
-	
+
 	@Override
 	protected void onInitialConfiguration() {
 		VUI.get().setDefaultView(200, 0, 0);
 		studiedSystem = (StudiedSystem) params[0];
 		ressourceFile = (File) params[1];
 	}
-	
+
 	@Override
 	protected void onInitialAgentsCreation() {
 		readRessourceFile(ressourceFile);
-		
+
 	}
-	
+
 	@Override
 	protected void onSystemCycleBegin() {
-		if(studiedSystem != null) {
+		if (studiedSystem != null) {
 			studiedSystem.playOneStep();
 			perceptionsAndActionState = studiedSystem.getOutput();
 		}
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
 	}
-	
+
 	/**
 	 * Learn.
 	 *
@@ -99,7 +95,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		setPerceptionsAndActionState(perceptionsActionState);
 		getScheduler().step();
 	}
-	
+
 	/**
 	 * Request.
 	 *
@@ -107,149 +103,132 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return the double
 	 */
 	public double request(HashMap<String, Double> perceptionsActionState) {
-		if(isUseOracle()) head.changeOracleConnection();
+		if (isUseOracle())
+			head.changeOracleConnection();
 		setPerceptionsAndActionState(perceptionsActionState);
 		getScheduler().step();
 		head.changeOracleConnection();
 		return getAction();
 	}
 
-	//isRunning used by visualization, removed (for now)
-
-	//setRunning used by visualization, removed (for now)
-	
-	//playOneStep used by visualization, removed (for now)
-
-	//changeControl used by visualization, removed (for now)
-	
-	//TODO check usefulness in amak
-	public StudiedSystem getStudiedSystem() {
-		return studiedSystem;
-	}
-
-	//setStudiedSystem never used -> removed
-	
 	public double getAction() {
 		return head.getAction();
 	}
-	
+
 	public boolean isUseOracle() {
 		return useOracle;
 	}
-	
-	public void setPerceptionsAndActionState(HashMap<String,Double> perceptionsAndActions) {
+
+	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
-	
+
 	public Double getPerceptionsOrAction(String key) {
-		return this.perceptionsAndActionState.get(key);	
+		return this.perceptionsAndActionState.get(key);
 	}
-	
+
 	/**
 	 * Read resource file and generate the AMOEBA described.
 	 *
 	 * @param systemFile the file XML file describing the AMOEBA.
 	 */
 	private void readRessourceFile(File systemFile) {
-	      SAXBuilder sxb = new SAXBuilder();
-	      Document document;
+		SAXBuilder sxb = new SAXBuilder();
+		Document document;
 		try {
 			System.out.println(systemFile);
 			document = sxb.build(systemFile);
-		    Element racine = document.getRootElement();
-		    System.out.println(racine.getName());
-		    
-		    //learning = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("allowed")); never used -> removed
-		    creationOfNewContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
-		    loadPresetContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
-		    
-		    
-		    
-		    // Initialize the sensor agents
-		    for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")){
-		    	Percept s = new Percept(this);
-		    	s.setName(element.getAttributeValue("Name"));	   
-		    }
+			Element racine = document.getRootElement();
+			System.out.println(racine.getName());
 
-		    
-		    
-		    //Initialize the controller agents
-		    for (Element element : racine.getChild("StartingAgents").getChildren("Controller")){
-		    	Head a = new Head(this);
-		    	a.setName(element.getAttributeValue("Name"));
-		    	System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
-		    	a.setNoCreation(!creationOfNewContext);
-		    	this.head = a;
-		    }
+			creationOfNewContext = Boolean.parseBoolean(
+					racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
+			loadPresetContext = Boolean.parseBoolean(
+					racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
 
-		    
-		    /*Load preset context if no learning required*/
+			// Initialize the sensor agents
+			for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")) {
+				Percept s = new Percept(this);
+				s.setName(element.getAttributeValue("Name"));
+			}
+
+			// Initialize the controller agents
+			for (Element element : racine.getChild("StartingAgents").getChildren("Controller")) {
+				Head a = new Head(this);
+				a.setName(element.getAttributeValue("Name"));
+				System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
+				a.setNoCreation(!creationOfNewContext);
+				this.head = a;
+			}
+
+			/* Load preset context if no learning required */
 			if (loadPresetContext) {
-				
-			    for (Element element : racine.getChild("PresetContexts").getChildren("Context")){
-			    	
-			    	double[] start, end;
-			    	int[] n;
-			    	String[] percepts;
-			    			
-			    	double action;
-			    	start = new double[element.getChildren("Range").size()];
-			    	end = new double[element.getChildren("Range").size()];
-			    	n = new int[element.getChildren("Range").size()];
-			    	percepts = new String[element.getChildren("Range").size()];
-	
-			    	
-			    	int i = 0;
-				    for (Element elem : element.getChildren("Range")){
-				    	start[i] = Double.parseDouble(elem.getAttributeValue("start"));
-				    	end  [i] = Double.parseDouble(elem.getAttributeValue("end"));
-				    	n    [i] = Integer.parseInt(elem.getAttributeValue("n"));
-				    	percepts[i] = elem.getAttributeValue("Name");
-				    	i++;
-				    }
-				    action = Double.parseDouble(element.getAttributeValue("Action"));
-			    	
-				   Head c = head;
-				    
-				   createPresetContext(start,end,n,new int[0],0,action,c,percepts);
-			    }
-				
+
+				for (Element element : racine.getChild("PresetContexts").getChildren("Context")) {
+
+					double[] start, end;
+					int[] n;
+					String[] percepts;
+
+					double action;
+					start = new double[element.getChildren("Range").size()];
+					end = new double[element.getChildren("Range").size()];
+					n = new int[element.getChildren("Range").size()];
+					percepts = new String[element.getChildren("Range").size()];
+
+					int i = 0;
+					for (Element elem : element.getChildren("Range")) {
+						start[i] = Double.parseDouble(elem.getAttributeValue("start"));
+						end[i] = Double.parseDouble(elem.getAttributeValue("end"));
+						n[i] = Integer.parseInt(elem.getAttributeValue("n"));
+						percepts[i] = elem.getAttributeValue("Name");
+						i++;
+					}
+					action = Double.parseDouble(element.getAttributeValue("Action"));
+
+					Head c = head;
+
+					createPresetContext(start, end, n, new int[0], 0, action, c, percepts);
+				}
+
 			}
 		} catch (JDOMException | IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private void createPresetContext(double[] start, double[] end, int[] n, int[] pos, int iteration, double action, Head controller, String[] percepts) {
-		/*TODO Hugo says : There was some code here without impact, there was a comment saying "broken by criterion".
-		 * I was not able to fix it, so I put an error message.
-		 * If you need this, please check the original project (AMOEBA3)
+
+	private void createPresetContext(double[] start, double[] end, int[] n, int[] pos, int iteration, double action,
+			Head controller, String[] percepts) {
+		/*
+		 * TODO Hugo says : There was some code here without impact, there was a comment
+		 * saying "broken by criterion". I was not able to fix it, so I put an error
+		 * message. If you need this, please check the original project (AMOEBA3)
 		 */
 		System.err.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
 	}
-	
-	public ArrayList<Percept> getPercepts(){
+
+	public ArrayList<Percept> getPercepts() {
 		ArrayList<Percept> percepts = new ArrayList<>();
-		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if((agent instanceof Percept)) {
-				percepts.add((Percept)agent);
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Percept)) {
+				percepts.add((Percept) agent);
 			}
 		}
 		return percepts;
 	}
-	
-	public  ArrayList<Context> getContexts(){
+
+	public ArrayList<Context> getContexts() {
 		ArrayList<Context> contexts = new ArrayList<>();
-		for(Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if((agent instanceof Context)) {
-				contexts.add((Context)agent);
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Context)) {
+				contexts.add((Context) agent);
 			}
 		}
 		return contexts;
 	}
-	
+
 	public LocalModel buildLocalModel(Context context) {
-		
+
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
 			return new LocalModelMillerRegression(this);
 		}
@@ -270,48 +249,50 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
 			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed, nConflictBeforeAugmentation, nSuccessBeforeDiminution);
+		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
+				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
 	}
 
 	@Override
 	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
 			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
 			int nSuccessBeforeInexactDiminution) {
-		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError,
+				minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
-	
+
 	@Override
 	protected void onRenderingInitialization() {
-		// TODO Auto-generated method stub
 		super.onRenderingInitialization();
 		point = VUI.get().createPoint(0, 0);
 	}
-	
+
 	protected void onUpdateRender() {
 		ArrayList<Percept> percepts = getPercepts();
 		point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
-		
+
 		HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 		HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 		ILxPlotChart loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);
 		ILxPlotChart allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
-		for(NCS ncs : NCS.values()) {
-			loopNCS.add(ncs.name(),cycle, thisLoopNCS.get(ncs));
-			allNCS.add(ncs.name(),cycle, allTimeNCS.get(ncs));
+		for (NCS ncs : NCS.values()) {
+			loopNCS.add(ncs.name(), cycle, thisLoopNCS.get(ncs));
+			allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
 		}
-		
+
 		ILxPlotChart nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
 		nbAgent.add("Percepts", cycle, getPercepts().size());
 		nbAgent.add("Contexts", cycle, getContexts().size());
-		
+
 		ILxPlotChart errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
-		errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());		
-		errors.add("Error Allowed",cycle, head.getErrorAllowed());
-		errors.add("Inexact Allowed",cycle, head.getInexactAllowed());
+		errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
+		errors.add("Error Allowed", cycle, head.getErrorAllowed());
+		errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
 		Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 		Collections.sort(sortedErrors);
-		errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size()/2));
-		
-		//System.out.println("Oracle : "+getPerceptionsOrAction("oracle")+"  Prediction : "+head.getAction());
+		errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+
+		// System.out.println("Oracle : "+getPerceptionsOrAction("oracle")+" Prediction
+		// : "+head.getAction());
 	}
 }

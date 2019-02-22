@@ -18,7 +18,7 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	
 	@Override
 	protected void onDecide() {
-		for(AmoebaMessage m : getReceivedMessagesGivenType(AmoebaMessage.class) ) {
+		for (AmoebaMessage m : getReceivedMessagesGivenType(AmoebaMessage.class) ) {
 			computeAMessage(m);
 		}
 	}

@@ -16,7 +16,7 @@ public class LocalModelFirstExp extends LocalModel {
 	 * @param world the world
 	 */
 	public LocalModelFirstExp() {
-		
+
 	}
 
 	@Override
@@ -25,16 +25,15 @@ public class LocalModelFirstExp extends LocalModel {
 	}
 
 	@Override
-	public double getProposition(Context context, Percept p1, Percept p2,
-			double v1, double v2) {
+	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		return 0;
 	}
 
 	@Override
 	public String getFormula(Context context) {
-		return  context.getExperiments().get(0).getProposition() +"";
+		return context.getExperiments().get(0).getProposition() + "";
 	}
-	
+
 	public String getCoefsFormula() {
 		return "";
 	}
@@ -44,8 +43,6 @@ public class LocalModelFirstExp extends LocalModel {
 		// TODO Auto-generated method stub
 	}
 
-
-	
 	public double[] getCoef() {
 		return new double[1];
 	}

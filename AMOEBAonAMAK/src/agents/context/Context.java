@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.print.attribute.standard.PrinterIsAcceptingJobs;
-
 import agents.AmoebaAgent;
 import agents.AmoebaMessage;
 import agents.MessageType;
@@ -15,7 +13,6 @@ import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
 import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.DrawablePoint;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import kernel.AMOEBA;
 import ncs.NCS;
@@ -77,8 +74,6 @@ public class Context extends AmoebaAgent {
 		firstPoint.setProposition(this.headAgent.getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
-		// TODO this.world.getScheduler().addAlteredContext(this); //Used for
-		// visualization
 		this.setName(String.valueOf(this.hashCode()));
 
 		perceptValidities = new HashMap<Percept, Boolean>();
@@ -86,10 +81,6 @@ public class Context extends AmoebaAgent {
 			perceptValidities.put(percept, false);
 		}
 	}
-
-	// TODO copy constructor, check usefulness
-
-	// getValueActionProposition only used by visualization -> removed (for now)
 
 	public void computeAMessage(AmoebaMessage m) {
 
@@ -121,7 +112,6 @@ public class Context extends AmoebaAgent {
 		if (computeValidityByPercepts()) {
 			AmoebaMessage message = new AmoebaMessage(getActionProposal(), MessageType.PROPOSAL, this);
 			sendMessage(message, headAgent.getAID());
-			// TODO Config.print("Message envoyé", 4);//Un print dans un config
 		}
 
 		this.activations = 0;
@@ -141,7 +131,7 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	// --------------------------------NCS
+	// -------------------------------- NCS
 	// Resolutions-----------------------------------------
 
 	public void solveNCS_IncompetentHead(Head head) {
@@ -271,15 +261,9 @@ public class Context extends AmoebaAgent {
 		return p;
 	}
 
-	// getPerceptsWithLesserImpactOnAVT never used -> removed
-
-	// getPerceptsWithLargerImpactOnAVT never used -> removed
-
 	public double getActionProposal() {
 		return localModel.getProposition(this);
 	}
-
-	// computeValidity never used -> removed
 
 	public HashMap<Percept, Range> getRanges() {
 		return ranges;
@@ -294,20 +278,6 @@ public class Context extends AmoebaAgent {
 		}
 		return null;
 	}
-
-	// setRanges never used -> removed
-
-	// getControler never used -> removed
-
-	// setControler never used -> removed
-
-	// getAction never used -> removed
-
-	// setAction never used -> removed
-
-	// getTargets used in visualization, removed (for now)
-
-	// String to see use
 
 	public String toString() {
 		return "Context :" + this.getName();// Percept name
@@ -355,39 +325,17 @@ public class Context extends AmoebaAgent {
 	 * return s; }
 	 */
 
-	// getNSelection used in visualization, removed (for now)
-
-	// setnSelection used in visualization, removed (for now)
-
-	// isValid never used -> removed
-
-	// setValid never used -> removed
-
-	// isFirstTimePeriod used in visualization, removed (for now)
-
-	// setFirstTimePeriod never used -> removed
-
-	// isBestContext used in visualization, removed (for now)
-
-	// setBestContext never used -> removed
-
 	public LocalModel getFunction() {
 		return localModel;
 	}
-
-	// setFunction never used -> removed
 
 	public ArrayList<Experiment> getExperiments() {
 		return experiments;
 	}
 
-	// setExperiments never used -> removed
-
 	public double getConfidence() {
 		return confidence;
 	}
-
-	// setConfidence never used -> removed
 
 	public double getNormalizedConfidence() {
 		return 1 / (1 + Math.exp(-confidence));
@@ -425,26 +373,23 @@ public class Context extends AmoebaAgent {
 	}
 
 	private void updateExperiments() {
-		ArrayList<Percept> var = amas.getPercepts();
-		maxActivationsRequired = var.size();
+		ArrayList<Percept> percepts = amas.getPercepts();
+		maxActivationsRequired = percepts.size();
 		Experiment exp = new Experiment();
 		// TODO see if possible to message
-		for (Percept v : var) {
-			exp.addDimension(v, v.getValue());
+		for (Percept percept : percepts) {
+			exp.addDimension(percept, percept.getValue());
 		}
 		exp.setProposition(headAgent.getOracleValue());
 
 		experiments.add(exp);
-		// TODO this.world.getScheduler().addAlteredContext(this);//visualization
 		localModel.updateModel(this);
 	}
 
 	public void analyzeResults(Head head) {
-
 		// TODO see if possible to message
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			solveNCS_Conflict(head);
-			// TODO this.world.getScheduler().addAlteredContext(this);//visualization
 		} else {
 			if (head.getCriticity(this) > head.getInexactAllowed()) {
 				solveNCS_ConflictInexact(head);
@@ -460,11 +405,11 @@ public class Context extends AmoebaAgent {
 	 *
 	 */
 	public void growRanges() {
-		ArrayList<Percept> allPercepts = amas.getPercepts();
-		for (Percept pct : allPercepts) {
-			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ? true : false;
+		ArrayList<Percept> percepts = amas.getPercepts();
+		for (Percept percept : percepts) {
+			boolean contain = ranges.get(percept).contains(percept.getValue()) == 0 ? true : false;
 			if (!contain) {
-				ranges.get(pct).adapt(this, pct.getValue(), pct);
+				ranges.get(percept).adapt(this, percept.getValue(), percept);
 			}
 		}
 	}
@@ -510,8 +455,6 @@ public class Context extends AmoebaAgent {
 		return test;
 	}
 
-	// getLocalModel used in visualization, removed (for now)
-
 	public boolean isDying() {
 		return isDying;
 	}
@@ -534,12 +477,11 @@ public class Context extends AmoebaAgent {
 		Iterator<Percept> iter = sP.iterator();
 		Percept p1 = iter.next();
 		Percept p2 = iter.next();
-		double x = ranges.get(p1).getStart()+(ranges.get(p1).getLenght()/2);
-		double y = ranges.get(p2).getStart()+(ranges.get(p2).getLenght()/2);
+		double x = ranges.get(p1).getStart() + (ranges.get(p1).getLenght() / 2);
+		double y = ranges.get(p2).getStart() + (ranges.get(p2).getLenght() / 2);
 		drawable.move(x, y);
 		drawable.setWidth(ranges.get(p1).getLenght());
 		drawable.setHeight(ranges.get(p2).getLenght());
-		
 
 		// Normalization of the color
 		double min = Double.POSITIVE_INFINITY;
@@ -558,9 +500,9 @@ public class Context extends AmoebaAgent {
 
 		int green;
 		int blue;
-		double normalizedValue = (getActionProposal()-min) / (max-min);
+		double normalizedValue = (getActionProposal() - min) / (max - min);
 		green = (int) (normalizedValue * 255);
-		blue = (int) ((1-normalizedValue) * 255);
+		blue = (int) ((1 - normalizedValue) * 255);
 
 		drawable.setColor(new Color(0, green, blue, 90));
 	}

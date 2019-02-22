@@ -4,19 +4,20 @@ import agents.context.Context;
 import agents.percept.Percept;
 
 /**
- * The abstract class of all agents in charge of the generation of the output from Context Agent.
- * For the sake of simplicity, it's not scheduled as agent like other of the system.
+ * The abstract class of all agents in charge of the generation of the output
+ * from Context Agent. For the sake of simplicity, it's not scheduled as agent
+ * like other of the system.
  */
-public abstract class LocalModel implements Cloneable{
+public abstract class LocalModel implements Cloneable {
 
 	/**
 	 * Instantiates a new local model agent.
 	 *
 	 */
 	public LocalModel() {
-		
+
 	}
-	
+
 	/**
 	 * Gets the proposition.
 	 *
@@ -24,16 +25,15 @@ public abstract class LocalModel implements Cloneable{
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context);
-	
-	
+
 	/**
 	 * Version of getProposition for 2D display.
 	 *
 	 * @param context the context
-	 * @param p1 the p 1
-	 * @param p2 the p 2
-	 * @param v1 the v 1
-	 * @param v2 the v 2
+	 * @param p1      the p 1
+	 * @param p2      the p 2
+	 * @param v1      the v 1
+	 * @param v2      the v 2
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context, Percept p1, Percept p2, double v1, double v2);
@@ -45,6 +45,7 @@ public abstract class LocalModel implements Cloneable{
 	 * @return the formula
 	 */
 	public abstract String getFormula(Context context);
+
 	public abstract String getCoefsFormula();
 
 	/**
@@ -53,11 +54,11 @@ public abstract class LocalModel implements Cloneable{
 	 * @param context the context
 	 */
 	public abstract void updateModel(Context context);
-	
+
 	public abstract double[] getCoef();
-	
-	public LocalModel clone() throws CloneNotSupportedException{
-		return (LocalModel)super.clone();
+
+	public LocalModel clone() throws CloneNotSupportedException {
+		return (LocalModel) super.clone();
 	}
 
 }

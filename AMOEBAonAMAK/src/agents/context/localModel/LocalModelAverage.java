@@ -5,7 +5,8 @@ import agents.context.Experiment;
 import agents.percept.Percept;
 
 /**
- * A simple local model which computes the average of all Context Agents experiments.
+ * A simple local model which computes the average of all Context Agents
+ * experiments.
  *
  */
 public class LocalModelAverage extends LocalModel {
@@ -18,18 +19,16 @@ public class LocalModelAverage extends LocalModel {
 		return average / context.getExperiments().size();
 	}
 
-
-	public double getProposition(Context context, Percept p1, Percept p2,
-			double v1, double v2) {
+	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		return 0;
 	}
 
 	public String getFormula(Context context) {
-		return  getProposition(context) + "";
+		return getProposition(context) + "";
 	}
-	
+
 	public String getCoefsFormula() {
-		return  "";
+		return "";
 	}
 
 	@Override

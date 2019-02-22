@@ -2,7 +2,6 @@ package agents;
 
 import java.io.Serializable;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum MessageType.
  */

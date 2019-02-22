@@ -2,7 +2,6 @@ package agents;
 
 import fr.irit.smac.amak.messaging.IAmakMessage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Message.
  */

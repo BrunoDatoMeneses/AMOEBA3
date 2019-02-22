@@ -11,11 +11,10 @@ public class Experiment {
 
 	/** The values. */
 	private LinkedHashMap<Percept, Double> values = new LinkedHashMap<Percept, Double>();
-	
+
 	/** The proposition. */
 	private double proposition;
 
-	
 	/**
 	 * Gets the values.
 	 *
@@ -24,7 +23,6 @@ public class Experiment {
 	public LinkedHashMap<Percept, Double> getValues() {
 		return values;
 	}
-
 
 	/**
 	 * Adds the dimension.
@@ -36,7 +34,6 @@ public class Experiment {
 		values.put(p, d);
 	}
 
-
 	/**
 	 * Gets the proposition.
 	 *
@@ -46,7 +43,6 @@ public class Experiment {
 		return proposition;
 	}
 
-
 	/**
 	 * Sets the proposition.
 	 *
@@ -55,20 +51,20 @@ public class Experiment {
 	public void setProposition(double proposition) {
 		this.proposition = proposition;
 	}
-	
+
 	/**
 	 * Gets the values as array.
 	 *
 	 * @return the values as array
 	 */
 	public double[] getValuesAsArray() {
-		double [] tab = new double[values.size()];
+		double[] tab = new double[values.size()];
 		int i = 0;
 		for (Percept p : values.keySet()) {
 			tab[i] = values.get(p);
 			i++;
 		}
-		
+
 		return tab;
 	}
 }

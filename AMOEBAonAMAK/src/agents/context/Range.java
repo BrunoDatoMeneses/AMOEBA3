@@ -9,83 +9,81 @@ public class Range implements Comparable<Object>, Cloneable {
 
 	/** The start. */
 	private double start;
-	
+
 	/** The end. */
 	private double end;
-	
+
 	/** The start inclu. */
 	private boolean start_inclu;
-	
+
 	/** The end inclu. */
 	private boolean end_inclu;
 
 	/** The context. */
 	private Context context;
-	
+
 	/** The percept. */
 	private Percept percept;
-	
+
 	/** The maxid. */
 	public static int maxid = 0; // TODO for debug purposes
-	
+
 	/** The id. */
 	public int id;
 
 	/** The Constant mininimalRange. */
 	public static final double mininimalRange = 10;
-	
+
 	/** The Constant useAVT. */
 	private static final boolean useAVT = true;
-	
+
 	/** The AV T delta min. */
 	/*---------------AVT---------------*/
 	private double AVT_deltaMin = 0.5;
-	
+
 	/** The AV T delta max. */
 	private double AVT_deltaMax = 0.5;
-	
+
 	/** The AV T last feedback min. */
 	private int AVT_lastFeedbackMin = 1;
-	
+
 	/** The AV T last feedback max. */
 	private int AVT_lastFeedbackMax = 1;
-	
+
 	/** The AV T acceleration. */
 	private double AVT_acceleration;
-	
+
 	/** The AV T deceleration. */
 	private double AVT_deceleration;
-	
+
 	/** The AV T start ratio. */
 	private double AVT_startRatio;
 	/*---------------------------------*/
-	
+
 	/*------------Percent--------------*/
 	/** The percent up. */
-	//Only used if useAVT == false
+	// Only used if useAVT == false
 	static public double percent_up = 0.2;
-	
+
 	/** The percent down. */
 	static public double percent_down = 0.1;
 	/*---------------------------------*/
 
-	
 	/**
 	 * Instantiates a new range.
 	 *
-	 * @param context the context
-	 * @param start the start
-	 * @param end the end
+	 * @param context                 the context
+	 * @param start                   the start
+	 * @param end                     the end
 	 * @param extendedrangeatcreation the extendedrangeatcreation
-	 * @param start_inclu the start inclu
-	 * @param end_inclu the end inclu
-	 * @param p the p
+	 * @param start_inclu             the start inclu
+	 * @param end_inclu               the end inclu
+	 * @param p                       the p
 	 */
-	public Range(Context context, double start, double end,
-			double extendedrangeatcreation, boolean start_inclu,
+	public Range(Context context, double start, double end, double extendedrangeatcreation, boolean start_inclu,
 			boolean end_inclu, Percept p) {
 		super();
-		
+
 		AVT_deceleration = context.getAmas().getEnvironment().getAVT_deceleration();
 		AVT_acceleration = context.getAmas().getEnvironment().getAVT_acceleration();
 		AVT_startRatio = context.getAmas().getEnvironment().getAVT_percentAtStart();
@@ -94,31 +92,29 @@ public class Range implements Comparable<Object>, Cloneable {
 		if (isPerceptEnum()) {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);
-			this.setStart( Math.round(p.getValue()));
-			this.setEnd( Math.round(p.getValue()));
+			this.setStart(Math.round(p.getValue()));
+			this.setEnd(Math.round(p.getValue()));
 		} else {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);
 			this.setStart(start - Math.abs(extendedrangeatcreation * start));
-			this.setEnd( end + Math.abs(extendedrangeatcreation * end));
+			this.setEnd(end + Math.abs(extendedrangeatcreation * end));
 		}
 		this.context = context;
 		id = maxid;
 		maxid++;
-		
-		/*Initialization of AVT : a better way to do that should be developped*/
+
+		/* Initialization of AVT : a better way to do that should be developped */
 		this.AVT_deltaMin = (end - start) * AVT_startRatio + 0.0001;
 		this.AVT_deltaMax = (end - start) * AVT_startRatio + 0.0001;
 	}
-	
-	//TODO copy constructor
 
 	/**
 	 * Method called by the context agent. Allow the range to adapt itself.
 	 *
-	 * @param c : the associated Context.
+	 * @param c           : the associated Context.
 	 * @param oracleValue the oracle value
-	 * @param p the p
+	 * @param p           the p
 	 */
 	public void adapt(Context c, double oracleValue, Percept p) {
 		if (!isPerceptEnum()) {
@@ -129,11 +125,11 @@ public class Range implements Comparable<Object>, Cloneable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adapt without AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptWithoutAVT(Context c, double oracleValue) {
@@ -141,13 +137,13 @@ public class Range implements Comparable<Object>, Cloneable {
 			adaptMaxWithoutAVT(c, oracleValue);
 		} else {
 			adaptMinWithoutAVT(c, oracleValue);
-		}		
+		}
 	}
 
 	/**
 	 * Adapt max without AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMaxWithoutAVT(Context c, double oracleValue) {
@@ -161,7 +157,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	/**
 	 * Adapt min without AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMinWithoutAVT(Context c, double oracleValue) {
@@ -172,11 +168,11 @@ public class Range implements Comparable<Object>, Cloneable {
 			this.setStart(start - ((end - start) * percent_down));
 		}
 	}
-	
+
 	/**
 	 * Adapt using AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptUsingAVT(Context c, double oracleValue) {
@@ -186,16 +182,17 @@ public class Range implements Comparable<Object>, Cloneable {
 			adaptMinUsingAVT(c, oracleValue);
 		}
 	}
-	
+
 	/**
 	 * Adapt max using AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMaxUsingAVT(Context c, double oracleValue) {
 
-		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
+		if (contains(oracleValue) == 0.0) { // If value is contained, it's a negative feedback for AVT (ie : we must
+											// exclude the value)
 
 			if (AVT_lastFeedbackMax == 1) {
 				AVT_deltaMax *= AVT_deceleration;
@@ -216,20 +213,20 @@ public class Range implements Comparable<Object>, Cloneable {
 			this.setEnd(end + AVT_deltaMax);
 
 			AVT_lastFeedbackMax = 1;
-		}		
-
+		}
 
 	}
 
 	/**
 	 * Adapt min using AVT.
 	 *
-	 * @param c the c
+	 * @param c           the c
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMinUsingAVT(Context c, double oracleValue) {
 
-		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
+		if (contains(oracleValue) == 0.0) { // If value is contained, it's a negative feedback for AVT (ie : we must
+											// exclude the value)
 
 			if (AVT_lastFeedbackMin == 1) {
 				AVT_deltaMin *= AVT_deceleration;
@@ -250,10 +247,10 @@ public class Range implements Comparable<Object>, Cloneable {
 			this.setStart(start - AVT_deltaMin);
 
 			AVT_lastFeedbackMin = 1;
-		}		
+		}
 
 	}
-	
+
 	/**
 	 * Simulate negative AVT feedback min.
 	 *
@@ -261,7 +258,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	 * @return the double
 	 */
 	public double simulateNegativeAVTFeedbackMin(double oracleValue) {
-		
+
 		if (AVT_lastFeedbackMin == 1) {
 			return start + (AVT_deltaMin * AVT_deceleration);
 		} else {
@@ -269,7 +266,7 @@ public class Range implements Comparable<Object>, Cloneable {
 		}
 
 	}
-	
+
 	/**
 	 * Simulate negative AVT feedback max.
 	 *
@@ -277,7 +274,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	 * @return the double
 	 */
 	public double simulateNegativeAVTFeedbackMax(double oracleValue) {
-		
+
 		if (AVT_lastFeedbackMax == 1) {
 			return end - (AVT_deltaMax * AVT_deceleration);
 		} else {
@@ -285,9 +282,6 @@ public class Range implements Comparable<Object>, Cloneable {
 		}
 
 	}
-	
-	
-	
 
 	/**
 	 * Check if the ranges is too small according to strategy.
@@ -295,18 +289,18 @@ public class Range implements Comparable<Object>, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		
+
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return ((start_inclu ? "[" : "]") + start + "," + end
-				+ (!end_inclu ? "[" : "]") + "  Current value : " + percept.getValue()
-				+ "  AVT_MIN : " + AVT_deltaMin
-				+ "  AVT_MAX : " + AVT_deltaMax );
+		return ((start_inclu ? "[" : "]") + start + "," + end + (!end_inclu ? "[" : "]") + "  Current value : "
+				+ percept.getValue() + "  AVT_MIN : " + AVT_deltaMin + "  AVT_MAX : " + AVT_deltaMax);
 	}
 
 	/**
@@ -317,7 +311,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	public Context getContext() {
 		return context;
 	}
-	
+
 	/**
 	 * Gets the AV twill to reduce.
 	 *
@@ -329,9 +323,9 @@ public class Range implements Comparable<Object>, Cloneable {
 			return this.AVT_lastFeedbackMax * this.AVT_deltaMax;
 		} else {
 			return this.AVT_lastFeedbackMin * this.AVT_deltaMin;
-		}	 
+		}
 	}
-	
+
 	/**
 	 * Match border with.
 	 *
@@ -343,13 +337,13 @@ public class Range implements Comparable<Object>, Cloneable {
 			this.context.die();
 		} else {
 			if (Math.abs(r.getStart() - this.getEnd()) > Math.abs(r.getEnd() - this.getStart())) {
-				//Change min
+				// Change min
 				this.setStart(r.getEnd());
 				this.setStart_inclu(!r.isEnd_inclu());
-				
+
 			} else {
-				//Change max
-				this.setEnd( r.getStart());
+				// Change max
+				this.setEnd(r.getStart());
 				this.setEnd_inclu(!r.isStart_inclu());
 			}
 		}
@@ -359,11 +353,11 @@ public class Range implements Comparable<Object>, Cloneable {
 	/**
 	 * Contains.
 	 *
-	 * @param d            : the value to test
+	 * @param d : the value to test
 	 * @return -1 if lower, +1 if higher, 0 if contained
 	 */
 	public int contains(Double d) {
-		if (  (d > start || (d >= start && start_inclu)) && (d < end || (d <= end && end_inclu))  ) {
+		if ((d > start || (d >= start && start_inclu)) && (d < end || (d <= end && end_inclu))) {
 			return 0;
 		} else if (d <= start) {
 			return -1;
@@ -416,7 +410,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	public double getLenght() {
 		return end - start;
 	}
-	
+
 	/**
 	 * Gets the nearest limit.
 	 *
@@ -454,30 +448,32 @@ public class Range implements Comparable<Object>, Cloneable {
 		return percept.isEnum();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
 	public int compareTo(Object o) {
 		return this.compareTo(o);
 	}
-	
+
 	private void setStart(double newStartValue) {
 		this.start = newStartValue;
-		if(this.context != null) {
+		if (this.context != null) {
 			this.percept.updateContextProjectionStart(this.context);
 		}
-		
+
 	}
-	
+
 	private void setEnd(double newEndValue) {
 		this.end = newEndValue;
-		if(this.context != null) {
-			this.percept.updateContextProjectionEnd(this.context);			
+		if (this.context != null) {
+			this.percept.updateContextProjectionEnd(this.context);
 		}
 	}
 
-	public Range clone() throws CloneNotSupportedException{
-		return (Range)super.clone();
+	public Range clone() throws CloneNotSupportedException {
+		return (Range) super.clone();
 	}
 }
