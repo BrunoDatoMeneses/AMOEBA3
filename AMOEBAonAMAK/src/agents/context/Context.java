@@ -379,6 +379,11 @@ public class Context extends AmoebaAgent {
 		drawable.setLayer(1);
 		drawable.setColor(new Color(173, 79, 9, 90));
 	}
+	
+	
+	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
+		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
+	}
 
 	@Override
 	protected void onUpdateRender() {
@@ -395,7 +400,7 @@ public class Context extends AmoebaAgent {
 		// Normalization of the color
 		double min = Double.POSITIVE_INFINITY;
 		double max = Double.NEGATIVE_INFINITY;
-		amas.getAgents();
+
 		for (Context c : amas.getContexts()) {
 			double val = c.getActionProposal();
 			if (val < min) {
@@ -407,12 +412,47 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		int green;
-		int blue;
-		double normalizedValue = (getActionProposal() - min) / (max - min);
-		green = (int) (normalizedValue * 255);
-		blue = (int) ((1 - normalizedValue) * 255);
+		Double r = 0.0;
+		Double g = 0.0;
+		Double b = 0.0;
+		double[] coefs = localModel.getCoef();
+		if (coefs.length > 0) {
+			if (coefs.length == 1) {
+				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				if (b.isNaN())
+					b = 0.0;
+			}
+			else if (coefs.length == 0) {
+				g = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				b = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+				if (g.isNaN())
+					g = 0.0;
+				if (b.isNaN())
+					b = 0.0;
+			}
+			else if (coefs.length >= 3) {
+				r = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				g = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+				b = normalizePositiveValues(255, 5, Math.abs(coefs[2]));
+				if (r.isNaN())
+					r = 0.0;
+				if (g.isNaN())
+					g = 0.0;
+				if (b.isNaN())
+					b = 0.0;
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+		}
+		else {
+			r = 255.0;
+			g = 255.0;
+			b = 255.0;
+		}
 
-		drawable.setColor(new Color(0, green, blue, 90));
+		drawable.setColor(new Color(r.intValue(), g.intValue(), b.intValue(), 90));
 	}
 }
