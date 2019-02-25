@@ -20,7 +20,16 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	protected void onDecide() {
 	}
 	
-	
+	@Override
+		protected void onUpdateRender() {
+			super.onUpdateRender();
+			if(!amas.isNoRenderUpdate()) {
+				updateRender();
+			}
+		}
+
+	protected void updateRender() {
+	}
 
 	public String getName() {
 		return name;

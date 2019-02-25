@@ -10,6 +10,7 @@ import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import kernel.AMOEBA;
@@ -348,8 +349,9 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : amas.getPercepts()) { // see if is compatible //Pred: world.getScheduler().getPerceptss()
 			percept.deleteContextProjection(this);
 		}
-		drawable.hide();
-		amas._removeAgent(this);
+		if(!Configuration.commandLineMode)
+			drawable.hide();
+		destroy();
 	}
 
 	public void setPerceptValidity(Percept percept) {
@@ -386,7 +388,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	@Override
-	protected void onUpdateRender() {
+	protected void updateRender() {
+		//update position
 		Set<Percept> sP = ranges.keySet();
 		Iterator<Percept> iter = sP.iterator();
 		Percept p1 = iter.next();
@@ -397,21 +400,7 @@ public class Context extends AmoebaAgent {
 		drawable.setWidth(ranges.get(p1).getLenght());
 		drawable.setHeight(ranges.get(p2).getLenght());
 
-		// Normalization of the color
-		double min = Double.POSITIVE_INFINITY;
-		double max = Double.NEGATIVE_INFINITY;
-
-		for (Context c : amas.getContexts()) {
-			double val = c.getActionProposal();
-			if (val < min) {
-				min = val;
-			}
-			if (val > max) {
-				max = val;
-			}
-
-		}
-
+		//update colors
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
@@ -452,7 +441,6 @@ public class Context extends AmoebaAgent {
 			g = 255.0;
 			b = 255.0;
 		}
-
 		drawable.setColor(new Color(r.intValue(), g.intValue(), b.intValue(), 90));
 	}
 }
