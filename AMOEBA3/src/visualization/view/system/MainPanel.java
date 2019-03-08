@@ -1,6 +1,7 @@
 package visualization.view.system;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -117,10 +118,12 @@ public class MainPanel extends JPanel{
 	private boolean firstGetValueCheckBox = false;
 	
 	static final int SPEED_MIN = 0;
-	static final int SPEED_MAX = 2000;
+	static final int SPEED_MAX = 1000;
 	static final int SPEED_INIT = 200;    //initial frames per second
 
 	private JSlider simulationSpeedSlider; 
+	
+	private JSlider valueForOnLineTestingSlider; 
 	
 	public int speed=200;
 	
@@ -143,6 +146,7 @@ public class MainPanel extends JPanel{
 		if (!minimalDisplay){
 			addTabbedPanel();
 		}
+		
 		
 	}
 	
@@ -201,6 +205,8 @@ public class MainPanel extends JPanel{
 	 */
 	private void addToolBar() {
 		toolBar = new JToolBar();
+		
+
 		
 		iconNeOCampus = new JLabel(Config.getIcon("neOCampus.png"));
 		toolBar.add(iconNeOCampus);
@@ -311,6 +317,32 @@ public class MainPanel extends JPanel{
 		simulationSpeedSlider.setPaintLabels(true);
 		
 		toolBar.add(simulationSpeedSlider);
+		
+		valueForOnLineTestingSlider = new JSlider(JSlider.HORIZONTAL,
+                0, 100, 50);
+		
+		class OnlineSliderListener implements ChangeListener {
+		    public void stateChanged(ChangeEvent e) {
+		        JSlider source = (JSlider)e.getSource();
+		        if (!source.getValueIsAdjusting()) {
+		            
+		            world.setIncrements((double)source.getValue()/1000);
+
+		        }    
+		    }
+		}
+		
+		valueForOnLineTestingSlider.addChangeListener(new OnlineSliderListener());
+		
+		
+		//Turn on labels at major tick marks.
+		valueForOnLineTestingSlider.setMajorTickSpacing(50);
+		valueForOnLineTestingSlider.setMinorTickSpacing(5);
+		valueForOnLineTestingSlider.setPaintTicks(true);
+		valueForOnLineTestingSlider.setPaintLabels(true);
+		
+		toolBar.add(valueForOnLineTestingSlider);
+		
 	}
 
 	

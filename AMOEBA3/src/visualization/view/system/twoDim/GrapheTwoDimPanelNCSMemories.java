@@ -418,22 +418,68 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		}
 	
 		
+		
+		
+		Head head = ncsMemory.getHead();
+		
+		String name = head.getName();
+		
 		Node node;
-		String headName = ncsMemory.getHead().getName();
-		if (graph.getNode(headName) != null) {
-			node = graph.getNode(headName);
-			node.addAttribute("ui.label", xValueDouble + " , " + yValueDouble);
+		if (graph.getNode(name) != null) {
+			node = graph.getNode(name);
+			node.addAttribute("ui.label",xValueDouble + " , " + yValueDouble);
 
 		} else {
-			graph.addNode(headName);
-			node = graph.getNode(headName);
+			graph.addNode(name);
+			node = graph.getNode(name);
 			node.addAttribute("ui.class", "Center");
 		}
 
 		node.addAttribute("EXIST", true);
 		node.setAttribute("xyz", xValueDouble, yValueDouble, 0);
+		node.addAttribute("ui.style", "size: " + doubleFormat.format(1) + "gu, " + doubleFormat.format(10) +"gu;");
+		node.addAttribute("ui.class","RGBAColor");
 		
-		//System.out.println("Drawn nodes : " + graph.getNodeSet().size() );
+		node.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+		
+		Node node2;
+		if (graph.getNode(name+"2") != null) {
+			node2 = graph.getNode(name+"2");
+			node2.addAttribute("ui.label", xValueDouble + " , " + yValueDouble);
+
+		} else {
+			graph.addNode(name+"2");
+			node2 = graph.getNode(name+"2");
+			node2.addAttribute("ui.class", "Center");
+		}
+		
+		node2.addAttribute("EXIST", true);
+		node2.setAttribute("xyz", xValueDouble, yValueDouble, 0);
+		node2.addAttribute("ui.style", "size: " + doubleFormat.format(10) + "gu, " + doubleFormat.format(1) +"gu;");
+		node2.addAttribute("ui.class","RGBAColor");
+		
+		node2.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+		
+		Node node3;
+		if (graph.getNode(name+"3") != null) {
+			node3 = graph.getNode(name+"3");
+			node3.addAttribute("ui.label", xValueDouble + " , " + yValueDouble);
+
+		} else {
+			graph.addNode(name+"3");
+			node3 = graph.getNode(name+"3");
+			node3.addAttribute("ui.class", "Center");
+		}
+		
+		node3.addAttribute("EXIST", true);
+		node3.setAttribute("xyz", xValueDouble, yValueDouble, 0);
+		
+		double XLength = 2*ncsMemory.getWorld().getNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())));
+		double YLength = 2*ncsMemory.getWorld().getNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())));
+		node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
+		node3.addAttribute("ui.class","RGBAColor");
+		
+		node3.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
 		
 		textarea.setText(ncsMemory.toStringDetailled());
 	}
@@ -1179,7 +1225,7 @@ private void startPanelController() {
 			}
 			
 			if (agent instanceof Head) {
-				Head head = (Head)agent;
+Head head = (Head)agent;
 				
 				controller = head; //TODO dirty
 				
@@ -1196,7 +1242,48 @@ private void startPanelController() {
 
 				node.addAttribute("EXIST", true);
 				node.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				node.addAttribute("ui.style", "size: " + doubleFormat.format(1) + "gu, " + doubleFormat.format(10) +"gu;");
+				node.addAttribute("ui.class","RGBAColor");
 				
+				node.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+				
+				Node node2;
+				if (graph.getNode(name+"2") != null) {
+					node2 = graph.getNode(name+"2");
+					node2.addAttribute("ui.label", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue() + " , " + ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue());
+
+				} else {
+					graph.addNode(name+"2");
+					node2 = graph.getNode(name+"2");
+					node2.addAttribute("ui.class", "Center");
+				}
+				
+				node2.addAttribute("EXIST", true);
+				node2.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				node2.addAttribute("ui.style", "size: " + doubleFormat.format(10) + "gu, " + doubleFormat.format(1) +"gu;");
+				node2.addAttribute("ui.class","RGBAColor");
+				
+				node2.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+				
+				Node node3;
+				if (graph.getNode(name+"3") != null) {
+					node3 = graph.getNode(name+"3");
+					node3.addAttribute("ui.label", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue() + " , " + ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue());
+
+				} else {
+					graph.addNode(name+"3");
+					node3 = graph.getNode(name+"3");
+					node3.addAttribute("ui.class", "Center");
+				}
+				
+				node3.addAttribute("EXIST", true);
+				node3.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				double XLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
+				double YLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
+				node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
+				node3.addAttribute("ui.class","RGBAColor");
+				
+				node3.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
 			}
 			
 		}

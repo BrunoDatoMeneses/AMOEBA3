@@ -72,6 +72,8 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
+	public double mappingErrorAllowed = 10;
+	
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
 	
@@ -89,11 +91,13 @@ public class World implements Serializable {
 	
 	public int tickThreshol = 10000;
 	
-	private double contextCreationPercentage = 0.2;
+	private double contextCreationPercentage = 0.1;
 	
 	public World() {
 		
 	}
+	
+	
 	
 	public double getContextCreationPercentage() {
 		return contextCreationPercentage;
@@ -884,7 +888,7 @@ public class World implements Serializable {
 	
 	public double getNeighborhood(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return pct.getRadiusContextForCreation();
+		return pct.getRadiusContextForCreation()*4;
 	}
 	
 }

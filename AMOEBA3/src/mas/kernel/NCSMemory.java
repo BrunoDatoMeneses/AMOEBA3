@@ -12,7 +12,7 @@ public class NCSMemory {
 	private ArrayList<Context> contexts = new ArrayList<Context>();
 	private ArrayList<Context> partiallyActivatedContexts = new ArrayList<Context>();
 	private ArrayList<Context> otherContexts = new ArrayList<Context>();
-	private ArrayList<Percept> percepts = new ArrayList<Percept>();;
+	private ArrayList<Percept> percepts = new ArrayList<Percept>();
 	private Head head;
 	private int tick;
 	private World world;
@@ -211,5 +211,9 @@ public class NCSMemory {
 		else {
 			return null;
 		}
+	}
+	
+	public World getWorld() {
+		return world;
 	}
 }

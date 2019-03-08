@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 
+import experiments.twoDimensionsLaunchers.F_XY_Manager;
 import visualization.view.JMainFrame;
 import visualization.view.system.MainPanel;
 import visualization.graphView.TemporalGraph;
@@ -44,6 +45,8 @@ public class AMOEBA extends Thread {
 	private boolean controlMode = false;
 	private boolean viewer = true;
 	private boolean csv = true;
+	
+	private F_XY_Manager manager;
 	
 	public int temporisation;
 	public boolean manual = false;
@@ -500,7 +503,7 @@ public class AMOEBA extends Thread {
 	}
 	
 	public void PAUSE(String message) {
-		System.out.println(message);
+		System.out.println(scheduler.getTick()+ " "  +message);
 		
 		if(!isRunning() && manual == false) {
 			while(!getPlayOneStep()) {
@@ -508,7 +511,7 @@ public class AMOEBA extends Thread {
 
 				try        
 				{
-				    Thread.sleep(200);
+				    Thread.sleep(500);
 				} 
 				catch(InterruptedException ex) 
 				{
@@ -531,5 +534,12 @@ public class AMOEBA extends Thread {
 		
 	}
 
+	public void setManager(F_XY_Manager mngr) {
+		this.manager = mngr;
+	}
+	
+	public F_XY_Manager getManager() {
+		return manager;
+	}
 
 }

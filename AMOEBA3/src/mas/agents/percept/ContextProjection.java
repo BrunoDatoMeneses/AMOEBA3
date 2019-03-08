@@ -74,8 +74,8 @@ public class ContextProjection implements Serializable{
 	}
 	
 	public boolean contains(Double value) {
-		world.trace(new ArrayList<String>(Arrays.asList(context.getName(),percept.getName(), ""+value, ""+(getCenter()-getRadius()), ""+ (getCenter() + getRadius()))));
-		return Math.abs(value - getCenter()) < getRadius() ;
+		//world.trace(new ArrayList<String>(Arrays.asList(context.getName(),percept.getName(), ""+value, ""+(getCenter()-getRadius()), ""+ (getCenter() + getRadius()))));
+		return Math.abs(value - getCenter()) <= getRadius() ;
 	}
 	
 	public boolean contains(Double value, Double neighborhood) {

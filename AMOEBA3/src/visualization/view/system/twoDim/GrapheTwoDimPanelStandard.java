@@ -79,6 +79,7 @@ import mas.agents.SystemAgent;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
 import mas.agents.context.ContextVoid;
+import mas.agents.context.Experiment;
 import mas.agents.context.Range;
 import mas.agents.head.Head;
 import visualization.graphView.GraphicVisualization2Dim;
@@ -239,6 +240,8 @@ public class GrapheTwoDimPanelStandard extends JPanel implements ViewerListener,
 	private List<String> perceptName = new ArrayList<>();	
 	
 	private Point3 requestPosition;
+	
+	private ArrayList<Point3> request = new ArrayList<Point3>();	
 	
 	/**
 	 * Instantiates a new graphe two dim panel standard.
@@ -1077,28 +1080,63 @@ private void startPanelController() {
 	private void setMinMax() {
 
 		
-		Node xMin;
-		Node xMax;
-		Node yMin;
-		Node yMax;
+		Node minMax;
 		
-		graph.addNode("xMin");
-		graph.addNode("xMax");
-		graph.addNode("yMin");
-		graph.addNode("yMax");
+		graph.addNode("minMax");
 		
-		xMin = graph.getNode("xMin");
-		xMax = graph.getNode("xMax");
-		yMin = graph.getNode("yMin");
-		yMax = graph.getNode("yMax");
 		
-		xMin.addAttribute("EXIST", true);
-		xMax.addAttribute("EXIST", true);
-		yMin.addAttribute("EXIST", true);
-		yMax.addAttribute("EXIST", true);
 		
-		drawXMinMax(xMin, xMax, (Percept)world.getAgents().get(comboDimX.getSelectedItem()), (Percept)world.getAgents().get(comboDimY.getSelectedItem()));
-		drawYMinMax(yMin, yMax, (Percept)world.getAgents().get(comboDimY.getSelectedItem()), (Percept)world.getAgents().get(comboDimX.getSelectedItem()));
+		minMax = graph.getNode("minMax");
+		
+		minMax.addAttribute("EXIST", true);
+		
+		Percept pAffichageX = (Percept)world.getAgents().get(comboDimX.getSelectedItem());
+		Percept pAffichageY = (Percept)world.getAgents().get(comboDimY.getSelectedItem());
+
+		double lengthX = (world.getScheduler().getTick()>0 ) ? pAffichageX.getMax() - pAffichageX.getMin() : 1;
+		double lengthY = (world.getScheduler().getTick()>0 ) ? pAffichageY.getMax() - pAffichageY.getMin() : 1;
+		
+		double xPos = (world.getScheduler().getTick()>0 ) ? (pAffichageX.getMax() + pAffichageX.getMin())/2 : 0;
+		double yPos = (world.getScheduler().getTick()>0 ) ? (pAffichageY.getMax() + pAffichageY.getMin())/2 : 0;
+		
+		
+		
+		minMax.setAttribute("xyz", xPos, yPos, 0);
+		
+		minMax.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		
+		minMax.addAttribute("ui.class","RGBAColor");
+		minMax.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
+		
+		
+		
+		
+	}
+	
+	private void setHiddenModel() {
+		Node hiddenModel;
+		
+		graph.addNode("hiddenModel");
+		
+		hiddenModel = graph.getNode("hiddenModel");
+		
+		hiddenModel.addAttribute("EXIST", true);
+		
+
+		double lengthX = (world.getScheduler().getTick()>0 ) ? world.getAmoeba().getManager().getSpaceSize()*2 : 1;
+		double lengthY = (world.getScheduler().getTick()>0 ) ? world.getAmoeba().getManager().getSpaceSize()*2 : 1;
+		
+		double xPos =  0;
+		double yPos =  0;
+		
+		
+		
+		hiddenModel.setAttribute("xyz", xPos, yPos, 0);
+		
+		hiddenModel.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+		
+		hiddenModel.addAttribute("ui.class","RGBAColor");
+		hiddenModel.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
 	}
 	
 	/**
@@ -1135,6 +1173,78 @@ private void startPanelController() {
 				obsEle.addPerceptList(p);
 			}	
 		}
+		
+		
+		Node originNode1;
+		originNode1 = graph.getNode("origin1");
+		originNode1.addAttribute("EXIST", true);
+		originNode1.setAttribute("xyz", 0, 0, 0);
+		originNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(2) +"gu;");
+		originNode1.addAttribute("ui.class","RGBAColor");
+		
+		originNode1.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
+		
+		Node originNode2;
+		originNode2 = graph.getNode("origin2");
+		originNode2.addAttribute("EXIST", true);
+		originNode2.setAttribute("xyz", 0, 0, 0);
+		originNode2.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(0.5) +"gu;");
+		originNode2.addAttribute("ui.class","RGBAColor");
+		
+		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
+		
+//		Node minMax;
+//		
+//		
+//		
+//		minMax = graph.getNode("minMax");
+//		
+//		minMax.addAttribute("EXIST", true);
+//		
+//		Percept pAffichageX = (Percept)world.getAgents().get(comboDimX.getSelectedItem());
+//		Percept pAffichageY = (Percept)world.getAgents().get(comboDimY.getSelectedItem());
+//
+//		double lengthX = (world.getScheduler().getTick()>0 ) ? pAffichageX.getMax() - pAffichageX.getMin() : 1;
+//		double lengthY = (world.getScheduler().getTick()>0 ) ? pAffichageY.getMax() - pAffichageY.getMin() : 1;
+//		
+//		double xPos = (world.getScheduler().getTick()>0 ) ? (pAffichageX.getMax() + pAffichageX.getMin())/2 : 0;
+//		double yPos = (world.getScheduler().getTick()>0 ) ? (pAffichageY.getMax() + pAffichageY.getMin())/2 : 0;
+//		
+//		
+//		
+//		minMax.setAttribute("xyz", xPos, yPos, 0);
+//		
+//		minMax.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
+//		
+//		minMax.addAttribute("ui.class","RGBAColor");
+//		minMax.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
+		
+	
+		
+//		Node hiddenModel;
+//		
+//
+//		
+//		hiddenModel = graph.getNode("hiddenModel");
+//		
+//		hiddenModel.addAttribute("EXIST", true);
+//		
+//
+//		double lengthX2 = (world.getScheduler().getTick()>0 ) ? world.getAmoeba().getManager().getSpaceSize()*2 : 1;
+//		double lengthY2 = (world.getScheduler().getTick()>0 ) ? world.getAmoeba().getManager().getSpaceSize()*2 : 1;
+//		
+//		double xPos2 =  0;
+//		double yPos2 =  0;
+//		
+//		
+//		
+//		hiddenModel.setAttribute("xyz", xPos2, yPos2, 0);
+//		
+//		hiddenModel.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX2) + "gu, " + doubleFormat.format(lengthY2) +"gu;");
+//		
+//		hiddenModel.addAttribute("ui.class","RGBAColor");
+//		hiddenModel.addAttribute("ui.style", "fill-color: rgba(0,255,0,25);");
+		
 		
 		for (String name : world.getAgents().keySet()) {
 			SystemAgent agent = world.getAgents().get(name);
@@ -1220,6 +1330,26 @@ private void startPanelController() {
 				node2.addAttribute("ui.class","RGBAColor");
 				
 				node2.addAttribute("ui.style", "fill-color: rgba(0,255,0,255);");
+				
+				Node node3;
+				if (graph.getNode(name+"3") != null) {
+					node3 = graph.getNode(name+"3");
+					node3.addAttribute("ui.label", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue() + " , " + ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue());
+
+				} else {
+					graph.addNode(name+"3");
+					node3 = graph.getNode(name+"3");
+					node3.addAttribute("ui.class", "Center");
+				}
+				
+				node3.addAttribute("EXIST", true);
+				node3.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
+				double XLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
+				double YLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
+				node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
+				node3.addAttribute("ui.class","RGBAColor");
+				
+				node3.addAttribute("ui.style", "fill-color: rgba(255,255,255,0);");
 			}
 			
 		}
@@ -1277,42 +1407,7 @@ private void startPanelController() {
 		}
 		
 		
-		Node originNode1;
-		originNode1 = graph.getNode("origin1");
-		originNode1.addAttribute("EXIST", true);
-		originNode1.setAttribute("xyz", 0, 0, 0);
-		originNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(2) +"gu;");
-		originNode1.addAttribute("ui.class","RGBAColor");
 		
-		originNode1.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
-		
-		Node originNode2;
-		originNode2 = graph.getNode("origin2");
-		originNode2.addAttribute("EXIST", true);
-		originNode2.setAttribute("xyz", 0, 0, 0);
-		originNode2.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(0.5) +"gu;");
-		originNode2.addAttribute("ui.class","RGBAColor");
-		
-		originNode2.addAttribute("ui.style", "fill-color: rgba(0,0,0,255);");
-		
-		Node xMin;
-		Node xMax;
-		Node yMin;
-		Node yMax;
-		
-		
-		xMin = graph.getNode("xMin");
-		xMax = graph.getNode("xMax");
-		yMin = graph.getNode("yMin");
-		yMax = graph.getNode("yMax");
-		
-		xMin.addAttribute("EXIST", true);
-		xMax.addAttribute("EXIST", true);
-		yMin.addAttribute("EXIST", true);
-		yMax.addAttribute("EXIST", true);
-		
-		drawXMinMax(xMin, xMax, (Percept)world.getAgents().get(comboDimX.getSelectedItem()), (Percept)world.getAgents().get(comboDimY.getSelectedItem()));
-		drawYMinMax(yMin, yMax, (Percept)world.getAgents().get(comboDimY.getSelectedItem()), (Percept)world.getAgents().get(comboDimX.getSelectedItem()));
 		
 		
 		Contexts.removeAllItems();
@@ -1321,6 +1416,119 @@ private void startPanelController() {
 			Contexts.addItem(ctxt);
 		}
 
+	}
+	
+	
+	public void highlightExperiments(Context ctxt) {
+		
+		
+		for(Experiment exp : ctxt.getExperiments()) {
+			
+			Node expNode1;
+			String expNode1String = "" + ctxt.getName()+"Exp"+ctxt.getExperiments().indexOf(exp)+"_1";
+			Node expNode2;
+			String expNode2String = "" + ctxt.getName()+"Exp"+ctxt.getExperiments().indexOf(exp)+"_2";
+			
+			if(graph.getNode(expNode1String) == null) {
+				graph.addNode(expNode1String);
+			}
+			if(graph.getNode(expNode2String) == null) {
+				graph.addNode(expNode2String);
+			}
+			expNode1 = graph.getNode(expNode1String);
+			expNode2 = graph.getNode(expNode2String);
+			
+			expNode1.addAttribute("EXIST", true);
+			expNode2.addAttribute("EXIST", true);
+			
+//			world.trace(new ArrayList<String>(Arrays.asList(
+//					"DRAW EXP", 
+//					expNode1String,
+//					" 1 "+comboDimX.getSelectedItem(),
+//					" 2 "+world.getAgents().get(comboDimX.getSelectedItem()),
+//					" 3 "+exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem())),
+//					" 4 "+exp.getValuesAsHashMap()	
+//					)));
+			double expNode1x = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem()));
+			double expNode2x = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem()));;
+			
+			double expNode1y = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimY.getSelectedItem()));;
+			double expNode2y = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimY.getSelectedItem()));;
+
+									
+					
+			
+			expNode1.setAttribute("xyz", expNode1x, expNode1y, 0);
+			expNode2.setAttribute("xyz", expNode2x, expNode2y, 0);
+			
+			expNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(6) +"gu;");
+			expNode2.addAttribute("ui.style", "size: " + doubleFormat.format(6) + "gu, " + doubleFormat.format(0.5) +"gu;");
+			
+			expNode1.addAttribute("ui.class","RGBAColor");
+			expNode2.addAttribute("ui.class","RGBAColor");
+			
+			expNode1.addAttribute("ui.style", "fill-color: rgba(255,255,255,255);");
+			expNode2.addAttribute("ui.style", "fill-color: rgba(255,255,255,255);");
+			
+
+		}
+		
+	}
+	
+	public void drawExperiments(Context ctxt) {
+		
+		
+		for(Experiment exp : ctxt.getExperiments()) {
+			
+			Node expNode1;
+			String expNode1String = "" + ctxt.getName()+"Exp"+ctxt.getExperiments().indexOf(exp)+"_1";
+			Node expNode2;
+			String expNode2String = "" + ctxt.getName()+"Exp"+ctxt.getExperiments().indexOf(exp)+"_2";
+			
+			if(graph.getNode(expNode1String) == null) {
+				graph.addNode(expNode1String);
+			}
+			if(graph.getNode(expNode2String) == null) {
+				graph.addNode(expNode2String);
+			}
+			expNode1 = graph.getNode(expNode1String);
+			expNode2 = graph.getNode(expNode2String);
+			
+			expNode1.addAttribute("EXIST", true);
+			expNode2.addAttribute("EXIST", true);
+			
+//			world.trace(new ArrayList<String>(Arrays.asList(
+//					"DRAW EXP", 
+//					expNode1String,
+//					" 1 "+comboDimX.getSelectedItem(),
+//					" 2 "+world.getAgents().get(comboDimX.getSelectedItem()),
+//					" 3 "+exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem())),
+//					" 4 "+exp.getValuesAsHashMap()	
+//					)));
+			double expNode1x = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem()));
+			double expNode2x = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimX.getSelectedItem()));;
+			
+			double expNode1y = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimY.getSelectedItem()));;
+			double expNode2y = exp.getValuesAsHashMap().get(world.getAgents().get(comboDimY.getSelectedItem()));;
+
+									
+					
+			
+			expNode1.setAttribute("xyz", expNode1x, expNode1y, 0);
+			expNode2.setAttribute("xyz", expNode2x, expNode2y, 0);
+			
+			expNode1.addAttribute("ui.style", "size: " + doubleFormat.format(0.5) + "gu, " + doubleFormat.format(2) +"gu;");
+			expNode2.addAttribute("ui.style", "size: " + doubleFormat.format(2) + "gu, " + doubleFormat.format(0.5) +"gu;");
+			
+			expNode1.addAttribute("ui.class","RGBAColor");
+			expNode2.addAttribute("ui.class","RGBAColor");
+			
+			expNode1.addAttribute("ui.style", "fill-color: rgba(255,255,255,255);");
+			expNode2.addAttribute("ui.style", "fill-color: rgba(255,255,255,255);");
+			
+
+		}
+		
 	}
 	
 	public void recolorContexts() {
@@ -1407,14 +1615,21 @@ private void startPanelController() {
 //				}
 //				
 				//System.out.println(world.getScheduler().getTick() + " Neighbor size "+ world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
-				if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
-					node.addAttribute("ui.style", "fill-color: rgba(255,0,255,200);");
-				}
+//				if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
+//					node.addAttribute("ui.style", "fill-color: rgba(255,0,255,200);");
+//				}
 //				
 //				if(world.getScheduler().getHeadAgent().getActivatedContexts().contains(n)) {
 //					node.addAttribute("ui.style", "fill-color: rgba(255,0,127,200);");
 //				}
+				
+//				if(world.getScheduler().getHeadAgent().getBestContext() == n) {
+//				node.addAttribute("ui.style", "fill-color: rgba(0,255,0,200);");
+//			}
 
+			
+				
+				drawExperiments(n);
 				
 			}
 			
@@ -1837,6 +2052,9 @@ private void startPanelController() {
 		
 		setOrigin();
 		setMinMax();
+		setHiddenModel();
+		
+		
 	}
 	
 	/**
@@ -1865,7 +2083,9 @@ private void startPanelController() {
 		world.getAmoeba().getLogFile().messageToDebug("Push button", 5, new LogMessageType[] {LogMessageType.INFORMATION});
 		toolBarInfo.setVisible(true);
 		System.out.println("node pushed : " + id);
-		//this.mous
+		requestPosition = viewer.getDefaultView().getCamera().transformPxToGu(mouseEvent.getX(), mouseEvent.getY());
+		System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
+
 		if(world.getScheduler().getContextByName(id)!=null) {
 			Context pushedContext = world.getScheduler().getContextByName(id);
 			setContextTextAreaInfo(id);
@@ -2108,8 +2328,14 @@ private void startPanelController() {
 		itemUdateView.addActionListener(e -> {update();});
 		JMenuItem itemUdateOverlapsAndNeighbours = new JMenuItem("Update Overlaps and Neighbours");
 		itemUdateOverlapsAndNeighbours.addActionListener(e -> {updateOverlapsAndNeighbours();});
+		JMenuItem itemShowExperiments = new JMenuItem("Show Experiments");
+		itemShowExperiments.addActionListener(e -> {showExperiments(id);});
+		JMenuItem itemKill = new JMenuItem("Kill");
+		itemKill.addActionListener(e -> {killContext(id);});
+		JMenuItem itemManualRequest = new JMenuItem("Manual request");
+		itemManualRequest.addActionListener(e -> {world.getScheduler().setManualRequest(requestPosition);});
 	    
-	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts();});
+	    itemShowAll.addActionListener( e -> {highlightNeighbours(id); popupVisualization2Dim(id); popupVisualizationNDim(id); recolorAllContexts(); update(); showExperiments(id);killContext(id);world.getScheduler().setManualRequest(requestPosition);});
 	    popup.add(itemShowContextNeighbours);
 	    popup.add(itemShow2Dim);
 	    popup.add(itemShowNDim);
@@ -2117,6 +2343,36 @@ private void startPanelController() {
 	    popup.add(itemRecolorAll);
 	    popup.add(itemUdateView);
 	    popup.add(itemUdateOverlapsAndNeighbours);
+	    popup.add(itemShowExperiments);
+	    popup.add(itemKill);
+	    popup.add(itemManualRequest);
+	    
+	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
+	}
+	
+	public void killContext(String id) {
+		world.getScheduler().getContextByName(id).die();
+		update();
+		
+	}
+	
+	public void showExperiments(String id) {
+		
+		highlightExperiments(world.getScheduler().getContextByName(id));
+		
+		
+	}
+	
+	public void popupMenuForRightClickOnVoid() {
+		JPopupMenu popup = new JPopupMenu("Right Click On Void");
+		JMenuItem itemShowAll = new JMenuItem("Show All");
+		JMenuItem itemManualRequest = new JMenuItem("Manual request");
+		itemManualRequest.addActionListener(e -> {world.getScheduler().setManualRequest(requestPosition);});
+	    
+	    itemShowAll.addActionListener( e -> {world.getScheduler().setManualRequest(requestPosition);});
+	 
+	    popup.add(itemManualRequest);
+	    
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 	}
 	
@@ -2270,7 +2526,7 @@ private void startPanelController() {
 		
 		
 		if(SwingUtilities.isRightMouseButton(e)){
-			world.getScheduler().setManualRequest(requestPosition);
+			popupMenuForRightClickOnVoid();
 			rightClick = true;
 			Robot bot;
 			try {

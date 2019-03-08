@@ -1,5 +1,6 @@
 package visualization.view.system;
 
+import java.awt.Color;
 import java.awt.Frame;
 import java.util.ArrayList;
 
@@ -62,6 +63,8 @@ public class MainTabbedPanel extends JTabbedPane{
 	 */
 	public MainTabbedPanel() {
 		super();
+		
+		this.setBackground(Color.BLACK);
 
 	}
 

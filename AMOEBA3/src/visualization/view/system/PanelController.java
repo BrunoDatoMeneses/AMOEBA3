@@ -72,6 +72,16 @@ public class PanelController extends JPanel implements ScheduledItem {
 	/** The dataset binary. */
 	XYSeriesCollection datasetBinary;
 	
+	/** The chart panel spatial criticality. */
+	/* spatial criticality chart */
+	ChartPanel chartPanelSpatialCriticality;
+	
+	/** The chart binary. */
+	JFreeChart chartSpatialCriticality;
+	
+	/** The dataset binary. */
+	XYSeriesCollection datasetSpatialCriticality;
+	
 	/** The controller. */
 	Head controller;
 	
@@ -141,6 +151,13 @@ public class PanelController extends JPanel implements ScheduledItem {
 		chartPanelBinary = new ChartPanel(chartBinary);
 		chartPanelBinary.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
 		this.add(chartPanelBinary);
+		
+		/* Create spatial criticality chart */
+		datasetSpatialCriticality = createDatasetSpatialCriticality();
+		JFreeChart chartSpatialCriticality = createChartSpatialCriticality();
+		chartPanelSpatialCriticality = new ChartPanel(chartSpatialCriticality);
+		chartPanelSpatialCriticality.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
+		this.add(chartPanelSpatialCriticality);
 
 	}
 
@@ -249,6 +266,18 @@ public class PanelController extends JPanel implements ScheduledItem {
 		XYSeriesCollection collection = new XYSeriesCollection();
 
 		collection.addSeries(new XYSeries("consecutiveContext"));
+
+		return collection;
+	}
+	
+	private XYSeriesCollection createDatasetSpatialCriticality() {
+
+		XYSeriesCollection collection = new XYSeriesCollection();
+
+		collection.addSeries(new XYSeries("spatialCriticality"));
+		collection.addSeries(new XYSeries("zero"));
+		collection.addSeries(new XYSeries("spatialGeneralization"));
+		
 
 		return collection;
 	}
@@ -365,6 +394,29 @@ public class PanelController extends JPanel implements ScheduledItem {
 				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 	}
 	
+	private JFreeChart createChartSpatialCriticality() {
+
+		// create subplot 1...
+		final XYDataset data1 = datasetSpatialCriticality;
+		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
+		final NumberAxis rangeAxis1 = new NumberAxis("Spatial criticality");
+		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
+		subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+
+		// parent plot...
+		final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(
+				new NumberAxis("Tick"));
+		plot.setGap(10.0);
+
+		// add the subplots...
+		plot.add(subplot1, 1);
+		plot.setOrientation(PlotOrientation.VERTICAL);
+
+		// return a new chart containing the overlaid plot...
+		return new JFreeChart("Spatial criticality",
+				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+	}
+	
 	/* (non-Javadoc)
 	 * @see view.system.ScheduledItem#update()
 	 */
@@ -386,9 +438,14 @@ public class PanelController extends JPanel implements ScheduledItem {
 				controller.getAveragePredictionCriticity());
 		datasetAverageCrit.getSeries("errorAllowed").add(world.getScheduler().getTick(),
 				controller.getErrorAllowed());
-		datasetAverageCrit.getSeries("inexactAllowed").add(world.getScheduler().getTick(),
-				controller.getInexactAllowed());
+//		datasetAverageCrit.getSeries("inexactAllowed").add(world.getScheduler().getTick(),
+//				controller.getInexactAllowed());
 		datasetBinary.getSeries("consecutiveContext").add(world.getScheduler().getTick(),(controller.getLastUsedContext() == controller.getBestContext())?0:1);
+		
+		datasetSpatialCriticality.getSeries("spatialCriticality").add(world.getScheduler().getTick(),controller.getAverageSpatialCriticality());
+		datasetSpatialCriticality.getSeries("zero").add(world.getScheduler().getTick(),0.0);
+		//datasetSpatialCriticality.getSeries("spatialGeneralization").add(world.getScheduler().getTick(),controller.getSpatialGeneralizationScore());
+		
 	}
 
 	// }

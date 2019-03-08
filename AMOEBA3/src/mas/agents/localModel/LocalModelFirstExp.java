@@ -1,11 +1,13 @@
 package mas.agents.localModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import mas.kernel.World;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
+import mas.agents.context.Experiment;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -29,7 +31,7 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	 */
 	@Override
 	public double getProposition(Context context) {
-		return context.getExperiments().get(0).getProposition();
+		return context.getExperiments().get(0).getOracleProposition();
 	}
 
 	/* (non-Javadoc)
@@ -46,7 +48,7 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	 */
 	@Override
 	public String getFormula(Context context) {
-		return  context.getExperiments().get(0).getProposition() +"";
+		return  context.getExperiments().get(0).getOracleProposition() +"";
 	}
 	
 	public String getCoefsFormula() {
@@ -69,6 +71,18 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	
 	public double[] getCoef() {
 		return new double[1];
+	}
+
+	@Override
+	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

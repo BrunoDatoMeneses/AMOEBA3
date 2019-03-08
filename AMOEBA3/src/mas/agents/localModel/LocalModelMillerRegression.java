@@ -25,7 +25,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 
 	
 	/** The coef. */
-	private double[] coef;
+	private double[] coefs;
 
 	/**
 	 * Instantiates a new local model miller regression.
@@ -45,7 +45,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	 * @param coef the new coef
 	 */
 	public void setCoef(double[] coef) {
-		this.coef = coef.clone();
+		this.coefs = coef.clone();
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	 * @return the coef
 	 */
 	public double[] getCoef() {
-		return coef;
+		return coefs;
 	}
 
 	/* (non-Javadoc)
@@ -76,37 +76,50 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	 * @see agents.localModel.LocalModelAgent#getProposition(agents.context.Context)
 	 */
 	public double getProposition(Context context) {
-		
-	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
-		
-		ArrayList<Percept> var = world.getAllPercept();
+			
+		ArrayList<Percept> percepts = world.getAllPercept();
 		
 		if (context.getExperiments().size() == 1) {
-			return context.getExperiments().get(0).getProposition();
+			return context.getExperiments().get(0).getOracleProposition();
 		}
-		
+			
+		double result = coefs[0];
 
-		//
-	/*	for (int i = 0 ; i < coef.length ; i++ ) {
-			System.out.print(coef[i] + "   " );
+		if (coefs[0] == Double.NaN) System.exit(0);
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			
+			if (Double.isNaN(coefs[i])) coefs[i] = 0;
+			result += coefs[i] * percepts.get(i-1).getValue();
+
 		}
-		System.out.println();*/
-		
-		
-		double result = coef[0];
-	//	System.out.println("Result 0" + " : " + result);
-		if (coef[0] == Double.NaN) System.exit(0);
-		for (int i = 1 ; i < coef.length ; i++) {
-			if (Double.isNaN(coef[i])) coef[i] = 0;
-			result += coef[i]*var.get(i-1).getValue();
-	//		System.out.println("Result " + i + " : " + result);
-	//		System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
-		}
-//		System.out.println("Result final" + " : " + result);
-
-
-		
+	
 		return result;
+	}
+	
+	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
+		
+
+		
+		if (experimentsList.size() == 1) {
+			return experimentsList.get(0).getOracleProposition();
+		}
+		else {
+			double result = coefs[0];
+
+			if (coefs[0] == Double.NaN) System.exit(0);
+			
+			for (int i = 1 ; i < coefs.length ; i++) {
+				
+				if (Double.isNaN(coefs[i])) coefs[i] = 0;
+				result += coefs[i] * experiment.getValuesAsArray()[i-1];
+
+			}
+		
+			return result;
+		}
+			
+		
 	}
 
 	
@@ -115,21 +128,21 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	 */
 	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		
-	//	System.out.println("get proposition");
+	//	//System.out.println("get proposition");
 	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
 		
 		ArrayList<Percept> var = world.getAllPercept();
 		
 		if (context.getExperiments().size() == 1) {
-			return context.getExperiments().get(0).getProposition();
+			return context.getExperiments().get(0).getOracleProposition();
 		}
 		
 		regression = new Regression(nParameters,true);
 		for (Experiment exp : context.getExperiments()) {
-			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
+			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
 
-			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { //TODO : to improve
-			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getProposition());
+			while (regression.getN() < context.getExperiments().get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
+			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getOracleProposition());
 		}
 		}
 
@@ -138,20 +151,20 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		//
 	//	for (int i = 0 ; i < coef.length ; i++ ) {
-	//		System.out.print(var.get(i).getName() + " coef : " + coef[i] + "   " );
+	//		//System.out.print(var.get(i).getName() + " coef : " + coef[i] + "   " );
 	//	}
-	//	System.out.println();
+	//	//System.out.println();
 		
 		double[] tabv = {v1,v2};
 		
 		double result = coef[0];
-	//	System.out.println("Result 0" + " : " + result);
+	//	//System.out.println("Result 0" + " : " + result);
 		if (coef[0] == Double.NaN) System.exit(0);
 		for (int i = 1 ; i < coef.length ; i++) {
 			if (Double.isNaN(coef[i])) coef[i] = 0;
 			result += coef[i]*tabv[i-1];
 		}
-//		System.out.println("Result final" + " : " + result);
+//		//System.out.println("Result final" + " : " + result);
 		return result;
 
 	
@@ -164,7 +177,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	public String getFormula(Context context) {
 		String s = "";
 		if (context.getExperiments().size() == 1) {
-			return ""+context.getExperiments().get(0).getProposition();
+			return ""+context.getExperiments().get(0).getOracleProposition();
 		}
 		else {
 			if (regression == null) updateModel(context);
@@ -203,14 +216,14 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 				
 		
-		String result = "" +coef[0];
-	//	System.out.println("Result 0" + " : " + result);
-		if (coef[0] == Double.NaN) System.exit(0);
+		String result = "" +coefs[0];
+	//	//System.out.println("Result 0" + " : " + result);
+		if (coefs[0] == Double.NaN) System.exit(0);
 		
-		for (int i = 1 ; i < coef.length ; i++) {
-			if (Double.isNaN(coef[i])) coef[i] = 0;
+		for (int i = 1 ; i < coefs.length ; i++) {
+			if (Double.isNaN(coefs[i])) coefs[i] = 0;
 			
-			result += "\t" + coef[i];
+			result += "\t" + coefs[i];
 			
 		}
 		
@@ -228,23 +241,57 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	public void updateModel(Context context) {
 		
 		regression = new Regression(nParameters,true);
+		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 		for (Experiment exp : context.getExperiments()) {
-			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
-		//	System.out.println(exp.getValues().toString());
+			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
+			
+			//System.out.println(exp.getValuesAsLinkedHashMap().toString());
 			for (int i = 0 ; i < exp.getValuesAsArray().length ; i++ ) {
-	//			System.out.print(exp.getValuesAsArray()[i] + "   " );
+				//System.out.print(exp.getValuesAsArray()[i] + "   " );
 			}
-//			System.out.println(exp.getProposition() + "   " );
+			//System.out.println(exp.getOracleProposition() + "   " );
 		}
 		
-	//	System.out.println("Number of experiments : " + context.getExperiments().size());
-		while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { //TODO : to improve
-			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getProposition());
+		//System.out.println("Number of experiments : " + context.getExperiments().size());
+		
+		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		
+		while (regression.getN() < context.getExperiments().get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
+			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getOracleProposition());
 		}
 		
 
 		
-		coef = regression.regress().getParameterEstimates();
+		coefs = regression.regress().getParameterEstimates();
+		
+	}
+	
+	@Override
+	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
+		
+		regression = new Regression(nParameters,true);
+		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		for (Experiment exp : experimentsList) {
+			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
+			
+			//System.out.println(exp.getValuesAsLinkedHashMap().toString());
+			for (int i = 0 ; i < exp.getValuesAsArray().length ; i++ ) {
+				//System.out.print(exp.getValuesAsArray()[i] + "   " );
+			}
+			//System.out.println(exp.getOracleProposition() + "   " );
+		}
+		
+		//System.out.println("Number of experiments : " + experimentsList.size());
+		
+		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		
+		while (regression.getN() < experimentsList.get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
+			regression.addObservation(experimentsList.get(0).getValuesAsArray(), experimentsList.get(0).getOracleProposition());
+		}
+		
+
+		
+		coefs = regression.regress().getParameterEstimates();
 		
 	}
 
@@ -254,30 +301,30 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 			ArrayList<Percept> var = world.getAllPercept();
 			
 			if (context.getExperiments().size() == 1) {
-				return context.getExperiments().get(0).getProposition();
+				return context.getExperiments().get(0).getOracleProposition();
 			}
 			
 
 			//
 		/*	for (int i = 0 ; i < coef.length ; i++ ) {
-				System.out.print(coef[i] + "   " );
+				//System.out.print(coef[i] + "   " );
 			}
-			System.out.println();*/
+			//System.out.println();*/
 			
 			
-			double result = coef[0];
-		//	System.out.println("Result 0" + " : " + result);
-			if (coef[0] == Double.NaN) System.exit(0);
+			double result = coefs[0];
+		//	//System.out.println("Result 0" + " : " + result);
+			if (coefs[0] == Double.NaN) System.exit(0);
 			
-			for (int i = 1 ; i < coef.length ; i++) {
-				if (Double.isNaN(coef[i])) coef[i] = 0;
+			for (int i = 1 ; i < coefs.length ; i++) {
+				if (Double.isNaN(coefs[i])) coefs[i] = 0;
 				
-				result += coef[i] * contextOverlap.getMiddleValue(var.get(i-1));
+				result += coefs[i] * contextOverlap.getMiddleValue(var.get(i-1));
 				
-		//		System.out.println("Result " + i + " : " + result);
-		//		System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
+		//		//System.out.println("Result " + i + " : " + result);
+		//		//System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
 			}
-//			System.out.println("Result final" + " : " + result);
+//			//System.out.println("Result final" + " : " + result);
 
 
 			

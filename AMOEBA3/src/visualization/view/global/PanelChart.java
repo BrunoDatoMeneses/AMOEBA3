@@ -58,6 +58,8 @@ public class PanelChart extends JPanel implements ScheduledItem {
 	 */
 	public PanelChart(World world) {
 
+		
+		
 		this.setLayout(new FlowLayout());
 		this.world = world;
 

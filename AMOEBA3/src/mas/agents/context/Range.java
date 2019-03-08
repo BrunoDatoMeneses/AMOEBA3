@@ -1,11 +1,16 @@
 package mas.agents.context;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import org.hamcrest.core.IsNull;
 
 import mas.agents.percept.Percept;
 import mas.kernel.World;
+import mas.ncs.NCS;
+import mas.agents.AbstractPair;
 import mas.agents.Agent;
 import mas.agents.messages.MessageType;
 
@@ -112,8 +117,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 //		this.AVT_deltaEnd = (end - start) * AVT_minRatio + 0.0001;
 		this.AVT_deltaStart = getLenght() * 0.2 + 0.0001;
 		this.AVT_deltaEnd = getLenght() * 0.2 + 0.0001;
-		////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "START" + "\t" + AVT_deltaStart);
-		////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "END" + "\t" + AVT_deltaEnd);
+		//////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "START" + "\t" + AVT_deltaStart);
+		//////System.out.println(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" + "END" + "\t" + AVT_deltaEnd);
 		
 
 	}
@@ -125,6 +130,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public Range(Range r) {
 		super();
+		this.percept = new Percept(r.percept);
 		this.setStart( r.start);
 		this.setEnd( r.end);
 		this.start_inclu = r.start_inclu;
@@ -133,7 +139,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		this.alphaFactor = r.alphaFactor;
 		this.oldValue = r.oldValue;
 		this.context = r.context;
-		this.percept = new Percept(r.percept);
+		
 		this.id = r.id;
 		this.AVT_acceleration = r.AVT_acceleration;
 		this.AVT_deceleration = r.AVT_deceleration;
@@ -189,11 +195,32 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @param oracleValue the oracle value
 	 * @param p the p
 	 */
+	public void adapt(Double oracleValue, double increment) {
+		if (!isPerceptEnum()) {
+	
+			
+			double minIncrement = Math.min(increment, getIncrement());
+			
+
+			staticAdapt(oracleValue, minIncrement);
+			
+			
+			//adaptUsingAVT(c, oracleValue);
+			//adaptWithoutAVT(c, oracleValue);
+			
+//			if (Range.useAVT) {
+//				adaptUsingAVT(c, oracleValue);
+//			} else {
+//				adaptWithoutAVT(c, oracleValue);
+//			}
+		}
+	}
+	
 	public void adapt(Double oracleValue) {
 		if (!isPerceptEnum()) {
 	
 			
-			staticAdapt(oracleValue);
+			staticAdapt(oracleValue, getIncrement());
 			
 			//adaptUsingAVT(c, oracleValue);
 			//adaptWithoutAVT(c, oracleValue);
@@ -268,11 +295,11 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	
 	
-	private void staticAdapt(double oracleValue) {
+	private void staticAdapt(double oracleValue, double increment) {
 		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
-			adaptEnd(oracleValue);
+			adaptEnd(oracleValue, increment);
 		} else {
-			adaptStart(oracleValue);
+			adaptStart(oracleValue, increment);
 		}
 	}
 	
@@ -284,40 +311,40 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	private void adaptEndUsingAVT(double oracleValue) {
 
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
 		
 		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			//System.out.print( "\tContained : True" );
+			////System.out.print( "\tContained : True" );
 
 			if (AVT_lastFeedbackEnd == 1) {
 				AVT_deltaEnd *= AVT_deceleration;
-				//System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+				////System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			} else {
 				AVT_deltaEnd *= AVT_acceleration;
-				//System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+				////System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			}
 			this.setEnd(end - AVT_deltaEnd);
 
 			
-			//System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+			////System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
 			AVT_lastFeedbackEnd = -1;
-			//System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
+			////System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
 
 		} else {
-			//System.out.print( "\tContained : False" );
+			////System.out.print( "\tContained : False" );
 			if (AVT_lastFeedbackEnd == 1) {
 				AVT_deltaEnd *= AVT_acceleration;
-				//System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+				////System.out.print(" AVT_acceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			} else {
 				AVT_deltaEnd *= AVT_deceleration;
-				//System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+				////System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			}
 			this.setEnd(end + AVT_deltaEnd);
 
-			//System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+			////System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
 			AVT_lastFeedbackEnd = 1;
-			//System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
+			////System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
 		}		
 
 		
@@ -325,48 +352,125 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public void endogenousAdaptEndUsingAVT() {
 
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
 		
 		AVT_deltaEnd *= AVT_deceleration;
-		//System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+		////System.out.print(" AVT_deceleration AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 		
-		//System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
+		////System.out.print("\tAVT_lastFeedbackEn\t" + AVT_lastFeedbackEnd);
 		AVT_lastFeedbackEnd = 0;
-		//System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
+		////System.out.print("\t" + AVT_lastFeedbackEnd + "\n");
 
 		
 	}
 	
 	public void endogenousAdaptStartUsingAVT() {
 
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptEndUsingAVT");
 		
 		AVT_deltaStart *= AVT_deceleration;
-		//System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+		////System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 		
-		//System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+		////System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
 		AVT_lastFeedbackStart = 0;
-		//System.out.print("\t" + AVT_lastFeedbackStart + "\n");
+		////System.out.print("\t" + AVT_lastFeedbackStart + "\n");
 
 		
 	}
 	
-	private void adaptEnd(double oracleValue) {
-
-		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
-
-			//this.setEnd(end + (world.getContextGrowingPercent()*2*this.getRadius()));
-			
-				this.setEnd(end + getIncrement()); 
-		} 
-		else {
-
-				this.setEnd(end - getIncrement());	
-		}
+	private void adaptEnd(double oracleValue, double increment) {
+		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
 		
-		//this.adaptEndUsingAVT(oracleValue);
+		//classicEndAdapt(oracleValue, increment);
+		adaptEndWithSplitting(oracleValue, increment);
 
+	}
+	
+	private void classicEndAdapt(double oracleValue, double increment) {
+		if (!(contains(oracleValue) == 0.0)) {  
+			
+			this.setEnd(end + increment);
+			
+			//this.setEnd(end + getIncrementDependingOnNeighboorDistances("end"));
+			//this.setEnd(end + getMaxIncrement("end")); 
+	} 
+	else {
 
+			this.setEnd(end - increment);	
+			//this.setEnd(end - getIncrementDependingOnNeighboorDistances("end"));
+	}
+	
+	//this.adaptEndUsingAVT(oracleValue);
+	}
+	
+	private void adaptEndWithSplitting(double oracleValue, double increment) {
+		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
+		
+		ArrayList<Context> bordererContexts = new ArrayList<Context>();
+		
+		if (!(contains(oracleValue) == 0.0)) {  
+
+		
+				for(Context ctxt: world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+					
+					world.trace(new ArrayList<String>(Arrays.asList(context.getName(),""+this.distance(ctxt.getRanges().get(this.percept)),"DISTANCE SPLIT",percept.getName() ,ctxt.getName() )));
+					
+					if(Math.abs(this.distance(ctxt.getRanges().get(this.percept))) <= increment && ctxt.getRanges().get(this.percept).getCenter() > this.getCenter()) {
+						
+						boolean bordererContextTest = true;
+						for(Percept pct : world.getScheduler().getPercepts()) {
+							
+							if(pct!=this.percept) {
+								
+								Range contextRangeOnOtherPercept = this.context.getRanges().get(pct);
+								Range otherContextRangeOnOtherPercept = ctxt.getRanges().get(pct);
+								
+								bordererContextTest = bordererContextTest && (contextRangeOnOtherPercept.distance(otherContextRangeOnOtherPercept) < 0);
+								
+							}
+						}
+						
+						if(bordererContextTest) {
+							world.trace(new ArrayList<String>(Arrays.asList(context.getName(),"END BORDER CONTEXT",percept.getName() ,ctxt.getName() )));
+							bordererContexts.add(ctxt);
+						}
+						
+					}
+					
+					
+				}
+				if(bordererContexts.size() > 0) {
+					world.trace(new ArrayList<String>(Arrays.asList("END BORDER CONTEXT",percept.getName())));
+					double minAlternativeIncrement = increment;
+					double alternativeIncrement;
+					for(Context ctxt : bordererContexts) {
+						alternativeIncrement = Math.abs(this.distance(ctxt.getRanges().get(this.percept)));
+						if(alternativeIncrement<minAlternativeIncrement) {
+							minAlternativeIncrement = alternativeIncrement;
+						}
+					}
+					this.setEnd(end + minAlternativeIncrement);
+					growWithBorderContext();
+				}
+				else {
+					this.setEnd(end + increment);
+				}
+				
+				//this.setEnd(end + increment);
+				//this.setEnd(end + getIncrementDependingOnNeighboorDistances("end"));
+				//this.setEnd(end + getMaxIncrement("end")); 
+		}else {
+
+			this.setEnd(end - increment);	
+			//this.setEnd(end - getIncrementDependingOnNeighboorDistances("end"));
+		} 
+
+	}
+	
+	private void growWithBorderContext() {
+		Context newContext = new Context(world, world.getScheduler().getHeadAgent(), this.context);
+		world.getScheduler().getHeadAgent().addActivatedContext(newContext);
+		world.getScheduler().getHeadAgent().addRequestNeighbor(newContext);
 	}
 
 	/**
@@ -377,66 +481,220 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	private void adaptStartUsingAVT(double oracleValue) {
 
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptStartUsingAVT");
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" + " AdaptStartUsingAVT");
 		
 		
 		if (contains(oracleValue) == 0.0) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
 
-			//System.out.print( "\tContained : True" );
+			////System.out.print( "\tContained : True" );
 			if (AVT_lastFeedbackStart == 1) {
 				AVT_deltaStart *= AVT_deceleration;
-				//System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+				////System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			} else {
 				AVT_deltaStart *= AVT_acceleration;
-				//System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+				////System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			}
 			this.setStart(start + AVT_deltaStart);
 
-			//System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+			////System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
 			AVT_lastFeedbackStart = -1;
-			//System.out.print("\t" + AVT_lastFeedbackStart + "\n");
+			////System.out.print("\t" + AVT_lastFeedbackStart + "\n");
 
 		} else {
 
-			//System.out.print( "\tContained : False" );
+			////System.out.print( "\tContained : False" );
 			if (AVT_lastFeedbackStart == 1) {
 				AVT_deltaStart *= AVT_acceleration;
-				//System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+				////System.out.print(" AVT_acceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			} else {
 				AVT_deltaStart *= AVT_deceleration;
-				//System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+				////System.out.print(" AVT_deceleration AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			}
 			this.setStart(start - AVT_deltaStart);
 
-			//System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
+			////System.out.print("\tAVT_lastFeedbackStart\t" + AVT_lastFeedbackStart);
 			AVT_lastFeedbackStart = 1;
-			//System.out.print("\t" + AVT_lastFeedbackStart + "\n");
+			////System.out.print("\t" + AVT_lastFeedbackStart + "\n");
 		}		
 
 	}
 	
-	private void adaptStart(double oracleValue) {
-
-		if (!(contains(oracleValue) == 0.0)) {  //If value is contained, it's a negative feedback for AVT (ie : we must exclude the value)
-
-			this.setStart(start - getIncrement());
-
-		}else {
-			
-			this.setStart(start + getIncrement());
-		}
-			
-		//this.adaptStartUsingAVT(oracleValue);
+	private void adaptStart(double oracleValue, double increment) {
+		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
+		
+		
+		//classicStartAdapt(oracleValue,increment);
+		adaptStartWithSplitting(oracleValue, increment);
 
 	}
 	
-	private double getIncrement() {
+	private void classicStartAdapt(double oracleValue, double increment) {
+		if (!(contains(oracleValue) == 0.0)) {  
+			
+			this.setStart(start - increment);
+			//this.setStart(start - getIncrementDependingOnNeighboorDistances("start"));
+			//this.setStart(start - getMaxIncrement("start"));
+
+
+		}else {
+			this.setStart(start + increment);
+		}
+			
+			
+			//this.setStart(start + getIncrementDependingOnNeighboorDistances("start"));
+			
+		//this.adaptStartUsingAVT(oracleValue);
+	}
+	
+	private void adaptStartWithSplitting(double oracleValue, double increment) {
+		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
+		ArrayList<Context> bordererContexts = new ArrayList<Context>();		
+			
+			if (!(contains(oracleValue) == 0.0)) {  
+
+			
+				for(Context ctxt: world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+					
+					if(Math.abs(this.distance(ctxt.getRanges().get(this.percept))) <= increment && ctxt.getRanges().get(this.percept).getCenter() < this.getCenter()) {
+						
+						boolean bordererContextTest = true;
+						for(Percept pct : world.getScheduler().getPercepts()) {
+							
+							if(pct!=this.percept) {
+								
+								Range contextRangeOnOtherPercept = this.context.getRanges().get(pct);
+								Range otherContextRangeOnOtherPercept = ctxt.getRanges().get(pct);
+								
+								bordererContextTest = bordererContextTest && (contextRangeOnOtherPercept.distance(otherContextRangeOnOtherPercept) < 0);
+								
+							}
+						}
+						
+						if(bordererContextTest) {
+							world.trace(new ArrayList<String>(Arrays.asList("START BORDER CONTEXT",percept.getName() ,ctxt.getName() )));
+							bordererContexts.add(ctxt);
+						}
+						
+					}
+					
+					
+				}
+				if(bordererContexts.size() >0) {
+					world.trace(new ArrayList<String>(Arrays.asList("START BORDER CONTEXT",percept.getName())));
+					double minAlternativeIncrement = increment;
+					double alternativeIncrement;
+					for(Context ctxt : bordererContexts) {
+						alternativeIncrement = Math.abs(this.distance(ctxt.getRanges().get(this.percept)));
+						if(alternativeIncrement<minAlternativeIncrement) {
+							minAlternativeIncrement = alternativeIncrement;
+						}
+					}
+					this.setStart(start - minAlternativeIncrement);
+					growWithBorderContext();
+				}
+				else {
+					this.setStart(start - increment);
+				}
+			
+			
+			
+			//this.setStart(start - getIncrementDependingOnNeighboorDistances("start"));
+			//this.setStart(start - getMaxIncrement("start"));
+
+		}else {
+			this.setStart(start + increment);
+		}
+			
+			
+			//this.setStart(start + getIncrementDependingOnNeighboorDistances("start"));
+			
+		//this.adaptStartUsingAVT(oracleValue);
+	}
+	
+	public double getIncrement() {
+		double increment =  world.getIncrements()*percept.getMinMaxDistance();
+		//double increment = 10*world.getIncrements()*this.getRadius();	
+		//world.trace(new ArrayList<String>(Arrays.asList(this.getContext().getName(),percept.getName(), "INCREMENT", ""+increment)));
+		return increment;
+	}
+	
+	private double getIncrementDependingOnNeighboorDistances(String rangeSide) {
+		double increment = this.getRadius()/2;
+		double incrementSum = 0.0;
+		ArrayList<Context>  neighbors = new ArrayList<Context>();
 		
-		if(world.getScheduler().getTick()>world.tickThreshol) {
-			return world.getIncrements()*percept.getMinMaxDistance()*getRadius();
+		for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+			
+			if(ctxt != this.context) {
+
+				if(rangeSide.equals("start")) {
+					double startDistance = startDistance(ctxt.getRanges().get(percept));
+					if(startDistance < this.getRadius()/2) {
+						if(startDistance>incrementSum) {
+							incrementSum = startDistance;
+						}
+						
+					}
+				}
+				else if(rangeSide.equals("end")) {
+					double endDistance = endDistance(ctxt.getRanges().get(percept));
+					if(endDistance < this.getRadius()/2) {
+						if(endDistance>incrementSum) {
+							incrementSum = endDistance;
+						}
+					}
+				}
+			}
+		}
+		if(incrementSum!=0.0) {
+			increment = incrementSum;
 		}
 		
-		return world.getIncrements()*percept.getMinMaxDistance();
+		
+		return increment;
+	}
+	
+	private double getMaxIncrement(String rangeSide) {
+		double increment =  world.getIncrements()*percept.getMinMaxDistance();
+		double possibleIncrement;
+		
+		//System.out.println("INI INCREMENT " + increment);
+		//System.out.println("NEIGHBORS " + world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
+		for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+			
+			if(ctxt != this.context) {
+//				possibleIncrement = this.distance(ctxt.getRanges().get(this.percept));
+//				//System.out.println("POS INCREMENT " + possibleIncrement);
+//				if(possibleIncrement<increment) {
+//					increment = possibleIncrement;
+//				}
+				if(rangeSide.equals("start")) {
+					if(this.getStart() > ctxt.getRanges().get(this.percept).getEnd()) {
+						possibleIncrement = this.distance(ctxt.getRanges().get(this.percept));
+						if(possibleIncrement<increment) {
+							increment = possibleIncrement;
+						}
+					}
+				}
+				else if(rangeSide.equals("end")) {
+					if(this.getEnd() < ctxt.getRanges().get(this.percept).getStart()) {
+						possibleIncrement = this.distance(ctxt.getRanges().get(this.percept));
+						if(possibleIncrement<increment) {
+							increment = possibleIncrement;
+						}
+					}
+				}
+			}
+			
+			
+			
+
+			
+			
+		}
+		
+		//world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), rangeSide +" INCREMENT ", ""+increment)));
+		return increment;
 	}
 	
 	/**
@@ -447,12 +705,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public double simulateNegativeAVTFeedbackStart(double oracleValue) {
 		
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
 		if (AVT_lastFeedbackStart == 1) {
-			////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_deceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			//////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_deceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			return start + (AVT_deltaStart * AVT_deceleration);
 		} else {
-			////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_acceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
+			//////System.out.println("simulateNegativeAVTFeedbackStart :" + Math.abs(AVT_deltaStart * AVT_acceleration) + "\t" + "AVT_deltaStart : " + "\t" +  AVT_deltaStart);
 			return start + (AVT_deltaStart * AVT_acceleration);
 		}
 
@@ -466,12 +724,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public double simulateNegativeAVTFeedbackEnd(double oracleValue) {
 		
-		//System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
+		////System.out.print(world.getScheduler().getTick() + "\t" + context.getName() + "\t" + percept.getName()+ "\t" );
 		if (AVT_lastFeedbackEnd == 1) {
-			////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_deceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			//////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_deceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			return end - (AVT_deltaEnd * AVT_deceleration);
 		} else {
-			////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_acceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
+			//////System.out.println("simulateNegativeAVTFeedbackEnd :" + Math.abs(AVT_deltaEnd * AVT_acceleration) + "\t" + "AVT_deltaEnd : " + "\t" +  AVT_deltaEnd);
 			return end - (AVT_deltaEnd * AVT_acceleration);
 		}
 
@@ -486,8 +744,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < mininimalRange && (end - start)>0) {
-			////System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
+		if((end - start) < world.mappingErrorAllowed && (end - start)>0) {
+			//////System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
 		}
 		
 		return (end - start) < mininimalRange && !this.isPerceptEnum();
@@ -582,13 +840,13 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	public void matchBorderWithBestContext(Context bestContext) {
-		////System.out.println("Match border " + percept.getName());
+		//////System.out.println("Match border " + percept.getName());
 		
 		Range bestContextRanges = bestContext.getRanges().get(percept);
 		
 		if (bestContextRanges.getStart() <= this.start &&  this.end <= bestContextRanges.getEnd() ) {
 			
-			////System.out.println(context.getName() + " DIES");
+			//////System.out.println(context.getName() + " DIES");
 			this.context.die();
 			
 		} else {
@@ -605,46 +863,285 @@ public class Range implements Serializable, Comparable, Cloneable {
 	
 	public void adaptTowardsBorder(Context bestContext) {
 		
-		////System.out.println("Adapt towards border " + percept.getName());
 		
 		Range bestContextRanges = bestContext.getRanges().get(percept);
 		
 		if (bestContextRanges.getStart() <= this.start &&  this.end <= bestContextRanges.getEnd() ) {
 			
-			////System.out.println(context.getName() + " DIES");
 			this.context.die();
 			
 		} else {
 			
 			if (Math.abs(bestContextRanges.getStart() - this.getEnd()) >= Math.abs(bestContextRanges.getEnd() - this.getStart())) {
 		
-				adaptOnOverlap(bestContextRanges, bestContextRanges.getEnd());
+				
+				
+				setOnConcurentOverlap(bestContextRanges, bestContextRanges.getEnd());
 			} else {
-				adaptOnOverlap(bestContextRanges, bestContextRanges.getStart());
+				setOnConcurentOverlap(bestContextRanges, bestContextRanges.getStart());
 			}
 		}
+		
+		
 
 	}
 	
 	
-	private void adaptOnOverlap(Range bestContextRanges, double border) {
+	public void adaptOnOverlap(Range overlappingContextRanges, double border) {
 		
-		if(overlapDistance(bestContextRanges) > nonOverlapDistance(bestContextRanges)) {
+		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),percept.getName(), "*********************************************************************************************************** ADAPT ON OVERLAP")));
+		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
+		
+		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensions = new HashMap<Percept,AbstractPair<Double,Double>>();
+		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,AbstractPair<Double,Double>>();
+		Double center;
+		double length = increment;
+		
+		
+		if(overlapDistance(overlappingContextRanges) > nonOverlapDistance(overlappingContextRanges)) {
 			
 			if (Math.abs(end - border) > Math.abs(border - start)) {
-				adaptEnd(border);
+				center = (end - increment + end) / 2;
 			} else {
-				adaptStart(border);
+				center = (start + increment + start) / 2;
 			}
 			
 		}
 		else {
 			if (Math.abs(end - border) < Math.abs(border - start)) {
-				adaptEnd(border);
+				center = (end - increment + end) / 2;
 			} else {
-				adaptStart(border);
+				center = (start + increment + start) / 2;
+
 			}
 		}
+		
+		
+		if(overlapDistance(overlappingContextRanges) > nonOverlapDistance(overlappingContextRanges)) {
+			
+			if (Math.abs(end - border) > Math.abs(border - start)) {
+				adaptEnd(border, increment);
+			} else {
+				adaptStart(border, increment);
+			}
+			
+		}
+		else {
+			if (Math.abs(end - border) < Math.abs(border - start)) {
+				adaptEnd(border, increment);
+			} else {
+				adaptStart(border, increment);
+			}
+		}
+		
+		
+		
+		
+		//if(this.context.getLocalModel().getCoef()[world.getScheduler().getPercepts().size()] != 0.0) { // if model
+			newContextDimensions.put(this.percept, new AbstractPair<Double, Double>(center, length));
+			newContextDimensionsBis.put(this.percept, new AbstractPair<Double, Double>(center, length));
+			ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+			boolean newContext = true;
+			
+			for(Percept pct : world.getScheduler().getPercepts()) {
+				if(pct != percept) {
+					Context overlappingContext = overlappingContextRanges.getContext();
+					newContext = newContext && !context.getRanges().get(pct).containedBy(overlappingContext.getRanges().get(pct));
+					
+					if(newContext) {
+						
+						world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),  ""+context.getRanges().get(pct), overlappingContext.getRanges().get(pct) + "",pct.getName(), "RANGES")));
+						world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),  ""+this.context.getRanges().get(pct).getLenght(), this.context.getRanges().get(pct).overlapDistance(overlappingContext.getRanges().get(pct)) + "",pct.getName(), "LENGTHS")));
+						
+						centersAndLengths = this.context.getRanges().get(pct).getCentersAndLengthsOfNonOverlapingZones(overlappingContext.getRanges().get(pct));
+						if(centersAndLengths.isEmpty()) {
+							newContext = false;
+						}
+						else if(centersAndLengths.size()==1) {
+							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+						}
+						else if(centersAndLengths.size()==2){
+							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensionsBis.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
+						}				
+					}					
+				}
+			}
+			
+			if(newContext) {
+
+				world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
+				for(Percept pct : world.getScheduler().getPercepts()) {
+					world.trace(new ArrayList<String>(Arrays.asList(pct.getName(),""+ newContextDimensions.get(pct).getA(),""+ newContextDimensions.get(pct).getB(),"NEW DIM")));
+				}
+				Context context = new Context(world, world.getScheduler().getHeadAgent(), this.getContext(), newContextDimensions);
+				
+				if(centersAndLengths.size()==2) {
+					world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
+					for(Percept pct : world.getScheduler().getPercepts()) {
+						world.trace(new ArrayList<String>(Arrays.asList(pct.getName(),""+ newContextDimensionsBis.get(pct).getA(),""+ newContextDimensionsBis.get(pct).getB(),"NEW DIM")));
+					}
+					Context contextBis = new Context(world, world.getScheduler().getHeadAgent(), this.getContext(), newContextDimensionsBis);
+				}
+			}
+		//}
+		
+		
+		
+		
+		
+		
+	}
+	
+public void setOnConcurentOverlap(Range overlappingContextRanges, double border) {
+		
+		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),percept.getName(), "*********************************************************************************************************** SET ON OVERLAP")));
+		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
+		
+		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensions = new HashMap<Percept,AbstractPair<Double,Double>>();
+		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,AbstractPair<Double,Double>>();
+		Double center;
+		double length;
+		
+		
+		if(overlapDistance(overlappingContextRanges) > nonOverlapDistance(overlappingContextRanges)) {
+			
+			if (Math.abs(end - border) > Math.abs(border - start)) {
+				center = (border + end) / 2;
+				length = Math.abs(end - border);
+			} else {
+				center = (start + border) / 2;
+				length = Math.abs(start - border);
+			}
+			
+		}
+		else {
+			if (Math.abs(end - border) < Math.abs(border - start)) {
+				center = (border + end) / 2;
+				length = Math.abs(end - border);
+			} else {
+				center = (start + border) / 2;
+				length = Math.abs(start - border);
+
+			}
+		}
+		
+		
+		if(overlapDistance(overlappingContextRanges) > nonOverlapDistance(overlappingContextRanges)) {
+			
+			if (Math.abs(end - border) > Math.abs(border - start)) {
+				setEnd(border);
+			} else {
+				setStart(border);
+			}
+			
+		}
+		else {
+			if (Math.abs(end - border) < Math.abs(border - start)) {
+				setEnd(border);
+			} else {
+				setStart(border);
+			}
+		}
+		
+		
+		
+		
+		//if(this.context.getLocalModel().getCoef()[world.getScheduler().getPercepts().size()] != 0.0) { // if model
+			newContextDimensions.put(this.percept, new AbstractPair<Double, Double>(center, length));
+			newContextDimensionsBis.put(this.percept, new AbstractPair<Double, Double>(center, length));
+			ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+			boolean newContext = true;
+			
+			for(Percept pct : world.getScheduler().getPercepts()) {
+				if(pct != percept) {
+					Context overlappingContext = overlappingContextRanges.getContext();
+					newContext = newContext && !context.getRanges().get(pct).containedBy(overlappingContext.getRanges().get(pct));
+					
+					if(newContext) {
+						
+						world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),  ""+context.getRanges().get(pct), overlappingContext.getRanges().get(pct) + "",pct.getName(), "RANGES")));
+						world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),  ""+this.context.getRanges().get(pct).getLenght(), this.context.getRanges().get(pct).overlapDistance(overlappingContext.getRanges().get(pct)) + "",pct.getName(), "LENGTHS")));
+						
+						centersAndLengths = this.context.getRanges().get(pct).getCentersAndLengthsOfNonOverlapingZones(overlappingContext.getRanges().get(pct));
+						if(centersAndLengths.isEmpty()) {
+							newContext = false;
+						}
+						else if(centersAndLengths.size()==1) {
+							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+						}
+						else if(centersAndLengths.size()==2){
+							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensionsBis.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
+						}				
+					}					
+				}
+			}
+			
+			if(newContext) {
+
+				world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
+				for(Percept pct : world.getScheduler().getPercepts()) {
+					world.trace(new ArrayList<String>(Arrays.asList(pct.getName(),""+ newContextDimensions.get(pct).getA(),""+ newContextDimensions.get(pct).getB(),"NEW DIM")));
+				}
+				Context context = new Context(world, world.getScheduler().getHeadAgent(), this.getContext(), newContextDimensions);
+				
+				if(centersAndLengths.size()==2) {
+					world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
+					for(Percept pct : world.getScheduler().getPercepts()) {
+						world.trace(new ArrayList<String>(Arrays.asList(pct.getName(),""+ newContextDimensionsBis.get(pct).getA(),""+ newContextDimensionsBis.get(pct).getB(),"NEW DIM")));
+					}
+					Context contextBis = new Context(world, world.getScheduler().getHeadAgent(), this.getContext(), newContextDimensionsBis);
+				}
+			}
+		//}
+		
+		
+		
+		
+		
+		
+	}
+	
+	public boolean containedBy(Range range) {
+		return range.getStart() <= this.getStart() && this.getEnd() <= range.getEnd();
+	}
+	
+	public ArrayList<AbstractPair<Double, Double>> getCentersAndLengthsOfNonOverlapingZones(Range overlappingRange) {
+		
+		ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+		
+		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), overlappingRange.getContext().getName(), "SEEK NON OVERLAPING")));
+		
+		if(this.getStart() < overlappingRange.getStart() && overlappingRange.getEnd() < this.getEnd()) {
+			
+			world.trace(new ArrayList<String>(Arrays.asList("CONTAINED", this.percept.getName())));
+			double center1 = (this.getStart() + overlappingRange.getStart() ) / 2;
+			double center2 = (overlappingRange.getEnd() + this.getEnd()) / 2;
+			double length1 = overlappingRange.getStart()-this.getStart();
+			double length2 = this.getEnd() - overlappingRange.getEnd() ;
+			centersAndLengths.add(new AbstractPair<Double, Double>(center1, length1));
+			centersAndLengths.add(new AbstractPair<Double, Double>(center2, length2));
+		}
+		else if(this.getStart() < overlappingRange.getStart() && overlappingRange.getStart() < this.getEnd()) {
+			
+			world.trace(new ArrayList<String>(Arrays.asList("START", this.percept.getName())));
+			double center = (this.getStart() + overlappingRange.getStart() ) / 2;
+			double length = overlappingRange.getStart()-this.getStart();
+			centersAndLengths.add(new AbstractPair<Double, Double>(center, length));
+		}
+		else if(this.getStart() < overlappingRange.getEnd() && overlappingRange.getEnd() < this.getEnd()) {
+			
+			world.trace(new ArrayList<String>(Arrays.asList("END", this.percept.getName())));
+			double center = (overlappingRange.getEnd() + this.getEnd()) / 2;
+			double length = this.getEnd() - overlappingRange.getEnd();
+			centersAndLengths.add(new AbstractPair<Double, Double>(center, length));
+		}
+		
+
+
+		
+		return centersAndLengths;
 		
 	}
 	
@@ -879,10 +1376,25 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	public void setStart(double newStartValue) {
+		
+		
+		
 		if(context !=null && percept !=null) {
-			////System.out.println(context.getName() + " " + percept.getName() + " START " + (Math.abs(newStartValue-this.start)));
+			//////System.out.println(context.getName() + " " + percept.getName() + " START " + (Math.abs(newStartValue-this.start)));
 		}
-		this.start = newStartValue;
+
+		if((Double)newStartValue!=null) {
+			if(newStartValue < percept.getMin()) {
+				this.start = percept.getMin();
+				
+			}else {
+				this.start = newStartValue;
+			}
+		}
+		else {
+			this.start = newStartValue;
+		}
+		
 		if(world != null) {
 			lastStartTickModification = world.getScheduler().getTick();
 		}
@@ -920,17 +1432,31 @@ public class Range implements Serializable, Comparable, Cloneable {
 			
 			this.context.updateActivatedContexts();
 			
-			
+			world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "SET START", ""+newStartValue)));
 		}
+		
+		NCSDetection_Uselessness();
 		
 	}
 	
 	public void setEnd(double newEndValue) {
+		
+		
+		
 		if(context !=null && percept !=null ) {
-			////System.out.println(context.getName() + " " + percept.getName() + " END " + (Math.abs(newEndValue-this.end)));
+			//////System.out.println(context.getName() + " " + percept.getName() + " END " + (Math.abs(newEndValue-this.end)));
+		}
+		if((Double)newEndValue!=null) {
+			if(newEndValue > percept.getMax()) {
+				this.end = percept.getMax();
+			}else {
+				this.end = newEndValue;
+			}
+		}else {
+			this.end = newEndValue;
 		}
 		
-		this.end = newEndValue;
+		
 
 		if(world != null) {
 			lastEndTickModification = world.getScheduler().getTick();
@@ -968,16 +1494,32 @@ public class Range implements Serializable, Comparable, Cloneable {
 			}
 		
 			this.context.updateActivatedContexts();
+			
+			world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "SET END", ""+newEndValue)));
+			
+			
 		}
+		
+		NCSDetection_Uselessness();
+	}
+	
+	public void NCSDetection_Uselessness() {
+		if(context != null) {
+			if(this.isTooSmall()){
+				context.solveNCS_Uselessness();
+			}
+		}
+		
+		
 	}
 	
 	public boolean contains(Double value, Double neighborhood) {
-		//System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
+		////System.out.println(context.getName() +" "+ percept.getName() + " " + value + " " + (start - neighborhood) + " " + start + " " + end + " " + (end + neighborhood));
 		return Math.abs(value - getCenter()) < (getRadius() + neighborhood );
 	}
 	
 	public boolean contains2(Double value) {
-		return Math.abs(value - getCenter()) < getRadius() ;
+		return Math.abs(value - getCenter()) <= getRadius() ;
 	}
 
 	public Range clone() throws CloneNotSupportedException{
@@ -1004,6 +1546,22 @@ public class Range implements Serializable, Comparable, Cloneable {
 		return Math.abs(this.getCenter() - otherRange.getCenter()) - this.getRadius() - otherRange.getRadius();
 	}
 	
+	public double startDistance(Range otherRange) {
+		return Math.abs(this.getStart() - otherRange.getEnd());
+	}
+	
+	public double endDistance(Range otherRange) {
+		return Math.abs(this.getEnd() - otherRange.getStart());
+	}
+	
+	public double startDistance(double value) {
+		return Math.abs(this.getStart() - value);
+	}
+	
+	public double endDistance(double value) {
+		return Math.abs(this.getEnd() - value);
+	}
+	
 	public double distance(double value) {
 		return Math.abs(this.getCenter() - value) - this.getRadius() ;
 	}
@@ -1012,7 +1570,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		return value - this.getCenter();
 	}
 	
-	private double overlapDistance(Range otherRange) {
+	public double overlapDistance(Range otherRange) {
 		
 		double distanceBetweenRanges = distance(otherRange);
 		if (distanceBetweenRanges<0) {
@@ -1037,4 +1595,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 			return 0.0;
 		}
 	}
+	
+	
 }

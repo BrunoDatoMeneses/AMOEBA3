@@ -29,7 +29,7 @@ public class F_XY_Launcher implements Serializable {
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		
 		/* Error parameter */
-		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
+		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 80, 80);
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 		
 		/* Other parameters */
@@ -38,6 +38,8 @@ public class F_XY_Launcher implements Serializable {
 		
 
 		F_XY_Manager f_XY_Manager = new F_XY_Manager(50.0);
+		
+		amoeba.setManager(f_XY_Manager);
 
 		int i = 0;
 		while(i<10000) {
@@ -55,6 +57,7 @@ public class F_XY_Launcher implements Serializable {
 			
 			if(amoeba.getScheduler().requestAsked()) {
 				amoeba.manual = true;
+				System.out.println("                                                                                                     MANUAL REQUEST");
 				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputRequest(amoeba.getScheduler().getManualRequest())));
 				amoeba.manual = false;
 				

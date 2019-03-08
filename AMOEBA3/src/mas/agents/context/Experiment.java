@@ -16,14 +16,15 @@ public class Experiment implements Serializable {
 	private LinkedHashMap<Percept, Double> values = new LinkedHashMap<Percept, Double>();
 	
 	/** The proposition. */
-	private double proposition;
+	private double oracleProposition;
 
+	private Context context;
 	
 	/**
 	 * Instantiates a new experiment.
 	 */
-	public Experiment() {
-		
+	public Experiment(Context ctxt) {
+		context = ctxt;
 	}
 
 	/**
@@ -31,7 +32,7 @@ public class Experiment implements Serializable {
 	 *
 	 * @return the ranges
 	 */
-	public HashMap<Percept, Double> getRanges() {
+	public HashMap<Percept, Double> getValuesAsHashMap() {
 		return values;
 	}
 
@@ -49,7 +50,7 @@ public class Experiment implements Serializable {
 	 *
 	 * @return the values
 	 */
-	public LinkedHashMap<Percept, Double> getValues() {
+	public LinkedHashMap<Percept, Double> getValuesAsLinkedHashMap() {
 		return values;
 	}
 
@@ -70,8 +71,8 @@ public class Experiment implements Serializable {
 	 *
 	 * @return the proposition
 	 */
-	public double getProposition() {
-		return proposition;
+	public double getOracleProposition() {
+		return oracleProposition;
 	}
 
 
@@ -80,8 +81,8 @@ public class Experiment implements Serializable {
 	 *
 	 * @param proposition the new proposition
 	 */
-	public void setProposition(double proposition) {
-		this.proposition = proposition;
+	public void setOracleProposition(double oracleProposition) {
+		this.oracleProposition = oracleProposition;
 	}
 	
 	/**
@@ -101,5 +102,15 @@ public class Experiment implements Serializable {
 	}
 	
 	
-	
+	public String toString() {
+		String string = "\n";
+		for(Percept pct : values.keySet()) {
+			string += pct.getName() + " " + values.get(pct) + "\n";
+		}
+		string += "Oracle : " + oracleProposition + "\n";
+		double modelPropositionOnExp = context.getPropositionOnExperiment(this);
+		string += "Proposition : " + modelPropositionOnExp + "\n";
+		string += "Error : " + Math.abs(oracleProposition-modelPropositionOnExp) + "\n";
+		return string;
+	}
 }

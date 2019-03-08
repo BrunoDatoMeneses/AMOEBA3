@@ -39,7 +39,7 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 	 */
 	@Override
 	public void playOneStep(double action) {
-
+		HashMap<String, Double> out = new HashMap<String, Double>();
 			
 		if (generator == null)	generator = new Random(29);
 			
@@ -48,6 +48,20 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
 	}
 
+	
+	public double model(double x, double y) {
+		
+		/* Disc */
+		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		
+		/* Square */
+		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+		
+		/* Triange */
+		return (y > x) ? 2*x + y : 5*x - 8*y;
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see kernel.StudiedSystem#getOutput()
 	 */
@@ -55,10 +69,7 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		//result = (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
-		result = (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
-		//	result = (2*x) + (4*y) + x*y;
-		//	result = (x > 2*y) ? 0.0 : 1.0;
+		result = model(x, y);
 		
 		out.put("px",x);
 		out.put("py",y);
@@ -73,13 +84,7 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		double xValue = values.get("px");
 		double yValue = values.get("py");
 		
-		//result = (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
-		result = (yValue > -spaceSize && yValue < spaceSize && xValue < spaceSize && xValue > -spaceSize) ? 2*xValue + yValue : 5*xValue - 8*yValue;
-		if(Math.abs(yValue) > 3 * spaceSize && Math.abs(xValue) > 3 * spaceSize) {
-			result = 1000*xValue + 500*yValue;
-		}
-		//	result = (2*x) + (4*y) + x*y;
-		//	result = (x > 2*y) ? 0.0 : 1.0;
+		result = model(xValue, yValue);
 		
 		out.put("px",xValue);
 		out.put("py",yValue);
@@ -96,7 +101,9 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 	}
 	
 
-	
+	public double getSpaceSize() {
+		return spaceSize;
+	}
 
 
 

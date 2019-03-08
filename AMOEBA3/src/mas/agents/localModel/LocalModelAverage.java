@@ -1,6 +1,7 @@
 package mas.agents.localModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import mas.kernel.World;
 import mas.agents.percept.Percept;
@@ -31,7 +32,7 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 	public double getProposition(Context context) {
 		double average = 0.0;
 		for (Experiment exp : context.getExperiments()) {
-			average += exp.getProposition();
+			average += exp.getOracleProposition();
 		}
 		return average / context.getExperiments().size();
 	}
@@ -73,6 +74,18 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 	
 	public double[] getCoef() {
 		return new double[1];
+	}
+
+	@Override
+	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
