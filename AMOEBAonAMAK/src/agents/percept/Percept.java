@@ -91,6 +91,10 @@ public class Percept extends AmoebaAgent {
 	public boolean isEnum() {
 		return isEnum;
 	}
+	
+	public void setEnum(boolean isEnum) {
+		this.isEnum = isEnum;
+	}
 
 	/*
 	 * Context projection methods

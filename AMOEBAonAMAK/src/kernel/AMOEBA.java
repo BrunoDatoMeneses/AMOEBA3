@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -99,6 +101,82 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
 	}
+	
+	@Override
+	public void cycle() {
+		cycle++;
+		
+		onSystemCycleBegin();
+		
+		//percepts
+		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
+				.collect(Collectors.toList());
+		Collections.sort(synchronousPercepts, new AgentOrderComparator());
+
+		for (Percept agent : synchronousPercepts) {
+			executor.execute(agent);
+		}
+		try {
+			perceptionPhaseSemaphore.acquire(synchronousPercepts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			decisionAndActionPhasesSemaphore.acquire(synchronousPercepts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		//contexts
+		List<Context> synchronousContexts = getContexts().stream().filter(a -> a.isSynchronous())
+				.collect(Collectors.toList());
+		Collections.sort(synchronousContexts, new AgentOrderComparator());
+
+		for (Context agent : synchronousContexts) {
+			executor.execute(agent);
+		}
+		try {
+			perceptionPhaseSemaphore.acquire(synchronousContexts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			decisionAndActionPhasesSemaphore.acquire(synchronousContexts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		//head
+		List<Head> heads = new ArrayList<>();
+		heads.add(head);
+		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous())
+				.collect(Collectors.toList());
+		Collections.sort(synchronousHeads, new AgentOrderComparator());
+
+		for (Head agent : synchronousHeads) {
+			executor.execute(agent);
+		}
+		try {
+			perceptionPhaseSemaphore.acquire(synchronousHeads.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			decisionAndActionPhasesSemaphore.acquire(synchronousHeads.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		removePendingAgents();
+
+		addPendingAgents();
+
+		onSystemCycleEnd();
+		
+		if (!Configuration.commandLineMode)
+			onUpdateRender();
+
+	}
 
 	/**
 	 * Learn.
@@ -119,9 +197,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public double request(HashMap<String, Double> perceptionsActionState) {
 		if (isUseOracle())
 			head.changeOracleConnection();
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
-		getScheduler().step();
+		cycle();
 		head.changeOracleConnection();
+		studiedSystem = ss;
 		return getAction();
 	}
 

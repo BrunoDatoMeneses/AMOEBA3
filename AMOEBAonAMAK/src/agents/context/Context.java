@@ -79,7 +79,7 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
 		}
-
+		
 		// Kill small contexts
 		for (Percept v : ranges.keySet()) {
 			if (ranges.get(v).isTooSmall()) {
@@ -87,6 +87,7 @@ public class Context extends AmoebaAgent {
 				break;
 			}
 		}
+		
 	}
 
 	// -------------------------------- NCS

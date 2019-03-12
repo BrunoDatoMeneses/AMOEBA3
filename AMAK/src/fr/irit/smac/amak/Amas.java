@@ -66,17 +66,17 @@ public class Amas<E extends Environment> implements Schedulable {
 	/**
 	 * This thread executor is here to run the agent cycle.
 	 */
-	private ThreadPoolExecutor executor;
+	protected ThreadPoolExecutor executor;
 	/**
 	 * This semaphore is meant to synchronize the agents after the decisionAndAction
 	 * phase
 	 */
-	private final Semaphore decisionAndActionPhasesSemaphore = new Semaphore(0);
+	protected final Semaphore decisionAndActionPhasesSemaphore = new Semaphore(0);
 
 	/**
 	 * This semaphore is meant to synchronize the agents after the perception phase
 	 */
-	private final Semaphore perceptionPhaseSemaphore = new Semaphore(0);
+	protected final Semaphore perceptionPhaseSemaphore = new Semaphore(0);
 
 	/**
 	 * The executionPolicy informs if agents must wait each other after the
@@ -154,7 +154,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	/**
 	 * Effectively add agent to the system
 	 */
-	private void addPendingAgents() {
+	protected void addPendingAgents() {
 		// The double loop is required as the method onReady should only be called when
 		// all the agents have been added
 		synchronized (agentsPendingAddition) {
@@ -269,7 +269,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	/**
 	 * Cycle of the system
 	 */
-	public final void cycle() {
+	public void cycle() {
 		cycle++;
 		List<Agent<? extends Amas<E>, E>> synchronousAgents = agents.stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
@@ -329,7 +329,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * Effectively remove the agents that has been destroyed in the previous cycle
 	 * to avoid {@link ConcurrentModificationException}
 	 */
-	private void removePendingAgents() {
+	protected void removePendingAgents() {
 
 		synchronized (agentsPendingRemoval) {
 			while (!agentsPendingRemoval.isEmpty())
@@ -402,7 +402,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * @author Alexandre Perles
 	 *
 	 */
-	private class AgentOrderComparator implements Comparator<Agent<? extends Amas<E>, E>> {
+	public class AgentOrderComparator implements Comparator<Agent<? extends Amas<E>, E>> {
 
 		@Override
 		public int compare(Agent<? extends Amas<E>, E> o1, Agent<? extends Amas<E>, E> o2) {
