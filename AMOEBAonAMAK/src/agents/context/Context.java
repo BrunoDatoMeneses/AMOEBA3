@@ -190,7 +190,7 @@ public class Context extends AmoebaAgent {
 		Percept p = null;
 		double volumeLost = Double.MAX_VALUE;
 		double vol;
-		
+
 		for (Percept v : containingRanges) {
 			if (!ranges.get(v).isPerceptEnum()) {
 
@@ -234,7 +234,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public String toString() {
-		return "Context :" + this.getName();// Percept name
+		return "Context :" + this.getName();
 	}
 
 	public LocalModel getFunction() {
@@ -299,7 +299,7 @@ public class Context extends AmoebaAgent {
 	public void analyzeResults(Head head) {
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			solveNCS_Conflict(head);
-			
+
 		} else {
 			if (head.getCriticity(this) > head.getInexactAllowed()) {
 				solveNCS_ConflictInexact(head);
@@ -349,7 +349,7 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : amas.getPercepts()) { // see if is compatible //Pred: world.getScheduler().getPerceptss()
 			percept.deleteContextProjection(this);
 		}
-		if(!Configuration.commandLineMode)
+		if (!Configuration.commandLineMode)
 			drawable.hide();
 		destroy();
 	}
@@ -381,15 +381,14 @@ public class Context extends AmoebaAgent {
 		drawable.setLayer(1);
 		drawable.setColor(new Color(173, 79, 9, 90));
 	}
-	
-	
+
 	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
-		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
+		return upperBound * 2 * (-0.5 + 1 / (1 + Math.exp(-value / dispersion)));
 	}
 
 	@Override
 	protected void updateRender() {
-		//update position
+		// update position
 		Set<Percept> sP = ranges.keySet();
 		Iterator<Percept> iter = sP.iterator();
 		Percept p1 = iter.next();
@@ -400,7 +399,7 @@ public class Context extends AmoebaAgent {
 		drawable.setWidth(ranges.get(p1).getLenght());
 		drawable.setHeight(ranges.get(p2).getLenght());
 
-		//update colors
+		// update colors
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
@@ -410,16 +409,14 @@ public class Context extends AmoebaAgent {
 				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
 				if (b.isNaN())
 					b = 0.0;
-			}
-			else if (coefs.length == 0) {
+			} else if (coefs.length == 0) {
 				g = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
 				b = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
 				if (g.isNaN())
 					g = 0.0;
 				if (b.isNaN())
 					b = 0.0;
-			}
-			else if (coefs.length >= 3) {
+			} else if (coefs.length >= 3) {
 				r = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
 				g = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
 				b = normalizePositiveValues(255, 5, Math.abs(coefs[2]));
@@ -429,14 +426,12 @@ public class Context extends AmoebaAgent {
 					g = 0.0;
 				if (b.isNaN())
 					b = 0.0;
-			}
-			else {
+			} else {
 				r = 255.0;
 				g = 255.0;
 				b = 255.0;
 			}
-		}
-		else {
+		} else {
 			r = 255.0;
 			g = 255.0;
 			b = 255.0;
