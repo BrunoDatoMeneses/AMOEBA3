@@ -132,7 +132,15 @@ public class Head extends AbstractHead implements Cloneable{
 	//Endogenous feedback
 	private boolean noBestContext;
 	
+	static double lembda = 0.99;
 	
+	public double evolutionCriticalityPrediction = 0.5;
+	public double evolutionCriticalityMapping = 0.5;
+	public double evolutionCriticalityConfidence = 0.5;
+	
+	private int currentCriticalityPrediction = 0;
+	private int currentCriticalityMapping = 0;
+	private int currentCriticalityConfidence = 0;
 	
 
 	/**
@@ -221,7 +229,9 @@ public class Head extends AbstractHead implements Cloneable{
 	public void play() {
 
 		
-
+		currentCriticalityPrediction = 0;
+		currentCriticalityMapping = 0;
+		currentCriticalityConfidence = 0;
 		
 		
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
@@ -317,11 +327,23 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		NCSDetection_Create_New_Context();	/*Finally, head agent check the need for a new context agent*/
 		
+		NCSDetection_Context_Overmapping();
+		
 		NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
 		
 		spatialCriticality = (getMinMaxVolume() - getVolumeOfAllContexts())/getMinMaxVolume();
 		
 		spatialGeneralizationScore = getVolumeOfAllContexts()/world.getScheduler().getContexts().size();
+		
+		double globalConfidence = 0;
+		for(Context ctxt : world.getScheduler().getContextsAsContext() ) {
+			globalConfidence += ctxt.getConfidence();
+		}
+		globalConfidence = globalConfidence / world.getScheduler().getContextsAsContext().size();
+		
+		evolutionCriticalityPrediction = (lembda * evolutionCriticalityPrediction) + ((1-lembda)*currentCriticalityPrediction);
+		evolutionCriticalityMapping = (lembda * evolutionCriticalityMapping) + ((1-lembda)*currentCriticalityMapping);
+		evolutionCriticalityConfidence = (lembda * evolutionCriticalityConfidence) + ((1-lembda)*currentCriticalityConfidence);
 	}
 	
 	public double getSpatialGeneralizationScore() {
@@ -865,17 +887,17 @@ public class Head extends AbstractHead implements Cloneable{
 	
 		boolean newContextCreated = false;
 		ArrayList<Agent> allContexts = world.getScheduler().getContexts();
-		//AbstractPair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(allContexts);
+		AbstractPair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
 		world.trace(new ArrayList<String>(Arrays.asList(""+activatedContexts.size(), "ACTIVATED CTXT")));
 		if(activatedContexts.size() == 0) {
 			
 			Context context;
-//			if(nearestGoodContext.getA() != null) {
-//				context = createNewContext(nearestGoodContext.getA());
-//			}else {
-//				context = createNewContext();
-//			}
-			context = createNewContext();
+			if(nearestGoodContext.getA() != null) {
+				context = createNewContext(nearestGoodContext.getA());
+			}else {
+				context = createNewContext();
+			}
+			//context = createNewContext();
 			
 
 			bestContext = context;
@@ -887,6 +909,13 @@ public class Head extends AbstractHead implements Cloneable{
 			updateStatisticalInformations();
 		}
 		
+	}
+	
+	private void NCSDetection_Context_Overmapping() {
+		
+		for(Context ctxt : activatedContexts) {
+			ctxt.NCSDetection_OverMapping();
+		}
 	}
 	
 	private void NCSDetection_Concurrence() {
@@ -993,11 +1022,10 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param allContext the all context
 	 * @return the distance to nearest good context
 	 */
-	private AbstractPair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Agent> allContext) {
+	private AbstractPair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Context> contextNeighbors) {
 		double d = Double.MAX_VALUE;
 		Context nearestGoodContext = null;
-		for (Agent a : allContext) {
-			Context c = (Context) a;
+		for (Context c : contextNeighbors) {
 			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
 				if (getExternalDistanceToContext(c) < d ) {
 					d = getExternalDistanceToContext(c);
@@ -2100,7 +2128,17 @@ public class Head extends AbstractHead implements Cloneable{
 		return averageSpatialCriticality;
 	}
 	
+	public void setBadCurrentCriticalityPrediction() {
+		currentCriticalityPrediction = 1;
+	}
 	
+	public void setBadCurrentCriticalityConfidence() {
+		currentCriticalityConfidence = 1;
+	}
+	
+	public void setBadCurrentCriticalityMapping() {
+		currentCriticalityMapping = 1;
+	}
 	
 
 	

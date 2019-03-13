@@ -381,8 +381,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	private void adaptEnd(double oracleValue, double increment) {
 		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
 		
-		//classicEndAdapt(oracleValue, increment);
-		adaptEndWithSplitting(oracleValue, increment);
+		classicEndAdapt(oracleValue, increment);
+		//adaptEndWithSplitting(oracleValue, increment);
 
 	}
 	
@@ -468,9 +468,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	private void growWithBorderContext() {
-		Context newContext = new Context(world, world.getScheduler().getHeadAgent(), this.context);
-		world.getScheduler().getHeadAgent().addActivatedContext(newContext);
-		world.getScheduler().getHeadAgent().addRequestNeighbor(newContext);
+//		Context newContext = new Context(world, world.getScheduler().getHeadAgent(), this.context);
+//		world.getScheduler().getHeadAgent().addActivatedContext(newContext);
+//		world.getScheduler().getHeadAgent().addRequestNeighbor(newContext);
 	}
 
 	/**
@@ -523,8 +523,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
 		
 		
-		//classicStartAdapt(oracleValue,increment);
-		adaptStartWithSplitting(oracleValue, increment);
+		classicStartAdapt(oracleValue,increment);
+		//adaptStartWithSplitting(oracleValue, increment);
 
 	}
 	
@@ -744,7 +744,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < world.mappingErrorAllowed && (end - start)>0) {
+		if((end - start) < world.getMappingErrorAllowed() && (end - start)>0) {
 			//////System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
 		}
 		

@@ -283,8 +283,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		}
 
-//		this.experiments = new ArrayList<Experiment>();
-//		experiments.addAll(bestNearestContext.getExperiments());
+		this.experiments = new ArrayList<Experiment>();
+		experiments.addAll(bestNearestContext.getExperiments());
 //		Experiment newPoint = new Experiment(this);
 //		
 //		for(Percept pct : ranges.keySet()) {
@@ -917,6 +917,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		//////System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " +"solveNCS_IncompetentHead");
 		world.raiseNCS(NCS.HEAD_INCOMPETENT);
 		growRanges();
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	/**
@@ -929,6 +930,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		//////System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Concurrence");
 		world.raiseNCS(NCS.CONTEXT_CONCURRENCE);
 		this.shrinkRangesToJoinBorders( head.getBestContext());
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	/**
@@ -940,6 +942,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "*********************************************************************************************************** SOLVE NCS USELESSNESS")));
 		world.raiseNCS(NCS.CONTEXT_USELESSNESS);
 		this.die();
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	/**
@@ -968,6 +971,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			if(newBetterModel!=null) {
 				//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"BETTER MODEL")));
 				localModel = newBetterModel;
+				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
 				
 			}
 			else {
@@ -980,11 +984,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			confidence++;
 		}
 		
-		NCSDetection_OverMapping();	
+		//NCSDetection_OverMapping();	
 		
 	}
 	
-	private void NCSDetection_OverMapping() {
+	public void NCSDetection_OverMapping() {
 		
 		for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
 			if(ctxt != this) {
@@ -993,8 +997,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					
 					for(Percept pct : ranges.keySet()) {
 						
-						world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + world.mappingErrorAllowed)));
-						if(Math.abs(this.distance(ctxt, pct)) < world.mappingErrorAllowed){
+						world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + world.getMappingErrorAllowed())));
+						if(Math.abs(this.distance(ctxt, pct)) < world.getMappingErrorAllowed()){
 							
 							boolean fusionTest = true;
 							
@@ -1003,8 +1007,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 								if(otherPct != pct) {
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
-									world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + world.mappingErrorAllowed)));
-									fusionTest = fusionTest && (lengthDifference < world.mappingErrorAllowed) && (centerDifference< world.mappingErrorAllowed);
+									world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + world.getMappingErrorAllowed())));
+									fusionTest = fusionTest && (lengthDifference < world.getMappingErrorAllowed()) && (centerDifference< world.getMappingErrorAllowed());
 								}
 							}
 							
@@ -1038,6 +1042,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.setConfidence(Math.max(this.getConfidence(), fusionContext.getConfidence()));
 		
 		fusionContext.die();
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	private boolean sameModelAs(Context ctxt, double errorAllowed) {
@@ -1136,6 +1141,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		};
 		
 		confidence -= 2;
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityConfidence();
 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
@@ -1192,6 +1198,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 //				break;
 //			}
 //		}
+		world.getScheduler().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	private boolean testIfOtherContextShouldFinalyShrink(Context otherContext, Percept shrinkingPercept) {
@@ -2755,6 +2762,18 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 			if (ranges.get(v).isTooSmall()){
 				solveNCS_Uselessness();
 				break;
+			}
+		}
+		if(!isDying) {
+			for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+				if(ctxt != this) {
+					if(this.getConfidence()<=ctxt.getConfidence()) {
+						if(this.containedBy(ctxt)) {
+							solveNCS_Uselessness();
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

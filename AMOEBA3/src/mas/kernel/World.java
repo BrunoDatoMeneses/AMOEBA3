@@ -72,7 +72,7 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
-	public double mappingErrorAllowed = 10;
+	private double mappingErrorAllowed = 10;
 	
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
@@ -98,6 +98,9 @@ public class World implements Serializable {
 	}
 	
 	
+	public double getMappingErrorAllowed() {
+		return mappingErrorAllowed;
+	}
 	
 	public double getContextCreationPercentage() {
 		return contextCreationPercentage;

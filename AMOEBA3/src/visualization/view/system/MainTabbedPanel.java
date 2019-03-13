@@ -13,6 +13,7 @@ import mas.kernel.World;
 import visualization.view.system.PanelController;
 import visualization.log.ConsolePanel;
 import visualization.observation.Observation;
+import visualization.view.global.CriticalityEvolution;
 import visualization.view.global.PanelChart;
 import visualization.view.global.PanelChart2;
 import visualization.view.global.PanelOneChart;
@@ -45,6 +46,7 @@ public class MainTabbedPanel extends JTabbedPane{
 	private PanelExoVSEndo exoVsEndoSharedIncompetenceNCSChart;
 	private PanelExoVSEndo exoVsEndoIncompetenceNCSChart;
 	private TimeExecutionCharts timeExecutionChart;
+	private CriticalityEvolution criticalityEvolutionChart;
 	private PanelController panelController;
 	
 	/** The panel two dim standard. */
@@ -102,6 +104,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		exoVsEndoIncompetenceNCSChart = new PanelExoVSEndo(world, "Exo Vs Endo Incompetence NCS");
 		panelController = new PanelController(world.getScheduler().getHeadAgent(), world);
 		timeExecutionChart = new TimeExecutionCharts(world, "Time Execution");
+		criticalityEvolutionChart = new CriticalityEvolution(world, "Criticality Evolution");
 		
 		
 		
@@ -113,6 +116,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		world.getScheduler().addScheduledItem(exoVsEndoIncompetenceNCSChart);
 		world.getScheduler().addScheduledItem(panelController);
 		world.getScheduler().addScheduledItem(timeExecutionChart);
+		world.getScheduler().addScheduledItem(criticalityEvolutionChart);
 		
 		//this.addTab("BlackBox", new JScrollPane(blackBoxPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		//this.addTab("System", systemPanel);
@@ -128,6 +132,7 @@ public class MainTabbedPanel extends JTabbedPane{
 		this.addTab("NCS Memories", new JScrollPane(panelTwoDimNCSMemories,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Marges", new JScrollPane(panelController,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		this.addTab("Time Execution", new JScrollPane(timeExecutionChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+		this.addTab("Criticality Evolution", new JScrollPane(criticalityEvolutionChart,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
 		
 		
 		((Frame) this.getTopLevelAncestor()).pack();
