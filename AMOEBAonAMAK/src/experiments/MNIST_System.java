@@ -49,10 +49,13 @@ public class MNIST_System implements StudiedSystem {
 			e.printStackTrace();
 			System.err.println("Looping on the file ...");
 			try {
+				mnist.close();
 				mnist = new BufferedReader(new FileReader(path));
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 				System.exit(1);
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
 		}
 	}
@@ -92,6 +95,7 @@ public class MNIST_System implements StudiedSystem {
 			}
 			double p = (correct*1.0)/nb;
 			System.out.println(correct+" success on "+nb+" try. "+p);
+			test.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,10 +121,10 @@ public class MNIST_System implements StudiedSystem {
 		amoeba.setDataForInexactMargin(500, 2, 0.2, 0.05, 40, 80);
 		
 		//exemple for using the learn method
-		//amoeba.setNoRenderUpdate(true);
+		amoeba.setNoRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(false);
 		long start = System.currentTimeMillis();
-		int nbCycle = 500;
+		int nbCycle = 1;
 		for(int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			//System.out.println(studiedSystem.getOutput());
@@ -128,11 +132,11 @@ public class MNIST_System implements StudiedSystem {
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Done in : "+(end-start)/1000.0);
-		//amoeba.setNoRenderUpdate(false);
+		amoeba.setNoRenderUpdate(false);
 		amoeba.allowGraphicalScheduler(true);
 		
 		start = System.currentTimeMillis();
-		test("D:\\hugor\\Documents\\mnist\\mnist_test.csv", amoeba, 1000);
+		test("D:\\hugor\\Documents\\mnist\\mnist_test.csv", amoeba, 500);
 		end = System.currentTimeMillis();
 		System.out.println("Done in : "+(end-start)/1000.0);
 		
