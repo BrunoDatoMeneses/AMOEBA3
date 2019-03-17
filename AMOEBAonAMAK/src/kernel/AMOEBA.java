@@ -231,10 +231,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		SAXBuilder sxb = new SAXBuilder();
 		Document document;
 		try {
-			System.out.println(systemFile);
+			Log.debug("INFO", "Ressource file : %s", systemFile.getAbsolutePath());
 			document = sxb.build(systemFile);
 			Element racine = document.getRootElement();
-			System.out.println(racine.getName());
 
 			creationOfNewContext = Boolean.parseBoolean(
 					racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
@@ -251,7 +250,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			for (Element element : racine.getChild("StartingAgents").getChildren("Controller")) {
 				Head a = new Head(this);
 				a.setName(element.getAttributeValue("Name"));
-				System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
+				Log.debug("INFO", "CREATION OF CONTEXT : " + this.creationOfNewContext);
 				a.setNoCreation(!creationOfNewContext);
 				this.head = a;
 			}

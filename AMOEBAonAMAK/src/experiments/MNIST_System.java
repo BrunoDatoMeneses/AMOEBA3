@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import agents.context.localModel.TypeLocalModel;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import kernel.World;
@@ -72,8 +75,11 @@ public class MNIST_System implements StudiedSystem {
 		return out;
 	}
 	
-	private static void test(String path, AMOEBA amoeba, int nbTests) {
+	private static List<Double> test(String path, AMOEBA amoeba, int nbTests) {
 		try {
+			long start = 0;
+			long end = 0;
+			long t = 0;
 			BufferedReader test = new BufferedReader(new FileReader(path));
 			String line;
 			int nb = 0;
@@ -88,14 +94,21 @@ public class MNIST_System implements StudiedSystem {
 				double oracle = Double.parseDouble(s[0]); 
 				out.put("oracle", oracle*100);
 				
+				start = System.currentTimeMillis();
 				double res = amoeba.request(out);
-				//System.out.println(nb+" Ora : "+oracle+"  res : "+res);
+				end = System.currentTimeMillis();
+				t += end-start;
 				if(Math.round(res/100) == oracle)
 					correct += 1;
 			}
 			double p = (correct*1.0)/nb;
-			System.out.println(correct+" success on "+nb+" try. "+p);
+			//System.out.println(correct+" success on "+nb+" try. "+p);
 			test.close();
+			
+			ArrayList<Double> ret = new ArrayList<>();
+			ret.add(p);
+			ret.add(t/1000.0);
+			return ret;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,14 +116,17 @@ public class MNIST_System implements StudiedSystem {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	public static void main(String[] args) {
-		StudiedSystem studiedSystem = new MNIST_System("D:\\hugor\\Documents\\mnist\\mnist_train.csv");
+	private static List<Double> benchmark(int nbThread, int nbCycle, int nbRequest){
+		StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
 		File file = new File("Ressources\\mnist.xml");
 		World world = new World();
-		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 1;
+		Configuration.commandLineMode = true;
+		Configuration.allowedSimultaneousAgentsExecution = nbThread;
+		
+		ArrayList<Double> ret = new ArrayList<>();
 
 		AMOEBA amoeba = new AMOEBA(world, file, studiedSystem);
 		for(Percept p : amoeba.getPercepts())
@@ -120,27 +136,81 @@ public class MNIST_System implements StudiedSystem {
 		amoeba.setDataForErrorMargin(1000, 3, 0.4, 0.1, 40, 80);
 		amoeba.setDataForInexactMargin(500, 2, 0.2, 0.05, 40, 80);
 		
-		//exemple for using the learn method
-		amoeba.setNoRenderUpdate(true);
-		amoeba.allowGraphicalScheduler(false);
-		long start = System.currentTimeMillis();
-		int nbCycle = 1;
+		long start = 0;
+		long end = 0;
+		long t = 0;
 		for(int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
-			//System.out.println(studiedSystem.getOutput());
-			amoeba.learn(studiedSystem.getOutput());
+			HashMap<String, Double> output = studiedSystem.getOutput();
+			start = System.currentTimeMillis();
+			amoeba.learn(output);
+			end = System.currentTimeMillis();
+			t += end-start;
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("Done in : "+(end-start)/1000.0);
-		amoeba.setNoRenderUpdate(false);
-		amoeba.allowGraphicalScheduler(true);
+		ret.add(t/1000.0);
 		
-		start = System.currentTimeMillis();
-		test("D:\\hugor\\Documents\\mnist\\mnist_test.csv", amoeba, 500);
-		end = System.currentTimeMillis();
-		System.out.println("Done in : "+(end-start)/1000.0);
-		
-		System.out.println("End main");
+		List<Double> testRet = test("..\\..\\mnist\\mnist_test.csv", amoeba, 500);
+		ret.add(testRet.get(1));
+				
+		return ret;
+	}
+	
+	public static void main(String[] args) {
+		boolean benchmark = true;
+		if(benchmark) { 
+			Log.minLevel = Log.Level.FATAL;
+			Configuration.commandLineMode = true;
+			int nbRequest = 500;
+			benchmark(1,1,1); //set up memory.
+			for(int nbCycle = 1; nbCycle < 513; nbCycle *= 2) {
+				List<Double> ret = benchmark(1, nbCycle, nbRequest);
+				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 1 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
+				ret = benchmark(4, nbCycle, nbRequest);
+				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 4 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
+				ret = benchmark(8, nbCycle, nbRequest);
+				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 8 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
+			}
+			System.out.println("Done.");
+			System.exit(0);
+		}
+		else {
+			//Non benchmark usage :
+			StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
+			File file = new File("Ressources\\mnist.xml");
+			World world = new World();
+			Configuration.commandLineMode = false;
+			Configuration.allowedSimultaneousAgentsExecution = 8;
+	
+			AMOEBA amoeba = new AMOEBA(world, file, studiedSystem);
+			for(Percept p : amoeba.getPercepts())
+				p.setEnum(true);
+			
+			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
+			amoeba.setDataForErrorMargin(1000, 3, 0.4, 0.1, 40, 80);
+			amoeba.setDataForInexactMargin(500, 2, 0.2, 0.05, 40, 80);
+			
+			//exemple for using the learn method
+			amoeba.setNoRenderUpdate(false);
+			amoeba.allowGraphicalScheduler(false);
+			long start = System.currentTimeMillis();
+			int nbCycle = 100;
+			for(int i = 0; i < nbCycle; ++i) {
+				studiedSystem.playOneStep();
+				//System.out.println(studiedSystem.getOutput());
+				amoeba.learn(studiedSystem.getOutput());
+			}
+			long end = System.currentTimeMillis();
+			System.out.println("Learning done in "+(end-start)/1000.0);
+			amoeba.setNoRenderUpdate(false);
+			amoeba.allowGraphicalScheduler(true);
+			
+			start = System.currentTimeMillis();
+			List<Double> ret = test("..\\..\\mnist\\mnist_test.csv", amoeba, 500);
+			end = System.currentTimeMillis();
+			System.out.println("Accuracy of "+ret.get(0)+" . Done in "+(end-start)/1000.0);
+			
+			System.out.println("End main");
+		}
 		
 	}
 }
