@@ -44,11 +44,12 @@ public class SaveState implements ISaveState {
 
 	public SaveState(AMOEBA amoeba) {
 		this.amoeba = amoeba;
-		this.perceptsByName = null;
+		this.perceptsByName = new HashMap<>();
 	}
 
 	public void load(File file) {
 		amoeba.clear();
+		perceptsByName.clear();
 
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc;
@@ -149,7 +150,28 @@ public class SaveState implements ISaveState {
 				ends.put(percept, end);
 			}
 			
-			new Context(amoeba, head, contextName, starts, ends);
+			Element elemExperiments = elemContext.getChild("Experiments");
+			ArrayList<Experiment> experiments = new ArrayList<>();
+			
+			for (Element elemExperiment : elemExperiments.getChildren()) {
+				Element elemValues = elemExperiment.getChild("Values");
+				Experiment experiment = new Experiment();
+				
+				for (Element elemValue : elemValues.getChildren()) {
+					String perceptName = elemValue.getAttributeValue(PERCEPT_NODE);
+					double value = Double.valueOf(elemValue.getAttributeValue("Value"));
+
+					if (!perceptsByName.containsKey(perceptName)) {
+						System.out.println(perceptsByName);
+						throw new IllegalDataException("Found unknown percept name " + perceptName + " in file\n");
+					}
+										Percept percept = perceptsByName.get(perceptName);
+					experiment.addDimension(percept, value);
+				}
+				experiments.add(experiment);
+			}
+			
+			new Context(amoeba, head, contextName, starts, ends, experiments);
 		}
 	}
 
@@ -194,8 +216,6 @@ public class SaveState implements ISaveState {
 	private void savePresetContexts(Document doc) {
 		Element elemPresetContexts = new Element("PresetContexts");
 		List<Context> contexts = amoeba.getContexts();
-		
-		elemPresetContexts.setAttribute(new Attribute("nb", String.valueOf(contexts.size())));
 
 		for (Context context : contexts) {
 			Element elemContext = new Element(CONTEXT_NODE);
@@ -256,17 +276,15 @@ public class SaveState implements ISaveState {
 	
 	public static void main(String[] args) {
 		File file = new File("./resources/twoDimensionsLauncher.xml");
+		File srcFile = new File("./resources/save1.xml");
+		File trgFile = new File("./resources/save2.xml");
 		
 		World world = new World();
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		Configuration.commandLineMode = false;
-		AMOEBA amoeba = new AMOEBA(world, file, studiedSystem);
+		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
 		SaveState saveState = new SaveState(amoeba);
-		File srcFile = new File("./resources/save1.xml");
-		
-		// DEBUG
-		System.out.println("DEBUG: before load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
-		saveState.load(srcFile);
+		saveState.load(file);
 
 		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
@@ -282,11 +300,13 @@ public class SaveState implements ISaveState {
 		}
 		amoeba.setNoRenderUpdate(false);
 		amoeba.allowGraphicalScheduler(true);
-
+		
+		// DEBUG
+		System.out.println("DEBUG: before load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
+		saveState.load(srcFile);
 		System.out.println("DEBUG: after  load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
 
 		// TEST "Labbeti" for XML SAVE
-		File trgFile = new File("./resources/save2.xml");
 		saveState.save(trgFile);
 	}
 }

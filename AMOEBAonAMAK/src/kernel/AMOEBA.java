@@ -2,8 +2,6 @@ package kernel;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,11 +10,6 @@ import java.util.Vector;
 
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
@@ -53,8 +46,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public int testValue = 0;
 	// --------------------------------
 
-	private File ressourceFile;
-
 	private Drawable point;
 	private ILxPlotChart loopNCS;
 	private ILxPlotChart allNCS;
@@ -70,14 +61,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * 
 	 * @param studiedSystem the studied system
 	 */
-	public AMOEBA(World environment, File ressourceFile, StudiedSystem studiedSystem) {
-		super(environment, Scheduling.HIDDEN, ressourceFile, studiedSystem);
+	public AMOEBA(World environment, StudiedSystem studiedSystem) {
+		super(environment, Scheduling.HIDDEN, studiedSystem);
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
-		ressourceFile = (File) params[0];
-		studiedSystem = (StudiedSystem) params[1];
+		studiedSystem = (StudiedSystem) params[0];
 	}
 
 	@Override
@@ -140,71 +130,53 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * 
 	 * @param systemFile the file XML file describing the AMOEBA.
 	 */
-	private void readRessourceFile(File systemFile) {
-		// TODO : remove this function ?
-		SAXBuilder sxb = new SAXBuilder();
-		Document document;
-		try {
-			System.out.println(systemFile);
-			document = sxb.build(systemFile);
-			Element racine = document.getRootElement();
-			System.out.println(racine.getName());
-
-			creationOfNewContext = Boolean.parseBoolean(
-					racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
-			loadPresetContext = Boolean.parseBoolean(
-					racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
-
-			// Initialize the sensor agents
-			for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")) {
-				Percept s = new Percept(this);
-				s.setName(element.getAttributeValue("Name"));
-			}
-
-			// Initialize the controller agents
-			for (Element element : racine.getChild("StartingAgents").getChildren("Controller")) {
-				Head a = new Head(this);
-				a.setName(element.getAttributeValue("Name"));
-				System.out.println("CREATION OF CONTEXT : " + this.creationOfNewContext);
-				a.setNoCreation(!creationOfNewContext);
-				this.head = a;
-			}
-
-			/* Load preset context if no learning required */
-			if (loadPresetContext) {
-
-				for (Element element : racine.getChild("PresetContexts").getChildren("Context")) {
-
-					double[] start, end;
-					int[] n;
-					String[] percepts;
-
-					double action;
-					start = new double[element.getChildren("Range").size()];
-					end = new double[element.getChildren("Range").size()];
-					n = new int[element.getChildren("Range").size()];
-					percepts = new String[element.getChildren("Range").size()];
-
-					int i = 0;
-					for (Element elem : element.getChildren("Range")) {
-						start[i] = Double.parseDouble(elem.getAttributeValue("start"));
-						end[i] = Double.parseDouble(elem.getAttributeValue("end"));
-						n[i] = Integer.parseInt(elem.getAttributeValue("n"));
-						percepts[i] = elem.getAttributeValue("Name");
-						i++;
-					}
-					action = Double.parseDouble(element.getAttributeValue("Action"));
-
-					Head c = head;
-
-					// createPresetContext(start, end, n, new int[0], 0, action, c, percepts);
-				}
-
-			}
-		} catch (JDOMException | IOException e) {
-			e.printStackTrace();
-		}
-	}
+	/*
+	 * TODO private void readRessourceFile(File systemFile) { // TODO : remove this
+	 * function ? SAXBuilder sxb = new SAXBuilder(); Document document; try {
+	 * System.out.println(systemFile); document = sxb.build(systemFile); Element
+	 * racine = document.getRootElement(); System.out.println(racine.getName());
+	 * 
+	 * creationOfNewContext = Boolean.parseBoolean(
+	 * racine.getChild("Configuration").getChild("Learning").getAttributeValue(
+	 * "creationOfNewContext")); loadPresetContext = Boolean.parseBoolean(
+	 * racine.getChild("Configuration").getChild("Learning").getAttributeValue(
+	 * "loadPresetContext"));
+	 * 
+	 * // Initialize the sensor agents for (Element element :
+	 * racine.getChild("StartingAgents").getChildren("Sensor")) { Percept s = new
+	 * Percept(this); s.setName(element.getAttributeValue("Name")); }
+	 * 
+	 * // Initialize the controller agents for (Element element :
+	 * racine.getChild("StartingAgents").getChildren("Controller")) { Head a = new
+	 * Head(this); a.setName(element.getAttributeValue("Name"));
+	 * System.out.println("CREATION OF CONTEXT : " + this.creationOfNewContext);
+	 * a.setNoCreation(!creationOfNewContext); this.head = a; }
+	 * 
+	 * // Load preset context if no learning required if (loadPresetContext) {
+	 * 
+	 * for (Element element :
+	 * racine.getChild("PresetContexts").getChildren("Context")) {
+	 * 
+	 * double[] start, end; int[] n; String[] percepts;
+	 * 
+	 * double action; start = new double[element.getChildren("Range").size()]; end =
+	 * new double[element.getChildren("Range").size()]; n = new
+	 * int[element.getChildren("Range").size()]; percepts = new
+	 * String[element.getChildren("Range").size()];
+	 * 
+	 * int i = 0; for (Element elem : element.getChildren("Range")) { start[i] =
+	 * Double.parseDouble(elem.getAttributeValue("start")); end[i] =
+	 * Double.parseDouble(elem.getAttributeValue("end")); n[i] =
+	 * Integer.parseInt(elem.getAttributeValue("n")); percepts[i] =
+	 * elem.getAttributeValue("Name"); i++; } action =
+	 * Double.parseDouble(element.getAttributeValue("Action"));
+	 * 
+	 * Head c = head;
+	 * 
+	 * // createPresetContext(start, end, n, new int[0], 0, action, c, percepts); }
+	 * 
+	 * } } catch (JDOMException | IOException e) { e.printStackTrace(); } }
+	 */
 
 	public LocalModel buildLocalModel(Context context) {
 
@@ -361,8 +333,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public void clear() {
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			agent.destroy();
+		// TODO (Labbeti) : corriger
+		List<Agent<? extends Amas<World>, World>> agents = getAgents();
+		for (Agent<? extends Amas<World>, World> agent : agents) {
+			if (agent != head)
+				agent.destroy();
+		}
+		System.out.println("DEBUG: agents = " + agents.size());
+		this.head = null;
+		if (!agents.isEmpty()) {
+			cycle();
 		}
 	}
 

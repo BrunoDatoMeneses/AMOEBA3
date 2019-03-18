@@ -23,7 +23,7 @@ public class Context extends AmoebaAgent {
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>(); // To save
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
-	
+
 	private LocalModel localModel; // To save
 	private double confidence = 0; // To save
 	private boolean isDying = false; // Donc pas enregistrer les contexts mourants
@@ -33,22 +33,36 @@ public class Context extends AmoebaAgent {
 		super(amoeba);
 
 		this.setName(String.valueOf(this.hashCode()));
-		
+		Experiment firstPoint = new Experiment();
+
 		List<Percept> percepts = amoeba.getPercepts();
 		for (Percept percept : percepts) {
 			double length = Math.abs(percept.getMinMaxDistance()) / 4.0;
 			Range range = new Range(this, percept.getValue() - length, percept.getValue() + length, 0, true, true,
 					percept);
 			ranges.put(percept, range);
+
+			firstPoint.addDimension(percept, percept.getValue());
 		}
-		
+		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
+		experiments.add(firstPoint);
+
 		buildModel(amoeba, head, amoeba.getPercepts());
 	}
 
-	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends) {
+	/**
+	 * Constructor used to create a new Context when loading a file (in Save State class)
+	 * @param amoeba the main amas
+	 * @param head
+	 * @param name
+	 * @param starts
+	 * @param ends
+	 * @param experiments
+	 */
+	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends, ArrayList<Experiment> experiments) {
 		super(amoeba);
 		this.ranges = new HashMap<>();
-		this.experiments = new ArrayList<>();
+		this.experiments = experiments;
 		this.perceptValidities = new HashMap<>();
 		this.confidence = 0;
 		this.isDying = false;
@@ -60,21 +74,17 @@ public class Context extends AmoebaAgent {
 			Range range = new Range(this, starts.get(percept), ends.get(percept), 0, true, true, percept);
 			this.ranges.put(percept, range);
 		}
-		
+
 		buildModel(amoeba, head, percepts);
 	}
-	
+
 	private void buildModel(AMOEBA amoeba, Head head, List<Percept> percepts) {
 		this.headAgent = head;
-		Experiment firstPoint = new Experiment();
 
 		for (Percept percept : percepts) {
-			firstPoint.addDimension(percept, percept.getValue());
 			percept.addContextProjection(this);
 		}
 		localModel = amoeba.buildLocalModel(this);
-		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
-		experiments.add(firstPoint);
 		localModel.updateModel(this);
 
 		perceptValidities = new HashMap<Percept, Boolean>();
@@ -82,32 +92,26 @@ public class Context extends AmoebaAgent {
 			perceptValidities.put(percept, false);
 		}
 	}
-	
-	/* TODO : remove
-	private void buildContext(Head headAgent, AMOEBA amoeba) {
 
-		for (Percept percept : percepts) {
-			double length = Math.abs(percept.getMinMaxDistance()) / 4.0;
-			Range range = new Range(this, percept.getValue() - length, percept.getValue() + length, 0, true, true,
-					percept);
-			ranges.put(percept, range);
-			firstPoint.addDimension(percept, percept.getValue());
+	/*
+	 * TODO : remove private void buildContext(Head headAgent, AMOEBA amoeba) {
+	 * 
+	 * for (Percept percept : percepts) { double length =
+	 * Math.abs(percept.getMinMaxDistance()) / 4.0; Range range = new Range(this,
+	 * percept.getValue() - length, percept.getValue() + length, 0, true, true,
+	 * percept); ranges.put(percept, range); firstPoint.addDimension(percept,
+	 * percept.getValue());
+	 * 
+	 * percept.addContextProjection(this); } localModel =
+	 * amoeba.buildLocalModel(this);
+	 * firstPoint.setProposition(this.headAgent.getOracleValue());
+	 * experiments.add(firstPoint); localModel.updateModel(this);
+	 * this.setName(String.valueOf(this.hashCode()));
+	 * 
+	 * perceptValidities = new HashMap<Percept, Boolean>(); for (Percept percept :
+	 * percepts) { perceptValidities.put(percept, false); } } //
+	 */
 
-			percept.addContextProjection(this);
-		}
-		localModel = amoeba.buildLocalModel(this);
-		firstPoint.setProposition(this.headAgent.getOracleValue());
-		experiments.add(firstPoint);
-		localModel.updateModel(this);
-		this.setName(String.valueOf(this.hashCode()));
-
-		perceptValidities = new HashMap<Percept, Boolean>();
-		for (Percept percept : percepts) {
-			perceptValidities.put(percept, false);
-		}
-	}
-	//*/
-	
 	@Override
 	protected int computeExecutionOrderLayer() {
 		return 1;
@@ -124,8 +128,8 @@ public class Context extends AmoebaAgent {
 		}
 
 		// Kill small contexts
-		for (Percept v : ranges.keySet()) {
-			if (ranges.get(v).isTooSmall()) {
+		for (Percept percept : ranges.keySet()) {
+			if (ranges.get(percept).isTooSmall()) {
 				solveNCS_Uselessness(headAgent);
 				break;
 			}
