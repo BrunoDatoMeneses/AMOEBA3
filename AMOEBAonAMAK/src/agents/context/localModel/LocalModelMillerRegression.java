@@ -26,10 +26,9 @@ public class LocalModelMillerRegression extends LocalModel {
 	 *
 	 * @param world the world
 	 */
-	public LocalModelMillerRegression(AMOEBA amoeba) {
-		ArrayList<Percept> percepts = amoeba.getPercepts();
-		this.nParameters = percepts.size();
-		regression = new Regression(nParameters, true);
+	public LocalModelMillerRegression(int nParameters) {
+		this.nParameters = nParameters;
+		this.regression = new Regression(nParameters, true);
 	}
 
 	/**

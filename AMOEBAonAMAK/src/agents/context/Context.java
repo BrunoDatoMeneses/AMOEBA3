@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
@@ -21,42 +24,78 @@ public class Context extends AmoebaAgent {
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
-
-	private LocalModel localModel;
-
-	private double confidence = 0;
-
-	private boolean isDying = false;
-
-	private DrawableRectangle drawable;
-
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 
-	public Context(AMOEBA amas, Head head) {
-		super(amas);
-		buildContext(head, amas);
+	private LocalModel localModel;
+	private double confidence = 0;
+	private boolean isDying = false;
+	private DrawableRectangle drawable;
+
+	public Context(AMOEBA amoeba, Head head) {
+		super(amoeba);
+
+		this.setName(String.valueOf(this.hashCode()));
+		
+		List<Percept> percepts = amoeba.getPercepts();
+		for (Percept percept : percepts) {
+			double length = Math.abs(percept.getMinMaxDistance()) / 4.0;
+			Range range = new Range(this, percept.getValue() - length, percept.getValue() + length, 0, true, true,
+					percept);
+			ranges.put(percept, range);
+		}
+		
+		buildModel(amoeba, head, amoeba.getPercepts());
 	}
 
-	@Override
-	protected int computeExecutionOrderLayer() {
-		return 1;
-	}
+	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends) {
+		super(amoeba);
+		this.ranges = new HashMap<>();
+		this.experiments = new ArrayList<>();
+		this.perceptValidities = new HashMap<>();
+		this.confidence = 0;
+		this.isDying = false;
 
+		setName(name);
+
+		List<Percept> percepts = new ArrayList<>(starts.keySet());
+		for (Percept percept : percepts) {
+			Range range = new Range(this, starts.get(percept), ends.get(percept), 0, true, true, percept);
+			this.ranges.put(percept, range);
+		}
+		
+		buildModel(amoeba, head, percepts);
+	}
+	
+	private void buildModel(AMOEBA amoeba, Head head, List<Percept> percepts) {
+		this.headAgent = head;
+		Experiment firstPoint = new Experiment();
+
+		for (Percept percept : percepts) {
+			firstPoint.addDimension(percept, percept.getValue());
+			percept.addContextProjection(this);
+		}
+		localModel = amoeba.buildLocalModel(this);
+		firstPoint.setProposition(this.headAgent.getOracleValue());
+		experiments.add(firstPoint);
+		localModel.updateModel(this);
+
+		perceptValidities = new HashMap<Percept, Boolean>();
+		for (Percept percept : percepts) {
+			perceptValidities.put(percept, false);
+		}
+	}
+	
+	/* TODO : remove
 	private void buildContext(Head headAgent, AMOEBA amoeba) {
 
-		ArrayList<Percept> var = amoeba.getPercepts();
-		Experiment firstPoint = new Experiment();
-		this.headAgent = headAgent;
+		for (Percept percept : percepts) {
+			double length = Math.abs(percept.getMinMaxDistance()) / 4.0;
+			Range range = new Range(this, percept.getValue() - length, percept.getValue() + length, 0, true, true,
+					percept);
+			ranges.put(percept, range);
+			firstPoint.addDimension(percept, percept.getValue());
 
-		for (Percept v : var) {
-			Range r;
-
-			double length = Math.abs(v.getMinMaxDistance()) / 4.0;
-			r = new Range(this, v.getValue() - length, v.getValue() + length, 0, true, true, v);
-			ranges.put(v, r);
-			firstPoint.addDimension(v, v.getValue());
-
-			v.addContextProjection(this);
+			percept.addContextProjection(this);
 		}
 		localModel = amoeba.buildLocalModel(this);
 		firstPoint.setProposition(this.headAgent.getOracleValue());
@@ -65,9 +104,15 @@ public class Context extends AmoebaAgent {
 		this.setName(String.valueOf(this.hashCode()));
 
 		perceptValidities = new HashMap<Percept, Boolean>();
-		for (Percept percept : var) {
+		for (Percept percept : percepts) {
 			perceptValidities.put(percept, false);
 		}
+	}
+	//*/
+	
+	@Override
+	protected int computeExecutionOrderLayer() {
+		return 1;
 	}
 
 	protected void onAct() {
@@ -89,8 +134,7 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	// -------------------------------- NCS
-	// Resolutions-----------------------------------------
+	// ---------------------------- NCS Resolutions ----------------------------
 
 	public void solveNCS_IncompetentHead(Head head) {
 		amas.getEnvironment().raiseNCS(NCS.HEAD_INCOMPETENT);

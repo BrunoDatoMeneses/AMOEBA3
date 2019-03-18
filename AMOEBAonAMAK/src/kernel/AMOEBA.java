@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JToggleButton;
@@ -72,11 +73,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
 	 * 
-	 * @param studiedSystem
-	 *            the studied system
+	 * @param studiedSystem the studied system
 	 */
-	public AMOEBA(World environment, File ressourceFile,
-			StudiedSystem studiedSystem) {
+	public AMOEBA(World environment, File ressourceFile, StudiedSystem studiedSystem) {
 		super(environment, Scheduling.HIDDEN, ressourceFile, studiedSystem);
 	}
 
@@ -88,8 +87,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	@Override
 	protected void onInitialAgentsCreation() {
-		readRessourceFile(ressourceFile);
-
 	}
 
 	@Override
@@ -105,8 +102,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Learn.
 	 * 
-	 * @param actions
-	 *            the actions
+	 * @param actions the actions
 	 */
 	public void learn(HashMap<String, Double> perceptionsActionState) {
 		setPerceptionsAndActionState(perceptionsActionState);
@@ -116,8 +112,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Request.
 	 * 
-	 * @param actions
-	 *            the actions
+	 * @param actions the actions
 	 * @return the double
 	 */
 	public double request(HashMap<String, Double> perceptionsActionState) {
@@ -137,8 +132,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return useOracle;
 	}
 
-	public void setPerceptionsAndActionState(
-			HashMap<String, Double> perceptionsAndActions) {
+	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
 
@@ -149,10 +143,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Read resource file and generate the AMOEBA described.
 	 * 
-	 * @param systemFile
-	 *            the file XML file describing the AMOEBA.
+	 * @param systemFile the file XML file describing the AMOEBA.
 	 */
 	private void readRessourceFile(File systemFile) {
+		// TODO : remove this function ?
 		SAXBuilder sxb = new SAXBuilder();
 		Document document;
 		try {
@@ -161,27 +155,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			Element racine = document.getRootElement();
 			System.out.println(racine.getName());
 
-			creationOfNewContext = Boolean.parseBoolean(racine
-					.getChild("Configuration").getChild("Learning")
-					.getAttributeValue("creationOfNewContext"));
-			loadPresetContext = Boolean.parseBoolean(racine
-					.getChild("Configuration").getChild("Learning")
-					.getAttributeValue("loadPresetContext"));
+			creationOfNewContext = Boolean.parseBoolean(
+					racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
+			loadPresetContext = Boolean.parseBoolean(
+					racine.getChild("Configuration").getChild("Learning").getAttributeValue("loadPresetContext"));
 
 			// Initialize the sensor agents
-			for (Element element : racine.getChild("StartingAgents")
-					.getChildren("Sensor")) {
+			for (Element element : racine.getChild("StartingAgents").getChildren("Sensor")) {
 				Percept s = new Percept(this);
 				s.setName(element.getAttributeValue("Name"));
 			}
 
 			// Initialize the controller agents
-			for (Element element : racine.getChild("StartingAgents")
-					.getChildren("Controller")) {
+			for (Element element : racine.getChild("StartingAgents").getChildren("Controller")) {
 				Head a = new Head(this);
 				a.setName(element.getAttributeValue("Name"));
-				System.out.print("CREATION OF CONTEXT : "
-						+ this.creationOfNewContext);
+				System.out.println("CREATION OF CONTEXT : " + this.creationOfNewContext);
 				a.setNoCreation(!creationOfNewContext);
 				this.head = a;
 			}
@@ -189,8 +178,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			/* Load preset context if no learning required */
 			if (loadPresetContext) {
 
-				for (Element element : racine.getChild("PresetContexts")
-						.getChildren("Context")) {
+				for (Element element : racine.getChild("PresetContexts").getChildren("Context")) {
 
 					double[] start, end;
 					int[] n;
@@ -204,21 +192,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 					int i = 0;
 					for (Element elem : element.getChildren("Range")) {
-						start[i] = Double.parseDouble(elem
-								.getAttributeValue("start"));
-						end[i] = Double.parseDouble(elem
-								.getAttributeValue("end"));
+						start[i] = Double.parseDouble(elem.getAttributeValue("start"));
+						end[i] = Double.parseDouble(elem.getAttributeValue("end"));
 						n[i] = Integer.parseInt(elem.getAttributeValue("n"));
 						percepts[i] = elem.getAttributeValue("Name");
 						i++;
 					}
-					action = Double.parseDouble(element
-							.getAttributeValue("Action"));
+					action = Double.parseDouble(element.getAttributeValue("Action"));
 
 					Head c = head;
 
-					createPresetContext(start, end, n, new int[0], 0, action,
-							c, percepts);
+					// createPresetContext(start, end, n, new int[0], 0, action, c, percepts);
 				}
 
 			}
@@ -227,43 +211,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 	}
 
-	private void createPresetContext(double[] start, double[] end, int[] n,
-			int[] pos, int iteration, double action, Head controller,
-			String[] percepts) {
-		/*
-		 * TODO Hugo says : There was some code here without impact, there was a
-		 * comment saying "broken by criterion". I was not able to fix it, so I
-		 * put an error message. If you need this, please check the original
-		 * project (AMOEBA3)
-		 */
-		System.err
-				.println("AMOEBA.createPresetContext (previously World.createPresetContext) is no longer supported");
-	}
-
-	public ArrayList<Percept> getPercepts() {
-		ArrayList<Percept> percepts = new ArrayList<>();
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if ((agent instanceof Percept)) {
-				percepts.add((Percept) agent);
-			}
-		}
-		return percepts;
-	}
-
-	public ArrayList<Context> getContexts() {
-		ArrayList<Context> contexts = new ArrayList<>();
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if ((agent instanceof Context)) {
-				contexts.add((Context) agent);
-			}
-		}
-		return contexts;
-	}
-
 	public LocalModel buildLocalModel(Context context) {
 
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			return new LocalModelMillerRegression(this);
+			// TODO: changed because getPercept is not init when load agents from file.
+			return new LocalModelMillerRegression(context.getRanges().size());
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
 			return new LocalModelFirstExp();
@@ -280,24 +232,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	@Override
-	public void setDataForErrorMargin(double errorAllowed,
-			double augmentationFactorError, double diminutionFactorError,
-			double minErrorAllowed, int nConflictBeforeAugmentation,
-			int nSuccessBeforeDiminution) {
-		head.setDataForErrorMargin(errorAllowed, augmentationFactorError,
-				diminutionFactorError, minErrorAllowed,
+	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
+			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
+		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
 				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
 	}
 
 	@Override
-	public void setDataForInexactMargin(double inexactAllowed,
-			double augmentationInexactError, double diminutionInexactError,
-			double minInexactAllowed, int nConflictBeforeInexactAugmentation,
+	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
+			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
 			int nSuccessBeforeInexactDiminution) {
-		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError,
-				diminutionInexactError, minInexactAllowed,
-				nConflictBeforeInexactAugmentation,
-				nSuccessBeforeInexactDiminution);
+		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError,
+				minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
 
 	public void setNoRenderUpdate(boolean noRenderUpdate) {
@@ -355,7 +301,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (cycle % 1000 == 0)
 			Log.inform("AMOEBA", "Cycle " + cycle);
 		if (!noRenderUpdate) {
-			ArrayList<Percept> percepts = getPercepts();
+			List<Percept> percepts = getPercepts();
 			point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
 
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -368,15 +314,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			nbAgent.add("Percepts", cycle, getPercepts().size());
 			nbAgent.add("Contexts", cycle, getContexts().size());
 
-			errors.add("Mean criticity", cycle,
-					head.getAveragePredictionCriticity());
+			errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
 			errors.add("Error Allowed", cycle, head.getErrorAllowed());
 			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
-			Vector<Double> sortedErrors = new Vector<>(
-					head.getxLastCriticityValues());
+			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
-			errors.add("Median criticity", cycle,
-					sortedErrors.get(sortedErrors.size() / 2));
+			errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 		}
 	}
 
@@ -386,5 +329,49 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public boolean isLoadPresetContext() {
 		return loadPresetContext;
+	}
+
+	public void setCreationOfNewContext(boolean creationOfNewContext) {
+		this.creationOfNewContext = creationOfNewContext;
+	}
+
+	public void setLoadPresetContext(boolean loadPresetContext) {
+		this.loadPresetContext = loadPresetContext;
+	}
+
+	public ArrayList<Percept> getPercepts() {
+		ArrayList<Percept> percepts = new ArrayList<>();
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Percept)) {
+				percepts.add((Percept) agent);
+			}
+		}
+		return percepts;
+	}
+
+	public ArrayList<Context> getContexts() {
+		ArrayList<Context> contexts = new ArrayList<>();
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Context)) {
+				contexts.add((Context) agent);
+			}
+		}
+		return contexts;
+	}
+
+	public ArrayList<Head> getHeads() {
+		ArrayList<Head> heads = new ArrayList<>();
+		heads.add(head);
+		return heads;
+	}
+
+	public void clear() {
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			agent.destroy();
+		}
+	}
+
+	public void setHead(Head head) {
+		this.head = head;
 	}
 }

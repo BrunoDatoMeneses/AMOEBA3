@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+  <Configuration>
+    <Learning creationOfNewContext="true" loadPresetContext="true" />
+  </Configuration>
+  <StartingAgents>
+    <Controller Name="Controller" />
+    <Sensor Name="px" />
+    <Sensor Name="py" />
+  </StartingAgents>
+  <PresetContexts nb="19">
+    <Context Name="188110939">
+      <Ranges>
+        <Range Sensor="px" Start="14.399110507598653" End="64.58496292026724" />
+        <Range Sensor="py" Start="105.5051189100592" End="126.02429195958624" />
+      </Ranges>
+    </Context>
+    <Context Name="1206984082">
+      <Ranges>
+        <Range Sensor="px" Start="102.60946797126547" End="125.83049993943558" />
+        <Range Sensor="py" Start="33.39473643095394" End="92.70401874585723" />
+      </Ranges>
+    </Context>
+    <Context Name="359463402">
+      <Ranges>
+        <Range Sensor="px" Start="102.60946797126547" End="116.97264052752023" />
+        <Range Sensor="py" Start="31.77911068568599" End="80.58026978139101" />
+      </Ranges>
+    </Context>
+    <Context Name="696360884">
+      <Ranges>
+        <Range Sensor="px" Start="-61.81810074190061" End="41.29837541632732" />
+        <Range Sensor="py" Start="100.28707005143796" End="113.1990975006954" />
+      </Ranges>
+    </Context>
+    <Context Name="2015771429">
+      <Ranges>
+        <Range Sensor="px" Start="103.98534889747934" End="130.0685629813578" />
+        <Range Sensor="py" Start="40.12860158342085" End="102.4165462707459" />
+      </Ranges>
+    </Context>
+    <Context Name="853672824">
+      <Ranges>
+        <Range Sensor="px" Start="110.5867550417218" End="133.61748164821321" />
+        <Range Sensor="py" Start="-100.0562706976139" End="-33.05769825942991" />
+      </Ranges>
+    </Context>
+    <Context Name="817455162">
+      <Ranges>
+        <Range Sensor="px" Start="-52.06106031942284" End="53.43862737034995" />
+        <Range Sensor="py" Start="-51.392623931359694" End="44.45212555164399" />
+      </Ranges>
+    </Context>
+    <Context Name="1579414727">
+      <Ranges>
+        <Range Sensor="px" Start="53.43862737034995" End="125.63201210689137" />
+        <Range Sensor="py" Start="-83.40082058483765" End="110.64457620780192" />
+      </Ranges>
+    </Context>
+    <Context Name="1517403770">
+      <Ranges>
+        <Range Sensor="px" Start="-122.03294406072524" End="-9.32051609135224" />
+        <Range Sensor="py" Start="44.45212555164399" End="197.98831865763765" />
+      </Ranges>
+    </Context>
+    <Context Name="1075465480">
+      <Ranges>
+        <Range Sensor="px" Start="98.10618638936731" End="116.57336749274296" />
+        <Range Sensor="py" Start="53.10425840296954" End="127.6601066957949" />
+      </Ranges>
+    </Context>
+    <Context Name="1169596118">
+      <Ranges>
+        <Range Sensor="px" Start="-72.61567619648815" End="-60.46026445570856" />
+        <Range Sensor="py" Start="101.88273023709456" End="130.03739573924491" />
+      </Ranges>
+    </Context>
+    <Context Name="1818455683">
+      <Ranges>
+        <Range Sensor="px" Start="-393.99864383517155" End="73.7208620916904" />
+        <Range Sensor="py" Start="-124.17800429995145" End="-51.392623931359694" />
+      </Ranges>
+    </Context>
+    <Context Name="969828088">
+      <Ranges>
+        <Range Sensor="px" Start="-49.27267351604986" End="-17.190248577533225" />
+        <Range Sensor="py" Start="114.60963510508" End="130.10918149299812" />
+      </Ranges>
+    </Context>
+    <Context Name="1116159184">
+      <Ranges>
+        <Range Sensor="px" Start="-38.791709460091575" End="-20.74307723329104" />
+        <Range Sensor="py" Start="56.91596366868788" End="114.60963510508" />
+      </Ranges>
+    </Context>
+    <Context Name="2043160218">
+      <Ranges>
+        <Range Sensor="px" Start="-36.05259838756643" End="-14.350686527499693" />
+        <Range Sensor="py" Start="44.45212555164399" End="91.8267237730926" />
+      </Ranges>
+    </Context>
+    <Context Name="688122133">
+      <Ranges>
+        <Range Sensor="px" Start="37.448658960585405" End="121.58651747338504" />
+        <Range Sensor="py" Start="-107.86811334724163" End="-83.40082058483765" />
+      </Ranges>
+    </Context>
+    <Context Name="61368072">
+      <Ranges>
+        <Range Sensor="px" Start="-121.18929177310321" End="-52.06106031942284" />
+        <Range Sensor="py" Start="-37.79901751419445" End="8.471094644538471" />
+      </Ranges>
+    </Context>
+    <Context Name="277866208">
+      <Ranges>
+        <Range Sensor="px" Start="17.9264335902782" End="64.16242951252234" />
+        <Range Sensor="py" Start="-51.392623931359694" End="-33.686044561509334" />
+      </Ranges>
+    </Context>
+    <Context Name="152983060">
+      <Ranges>
+        <Range Sensor="px" Start="-14.638564502635559" End="11.143227970810637" />
+        <Range Sensor="py" Start="35.45531942354702" End="76.17850091183504" />
+      </Ranges>
+    </Context>
+  </PresetContexts>
+</System>

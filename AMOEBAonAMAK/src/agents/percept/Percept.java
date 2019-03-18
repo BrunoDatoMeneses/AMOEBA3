@@ -35,8 +35,8 @@ public class Percept extends AmoebaAgent {
 			if (contextProjection.contains(this.value)) {
 				validContextProjection.add(contextProjection.getContext());
 			}
-		} 
-		for(Context context : validContextProjection) {
+		}
+		for (Context context : validContextProjection) {
 			context.setPerceptValidity(this);
 		}
 
@@ -61,8 +61,7 @@ public class Percept extends AmoebaAgent {
 		min += 0.05 * dist;
 		max -= 0.05 * dist;
 	}
-	
-	
+
 	/**
 	 * Gets the min max distance.
 	 *
@@ -73,7 +72,7 @@ public class Percept extends AmoebaAgent {
 			return 0;
 		return Math.abs(max - min);
 	}
-	
+
 	/**
 	 * Gets the value.
 	 *
@@ -82,7 +81,7 @@ public class Percept extends AmoebaAgent {
 	public double getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * Checks if is enum.
 	 *
@@ -111,8 +110,7 @@ public class Percept extends AmoebaAgent {
 	public void updateContextProjectionEnd(Context context) {
 		contextProjections.get(context).updateEnd();
 	}
-	
-	
+
 	@Override
 	protected int computeExecutionOrderLayer() {
 		return 0;
