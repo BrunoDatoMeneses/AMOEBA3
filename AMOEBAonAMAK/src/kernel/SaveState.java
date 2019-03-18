@@ -20,6 +20,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import agents.context.Context;
+import agents.context.Experiment;
 import agents.context.Range;
 import agents.head.Head;
 import agents.percept.Percept;
@@ -90,8 +91,6 @@ public class SaveState implements ISaveState {
 		Element elemLearning = elemConfiguration.getChild("Learning");
 
 		try {
-			// boolean allowed = elemLearning.getAttribute("allowed").getBooleanValue(); //
-			// TODO ?
 			boolean creationOfNewContext = elemLearning.getAttribute("creationOfNewContext").getBooleanValue();
 			boolean loadPresetContext = elemLearning.getAttribute("loadPresetContext").getBooleanValue();
 
@@ -159,7 +158,6 @@ public class SaveState implements ISaveState {
 		Element elemLearning = new Element("Learning");
 		List<Attribute> attributes = new ArrayList<>();
 
-		// attributes.add(new Attribute("allowed", String.valueOf(true))); // TODO ?
 		attributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
 		attributes.add(new Attribute("loadPresetContext", String.valueOf(amoeba.isLoadPresetContext())));
 		elemLearning.setAttributes(attributes);
@@ -217,7 +215,34 @@ public class SaveState implements ISaveState {
 				eRanges.addContent(eRange);
 			}
 			elemContext.addContent(eRanges);
+			
+			ArrayList<Experiment> experiments = context.getExperiments();
+			Element eExperiments = new Element("Experiments");
+			for (Experiment experiment : experiments) {
+				Map<Percept, Double> values = experiment.getValues();
+				Element eValues = new Element("Values");
+				
+				for (Entry<Percept, Double> entry : values.entrySet()) {
+					Percept percept = entry.getKey();
+					Double value = entry.getValue();
+					
+					List<Attribute> attributes = new ArrayList<>();
+					attributes.add(new Attribute(PERCEPT_NODE, percept.getName()));
+					attributes.add(new Attribute("Value", String.valueOf(value)));
+					
+					Element eValue = new Element("Value");
+					eValue.setAttributes(attributes);
+					eValues.addContent(eValue);
+				}
 
+				Element eExperiment = new Element("Experiment");
+				eExperiment.addContent(eValues);
+				eExperiment.setAttribute(new Attribute("Proposition", String.valueOf(experiment.getProposition())));
+				
+				eExperiments.addContent(eExperiment);
+			}
+			elemContext.addContent(eExperiments);
+			
 			List<Attribute> eAgentAttributes = new ArrayList<>();
 			eAgentAttributes.add(new Attribute("Name", String.valueOf(context.getName())));
 			elemContext.setAttributes(eAgentAttributes);
@@ -245,8 +270,8 @@ public class SaveState implements ISaveState {
 
 		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
-		amoeba.setNoRenderUpdate(false);
-		amoeba.allowGraphicalScheduler(true);
+		amoeba.setNoRenderUpdate(true);
+		amoeba.allowGraphicalScheduler(false);
 		
 		System.out.println("DEBUG: Begin learning.");
 		// Example for using the learn method
@@ -255,6 +280,8 @@ public class SaveState implements ISaveState {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
 		}
+		amoeba.setNoRenderUpdate(false);
+		amoeba.allowGraphicalScheduler(true);
 
 		System.out.println("DEBUG: after  load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
 

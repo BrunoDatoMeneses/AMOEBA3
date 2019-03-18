@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
@@ -20,17 +19,16 @@ import kernel.AMOEBA;
 import ncs.NCS;
 
 public class Context extends AmoebaAgent {
-
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
-	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
+	private ArrayList<Experiment> experiments = new ArrayList<Experiment>(); // To save
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
-
-	private LocalModel localModel;
-	private double confidence = 0;
-	private boolean isDying = false;
+	
+	private LocalModel localModel; // To save
+	private double confidence = 0; // To save
+	private boolean isDying = false; // Donc pas enregistrer les contexts mourants
 	private DrawableRectangle drawable;
-
+	
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
 
@@ -75,7 +73,7 @@ public class Context extends AmoebaAgent {
 			percept.addContextProjection(this);
 		}
 		localModel = amoeba.buildLocalModel(this);
-		firstPoint.setProposition(this.headAgent.getOracleValue());
+		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
 

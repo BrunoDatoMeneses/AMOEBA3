@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
-import kernel.AMOEBA;
 
 /**
  * The Class LocalModelMillerRegression.
