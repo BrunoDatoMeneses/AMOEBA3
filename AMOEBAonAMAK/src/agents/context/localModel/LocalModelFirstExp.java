@@ -40,11 +40,15 @@ public class LocalModelFirstExp extends LocalModel {
 
 	@Override
 	public void updateModel(Context context) {
-		// TODO Auto-generated method stub
 	}
-
-	public double[] getCoef() {
+	
+	@Override
+	public double[] getCoefs() {
 		return new double[1];
 	}
 
+	@Override
+	public TypeLocalModel getType() {
+		return TypeLocalModel.FIRST_EXPERIMENT;
+	}
 }

@@ -33,10 +33,15 @@ public class LocalModelAverage extends LocalModel {
 
 	@Override
 	public void updateModel(Context context) {
-		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public double[] getCoefs() {
+		return new double[1];
 	}
 
-	public double[] getCoef() {
-		return new double[1];
+	@Override
+	public TypeLocalModel getType() {
+		return TypeLocalModel.AVERAGE;
 	}
 }

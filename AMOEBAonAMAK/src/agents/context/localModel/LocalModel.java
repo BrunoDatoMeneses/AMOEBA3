@@ -55,10 +55,11 @@ public abstract class LocalModel implements Cloneable {
 	 */
 	public abstract void updateModel(Context context);
 
-	public abstract double[] getCoef();
+	public abstract double[] getCoefs();
 
 	public LocalModel clone() throws CloneNotSupportedException {
 		return (LocalModel) super.clone();
 	}
-
+	
+	public abstract TypeLocalModel getType();
 }

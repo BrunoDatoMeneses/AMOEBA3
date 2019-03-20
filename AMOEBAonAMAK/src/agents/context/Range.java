@@ -26,7 +26,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	private Percept percept;
 
 	/** The maxid. */
-	public static int maxid = 0; // TODO for debug purposes
+	public static int maxid = 0; // Used for debug purposes
 
 	/** The id. */
 	public int id;

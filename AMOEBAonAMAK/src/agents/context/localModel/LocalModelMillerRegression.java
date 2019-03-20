@@ -17,8 +17,8 @@ public class LocalModelMillerRegression extends LocalModel {
 	/** The regression. */
 	transient private Regression regression;
 
-	/** The coef. */
-	private double[] coef;
+	/** The coefs. */
+	private double[] coefs;
 
 	/**
 	 * Instantiates a new local model miller regression.
@@ -29,14 +29,18 @@ public class LocalModelMillerRegression extends LocalModel {
 		this.nParameters = nParameters;
 		this.regression = new Regression(nParameters, true);
 	}
-
+	
+	public void setCoefs(double[] coefs) {
+		this.coefs = coefs;
+	}
+	
 	/**
-	 * Gets the coef.
+	 * Gets the coefficients
 	 *
-	 * @return the coef
+	 * @return the coefs
 	 */
-	public double[] getCoef() {
-		return coef;
+	public double[] getCoefs() {
+		return coefs;
 	}
 
 	public double getProposition(Context context) {
@@ -46,13 +50,13 @@ public class LocalModelMillerRegression extends LocalModel {
 			return context.getExperiments().get(0).getProposition();
 		}
 
-		double result = coef[0];
-		if (coef[0] == Double.NaN)
+		double result = coefs[0];
+		if (coefs[0] == Double.NaN)
 			System.exit(0);
-		for (int i = 1; i < coef.length; i++) {
-			if (Double.isNaN(coef[i]))
-				coef[i] = 0;
-			result += coef[i] * percepts.get(i - 1).getValue();
+		for (int i = 1; i < coefs.length; i++) {
+			if (Double.isNaN(coefs[i]))
+				coefs[i] = 0;
+			result += coefs[i] * percepts.get(i - 1).getValue();
 		}
 
 		return result;
@@ -67,8 +71,9 @@ public class LocalModelMillerRegression extends LocalModel {
 		regression = new Regression(nParameters, true);
 		for (Experiment exp : context.getExperiments()) {
 			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
-
-			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { // TODO : to improve
+			
+			// TODO : to improve
+			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { 
 				regression.addObservation(context.getExperiments().get(0).getValuesAsArray(),
 						context.getExperiments().get(0).getProposition());
 			}
@@ -134,15 +139,15 @@ public class LocalModelMillerRegression extends LocalModel {
 	}
 
 	public String getCoefsFormula() {
-		String result = "" + coef[0];
-		if (coef[0] == Double.NaN)
+		String result = "" + coefs[0];
+		if (coefs[0] == Double.NaN)
 			System.exit(0);
 
-		for (int i = 1; i < coef.length; i++) {
-			if (Double.isNaN(coef[i]))
-				coef[i] = 0;
+		for (int i = 1; i < coefs.length; i++) {
+			if (Double.isNaN(coefs[i]))
+				coefs[i] = 0;
 
-			result += "\t" + coef[i];
+			result += "\t" + coefs[i];
 		}
 		return result;
 	}
@@ -153,13 +158,18 @@ public class LocalModelMillerRegression extends LocalModel {
 		for (Experiment exp : context.getExperiments()) {
 			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
 		}
-
-		while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { // TODO : to improve
+		
+		// TODO : to improve
+		while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { 
 			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(),
 					context.getExperiments().get(0).getProposition());
 		}
 
-		coef = regression.regress().getParameterEstimates();
+		coefs = regression.regress().getParameterEstimates();
 	}
 
+	@Override
+	public TypeLocalModel getType() {
+		return TypeLocalModel.MILLER_REGRESSION;
+	}
 }

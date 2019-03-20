@@ -11,6 +11,7 @@ import java.util.Vector;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelAverage;
@@ -34,17 +35,14 @@ import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
 import ncs.NCS;
 
 public class AMOEBA extends Amas<World> implements IAMOEBA {
+	// -- Attributes
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
 	private StudiedSystem studiedSystem;
 	private boolean useOracle = true;
-
-	// Imported from World -----------
 	private boolean creationOfNewContext;
 	private boolean loadPresetContext;
-	public int testValue = 0;
-	// --------------------------------
 
 	private Drawable point;
 	private ILxPlotChart loopNCS;
@@ -53,7 +51,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private ILxPlotChart errors;
 	private JToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
-
 	private boolean noRenderUpdate = false;
 
 	/**
@@ -62,12 +59,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @param studiedSystem the studied system
 	 */
 	public AMOEBA(World environment, StudiedSystem studiedSystem) {
-		super(environment, Scheduling.HIDDEN, studiedSystem);
+		super(environment, Scheduling.HIDDEN);
+		this.head = null;
+		this.studiedSystem = studiedSystem;
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
-		studiedSystem = (StudiedSystem) params[0];
 	}
 
 	@Override
@@ -131,10 +129,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @param systemFile the file XML file describing the AMOEBA.
 	 */
 	/*
-	 * TODO private void readRessourceFile(File systemFile) { // TODO : remove this
-	 * function ? SAXBuilder sxb = new SAXBuilder(); Document document; try {
-	 * System.out.println(systemFile); document = sxb.build(systemFile); Element
-	 * racine = document.getRootElement(); System.out.println(racine.getName());
+	 * TODO (Labbeti) remove : private void readRessourceFile(File systemFile) { //
+	 * TODO : remove this function ? SAXBuilder sxb = new SAXBuilder(); Document
+	 * document; try { System.out.println(systemFile); document =
+	 * sxb.build(systemFile); Element racine = document.getRootElement();
+	 * System.out.println(racine.getName());
 	 * 
 	 * creationOfNewContext = Boolean.parseBoolean(
 	 * racine.getChild("Configuration").getChild("Learning").getAttributeValue(
@@ -181,7 +180,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public LocalModel buildLocalModel(Context context) {
 
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			// TODO: changed because getPercept is not init when load agents from file.
+			// TODO (Labbeti) : changed because getPercept is not init when load agents from
+			// file.
 			return new LocalModelMillerRegression(context.getRanges().size());
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
@@ -286,7 +286,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
-			errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+			if (!sortedErrors.isEmpty()) {
+				// TODO (Labbeti) => add for avoid crash when head has just been created. keep
+				// it ?
+				errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+			}
 		}
 	}
 
@@ -332,18 +336,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return heads;
 	}
 
-	public void clear() {
-		// TODO (Labbeti) : corriger
+	public void clearAgents() {
+		// TODO (Labbeti) : fix this
 		List<Agent<? extends Amas<World>, World>> agents = getAgents();
 		for (Agent<? extends Amas<World>, World> agent : agents) {
-			if (agent != head)
-				agent.destroy();
+			AmoebaAgent amoebaAgent = (AmoebaAgent) agent;
+			amoebaAgent.die();
 		}
-		System.out.println("DEBUG: agents = " + agents.size());
-		this.head = null;
-		if (!agents.isEmpty()) {
-			cycle();
-		}
+		agents.clear();
 	}
 
 	public void setHead(Head head) {

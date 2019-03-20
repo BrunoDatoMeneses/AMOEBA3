@@ -19,11 +19,8 @@ public class Head extends AmoebaAgent {
 	private Context newContext;
 
 	HashMap<Percept, Double> currentSituation = new HashMap<>();
-
 	private ArrayList<Context> activatedContexts = new ArrayList<>();
-
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<>();
-
 	private int numberOfCriticityValuesForAverage = 100;
 
 	private int nConflictBeforeAugmentation = 1;
@@ -114,7 +111,6 @@ public class Head extends AmoebaAgent {
 		this.nSuccessBeforeInexactDiminution = nSuccessBeforeInexactDiminution;
 	}
 
-	
 	public void proposition(Context c) {
 		activatedContexts.add(c);
 	}
@@ -167,7 +163,6 @@ public class Head extends AmoebaAgent {
 
 		/* Compute the criticity. Will be used by context agents. */
 		criticity = Math.abs(oracleValue - prediction);
-
 
 		selfAnalysationOfContexts();
 
@@ -259,7 +254,7 @@ public class Head extends AmoebaAgent {
 		for (int i = 0; i < activatedContexts.size(); i++) {
 			if (activatedContexts.get(i).isDying()) {
 				activatedContexts.remove(i);
-			}else
+			} else
 				activatedContexts.get(i).analyzeResults(this);
 		}
 	}

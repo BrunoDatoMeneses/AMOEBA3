@@ -26,7 +26,6 @@ public class Context extends AmoebaAgent {
 
 	private LocalModel localModel; // To save
 	private double confidence = 0; // To save
-	private boolean isDying = false; // Donc pas enregistrer les contexts mourants
 	private DrawableRectangle drawable;
 	
 	public Context(AMOEBA amoeba, Head head) {
@@ -47,6 +46,9 @@ public class Context extends AmoebaAgent {
 		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
 		experiments.add(firstPoint);
 
+		localModel = amoeba.buildLocalModel(this);
+		localModel.updateModel(this);
+
 		buildModel(amoeba, head, amoeba.getPercepts());
 	}
 
@@ -59,13 +61,13 @@ public class Context extends AmoebaAgent {
 	 * @param ends
 	 * @param experiments
 	 */
-	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends, ArrayList<Experiment> experiments) {
+	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends, ArrayList<Experiment> experiments, LocalModel localModel) {
 		super(amoeba);
 		this.ranges = new HashMap<>();
 		this.experiments = experiments;
 		this.perceptValidities = new HashMap<>();
 		this.confidence = 0;
-		this.isDying = false;
+		this.localModel = localModel;
 
 		setName(name);
 
@@ -84,8 +86,6 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : percepts) {
 			percept.addContextProjection(this);
 		}
-		localModel = amoeba.buildLocalModel(this);
-		localModel.updateModel(this);
 
 		perceptValidities = new HashMap<Percept, Boolean>();
 		for (Percept percept : percepts) {
@@ -94,8 +94,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	/*
-	 * TODO : remove private void buildContext(Head headAgent, AMOEBA amoeba) {
-	 * 
+	 * TODO (Labbeti) : remove 
+	 * private void buildContext(Head headAgent, AMOEBA amoeba) {
 	 * for (Percept percept : percepts) { double length =
 	 * Math.abs(percept.getMinMaxDistance()) / 4.0; Range range = new Range(this,
 	 * percept.getValue() - length, percept.getValue() + length, 0, true, true,
@@ -116,7 +116,8 @@ public class Context extends AmoebaAgent {
 	protected int computeExecutionOrderLayer() {
 		return 1;
 	}
-
+	
+	@Override
 	protected void onAct() {
 		if (computeValidityByPercepts()) {
 			headAgent.proposition(this);
@@ -389,15 +390,17 @@ public class Context extends AmoebaAgent {
 			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
 		}
 	}
-
+	
+	@Override
 	public void die() {
-		isDying = true;
-		for (Percept percept : amas.getPercepts()) { // see if is compatible //Pred: world.getScheduler().getPerceptss()
+		ArrayList<Percept> percepts = amas.getPercepts();
+		for (Percept percept : percepts) {
 			percept.deleteContextProjection(this);
 		}
-		if (!Configuration.commandLineMode)
+		if (!Configuration.commandLineMode) {
 			drawable.hide();
-		destroy();
+		}
+		super.die();
 	}
 
 	public void setPerceptValidity(Percept percept) {
@@ -410,10 +413,6 @@ public class Context extends AmoebaAgent {
 			test = test && perceptValidities.get(percept);
 		}
 		return test;
-	}
-
-	public boolean isDying() {
-		return isDying;
 	}
 
 	/**
@@ -445,11 +444,11 @@ public class Context extends AmoebaAgent {
 		drawable.setWidth(ranges.get(p1).getLenght());
 		drawable.setHeight(ranges.get(p2).getLenght());
 
-		// update colors
+		// Update colors
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
-		double[] coefs = localModel.getCoef();
+		double[] coefs = localModel.getCoefs();
 		if (coefs.length > 0) {
 			if (coefs.length == 1) {
 				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
