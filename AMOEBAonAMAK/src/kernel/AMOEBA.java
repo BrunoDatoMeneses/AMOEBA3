@@ -130,7 +130,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
-			
+
 			// @note (Labbeti) Test added to avoid crash when head has just been created.
 			if (!sortedErrors.isEmpty()) {
 				errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
@@ -150,6 +150,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Learn.
+	 * 
 	 * @param actions the actions
 	 */
 	@Override
@@ -160,6 +161,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Request.
+	 * 
 	 * @param actions the actions
 	 * @return the double
 	 */
@@ -176,8 +178,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public LocalModel buildLocalModel(Context context) {
 
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			// TODO (Labbeti) : changed because getPercept is not init when load agents from
-			// file.
+			// note (Labbeti) This constructor has changed because getPercept is not
+			// initialized when we load agents from a file.
 			return new LocalModelMillerRegression(context.getRanges().size());
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
@@ -204,7 +206,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		agents.clear();
 	}
 
-	
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
 	}
@@ -248,7 +249,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
 
-	
 	public double getAction() {
 		return head.getAction();
 	}
