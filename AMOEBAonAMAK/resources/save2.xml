@@ -9,7 +9,8 @@
     <Sensor Name="py" />
   </StartingAgents>
   <PresetContexts>
-    <Context Name="363470287">
+    <!-- Nb contexts = 36 -->
+    <Context Name="924220668" LocalModel="MILLER_REGRESSION" Confidence="0.0">
       <Ranges>
         <Range Sensor="px" Start="14.399110507598653" End="64.58496292026724" />
         <Range Sensor="py" Start="105.5051189100592" End="126.02429195958624" />
@@ -28,159 +29,11 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="2012307094">
+    <Context Name="479707401" LocalModel="MILLER_REGRESSION" Confidence="87.0">
       <Ranges>
-        <Range Sensor="px" Start="-130.9226881927019" End="-81.13583024979242" />
-        <Range Sensor="py" Start="-134.8040371153587" End="68.92690756304931" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-192.28558289672117">
-          <Values>
-            <Value Sensor="px" Value="-91.15882022119175" />
-            <Value Sensor="py" Value="-32.93856477615469" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="494.3160464775665">
-          <Values>
-            <Value Sensor="px" Value="-12.185193714012122" />
-            <Value Sensor="py" Value="-69.40525188095339" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-18.0308108232516">
-          <Values>
-            <Value Sensor="px" Value="-6.179014620968637" />
-            <Value Sensor="py" Value="-5.672781581314323" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="194.5926458914896">
-          <Values>
-            <Value Sensor="px" Value="-97.45733440314477" />
-            <Value Sensor="py" Value="-85.23491473840168" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-723.8043861740819">
-          <Values>
-            <Value Sensor="px" Value="-38.47739468230924" />
-            <Value Sensor="py" Value="66.42717659531696" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-124.74105165192631">
-          <Values>
-            <Value Sensor="px" Value="-48.24996276852642" />
-            <Value Sensor="py" Value="-28.24112611487346" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-95.90697818552493">
-          <Values>
-            <Value Sensor="px" Value="-30.308643331719654" />
-            <Value Sensor="py" Value="-35.28969152208563" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-45.211024766628725">
-          <Values>
-            <Value Sensor="px" Value="-29.003068170194844" />
-            <Value Sensor="py" Value="12.795111573760964" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="13.813919696284557">
-          <Values>
-            <Value Sensor="px" Value="23.390148265035315" />
-            <Value Sensor="py" Value="-32.96637683378607" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="556.5285944378387">
-          <Values>
-            <Value Sensor="px" Value="11.668220455127255" />
-            <Value Sensor="py" Value="-62.273436520275304" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="358.7508480521939">
-          <Values>
-            <Value Sensor="px" Value="55.408974973532565" />
-            <Value Sensor="py" Value="-10.213246648066377" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="619.1358174232421">
-          <Values>
-            <Value Sensor="px" Value="57.80331317077314" />
-            <Value Sensor="py" Value="-41.26490644617205" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="26.672056787972867">
-          <Values>
-            <Value Sensor="px" Value="19.18510945632057" />
-            <Value Sensor="py" Value="-11.698162124668276" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-43.423078129820496">
-          <Values>
-            <Value Sensor="px" Value="-22.233798448957167" />
-            <Value Sensor="py" Value="1.0445187680938384" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-76.73847538814893">
-          <Values>
-            <Value Sensor="px" Value="-40.86999008613428" />
-            <Value Sensor="py" Value="5.001504784119626" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="921.0524298593552">
-          <Values>
-            <Value Sensor="px" Value="39.48813355129977" />
-            <Value Sensor="py" Value="-90.45147026285704" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-76.43822805358872">
-          <Values>
-            <Value Sensor="px" Value="-40.247920734398775" />
-            <Value Sensor="py" Value="4.057613415208827" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="27.97477553195165">
-          <Values>
-            <Value Sensor="px" Value="31.282154854240176" />
-            <Value Sensor="py" Value="-34.5895341765287" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-1.4199328420271726">
-          <Values>
-            <Value Sensor="px" Value="22.817499907795646" />
-            <Value Sensor="py" Value="-47.054932657618465" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="591.2384582046828">
-          <Values>
-            <Value Sensor="px" Value="34.79917417714498" />
-            <Value Sensor="py" Value="-52.15532341486975" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="281.2721712314292">
-          <Values>
-            <Value Sensor="px" Value="-85.8269762421775" />
-            <Value Sensor="py" Value="-88.80088155528958" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-413.06327114183716">
-          <Values>
-            <Value Sensor="px" Value="-92.62450019393536" />
-            <Value Sensor="py" Value="-6.25740372847996" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-187.8657441337511">
-          <Values>
-            <Value Sensor="px" Value="-81.37707854909688" />
-            <Value Sensor="py" Value="-27.377456076466665" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1253101933">
-      <Ranges>
-        <Range Sensor="px" Start="-115.08367532164688" End="-70.90835645057794" />
-        <Range Sensor="py" Start="68.92690756304931" End="100.60621723845153" />
+        <Range Sensor="px" Start="-115.08367532164688" End="-67.99603485123376" />
+        <Range Sensor="py" Start="29.074758932263165" End="100.60621723845153" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="-783.8757951094915">
@@ -202,9 +55,8 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1101042150">
+    <Context Name="1963771941" LocalModel="MILLER_REGRESSION" Confidence="-5.0">
       <Ranges>
         <Range Sensor="px" Start="108.10521117146381" End="125.83049993943558" />
         <Range Sensor="py" Start="9.670823504992626" End="92.70401874585723" />
@@ -217,9 +69,8 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="784889759">
+    <Context Name="1842679385" LocalModel="MILLER_REGRESSION" Confidence="-2.0">
       <Ranges>
         <Range Sensor="px" Start="102.60946797126547" End="116.97264052752023" />
         <Range Sensor="py" Start="31.77911068568599" End="80.58026978139101" />
@@ -232,56 +83,10 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1707240999">
+    <Context Name="1575682621" LocalModel="MILLER_REGRESSION" Confidence="-5.0">
       <Ranges>
-        <Range Sensor="px" Start="-178.49357082603947" End="53.44763995589575" />
-        <Range Sensor="py" Start="10.762749504012913" End="42.1431662643879" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="108.89360338707263">
-          <Values>
-            <Value Sensor="px" Value="55.09149770966852" />
-            <Value Sensor="py" Value="20.820485645158747" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="310.39434461335566">
-          <Values>
-            <Value Sensor="px" Value="87.66177625749837" />
-            <Value Sensor="py" Value="15.989317084267029" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="206.27568265943114">
-          <Values>
-            <Value Sensor="px" Value="82.07059960664338" />
-            <Value Sensor="py" Value="25.509664421723222" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-51.449563865711404">
-          <Values>
-            <Value Sensor="px" Value="-17.40670454304858" />
-            <Value Sensor="py" Value="-16.636154779614245" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-69.3772238256582">
-          <Values>
-            <Value Sensor="px" Value="-16.501469743216603" />
-            <Value Sensor="py" Value="-36.37428433922501" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1.9085945746634358">
-          <Values>
-            <Value Sensor="px" Value="-14.831561693401518" />
-            <Value Sensor="py" Value="31.571717961466472" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="2098963582">
-      <Ranges>
-        <Range Sensor="px" Start="-67.99603485123376" End="-36.617721106491025" />
+        <Range Sensor="px" Start="-67.99603485123376" End="-35.112911548971944" />
         <Range Sensor="py" Start="113.36359494459745" End="139.20751611171497" />
       </Ranges>
       <Experiments>
@@ -298,9 +103,8 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="901672251">
+    <Context Name="2066206039" LocalModel="MILLER_REGRESSION" Confidence="-4.0">
       <Ranges>
         <Range Sensor="px" Start="105.53490087860717" End="130.0685629813578" />
         <Range Sensor="py" Start="40.12860158342085" End="102.4165462707459" />
@@ -319,9 +123,8 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1671449431">
+    <Context Name="1554118229" LocalModel="MILLER_REGRESSION" Confidence="-9.0">
       <Ranges>
         <Range Sensor="px" Start="110.5867550417218" End="133.61748164821321" />
         <Range Sensor="py" Start="-100.0562706976139" End="-33.05769825942991" />
@@ -340,90 +143,11 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="309837628">
+    <Context Name="1034492577" LocalModel="MILLER_REGRESSION" Confidence="128.0">
       <Ranges>
-        <Range Sensor="px" Start="93.58877385715567" End="122.14249496532868" />
-        <Range Sensor="py" Start="-85.95679060023609" End="-39.25502780689749" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="922.0867860045885">
-          <Values>
-            <Value Sensor="px" Value="84.24790247521085" />
-            <Value Sensor="py" Value="-62.60590920356679" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1050.5544324929501">
-          <Values>
-            <Value Sensor="px" Value="93.873016317623" />
-            <Value Sensor="py" Value="-72.64866886310438" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1903692397">
-      <Ranges>
-        <Range Sensor="px" Start="53.41644928311908" End="65.36498468914704" />
-        <Range Sensor="py" Start="-110.39349766068626" End="-74.15926709164505" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="818.682773710286">
-          <Values>
-            <Value Sensor="px" Value="65.88350586319311" />
-            <Value Sensor="py" Value="-61.15815554929005" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="763.4395526944162">
-          <Values>
-            <Value Sensor="px" Value="79.23454295831513" />
-            <Value Sensor="py" Value="-45.90835473785506" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1004.082704079135">
-          <Values>
-            <Value Sensor="px" Value="55.8919535151779" />
-            <Value Sensor="py" Value="-90.5778670629057" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="13.813919696284557">
-          <Values>
-            <Value Sensor="px" Value="23.390148265035315" />
-            <Value Sensor="py" Value="-32.96637683378607" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="874.1813707615534">
-          <Values>
-            <Value Sensor="px" Value="89.76604891214215" />
-            <Value Sensor="py" Value="-53.16889077510532" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1209.8196280091406">
-          <Values>
-            <Value Sensor="px" Value="83.28569647297226" />
-            <Value Sensor="py" Value="-99.17389320553491" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1158.5873570017138">
-          <Values>
-            <Value Sensor="px" Value="72.75849770195548" />
-            <Value Sensor="py" Value="-99.34935856149207" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="931.6735076520853">
-          <Values>
-            <Value Sensor="px" Value="63.92971869473445" />
-            <Value Sensor="py" Value="-76.50311427230163" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1732624183">
-      <Ranges>
-        <Range Sensor="px" Start="-70.90835645057794" End="24.245182247506623" />
-        <Range Sensor="py" Start="56.839995591751176" End="113.36359494459745" />
+        <Range Sensor="px" Start="-67.99603485123376" End="134.9352427659951" />
+        <Range Sensor="py" Start="51.81563120483151" End="113.36359494459745" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="-927.2278049686427">
@@ -445,54 +169,11 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="275723899">
+    <Context Name="1220826004" LocalModel="MILLER_REGRESSION" Confidence="178.0">
       <Ranges>
-        <Range Sensor="px" Start="-7.176812420972777" End="56.61340261769457" />
-        <Range Sensor="py" Start="108.4310772769978" End="119.08313671909325" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-561.327287033361">
-          <Values>
-            <Value Sensor="px" Value="33.83125438959909" />
-            <Value Sensor="py" Value="91.31044487266955" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="822310699">
-      <Ranges>
-        <Range Sensor="px" Start="-2.533420404248133" End="66.47850479405776" />
-        <Range Sensor="py" Start="68.92690756304931" End="91.1004431610435" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-324.20691441887845">
-          <Values>
-            <Value Sensor="px" Value="41.831460080377084" />
-            <Value Sensor="py" Value="66.67052685259549" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-89.85296551318862">
-          <Values>
-            <Value Sensor="px" Value="55.638793270718814" />
-            <Value Sensor="py" Value="46.00586648334784" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-391.6048447359318">
-          <Values>
-            <Value Sensor="px" Value="47.791897848690425" />
-            <Value Sensor="py" Value="78.820541747423" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1377030299">
-      <Ranges>
-        <Range Sensor="px" Start="66.47850479405776" End="119.32153528583169" />
-        <Range Sensor="py" Start="27.245860199734256" End="96.8562725239101" />
+        <Range Sensor="px" Start="28.291986463376663" End="119.32153528583169" />
+        <Range Sensor="py" Start="-130.29748780280784" End="59.730452617682985" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="-181.45567396271406">
@@ -513,13 +194,54 @@
             <Value Sensor="py" Value="78.820541747423" />
           </Values>
         </Experiment>
+        <Experiment Proposition="110.7366708644467">
+          <Values>
+            <Value Sensor="px" Value="48.58752231872489" />
+            <Value Sensor="py" Value="13.561626226996903" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="674.5574635743053">
+          <Values>
+            <Value Sensor="px" Value="91.89288750389102" />
+            <Value Sensor="py" Value="-26.886628256856284" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="175.78961073994157">
+          <Values>
+            <Value Sensor="px" Value="52.50501982179687" />
+            <Value Sensor="py" Value="10.841936046130352" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-115.41376591607707">
+          <Values>
+            <Value Sensor="px" Value="86.67243270475599" />
+            <Value Sensor="py" Value="68.59699117998213" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="406.5571921966205">
+          <Values>
+            <Value Sensor="px" Value="58.43809096794428" />
+            <Value Sensor="py" Value="-14.295842169612394" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="611.1455258628448">
+          <Values>
+            <Value Sensor="px" Value="52.13683283011936" />
+            <Value Sensor="py" Value="-43.807670214031006" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="50.52462900611967">
+          <Values>
+            <Value Sensor="px" Value="24.855308739756342" />
+            <Value Sensor="py" Value="0.8140115266069836" />
+          </Values>
+        </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1853229992">
+    <Context Name="1272509915" LocalModel="MILLER_REGRESSION" Confidence="3.0">
       <Ranges>
-        <Range Sensor="px" Start="93.83519814095183" End="135.15407838931728" />
-        <Range Sensor="py" Start="-85.06570258534974" End="-9.126770378479513" />
+        <Range Sensor="px" Start="99.46865706153372" End="135.15407838931728" />
+        <Range Sensor="py" Start="-63.36872195481539" End="-9.126770378479513" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="762.4180328656433">
@@ -534,136 +256,78 @@
             <Value Sensor="py" Value="-10.213246648066377" />
           </Values>
         </Experiment>
-        <Experiment Proposition="568.4116437943518">
-          <Values>
-            <Value Sensor="px" Value="95.61229297808744" />
-            <Value Sensor="py" Value="-11.29377236298932" />
-          </Values>
-        </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="271263736">
+    <Context Name="1072134970" LocalModel="MILLER_REGRESSION" Confidence="0.0">
       <Ranges>
-        <Range Sensor="px" Start="-8.617441087527602" End="66.47850479405776" />
-        <Range Sensor="py" Start="53.40811074247122" End="68.92690756304931" />
+        <Range Sensor="px" Start="48.23701201112621" End="64.89414008962088" />
+        <Range Sensor="py" Start="-130.8765694462789" End="-115.2474729389265" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="-191.46157203593611">
+        <Experiment Proposition="933.5827291777882">
           <Values>
-            <Value Sensor="px" Value="45.366252980103106" />
-            <Value Sensor="py" Value="52.286604617056454" />
+            <Value Sensor="px" Value="37.7921997698069" />
+            <Value Sensor="py" Value="-93.07771629109422" />
           </Values>
         </Experiment>
-        <Experiment Proposition="90.7129924924414">
+        <Experiment Proposition="804.7845108244442">
           <Values>
-            <Value Sensor="px" Value="65.54669658074282" />
-            <Value Sensor="py" Value="29.627561301409088" />
+            <Value Sensor="px" Value="47.1556684285017" />
+            <Value Sensor="py" Value="-71.12577108524196" />
           </Values>
         </Experiment>
-        <Experiment Proposition="-392.2278281522644">
+        <Experiment Proposition="877.294455696943">
           <Values>
-            <Value Sensor="px" Value="35.3420996689557" />
-            <Value Sensor="py" Value="71.11729081213036" />
+            <Value Sensor="px" Value="55.64059745848886" />
+            <Value Sensor="py" Value="-74.88643355056234" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1710419977">
+    <Context Name="332551133" LocalModel="MILLER_REGRESSION" Confidence="0.0">
       <Ranges>
-        <Range Sensor="px" Start="-40.71930866004074" End="21.073248602468453" />
-        <Range Sensor="py" Start="-75.35669430837726" End="10.762749504012916" />
+        <Range Sensor="px" Start="-17.190248577533225" End="-2.533420404248133" />
+        <Range Sensor="py" Start="106.48726486759453" End="130.12205695932073" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="-1.245750537440271">
+        <Experiment Proposition="-783.295235895372">
           <Values>
-            <Value Sensor="px" Value="6.438300829768906" />
-            <Value Sensor="py" Value="-14.122352196978083" />
+            <Value Sensor="px" Value="-1.7295634126424098" />
+            <Value Sensor="py" Value="96.83092735401999" />
           </Values>
         </Experiment>
-        <Experiment Proposition="85.88090307645082">
+        <Experiment Proposition="-611.5990048510677">
           <Values>
-            <Value Sensor="px" Value="19.927934310726613" />
-            <Value Sensor="py" Value="46.025034454997595" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1.331332508769556">
-          <Values>
-            <Value Sensor="px" Value="2.8718906471294936" />
-            <Value Sensor="py" Value="-4.412448785489431" />
+            <Value Sensor="px" Value="12.318723433700951" />
+            <Value Sensor="py" Value="84.14907775244656" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="883196420">
+    <Context Name="1969703183" LocalModel="MILLER_REGRESSION" Confidence="-2.0">
       <Ranges>
-        <Range Sensor="px" Start="-113.94552369985092" End="-48.04772876450518" />
-        <Range Sensor="py" Start="53.40811074247122" End="64.98444794859404" />
+        <Range Sensor="px" Start="-89.04724369089094" End="-33.30575589573286" />
+        <Range Sensor="py" Start="-136.0783373728779" End="-106.91492716534594" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="-759.4048001642703">
+        <Experiment Proposition="463.34188075880724">
           <Values>
-            <Value Sensor="px" Value="-85.36998909225997" />
-            <Value Sensor="py" Value="41.56935683787131" />
+            <Value Sensor="px" Value="-61.1764997933119" />
+            <Value Sensor="py" Value="-96.15304746567084" />
           </Values>
         </Experiment>
-        <Experiment Proposition="-681.1984786754954">
+        <Experiment Proposition="257.40537826227364">
           <Values>
-            <Value Sensor="px" Value="-62.828409493343116" />
-            <Value Sensor="py" Value="45.88205390109748" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-802.586822220456">
-          <Values>
-            <Value Sensor="px" Value="-78.4453153298851" />
-            <Value Sensor="py" Value="51.29503069637882" />
+            <Value Sensor="px" Value="-75.80571207276417" />
+            <Value Sensor="py" Value="-79.55424232826181" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1100939528">
+    <Context Name="1686060872" LocalModel="MILLER_REGRESSION" Confidence="146.0">
       <Ranges>
-        <Range Sensor="px" Start="-129.57589154598685" End="-113.94552369985092" />
-        <Range Sensor="py" Start="28.283587126223843" End="100.94813474886169" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-1002.7179369629276">
-          <Values>
-            <Value Sensor="px" Value="-97.1582098925171" />
-            <Value Sensor="py" Value="64.61586093754276" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1708357407">
-      <Ranges>
-        <Range Sensor="px" Start="1.912148907978903" End="75.92199455648219" />
-        <Range Sensor="py" Start="91.1004431610435" End="131.68918651873824" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-625.534340642052">
-          <Values>
-            <Value Sensor="px" Value="28.344165211015792" />
-            <Value Sensor="py" Value="95.90689583714138" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-587.8181704608235">
-          <Values>
-            <Value Sensor="px" Value="38.15444934763668" />
-            <Value Sensor="py" Value="97.32380214987586" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1551740396">
-      <Ranges>
-        <Range Sensor="px" Start="33.91850540931384" End="54.709806644430955" />
-        <Range Sensor="py" Start="-55.51569038222088" End="-1.6232625144379007" />
+        <Range Sensor="px" Start="-48.693310514883315" End="17.157876335068742" />
+        <Range Sensor="py" Start="-47.13234604723242" End="51.81563120483151" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="34.52376246484721">
@@ -672,166 +336,80 @@
             <Value Sensor="py" Value="-28.56947644832939" />
           </Values>
         </Experiment>
+        <Experiment Proposition="-26.842402013409885">
+          <Values>
+            <Value Sensor="px" Value="8.992191434353947" />
+            <Value Sensor="py" Value="-44.82678488211778" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="12.73197845508922">
+          <Values>
+            <Value Sensor="px" Value="16.782983886267044" />
+            <Value Sensor="py" Value="-20.833989317444868" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="135.78128144557286">
+          <Values>
+            <Value Sensor="px" Value="51.569351835939116" />
+            <Value Sensor="py" Value="15.258184716765344" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="102.48596391598818">
+          <Values>
+            <Value Sensor="px" Value="46.98696291458957" />
+            <Value Sensor="py" Value="8.51203808680905" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="20.09040596645597">
+          <Values>
+            <Value Sensor="px" Value="-0.5056579681358198" />
+            <Value Sensor="py" Value="21.10172190272761" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="129.28109034386424">
+          <Values>
+            <Value Sensor="px" Value="41.650281806788755" />
+            <Value Sensor="py" Value="45.98052673028672" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-87.94569598880695">
+          <Values>
+            <Value Sensor="px" Value="-30.136314037272992" />
+            <Value Sensor="py" Value="-27.67306791426096" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-122.3387706283911">
+          <Values>
+            <Value Sensor="px" Value="-45.56973372156292" />
+            <Value Sensor="py" Value="-31.199303185265272" />
+          </Values>
+        </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="737367111">
+    <Context Name="661493309" LocalModel="MILLER_REGRESSION" Confidence="-7.0">
       <Ranges>
-        <Range Sensor="px" Start="99.46865706153372" End="139.62284525191416" />
-        <Range Sensor="py" Start="-27.004483951647828" End="7.546666090846196" />
+        <Range Sensor="px" Start="-14.482293640281394" End="0.05187619843903679" />
+        <Range Sensor="py" Start="-129.23530443755686" End="-101.6191470518774" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="573.3817697760537">
+        <Experiment Proposition="780.8019501781297">
           <Values>
-            <Value Sensor="px" Value="99.11009966656943" />
-            <Value Sensor="py" Value="-9.728908930400815" />
+            <Value Sensor="px" Value="7.9323025929373125" />
+            <Value Sensor="py" Value="-92.64255465168038" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="619.5516345770275">
+          <Values>
+            <Value Sensor="px" Value="-6.218993519234539" />
+            <Value Sensor="py" Value="-81.33082527165001" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1690660900">
+    <Context Name="674201686" LocalModel="MILLER_REGRESSION" Confidence="-4.0">
       <Ranges>
-        <Range Sensor="px" Start="89.61112178473303" End="122.08637108338809" />
-        <Range Sensor="py" Start="-137.55593166883187" End="-98.86213819134696" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="1236.2193245734252">
-          <Values>
-            <Value Sensor="px" Value="91.64060611589898" />
-            <Value Sensor="py" Value="-97.2520367492413" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1197.5824475546067">
-          <Values>
-            <Value Sensor="px" Value="91.96564148839883" />
-            <Value Sensor="py" Value="-92.21928001407656" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="426998628">
-      <Ranges>
-        <Range Sensor="px" Start="-126.33518464755223" End="-113.94552369985092" />
-        <Range Sensor="py" Start="-43.45721253193291" End="26.461042120200357" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-425.33490155332913">
-          <Values>
-            <Value Sensor="px" Value="-98.66391664005188" />
-            <Value Sensor="py" Value="-8.498085205866278" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-181.2284867982948">
-          <Values>
-            <Value Sensor="px" Value="-96.35088212263014" />
-            <Value Sensor="py" Value="-37.56574047685699" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1997477938">
-      <Ranges>
-        <Range Sensor="px" Start="73.35941699905337" End="123.92814183517025" />
-        <Range Sensor="py" Start="-66.71873256649737" End="-47.585499812686464" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="1036.9442873380426">
-          <Values>
-            <Value Sensor="px" Value="87.30062487131549" />
-            <Value Sensor="py" Value="-75.05514537268316" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="1197.5824475546067">
-          <Values>
-            <Value Sensor="px" Value="91.96564148839883" />
-            <Value Sensor="py" Value="-92.21928001407656" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1478460491">
-      <Ranges>
-        <Range Sensor="px" Start="25.67806682998084" End="39.74575039648497" />
-        <Range Sensor="py" Start="-85.67046062173813" End="-33.62447636039672" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="567.8231982977195">
-          <Values>
-            <Value Sensor="px" Value="20.273930708411214" />
-            <Value Sensor="py" Value="-58.30669309445793" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="710.0463337097274">
-          <Values>
-            <Value Sensor="px" Value="41.6356551391065" />
-            <Value Sensor="py" Value="-62.733507251774355" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="715.8452583244685">
-          <Values>
-            <Value Sensor="px" Value="16.80933742314683" />
-            <Value Sensor="py" Value="-78.9748214010918" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1364570155">
-      <Ranges>
-        <Range Sensor="px" Start="54.662391775375895" End="81.70560641641003" />
-        <Range Sensor="py" Start="-133.58099551370248" End="-110.39349766068626" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="1124.1575045647562">
-          <Values>
-            <Value Sensor="px" Value="65.56842584648012" />
-            <Value Sensor="py" Value="-99.53942191654444" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="906.3491658535676">
-          <Values>
-            <Value Sensor="px" Value="52.80197262149598" />
-            <Value Sensor="py" Value="-80.29241284326096" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="842.9043451215148">
-          <Values>
-            <Value Sensor="px" Value="53.30937745841284" />
-            <Value Sensor="py" Value="-72.04468222868132" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1578433723">
-      <Ranges>
-        <Range Sensor="px" Start="-2.096016420031207" End="9.561241376508537" />
-        <Range Sensor="py" Start="13.247764674193501" End="53.40811074247122" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="13.456278150150226">
-          <Values>
-            <Value Sensor="px" Value="-12.867958837730619" />
-            <Value Sensor="py" Value="39.19219582561146" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-14.69546645968527">
-          <Values>
-            <Value Sensor="px" Value="-19.11361424605873" />
-            <Value Sensor="py" Value="23.53176203243219" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="39716609">
-      <Ranges>
-        <Range Sensor="px" Start="-9.27289353257991" End="54.662391775375895" />
-        <Range Sensor="py" Start="-128.48267433384714" End="-100.26171716186631" />
+        <Range Sensor="px" Start="-9.27289353257991" End="17.157876335068742" />
+        <Range Sensor="py" Start="-128.48267433384714" End="-94.45540644335215" />
       </Ranges>
       <Experiments>
         <Experiment Proposition="896.99976007577">
@@ -840,58 +418,18 @@
             <Value Sensor="py" Value="-97.94075180859751" />
           </Values>
         </Experiment>
-        <Experiment Proposition="842.9043451215148">
-          <Values>
-            <Value Sensor="px" Value="53.30937745841284" />
-            <Value Sensor="py" Value="-72.04468222868132" />
-          </Values>
-        </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1925180793">
+    <Context Name="688726194" LocalModel="MILLER_REGRESSION" Confidence="1.0">
       <Ranges>
-        <Range Sensor="px" Start="50.89166969721961" End="90.81991605386554" />
-        <Range Sensor="py" Start="-49.494921097670094" End="5.604578373864584" />
+        <Range Sensor="px" Start="-112.81187483145231" End="-79.64909439078646" />
+        <Range Sensor="py" Start="-49.068916407597435" End="-21.817359042289333" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="503.32115193399903">
+        <Experiment Proposition="-372.21215516861946">
           <Values>
-            <Value Sensor="px" Value="69.42976621994808" />
-            <Value Sensor="py" Value="-19.52154010428233" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="646.2819205495393">
-          <Values>
-            <Value Sensor="px" Value="90.15908702785798" />
-            <Value Sensor="py" Value="-24.43581067628118" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="563.4818973687507">
-          <Values>
-            <Value Sensor="px" Value="85.2819083162061" />
-            <Value Sensor="py" Value="-17.134044473465025" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="631272268">
-      <Ranges>
-        <Range Sensor="px" Start="-77.00307290608359" End="-40.71930866004074" />
-        <Range Sensor="py" Start="-122.055959353536" End="4.192721390613247" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-120.93554850510702">
-          <Values>
-            <Value Sensor="px" Value="-87.40097865741518" />
-            <Value Sensor="py" Value="-39.50866809774611" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="52.79248546556232">
-          <Values>
-            <Value Sensor="px" Value="-90.25871031837627" />
-            <Value Sensor="py" Value="-63.010754632180465" />
+            <Value Sensor="px" Value="-83.61640073699515" />
+            <Value Sensor="py" Value="-5.733731064544534" />
           </Values>
         </Experiment>
         <Experiment Proposition="-265.7457170696855">
@@ -900,60 +438,380 @@
             <Value Sensor="py" Value="-6.0242883285148485" />
           </Values>
         </Experiment>
-        <Experiment Proposition="-61.521750517450855">
+        <Experiment Proposition="-284.9198828713211">
           <Values>
-            <Value Sensor="px" Value="-21.988939211152235" />
-            <Value Sensor="py" Value="-17.543872095146384" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="371.1715377119006">
-          <Values>
-            <Value Sensor="px" Value="-45.699068592682046" />
-            <Value Sensor="py" Value="-74.95836008441385" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-51.89176793770935">
-          <Values>
-            <Value Sensor="px" Value="-24.904897994657027" />
-            <Value Sensor="py" Value="-2.0819719483953003" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="-120.9050275826679">
-          <Values>
-            <Value Sensor="px" Value="-45.19180010319832" />
-            <Value Sensor="py" Value="-30.52142737627126" />
+            <Value Sensor="px" Value="-86.84433023516654" />
+            <Value Sensor="py" Value="-18.662721038063946" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1952188360">
+    <Context Name="1160108346" LocalModel="MILLER_REGRESSION" Confidence="54.0">
       <Ranges>
-        <Range Sensor="px" Start="16.02353261610207" End="37.37079553974719" />
-        <Range Sensor="py" Start="-83.35541538418977" End="-51.88974602322085" />
+        <Range Sensor="px" Start="-122.24775960308492" End="-49.33434499503315" />
+        <Range Sensor="py" Start="-21.817359042289333" End="30.847877199320763" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="699.417327653659">
+        <Experiment Proposition="-481.61869791326706">
           <Values>
-            <Value Sensor="px" Value="45.49803117642441" />
-            <Value Sensor="py" Value="-58.99089647144211" />
+            <Value Sensor="px" Value="-85.79105229905903" />
+            <Value Sensor="py" Value="6.582929552246486" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-551.8312734849211">
+          <Values>
+            <Value Sensor="px" Value="-70.27294412531828" />
+            <Value Sensor="py" Value="25.058319107291215" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-251.68925509159283">
+          <Values>
+            <Value Sensor="px" Value="-54.08124180943983" />
+            <Value Sensor="py" Value="-2.3396192444507857" />
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
-    <Context Name="1595526752">
+    <Context Name="1141338998" LocalModel="MILLER_REGRESSION" Confidence="-3.0">
       <Ranges>
-        <Range Sensor="px" Start="18.504857859866277" End="39.0122491164337" />
-        <Range Sensor="py" Start="-136.7494002324551" End="-60.78927494653133" />
+        <Range Sensor="px" Start="-67.99603485123376" End="-51.7843107475765" />
+        <Range Sensor="py" Start="34.39807036739698" End="73.11679021328882" />
       </Ranges>
       <Experiments>
-        <Experiment Proposition="914.8995446249744">
+        <Experiment Proposition="-703.9067919968201">
           <Values>
-            <Value Sensor="px" Value="24.948968781805746" />
-            <Value Sensor="py" Value="-98.7693375894932" />
+            <Value Sensor="px" Value="-62.56968672559435" />
+            <Value Sensor="py" Value="48.88229479610604" />
           </Values>
         </Experiment>
+        <Experiment Proposition="-657.7603562021495">
+          <Values>
+            <Value Sensor="px" Value="-67.23545112529207" />
+            <Value Sensor="py" Value="40.19788757196115" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-663.0843958819323">
+          <Values>
+            <Value Sensor="px" Value="-65.97403525996475" />
+            <Value Sensor="py" Value="41.651777447763564" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1068106640" LocalModel="MILLER_REGRESSION" Confidence="-1.0">
+      <Ranges>
+        <Range Sensor="px" Start="34.90896681200867" End="45.34109259734818" />
+        <Range Sensor="py" Start="23.792143585032136" End="52.38135749439837" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="117.48992813937335">
+          <Values>
+            <Value Sensor="px" Value="40.72882204503991" />
+            <Value Sensor="py" Value="36.03228404929353" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="95.59480855087804">
+          <Values>
+            <Value Sensor="px" Value="37.89394662231296" />
+            <Value Sensor="py" Value="19.806915306252115" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1078545360" LocalModel="MILLER_REGRESSION" Confidence="-1.0">
+      <Ranges>
+        <Range Sensor="px" Start="34.90896681200867" End="58.864924910250124" />
+        <Range Sensor="py" Start="-40.191406818651316" End="-20.96142363541909" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="-1.4199328420271726">
+          <Values>
+            <Value Sensor="px" Value="22.817499907795646" />
+            <Value Sensor="py" Value="-47.054932657618465" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="15.368380260577723">
+          <Values>
+            <Value Sensor="px" Value="28.251203015445615" />
+            <Value Sensor="py" Value="-41.13402577031351" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="401244114" LocalModel="MILLER_REGRESSION" Confidence="-3.0">
+      <Ranges>
+        <Range Sensor="px" Start="34.90896681200867" End="50.03829530772808" />
+        <Range Sensor="py" Start="-20.96142363541909" End="23.297971830020796" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="62.6442085895939">
+          <Values>
+            <Value Sensor="px" Value="35.996195822220734" />
+            <Value Sensor="py" Value="-9.34818305484757" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="95.6482690076882">
+          <Values>
+            <Value Sensor="px" Value="40.83595451029585" />
+            <Value Sensor="py" Value="13.976359987096497" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="116.84874124704339">
+          <Values>
+            <Value Sensor="px" Value="47.82453580848014" />
+            <Value Sensor="py" Value="21.199669630083108" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="2114916104" LocalModel="MILLER_REGRESSION" Confidence="-5.0">
+      <Ranges>
+        <Range Sensor="px" Start="-129.26047687852318" End="-59.17602005855347" />
+        <Range Sensor="py" Start="-111.83902540318134" End="-93.71503147220176" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="246.38368902401015">
+          <Values>
+            <Value Sensor="px" Value="-94.21824846853832" />
+            <Value Sensor="py" Value="-89.68436642083772" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="130.92158772529922">
+          <Values>
+            <Value Sensor="px" Value="-99.52438711631157" />
+            <Value Sensor="py" Value="-78.56794041335714" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1681506000" LocalModel="MILLER_REGRESSION" Confidence="-6.0">
+      <Ranges>
+        <Range Sensor="px" Start="-121.26556686689307" End="-101.94225573793331" />
+        <Range Sensor="py" Start="-77.63185792301164" End="-37.30813928822025" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="-29.909857200562215">
+          <Values>
+            <Value Sensor="px" Value="-87.70911360101117" />
+            <Value Sensor="py" Value="-51.0794638505617" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-126.44477084805624">
+          <Values>
+            <Value Sensor="px" Value="-68.10555519300874" />
+            <Value Sensor="py" Value="-26.760375639623433" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="134.07997128028916">
+          <Values>
+            <Value Sensor="px" Value="-55.05583615673084" />
+            <Value Sensor="py" Value="-51.16989400799292" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="328434909" LocalModel="MILLER_REGRESSION" Confidence="5.0">
+      <Ranges>
+        <Range Sensor="px" Start="-101.94225573793331" End="-37.75506160072938" />
+        <Range Sensor="py" Start="-87.64939836999693" End="-34.506187040803596" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="134.06467716362602">
+          <Values>
+            <Value Sensor="px" Value="-69.84865866933134" />
+            <Value Sensor="py" Value="-60.413496313785345" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="179.40767249903922">
+          <Values>
+            <Value Sensor="px" Value="-95.59400854859518" />
+            <Value Sensor="py" Value="-82.17221440525189" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="157.68799567763352">
+          <Values>
+            <Value Sensor="px" Value="-60.99362051433703" />
+            <Value Sensor="py" Value="-57.832012281164836" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="900456971" LocalModel="MILLER_REGRESSION" Confidence="-13.0">
+      <Ranges>
+        <Range Sensor="px" Start="-91.07339343316472" End="-59.20770817179642" />
+        <Range Sensor="py" Start="-132.83801225528785" End="-114.94868472795162" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="450.0636769476719">
+          <Values>
+            <Value Sensor="px" Value="-61.19909475063194" />
+            <Value Sensor="py" Value="-94.50739383760396" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="429.10577945866163">
+          <Values>
+            <Value Sensor="px" Value="-57.9227518678489" />
+            <Value Sensor="py" Value="-89.83994234973827" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="483202384" LocalModel="MILLER_REGRESSION" Confidence="-1.0">
+      <Ranges>
+        <Range Sensor="px" Start="-37.75506160072938" End="-21.210097719776364" />
+        <Range Sensor="py" Start="-97.6596668163357" End="-47.13234604723242" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="424.76167293730305">
+          <Values>
+            <Value Sensor="px" Value="-23.075157163736115" />
+            <Value Sensor="py" Value="-67.51718234449795" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="614.7733454936457">
+          <Values>
+            <Value Sensor="px" Value="-10.148607708978584" />
+            <Value Sensor="py" Value="-83.18954800481733" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="441.96751976969495">
+          <Values>
+            <Value Sensor="px" Value="-19.88666456239403" />
+            <Value Sensor="py" Value="-67.67510532270813" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="313197711" LocalModel="MILLER_REGRESSION" Confidence="-12.0">
+      <Ranges>
+        <Range Sensor="px" Start="-22.29948409406154" End="-12.139399412318085" />
+        <Range Sensor="py" Start="-90.79951373375195" End="-79.23534123838581" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="572.1147260740659">
+          <Values>
+            <Value Sensor="px" Value="9.541725596143458" />
+            <Value Sensor="py" Value="-65.55076226166857" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="14207225" LocalModel="MILLER_REGRESSION" Confidence="-5.0">
+      <Ranges>
+        <Range Sensor="px" Start="-121.30216991184571" End="-74.46067051282175" />
+        <Range Sensor="py" Start="-114.94868472795162" End="-87.64939836999693" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="281.2721712314292">
+          <Values>
+            <Value Sensor="px" Value="-85.8269762421775" />
+            <Value Sensor="py" Value="-88.80088155528958" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1533984563" LocalModel="MILLER_REGRESSION" Confidence="-8.0">
+      <Ranges>
+        <Range Sensor="px" Start="-80.8690237183392" End="-51.7843107475765" />
+        <Range Sensor="py" Start="-34.506187040803596" End="-21.817359042289333" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="1.9657444299080566">
+          <Values>
+            <Value Sensor="px" Value="-55.70259555459709" />
+            <Value Sensor="py" Value="-35.05984027536169" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-81.26688738229653">
+          <Values>
+            <Value Sensor="px" Value="-28.858488238979962" />
+            <Value Sensor="py" Value="-23.549910904336603" />
+          </Values>
+        </Experiment>
+        <Experiment Proposition="-53.99383563217634">
+          <Values>
+            <Value Sensor="px" Value="-59.185649218866466" />
+            <Value Sensor="py" Value="-30.2418013077695" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="726901021" LocalModel="MILLER_REGRESSION" Confidence="-5.0">
+      <Ranges>
+        <Range Sensor="px" Start="-23.22931581970207" End="8.342561745327064" />
+        <Range Sensor="py" Start="-80.37284328890081" End="-50.559034265484335" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="436.19883765461736">
+          <Values>
+            <Value Sensor="px" Value="-21.842361279627042" />
+            <Value Sensor="py" Value="-68.17633050659407" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="979681520" LocalModel="MILLER_REGRESSION" Confidence="-8.0">
+      <Ranges>
+        <Range Sensor="px" Start="-23.22931581970207" End="6.810276450271429" />
+        <Range Sensor="py" Start="-99.7862493848121" End="-42.56103646949049" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="536.563911923893">
+          <Values>
+            <Value Sensor="px" Value="-6.565046298663479" />
+            <Value Sensor="py" Value="-71.17364292715129" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="560800441" LocalModel="MILLER_REGRESSION" Confidence="2.0">
+      <Ranges>
+        <Range Sensor="px" Start="17.157876335068742" End="36.62489993087975" />
+        <Range Sensor="py" Start="-46.550307270284236" End="11.889406847452111" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="19.805708228219185">
+          <Values>
+            <Value Sensor="px" Value="18.568079219817623" />
+            <Value Sensor="py" Value="-17.33045021141606" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1500126386" LocalModel="MILLER_REGRESSION" Confidence="-1.0">
+      <Ranges>
+        <Range Sensor="px" Start="-20.87865086187083" End="32.54305689080303" />
+        <Range Sensor="py" Start="-70.67253926421432" End="-47.13234604723242" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="-37.22955406807755">
+          <Values>
+            <Value Sensor="px" Value="5.8322030144660975" />
+            <Value Sensor="py" Value="-48.893960097009746" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1871119819" LocalModel="MILLER_REGRESSION" Confidence="-2.0">
+      <Ranges>
+        <Range Sensor="px" Start="-14.947383930369428" End="33.13215304703705" />
+        <Range Sensor="py" Start="-77.78601551145331" End="-47.13234604723242" />
+      </Ranges>
+      <Experiments>
+        <Experiment Proposition="486.8200353403652">
+          <Values>
+            <Value Sensor="px" Value="9.09238455833381" />
+            <Value Sensor="py" Value="-55.16976406858702" />
+          </Values>
+        </Experiment>
+      </Experiments>
+    </Context>
+    <Context Name="1945648011" LocalModel="MILLER_REGRESSION" Confidence="0.0">
+      <Ranges>
+        <Range Sensor="px" Start="-4.067599145659244" End="38.599161175588776" />
+        <Range Sensor="py" Start="-118.26711549247031" End="-53.072596951612354" />
+      </Ranges>
+      <Experiments>
         <Experiment Proposition="771.6877548511545">
           <Values>
             <Value Sensor="px" Value="17.265781014964766" />
@@ -961,190 +819,6 @@
           </Values>
         </Experiment>
       </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1982345224">
-      <Ranges>
-        <Range Sensor="px" Start="40.45463782694492" End="97.10755093332895" />
-        <Range Sensor="py" Start="1.6938641730961903" End="37.96980899751207" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="212.63558767236088">
-          <Values>
-            <Value Sensor="px" Value="68.78109438013693" />
-            <Value Sensor="py" Value="16.408735528540475" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1640785897">
-      <Ranges>
-        <Range Sensor="px" Start="37.448658960585405" End="97.546986469728" />
-        <Range Sensor="py" Start="-104.06381023642398" End="-62.21697601742981" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="972.1778337046574">
-          <Values>
-            <Value Sensor="px" Value="67.4978227151567" />
-            <Value Sensor="py" Value="-79.33609001610924" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1175112517">
-      <Ranges>
-        <Range Sensor="px" Start="-103.66578836741265" End="-47.87896288755026" />
-        <Range Sensor="py" Start="22.242324044372808" End="70.47394117055802" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-735.9463341039348">
-          <Values>
-            <Value Sensor="px" Value="-75.77237562748145" />
-            <Value Sensor="py" Value="44.63555699581594" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="862307170">
-      <Ranges>
-        <Range Sensor="px" Start="64.16242951252234" End="90.25553478268478" />
-        <Range Sensor="py" Start="-81.29393927270252" End="-48.76365704689364" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="810.8899477363091">
-          <Values>
-            <Value Sensor="px" Value="59.99081433305966" />
-            <Value Sensor="py" Value="-63.866984508876335" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="738.8508807723999">
-          <Values>
-            <Value Sensor="px" Value="49.59183329525314" />
-            <Value Sensor="py" Value="-61.36146428701679" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="987.1518624391182">
-          <Values>
-            <Value Sensor="px" Value="72.89561817852852" />
-            <Value Sensor="py" Value="-77.83422144330945" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="831785416">
-      <Ranges>
-        <Range Sensor="px" Start="-17.078930633594087" End="-0.2429712980490848" />
-        <Range Sensor="py" Start="-122.82053790008763" End="-46.40791204837786" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="553.505832468896">
-          <Values>
-            <Value Sensor="px" Value="-24.681593464993192" />
-            <Value Sensor="py" Value="-84.61422497423274" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="567585884">
-      <Ranges>
-        <Range Sensor="px" Start="17.9264335902782" End="64.16242951252234" />
-        <Range Sensor="py" Start="-89.39084880740575" End="-33.686044561509334" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="705.7862483616339">
-          <Values>
-            <Value Sensor="px" Value="42.6957349771947" />
-            <Value Sensor="py" Value="-61.53844668445754" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="2067711585">
-      <Ranges>
-        <Range Sensor="px" Start="42.97306867221843" End="91.62452019394392" />
-        <Range Sensor="py" Start="-137.76157842343255" End="-62.0891809569934" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="1166.3044793881882">
-          <Values>
-            <Value Sensor="px" Value="73.38028837329686" />
-            <Value Sensor="py" Value="-99.92537969021298" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1794460295">
-      <Ranges>
-        <Range Sensor="px" Start="-142.70805745233127" End="-56.91479114533773" />
-        <Range Sensor="py" Start="-14.138824095604345" End="51.931172952167984" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="-650.226516920427">
-          <Values>
-            <Value Sensor="px" Value="-99.8114242988345" />
-            <Value Sensor="py" Value="18.89617442828182" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1850191305">
-      <Ranges>
-        <Range Sensor="px" Start="-17.078930633594087" End="18.504857859866277" />
-        <Range Sensor="py" Start="-121.6279283577754" End="-59.58059929641382" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="676.6359948560421">
-          <Values>
-            <Value Sensor="px" Value="-9.639623152142951" />
-            <Value Sensor="py" Value="-90.60426382709461" />
-          </Values>
-        </Experiment>
-        <Experiment Proposition="771.6877548511545">
-          <Values>
-            <Value Sensor="px" Value="17.265781014964766" />
-            <Value Sensor="py" Value="-85.66985622204133" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="1848616447">
-      <Ranges>
-        <Range Sensor="px" Start="66.57322260946069" End="130.13910128896265" />
-        <Range Sensor="py" Start="-114.19401013404112" End="-66.96076600650863" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="1202.9045588432482">
-          <Values>
-            <Value Sensor="px" Value="98.35616194921167" />
-            <Value Sensor="py" Value="-88.89046863714871" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
-    </Context>
-    <Context Name="785284047">
-      <Ranges>
-        <Range Sensor="px" Start="-122.47860929048107" End="-77.00307290608359" />
-        <Range Sensor="py" Start="-121.20586705052717" End="-62.320697168828175" />
-      </Ranges>
-      <Experiments>
-        <Experiment Proposition="302.35454356041214">
-          <Values>
-            <Value Sensor="px" Value="-86.35034266340185" />
-            <Value Sensor="py" Value="-91.76328210967768" />
-          </Values>
-        </Experiment>
-      </Experiments>
-      <Model type="MILLER_REGRESSION" />
     </Context>
   </PresetContexts>
 </System>

@@ -334,7 +334,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	public void matchBorderWith(Context c) {
 		Range r = c.getRanges().get(percept);
 		if (r.getStart() <= this.start && r.getEnd() >= this.end) {
-			this.context.die();
+			this.context.destroy();
 		} else {
 			if (Math.abs(r.getStart() - this.getEnd()) > Math.abs(r.getEnd() - this.getStart())) {
 				// Change min

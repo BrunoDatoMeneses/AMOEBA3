@@ -51,7 +51,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private ILxPlotChart errors;
 	private JToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
-	private boolean noRenderUpdate = false;
+	private boolean renderUpdate = true;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
@@ -60,7 +60,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public AMOEBA(World environment, StudiedSystem studiedSystem) {
 		super(environment, Scheduling.HIDDEN);
-		this.head = null;
 		this.studiedSystem = studiedSystem;
 	}
 
@@ -70,164 +69,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	@Override
 	protected void onInitialAgentsCreation() {
-	}
-
-	@Override
-	protected void onSystemCycleBegin() {
-		if (studiedSystem != null) {
-			studiedSystem.playOneStep();
-			perceptionsAndActionState = studiedSystem.getOutput();
-		}
-		environment.preCycleActions();
-		head.clearAllUseableContextLists();
-	}
-
-	/**
-	 * Learn.
-	 * 
-	 * @param actions the actions
-	 */
-	public void learn(HashMap<String, Double> perceptionsActionState) {
-		setPerceptionsAndActionState(perceptionsActionState);
-		this.cycle();
-	}
-
-	/**
-	 * Request.
-	 * 
-	 * @param actions the actions
-	 * @return the double
-	 */
-	public double request(HashMap<String, Double> perceptionsActionState) {
-		if (isUseOracle())
-			head.changeOracleConnection();
-		setPerceptionsAndActionState(perceptionsActionState);
-		getScheduler().step();
-		head.changeOracleConnection();
-		return getAction();
-	}
-
-	public double getAction() {
-		return head.getAction();
-	}
-
-	public boolean isUseOracle() {
-		return useOracle;
-	}
-
-	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
-		this.perceptionsAndActionState = perceptionsAndActions;
-	}
-
-	public Double getPerceptionsOrAction(String key) {
-		return this.perceptionsAndActionState.get(key);
-	}
-
-	/**
-	 * Read resource file and generate the AMOEBA described.
-	 * 
-	 * @param systemFile the file XML file describing the AMOEBA.
-	 */
-	/*
-	 * TODO (Labbeti) remove : private void readRessourceFile(File systemFile) { //
-	 * TODO : remove this function ? SAXBuilder sxb = new SAXBuilder(); Document
-	 * document; try { System.out.println(systemFile); document =
-	 * sxb.build(systemFile); Element racine = document.getRootElement();
-	 * System.out.println(racine.getName());
-	 * 
-	 * creationOfNewContext = Boolean.parseBoolean(
-	 * racine.getChild("Configuration").getChild("Learning").getAttributeValue(
-	 * "creationOfNewContext")); loadPresetContext = Boolean.parseBoolean(
-	 * racine.getChild("Configuration").getChild("Learning").getAttributeValue(
-	 * "loadPresetContext"));
-	 * 
-	 * // Initialize the sensor agents for (Element element :
-	 * racine.getChild("StartingAgents").getChildren("Sensor")) { Percept s = new
-	 * Percept(this); s.setName(element.getAttributeValue("Name")); }
-	 * 
-	 * // Initialize the controller agents for (Element element :
-	 * racine.getChild("StartingAgents").getChildren("Controller")) { Head a = new
-	 * Head(this); a.setName(element.getAttributeValue("Name"));
-	 * System.out.println("CREATION OF CONTEXT : " + this.creationOfNewContext);
-	 * a.setNoCreation(!creationOfNewContext); this.head = a; }
-	 * 
-	 * // Load preset context if no learning required if (loadPresetContext) {
-	 * 
-	 * for (Element element :
-	 * racine.getChild("PresetContexts").getChildren("Context")) {
-	 * 
-	 * double[] start, end; int[] n; String[] percepts;
-	 * 
-	 * double action; start = new double[element.getChildren("Range").size()]; end =
-	 * new double[element.getChildren("Range").size()]; n = new
-	 * int[element.getChildren("Range").size()]; percepts = new
-	 * String[element.getChildren("Range").size()];
-	 * 
-	 * int i = 0; for (Element elem : element.getChildren("Range")) { start[i] =
-	 * Double.parseDouble(elem.getAttributeValue("start")); end[i] =
-	 * Double.parseDouble(elem.getAttributeValue("end")); n[i] =
-	 * Integer.parseInt(elem.getAttributeValue("n")); percepts[i] =
-	 * elem.getAttributeValue("Name"); i++; } action =
-	 * Double.parseDouble(element.getAttributeValue("Action"));
-	 * 
-	 * Head c = head;
-	 * 
-	 * // createPresetContext(start, end, n, new int[0], 0, action, c, percepts); }
-	 * 
-	 * } } catch (JDOMException | IOException e) { e.printStackTrace(); } }
-	 */
-
-	public LocalModel buildLocalModel(Context context) {
-
-		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			// TODO (Labbeti) : changed because getPercept is not init when load agents from
-			// file.
-			return new LocalModelMillerRegression(context.getRanges().size());
-		}
-		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp();
-		}
-		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage();
-		}
-		return null;
-	}
-
-	@Override
-	public void setLocalModel(TypeLocalModel localModel) {
-		this.localModel = localModel;
-	}
-
-	@Override
-	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
-			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
-				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
-	}
-
-	@Override
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
-			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
-			int nSuccessBeforeInexactDiminution) {
-		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError,
-				minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
-	}
-
-	public void setNoRenderUpdate(boolean noRenderUpdate) {
-		if (!Configuration.commandLineMode) {
-			this.noRenderUpdate = noRenderUpdate;
-			toggleRender.setSelected(noRenderUpdate);
-		}
-	}
-
-	public boolean isNoRenderUpdate() {
-		return noRenderUpdate;
-	}
-
-	public void allowGraphicalScheduler(boolean allow) {
-		if (!Configuration.commandLineMode) {
-			schedulerToolbar.getComponent(0).setEnabled(allow);
-		}
 	}
 
 	@Override
@@ -251,23 +92,26 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 				if (state == ItemEvent.SELECTED) {
-					noRenderUpdate = true;
+					renderUpdate = false;
 				} else {
-					noRenderUpdate = false;
+					renderUpdate = true;
 				}
 			}
 		};
-		toggleRender.setSelected(noRenderUpdate);
+		toggleRender.setSelected(!renderUpdate);
 		toggleRender.addItemListener(itemListener);
 		JToolBar tb = new JToolBar();
 		tb.add(toggleRender);
 		MainWindow.addToolbar(tb);
 	}
 
+	@Override
 	protected void onUpdateRender() {
-		if (cycle % 1000 == 0)
+		if (cycle % 1000 == 0) {
 			Log.inform("AMOEBA", "Cycle " + cycle);
-		if (!noRenderUpdate) {
+		}
+
+		if (renderUpdate) {
 			List<Percept> percepts = getPercepts();
 			point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
 
@@ -286,38 +130,127 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
+			
+			// @note (Labbeti) Test added to avoid crash when head has just been created.
 			if (!sortedErrors.isEmpty()) {
-				// TODO (Labbeti) => add for avoid crash when head has just been created. keep
-				// it ?
 				errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 			}
 		}
 	}
 
-	public boolean isCreationOfNewContext() {
-		return creationOfNewContext;
+	@Override
+	protected void onSystemCycleBegin() {
+		if (studiedSystem != null) {
+			studiedSystem.playOneStep();
+			perceptionsAndActionState = studiedSystem.getOutput();
+		}
+		environment.preCycleActions();
+		head.clearAllUseableContextLists();
 	}
 
-	public boolean isLoadPresetContext() {
-		return loadPresetContext;
+	/**
+	 * Learn.
+	 * @param actions the actions
+	 */
+	@Override
+	public void learn(HashMap<String, Double> perceptionsActionState) {
+		setPerceptionsAndActionState(perceptionsActionState);
+		this.cycle();
 	}
 
+	/**
+	 * Request.
+	 * @param actions the actions
+	 * @return the double
+	 */
+	@Override
+	public double request(HashMap<String, Double> perceptionsActionState) {
+		if (isUseOracle())
+			head.changeOracleConnection();
+		setPerceptionsAndActionState(perceptionsActionState);
+		getScheduler().step();
+		head.changeOracleConnection();
+		return getAction();
+	}
+
+	public LocalModel buildLocalModel(Context context) {
+
+		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
+			// TODO (Labbeti) : changed because getPercept is not init when load agents from
+			// file.
+			return new LocalModelMillerRegression(context.getRanges().size());
+		}
+		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
+			return new LocalModelFirstExp();
+		}
+		if (localModel == TypeLocalModel.AVERAGE) {
+			return new LocalModelAverage();
+		}
+		return null;
+	}
+
+	public void allowGraphicalScheduler(boolean allow) {
+		if (!Configuration.commandLineMode) {
+			schedulerToolbar.getComponent(0).setEnabled(allow);
+		}
+	}
+
+	public void clearAgents() {
+		List<Agent<? extends Amas<World>, World>> agents = getAgents();
+		for (Agent<? extends Amas<World>, World> agent : agents) {
+			AmoebaAgent amoebaAgent = (AmoebaAgent) agent;
+			amoebaAgent.destroy();
+		}
+		agents.clear();
+	}
+
+	
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
+	}
+
+	@Override
+	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
+			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
+		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
+				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
+	}
+
+	@Override
+	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
+			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
+			int nSuccessBeforeInexactDiminution) {
+		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError,
+				minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+	}
+
+	public void setHead(Head head) {
+		this.head = head;
 	}
 
 	public void setLoadPresetContext(boolean loadPresetContext) {
 		this.loadPresetContext = loadPresetContext;
 	}
 
-	public ArrayList<Percept> getPercepts() {
-		ArrayList<Percept> percepts = new ArrayList<>();
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if ((agent instanceof Percept)) {
-				percepts.add((Percept) agent);
-			}
+	@Override
+	public void setLocalModel(TypeLocalModel localModel) {
+		this.localModel = localModel;
+	}
+
+	public void setRenderUpdate(boolean renderUpdate) {
+		if (!Configuration.commandLineMode) {
+			this.renderUpdate = renderUpdate;
+			toggleRender.setSelected(!renderUpdate);
 		}
-		return percepts;
+	}
+
+	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
+		this.perceptionsAndActionState = perceptionsAndActions;
+	}
+
+	
+	public double getAction() {
+		return head.getAction();
 	}
 
 	public ArrayList<Context> getContexts() {
@@ -336,17 +269,33 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return heads;
 	}
 
-	public void clearAgents() {
-		// TODO (Labbeti) : fix this
-		List<Agent<? extends Amas<World>, World>> agents = getAgents();
-		for (Agent<? extends Amas<World>, World> agent : agents) {
-			AmoebaAgent amoebaAgent = (AmoebaAgent) agent;
-			amoebaAgent.die();
+	public ArrayList<Percept> getPercepts() {
+		ArrayList<Percept> percepts = new ArrayList<>();
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Percept)) {
+				percepts.add((Percept) agent);
+			}
 		}
-		agents.clear();
+		return percepts;
 	}
 
-	public void setHead(Head head) {
-		this.head = head;
+	public Double getPerceptionsOrAction(String key) {
+		return this.perceptionsAndActionState.get(key);
+	}
+
+	public boolean isCreationOfNewContext() {
+		return creationOfNewContext;
+	}
+
+	public boolean isLoadPresetContext() {
+		return loadPresetContext;
+	}
+
+	public boolean isRenderUpdate() {
+		return renderUpdate;
+	}
+
+	public boolean isUseOracle() {
+		return useOracle;
 	}
 }

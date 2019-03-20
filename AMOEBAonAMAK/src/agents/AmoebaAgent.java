@@ -24,7 +24,7 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	@Override
 	protected void onUpdateRender() {
 		super.onUpdateRender();
-		if (!amas.isNoRenderUpdate()) {
+		if (amas.isRenderUpdate()) {
 			updateRender();
 		}
 	}
@@ -35,10 +35,11 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public void die() {
+	
+	@Override
+	public void destroy() {
 		dying = true;
-		destroy();
+		super.destroy();
 	}
 
 	public String getName() {

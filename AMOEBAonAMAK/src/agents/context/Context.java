@@ -21,17 +21,16 @@ import ncs.NCS;
 public class Context extends AmoebaAgent {
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
-	private ArrayList<Experiment> experiments = new ArrayList<Experiment>(); // To save
+	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
-
-	private LocalModel localModel; // To save
-	private double confidence = 0; // To save
+	private LocalModel localModel;
+	private double confidence = 0;
 	private DrawableRectangle drawable;
-	
+
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
 
-		this.setName(String.valueOf(this.hashCode()));
+		setName(String.valueOf(this.hashCode()));
 		Experiment firstPoint = new Experiment();
 
 		List<Percept> percepts = amoeba.getPercepts();
@@ -45,28 +44,29 @@ public class Context extends AmoebaAgent {
 		}
 		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
 		experiments.add(firstPoint);
-
 		localModel = amoeba.buildLocalModel(this);
-		localModel.updateModel(this);
 
 		buildModel(amoeba, head, amoeba.getPercepts());
 	}
 
 	/**
-	 * Constructor used to create a new Context when loading a file (in Save State class)
-	 * @param amoeba the main amas
+	 * Constructor used to create a new Context when loading a file (in Save State
+	 * class)
+	 * 
+	 * @param amoeba      the main amas
 	 * @param head
 	 * @param name
 	 * @param starts
 	 * @param ends
 	 * @param experiments
 	 */
-	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends, ArrayList<Experiment> experiments, LocalModel localModel) {
+	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends,
+			ArrayList<Experiment> experiments, LocalModel localModel, double confidence) {
 		super(amoeba);
 		this.ranges = new HashMap<>();
 		this.experiments = experiments;
 		this.perceptValidities = new HashMap<>();
-		this.confidence = 0;
+		this.confidence = confidence;
 		this.localModel = localModel;
 
 		setName(name);
@@ -80,8 +80,9 @@ public class Context extends AmoebaAgent {
 		buildModel(amoeba, head, percepts);
 	}
 
-	private void buildModel(AMOEBA amoeba, Head head, List<Percept> percepts) {
+	private final void buildModel(AMOEBA amoeba, Head head, List<Percept> percepts) {
 		this.headAgent = head;
+		this.localModel.updateModel(this);
 
 		for (Percept percept : percepts) {
 			percept.addContextProjection(this);
@@ -93,30 +94,11 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	/*
-	 * TODO (Labbeti) : remove 
-	 * private void buildContext(Head headAgent, AMOEBA amoeba) {
-	 * for (Percept percept : percepts) { double length =
-	 * Math.abs(percept.getMinMaxDistance()) / 4.0; Range range = new Range(this,
-	 * percept.getValue() - length, percept.getValue() + length, 0, true, true,
-	 * percept); ranges.put(percept, range); firstPoint.addDimension(percept,
-	 * percept.getValue());
-	 * 
-	 * percept.addContextProjection(this); } localModel =
-	 * amoeba.buildLocalModel(this);
-	 * firstPoint.setProposition(this.headAgent.getOracleValue());
-	 * experiments.add(firstPoint); localModel.updateModel(this);
-	 * this.setName(String.valueOf(this.hashCode()));
-	 * 
-	 * perceptValidities = new HashMap<Percept, Boolean>(); for (Percept percept :
-	 * percepts) { perceptValidities.put(percept, false); } } //
-	 */
-
 	@Override
 	protected int computeExecutionOrderLayer() {
 		return 1;
 	}
-	
+
 	@Override
 	protected void onAct() {
 		if (computeValidityByPercepts()) {
@@ -151,7 +133,7 @@ public class Context extends AmoebaAgent {
 
 	private void solveNCS_Uselessness(Head head) {
 		amas.getEnvironment().raiseNCS(NCS.CONTEXT_USELESSNESS);
-		this.die();
+		this.destroy();
 	}
 
 	private void solveNCS_ConflictInexact(Head head) {
@@ -182,7 +164,7 @@ public class Context extends AmoebaAgent {
 		if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) {
 			p = this.getPerceptsWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
 			if (p == null) {
-				this.die();
+				this.destroy();
 			} else {
 				ranges.get(p).matchBorderWith(head.getBestContext());
 			}
@@ -201,134 +183,8 @@ public class Context extends AmoebaAgent {
 
 	// -----------------------------------------------------------------------------------------------
 
-	private Percept getPerceptsWithLesserImpactOnVolumeNotIncludedIn(ArrayList<Percept> containingRanges, Context c) {
-		Percept p = null;
-		double volumeLost = Double.MAX_VALUE;
-		double vol;
-
-		for (Percept percept : containingRanges) {
-			if (!ranges.get(percept).isPerceptEnum()) {
-				Range r = c.getRanges().get(percept);
-				if (!(r.getStart() <= ranges.get(percept).getStart() && r.getEnd() >= ranges.get(percept).getEnd())) {
-					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
-						vol = ranges.get(percept).getEnd()
-								- ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue());
-					} else {
-						vol = ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue())
-								- ranges.get(percept).getStart();
-					}
-
-					for (Percept p2 : ranges.keySet()) {
-						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							vol *= ranges.get(p2).getLenght();
-						}
-					}
-					if (vol < volumeLost) {
-						volumeLost = vol;
-						p = percept;
-					}
-				}
-			}
-		}
-		return p;
-	}
-
-	private Percept getPerceptsWithLesserImpactOnVolume(ArrayList<Percept> containingRanges) {
-		Percept p = null;
-		double volumeLost = Double.MAX_VALUE;
-		double vol;
-
-		for (Percept v : containingRanges) {
-			if (!ranges.get(v).isPerceptEnum()) {
-
-				if (ranges.get(v).getNearestLimit(v.getValue()) == false) {
-					vol = ranges.get(v).getEnd() - ranges.get(v).simulateNegativeAVTFeedbackMin(v.getValue());
-				} else {
-					vol = ranges.get(v).simulateNegativeAVTFeedbackMax(v.getValue()) - ranges.get(v).getStart();
-				}
-
-				for (Percept v2 : ranges.keySet()) {
-					if (!ranges.get(v).isPerceptEnum() && v2 != v) {
-						vol *= ranges.get(v2).getLenght();
-					}
-				}
-				if (vol < volumeLost) {
-					volumeLost = vol;
-					p = v;
-				}
-
-			}
-
-		}
-		return p;
-	}
-
-	public double getActionProposal() {
-		return localModel.getProposition(this);
-	}
-
-	public HashMap<Percept, Range> getRanges() {
-		return ranges;
-	}
-
-	public Range getRangeByPerceptName(String perceptName) {
-		for (Percept prct : ranges.keySet()) {
-			if (prct.getName().equals(perceptName)) {
-				return ranges.get(prct);
-			}
-		}
-		return null;
-	}
-
 	public String toString() {
 		return "Context :" + this.getName();
-	}
-
-	public LocalModel getFunction() {
-		return localModel;
-	}
-
-	public ArrayList<Experiment> getExperiments() {
-		return experiments;
-	}
-
-	public double getConfidence() {
-		return confidence;
-	}
-
-	public double getNormalizedConfidence() {
-		return 1 / (1 + Math.exp(-confidence));
-	}
-
-	public double getParametrizedNormalizedConfidence(double dispersion) {
-		return 1 / (1 + Math.exp(-confidence / dispersion));
-	}
-
-	public double getInfluence(HashMap<Percept, Double> situation) {
-		Double influence = 1.0;
-
-		for (Percept pct : situation.keySet()) {
-			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
-		}
-
-		return influence;
-	}
-
-	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
-		double center = getCenterByPercept(pct);
-		double radius = getRadiusByPercept(pct);
-
-		return getNormalizedConfidence() * Math.exp(-Math.pow(situation - center, 2) / (2 * Math.pow(radius, 2)));
-	}
-
-	public double getCenterByPercept(Percept pct) {
-		return (this.getRangeByPerceptName(pct.getName()).getEnd()
-				+ this.getRangeByPerceptName(pct.getName()).getStart()) / 2;
-	}
-
-	public double getRadiusByPercept(Percept pct) {
-		return (this.getRangeByPerceptName(pct.getName()).getEnd()
-				- this.getRangeByPerceptName(pct.getName()).getStart()) / 2;
 	}
 
 	private void updateExperiments() {
@@ -385,14 +241,14 @@ public class Context extends AmoebaAgent {
 		Percept perceptWithLesserImpact = getPerceptsWithLesserImpactOnVolumeNotIncludedIn(containingRanges,
 				consideredContext);
 		if (perceptWithLesserImpact == null) {
-			this.die();
+			this.destroy();
 		} else {
 			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
 		}
 	}
-	
+
 	@Override
-	public void die() {
+	public void destroy() {
 		ArrayList<Percept> percepts = amas.getPercepts();
 		for (Percept percept : percepts) {
 			percept.deleteContextProjection(this);
@@ -400,11 +256,7 @@ public class Context extends AmoebaAgent {
 		if (!Configuration.commandLineMode) {
 			drawable.hide();
 		}
-		super.die();
-	}
-
-	public void setPerceptValidity(Percept percept) {
-		perceptValidities.put(percept, true);
+		super.destroy();
 	}
 
 	public Boolean computeValidityByPercepts() {
@@ -482,5 +334,135 @@ public class Context extends AmoebaAgent {
 			b = 255.0;
 		}
 		drawable.setColor(new Color(r.intValue(), g.intValue(), b.intValue(), 90));
+	}
+
+	public void setPerceptValidity(Percept percept) {
+		perceptValidities.put(percept, true);
+	}
+
+	public double getActionProposal() {
+		return localModel.getProposition(this);
+	}
+
+	public double getCenterByPercept(Percept pct) {
+		return (this.getRangeByPerceptName(pct.getName()).getEnd()
+				+ this.getRangeByPerceptName(pct.getName()).getStart()) / 2;
+	}
+
+	public double getConfidence() {
+		return confidence;
+	}
+
+	public ArrayList<Experiment> getExperiments() {
+		return experiments;
+	}
+
+	public LocalModel getFunction() {
+		return localModel;
+	}
+
+	public double getInfluence(HashMap<Percept, Double> situation) {
+		Double influence = 1.0;
+
+		for (Percept pct : situation.keySet()) {
+			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
+		}
+
+		return influence;
+	}
+
+	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
+		double center = getCenterByPercept(pct);
+		double radius = getRadiusByPercept(pct);
+
+		return getNormalizedConfidence() * Math.exp(-Math.pow(situation - center, 2) / (2 * Math.pow(radius, 2)));
+	}
+
+	public double getNormalizedConfidence() {
+		return 1 / (1 + Math.exp(-confidence));
+	}
+
+	public double getParametrizedNormalizedConfidence(double dispersion) {
+		return 1 / (1 + Math.exp(-confidence / dispersion));
+	}
+
+	private Percept getPerceptsWithLesserImpactOnVolumeNotIncludedIn(ArrayList<Percept> containingRanges, Context c) {
+		Percept p = null;
+		double volumeLost = Double.MAX_VALUE;
+		double vol;
+
+		for (Percept percept : containingRanges) {
+			if (!ranges.get(percept).isPerceptEnum()) {
+				Range r = c.getRanges().get(percept);
+				if (!(r.getStart() <= ranges.get(percept).getStart() && r.getEnd() >= ranges.get(percept).getEnd())) {
+					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
+						vol = ranges.get(percept).getEnd()
+								- ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue());
+					} else {
+						vol = ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue())
+								- ranges.get(percept).getStart();
+					}
+
+					for (Percept p2 : ranges.keySet()) {
+						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
+							vol *= ranges.get(p2).getLenght();
+						}
+					}
+					if (vol < volumeLost) {
+						volumeLost = vol;
+						p = percept;
+					}
+				}
+			}
+		}
+		return p;
+	}
+
+	private Percept getPerceptsWithLesserImpactOnVolume(ArrayList<Percept> containingRanges) {
+		Percept p = null;
+		double volumeLost = Double.MAX_VALUE;
+		double vol;
+
+		for (Percept v : containingRanges) {
+			if (!ranges.get(v).isPerceptEnum()) {
+
+				if (ranges.get(v).getNearestLimit(v.getValue()) == false) {
+					vol = ranges.get(v).getEnd() - ranges.get(v).simulateNegativeAVTFeedbackMin(v.getValue());
+				} else {
+					vol = ranges.get(v).simulateNegativeAVTFeedbackMax(v.getValue()) - ranges.get(v).getStart();
+				}
+
+				for (Percept v2 : ranges.keySet()) {
+					if (!ranges.get(v).isPerceptEnum() && v2 != v) {
+						vol *= ranges.get(v2).getLenght();
+					}
+				}
+				if (vol < volumeLost) {
+					volumeLost = vol;
+					p = v;
+				}
+
+			}
+
+		}
+		return p;
+	}
+
+	public double getRadiusByPercept(Percept pct) {
+		return (this.getRangeByPerceptName(pct.getName()).getEnd()
+				- this.getRangeByPerceptName(pct.getName()).getStart()) / 2;
+	}
+
+	public Range getRangeByPerceptName(String perceptName) {
+		for (Percept prct : ranges.keySet()) {
+			if (prct.getName().equals(perceptName)) {
+				return ranges.get(prct);
+			}
+		}
+		return null;
+	}
+
+	public HashMap<Percept, Range> getRanges() {
+		return ranges;
 	}
 }
