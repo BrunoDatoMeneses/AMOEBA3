@@ -155,25 +155,37 @@ public class MNIST_System implements StudiedSystem {
 		return ret;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		boolean benchmark = true;
 		if(benchmark) { 
+			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd";
+			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd";
 			Log.minLevel = Log.Level.FATAL;
 			Configuration.commandLineMode = true;
 			int nbRequest = 500;
 			benchmark(1,1,1); //set up memory.
-			for(int nbCycle = 1; nbCycle < 513; nbCycle *= 2) {
-				List<Double> ret = benchmark(1, nbCycle, nbRequest);
-				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 1 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
-				ret = benchmark(4, nbCycle, nbRequest);
-				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 4 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
-				ret = benchmark(8, nbCycle, nbRequest);
-				System.out.println(nbCycle+" cycles, "+nbRequest+" requests, 8 thd | cycle time : "+ret.get(0)+"s. request time : "+ret.get(1)+"s.");
+			for(int nbCycle = 1; nbCycle < 502; nbCycle += 100) {
+				System.out.println("Nb Cycle : "+nbCycle);
+				outLearn += nbCycle + " ";
+				outRequest += nbCycle + " ";
+				for(int thd = 1; thd <= 8; thd *= 2) {
+					List<Double> ret = benchmark(thd, nbCycle, nbRequest);
+					outLearn += ret.get(0) + " ";
+					outRequest += ret.get(1) + " ";
+				}
+				outLearn += "\n";
+				outRequest += "\n";
 			}
+			System.out.println("Learn : ");
+			System.out.println(outLearn);
+			System.out.println("Request : ");
+			System.out.println(outRequest);
 			System.out.println("Done.");
 			System.exit(0);
 		}
 		else {
+			System.out.println("To start press a key.");
+			System.in.read();
 			//Non benchmark usage :
 			StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
 			File file = new File("Ressources\\mnist.xml");

@@ -128,6 +128,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		//contexts
+		//launch only usefull context
 		List<Context> synchronousContexts = getContexts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());

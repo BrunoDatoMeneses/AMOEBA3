@@ -1,6 +1,7 @@
 package experiments;
 
 import java.io.File;
+import java.io.IOException;
 
 import fr.irit.smac.amak.Configuration;
 import kernel.AMOEBA;
@@ -9,12 +10,14 @@ import kernel.World;
 
 public class Main {
 
-	public static void main(String[] args) {
-		//experiment();
-		benchmark();
+	public static void main(String[] args) throws IOException {
+		experiment();
+		//benchmark();
 	}
 	
-	private static void experiment() {
+	private static void experiment() throws IOException {
+		System.out.println("To start press a key.");
+		System.in.read();
 		File file = new File("Ressources\\twoDimensionsLauncher.xml");
 		System.out.println(file);
 		World world = new World();
@@ -30,7 +33,7 @@ public class Main {
 		amoeba.setNoRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(false);
 		long start = System.currentTimeMillis();
-		int nbCycle = 10000;
+		int nbCycle = 2000;
 		for(int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			//System.out.println(studiedSystem.getOutput());
