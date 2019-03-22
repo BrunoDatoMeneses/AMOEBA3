@@ -15,10 +15,11 @@ public class Percept extends AmoebaAgent {
 	private double max = Double.MIN_VALUE;
 
 	private double value;
-	private boolean isEnum = false;
+	private boolean isEnum;
 
 	public Percept(AMOEBA amas) {
 		super(amas);
+		this.isEnum = false;
 	}
 
 	@Override
@@ -60,6 +61,10 @@ public class Percept extends AmoebaAgent {
 		double dist = max - min;
 		min += 0.05 * dist;
 		max -= 0.05 * dist;
+	}
+	
+	public void setEnum(boolean isEnum) {
+		this.isEnum = isEnum;
 	}
 
 	/**

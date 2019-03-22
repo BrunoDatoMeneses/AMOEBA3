@@ -15,8 +15,6 @@ public interface IAMOEBA {
 	public double request(HashMap<String, Double> perceptionsActionState);
 	
 	public void setCreationOfNewContext(boolean creationOfNewContext);
-	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError, double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution);
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError, double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation, int nSuccessBeforeInexactDiminution);
 	public void setHead(Head head);
 	public void setLoadPresetContext(boolean loadPresetContext);
 	public void setLocalModel(TypeLocalModel localModel);

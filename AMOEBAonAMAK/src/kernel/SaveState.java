@@ -54,7 +54,7 @@ public class SaveState implements ISaveState {
 	}
 
 	// -------------------- Public Methods --------------------
-
+	
 	/**
 	 * Load from an XML file a model for AMOEBA.
 	 * 
@@ -62,7 +62,7 @@ public class SaveState implements ISaveState {
 	 *             XML format.
 	 */
 	@Override
-	public void load(File file) {
+	public void loadXML(File file) {
 		amoeba.clearAgents();
 		perceptsByName.clear();
 
@@ -91,7 +91,7 @@ public class SaveState implements ISaveState {
 	 * @param file The file where you want to insert the model.
 	 */
 	@Override
-	public void save(File file) {
+	public void saveXML(File file) {
 		Element elemSystem = new Element("System");
 		Document doc = new Document(elemSystem);
 
@@ -109,7 +109,7 @@ public class SaveState implements ISaveState {
 			e.printStackTrace();
 		}
 	}
-
+	
 	// -------------------- Private methods --------------------
 
 	private void loadConfiguration(Element systemElement) {
@@ -130,21 +130,43 @@ public class SaveState implements ISaveState {
 	private void loadStartingAgents(Element systemElement) {
 		Element startingAgentsElement = systemElement.getChild("StartingAgents");
 		List<Element> agentsElement = startingAgentsElement.getChildren();
-		this.perceptsByName = new HashMap<>();
 
 		int nbHeadsAdded = 0;
 		int nbPerceptsAdded = 0;
-		for (Element agentElement : agentsElement) {
-			if (agentElement.getName().equals(HEAD_NODE)) {
+		for (Element startingAgentElement : agentsElement) {
+			if (startingAgentElement.getName().equals(HEAD_NODE)) {
 				Head head = new Head(amoeba);
-				head.setName(agentElement.getAttributeValue("Name"));
+				head.setName(startingAgentElement.getAttributeValue("Name"));
 				head.setNoCreation(!amoeba.isCreationOfNewContext());
+				
+				// TODO : maybe set default values if you cant find errorMargin and inexactMargin ?
+				Element errorMarginElement = startingAgentElement.getChild("ErrorMargin");
+				double errorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("ErrorAllowed"));
+				double augmentationFactorError = Double.valueOf(errorMarginElement.getAttributeValue("AugmentationFactorError"));
+				double diminutionFactorError = Double.valueOf(errorMarginElement.getAttributeValue("DiminutionFactorError"));
+				double minErrorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("MinErrorAllowed"));
+				int nConflictBeforeAugmentation = Integer.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
+				int nSuccessBeforeDiminution = Integer.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
+				head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed, nConflictBeforeAugmentation, nSuccessBeforeDiminution);
+				
+				Element inexactMarginElement = startingAgentElement.getChild("InexactMargin");
+				double inexactAllowed = Double.valueOf(inexactMarginElement.getAttributeValue("InexactAllowed"));
+				double augmentationInexactError = Double.valueOf(inexactMarginElement.getAttributeValue("AugmentationInexactError"));
+				double diminutionInexactError = Double.valueOf(inexactMarginElement.getAttributeValue("DiminutionInexactError"));
+				double minInexactAllowed = Double.valueOf(inexactMarginElement.getAttributeValue("MinInexactAllowed"));
+				int nConflictBeforeInexactAugmentation = Integer.valueOf(inexactMarginElement.getAttributeValue("NConflictBeforeInexactAugmentation"));
+				int nSuccessBeforeInexactDiminution = Integer.valueOf(inexactMarginElement.getAttributeValue("NSuccessBeforeInexactDiminution"));
+				head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
+				
 				amoeba.setHead(head);
 				nbHeadsAdded++;
-			} else if (agentElement.getName().equals(PERCEPT_NODE)) {
+			} else if (startingAgentElement.getName().equals(PERCEPT_NODE)) {
 				Percept percept = new Percept(amoeba);
-				percept.setName(agentElement.getAttributeValue("Name"));
-				this.perceptsByName.put(percept.getName(), percept);
+				percept.setName(startingAgentElement.getAttributeValue("Name"));
+				boolean isEnum = Boolean.valueOf(startingAgentElement.getAttributeValue("Enum"));
+				percept.setEnum(isEnum);
+				
+				perceptsByName.put(percept.getName(), percept);
 				nbPerceptsAdded++;
 			}
 		}
@@ -247,13 +269,13 @@ public class SaveState implements ISaveState {
 	private void saveConfiguration(Element rootElement) {
 		Element configurationElement = new Element("Configuration");
 		Element learningElement = new Element("Learning");
-		List<Attribute> attributes = new ArrayList<>();
+		List<Attribute> learningAttributes = new ArrayList<>();
 
-		attributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
-		attributes.add(new Attribute("loadPresetContext", String.valueOf(amoeba.isLoadPresetContext())));
-		learningElement.setAttributes(attributes);
+		learningAttributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
+		learningAttributes.add(new Attribute("loadPresetContext", String.valueOf(amoeba.isLoadPresetContext())));
+		learningElement.setAttributes(learningAttributes);
 
-		configurationElement.addContent(learningElement);
+		configurationElement.addContent(learningElement);		
 		rootElement.addContent(configurationElement);
 	}
 
@@ -268,6 +290,29 @@ public class SaveState implements ISaveState {
 
 			attributes.add(new Attribute("Name", head.getName()));
 			controllerElement.setAttributes(attributes);
+
+			Element errorMarginElement = new Element("ErrorMargin");
+			List<Attribute> errorAttributes = new ArrayList<>();
+			errorAttributes.add(new Attribute("ErrorAllowed", String.valueOf(head.getErrorAllowed())));
+			errorAttributes.add(new Attribute("AugmentationFactorError", String.valueOf(head.getErrorAllowed())));
+			errorAttributes.add(new Attribute("DiminutionFactorError", String.valueOf(head.getDiminutionFactorError())));
+			errorAttributes.add(new Attribute("MinErrorAllowed", String.valueOf(head.getMinErrorAllowed())));
+			errorAttributes.add(new Attribute("NConflictBeforeAugmentation", String.valueOf(head.getNConflictBeforeAugmentation())));
+			errorAttributes.add(new Attribute("NSuccessBeforeDiminution", String.valueOf(head.getNSuccessBeforeDiminution())));
+			errorMarginElement.setAttributes(errorAttributes);
+			controllerElement.addContent(errorMarginElement);
+			
+			Element inexactMarginElement = new Element("InexactMargin");
+			List<Attribute> inexactAttributes = new ArrayList<>();
+			inexactAttributes.add(new Attribute("InexactAllowed", String.valueOf(head.getInexactAllowed())));
+			inexactAttributes.add(new Attribute("AugmentationInexactError", String.valueOf(head.getAugmentationInexactError())));
+			inexactAttributes.add(new Attribute("DiminutionInexactError", String.valueOf(head.getDiminutionInexactError())));
+			inexactAttributes.add(new Attribute("MinInexactAllowed", String.valueOf(head.getMinInexactAllowed())));
+			inexactAttributes.add(new Attribute("NConflictBeforeInexactAugmentation", String.valueOf(head.getNConflictBeforeInexactAugmentation())));
+			inexactAttributes.add(new Attribute("NSuccessBeforeInexactDiminution", String.valueOf(head.getNSuccessBeforeInexactDiminution())));
+			inexactMarginElement.setAttributes(inexactAttributes);
+			controllerElement.addContent(inexactMarginElement);
+
 			startingAgentsElement.addContent(controllerElement);
 		}
 
@@ -276,6 +321,7 @@ public class SaveState implements ISaveState {
 			List<Attribute> attributes = new ArrayList<>();
 
 			attributes.add(new Attribute("Name", percept.getName()));
+			attributes.add(new Attribute("Enum", String.valueOf(percept.isEnum())));
 			sensorElement.setAttributes(attributes);
 			startingAgentsElement.addContent(sensorElement);
 		}
@@ -379,17 +425,18 @@ public class SaveState implements ISaveState {
 		SaveState saveState = new SaveState(amoeba);
 
 		System.out.println(
-				"DEBUG: before load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
-		saveState.load(srcFile);
+				"DEBUG: before load: contexts/agents = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
+		saveState.loadXML(file);
+		
+		// TODO : rem this:
+		//amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
+		//amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
+		amoeba.setRenderUpdate(false); // TODO to save ?
+		amoeba.allowGraphicalScheduler(false); // TODO to save ?
 
-		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
-		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
-		amoeba.setRenderUpdate(false);
-		amoeba.allowGraphicalScheduler(false);
-
-		System.out.println("DEBUG: Begin learning.");
-		// Example for using the learn method
 		int nbCycles = 1;
+		System.out.println("DEBUG: Begin learning with " + nbCycles + " cycles.");
+		// Example for using the learn method
 		for (int i = 0; i < nbCycles; ++i) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
@@ -397,11 +444,11 @@ public class SaveState implements ISaveState {
 
 		// DEBUG
 		System.out.println(
-				"DEBUG: after  load: contexts = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
+				"DEBUG: after  load: contexts/agents = " + amoeba.getContexts().size() + "/" + amoeba.getAgents().size());
 
 		amoeba.setRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(true);
 
-		saveState.save(trgFile);
+		saveState.saveXML(trgFile);
 	}
 }

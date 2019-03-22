@@ -51,7 +51,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private ILxPlotChart errors;
 	private JToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
-	private boolean renderUpdate = true;
+	private boolean renderUpdate = false;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
@@ -87,7 +87,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
 
 		// update render button
-		toggleRender = new JToggleButton("No Update Render");
+		toggleRender = new JToggleButton("Update Render");
 		ItemListener itemListener = new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
@@ -176,7 +176,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public LocalModel buildLocalModel(Context context) {
-
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
 			// note (Labbeti) This constructor has changed because getPercept is not
 			// initialized when we load agents from a file.
@@ -206,23 +205,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		agents.clear();
 	}
 
+	
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
-	}
-
-	@Override
-	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
-			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
-				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
-	}
-
-	@Override
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
-			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
-			int nSuccessBeforeInexactDiminution) {
-		head.setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError,
-				minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
 	}
 
 	public void setHead(Head head) {
@@ -249,6 +234,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
 
+	
 	public double getAction() {
 		return head.getAction();
 	}
