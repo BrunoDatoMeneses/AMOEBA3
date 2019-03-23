@@ -13,14 +13,15 @@ import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import fr.irit.smac.amak.ui.drawables.DrawableString;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 /**
@@ -76,7 +77,7 @@ public class VUI {
 	/**
 	 * The canvas on which all is drawn
 	 */
-	private Group canvas;
+	private Pane canvas;
 
 	/**
 	 * Label aiming at showing information about the VUI (zoom and offset)
@@ -111,9 +112,9 @@ public class VUI {
 	private double worldCenterY = defaultWorldCenterY;
 	
 	/**
-	 * The associated scene
+	 * Used to be sure that only one thread at the same time create a VUI
 	 */
-	private Scene scene;
+	private static ReentrantLock instanceLock = new ReentrantLock();
 	
 	/**
 	 * Get the default VUI
@@ -132,16 +133,14 @@ public class VUI {
 	 * @return The VUI with id "id"
 	 */
 	public static VUI get(String id) {
-		System.out.println("get id");
+		instanceLock.lock();
 		if (!instances.containsKey(id)) {
-			System.out.println("not contains");
 			VUI value = new VUI(id);
-			System.out.println("Created of VUI");
 			instances.put(id, value);
-			System.out.println("Add id to instances");
+			instanceLock.unlock();
 			return value;
 		}
-		System.out.println("No need to create");
+		instanceLock.unlock();
 		return instances.get(id);
 	}
 
@@ -153,22 +152,16 @@ public class VUI {
 	 *            The title used for the vui
 	 */
 	private VUI(String title) {
-		System.out.println("CONSTR VUI");
 		panel = new BorderPane();
-		System.out.println("New BorderPane created");
 		
 		HBox statusPanel = new HBox();
-		System.out.println("New HBox created");
 		statusLabel = new Label("status");
-		System.out.println("New Label created");
 		statusLabel.setTextAlignment(TextAlignment.LEFT);
-		System.out.println("After set alignment");
 		statusPanel.getChildren().add(statusLabel);
-		System.out.println("statusLabel added statusPanel");
+		panel.setTop(statusPanel); // TODO: setBottom, not setTop
+		
 		Button resetButton = new Button("Reset");
-		System.out.println("New Button created");
 		resetButton.setOnAction(new EventHandler<ActionEvent>() {
-			
 			@Override
 			public void handle(ActionEvent event) {
 				zoom = defaultZoom;
@@ -177,13 +170,69 @@ public class VUI {
 				updateCanvas();
 			}
 		});
-		System.out.println("New action associated to the button");
 		statusPanel.getChildren().add(resetButton);
-		System.out.println("resetButton added to statusPanel");
-		panel.setBottom(statusPanel);
-		System.out.println("statusPanel added to panel");
+		
+
+		canvas = new Pane();
+		
+		final double w = canvas.getWidth();
+		final double h = canvas.getHeight();
+		
+		canvas.getChildren().add(new Rectangle(0, 0, w, h));
+
+		setWorldOffsetX(worldCenterX + screenToWorldDistance(w / 2));
+		setWorldOffsetY(worldCenterY + screenToWorldDistance(h / 2));
+		
+		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				lastDragX = event.getX();
+				lastDragY = event.getY();
+			}
+		});
+		canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				lastDragX = null;
+				lastDragY = null;
+			}
+		});
+		canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				try {
+					worldCenterX += screenToWorldDistance(event.getX() - lastDragX);
+					worldCenterY += screenToWorldDistance(event.getY() - lastDragY);
+					lastDragX = event.getX();
+					lastDragY = event.getY();
+					updateCanvas();
+				} catch (Exception ez) {
+					// Catch exception occurring when mouse is out of the canvas
+				}
+			}
+		});
+		
+		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
+			@Override
+			public void handle(ScrollEvent event) {
+				double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				zoom += event.getDeltaY() / event.getMultiplierY() * 10;
+				if (zoom < 10)
+					zoom = 10;
+				
+				double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				worldCenterX -= wdx2 - wdx;
+				worldCenterY -= wdy2 - wdy;
+				updateCanvas();
+			}
+		});
+		
+		canvas.prefWidth(800);
+		canvas.prefHeight(600);
+		panel.setCenter(canvas);
 		MainWindow.addTabbedPanel("VUI #" + title, panel);
-		System.out.println("tabbedPanel added to MainWindow");
 	}
 
 	/**
@@ -275,6 +324,7 @@ public class VUI {
 		d.setPanel(this);
 		drawablesLock.lock();
 		drawables.add(d);
+		d.onDraw(canvas);
 		drawablesLock.unlock();
 		updateCanvas();
 	}
@@ -283,6 +333,9 @@ public class VUI {
 	 * Refresh the canvas
 	 */
 	public void updateCanvas() {
+		for (Drawable d: drawables)
+			d.onDraw(canvas);
+		
 		statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
 	}
 
@@ -292,7 +345,7 @@ public class VUI {
 	 * @return the canvas width
 	 */
 	public double getCanvasWidth() {
-		return scene.getWidth();
+		return canvas.getWidth();
 	}
 
 	/**
@@ -301,7 +354,7 @@ public class VUI {
 	 * @return the canvas height
 	 */
 	public double getCanvasHeight() {
-		return scene.getHeight();
+		return canvas.getHeight();
 	}
 
 	/**
@@ -428,75 +481,8 @@ public class VUI {
 		add(ds);
 		return ds;
 	}
-
-	/**
-	 * Set the canvas of the VUI
-	 * 
-	 * @param scene
-	 *            The associated scene
-	 * @param canvas
-	 *            The associated canvas
-	 */
-	public void setCanvas(Scene scene, Group root) {
-		this.scene = scene;
-		canvas = root;
-		
-		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				lastDragX = event.getX();
-				lastDragY = event.getY();
-			}
-		});
-		canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				lastDragX = null;
-				lastDragY = null;
-			}
-		});
-		canvas.setOnMouseMoved(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				try {
-				worldCenterX += screenToWorldDistance(event.getX() - lastDragX);
-				worldCenterY += screenToWorldDistance(event.getY() - lastDragY);
-				lastDragX = event.getX();
-				lastDragY = event.getY();
-				updateCanvas();
-				} catch (Exception ez) {
-					// Catch exception occurring when mouse is out of the canvas
-				}
-			}
-		});
-		
-		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
-			@Override
-			public void handle(ScrollEvent event) {
-				double wdx = screenToWorldDistance(scene.getWidth() / 2 - event.getX());
-				double wdy = screenToWorldDistance(scene.getHeight() / 2 - event.getY());
-				
-				zoom -= event.getTouchCount() * 10;
-				if (zoom < 10)
-					zoom = 10;
-				
-				double wdx2 = screenToWorldDistance(scene.getWidth() / 2 - event.getX());
-				double wdy2 = screenToWorldDistance(scene.getHeight() / 2 - event.getY());
-				worldCenterX -= wdx2 - wdx;
-				worldCenterY -= wdy2 - wdy;
-				updateCanvas();
-			}
-		});
-		
-		canvas.prefWidth(800);
-		canvas.prefHeight(600);
-		panel.setCenter(canvas);
-	}
 	
-	/**
-	 * Use to get the associated group
-	 */
-	public Group getGroup() {
+	public Pane getCanvas() {
 		return canvas;
 	}
 }

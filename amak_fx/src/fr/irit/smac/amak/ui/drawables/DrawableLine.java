@@ -9,7 +9,7 @@ public class DrawableLine extends Drawable {
 	public DrawableLine(VUI vui, double dx, double dy, double tx, double ty) {
 		super(vui, 0, 0, 0, 0);
 		line = new Line(dx, dy, tx, ty);
-		vui.getGroup().getChildren().add(line);
+		vui.getCanvas().getChildren().add(line);
 	}
 
 	@Override

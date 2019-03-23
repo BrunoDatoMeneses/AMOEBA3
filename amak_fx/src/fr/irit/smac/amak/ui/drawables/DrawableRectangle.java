@@ -10,7 +10,7 @@ public class DrawableRectangle extends Drawable {
 	public DrawableRectangle(VUI vui, double dx, double dy, double width, double height) {
 		super(vui, dx, dy, width, height);
 		rectangle = new Rectangle();
-		vui.getGroup().getChildren().add(rectangle);
+		vui.getCanvas().getChildren().add(rectangle);
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class SchedulerToolbar extends ToolBar {
 	 * 
 	 */
 	public SchedulerToolbar(String title, Scheduler scheduler) {
-		System.out.println("BEGIN CONST SchedulerToolbar");
+		super();
 		this.title = title;
 		this.scheduler = scheduler;
 		this.scheduler.setOnStop(s -> getSlider().setValue(1));
@@ -79,9 +79,8 @@ public class SchedulerToolbar extends ToolBar {
 				getSlider().setValue(1);
 			}
 		});
-		getChildren().add(getSlider());
+		getItems().add(getSlider());
 		setPrefSize(300, 100);
-		System.out.println("END CONST SchedulerToolbar");
 	}
 
 	/**
@@ -107,7 +106,6 @@ public class SchedulerToolbar extends ToolBar {
 			labelTable.put(7d, new Label("MAX"));
 			
 			runController.setLabelFormatter(new StringConverter<Double>() {
-				
 				@Override
 				public String toString(Double n) {
 					return labelTable.get(n).getText();
@@ -116,8 +114,7 @@ public class SchedulerToolbar extends ToolBar {
 				@Override
 				public Double fromString(String string) {
 					Set<Double> keySet = labelTable.keySet();
-					
-					for (Double d: keySet) {
+					for (Double d : keySet) {
 						if (labelTable.get(d).getText() == string)
 							return d;
 					}
@@ -128,6 +125,8 @@ public class SchedulerToolbar extends ToolBar {
 
 			runController.setShowTickMarks(true);
 			runController.setShowTickLabels(true);
+			runController.setMajorTickUnit(1);
+			runController.setPrefWidth(200);
 			runController.valueProperty().addListener(l -> {
 				switch ((int) runController.getValue()) {
 				case 0:

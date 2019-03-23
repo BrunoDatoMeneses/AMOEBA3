@@ -112,10 +112,8 @@ public class Scheduler implements Runnable, Serializable {
 			defaultScheduler = new Scheduler();
 			if (!Configuration.commandLineMode) {
 				MainWindow.instance();
-				System.out.println("Create toolbar");
 				SchedulerToolbar st = new SchedulerToolbar("Default", defaultScheduler);
-				System.out.println("Associate toolbar");
-				MainWindow.addToolbar(new SchedulerToolbar("Default", defaultScheduler));
+				MainWindow.addToolbar(st);
 			}
 		}
 		return defaultScheduler;
@@ -145,7 +143,6 @@ public class Scheduler implements Runnable, Serializable {
 			break;
 		default:
 			break;
-
 		}
 		stateLock.unlock();
 		synchronized (onChange) {

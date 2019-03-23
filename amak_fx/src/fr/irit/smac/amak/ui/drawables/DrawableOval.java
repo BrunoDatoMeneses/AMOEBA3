@@ -10,7 +10,7 @@ public class DrawableOval extends Drawable {
 	public DrawableOval(VUI vui, double dx, double dy, double width, double height) {
 		super(vui, dx, dy, width, height);
 		ellipse = new Ellipse();
-		vui.getGroup().getChildren().add(ellipse);
+		vui.getCanvas().getChildren().add(ellipse);
 	}
 
 	@Override

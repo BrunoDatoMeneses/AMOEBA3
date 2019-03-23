@@ -3,12 +3,13 @@ package fr.irit.smac.amak.ui;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.management.InstanceAlreadyExistsException;
+
 import fr.irit.smac.amak.Information;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -80,72 +81,68 @@ public class MainWindow extends Application {
 	 */
 	private static ReentrantLock startLock = new ReentrantLock();
 	private static Condition waiting = startLock.newCondition();
+	/**
+	 * Boolean used in instance() function to forbid multiple calls of Application.launch()
+	 */
+	private static boolean isCreated = false;
 	
 	/**
 	 * Create the frame.
+	 * 
+	 * @throws InstanceAlreadyExistsException if the MainWindow has already been instantiated.
+	 * This constructor should be used by the Application of JavaFX only.
 	 */
-	public MainWindow() {
-		instanceLock.lock();
-		if (instance == null) {
-			System.out.println("Before launching");
-			Thread ui = new Thread(new Runnable() {
-			    @Override
-			    public void run() {
-					Application.launch(MainWindow.class);
-			    }
-			});
-			ui.start();
-			System.out.println("After launching");
-		}
-		instanceLock.unlock();
+	public MainWindow() throws InstanceAlreadyExistsException {
+		super();
+		if (instance == null)
+			instance = this;
+		else throw new InstanceAlreadyExistsException();
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		startLock.lock();
-		System.out.println("BEGIN START");
 		// Creation of scene and root group
 		primaryStage.setTitle("AMAK");
-		Group root = new Group();
+		AnchorPane root = new AnchorPane();
 		Scene scene = new Scene(root, 450, 300);
 		stage = primaryStage;
+		stage.setScene(scene);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				System.exit(0);
+			}
+		});
 		
-		System.out.println("Border organization of the scene");
 		// Border organization of the scene
 		BorderPane organizationPane = new BorderPane();
 		root.getChildren().add(organizationPane);
+		organizationPane.prefHeightProperty().bind(stage.heightProperty());
+		organizationPane.prefWidthProperty().bind(stage.widthProperty());
 		
-		System.out.println("Creation of the toolbar (Bottom)");
 		// Creation of the toolbar (Bottom)
 		toolbarPanel = new FlowPane();
-		toolbarPanel.setHgap(5);
-		toolbarPanel.setVgap(5);
 		organizationPane.setBottom(toolbarPanel);
-		
-		System.out.println("Creation of the split pane (Center)");
+
 		// Creation of the split pane (Center)
 		splitPane = new SplitPane();
 		splitPane.setOrientation(Orientation.HORIZONTAL);
 		organizationPane.setCenter(splitPane);
-		
-		System.out.println("Creation of the left part of the split pane (Center Left)");
+
 		// Creation of the left part of the split pane (Center Left)
 		AnchorPane left = new AnchorPane();
 		splitPane.getItems().add(left);
 		
-		System.out.println("Creation of the right part of the split pane (Center Right)");
 		// Creation of the right part of the split pane (Center Right)
 		tabbedPanel = new TabPane();
 		splitPane.getItems().add(tabbedPanel);
-		
-		System.out.println("Creation of the menu bar (Top)");
+
 		// Creation of the menu bar (Top)
 		menuBar = new MenuBar();
 		optionsMenu = new Menu("Options");
-		menuBar.getMenus().add(optionsMenu);
 		organizationPane.setTop(menuBar);
 		
-		System.out.println("Creation of the close menu item");
 		// Creation of the close menu item
 		MenuItem menuItem = new MenuItem("Close");
 		menuItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -156,21 +153,14 @@ public class MainWindow extends Application {
 		});
 		optionsMenu.getItems().add(menuItem);
 		
+		menuBar.getMenus().add(optionsMenu);
 		menuBar.getMenus().add(new Menu("AMAK v" + Information.VERSION));
-
-		instance = this;
 		
 		startEnded = true;
 		waiting.signal();
 		startLock.unlock();
 		
-		System.out.println("Association between the root Group and the main VUI");
-		// Association between the root Group and the main VUI
-		VUI.get().setCanvas(scene, root);
-		
-		stage.setScene(scene);
 		stage.show();
-		System.out.println("END START");
 	}
 
 	/**
@@ -193,7 +183,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().stage.setOnCloseRequest(onClose);
+		instance.stage.setOnCloseRequest(onClose);
 	}
 	
 	/**
@@ -216,7 +206,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().stage.getIcons().add(new Image(filename));
+		instance.stage.getIcons().add(new Image(filename));
 	}
 	
 	/**
@@ -239,7 +229,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().stage.setTitle(title);
+		instance.stage.setTitle(title);
 	}
 	
 	/**
@@ -266,7 +256,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().optionsMenu.getItems().add(menuItem);
+		instance.optionsMenu.getItems().add(menuItem);
 	}
 	
 	/**
@@ -277,7 +267,6 @@ public class MainWindow extends Application {
 	 */
 	public static void addToolbar(ToolBar toolbar) {
 		instance();
-		System.out.println("BEGIN addToolbar");
 		if (!startEnded) {
 			startLock.lock();
 			try {
@@ -290,9 +279,8 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().toolbarPanel.getChildren().add(toolbar);
-		instance().stage.sizeToScene();
-		System.out.println("END addToolbar");
+		instance.toolbarPanel.getChildren().add(toolbar);
+		instance.stage.sizeToScene();
 	}
 	
 	/**
@@ -339,8 +327,8 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().splitPane.getItems().set(1, panel);
-		instance().stage.sizeToScene();
+		instance.splitPane.getItems().set(1, panel);
+		instance.stage.sizeToScene();
 	}
 	
 	/**
@@ -350,8 +338,15 @@ public class MainWindow extends Application {
 	 */
 	public static MainWindow instance() {
 		instanceLock.lock();
-		if (instance == null) {
-			instance = new MainWindow();
+		if (!isCreated) {
+			isCreated = true;
+			Thread ui = new Thread(new Runnable() {
+			    @Override
+			    public void run() {
+					Application.launch(MainWindow.class);
+			    }
+			});
+			ui.start();
 		}
 		instanceLock.unlock();
 		return instance;
@@ -379,7 +374,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance().tabbedPanel.getTabs().add(new Tab(title, panel));
-		instance().stage.sizeToScene();
+		instance.tabbedPanel.getTabs().add(new Tab(title, panel));
+		instance.stage.sizeToScene();
 	}
 }

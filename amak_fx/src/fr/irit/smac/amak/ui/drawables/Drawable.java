@@ -1,7 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.ui.VUI;
-import javafx.scene.Group;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 /**
@@ -204,10 +204,10 @@ public abstract class Drawable {
 	/**
 	 * Draw the object if visible and if on screen
 	 * 
-	 * @param group
-	 *            The group container
+	 * @param pane
+	 *            The pane container
 	 */
-	public void onDraw(Group group) {
+	public void onDraw(Pane pane) {
 		if (isVisible() && isOnScreen()) {
 			_onDraw();
 		}

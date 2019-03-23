@@ -10,7 +10,7 @@ public class DrawableCircle extends Drawable {
 	public DrawableCircle(VUI vui, double dx, double dy, double size) {
 		super(vui, dx, dy, size, size);
 		circle = new Circle();
-		vui.getGroup().getChildren().add(circle);
+		vui.getCanvas().getChildren().add(circle);
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public class DrawableImage extends Drawable {
 		super(vui, dx, dy, 0, 0);
 		this.setFilename(filename);
 		image = new ImageView(new Image(filename));
-		vui.getGroup().getChildren().add(image);
+		vui.getCanvas().getChildren().add(image);
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {

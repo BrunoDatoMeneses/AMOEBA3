@@ -9,7 +9,7 @@ public class DrawableString extends Drawable {
 	public DrawableString(VUI vui, double dx, double dy, String text) {
 		super(vui, dx, dy, 1, 1);
 		textZone = new Text(text);
-		vui.getGroup().getChildren().add(textZone);
+		vui.getCanvas().getChildren().add(textZone);
 	}
 
 	@Override
