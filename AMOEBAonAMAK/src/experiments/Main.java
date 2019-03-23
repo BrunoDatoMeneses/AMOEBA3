@@ -30,7 +30,7 @@ public class Main {
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 
 		//exemple for using the learn method
-		amoeba.setNoRenderUpdate(true);
+		/*amoeba.setNoRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(false);
 		long start = System.currentTimeMillis();
 		int nbCycle = 2000;
@@ -42,7 +42,7 @@ public class Main {
 		long end = System.currentTimeMillis();
 		System.out.println("Done in : "+(end-start)/1000.0);
 		amoeba.setNoRenderUpdate(false);
-		amoeba.allowGraphicalScheduler(true);
+		amoeba.allowGraphicalScheduler(true);*/
 		System.out.println("End main");
 	}
 	

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -52,6 +53,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private StudiedSystem studiedSystem;
 
 	private boolean useOracle = true;
+	
+	private HashSet<Context> validContexts;
 
 	// Imported from World -----------
 	private boolean creationOfNewContext;
@@ -100,6 +103,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
+		validContexts = null;
+		environment.resetNbActivatedAgent();
 	}
 	
 	@Override
@@ -127,9 +132,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			e.printStackTrace();
 		}
 		
-		//contexts
-		//launch only usefull context
-		List<Context> synchronousContexts = getContexts().stream().filter(a -> a.isSynchronous())
+		//only launch useful contexts
+		List<Context> synchronousContexts = validContexts.stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());
 
@@ -335,6 +339,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		return null;
 	}
+	
+	public synchronized void updateValidContexts (HashSet<Context> validContexts){
+		if(this.validContexts == null) {
+			this.validContexts = validContexts;
+		} else {
+			this.validContexts.retainAll(validContexts);
+		}
+	}
+	
+	public HashSet<Context> getValidContexts() {
+		return validContexts;
+	}
 
 	@Override
 	public void setLocalModel(TypeLocalModel localModel) {
@@ -423,6 +439,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 			nbAgent.add("Percepts", cycle, getPercepts().size());
 			nbAgent.add("Contexts", cycle, getContexts().size());
+			nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
 	
 			errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
 			errors.add("Error Allowed", cycle, head.getErrorAllowed());

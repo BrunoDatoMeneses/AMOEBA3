@@ -1,7 +1,7 @@
 package agents.percept;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
@@ -9,7 +9,7 @@ import kernel.AMOEBA;
 
 public class Percept extends AmoebaAgent {
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	private ArrayList<Context> validContextProjection = new ArrayList<Context>();
+	private HashSet<Context> validContextProjection = new HashSet<Context>();
 
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -29,16 +29,14 @@ public class Percept extends AmoebaAgent {
 	}
 
 	public void computeContextProjectionValidity() {
-		validContextProjection = new ArrayList<Context>();
+		validContextProjection = new HashSet<Context>();
 
 		for (ContextProjection contextProjection : contextProjections.values()) {
 			if (contextProjection.contains(this.value)) {
 				validContextProjection.add(contextProjection.getContext());
 			}
 		} 
-		for(Context context : validContextProjection) {
-			context.setPerceptValidity(this);
-		}
+		amas.updateValidContexts(validContextProjection);
 
 	}
 

@@ -30,8 +30,6 @@ public class Context extends AmoebaAgent {
 
 	private DrawableRectangle drawable;
 
-	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
-
 	public Context(AMOEBA amas, Head head) {
 		super(amas);
 		buildContext(head, amas);
@@ -63,22 +61,12 @@ public class Context extends AmoebaAgent {
 		experiments.add(firstPoint);
 		localModel.updateModel(this);
 		this.setName(String.valueOf(this.hashCode()));
-
-		perceptValidities = new HashMap<Percept, Boolean>();
-		for (Percept percept : var) {
-			perceptValidities.put(percept, false);
-		}
 	}
 
 	protected void onAct() {
-		if (computeValidityByPercepts()) {
-			headAgent.proposition(this);
-		}
-
-		// Reset percepts validities
-		for (Percept percept : perceptValidities.keySet()) {
-			perceptValidities.put(percept, false);
-		}
+		//only activated context are executed
+		
+		headAgent.proposition(this);
 		
 		// Kill small contexts
 		for (Percept v : ranges.keySet()) {
@@ -353,18 +341,6 @@ public class Context extends AmoebaAgent {
 		if(!Configuration.commandLineMode)
 			drawable.hide();
 		destroy();
-	}
-
-	public void setPerceptValidity(Percept percept) {
-		perceptValidities.put(percept, true);
-	}
-
-	public Boolean computeValidityByPercepts() {
-		Boolean test = true;
-		for (Percept percept : perceptValidities.keySet()) {
-			test = test && perceptValidities.get(percept);
-		}
-		return test;
 	}
 
 	public boolean isDying() {

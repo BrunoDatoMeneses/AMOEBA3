@@ -158,13 +158,13 @@ public class MNIST_System implements StudiedSystem {
 	public static void main(String[] args) throws IOException {
 		boolean benchmark = true;
 		if(benchmark) { 
-			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd";
-			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd";
+			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
+			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
 			Log.minLevel = Log.Level.FATAL;
 			Configuration.commandLineMode = true;
 			int nbRequest = 500;
 			benchmark(1,1,1); //set up memory.
-			for(int nbCycle = 1; nbCycle < 502; nbCycle += 100) {
+			for(int nbCycle = 1; nbCycle < 1002; nbCycle += 100) {
 				System.out.println("Nb Cycle : "+nbCycle);
 				outLearn += nbCycle + " ";
 				outRequest += nbCycle + " ";

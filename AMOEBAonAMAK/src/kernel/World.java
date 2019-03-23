@@ -14,6 +14,7 @@ public class World extends Environment {
 	private HashMap<NCS,Integer> numberOfNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> allTimeNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> thisLoopNCS = new HashMap<NCS,Integer>();
+	private int nbActivatedAgent;
 	
 	private double AVT_acceleration = 2;
 	private double AVT_deceleration = 1./3.0;
@@ -37,7 +38,7 @@ public class World extends Environment {
 		}
 	}
 	
-	public void raiseNCS(NCS ncs) {
+	public synchronized void raiseNCS(NCS ncs) {
 		thisLoopNCS.put(ncs, thisLoopNCS.get(ncs) + 1);
 		
 		if (ncs.equals(NCS.CONTEXT_CONFLICT_FALSE) || ncs.equals(NCS.HEAD_INCOMPETENT)) {
@@ -78,6 +79,18 @@ public class World extends Environment {
 	
 	public HashMap<NCS, Integer> getAllTimeNCS() {
 		return allTimeNCS;
+	}
+	
+	public synchronized void incrementNbActivatedAgent() {
+		nbActivatedAgent += 1;
+	}
+	
+	public int getNbActivatedAgent() {
+		return nbActivatedAgent;
+	}
+	
+	public void resetNbActivatedAgent() {
+		nbActivatedAgent = 0;
 	}
 }
 
