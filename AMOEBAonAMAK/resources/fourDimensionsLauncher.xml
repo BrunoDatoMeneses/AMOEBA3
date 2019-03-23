@@ -14,7 +14,10 @@
 		<Sensor Name="px3" Source="x3"></Sensor>
 		<Sensor Name="px4" Source="x4"></Sensor>
 	
-	  	<Controller Name="Controller" Oracle="test"></Controller> 
+	  	<Controller Name="Controller" Oracle="test">
+              <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="2000.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
+              <InexactMargin InexactAllowed="500.0" AugmentationInexactError="2.5" DiminutionInexactError="0.2" MinInexactAllowed="0.05" NConflictBeforeInexactAugmentation="40" NSuccessBeforeInexactDiminution="80" />
+        </Controller> 
 
 
 			
