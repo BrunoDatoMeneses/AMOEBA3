@@ -10,7 +10,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -55,6 +58,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean useOracle = true;
 	
 	private HashSet<Context> validContexts;
+	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
+	
+	private boolean runAll = false;
 
 	// Imported from World -----------
 	private boolean creationOfNewContext;
@@ -132,8 +138,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			e.printStackTrace();
 		}
 		
-		//only launch useful contexts
-		List<Context> synchronousContexts = validContexts.stream().filter(a -> a.isSynchronous())
+		//updating all context is sometime useful, 
+		//for example after activating updateRender.
+		Stream<Context> contextStream = null;
+		if(runAll) {
+			contextStream = getContexts().stream(); //update all context
+			runAll = false;
+		} else {
+			contextStream = getValidContexts().stream(); //or only valid ones
+		}
+		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());
 
@@ -340,16 +354,21 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return null;
 	}
 	
-	public synchronized void updateValidContexts (HashSet<Context> validContexts){
+	public void updateValidContexts (HashSet<Context> validContexts){
+		validContextLock.writeLock().lock();
 		if(this.validContexts == null) {
 			this.validContexts = validContexts;
 		} else {
 			this.validContexts.retainAll(validContexts);
 		}
+		validContextLock.writeLock().unlock();
 	}
 	
 	public HashSet<Context> getValidContexts() {
-		return validContexts;
+		validContextLock.readLock().lock();
+		HashSet<Context> ret = validContexts;
+		validContextLock.readLock().unlock();
+		return ret;
 	}
 
 	@Override
@@ -388,6 +407,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			schedulerToolbar.getComponent(0).setEnabled(allow);
 		}
 	}
+	
+	public void nextCycleRunAllAgent() {
+		runAll = true;
+	}
 
 	@Override
 	protected void onRenderingInitialization() {
@@ -413,6 +436,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		            noRenderUpdate = true;
 		        } else {
 		            noRenderUpdate = false;
+		            nextCycleRunAllAgent();
 		        }
 		    }
 		};

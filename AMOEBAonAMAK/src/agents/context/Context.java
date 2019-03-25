@@ -64,9 +64,10 @@ public class Context extends AmoebaAgent {
 	}
 
 	protected void onAct() {
-		//only activated context are executed
 		
-		headAgent.proposition(this);
+		if(amas.getValidContexts().contains(this)) {
+			headAgent.proposition(this);
+		}
 		
 		// Kill small contexts
 		for (Percept v : ranges.keySet()) {
