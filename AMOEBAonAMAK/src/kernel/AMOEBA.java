@@ -41,17 +41,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
 	private StudiedSystem studiedSystem;
 	private boolean useOracle = true;
-	private boolean creationOfNewContext;
-	private boolean loadPresetContext;
-
-	private Drawable point;
-	private ILxPlotChart loopNCS;
-	private ILxPlotChart allNCS;
-	private ILxPlotChart nbAgent;
-	private ILxPlotChart errors;
-	private JToggleButton toggleRender;
-	private SchedulerToolbar schedulerToolbar;
+	private boolean creationOfNewContext = true;
+	private boolean loadPresetContext = true;
 	private boolean renderUpdate = false;
+
+	private transient Drawable point;
+	private transient ILxPlotChart loopNCS;
+	private transient ILxPlotChart allNCS;
+	private transient ILxPlotChart nbAgent;
+	private transient ILxPlotChart errors;
+	private transient JToggleButton toggleRender;
+	private transient SchedulerToolbar schedulerToolbar;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
@@ -92,14 +92,15 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				int state = itemEvent.getStateChange();
 				if (state == ItemEvent.SELECTED) {
-					renderUpdate = false;
-				} else {
 					renderUpdate = true;
+				} else {
+					renderUpdate = false;
 				}
 			}
 		};
-		toggleRender.setSelected(!renderUpdate);
 		toggleRender.addItemListener(itemListener);
+		toggleRender.setSelected(renderUpdate);
+
 		JToolBar tb = new JToolBar();
 		tb.add(toggleRender);
 		MainWindow.addToolbar(tb);
@@ -177,8 +178,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public LocalModel buildLocalModel(Context context) {
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			// note (Labbeti) This constructor has changed because getPercept is not
+			// @note (Labbeti) This constructor has changed because getPercept is not
 			// initialized when we load agents from a file.
+			// TODO (Labbeti) : change this with the new version of AMAK (when agents will be loaded
+			// in the same cycle with addPendingAgents)
 			return new LocalModelMillerRegression(context.getRanges().size());
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
@@ -205,7 +208,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		agents.clear();
 	}
 
-	
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
 	}
@@ -226,7 +228,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
-			toggleRender.setSelected(!renderUpdate);
+			toggleRender.setSelected(renderUpdate);
 		}
 	}
 
@@ -234,7 +236,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
 
-	
 	public double getAction() {
 		return head.getAction();
 	}

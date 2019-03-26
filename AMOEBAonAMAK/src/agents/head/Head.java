@@ -13,12 +13,12 @@ import ncs.NCS;
  * The Class Head.
  */
 public class Head extends AmoebaAgent {
-
+	private static final long serialVersionUID = 1L;
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
 
-	HashMap<Percept, Double> currentSituation = new HashMap<>();
+	private HashMap<Percept, Double> currentSituation = new HashMap<>();
 	private ArrayList<Context> activatedContexts = new ArrayList<>();
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<>();
 	private int numberOfCriticityValuesForAverage = 100;
@@ -72,7 +72,7 @@ public class Head extends AmoebaAgent {
 	 * from context agents when needed.
 	 */
 	@Override
-	protected void onAct() { // play
+	protected void onAct() {
 		for (Percept pct : this.amas.getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}

@@ -19,13 +19,15 @@ import kernel.AMOEBA;
 import ncs.NCS;
 
 public class Context extends AmoebaAgent {
+	private static final long serialVersionUID = 1L;
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	private LocalModel localModel;
 	private double confidence = 0;
-	private DrawableRectangle drawable;
+	
+	private transient DrawableRectangle drawable;
 
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
@@ -138,9 +140,7 @@ public class Context extends AmoebaAgent {
 
 	private void solveNCS_ConflictInexact(Head head) {
 		amas.getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
-		if (true) {
-			confidence--;
-		}
+		confidence--;
 		updateExperiments();
 	}
 
@@ -154,27 +154,25 @@ public class Context extends AmoebaAgent {
 		;
 
 		// The conflict lowers confidence
-		if (true) {
-			confidence -= 2;
-		}
+		confidence -= 2;
 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
-		Percept p;
+		
 		if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) {
-			p = this.getPerceptsWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
-			if (p == null) {
+			Percept percept = this.getPerceptsWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
+			if (percept == null) {
 				this.destroy();
 			} else {
-				ranges.get(p).matchBorderWith(head.getBestContext());
+				ranges.get(percept).matchBorderWith(head.getBestContext());
 			}
 		} else {
-			p = this.getPerceptsWithLesserImpactOnVolume(percepts);
-			ranges.get(p).adapt(this, p.getValue(), p);
+			Percept percept = this.getPerceptsWithLesserImpactOnVolume(percepts);
+			ranges.get(percept).adapt(this, percept.getValue(), percept);
 		}
 
-		for (Percept v : ranges.keySet()) {
-			if (ranges.get(v).isTooSmall()) {
+		for (Percept percept : percepts) {
+			if (ranges.get(percept).isTooSmall()) {
 				solveNCS_Uselessness(head);
 				break;
 			}

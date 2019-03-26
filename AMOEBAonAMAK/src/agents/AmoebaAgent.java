@@ -1,5 +1,7 @@
 package agents;
 
+import java.io.Serializable;
+
 import fr.irit.smac.amak.CommunicatingAgent;
 import kernel.AMOEBA;
 import kernel.World;
@@ -7,7 +9,8 @@ import kernel.World;
 /**
  * The base class for all AMOEBA agents
  */
-public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> {
+public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> implements Serializable {
+	private static final long serialVersionUID = 1L;
 	// Attributes
 	protected String name;
 	private boolean dying;
