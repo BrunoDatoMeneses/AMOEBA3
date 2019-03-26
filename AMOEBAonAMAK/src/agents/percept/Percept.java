@@ -30,13 +30,20 @@ public class Percept extends AmoebaAgent {
 
 	public void computeContextProjectionValidity() {
 		validContextProjection = new HashSet<Context>();
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-			if (contextProjection.contains(this.value)) {
-				validContextProjection.add(contextProjection.getContext());
-			}
-		} 
-		amas.updateValidContexts(validContextProjection);
+		
+		HashSet<Context> contexts = amas.getValidContexts();
+		if(contexts == null) {
+			contexts = new HashSet<>(amas.getContexts());
+		}
+		
+		if(!contexts.isEmpty()) {
+			for (Context c : contexts) {
+				if (contextProjections.get(c).contains(this.value)) {
+					validContextProjection.add(c);
+				}
+			} 
+			amas.updateValidContexts(validContextProjection);
+		}
 
 	}
 

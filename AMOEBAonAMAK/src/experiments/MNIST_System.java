@@ -204,8 +204,9 @@ public class MNIST_System implements StudiedSystem {
 			//exemple for using the learn method
 			amoeba.setNoRenderUpdate(false);
 			amoeba.allowGraphicalScheduler(false);
+			
 			long start = System.currentTimeMillis();
-			int nbCycle = 100;
+			int nbCycle = 1000;
 			for(int i = 0; i < nbCycle; ++i) {
 				studiedSystem.playOneStep();
 				//System.out.println(studiedSystem.getOutput());
@@ -213,13 +214,14 @@ public class MNIST_System implements StudiedSystem {
 			}
 			long end = System.currentTimeMillis();
 			System.out.println("Learning done in "+(end-start)/1000.0);
-			amoeba.setNoRenderUpdate(false);
-			amoeba.allowGraphicalScheduler(true);
 			
 			start = System.currentTimeMillis();
 			List<Double> ret = test("..\\..\\mnist\\mnist_test.csv", amoeba, 500);
 			end = System.currentTimeMillis();
 			System.out.println("Accuracy of "+ret.get(0)+" . Done in "+(end-start)/1000.0);
+			
+			amoeba.setNoRenderUpdate(false);
+			amoeba.allowGraphicalScheduler(true);
 			
 			System.out.println("End main");
 		}

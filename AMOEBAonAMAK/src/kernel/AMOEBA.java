@@ -138,14 +138,23 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			e.printStackTrace();
 		}
 		
-		//updating all context is sometime useful, 
-		//for example after activating updateRender.
+		// it is sometime useful to run all context agent
+		// especially to check if they're not too small,
+		// or after reactivating rendering.
+		if(cycle%1000 == 0) {
+			runAll = true;
+		}
+		
 		Stream<Context> contextStream = null;
 		if(runAll) {
 			contextStream = getContexts().stream(); //update all context
 			runAll = false;
 		} else {
-			contextStream = getValidContexts().stream(); //or only valid ones
+			HashSet<Context> vcontexts = getValidContexts();
+			if(vcontexts == null) {
+				vcontexts = new HashSet<>();
+			} 
+			contextStream = vcontexts.stream(); //or only valid ones
 		}
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
