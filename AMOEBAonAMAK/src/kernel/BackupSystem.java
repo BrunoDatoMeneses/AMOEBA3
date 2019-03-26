@@ -44,13 +44,12 @@ public class BackupSystem implements IBackupSystem {
 
 	// Members
 	private AMOEBA amoeba;
-	private Map<String, Percept> perceptsByName;
+	private Map<String, Percept> perceptsByName= new HashMap<>();
 
 	// -------------------- Constructor --------------------
 
 	public BackupSystem(AMOEBA amoeba) {
 		this.amoeba = amoeba;
-		this.perceptsByName = new HashMap<>();
 	}
 
 	// -------------------- Public Methods --------------------

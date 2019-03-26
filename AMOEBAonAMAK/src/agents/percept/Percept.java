@@ -8,7 +8,7 @@ import agents.context.Context;
 import kernel.AMOEBA;
 
 public class Percept extends AmoebaAgent {
-	private static final long serialVersionUID = -2994258646211372705L;
+	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private ArrayList<Context> validContextProjection = new ArrayList<Context>();
 

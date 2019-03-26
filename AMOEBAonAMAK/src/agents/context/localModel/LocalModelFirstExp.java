@@ -20,6 +20,10 @@ public class LocalModelFirstExp extends LocalModel {
 	}
 
 	@Override
+	public void updateModel(Context context) {
+	}
+
+	@Override
 	public double getProposition(Context context) {
 		return context.getExperiments().get(0).getProposition();
 	}
@@ -38,10 +42,6 @@ public class LocalModelFirstExp extends LocalModel {
 		return "";
 	}
 
-	@Override
-	public void updateModel(Context context) {
-	}
-	
 	@Override
 	public double[] getCoefs() {
 		return new double[1];

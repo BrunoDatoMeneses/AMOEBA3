@@ -29,11 +29,27 @@ public class LocalModelMillerRegression extends LocalModel {
 		this.nParameters = nParameters;
 		this.regression = new Regression(nParameters, true);
 	}
-	
+
+	@Override
+	public void updateModel(Context context) {
+		regression = new Regression(nParameters, true);
+		for (Experiment exp : context.getExperiments()) {
+			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
+		}
+
+		// TODO : to improve
+		while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) {
+			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(),
+					context.getExperiments().get(0).getProposition());
+		}
+
+		coefs = regression.regress().getParameterEstimates();
+	}
+
 	public void setCoefs(double[] coefs) {
 		this.coefs = coefs;
 	}
-	
+
 	/**
 	 * Gets the coefficients
 	 *
@@ -71,9 +87,9 @@ public class LocalModelMillerRegression extends LocalModel {
 		regression = new Regression(nParameters, true);
 		for (Experiment exp : context.getExperiments()) {
 			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
-			
+
 			// TODO : to improve
-			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { 
+			while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) {
 				regression.addObservation(context.getExperiments().get(0).getValuesAsArray(),
 						context.getExperiments().get(0).getProposition());
 			}
@@ -150,22 +166,6 @@ public class LocalModelMillerRegression extends LocalModel {
 			result += "\t" + coefs[i];
 		}
 		return result;
-	}
-
-	@Override
-	public void updateModel(Context context) {
-		regression = new Regression(nParameters, true);
-		for (Experiment exp : context.getExperiments()) {
-			regression.addObservation(exp.getValuesAsArray(), exp.getProposition());
-		}
-		
-		// TODO : to improve
-		while (regression.getN() < context.getExperiments().get(0).getValues().size() + 2) { 
-			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(),
-					context.getExperiments().get(0).getProposition());
-		}
-
-		coefs = regression.regress().getParameterEstimates();
 	}
 
 	@Override

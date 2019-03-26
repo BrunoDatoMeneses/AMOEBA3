@@ -205,6 +205,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			AmoebaAgent amoebaAgent = (AmoebaAgent) agent;
 			amoebaAgent.destroy();
 		}
+		this.head = null;
 		agents.clear();
 	}
 

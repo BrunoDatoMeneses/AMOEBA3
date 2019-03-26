@@ -26,7 +26,7 @@ public class Context extends AmoebaAgent {
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	private LocalModel localModel;
 	private double confidence = 0;
-	
+
 	private transient DrawableRectangle drawable;
 
 	public Context(AMOEBA amoeba, Head head) {
@@ -158,7 +158,7 @@ public class Context extends AmoebaAgent {
 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
-		
+
 		if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()) {
 			Percept percept = this.getPerceptsWithLesserImpactOnVolumeNotIncludedIn(percepts, head.getBestContext());
 			if (percept == null) {
@@ -358,7 +358,8 @@ public class Context extends AmoebaAgent {
 	public LocalModel getFunction() {
 		return localModel;
 	}
-
+	
+	// TODO (Labbeti) : remove this ?
 	public double getInfluence(HashMap<Percept, Double> situation) {
 		Double influence = 1.0;
 
@@ -369,6 +370,7 @@ public class Context extends AmoebaAgent {
 		return influence;
 	}
 
+	// TODO (Labbeti) : remove this ?
 	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
 		double center = getCenterByPercept(pct);
 		double radius = getRadiusByPercept(pct);
@@ -376,10 +378,12 @@ public class Context extends AmoebaAgent {
 		return getNormalizedConfidence() * Math.exp(-Math.pow(situation - center, 2) / (2 * Math.pow(radius, 2)));
 	}
 
+	// TODO (Labbeti) : remove this ?
 	public double getNormalizedConfidence() {
 		return 1 / (1 + Math.exp(-confidence));
 	}
 
+	// TODO (Labbeti) : remove this ?
 	public double getParametrizedNormalizedConfidence(double dispersion) {
 		return 1 / (1 + Math.exp(-confidence / dispersion));
 	}
