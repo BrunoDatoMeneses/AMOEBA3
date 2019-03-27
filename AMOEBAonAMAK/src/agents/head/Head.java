@@ -13,17 +13,14 @@ import ncs.NCS;
  * The Class Head.
  */
 public class Head extends AmoebaAgent {
-
+	private static final long serialVersionUID = 1L;
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
 
-	HashMap<Percept, Double> currentSituation = new HashMap<>();
-
+	private HashMap<Percept, Double> currentSituation = new HashMap<>();
 	private ArrayList<Context> activatedContexts = new ArrayList<>();
-
 	private ArrayList<Double> xLastCriticityValues = new ArrayList<>();
-
 	private int numberOfCriticityValuesForAverage = 100;
 
 	private int nConflictBeforeAugmentation = 1;
@@ -52,9 +49,6 @@ public class Head extends AmoebaAgent {
 	private boolean firstContext = false;
 	private boolean contextFromPropositionWasSelected = false;
 
-	Double maxConfidence;
-	Double minConfidence;
-
 	/**
 	 * Instantiates a new head.
 	 *
@@ -62,8 +56,6 @@ public class Head extends AmoebaAgent {
 	 */
 	public Head(AMOEBA amas) {
 		super(amas);
-		maxConfidence = Double.NEGATIVE_INFINITY;
-		minConfidence = Double.POSITIVE_INFINITY;
 	}
 
 	@Override
@@ -71,50 +63,6 @@ public class Head extends AmoebaAgent {
 		return 2;
 	}
 
-	/**
-	 * Sets the data for error margin.
-	 *
-	 * @param errorAllowed                the error allowed
-	 * @param augmentationFactorError     the augmentation factor error
-	 * @param diminutionFactorError       the diminution factor error
-	 * @param minErrorAllowed             the min error allowed
-	 * @param nConflictBeforeAugmentation the n conflict before augmentation
-	 * @param nSuccessBeforeDiminution    the n success before diminution
-	 */
-	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
-			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		this.errorAllowed = errorAllowed;
-		this.augmentationFactorError = augmentationFactorError;
-		this.diminutionFactorError = diminutionFactorError;
-		this.minErrorAllowed = minErrorAllowed;
-		this.nConflictBeforeAugmentation = nConflictBeforeAugmentation;
-		this.nSuccessBeforeDiminution = nSuccessBeforeDiminution;
-	}
-
-	/**
-	 * Sets the data for inexact margin.
-	 *
-	 * @param inexactAllowed                     the inexact allowed
-	 * @param augmentationInexactError           the augmentation inexact error
-	 * @param diminutionInexactError             the diminution inexact error
-	 * @param minInexactAllowed                  the min inexact allowed
-	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact
-	 *                                           augmentation
-	 * @param nSuccessBeforeInexactDiminution    the n success before inexact
-	 *                                           diminution
-	 */
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
-			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
-			int nSuccessBeforeInexactDiminution) {
-		this.inexactAllowed = inexactAllowed;
-		this.augmentationInexactError = augmentationInexactError;
-		this.diminutionInexactError = diminutionInexactError;
-		this.minInexactAllowed = minInexactAllowed;
-		this.nConflictBeforeInexactAugmentation = nConflictBeforeInexactAugmentation;
-		this.nSuccessBeforeInexactDiminution = nSuccessBeforeInexactDiminution;
-	}
-
-	
 	public void proposition(Context c) {
 		activatedContexts.add(c);
 	}
@@ -124,7 +72,7 @@ public class Head extends AmoebaAgent {
 	 * from context agents when needed.
 	 */
 	@Override
-	protected void onAct() { // play
+	protected void onAct() {
 		for (Percept pct : this.amas.getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}
@@ -167,7 +115,6 @@ public class Head extends AmoebaAgent {
 
 		/* Compute the criticity. Will be used by context agents. */
 		criticity = Math.abs(oracleValue - prediction);
-
 
 		selfAnalysationOfContexts();
 
@@ -259,102 +206,9 @@ public class Head extends AmoebaAgent {
 		for (int i = 0; i < activatedContexts.size(); i++) {
 			if (activatedContexts.get(i).isDying()) {
 				activatedContexts.remove(i);
-			}else
+			} else
 				activatedContexts.get(i).analyzeResults(this);
 		}
-	}
-
-	private void getNearestContextAsBestContext() {
-		ArrayList<Context> allContexts = amas.getContexts();
-		Context nearestContext = this.getNearestContext(allContexts);
-
-		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();
-		} else {
-			prediction = 0;
-		}
-
-		bestContext = nearestContext;
-	}
-
-	/**
-	 * Gets the nearest good context.
-	 *
-	 * @param allContext the all context
-	 * @return the nearest good context
-	 */
-	private Context getNearestGoodContext(ArrayList<Context> allContext) {
-		Context nearest = null;
-		for (AmoebaAgent a : allContext) {
-			Context c = (Context) a;
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
-				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest)) {
-					nearest = c;
-				}
-			}
-		}
-		return nearest;
-	}
-
-	/**
-	 * Gets the distance to nearest good context.
-	 *
-	 * @param allContext the all context
-	 * @return the distance to nearest good context
-	 */
-	private double getDistanceToNearestGoodContext(ArrayList<Context> allContext) {
-		double d = Double.MAX_VALUE;
-		for (AmoebaAgent a : allContext) {
-			Context c = (Context) a;
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
-				if (getExternalDistanceToContext(c) < d) {
-					d = getExternalDistanceToContext(c);
-				}
-			}
-		}
-		return d;
-	}
-
-	/**
-	 * Gets the nearest context.
-	 *
-	 * @param allContext the all context
-	 * @return the nearest context
-	 */
-	private Context getNearestContext(ArrayList<Context> allContext) {
-		Context nearest = null;
-		double distanceToNearest = Double.MAX_VALUE;
-		for (AmoebaAgent a : allContext) {
-			Context c = (Context) a;
-			if (c != newContext && !c.isDying()) {
-				if (nearest == null || getExternalDistanceToContext(c) < distanceToNearest) {
-					nearest = c;
-					distanceToNearest = getExternalDistanceToContext(c);
-				}
-			}
-		}
-
-		return nearest;
-	}
-
-	/**
-	 * Gets the external distance to context.
-	 *
-	 * @param context the context
-	 * @return the external distance to context
-	 */
-	private double getExternalDistanceToContext(Context context) {
-		double d = 0.0;
-		ArrayList<Percept> percepts = amas.getPercepts();
-		for (Percept p : percepts) {
-			double min = context.getRanges().get(p).getStart();
-			double max = context.getRanges().get(p).getEnd();
-			if (min > p.getValue() || max < p.getValue()) {
-				d += Math.min(Math.abs(p.getValue() - min), Math.abs(p.getValue() - max));
-			}
-
-		}
-		return d;
 	}
 
 	/**
@@ -465,6 +319,196 @@ public class Head extends AmoebaAgent {
 	}
 
 	/**
+	 * Change oracle connection.
+	 */
+	public void changeOracleConnection() {
+		useOracle = !useOracle;
+	}
+
+	/**
+	 * Checks if is context from proposition was selected.
+	 *
+	 * @return true, if is context from proposition was selected
+	 */
+	public boolean isContextFromPropositionWasSelected() {
+		return contextFromPropositionWasSelected;
+	}
+
+	public Head clone() throws CloneNotSupportedException {
+		return (Head) super.clone();
+	}
+
+	public void clearAllUseableContextLists() {
+		activatedContexts.clear();
+	}
+	
+	
+	/**
+	 * Sets the data for error margin.
+	 *
+	 * @param errorAllowed                the error allowed
+	 * @param augmentationFactorError     the augmentation factor error
+	 * @param diminutionFactorError       the diminution factor error
+	 * @param minErrorAllowed             the min error allowed
+	 * @param nConflictBeforeAugmentation the n conflict before augmentation
+	 * @param nSuccessBeforeDiminution    the n success before diminution
+	 */
+	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
+			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
+		this.errorAllowed = errorAllowed;
+		this.augmentationFactorError = augmentationFactorError;
+		this.diminutionFactorError = diminutionFactorError;
+		this.minErrorAllowed = minErrorAllowed;
+		this.nConflictBeforeAugmentation = nConflictBeforeAugmentation;
+		this.nSuccessBeforeDiminution = nSuccessBeforeDiminution;
+	}
+
+	/**
+	 * Sets the data for inexact margin.
+	 *
+	 * @param inexactAllowed                     the inexact allowed
+	 * @param augmentationInexactError           the augmentation inexact error
+	 * @param diminutionInexactError             the diminution inexact error
+	 * @param minInexactAllowed                  the min inexact allowed
+	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact
+	 *                                           augmentation
+	 * @param nSuccessBeforeInexactDiminution    the n success before inexact
+	 *                                           diminution
+	 */
+	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError,
+			double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation,
+			int nSuccessBeforeInexactDiminution) {
+		this.inexactAllowed = inexactAllowed;
+		this.augmentationInexactError = augmentationInexactError;
+		this.diminutionInexactError = diminutionInexactError;
+		this.minInexactAllowed = minInexactAllowed;
+		this.nConflictBeforeInexactAugmentation = nConflictBeforeInexactAugmentation;
+		this.nSuccessBeforeInexactDiminution = nSuccessBeforeInexactDiminution;
+	}
+
+	/**
+	 * Sets the no creation.
+	 *
+	 * @param noCreation the new no creation
+	 */
+	public void setNoCreation(boolean noCreation) {
+		this.noCreation = noCreation;
+	}
+
+	/**
+	 * Sets the new context.
+	 *
+	 * @param newContext the new new context
+	 */
+	public void setNewContext(Context newContext) {
+		this.newContext = newContext;
+	}
+
+	/**
+	 * Sets the context from proposition was selected.
+	 *
+	 * @param contextFromPropositionWasSelected the new context from proposition was
+	 *                                          selected
+	 */
+	public void setContextFromPropositionWasSelected(boolean contextFromPropositionWasSelected) {
+		this.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
+	}
+
+	
+	private void getNearestContextAsBestContext() {
+		ArrayList<Context> allContexts = amas.getContexts();
+		Context nearestContext = this.getNearestContext(allContexts);
+
+		if (nearestContext != null) {
+			prediction = nearestContext.getActionProposal();
+		} else {
+			prediction = 0;
+		}
+
+		bestContext = nearestContext;
+	}
+
+	/**
+	 * Gets the nearest good context.
+	 *
+	 * @param allContext the all context
+	 * @return the nearest good context
+	 */
+	private Context getNearestGoodContext(ArrayList<Context> allContext) {
+		Context nearest = null;
+		for (AmoebaAgent a : allContext) {
+			Context c = (Context) a;
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest)) {
+					nearest = c;
+				}
+			}
+		}
+		return nearest;
+	}
+
+	/**
+	 * Gets the distance to nearest good context.
+	 *
+	 * @param allContext the all context
+	 * @return the distance to nearest good context
+	 */
+	private double getDistanceToNearestGoodContext(ArrayList<Context> allContext) {
+		double d = Double.MAX_VALUE;
+		for (AmoebaAgent a : allContext) {
+			Context c = (Context) a;
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+				if (getExternalDistanceToContext(c) < d) {
+					d = getExternalDistanceToContext(c);
+				}
+			}
+		}
+		return d;
+	}
+
+	/**
+	 * Gets the nearest context.
+	 *
+	 * @param allContext the all context
+	 * @return the nearest context
+	 */
+	private Context getNearestContext(ArrayList<Context> allContext) {
+		Context nearest = null;
+		double distanceToNearest = Double.MAX_VALUE;
+		for (AmoebaAgent a : allContext) {
+			Context c = (Context) a;
+			if (c != newContext && !c.isDying()) {
+				if (nearest == null || getExternalDistanceToContext(c) < distanceToNearest) {
+					nearest = c;
+					distanceToNearest = getExternalDistanceToContext(c);
+				}
+			}
+		}
+
+		return nearest;
+	}
+
+	/**
+	 * Gets the external distance to context.
+	 *
+	 * @param context the context
+	 * @return the external distance to context
+	 */
+	private double getExternalDistanceToContext(Context context) {
+		double d = 0.0;
+		ArrayList<Percept> percepts = amas.getPercepts();
+		for (Percept p : percepts) {
+			double min = context.getRanges().get(p).getStart();
+			double max = context.getRanges().get(p).getEnd();
+			if (min > p.getValue() || max < p.getValue()) {
+				d += Math.min(Math.abs(p.getValue() - min), Math.abs(p.getValue() - max));
+			}
+
+		}
+		return d;
+	}
+
+	/**
 	 * Gets the best context.
 	 *
 	 * @return the best context
@@ -502,15 +546,6 @@ public class Head extends AmoebaAgent {
 	}
 
 	/**
-	 * Sets the no creation.
-	 *
-	 * @param noCreation the new no creation
-	 */
-	public void setNoCreation(boolean noCreation) {
-		this.noCreation = noCreation;
-	}
-
-	/**
 	 * Gets the oracle value.
 	 *
 	 * @return the oracle value
@@ -537,20 +572,12 @@ public class Head extends AmoebaAgent {
 		return newContext;
 	}
 
-	/**
-	 * Sets the new context.
-	 *
-	 * @param newContext the new new context
-	 */
-	public void setNewContext(Context newContext) {
-		this.newContext = newContext;
+	public double getAveragePredictionCriticity() {
+		return averagePredictionCriticity;
 	}
 
-	/**
-	 * Change oracle connection.
-	 */
-	public void changeOracleConnection() {
-		useOracle = !useOracle;
+	public ArrayList<Double> getxLastCriticityValues() {
+		return xLastCriticityValues;
 	}
 
 	/**
@@ -562,38 +589,43 @@ public class Head extends AmoebaAgent {
 		return inexactAllowed;
 	}
 
-	/**
-	 * Checks if is context from proposition was selected.
-	 *
-	 * @return true, if is context from proposition was selected
-	 */
-	public boolean isContextFromPropositionWasSelected() {
-		return contextFromPropositionWasSelected;
+	public int getNConflictBeforeAugmentation() {
+		return nConflictBeforeAugmentation;
 	}
 
-	/**
-	 * Sets the context from proposition was selected.
-	 *
-	 * @param contextFromPropositionWasSelected the new context from proposition was
-	 *                                          selected
-	 */
-	public void setContextFromPropositionWasSelected(boolean contextFromPropositionWasSelected) {
-		this.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
+	public int getNSuccessBeforeDiminution() {
+		return nSuccessBeforeDiminution;
 	}
 
-	public Head clone() throws CloneNotSupportedException {
-		return (Head) super.clone();
+	public int getNConflictBeforeInexactAugmentation() {
+		return nConflictBeforeInexactAugmentation;
 	}
 
-	public double getAveragePredictionCriticity() {
-		return averagePredictionCriticity;
+	public int getNSuccessBeforeInexactDiminution() {
+		return nSuccessBeforeInexactDiminution;
 	}
 
-	public ArrayList<Double> getxLastCriticityValues() {
-		return xLastCriticityValues;
+	public double getAugmentationFactorError() {
+		return augmentationFactorError;
 	}
 
-	public void clearAllUseableContextLists() {
-		activatedContexts.clear();
+	public double getDiminutionFactorError() {
+		return diminutionFactorError;
+	}
+
+	public double getMinErrorAllowed() {
+		return minErrorAllowed;
+	}
+
+	public double getAugmentationInexactError() {
+		return augmentationInexactError;
+	}
+
+	public double getDiminutionInexactError() {
+		return diminutionInexactError;
+	}
+
+	public double getMinInexactAllowed() {
+		return minInexactAllowed;
 	}
 }

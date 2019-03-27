@@ -8,6 +8,7 @@ import agents.context.Context;
 import kernel.AMOEBA;
 
 public class Percept extends AmoebaAgent {
+	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 
@@ -15,14 +16,15 @@ public class Percept extends AmoebaAgent {
 	private double max = Double.MIN_VALUE;
 
 	private double value;
-	private boolean isEnum = false;
+	private boolean isEnum;
 
 	public Percept(AMOEBA amas) {
 		super(amas);
+		this.isEnum = false;
 	}
 
 	@Override
-	protected void onAct() { // play
+	protected void onAct() {
 		value = amas.getPerceptionsOrAction(name);
 		ajustMinMax();
 		computeContextProjectionValidity();
@@ -67,7 +69,10 @@ public class Percept extends AmoebaAgent {
 		max -= 0.05 * dist;
 	}
 	
-	
+	public void setEnum(boolean isEnum) {
+		this.isEnum = isEnum;
+	}
+
 	/**
 	 * Gets the min max distance.
 	 *
@@ -78,7 +83,7 @@ public class Percept extends AmoebaAgent {
 			return 0;
 		return Math.abs(max - min);
 	}
-	
+
 	/**
 	 * Gets the value.
 	 *
@@ -87,7 +92,7 @@ public class Percept extends AmoebaAgent {
 	public double getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * Checks if is enum.
 	 *
@@ -120,8 +125,7 @@ public class Percept extends AmoebaAgent {
 	public void updateContextProjectionEnd(Context context) {
 		contextProjections.get(context).updateEnd();
 	}
-	
-	
+
 	@Override
 	protected int computeExecutionOrderLayer() {
 		return 0;

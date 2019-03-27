@@ -11,6 +11,10 @@ import agents.percept.Percept;
  */
 public class LocalModelAverage extends LocalModel {
 
+	@Override
+	public void updateModel(Context context) {
+	}
+
 	public double getProposition(Context context) {
 		double average = 0.0;
 		for (Experiment exp : context.getExperiments()) {
@@ -32,11 +36,12 @@ public class LocalModelAverage extends LocalModel {
 	}
 
 	@Override
-	public void updateModel(Context context) {
-		// TODO Auto-generated method stub
+	public double[] getCoefs() {
+		return new double[1];
 	}
 
-	public double[] getCoef() {
-		return new double[1];
+	@Override
+	public TypeLocalModel getType() {
+		return TypeLocalModel.AVERAGE;
 	}
 }
