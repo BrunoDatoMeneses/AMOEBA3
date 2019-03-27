@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 /**
@@ -172,17 +171,7 @@ public class VUI {
 		});
 		statusPanel.getChildren().add(resetButton);
 		
-
 		canvas = new Pane();
-		
-		final double w = canvas.getWidth();
-		final double h = canvas.getHeight();
-		
-		canvas.getChildren().add(new Rectangle(0, 0, w, h));
-
-		setWorldOffsetX(worldCenterX + screenToWorldDistance(w / 2));
-		setWorldOffsetY(worldCenterY + screenToWorldDistance(h / 2));
-		
 		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -201,8 +190,12 @@ public class VUI {
 			@Override
 			public void handle(MouseEvent event) {
 				try {
-					worldCenterX += screenToWorldDistance(event.getX() - lastDragX);
-					worldCenterY += screenToWorldDistance(event.getY() - lastDragY);
+					double transX = screenToWorldDistance(event.getX() - lastDragX);
+					double transY = screenToWorldDistance(event.getY() - lastDragY);
+					worldCenterX += transX;
+					worldCenterY += transY;
+					worldOffsetX += transX;
+					worldOffsetY += transY;
 					lastDragX = event.getX();
 					lastDragY = event.getY();
 					updateCanvas();
@@ -215,22 +208,20 @@ public class VUI {
 		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
 			@Override
 			public void handle(ScrollEvent event) {
-				double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-				double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				double wdx = screenToWorldDistance(event.getX());
+				double wdy = screenToWorldDistance(event.getY());
 				zoom += event.getDeltaY() / event.getMultiplierY() * 10;
 				if (zoom < 10)
 					zoom = 10;
 				
-				double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-				double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				double wdx2 = screenToWorldDistance(event.getX());
+				double wdy2 = screenToWorldDistance(event.getY());
 				worldCenterX -= wdx2 - wdx;
 				worldCenterY -= wdy2 - wdy;
 				updateCanvas();
 			}
 		});
 		
-		canvas.prefWidth(800);
-		canvas.prefHeight(600);
 		panel.setCenter(canvas);
 		MainWindow.addTabbedPanel("VUI #" + title, panel);
 	}
@@ -324,7 +315,6 @@ public class VUI {
 		d.setPanel(this);
 		drawablesLock.lock();
 		drawables.add(d);
-		d.onDraw(canvas);
 		drawablesLock.unlock();
 		updateCanvas();
 	}
@@ -333,8 +323,17 @@ public class VUI {
 	 * Refresh the canvas
 	 */
 	public void updateCanvas() {
+		final double w = canvas.getWidth();
+		final double h = canvas.getHeight();
+		
+		setWorldOffsetX(worldCenterX + screenToWorldDistance(w/2));
+		setWorldOffsetY(worldCenterY + screenToWorldDistance(h/2));
+
+		drawablesLock.lock();
+		Collections.sort(drawables, (o1, o2) -> o1.getLayer() - o2.getLayer());
 		for (Drawable d: drawables)
 			d.onDraw(canvas);
+		drawablesLock.unlock();
 		
 		statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
 	}

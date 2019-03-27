@@ -18,7 +18,7 @@ public class DrawableCircle extends Drawable {
 		double renderedWidth = getRenderedWidth();
 		double renderedHeigth = getRenderedHeight();
 		circle.setCenterX(left()+renderedWidth/2);
-		circle.setCenterY(right()+renderedHeigth/2);
+		circle.setCenterY(top()+renderedHeigth/2);
 		circle.setRadius(renderedWidth*2);
 		if (strokeMode)
 			circle.setFill(Color.TRANSPARENT);

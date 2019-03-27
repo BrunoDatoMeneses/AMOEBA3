@@ -18,7 +18,7 @@ public class DrawableOval extends Drawable {
 		double renderedWidth = getRenderedWidth();
 		double renderedHeigth = getRenderedHeight();
 		ellipse.setCenterX(left()+renderedWidth/2);
-		ellipse.setCenterY(right()+renderedHeigth/2);
+		ellipse.setCenterY(top()+renderedHeigth/2);
 		ellipse.setRadiusX(renderedWidth*2);
 		ellipse.setRadiusY(renderedHeigth*2);
 		if (strokeMode)
