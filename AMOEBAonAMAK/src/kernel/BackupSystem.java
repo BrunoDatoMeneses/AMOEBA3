@@ -73,6 +73,7 @@ public class BackupSystem implements IBackupSystem {
 		} catch (JDOMException | IOException e) {
 			e.printStackTrace();
 		}
+		amoeba.onLoadEnded();
 	}
 
 	@Override
@@ -332,7 +333,7 @@ public class BackupSystem implements IBackupSystem {
 		Element errorMarginElement = new Element("ErrorMargin");
 		List<Attribute> errorAttributes = new ArrayList<>();
 		errorAttributes.add(new Attribute("ErrorAllowed", String.valueOf(head.getErrorAllowed())));
-		errorAttributes.add(new Attribute("AugmentationFactorError", String.valueOf(head.getErrorAllowed())));
+		errorAttributes.add(new Attribute("AugmentationFactorError", String.valueOf(head.getAugmentationFactorError())));
 		errorAttributes.add(new Attribute("DiminutionFactorError", String.valueOf(head.getDiminutionFactorError())));
 		errorAttributes.add(new Attribute("MinErrorAllowed", String.valueOf(head.getMinErrorAllowed())));
 		errorAttributes.add(

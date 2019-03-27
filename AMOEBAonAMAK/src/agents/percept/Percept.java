@@ -68,10 +68,6 @@ public class Percept extends AmoebaAgent {
 		min += 0.05 * dist;
 		max -= 0.05 * dist;
 	}
-	
-	public void setEnum(boolean isEnum) {
-		this.isEnum = isEnum;
-	}
 
 	/**
 	 * Gets the min max distance.

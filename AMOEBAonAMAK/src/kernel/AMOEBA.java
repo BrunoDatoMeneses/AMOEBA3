@@ -103,6 +103,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				int state = itemEvent.getStateChange();
 				if (state == ItemEvent.SELECTED) {
 					renderUpdate = true;
+					nextCycleRunAllAgent();
 				} else {
 					renderUpdate = false;
 				}
@@ -135,6 +136,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 			nbAgent.add("Percepts", cycle, getPercepts().size());
 			nbAgent.add("Contexts", cycle, getContexts().size());
+			nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
 
 			errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
 			errors.add("Error Allowed", cycle, head.getErrorAllowed());
@@ -316,6 +318,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.head = null;
 		agents.clear();
 	}
+	
+	public void onLoadEnded() {
+		super.addPendingAgents();
+	}
 
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
@@ -375,7 +381,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return percepts;
 	}
 	
-	public void updateValidContexts (HashSet<Context> validContexts){
+	public void updateValidContexts(HashSet<Context> validContexts){
 		validContextLock.writeLock().lock();
 		if(this.validContexts == null) {
 			this.validContexts = validContexts;
@@ -408,66 +414,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		runAll = true;
 	}
 
-	@Override
-	protected void onRenderingInitialization() {
-		super.onRenderingInitialization();
-		//scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("AMOEBA", getScheduler());
-		MainWindow.addToolbar(schedulerToolbar);
-		
-		//amoeba and agent
-		VUI.get().setDefaultView(200, 0, 0);
-		point = VUI.get().createPoint(0, 0);
-		loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);
-		allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
-		nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
-		errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
-		
-		// update render button
-		toggleRender = new JToggleButton("No Update Render");
-		ItemListener itemListener = new ItemListener() {
-		    public void itemStateChanged(ItemEvent itemEvent) {
-		        int state = itemEvent.getStateChange();
-		        if (state == ItemEvent.SELECTED) {
-		            noRenderUpdate = true;
-		        } else {
-		            noRenderUpdate = false;
-		            nextCycleRunAllAgent();
-		        }
-		    }
-		};
-		toggleRender.setSelected(noRenderUpdate);
-		toggleRender.addItemListener(itemListener);
-		JToolBar tb = new JToolBar();
-		tb.add(toggleRender);
-		MainWindow.addToolbar(tb);
-	}
-
-	protected void onUpdateRender() {
-		if(cycle % 1000 == 0)
-			Log.inform("AMOEBA", "Cycle "+cycle);
-		if(!noRenderUpdate) {
-			ArrayList<Percept> percepts = getPercepts();
-			point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
-	
-			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
-			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
-			for (NCS ncs : NCS.values()) {
-				loopNCS.add(ncs.name(), cycle, thisLoopNCS.get(ncs));
-				allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
-			}
-	
-			nbAgent.add("Percepts", cycle, getPercepts().size());
-			nbAgent.add("Contexts", cycle, getContexts().size());
-			nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
-	
-			errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
-			errors.add("Error Allowed", cycle, head.getErrorAllowed());
-			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
-			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
-			Collections.sort(sortedErrors);
-			errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
-		}
 	public boolean isRenderUpdate() {
 		return renderUpdate;
 	}

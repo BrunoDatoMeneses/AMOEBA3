@@ -10,10 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import agents.context.localModel.TypeLocalModel;
-import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
+import kernel.BackupSystem;
+import kernel.IBackupSystem;
 import kernel.StudiedSystem;
 import kernel.World;
 
@@ -121,20 +122,18 @@ public class MNIST_System implements StudiedSystem {
 	
 	private static List<Double> benchmark(int nbThread, int nbCycle, int nbRequest){
 		StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
-		File file = new File("Ressources\\mnist.xml");
+		File file = new File("resources\\mnist.xml");
 		World world = new World();
 		Configuration.commandLineMode = true;
 		Configuration.allowedSimultaneousAgentsExecution = nbThread;
 		
 		ArrayList<Double> ret = new ArrayList<>();
 
-		AMOEBA amoeba = new AMOEBA(world, file, studiedSystem);
-		for(Percept p : amoeba.getPercepts())
-			p.setEnum(true);
+		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		backupSystem.loadXML(file);
 		
 		amoeba.setLocalModel(TypeLocalModel.AVERAGE);
-		amoeba.setDataForErrorMargin(1000, 3, 0.4, 0.1, 40, 80);
-		amoeba.setDataForInexactMargin(500, 2, 0.2, 0.05, 40, 80);
 		
 		long start = 0;
 		long end = 0;
@@ -188,21 +187,19 @@ public class MNIST_System implements StudiedSystem {
 			System.in.read();
 			//Non benchmark usage :
 			StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
-			File file = new File("Ressources\\mnist.xml");
+			File file = new File("resources\\mnist.xml");
 			World world = new World();
 			Configuration.commandLineMode = false;
 			Configuration.allowedSimultaneousAgentsExecution = 8;
 	
-			AMOEBA amoeba = new AMOEBA(world, file, studiedSystem);
-			for(Percept p : amoeba.getPercepts())
-				p.setEnum(true);
+			AMOEBA amoeba = new AMOEBA(world, studiedSystem);
+			IBackupSystem backupSystem = new BackupSystem(amoeba);
+			backupSystem.loadXML(file);
 			
 			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
-			amoeba.setDataForErrorMargin(1000, 3, 0.4, 0.1, 40, 80);
-			amoeba.setDataForInexactMargin(500, 2, 0.2, 0.05, 40, 80);
 			
 			//exemple for using the learn method
-			amoeba.setNoRenderUpdate(false);
+			amoeba.setRenderUpdate(false);
 			amoeba.allowGraphicalScheduler(false);
 			
 			long start = System.currentTimeMillis();
@@ -220,7 +217,7 @@ public class MNIST_System implements StudiedSystem {
 			end = System.currentTimeMillis();
 			System.out.println("Accuracy of "+ret.get(0)+" . Done in "+(end-start)/1000.0);
 			
-			amoeba.setNoRenderUpdate(false);
+			amoeba.setRenderUpdate(false);
 			amoeba.allowGraphicalScheduler(true);
 			
 			System.out.println("End main");
