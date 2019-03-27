@@ -1344,8 +1344,8 @@ private void startPanelController() {
 				
 				node3.addAttribute("EXIST", true);
 				node3.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
-				double XLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
-				double YLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
+				double XLength = 2*world.getContextCreationNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
+				double YLength = 2*world.getContextCreationNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
 				node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
 				node3.addAttribute("ui.class","RGBAColor");
 				
@@ -1614,7 +1614,7 @@ private void startPanelController() {
 //					}
 //				}
 //				
-				//System.out.println(world.getScheduler().getTick() + " Neighbor size "+ world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
+//				System.out.println(world.getScheduler().getTick() + " Neighbor size "+ world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().size());
 //				if(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts().contains(n)) {
 //					node.addAttribute("ui.style", "fill-color: rgba(255,0,255,200);");
 //				}

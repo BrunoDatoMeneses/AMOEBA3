@@ -18,6 +18,9 @@ public class Manager implements StudiedSystem, Serializable{
 	/** The y. */
 	double y = 0;
 	
+	/** The z. */
+	double z = 0;
+	
 	/** The result. */
 	double result = 0;
 	
@@ -47,19 +50,44 @@ public class Manager implements StudiedSystem, Serializable{
 		
 		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
 		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
+		z = (generator.nextDouble()- 0.5) * spaceSize * 4;
 	}
 
 	
-	public double model(double x, double y) {
+	public double model() {
 		
 		/* Disc */
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Square */
-		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y - z: 5*x - 8*y - z;
 		
 		/* Triange */
-		return (y > x) ? 2*x + y : 5*x - 8*y;
+		return (y > x) ? 2*x + y - z : 5*x - 8*y - z;
+		
+		/* Cube */
+		//return 5*x - 8*y - z;
+		
+		/* Split */
+		//return ( x <= 0 ) ? 2*x + y - z: 5*x - 8*y - z;
+		
+	}
+	
+public double model(double xV, double yV) {
+		
+		/* Disc */
+		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		
+		/* Square */
+		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y - z: 5*x - 8*y - z;
+		
+		/* Triange */
+		//return (y > x) ? 2*x + y : 5*x - 8*y;
+		
+		/* Cube */
+		return 5*xV - 8*yV;
+		
+		
 		
 	}
 	
@@ -70,10 +98,11 @@ public class Manager implements StudiedSystem, Serializable{
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = model(x, y);
+		result = model();
 		
 		out.put("px",x);
 		out.put("py",y);
+		out.put("pz",z);
 		out.put("oracle",result);
 		return out;
 	}
@@ -84,11 +113,13 @@ public class Manager implements StudiedSystem, Serializable{
 
 		double xValue = values.get("px");
 		double yValue = values.get("py");
+		double zValue = 0.0;
 		
 		result = model(xValue, yValue);
 		
 		out.put("px",xValue);
 		out.put("py",yValue);
+		out.put("pZ",zValue);
 		out.put("oracle",result);
 		return out;
 	}

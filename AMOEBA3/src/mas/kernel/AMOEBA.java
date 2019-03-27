@@ -51,6 +51,9 @@ public class AMOEBA extends Thread {
 	public int temporisation;
 	public boolean manual = false;
 	
+	
+	
+	
 	//private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
 	
 
@@ -503,7 +506,7 @@ public class AMOEBA extends Thread {
 	}
 	
 	public void PAUSE(String message) {
-		System.out.println(scheduler.getTick()+ " "  +message);
+		//System.out.println(scheduler.getTick()+ " "  +message);
 		
 		if(!isRunning() && manual == false) {
 			while(!getPlayOneStep()) {

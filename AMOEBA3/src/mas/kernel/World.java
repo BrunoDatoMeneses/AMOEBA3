@@ -72,19 +72,19 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
-	private double mappingErrorAllowed = 10;
+	private double mappingErrorAllowed = 0.1;
 	
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
 	
 	
 	//BUREAU
-//	private int xGraphSize = 1600;
-//	private int yGraphSize = 800;
+	private int xGraphSize = 2700;
+	private int yGraphSize = 1500;
 	
 	//REUNION
-	private int xGraphSize = 1200;
-	private int yGraphSize = 600;
+//	private int xGraphSize = 1200;
+//	private int yGraphSize = 600;
 	
 	public double increment_up = 0.05;
 	public double increment_down = 0.05;
@@ -107,11 +107,11 @@ public class World implements Serializable {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-		String message = "" +this.getScheduler().getTick();
-		for(String info : infos) {
-			message += " " + info;
-		}
-		System.out.println(message);
+//		String message = "" +this.getScheduler().getTick();
+//		for(String info : infos) {
+//			message += " " + info;
+//		}
+//		System.out.println(message);
 	}
 	
 	/**
@@ -885,13 +885,22 @@ public class World implements Serializable {
 		increment_down = value;
 	}
 	
+	public void setMappingErrorAllowed(double value) {
+		mappingErrorAllowed = value;
+	}
+	
 	public double getIncrements() {
 		return increment_up ;
 	}
 	
-	public double getNeighborhood(Context ctxt, Percept pct) {
+	public double getContextCreationNeighborhood(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return pct.getRadiusContextForCreation()*4;
+		return pct.getRadiusContextForCreation();
+	}
+	
+	public double getContextNeighborhood(Context ctxt, Percept pct) {
+		//return 2*ctxt.getRanges().get(pct).getRadius();
+		return ctxt.getRanges().get(pct).getRadius();
 	}
 	
 }

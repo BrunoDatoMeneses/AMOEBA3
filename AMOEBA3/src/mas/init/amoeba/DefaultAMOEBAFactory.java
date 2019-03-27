@@ -27,8 +27,10 @@ public class DefaultAMOEBAFactory {
 	 * @return the amoeba
 	 */
 	public AMOEBA createAMOEBA(boolean viewer, String pathToAgentsXML) {
+		
 		try {
 			InputStream agentsXMLInput = getClass().getClassLoader().getResourceAsStream(pathToAgentsXML);
+			
 			
 			if ( agentsXMLInput.available() > 0) {
 								

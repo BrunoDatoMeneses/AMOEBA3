@@ -53,6 +53,9 @@ public class Scheduler implements Serializable{
 	private ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
 	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
 	private ArrayList<Context> lastModifiedContext = new ArrayList<Context>();
+	
+	private ArrayList<Context> toKillContexts = new ArrayList<Context>();
+	private ArrayList<Context> spatiallyAlteredContext = new ArrayList<Context>();
 
 	private boolean waitForGUIUpdate = false;
 	private boolean useOracle = true;
@@ -197,6 +200,7 @@ public class Scheduler implements Serializable{
 			
 			addNewAgents();//scheduler acces to new agents
 			killAgents();
+			spatiallyAlteredContext.clear();
 			
 			playAllAgents();
 			
@@ -372,6 +376,7 @@ public class Scheduler implements Serializable{
 			}
 		}
 		killList.clear();
+		toKillContexts.clear();
 	}
 	
 	/**
@@ -767,6 +772,30 @@ public class Scheduler implements Serializable{
 	
 	public boolean requestAsked() {
 		return manualRequest;
+	}
+	
+	public void addToKillContext(Context ctxt) {
+		toKillContexts.add(ctxt);
+	}
+	
+	public void addSpatiallyAlteredContext(Context ctxt) {
+		spatiallyAlteredContext.add(ctxt);
+	}
+	
+	public ArrayList<Context> getToKillContext() {
+		return toKillContexts;
+	}
+	
+	public ArrayList<Context> getSpatiallyAlteredContext() {
+		return spatiallyAlteredContext;
+	}
+	
+	private void clearToKillContext() {
+		toKillContexts.clear();
+	}
+	
+	private void clearSpatiallyAlteredContext() {
+		spatiallyAlteredContext.clear();
 	}
 	
 }

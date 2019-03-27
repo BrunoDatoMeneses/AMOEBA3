@@ -56,7 +56,6 @@ public class SocketServer {
 		System.out.println("MSG :\t" + message);
 		String delimsTags = "[ _~]+";
 		String[] tokens = message.split(delimsTags);
-		if ((tokens.length != 19) && (tokens.length != 22)) return "";
 		
 		return message;
 	}
@@ -64,4 +63,6 @@ public class SocketServer {
 	public int getMessageCounter(){
 		return counter;
 	}
+	
+	
 }

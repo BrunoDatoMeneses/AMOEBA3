@@ -494,34 +494,15 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 
 		for(Percept fixedPct: ranges.keySet()) {
 			
-			
 			alternativeContexts.put(fixedPct, new SpatialContext(this));
-
-			////System.out.println("FIXED PERCEPT :"  + fixedPct.getName());
-			
+	
 			for(Percept pctDirectionForExpanding: ranges.keySet()) {
-
-				
+		
 				if(pctDirectionForExpanding != fixedPct) {
-					
-					////System.out.println("DIRECTION PERCEPT :"  + pctDirectionForExpanding.getName());
-					
-					////System.out.println("ALL NEIGHBORS");
-					for(Context ct : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
-						////System.out.println(ct.getName());
-					}
-					
+								
 					neighborsOnOneDirection = getContextsOnAPerceptDirectionFromContextsNeighbors(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts(), pctDirectionForExpanding, alternativeContexts.get(fixedPct));
-					
-					
-					////System.out.println("NEIGHBORS THROUGH " + pctDirectionForExpanding.getName());
-					for(Context ct : neighborsOnOneDirection) {
-						////System.out.println(ct.getName());
-					}
-					
-					
+						
 					AbstractPair<Double,Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(neighborsOnOneDirection, pctDirectionForExpanding);
-					////System.out.println("START : " + expandingRadiuses.getA() + " END " + expandingRadiuses.getB());
 					alternativeContexts.get(fixedPct).expandEnd(pctDirectionForExpanding, expandingRadiuses.getB());
 					alternativeContexts.get(fixedPct).expandStart(pctDirectionForExpanding, expandingRadiuses.getA());
 				}
@@ -537,8 +518,6 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		if(maxVolumeSpatialContext != null) {
 			matchSpatialContextRanges(maxVolumeSpatialContext);
 		}
-		
-		
 	}
 	
 	public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
@@ -966,63 +945,92 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			
-			LocalModelAgent newBetterModel = tryNewExperiment();
 			
-			if(newBetterModel!=null) {
-				//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"BETTER MODEL")));
-				localModel = newBetterModel;
-				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
+//			Context nearestGoodContext = head.getNearestBetterContext(head.getActivatedNeighborsContexts(), head.getCriticity(this));
+//			if(nearestGoodContext != null) {
+//				localModel = new LocalModelMillerRegression(world);
+//				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
+//				
+//				
+//				
+//				this.confidence = nearestGoodContext.getConfidence();	
+//				this.localModel = new LocalModelMillerRegression(world);
+//				double[] coef = ((LocalModelMillerRegression) nearestGoodContext.localModel).getCoef();
+//				((LocalModelMillerRegression) this.localModel).setCoef(coef);
+//				this.actionProposition = ((LocalModelMillerRegression) nearestGoodContext.localModel).getProposition(nearestGoodContext);
+//				this.experiments = new ArrayList<Experiment>();
+//				experiments.addAll(nearestGoodContext.getExperiments());
+//			}
+//			else {
+				LocalModelAgent newBetterModel = tryNewExperiment();
 				
-			}
-			else {
-				//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NOT BETTER MODEL")));
-				solveNCS_Conflict(head);
-				this.world.getScheduler().addAlteredContext(this);
-			}
+				if(newBetterModel!=null) {
+					//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"BETTER MODEL")));
+					localModel = newBetterModel;
+					world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
+					
+				}
+				else {
+					//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NOT BETTER MODEL")));
+					solveNCS_Conflict(head);
+					this.world.getScheduler().addAlteredContext(this);
+				}
+//			}
 			
 		}else {
+			
 			confidence++;
+			
 		}
 		
 		//NCSDetection_OverMapping();	
 		
 	}
 	
+	
+	
 	public void NCSDetection_OverMapping() {
 		
+		boolean fusionAcomplished = false;
+		
+		
 		for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
-			if(ctxt != this) {
+			
+			
+			if(ctxt != this && !ctxt.isDying()) {
 				
-				if(this.sameModelAs(ctxt, world.getScheduler().getHeadAgent().getErrorAllowed()/10)) {
+				fusionAcomplished = false;
+	
+				if(this.sameModelAs(ctxt, world.getScheduler().getHeadAgent().getErrorAllowed()/10) ) {
 					
 					for(Percept pct : ranges.keySet()) {
 						
+						boolean fusionTest = true;
+						
 						world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + world.getMappingErrorAllowed())));
-						if(Math.abs(this.distance(ctxt, pct)) < world.getMappingErrorAllowed()){
-							
-							boolean fusionTest = true;
-							
+						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowed()){		
+														
 							for(Percept otherPct : ranges.keySet()) {
 								
 								if(otherPct != pct) {
+																		
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
 									world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + world.getMappingErrorAllowed())));
-									fusionTest = fusionTest && (lengthDifference < world.getMappingErrorAllowed()) && (centerDifference< world.getMappingErrorAllowed());
+									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowed()) && (centerDifference< otherPct.getMappingErrorAllowed());
 								}
 							}
 							
 							if(fusionTest) {
 								solveNCS_OverMapping(ctxt,pct);
+								fusionAcomplished = true;
 							}
 							
 						}
 					}
 					
 				}
-				
-				
-				
+								
 			}
 		}
 		
@@ -1149,23 +1157,25 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		AbstractPair<Percept, Context> perceptForAdapatationAndOverlapingContext = getPerceptForAdaptationWithOverlapingContext(percepts);			
 		Percept p = perceptForAdapatationAndOverlapingContext.getA();
 		
-		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
-			world.trace(new ArrayList<String>(Arrays.asList(this.getName(),p.getName(),perceptForAdapatationAndOverlapingContext.getB().getName(), "*********************************************************************************************************** CONFLICT OVERLAP")));
-			Range overlapingRange = perceptForAdapatationAndOverlapingContext.getB().getRanges().get(p);
-			
-			
-			if (Math.abs(overlapingRange.getStart() - this.getRanges().get(p).getEnd()) >= Math.abs(overlapingRange.getEnd() - this.getRanges().get(p).getStart())) {
-						
-				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getEnd());
-			} else {
-				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getStart());
-			}
-			
-			//ranges.get(p).adapt(p.getValue(), Math.abs(this.distance(overlapingContext, p))); 
-			
-		}else {
-			ranges.get(p).adapt(p.getValue()); 
-		}
+//		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
+//			world.trace(new ArrayList<String>(Arrays.asList(this.getName(),p.getName(),perceptForAdapatationAndOverlapingContext.getB().getName(), "*********************************************************************************************************** CONFLICT OVERLAP")));
+//			Range overlapingRange = perceptForAdapatationAndOverlapingContext.getB().getRanges().get(p);
+//			
+//			
+//			if (Math.abs(overlapingRange.getStart() - this.getRanges().get(p).getEnd()) >= Math.abs(overlapingRange.getEnd() - this.getRanges().get(p).getStart())) {
+//						
+//				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getEnd());
+//			} else {
+//				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getStart());
+//			}
+//			
+//			//ranges.get(p).adapt(p.getValue(), Math.abs(this.distance(overlapingContext, p))); 
+//			
+//		}else {
+//			ranges.get(p).adapt(p.getValue()); 
+//		}
+		
+		ranges.get(p).adapt(p.getValue());
 		
 		
 //		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
@@ -1366,6 +1376,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					
 					
 					if(percept.contextOrder(this, bestContext)) {
+						world.trace(new ArrayList<String>(Arrays.asList("ORDER :",percept.getName() ,this.getName(), bestContext.getName())));
 						vol = Math.abs(percept.getEndRangeProjection(this) - percept.getStartRangeProjection(bestContext));
 						if(vol<volumeLost) {
 							volumeLost = vol;
@@ -1373,6 +1384,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 						}
 					}
 					else if(percept.contextOrder(bestContext, this)) {
+						world.trace(new ArrayList<String>(Arrays.asList("ORDER :",percept.getName() ,bestContext.getName(), this.getName())));
 						vol = Math.abs(percept.getEndRangeProjection(bestContext) - percept.getStartRangeProjection(this));
 						if(vol<volumeLost) {
 							volumeLost = vol;
@@ -2227,7 +2239,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 	public void shrinkRangesToJoinBorders(Context bestContext) {
 
 		
-		Percept perceptWithLesserImpact = getPerceptWithBiggerImpactOnOverlap(world.getScheduler().getPercepts(),bestContext);
+		Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(world.getScheduler().getPercepts(),bestContext);
 		
 			
 		
@@ -2235,13 +2247,13 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 		//if(perceptWithLesserImpact!=null) world.trace(new ArrayList<String>(Arrays.asList(this.getName(),perceptWithLesserImpact.getName(), "PERCEPT BIGGER IMPACT")));
 		
 
-		if (perceptWithLesserImpact == null) {
+		if (perceptWithBiggerImpactOnOverlap == null) {
 
 			this.die();
 		}else {
 			
-			//ranges.get(perceptWithLesserImpact).matchBorderWithBestContext(bestContext);
-			ranges.get(perceptWithLesserImpact).adaptTowardsBorder(bestContext);
+			ranges.get(perceptWithBiggerImpactOnOverlap).matchBorderWithBestContext(bestContext);
+			//ranges.get(perceptWithBiggerImpactOnOverlap).adaptTowardsBorder(bestContext);
 			
 			
 //			if(testIfOtherContextShouldFinalyShrink(bestContext, perceptWithLesserImpact)){
@@ -2304,6 +2316,11 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 		for(Percept percept : world.getScheduler().getPercepts()) {
 			percept.deleteContextProjection(this);
 		}
+		
+		if(!world.getScheduler().getToKillContext().contains(this)) {
+			world.getScheduler().addToKillContext(this);
+		}
+		
 	}
 	
 	
@@ -2776,6 +2793,67 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 				}
 			}
 		}
+	}
+	
+	public String getColor() {
+		String colors = "";
+		Double r = 0.0;
+		Double g = 0.0;
+		Double b = 0.0;
+		double[] coefs = this.getLocalModel().getCoef();
+
+		if(coefs.length>0) {
+			if(coefs.length==1) {
+				
+				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else if(coefs.length==2) {
+
+				g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
+				b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
+				if(g.isNaN()) {
+					g = 0.0;
+				}
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else if(coefs.length>=3) {
+
+				r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
+				g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
+				b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
+				if(r.isNaN()) {
+					r = 0.0;
+				}
+				if(g.isNaN()) {
+					g = 0.0;
+				}
+				if(b.isNaN()) {
+					b = 0.0;
+				}
+			}
+			else {
+				r = 255.0;
+				g = 255.0;
+				b = 255.0;
+			}
+		}
+		else {
+			r = 255.0;
+			g = 255.0;
+			b = 255.0;
+		}
+		
+		colors += r.intValue() + "," + g.intValue() + "," + b.intValue() + ",100";
+		return colors;
+	}
+	
+	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
+		return upperBound*2*(- 0.5 + 1/(1+Math.exp(-value/dispersion)));
 	}
 
 }

@@ -319,14 +319,14 @@ public class MainPanel extends JPanel{
 		toolBar.add(simulationSpeedSlider);
 		
 		valueForOnLineTestingSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 100, 50);
+                0, 20, 20);
 		
 		class OnlineSliderListener implements ChangeListener {
 		    public void stateChanged(ChangeEvent e) {
 		        JSlider source = (JSlider)e.getSource();
 		        if (!source.getValueIsAdjusting()) {
 		            
-		            world.setIncrements((double)source.getValue()/1000);
+		            world.setMappingErrorAllowed((double)source.getValue()/100);
 
 		        }    
 		    }
@@ -336,8 +336,8 @@ public class MainPanel extends JPanel{
 		
 		
 		//Turn on labels at major tick marks.
-		valueForOnLineTestingSlider.setMajorTickSpacing(50);
-		valueForOnLineTestingSlider.setMinorTickSpacing(5);
+		valueForOnLineTestingSlider.setMajorTickSpacing(5);
+		valueForOnLineTestingSlider.setMinorTickSpacing(1);
 		valueForOnLineTestingSlider.setPaintTicks(true);
 		valueForOnLineTestingSlider.setPaintLabels(true);
 		

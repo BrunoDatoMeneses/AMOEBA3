@@ -474,8 +474,8 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		node3.addAttribute("EXIST", true);
 		node3.setAttribute("xyz", xValueDouble, yValueDouble, 0);
 		
-		double XLength = 2*ncsMemory.getWorld().getNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())));
-		double YLength = 2*ncsMemory.getWorld().getNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())));
+		double XLength = 2*ncsMemory.getWorld().getContextCreationNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimX.getSelectedItem())));
+		double YLength = 2*ncsMemory.getWorld().getContextCreationNeighborhood(null, (ncsMemory.getPerceptByName((String)comboDimY.getSelectedItem())));
 		node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
 		node3.addAttribute("ui.class","RGBAColor");
 		
@@ -1278,8 +1278,8 @@ Head head = (Head)agent;
 				
 				node3.addAttribute("EXIST", true);
 				node3.setAttribute("xyz", ((Percept)(world.getAgents().get(comboDimX.getSelectedItem()))).getValue(), ((Percept)(world.getAgents().get(comboDimY.getSelectedItem()))).getValue(), 0);
-				double XLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
-				double YLength = 2*world.getNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
+				double XLength = 2*world.getContextCreationNeighborhood(null, (Percept)(world.getAgents().get(comboDimX.getSelectedItem())));
+				double YLength = 2*world.getContextCreationNeighborhood(null, (Percept)(world.getAgents().get(comboDimY.getSelectedItem())));
 				node3.addAttribute("ui.style", "size: " + doubleFormat.format(XLength) + "gu, " + doubleFormat.format(YLength) +"gu;");
 				node3.addAttribute("ui.class","RGBAColor");
 				

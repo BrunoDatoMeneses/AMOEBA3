@@ -80,17 +80,17 @@ public class Head extends AbstractHead implements Cloneable{
 	private int perfIndicatorInexact = 0;
 	
 	private double prediction;
-	private Double endogenousPredictionActivatedContextsOverlaps;
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence;
+	private Double endogenousPredictionActivatedContextsOverlaps =0.0;
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence=0.0;
 	
-	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence;
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence=0.0;
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence=0.0;
 	
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume=0.0;
 	
-	private Double endogenousPredictionActivatedContextsSharedIncompetence;
-	private Double endogenousPredictionNContexts;
-	private Double endogenousPredictionNContextsByInfluence;
+	private Double endogenousPredictionActivatedContextsSharedIncompetence=0.0;
+	private Double endogenousPredictionNContexts=0.0;
+	private Double endogenousPredictionNContextsByInfluence=0.0;
 	
 	private double oracleValue;
 	private double oldOracleValue;
@@ -141,6 +141,32 @@ public class Head extends AbstractHead implements Cloneable{
 	private int currentCriticalityPrediction = 0;
 	private int currentCriticalityMapping = 0;
 	private int currentCriticalityConfidence = 0;
+	
+	
+	public long playExecutionTime;
+	public long endogenousExecutionTime;
+	public long contextSelfAnalisisExecutionTime;
+	
+	public long incompetentHeadNCSExecutionTime;
+	public long concurrenceNCSExecutionTime;
+	public long create_New_ContextNCSExecutionTime;
+	public long overmappingNCSExecutionTime;
+	public long memoryCreationExecutionTime;
+	
+	public long otherExecutionTime;
+	
+	public long playExecutionTimeSum = 0;
+	public long endogenousExecutionTimeSum= 0;
+	public long contextSelfAnalisisExecutionTimeSum= 0;
+	
+	public long incompetentHeadNCSExecutionTimeSum= 0;
+	public long concurrenceNCSExecutionTimeSum= 0;
+	public long create_New_ContextNCSExecutionTimeSum= 0;
+	public long overmappingNCSExecutionTimeSum= 0;
+	public long memoryCreationExecutionTimeSum= 0;
+	
+	public long otherExecutionTimeSum= 0;
+	
 	
 
 	/**
@@ -280,11 +306,7 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void playWithOracle() {
 		
-		//System.out.println(world.getScheduler().getTick() + " ACTIVATED CONTEXTS");
-		for(Context ctxt : activatedContexts) {
-			//System.out.println("--> " + ctxt.getName());
-		}
-			
+		playExecutionTime = System.currentTimeMillis();	
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); //using highest confidence 
 		}
@@ -310,28 +332,43 @@ public class Head extends AbstractHead implements Cloneable{
 			//functionSelected = bestContext.getFunction().getFormula(bestContext);
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 		}
-
+		playExecutionTime = System.currentTimeMillis() - playExecutionTime;	
 		
-		endogenousPlay();
+		endogenousExecutionTime = System.currentTimeMillis();
+		//endogenousPlay();
+		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
 		
-		
-		
+		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
 		selfAnalysationOfContexts();
+		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
 		
 		world.getAmoeba().PAUSE("BEFORE HEAD NCS ");
 
+		incompetentHeadNCSExecutionTime =  System.currentTimeMillis();
 		NCSDetection_IncompetentHead();		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
+		incompetentHeadNCSExecutionTime =  System.currentTimeMillis() - incompetentHeadNCSExecutionTime;
+		
+		concurrenceNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Concurrence(); 		/*If result is good, shrink redundant context (concurrence NCS)*/
+		concurrenceNCSExecutionTime = System.currentTimeMillis() - concurrenceNCSExecutionTime;
 		
 		world.getAmoeba().PAUSE("BEFORE HEAD NCS CONTEXT CREATION");
 		
+		create_New_ContextNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Create_New_Context();	/*Finally, head agent check the need for a new context agent*/
+		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
 		
+		overmappingNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Context_Overmapping();
+		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 		
-		NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
+		memoryCreationExecutionTime = System.currentTimeMillis();
+		//NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
+		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 		
+		otherExecutionTime = System.currentTimeMillis();
 		spatialCriticality = (getMinMaxVolume() - getVolumeOfAllContexts())/getMinMaxVolume();
+		
 		
 		spatialGeneralizationScore = getVolumeOfAllContexts()/world.getScheduler().getContexts().size();
 		
@@ -344,6 +381,20 @@ public class Head extends AbstractHead implements Cloneable{
 		evolutionCriticalityPrediction = (lembda * evolutionCriticalityPrediction) + ((1-lembda)*currentCriticalityPrediction);
 		evolutionCriticalityMapping = (lembda * evolutionCriticalityMapping) + ((1-lembda)*currentCriticalityMapping);
 		evolutionCriticalityConfidence = (lembda * evolutionCriticalityConfidence) + ((1-lembda)*currentCriticalityConfidence);
+		
+		otherExecutionTime = System.currentTimeMillis() - otherExecutionTime;
+		
+		playExecutionTimeSum += playExecutionTime;
+		endogenousExecutionTimeSum += endogenousExecutionTime;
+		contextSelfAnalisisExecutionTimeSum += contextSelfAnalisisExecutionTime;
+		
+		incompetentHeadNCSExecutionTimeSum += incompetentHeadNCSExecutionTime;
+		concurrenceNCSExecutionTimeSum += concurrenceNCSExecutionTime;
+		create_New_ContextNCSExecutionTimeSum += create_New_ContextNCSExecutionTime;
+		overmappingNCSExecutionTimeSum += overmappingNCSExecutionTime;
+		memoryCreationExecutionTimeSum += memoryCreationExecutionTime;
+		
+		otherExecutionTimeSum += otherExecutionTime;
 	}
 	
 	public double getSpatialGeneralizationScore() {
@@ -385,7 +436,7 @@ public class Head extends AbstractHead implements Cloneable{
 			////////System.out.println("NO BEST ...");
 			noBestContext = true;
 			ArrayList<Agent> allContexts = world.getScheduler().getContexts();
-			Context nearestContext = this.getNearestContext(allContexts);
+			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 			prediction = nearestContext.getActionProposal();
 			bestContext = nearestContext;
 		}
@@ -886,13 +937,13 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	
 		boolean newContextCreated = false;
-		ArrayList<Agent> allContexts = world.getScheduler().getContexts();
 		AbstractPair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
-		world.trace(new ArrayList<String>(Arrays.asList(""+activatedContexts.size(), "ACTIVATED CTXT")));
+		
 		if(activatedContexts.size() == 0) {
 			
 			Context context;
 			if(nearestGoodContext.getA() != null) {
+				world.trace(new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(), "************************************* NEAREST GOOD CONTEXT")));
 				context = createNewContext(nearestGoodContext.getA());
 			}else {
 				context = createNewContext();
@@ -913,7 +964,10 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void NCSDetection_Context_Overmapping() {
 		
-		for(Context ctxt : activatedContexts) {
+		ArrayList<Context> activatedContextsCopy = new ArrayList<Context>();
+		activatedContextsCopy.addAll(activatedContexts);
+		
+		for(Context ctxt : activatedContextsCopy) {
 			ctxt.NCSDetection_OverMapping();
 		}
 	}
@@ -933,9 +987,9 @@ public class Head extends AbstractHead implements Cloneable{
 	private void NCSDetection_IncompetentHead() {
 		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
 		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())){
-			ArrayList<Agent> allContexts = world.getScheduler().getContexts();
 			
-			Context c = getNearestGoodContext(allContexts);
+			//Context c = getNearestGoodContext(activatedNeighborsContexts);
+			Context c = getSmallestGoodContext(activatedNeighborsContexts);
 			if(c!=null) {
 				////////System.out.println("Nearest good context : " + c.getName());
 			}
@@ -973,8 +1027,19 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	private void setNearestContextAsBestContext() {
-		ArrayList<Agent> allContexts = world.getScheduler().getContexts();
-		Context nearestContext = this.getNearestContext(allContexts);
+		Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
+
+		if (nearestContext != null) {
+			prediction = nearestContext.getActionProposal();
+		} else {
+			prediction = 0;
+		}
+
+		bestContext =  nearestContext;
+	}
+	
+	private void setNearestGoodContextAsBestContext() {
+		Context nearestContext = this.getNearestGoodContext(activatedNeighborsContexts);
 
 		if (nearestContext != null) {
 			prediction = nearestContext.getActionProposal();
@@ -1000,11 +1065,43 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param allContext the all context
 	 * @return the nearest good context
 	 */
-	private Context getNearestGoodContext(ArrayList<Agent> allContext) {
+	public Context getNearestGoodContext(ArrayList<Context> allContext) {
 		Context nearest = null;
-		for (Agent a : allContext) {
-			Context c = (Context) a;
+		for (Context c : allContext) {
 			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest) ) {
+					nearest = c;
+				}
+			}
+		}
+		
+		
+		return nearest;
+		
+	}
+	
+	public Context getSmallestGoodContext(ArrayList<Context> neighbors) {
+		Context smallest = null;
+		double minVolume = Double.POSITIVE_INFINITY;
+		double currentVolume;
+		for (Context c : neighbors) {
+			currentVolume = c.getVolume();
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+				if (smallest == null || currentVolume < minVolume ) {
+					smallest = c;
+				}
+			}
+		}
+		
+		
+		return smallest;
+		
+	}
+	
+	public Context getNearestBetterContext(ArrayList<Context> allContext, double currentError) {
+		Context nearest = null;
+		for (Context c : allContext) {
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && Math.abs((c.getActionProposal() - oracleValue)) <  currentError &&  c != newContext && !c.isDying()) {
 				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest) ) {
 					nearest = c;
 				}
@@ -1046,11 +1143,10 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param allContext the all context
 	 * @return the nearest context
 	 */
-	private Context getNearestContext(ArrayList<Agent> allContext) {
+	private Context getNearestContext(ArrayList<Context> contextNeighboors) {
 		Context nearest = null;
 		double distanceToNearest = Double.MAX_VALUE;
-		for (Agent a : allContext) {
-			Context c = (Context) a;
+		for (Context c : contextNeighboors) {
 			if (c != newContext && !c.isDying()) {
 				if (nearest == null || getExternalDistanceToContext(c) < distanceToNearest ) {
 					nearest = c;
@@ -1302,13 +1398,13 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
 			perfIndicator = 0;
-			errorAllowed *= augmentationFactorError;
+			errorAllowed += augmentationFactorError * averagePredictionCriticity;
 			//////////System.out.println("いいいいいいいいいいい  augmentationFactorError :" + augmentationFactorError);
 		}
 		
 		if (perfIndicator >= nSuccessBeforeDiminution) {
 			perfIndicator = 0;
-			errorAllowed *= diminutionFactorError;
+			errorAllowed -= diminutionFactorError * averagePredictionCriticity;
 			//////////System.out.println("いいいいいいいいいいい  diminutionFactorError :" + diminutionFactorError);
 			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
 		}
@@ -2083,23 +2179,19 @@ public class Head extends AbstractHead implements Cloneable{
 						Math.abs(pct.getMin()- pct.getValue())),
 				Math.min(pct.getRadiusContextForCreation(), 
 						Math.abs(pct.getMax()-pct.getValue())));
+		
 		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
 		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(Math.abs(pct.getMin()- pct.getValue()),Math.abs(pct.getMax()-pct.getValue()));
-
-		////System.out.println("MIN MAX "  + pct.getName() +" " + pct.getValue() + " < " + pct.getMin() + " , "  + pct.getMax() + " > / < " + Math.abs(pct.getMin()- pct.getValue()) + " , " + Math.abs(pct.getMax()-pct.getValue()) + " >");
-		
+	
 		double currentStartRadius;
 		double currentEndRadius;
-		
-
-			
+				
 		//for(Context ctxt:partialNeighborContexts.get(pct)) {
 		for(Context ctxt:activatedNeighborsContexts) {			
 			
 			if(ctxt.getRanges().get(pct).centerDistance(pct.getValue()) < 0) {
 				// End radius
 				currentEndRadius = ctxt.getRanges().get(pct).distance(pct.getValue());
-				//////System.out.println(ctxt.getName() + " " + pct.getName() + " " + currentRadius + " " + maxRadius);
 				if(currentEndRadius < maxRadiuses.getB() && currentEndRadius > 0 ) {
 					maxRadiuses.setB(currentEndRadius); 
 				}
@@ -2108,7 +2200,6 @@ public class Head extends AbstractHead implements Cloneable{
 			if(ctxt.getRanges().get(pct).centerDistance(pct.getValue()) > 0) {
 				// Start radius
 				currentStartRadius = ctxt.getRanges().get(pct).distance(pct.getValue());
-				//////System.out.println(ctxt.getName() + " " + pct.getName() + " " + currentRadius + " " + maxRadius);
 				if(currentStartRadius < maxRadiuses.getA() && currentStartRadius > 0 ) {
 					maxRadiuses.setA(currentStartRadius); 
 				}

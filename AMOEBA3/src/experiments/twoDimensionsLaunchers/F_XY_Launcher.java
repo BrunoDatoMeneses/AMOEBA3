@@ -29,7 +29,7 @@ public class F_XY_Launcher implements Serializable {
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		
 		/* Error parameter */
-		amoeba.setDataForErrorMargin(10, 5, 0.4, 10, 8000, 8000);
+		amoeba.setDataForErrorMargin(500, 0.5, 0.5, 1, 20, 20);
 		
 		/* Other parameters */
 		amoeba.setRememberState(false);

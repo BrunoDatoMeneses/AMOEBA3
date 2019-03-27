@@ -2,6 +2,7 @@ package mas.agents.percept;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,8 +39,6 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
 	
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	public ArrayList<Context> validContextProjection = new ArrayList<Context>();
-	public ArrayList<Context> validNeigborhoodContextProjection = new ArrayList<Context>();
 	public HashMap<String, PerceptOverlap> perceptOverlaps = new HashMap<String, PerceptOverlap>();
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
 	
@@ -139,10 +138,6 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		
 		this.contextProjections = new HashMap<Context, ContextProjection>();
 		
-
-		
-		this.validContextProjection = new ArrayList<Context>();
-		this.validNeigborhoodContextProjection = new ArrayList<Context>();
 		this.perceptOverlaps = new HashMap<String, PerceptOverlap>();
 		
 		this.sortedRanges.put("start", new ArrayList<Context>());
@@ -195,63 +190,26 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	}
 	
 	public void computeContextProjectionValidity() {
-		validContextProjection = new ArrayList<Context>();
-		validNeigborhoodContextProjection = new ArrayList<Context>();
 		
 		
 		for(ContextProjection contextProjection : contextProjections.values()) {
 			
-			//System.out.println(contextProjection.contains(this.value));
-			if(!contextProjection.contains(this.value)) {
-
-				contextProjection.getContext().addNonValidPercept(this);	
-				
-			}
 			
 			//if(!contextProjection.contains(this.value, getRadiusContextForCreation())) {
-			if(!contextProjection.contains(this.value, world.getNeighborhood(contextProjection.getContext(), this))) {
-				////////System.out.println(contextProjection.getContext().getName() + " " + this.getName() + " non valid");
+			
+			
+			if(!contextProjection.inNeighborhood()) {
 				contextProjection.getContext().addNonValidNeighborPercept(this);
-				
-				////System.out.println(world.getScheduler().getTick() + " " + contextProjection.getContext().getName() + " " + this.getName() + " " + "NON VALID" + " " + getRadiusContextForCreation());
+				contextProjection.getContext().addNonValidPercept(this);
 			}
+			else if(!contextProjection.contains(this.value)) {
+				contextProjection.getContext().addNonValidPercept(this);
+			}
+				
 			
-			
-			
-			
-			
-			if(contextProjection.contains(this.value)) {
 
-				validContextProjection.add(contextProjection.getContext());
-				contextProjection.getContext().setPerceptValidity(this);
-				//////////System.out.println("Percept "+this.name+ " Context "+contextProjection.getContex().getName());
-				
-								
-			}
 			
 			
-//			if(contextProjection.contains(this.value, 2 * Math.abs(this.getMinMaxDistance()) * world.contextCreationPercentage )) {
-//				
-//			}
-			
-			
-			if(contextProjection.inNeighborhoodOf(this.value)){
-				validNeigborhoodContextProjection.add(contextProjection.getContext());
-				contextProjection.getContext().setNeighborhoodPerceptValidity(this);
-			}
-			
-			for(ContextProjection ctxtPrjct : contextProjections.values()) {
-				double distance = contextProjection.distance(ctxtPrjct);
-				
-				if(contextProjection.getContext().getContextDistanceUpdateTick(ctxtPrjct.getContext(), this) != null){
-					
-					if(contextProjection.getContext().getContextDistanceUpdateTick(ctxtPrjct.getContext(), this) !=  world.getScheduler().getTick()) {
-						
-						contextProjection.getContext().addContextDistance(ctxtPrjct.getContext(), this, distance);
-						ctxtPrjct.getContext().addContextDistance(contextProjection.getContext(), this, distance);
-					}
-				}
-			}
 		}
 		
 		
@@ -794,11 +752,15 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	public boolean contextOrder(Context context1, Context context2) {
 		
-	double contextStart1 = getStartRangeProjection(context1);
-	double contextStart2 = getStartRangeProjection(context2);
-	double contextEnd1 = getEndRangeProjection(context1);
+		double contextStart1 = getStartRangeProjection(context1);
+		double contextEnd1 = getEndRangeProjection(context1);
+	
+		double contextStart2 = getStartRangeProjection(context2);
+		double contextEnd2 = getEndRangeProjection(context2);
 		
-		return  (contextStart1 <= contextStart2 && contextStart2 <= contextEnd1)  ;
+		//world.trace(new ArrayList<String>(Arrays.asList(""+contextStart1,""+contextStart2, ""+contextEnd1, ""+(contextStart1 <= contextStart2 && contextStart2 <= contextEnd1))));
+		
+		return  (contextStart1 <= contextStart2 && contextStart2 <= contextEnd1 && contextEnd1 <= contextEnd2)  ;
 	}
 	
 	public Percept clone() throws CloneNotSupportedException{
@@ -807,6 +769,10 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	public double getRadiusContextForCreation() {
 		//return 200*world.getContextCreationPercentage();
-		return getMinMaxDistance()*world.getContextCreationPercentage();
+		return getMinMaxDistance()*world.getMappingErrorAllowed();
+	}
+	
+	public double getMappingErrorAllowed() {
+		return getMinMaxDistance()*world.getMappingErrorAllowed();
 	}
 }
