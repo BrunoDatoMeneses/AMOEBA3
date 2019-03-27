@@ -1,11 +1,13 @@
 package agents.context;
 
 import agents.percept.Percept;
+import java.io.Serializable;
 
 /**
  * The Class Range.
  */
-public class Range implements Comparable<Object>, Cloneable {
+public class Range implements Comparable<Object>, Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
 
 	/** The start. */
 	private double start;
@@ -26,13 +28,13 @@ public class Range implements Comparable<Object>, Cloneable {
 	private Percept percept;
 
 	/** The maxid. */
-	public static int maxid = 0; // TODO for debug purposes
+	private static int maxid = 0; // Used for debug purposes
 
 	/** The id. */
-	public int id;
+	private int id;
 
 	/** The Constant mininimalRange. */
-	public static final double mininimalRange = 10;
+	private static final double mininimalRange = 10;
 
 	/** The Constant useAVT. */
 	private static final boolean useAVT = true;
@@ -63,10 +65,10 @@ public class Range implements Comparable<Object>, Cloneable {
 	/*------------Percent--------------*/
 	/** The percent up. */
 	// Only used if useAVT == false
-	static public double percent_up = 0.2;
+	private static double percent_up = 0.2;
 
 	/** The percent down. */
-	static public double percent_down = 0.1;
+	private static double percent_down = 0.1;
 	/*---------------------------------*/
 
 	/**
@@ -190,9 +192,9 @@ public class Range implements Comparable<Object>, Cloneable {
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMaxUsingAVT(Context c, double oracleValue) {
-
-		if (contains(oracleValue) == 0.0) { // If value is contained, it's a negative feedback for AVT (ie : we must
-											// exclude the value)
+		// If value is contained, it's a negative feedback for AVT (ie : we must exclude
+		// the value)
+		if (contains(oracleValue) == 0.0) {
 
 			if (AVT_lastFeedbackMax == 1) {
 				AVT_deltaMax *= AVT_deceleration;
@@ -224,9 +226,9 @@ public class Range implements Comparable<Object>, Cloneable {
 	 * @param oracleValue the oracle value
 	 */
 	private void adaptMinUsingAVT(Context c, double oracleValue) {
-
-		if (contains(oracleValue) == 0.0) { // If value is contained, it's a negative feedback for AVT (ie : we must
-											// exclude the value)
+		// If value is contained, it's a negative feedback for AVT (ie : we must exclude
+		// the value)
+		if (contains(oracleValue) == 0.0) {
 
 			if (AVT_lastFeedbackMin == 1) {
 				AVT_deltaMin *= AVT_deceleration;
@@ -334,7 +336,7 @@ public class Range implements Comparable<Object>, Cloneable {
 	public void matchBorderWith(Context c) {
 		Range r = c.getRanges().get(percept);
 		if (r.getStart() <= this.start && r.getEnd() >= this.end) {
-			this.context.die();
+			this.context.destroy();
 		} else {
 			if (Math.abs(r.getStart() - this.getEnd()) > Math.abs(r.getEnd() - this.getStart())) {
 				// Change min
@@ -475,5 +477,9 @@ public class Range implements Comparable<Object>, Cloneable {
 
 	public Range clone() throws CloneNotSupportedException {
 		return (Range) super.clone();
+	}
+
+	public int getId() {
+		return id;
 	}
 }

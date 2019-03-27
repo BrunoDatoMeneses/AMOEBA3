@@ -16,7 +16,7 @@ public interface StudiedSystem {
 
 	/**
 	 * Gets the output.
-	 *
+	 * 
 	 * @return the output
 	 */
 	public HashMap<String, Double> getOutput();

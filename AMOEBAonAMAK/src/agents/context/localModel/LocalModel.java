@@ -8,15 +8,20 @@ import agents.percept.Percept;
  * from Context Agent. For the sake of simplicity, it's not scheduled as agent
  * like other of the system.
  */
-public abstract class LocalModel implements Cloneable {
+public abstract class LocalModel {
 
 	/**
 	 * Instantiates a new local model agent.
-	 *
 	 */
 	public LocalModel() {
-
 	}
+
+	/**
+	 * Update model.
+	 *
+	 * @param context the context
+	 */
+	public abstract void updateModel(Context context);
 
 	/**
 	 * Gets the proposition.
@@ -48,17 +53,7 @@ public abstract class LocalModel implements Cloneable {
 
 	public abstract String getCoefsFormula();
 
-	/**
-	 * Update model.
-	 *
-	 * @param context the context
-	 */
-	public abstract void updateModel(Context context);
+	public abstract double[] getCoefs();
 
-	public abstract double[] getCoef();
-
-	public LocalModel clone() throws CloneNotSupportedException {
-		return (LocalModel) super.clone();
-	}
-
+	public abstract TypeLocalModel getType();
 }
