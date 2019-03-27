@@ -31,7 +31,6 @@ public class Context extends AmoebaAgent {
 
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
-
 		setName(String.valueOf(this.hashCode()));
 		Experiment firstPoint = new Experiment();
 
@@ -89,11 +88,6 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : percepts) {
 			percept.addContextProjection(this);
 		}
-
-		perceptValidities = new HashMap<Percept, Boolean>();
-		for (Percept percept : percepts) {
-			perceptValidities.put(percept, false);
-		}
 	}
 
 	@Override
@@ -103,15 +97,11 @@ public class Context extends AmoebaAgent {
 
 	@Override
 	protected void onAct() {
-		if (computeValidityByPercepts()) {
+		
+		if(amas.getValidContexts().contains(this)) {
 			headAgent.proposition(this);
 		}
-
-		// Reset percepts validities
-		for (Percept percept : perceptValidities.keySet()) {
-			perceptValidities.put(percept, false);
-		}
-
+		
 		// Kill small contexts
 		for (Percept percept : ranges.keySet()) {
 			if (ranges.get(percept).isTooSmall()) {
@@ -119,6 +109,7 @@ public class Context extends AmoebaAgent {
 				break;
 			}
 		}
+		
 	}
 
 	// ---------------------------- NCS Resolutions ----------------------------
@@ -255,14 +246,6 @@ public class Context extends AmoebaAgent {
 			drawable.hide();
 		}
 		super.destroy();
-	}
-
-	public Boolean computeValidityByPercepts() {
-		Boolean test = true;
-		for (Percept percept : perceptValidities.keySet()) {
-			test = test && perceptValidities.get(percept);
-		}
-		return test;
 	}
 
 	/**

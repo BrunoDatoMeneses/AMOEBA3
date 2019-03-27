@@ -27,6 +27,7 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> impl
 	@Override
 	protected void onUpdateRender() {
 		super.onUpdateRender();
+		amas.getEnvironment().incrementNbActivatedAgent();
 		if (amas.isRenderUpdate()) {
 			updateRender();
 		}
