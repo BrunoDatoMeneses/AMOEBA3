@@ -1,25 +1,49 @@
 package kernel;
 
 import java.util.HashMap;
-import java.util.List;
-
-import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.Amas;
 
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 
 public interface IAMOEBA {
+	/**
+	 * Remove ALL agents.
+	 */
 	public void clearAgents();
+	
+	/**
+	 * Run a learning cycle.
+	 * @param perceptionsActionState the output of your studied system.
+	 */
 	public void learn(HashMap<String, Double> perceptionsActionState);
+	
+	/**
+	 * Run a cycle without learning.
+	 * @param perceptionsActionState the output of your studied system.
+	 * @return the result estimated by AMOEBA.
+	 */
 	public double request(HashMap<String, Double> perceptionsActionState);
 	
-	public void setCreationOfNewContext(boolean creationOfNewContext);
+	/**
+	 * Set the Head agent.
+	 * @param head
+	 */
 	public void setHead(Head head);
-	public void setLoadPresetContext(boolean loadPresetContext);
+	
+	/**
+	 * Set the type of local model that will be used by newly created context.
+	 */
 	public void setLocalModel(TypeLocalModel localModel);
 	
-	public List<Agent<? extends Amas<World>, World>> getAgents();
+	/**
+	 * Allow the creation of new context.
+	 * @param creationOfNewContext
+	 */
+	public void setCreationOfNewContext(boolean creationOfNewContext);
+	
+	/**
+	 * If AMOEBA is allowed to create new context.
+	 * @return
+	 */
 	public boolean isCreationOfNewContext();
-	public boolean isLoadPresetContext();
 }

@@ -19,7 +19,8 @@ import kernel.StudiedSystem;
 import kernel.World;
 
 /**
- * The Class BadContextManager.
+ * A system using the MNIST database in the CSV format.
+ * You'll need to get it here : https://pjreddie.com/projects/mnist-in-csv/ 
  */
 public class MNIST_System implements StudiedSystem {
 	BufferedReader mnist; 
@@ -155,7 +156,7 @@ public class MNIST_System implements StudiedSystem {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		boolean benchmark = true;
+		boolean benchmark = false;
 		if(benchmark) { 
 			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
 			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
@@ -199,7 +200,7 @@ public class MNIST_System implements StudiedSystem {
 			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 			
 			//exemple for using the learn method
-			amoeba.setRenderUpdate(false);
+			amoeba.setRenderUpdate(true);
 			amoeba.allowGraphicalScheduler(false);
 			
 			long start = System.currentTimeMillis();
@@ -217,7 +218,7 @@ public class MNIST_System implements StudiedSystem {
 			end = System.currentTimeMillis();
 			System.out.println("Accuracy of "+ret.get(0)+" . Done in "+(end-start)/1000.0);
 			
-			amoeba.setRenderUpdate(false);
+			amoeba.setRenderUpdate(true);
 			amoeba.allowGraphicalScheduler(true);
 			
 			System.out.println("End main");

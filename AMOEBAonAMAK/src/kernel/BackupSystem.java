@@ -45,6 +45,7 @@ public class BackupSystem implements IBackupSystem {
 	// Members
 	private AMOEBA amoeba;
 	private Map<String, Percept> perceptsByName= new HashMap<>();
+	private boolean loadPresetContext = true;
 
 	// -------------------- Constructor --------------------
 
@@ -67,7 +68,7 @@ public class BackupSystem implements IBackupSystem {
 			Element rootElement = doc.getRootElement();
 			loadConfiguration(rootElement);
 			loadStartingAgents(rootElement);
-			if (amoeba.isLoadPresetContext()) {
+			if (isLoadPresetContext()) {
 				loadPresetContexts(rootElement);
 			}
 		} catch (JDOMException | IOException e) {
@@ -95,6 +96,14 @@ public class BackupSystem implements IBackupSystem {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setLoadPresetContext(boolean loadPresetContext) {
+		this.loadPresetContext = loadPresetContext;
+	}
+	
+	public boolean isLoadPresetContext() {
+		return loadPresetContext;
+	}
 
 	// -------------------- Private methods --------------------
 
@@ -107,7 +116,7 @@ public class BackupSystem implements IBackupSystem {
 			boolean loadPresetContext = learningElement.getAttribute("loadPresetContext").getBooleanValue();
 
 			amoeba.setCreationOfNewContext(creationOfNewContext);
-			amoeba.setLoadPresetContext(loadPresetContext);
+			setLoadPresetContext(loadPresetContext);
 		} catch (DataConversionException e) {
 			e.printStackTrace();
 		}
@@ -286,7 +295,7 @@ public class BackupSystem implements IBackupSystem {
 		List<Attribute> learningAttributes = new ArrayList<>();
 
 		learningAttributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
-		learningAttributes.add(new Attribute("loadPresetContext", String.valueOf(amoeba.isLoadPresetContext())));
+		learningAttributes.add(new Attribute("loadPresetContext", String.valueOf(isLoadPresetContext())));
 		learningElement.setAttributes(learningAttributes);
 
 		configurationElement.addContent(learningElement);

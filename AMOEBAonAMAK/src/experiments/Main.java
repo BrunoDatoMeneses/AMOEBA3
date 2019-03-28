@@ -32,7 +32,7 @@ public class Main {
 		backupSystem.loadXML(file);
 
 		// Example for using the learn method
-		/*amoeba.setRenderUpdate(false);
+		amoeba.setRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(false);
 		long start = System.currentTimeMillis();
 		int nbCycle = 2000;
@@ -44,7 +44,7 @@ public class Main {
 		long end = System.currentTimeMillis();
 		System.out.println("Done in : " + (end - start) / 1000.0);
 		amoeba.setRenderUpdate(true);
-		amoeba.allowGraphicalScheduler(true);*/
+		amoeba.allowGraphicalScheduler(true);
 		System.out.println("End main");
 	}
 }

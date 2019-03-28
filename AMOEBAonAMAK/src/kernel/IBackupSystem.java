@@ -22,4 +22,16 @@ public interface IBackupSystem {
 	 */
 	public void saveXML(File file);
 	
+	/**
+	 * Allow to load preset context. Default at true.
+	 * @param loadPresetContext
+	 */
+	public void setLoadPresetContext(boolean loadPresetContext);
+	
+	/**
+	 * If the backup system is allowed to lead preset context.
+	 * @return
+	 */
+	public boolean isLoadPresetContext();
+	
 }

@@ -52,7 +52,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
-	private boolean loadPresetContext = true;
 	private boolean renderUpdate = false;
 
 	private Drawable point;
@@ -103,7 +102,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				int state = itemEvent.getStateChange();
 				if (state == ItemEvent.SELECTED) {
 					renderUpdate = true;
-					nextCycleRunAllAgent();
 				} else {
 					renderUpdate = false;
 				}
@@ -163,6 +161,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		environment.resetNbActivatedAgent();
 	}
 	
+	/**
+	 * Define what is done during a cycle, 
+	 * most importantly it launch agents.
+	 * 
+	 * Every 1000 cycles, all Context are launched, allowing
+	 * delete themselves if they're too small. To change this behavior 
+	 * this method. 
+	 */
 	@Override
 	public void cycle() {
 		cycle++;
@@ -256,42 +262,29 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	}
 
-	/**
-	 * Learn.
-	 * 
-	 * @param actions the actions
-	 */
 	@Override
 	public void learn(HashMap<String, Double> perceptionsActionState) {
 		setPerceptionsAndActionState(perceptionsActionState);
 		this.cycle();
 	}
 
-	/**
-	 * Request.
-	 * 
-	 * @param actions the actions
-	 * @return the double
-	 */
 	@Override
 	public double request(HashMap<String, Double> perceptionsActionState) {
-		if (isUseOracle())
+		boolean usingOracle = isUseOracle();
+		if (usingOracle)
 			head.changeOracleConnection();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
-		head.changeOracleConnection();
+		if (usingOracle)
+			head.changeOracleConnection();
 		studiedSystem = ss;
 		return getAction();
 	}
 
 	public LocalModel buildLocalModel(Context context) {
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			// @note (Labbeti) This constructor has changed because getPercept is not
-			// initialized when we load agents from a file.
-			// TODO (Labbeti) : change this with the new version of AMAK (when agents will be loaded
-			// in the same cycle with addPendingAgents)
 			return new LocalModelMillerRegression(context.getRanges().size());
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
@@ -303,12 +296,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return null;
 	}
 
+	/**
+	 * Activate or deactivate the graphical scheduler. 
+	 * Allowing ordDenying the user to change the simulation speed.
+	 * @param allow
+	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
 			schedulerToolbar.getComponent(0).setEnabled(allow);
 		}
 	}
 
+	@Override
 	public void clearAgents() {
 		List<Agent<? extends Amas<World>, World>> agents = getAgents();
 		for (Agent<? extends Amas<World>, World> agent : agents) {
@@ -316,23 +315,21 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			amoebaAgent.destroy();
 		}
 		this.head = null;
-		agents.clear();
+		super.removePendingAgents();
 	}
 	
 	public void onLoadEnded() {
 		super.addPendingAgents();
 	}
 
+	@Override
 	public void setCreationOfNewContext(boolean creationOfNewContext) {
 		this.creationOfNewContext = creationOfNewContext;
 	}
 
+	@Override
 	public void setHead(Head head) {
 		this.head = head;
-	}
-
-	public void setLoadPresetContext(boolean loadPresetContext) {
-		this.loadPresetContext = loadPresetContext;
 	}
 
 	@Override
@@ -340,17 +337,30 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.localModel = localModel;
 	}
 
+	/**
+	 * Activate or deactivate rendering of agents at runtime.
+	 * @param renderUpdate
+	 */
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
 			toggleRender.setSelected(renderUpdate);
+			nextCycleRunAllAgent();
 		}
 	}
 
+	/**
+	 * Set input used by percepts and oracle.
+	 * @param perceptionsAndActions
+	 */
 	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
 		this.perceptionsAndActionState = perceptionsAndActions;
 	}
 
+	/**
+	 * Get the last prediction from the system.
+	 * @return
+	 */
 	public double getAction() {
 		return head.getAction();
 	}
@@ -381,6 +391,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return percepts;
 	}
 	
+	/**
+	 * Update the set of valid context.
+	 * The update is done with an intersect of the previous and new set.
+	 * 
+	 * Synchronized with a writeLock.
+	 * @param new validContextsn set.
+	 */
 	public void updateValidContexts(HashSet<Context> validContexts){
 		validContextLock.writeLock().lock();
 		if(this.validContexts == null) {
@@ -391,6 +408,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		validContextLock.writeLock().unlock();
 	}
 	
+	/**
+	 * Return the current set of valid contexts.
+	 * 
+	 * Synchronized with a readLock.
+	 * @return
+	 */
 	public HashSet<Context> getValidContexts() {
 		validContextLock.readLock().lock();
 		HashSet<Context> ret = validContexts;
@@ -402,14 +425,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return this.perceptionsAndActionState.get(key);
 	}
 
+	@Override
 	public boolean isCreationOfNewContext() {
 		return creationOfNewContext;
 	}
-
-	public boolean isLoadPresetContext() {
-		return loadPresetContext;
-	}
 	
+	/**
+	 * Tell AMOEBA to run all (contexts) agent for the next cycle.
+	 */
 	public void nextCycleRunAllAgent() {
 		runAll = true;
 	}
