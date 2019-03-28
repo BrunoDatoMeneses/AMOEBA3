@@ -3,12 +3,11 @@ package fr.irit.smac.amak.ui.drawables;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.VUI;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.transform.Affine;
 
 public class DrawableImage extends Drawable {
 
@@ -18,9 +17,12 @@ public class DrawableImage extends Drawable {
 
 	public DrawableImage(VUI vui, double dx, double dy, String filename) {
 		super(vui, dx, dy, 0, 0);
-		this.setFilename(filename);
 		image = new ImageView(new Image(filename));
-		vui.getCanvas().getChildren().add(image);
+		this.setFilename(filename);
+		Platform.runLater(() -> {
+			// Update UI here.
+			vui.getCanvas().getChildren().add(image);
+		});
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {
@@ -37,7 +39,7 @@ public class DrawableImage extends Drawable {
 		} catch (NullPointerException | IllegalArgumentException e) {
 			Log.error("AMAK", "Can't find/load the file %s", this.filename);
 			try {
-				image.setImage(loadByFilename("Resources/unavailable.png"));
+				image.setImage(loadByFilename("file:Resources/unavailable.png"));
 			} catch (NullPointerException | IllegalArgumentException e1) {
 				Log.fatal("AMAK", "Can't load resources belonging to AMAK. Bad things may happen.");
 			}
@@ -48,16 +50,9 @@ public class DrawableImage extends Drawable {
 
 	@Override
 	public void _onDraw() {
-		Affine identity = new Affine();
-		Affine trans = new Affine();
-		trans.setToTransform(identity);
-		trans.setTx(left());
-		trans.setTy(top());
-		trans.appendRotation(getAngle(), getRenderedWidth() / 2, getRenderedHeight() / 2);
-		image.getTransforms().addAll(trans);
-		if (!isFixed()) {
-			image.setFitWidth(vui.getZoomFactor()*getWidth()/this.image.getFitWidth());
-			image.setFitHeight(vui.getZoomFactor()*getHeight()/this.image.getFitHeight());
-		}
+		image.setX(left() - getWidth() / 2);
+		image.setY(top() - getHeight() / 2);
+		image.setFitWidth(getRenderedWidth());
+		image.setFitHeight(getRenderedHeight());
 	}
 }

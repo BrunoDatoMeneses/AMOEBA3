@@ -75,8 +75,7 @@ public class AsyncTest {
 
 		@Override
 		protected void onAgentCycleEnd() {
-			// TODO uncomment
-			//Log.debug("AsyncTest", "Agent #%d cycle %d", getId(), myCycle);
+			Log.debug("AsyncTest", "Agent #%d cycle %d", getId(), myCycle);
 		}
 	}
 

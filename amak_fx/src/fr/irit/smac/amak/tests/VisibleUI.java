@@ -6,8 +6,7 @@ import fr.irit.smac.amak.ui.VUI;
 public class VisibleUI {
 	public static void main(String[] args) {
 		MainWindow.setWindowTitle("VUI Example");
-		// TODO uncomment
-		// MainWindow.setWindowIcon("Resources/ant.png");
+		MainWindow.setWindowIcon("file:Resources/ant.png");
 		VUI.get().createRectangle(0, 0, 200, 150);
 	}
 }

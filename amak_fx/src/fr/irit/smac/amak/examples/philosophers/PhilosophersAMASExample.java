@@ -1,42 +1,40 @@
 package fr.irit.smac.amak.examples.philosophers;
 
-import java.awt.Color;
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JToolBar;
-
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.VUI;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
+import javafx.scene.paint.Color;
 
 public class PhilosophersAMASExample extends Amas<TableExample> {
-	private JLabel comp;
+	private Label comp;
 	private PhilosopherExample[] ps;
 
 	public PhilosophersAMASExample(TableExample env) {
 		super(env, Scheduling.DEFAULT);
 	}
-	
+
 	@Override
 	protected void onInitialConfiguration() {
 		Configuration.executionPolicy = ExecutionPolicy.TWO_PHASES;
-		JToolBar toolbar = new JToolBar();
-		comp = new JLabel("Cycle");
-		comp.setPreferredSize(new Dimension(200, 100));
-		toolbar.add(comp);
+		ToolBar toolbar = new ToolBar();
+		comp = new Label("Cycle");
+		comp.setPrefSize(200, 100);
+		toolbar.getItems().add(comp);
 		MainWindow.addToolbar(toolbar);
-		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9f, 0.9f, 0.9f, 0.5f)).setFixed().setLayer(5);
+		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9, 0.9, 0.9, 0.5)).setFixed().setLayer(5);
 
-		VUI.get().createRectangle(20, 20, 20, 20).setColor(Color.red).setFixed().setLayer(10);
+		VUI.get().createRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10);
 		VUI.get().createString(45, 25, "Hungry").setFixed().setLayer(10);
 
-		VUI.get().createRectangle(20, 45, 20, 20).setColor(Color.blue).setFixed().setLayer(10);
+		VUI.get().createRectangle(20, 45, 20, 20).setColor(Color.BLUE).setFixed().setLayer(10);
 		VUI.get().createString(45, 50, "Eating").setFixed().setLayer(10);
 
-		VUI.get().createRectangle(20, 70, 20, 20).setColor(Color.green).setFixed().setLayer(10);
+		VUI.get().createRectangle(20, 70, 20, 20).setColor(Color.GREEN).setFixed().setLayer(10);
 		VUI.get().createString(45, 75, "Thinking").setFixed().setLayer(10);
 	}
 
@@ -64,6 +62,8 @@ public class PhilosophersAMASExample extends Amas<TableExample> {
 
 	@Override
 	protected void onSystemCycleBegin() {
-		comp.setText("Cycle " + getCycle());
+		Platform.runLater(() -> {
+			comp.setText("Cycle " + getCycle());
+		});
 	}
 }

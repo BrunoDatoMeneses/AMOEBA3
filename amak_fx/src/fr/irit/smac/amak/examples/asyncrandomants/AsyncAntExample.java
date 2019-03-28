@@ -59,7 +59,7 @@ public class AsyncAntExample extends Agent<AsyncAntsAMASExample, AsyncWorldExamp
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get().createImage(dx, dy, "Resources/ant.png");
+		image = VUI.get().createImage(dx, dy, "file:Resources/ant.png");
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class AsyncAntExample extends Agent<AsyncAntsAMASExample, AsyncWorldExamp
 			dy += getEnvironment().getHeight();
 
 		if (getEnvironment().getRandom().nextDouble() < 0.01) {
-			image.setFilename("Resources/ant_dead.png");
+			image.setFilename("file:Resources/ant_dead.png");
 			destroy();
 		}
 

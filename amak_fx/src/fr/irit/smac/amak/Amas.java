@@ -123,12 +123,15 @@ public class Amas<E extends Environment> implements Schedulable {
 	public Amas(E environment, Scheduling scheduling, Object... params) {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
 		if (scheduling == Scheduling.DEFAULT) {
+			MainWindow.instance();
 			this.scheduler = Scheduler.getDefaultScheduler();
 			this.scheduler.add(this);
 		} else {
 			this.scheduler = new Scheduler(this);
-			if (scheduling == Scheduling.UI && !Configuration.commandLineMode)
+			if (scheduling == Scheduling.UI && !Configuration.commandLineMode) {
+				MainWindow.instance();
 				MainWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
+			}
 		}
 		this.scheduler.lock();
 		this.params = params;

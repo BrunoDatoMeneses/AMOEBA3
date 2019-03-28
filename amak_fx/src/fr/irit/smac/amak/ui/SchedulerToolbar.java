@@ -80,7 +80,7 @@ public class SchedulerToolbar extends ToolBar {
 			}
 		});
 		getItems().add(getSlider());
-		setPrefSize(300, 100);
+		setPrefSize(220, 120);
 	}
 
 	/**

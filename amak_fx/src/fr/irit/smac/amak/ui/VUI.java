@@ -12,6 +12,7 @@ import fr.irit.smac.amak.ui.drawables.DrawableImage;
 import fr.irit.smac.amak.ui.drawables.DrawablePoint;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import fr.irit.smac.amak.ui.drawables.DrawableString;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -109,12 +110,12 @@ public class VUI {
 	 * The vertical position of the view
 	 */
 	private double worldCenterY = defaultWorldCenterY;
-	
+
 	/**
 	 * Used to be sure that only one thread at the same time create a VUI
 	 */
 	private static ReentrantLock instanceLock = new ReentrantLock();
-	
+
 	/**
 	 * Get the default VUI
 	 * 
@@ -152,13 +153,13 @@ public class VUI {
 	 */
 	private VUI(String title) {
 		panel = new BorderPane();
-		
+
 		HBox statusPanel = new HBox();
 		statusLabel = new Label("status");
 		statusLabel.setTextAlignment(TextAlignment.LEFT);
 		statusPanel.getChildren().add(statusLabel);
-		panel.setTop(statusPanel); // TODO: setBottom, not setTop
-		
+		panel.setBottom(statusPanel);
+
 		Button resetButton = new Button("Reset");
 		resetButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -170,7 +171,7 @@ public class VUI {
 			}
 		});
 		statusPanel.getChildren().add(resetButton);
-		
+
 		canvas = new Pane();
 		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
@@ -204,24 +205,24 @@ public class VUI {
 				}
 			}
 		});
-		
+
 		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
 			@Override
 			public void handle(ScrollEvent event) {
-				double wdx = screenToWorldDistance(event.getX());
-				double wdy = screenToWorldDistance(event.getY());
+				double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
 				zoom += event.getDeltaY() / event.getMultiplierY() * 10;
 				if (zoom < 10)
 					zoom = 10;
-				
-				double wdx2 = screenToWorldDistance(event.getX());
-				double wdy2 = screenToWorldDistance(event.getY());
+
+				double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
 				worldCenterX -= wdx2 - wdx;
 				worldCenterY -= wdy2 - wdy;
 				updateCanvas();
 			}
 		});
-		
+
 		panel.setCenter(canvas);
 		MainWindow.addTabbedPanel("VUI #" + title, panel);
 	}
@@ -325,17 +326,19 @@ public class VUI {
 	public void updateCanvas() {
 		final double w = canvas.getWidth();
 		final double h = canvas.getHeight();
-		
-		setWorldOffsetX(worldCenterX + screenToWorldDistance(w/2));
-		setWorldOffsetY(worldCenterY + screenToWorldDistance(h/2));
+
+		setWorldOffsetX(worldCenterX + screenToWorldDistance(w / 2));
+		setWorldOffsetY(worldCenterY + screenToWorldDistance(h / 2));
 
 		drawablesLock.lock();
 		Collections.sort(drawables, (o1, o2) -> o1.getLayer() - o2.getLayer());
-		for (Drawable d: drawables)
+		for (Drawable d : drawables)
 			d.onDraw(canvas);
 		drawablesLock.unlock();
-		
-		statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
+
+		Platform.runLater(() -> {
+			statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
+		});
 	}
 
 	/**
@@ -480,7 +483,7 @@ public class VUI {
 		add(ds);
 		return ds;
 	}
-	
+
 	public Pane getCanvas() {
 		return canvas;
 	}

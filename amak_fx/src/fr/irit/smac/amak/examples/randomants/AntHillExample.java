@@ -1,12 +1,11 @@
 package fr.irit.smac.amak.examples.randomants;
 
-import java.awt.Color;
-
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import fr.irit.smac.amak.ui.drawables.DrawableString;
+import javafx.scene.paint.Color;
 
 public class AntHillExample extends Amas<WorldExample> {
 
@@ -25,9 +24,9 @@ public class AntHillExample extends Amas<WorldExample> {
 	@Override
 	protected void onRenderingInitialization() {
 
-		VUI.get().createRectangle(90, 20, 180, 40).setColor(new Color(0.9f, 0.9f, 0.9f, 0.8f)).setFixed().setLayer(5);
+		VUI.get().createRectangle(90, 20, 180, 40).setColor(new Color(0.9, 0.9, 0.9, 0.8)).setFixed().setLayer(5);
 
-		VUI.get().createImage(20, 20, "Resources/ant.png").setFixed().setLayer(10);
+		VUI.get().createImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10);
 		antsCountLabel = (DrawableString) VUI.get().createString(45, 25, "Ants count").setFixed().setLayer(10);
 	}
 

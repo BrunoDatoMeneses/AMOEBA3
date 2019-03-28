@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -280,7 +281,6 @@ public class MainWindow extends Application {
 			}
 		}
 		instance.toolbarPanel.getChildren().add(toolbar);
-		instance.stage.sizeToScene();
 	}
 	
 	/**
@@ -304,7 +304,6 @@ public class MainWindow extends Application {
 			}
 		}
 		instance().splitPane.getItems().set(0, panel);
-		instance().stage.sizeToScene();
 	}
 	
 	/**
@@ -328,7 +327,6 @@ public class MainWindow extends Application {
 			}
 		}
 		instance.splitPane.getItems().set(1, panel);
-		instance.stage.sizeToScene();
 	}
 	
 	/**
@@ -375,6 +373,5 @@ public class MainWindow extends Application {
 			}
 		}
 		instance.tabbedPanel.getTabs().add(new Tab(title, panel));
-		instance.stage.sizeToScene();
 	}
 }

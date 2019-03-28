@@ -1,9 +1,8 @@
 package fr.irit.smac.amak.examples.randomants;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import fr.irit.smac.amak.ui.MainWindow;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 
 public class AntsLaunchExample {
 
@@ -12,8 +11,8 @@ public class AntsLaunchExample {
 		
 		new AntHillExample(env);
 		
-		JPanel panel = new JPanel();
-		panel.add(new JLabel("<html><b>AntHill simulation</b><br/><br/>"
+		Pane panel = new Pane();
+		panel.getChildren().add(new Label("<html><b>AntHill simulation</b><br/><br/>"
 				+ "Ants move randomly.<br />"
 				+ "This demo is here to show AMAK<br />rendering capacities.</html>"));
 		MainWindow.setLeftPanel(panel);
