@@ -1,6 +1,5 @@
 package agents.context;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +12,7 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import javafx.scene.paint.Color;
 import kernel.AMOEBA;
 import ncs.NCS;
 

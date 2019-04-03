@@ -20,7 +20,7 @@ public class Main {
 		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 
-		//exemple for using the learn method
+		//example for using the learn method
 		amoeba.setNoRenderUpdate(true);
 		amoeba.allowGraphicalScheduler(false);
 		int nbCycle = 10000;
