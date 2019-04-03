@@ -39,6 +39,10 @@ import fr.irit.smac.lxplot.commons.ChartType;
 import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
 import ncs.NCS;
 
+/**
+ * The AMOEBA amas
+ *
+ */
 public class AMOEBA extends Amas<World> implements IAMOEBA {
 	// -- Attributes
 	private Head head;

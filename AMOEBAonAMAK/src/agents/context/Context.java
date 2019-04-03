@@ -18,6 +18,10 @@ import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import kernel.AMOEBA;
 import ncs.NCS;
 
+/**
+ * The core agent of AMOEBA.
+ * 
+ */
 public class Context extends AmoebaAgent {
 	private static final long serialVersionUID = 1L;
 	private Head headAgent;
@@ -60,6 +64,8 @@ public class Context extends AmoebaAgent {
 	 * @param starts
 	 * @param ends
 	 * @param experiments
+	 * @param localModel
+	 * @param confidence
 	 */
 	public Context(AMOEBA amoeba, Head head, String name, Map<Percept, Double> starts, Map<Percept, Double> ends,
 			ArrayList<Experiment> experiments, LocalModel localModel, double confidence) {
@@ -88,11 +94,6 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : percepts) {
 			percept.addContextProjection(this);
 		}
-	}
-
-	@Override
-	protected int computeExecutionOrderLayer() {
-		return 1;
 	}
 
 	@Override
@@ -340,35 +341,6 @@ public class Context extends AmoebaAgent {
 
 	public LocalModel getFunction() {
 		return localModel;
-	}
-	
-	// TODO (Labbeti) : remove this ?
-	public double getInfluence(HashMap<Percept, Double> situation) {
-		Double influence = 1.0;
-
-		for (Percept pct : situation.keySet()) {
-			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
-		}
-
-		return influence;
-	}
-
-	// TODO (Labbeti) : remove this ?
-	public double getInfluenceByPerceptSituation(Percept pct, double situation) {
-		double center = getCenterByPercept(pct);
-		double radius = getRadiusByPercept(pct);
-
-		return getNormalizedConfidence() * Math.exp(-Math.pow(situation - center, 2) / (2 * Math.pow(radius, 2)));
-	}
-
-	// TODO (Labbeti) : remove this ?
-	public double getNormalizedConfidence() {
-		return 1 / (1 + Math.exp(-confidence));
-	}
-
-	// TODO (Labbeti) : remove this ?
-	public double getParametrizedNormalizedConfidence(double dispersion) {
-		return 1 / (1 + Math.exp(-confidence / dispersion));
 	}
 
 	private Percept getPerceptsWithLesserImpactOnVolumeNotIncludedIn(ArrayList<Percept> containingRanges, Context c) {

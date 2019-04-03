@@ -5,6 +5,11 @@ import java.util.HashMap;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 
+/**
+ * An AMOEBA is an autonomous multi-agent system, 
+ * capable of learning and making prediction 
+ *
+ */
 public interface IAMOEBA {
 	/**
 	 * Remove ALL agents.

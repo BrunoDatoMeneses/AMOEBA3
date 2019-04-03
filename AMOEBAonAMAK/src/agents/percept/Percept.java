@@ -7,6 +7,11 @@ import agents.AmoebaAgent;
 import agents.context.Context;
 import kernel.AMOEBA;
 
+/**
+ * Percept agent is in charge of the communication with the environment.
+ * Each Percept agent must be connected to one data source.
+ *
+ */
 public class Percept extends AmoebaAgent {
 	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
@@ -33,8 +38,11 @@ public class Percept extends AmoebaAgent {
 	public void computeContextProjectionValidity() {
 		validContextProjection = new HashSet<Context>();
 		
+		// To avoid unnecessary tests, we only compute validity on context
+		// validated by percepts that had finished before us
 		HashSet<Context> contexts = amas.getValidContexts();
 		if(contexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
 			contexts = new HashSet<>(amas.getContexts());
 		}
 		
@@ -120,10 +128,5 @@ public class Percept extends AmoebaAgent {
 
 	public void updateContextProjectionEnd(Context context) {
 		contextProjections.get(context).updateEnd();
-	}
-
-	@Override
-	protected int computeExecutionOrderLayer() {
-		return 0;
 	}
 }

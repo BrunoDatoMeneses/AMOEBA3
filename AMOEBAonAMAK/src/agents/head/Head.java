@@ -51,16 +51,10 @@ public class Head extends AmoebaAgent {
 
 	/**
 	 * Instantiates a new head.
-	 *
-	 * @param world the world
+	 * @param the amoeba which the head is attached to.
 	 */
 	public Head(AMOEBA amas) {
 		super(amas);
-	}
-
-	@Override
-	protected int computeExecutionOrderLayer() {
-		return 2;
 	}
 
 	public void proposition(Context c) {

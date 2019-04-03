@@ -15,6 +15,10 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> impl
 	protected String name;
 	private boolean dying;
 
+	/**
+	 * Instantiate a new agent attached to an amoeba
+	 * @param the amoeba
+	 */
 	public AmoebaAgent(AMOEBA amas) {
 		super(amas);
 		this.dying = false;
@@ -33,6 +37,9 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> impl
 		}
 	}
 
+	/**
+	 * Rendering that can be deactivated at runtime
+	 */
 	protected void updateRender() {
 	}
 
