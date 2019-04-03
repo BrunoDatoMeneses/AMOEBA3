@@ -165,9 +165,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * Define what is done during a cycle, 
 	 * most importantly it launch agents.
 	 * 
-	 * Every 1000 cycles, all Context are launched, allowing
+	 * Every 1000 cycles, all Context are launched, allowing to
 	 * delete themselves if they're too small. To change this behavior 
-	 * this method. 
+	 * you have to modify this method. 
 	 */
 	@Override
 	public void cycle() {
@@ -175,7 +175,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		onSystemCycleBegin();
 		
-		//percepts
+		// run percepts
 		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
 		Collections.sort(synchronousPercepts, new AgentOrderComparator());
@@ -212,6 +212,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			} 
 			contextStream = vcontexts.stream(); //or only valid ones
 		}
+		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());
@@ -230,7 +231,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			e.printStackTrace();
 		}
 		
-		//head
+		// run head
 		List<Head> heads = new ArrayList<>();
 		heads.add(head);
 		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous())
@@ -264,8 +265,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	@Override
 	public void learn(HashMap<String, Double> perceptionsActionState) {
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
-		this.cycle();
+		cycle();
+		studiedSystem = ss;
 	}
 
 	@Override
@@ -345,7 +349,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
 			toggleRender.setSelected(renderUpdate);
-			nextCycleRunAllAgent();
+			nextCycleRunAllAgents();
 		}
 	}
 
@@ -415,8 +419,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public HashSet<Context> getValidContexts() {
+		HashSet<Context> ret;
 		validContextLock.readLock().lock();
-		HashSet<Context> ret = validContexts;
+		if( validContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(validContexts);
+		}
 		validContextLock.readLock().unlock();
 		return ret;
 	}
@@ -433,7 +442,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Tell AMOEBA to run all (contexts) agent for the next cycle.
 	 */
-	public void nextCycleRunAllAgent() {
+	public void nextCycleRunAllAgents() {
 		runAll = true;
 	}
 
