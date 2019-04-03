@@ -5,7 +5,6 @@ import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.lxplot.LxPlot;
 
 public class Order {
 	public boolean lastExecutedWasEnvironment;

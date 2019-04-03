@@ -6,8 +6,6 @@ import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
-import fr.irit.smac.lxplot.LxPlot;
-import fr.irit.smac.lxplot.commons.ChartType;
 import javafx.scene.paint.Color;
 
 /**
@@ -40,6 +38,11 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 * The id of the philosopher
 	 */
 	private int id;
+	
+	/**
+	 * Class to plot statistics
+	 */
+	private static PhilosophersStatistics philosophersStatistics = new PhilosophersStatistics("Eaten pastas");
 
 	/**
 	 * States philosophers can be in
@@ -95,6 +98,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 */
 	public PhilosopherExample(int id, PhilosophersAMASExample amas, ForkExample left, ForkExample right) {
 		super(amas, id, left, right);
+		philosophersStatistics.addPhilosopher(id, 1);
 	}
 
 	@Override
@@ -169,7 +173,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 
 	@Override
 	protected void onUpdateRender() {
-		LxPlot.getChart("Eaten Pastas", ChartType.BAR).add(id, eatenPastas);
+		philosophersStatistics.updatePhilosopher(id, eatenPastas);
 		switch (state) {
 		case EATING:
 			drawableRectangle.setColor(Color.BLUE);

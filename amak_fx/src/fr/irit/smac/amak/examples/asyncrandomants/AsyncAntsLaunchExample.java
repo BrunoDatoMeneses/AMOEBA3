@@ -3,12 +3,8 @@ package fr.irit.smac.amak.examples.asyncrandomants;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.ui.MainWindow;
-import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 
 /**
  * Class aiming at starting the mas-less ants system
