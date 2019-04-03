@@ -98,7 +98,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 */
 	public PhilosopherExample(int id, PhilosophersAMASExample amas, ForkExample left, ForkExample right) {
 		super(amas, id, left, right);
-		philosophersStatistics.addPhilosopher(id, 1);
+		philosophersStatistics.addPhilosopher(id, 0);
 	}
 
 	@Override
