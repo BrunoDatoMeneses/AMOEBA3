@@ -77,7 +77,14 @@ public class MNIST_System implements StudiedSystem {
 		return out;
 	}
 	
-	private static List<Double> test(String path, AMOEBA amoeba, int nbTests) {
+	/**
+	 * Evaluate an AMOEBA against a test dataset
+	 * @param path to the test dataset
+	 * @param the trained amoeba
+	 * @param the number of test
+	 * @return a list with the success rate and the execution time
+	 */
+	public static List<Double> test(String path, AMOEBA amoeba, int nbTests) {
 		try {
 			long start = 0;
 			long end = 0;
@@ -121,60 +128,49 @@ public class MNIST_System implements StudiedSystem {
 		return null;
 	}
 	
-	private static List<Double> benchmark(int nbThread, int nbCycle, int nbRequest){
-		StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
-		File file = new File("resources\\mnist.xml");
-		World world = new World();
-		Configuration.commandLineMode = true;
-		Configuration.allowedSimultaneousAgentsExecution = nbThread;
-		
-		ArrayList<Double> ret = new ArrayList<>();
-
-		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		backupSystem.loadXML(file);
-		
-		amoeba.setLocalModel(TypeLocalModel.AVERAGE);
-		
-		long start = 0;
-		long end = 0;
-		long t = 0;
-		for(int i = 0; i < nbCycle; ++i) {
-			studiedSystem.playOneStep();
-			HashMap<String, Double> output = studiedSystem.getOutput();
-			start = System.currentTimeMillis();
-			amoeba.learn(output);
-			end = System.currentTimeMillis();
-			t += end-start;
-		}
-		ret.add(t/1000.0);
-		
-		List<Double> testRet = test("..\\..\\mnist\\mnist_test.csv", amoeba, 500);
-		ret.add(testRet.get(1));
-				
-		return ret;
-	}
-	
 	public static void main(String[] args) throws IOException {
-		boolean benchmark = false;
+		boolean benchmark = true;
 		if(benchmark) { 
-			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
-			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
+			System.out.println("AMOEBA benchmark with MNIST");
 			Log.minLevel = Log.Level.FATAL;
 			Configuration.commandLineMode = true;
-			int nbRequest = 500;
-			benchmark(1,1,1); //set up memory.
-			for(int nbCycle = 1; nbCycle < 1002; nbCycle += 100) {
-				System.out.println("Nb Cycle : "+nbCycle);
-				outLearn += nbCycle + " ";
-				outRequest += nbCycle + " ";
-				for(int thd = 1; thd <= 8; thd *= 2) {
-					List<Double> ret = benchmark(thd, nbCycle, nbRequest);
-					outLearn += ret.get(0) + " ";
-					outRequest += ret.get(1) + " ";
-				}
-				outLearn += "\n";
-				outRequest += "\n";
+			
+			File file = new File("resources\\mnist.xml");
+			
+			// setup cache --- (very important to reduce impact of the 1st measure)
+			System.out.println("setup...");
+			Configuration.allowedSimultaneousAgentsExecution = 1;
+			StudiedSystem learnSystem = new MNIST_System("../../mnist/mnist_train.csv");
+			StudiedSystem requestSystem = new MNIST_System("../../mnist/mnist_test.csv");
+			World world = new World();
+			AMOEBA amoeba = new AMOEBA(world, null);
+			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
+			IBackupSystem backupSystem = new BackupSystem(amoeba);
+			backupSystem.loadXML(file);
+			Benchmark.benchmark(amoeba, learnSystem, requestSystem, 100, 100, 50, null);
+			System.out.println("Done. Starting benchmark.");
+			// ---------------
+			List<List<List<Double>>> results = new ArrayList<>();
+			for(int thd = 1; thd <= 8; thd *= 2) {
+				Configuration.allowedSimultaneousAgentsExecution = thd;
+				learnSystem = new MNIST_System("../../mnist/mnist_train.csv");
+				requestSystem = new MNIST_System("../../mnist/mnist_test.csv");
+				world = new World();
+				amoeba = new AMOEBA(world, null);
+				amoeba.setLocalModel(TypeLocalModel.AVERAGE);
+				backupSystem = new BackupSystem(amoeba);
+				backupSystem.loadXML(file);
+				List<List<Double>> bench = Benchmark.benchmark(amoeba, learnSystem, requestSystem, 1000, 500, 100, null);
+				System.out.println("Thd "+thd+" "+bench);
+				results.add(bench);
+			}
+			String outLearn = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
+			String outRequest = "Cycle 1Thd 2Thd 4Thd 8Thd\n";
+			for(int i = 0; i < results.get(0).size(); ++i) {
+				outLearn += results.get(0).get(i).get(0) +", "+ results.get(0).get(i).get(1) +", "+ results.get(1).get(i).get(1)
+						 +", "+ results.get(2).get(i).get(1) +", "+ results.get(3).get(i).get(1) +"\n";
+				outRequest += results.get(0).get(i).get(0) +", "+ results.get(0).get(i).get(2) +", "+ results.get(1).get(i).get(2)
+						 +", "+ results.get(2).get(i).get(2) +", "+ results.get(3).get(i).get(2) +"\n";
 			}
 			System.out.println("Learn : ");
 			System.out.println(outLearn);
@@ -199,15 +195,14 @@ public class MNIST_System implements StudiedSystem {
 			
 			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 			
-			//exemple for using the learn method
+			//Example for using the learn method
 			amoeba.setRenderUpdate(true);
 			amoeba.allowGraphicalScheduler(false);
 			
 			long start = System.currentTimeMillis();
-			int nbCycle = 1000;
+			int nbCycle = 100;
 			for(int i = 0; i < nbCycle; ++i) {
 				studiedSystem.playOneStep();
-				//System.out.println(studiedSystem.getOutput());
 				amoeba.learn(studiedSystem.getOutput());
 			}
 			long end = System.currentTimeMillis();
