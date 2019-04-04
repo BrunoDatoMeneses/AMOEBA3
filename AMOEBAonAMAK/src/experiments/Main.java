@@ -13,10 +13,10 @@ import kernel.World;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		experiment();
+		example();
 	}
 
-	private static void experiment() throws IOException {
+	private static void example() throws IOException {
 	
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
@@ -26,11 +26,17 @@ public class Main {
 		World world = new World();
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
+		// A window appeared, allowing to control the simulation, but if you try to run it
+		// it will crash (there's no percepts !). We need to load a configuration :
+		
 		// Create a backup system for the AMOEBA
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		// Load a configuration matching the studied system
 		File file = new File("resources\\twoDimensionsLauncher.xml");
 		backupSystem.loadXML(file);
+		
+		// The amoeba is ready to be used.
+		// Next we show how to control it with code :
 		
 		// We deny the possibility to change simulation speed with the UI
 		amoeba.allowGraphicalScheduler(false);
@@ -64,6 +70,7 @@ public class Main {
 		amoeba.request(studiedSystem.getOutput());
 		// We allow simulation control with the UI
 		amoeba.allowGraphicalScheduler(true);
+		
 		System.out.println("End main");
 	}
 }

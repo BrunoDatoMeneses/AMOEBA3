@@ -404,7 +404,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * The update is done with an intersect of the previous and new set.
 	 * 
 	 * Synchronized with a writeLock.
-	 * @param new validContextsn set.
+	 * @param validContexts new validContexts set.
 	 */
 	public void updateValidContexts(HashSet<Context> validContexts){
 		validContextLock.writeLock().lock();
