@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	
+	<StartingAgents>
+	
+		<Sensor Name="px1" Source="x1"></Sensor>
+		<Sensor Name="px2" Source="x2"></Sensor>
+		<Sensor Name="px3" Source="x3"></Sensor>
+		<Sensor Name="px4" Source="x4"></Sensor>
+	
+	  	<Controller Name="Controller" Oracle="test">
+              <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
+              <InexactMargin InexactAllowed="500.0" AugmentationInexactError="2.5" DiminutionInexactError="0.2" MinInexactAllowed="0.05" NConflictBeforeInexactAugmentation="40" NSuccessBeforeInexactDiminution="80" />
+        </Controller> 
+
+
+			
+	</StartingAgents>
+	
+	
+</System>

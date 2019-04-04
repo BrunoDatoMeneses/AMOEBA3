@@ -1,43 +1,58 @@
 package agents.percept;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
 import kernel.AMOEBA;
 
+/**
+ * Percept agent is in charge of the communication with the environment.
+ * Each Percept agent must be connected to one data source.
+ *
+ */
 public class Percept extends AmoebaAgent {
+	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	private ArrayList<Context> validContextProjection = new ArrayList<Context>();
+	private HashSet<Context> validContextProjection = new HashSet<Context>();
 
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
 
 	private double value;
-	private boolean isEnum = false;
+	private boolean isEnum;
 
 	public Percept(AMOEBA amas) {
 		super(amas);
+		this.isEnum = false;
 	}
 
 	@Override
-	protected void onAct() { // play
+	protected void onAct() {
 		value = amas.getPerceptionsOrAction(name);
 		ajustMinMax();
 		computeContextProjectionValidity();
 	}
 
 	public void computeContextProjectionValidity() {
-		validContextProjection = new ArrayList<Context>();
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-			if (contextProjection.contains(this.value)) {
-				validContextProjection.add(contextProjection.getContext());
-			}
-		} 
-		for(Context context : validContextProjection) {
-			context.setPerceptValidity(this);
+		validContextProjection = new HashSet<Context>();
+		
+		// To avoid unnecessary tests, we only compute validity on context
+		// validated by percepts that had finished before us
+		HashSet<Context> contexts = amas.getValidContexts();
+		if(contexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
+			contexts = new HashSet<>(amas.getContexts());
+		}
+		
+		if(!contexts.isEmpty()) {
+			for (Context c : contexts) {
+				if (contextProjections.get(c).contains(this.value)) {
+					validContextProjection.add(c);
+				}
+			} 
+			amas.updateValidContexts(validContextProjection);
 		}
 
 	}
@@ -61,8 +76,7 @@ public class Percept extends AmoebaAgent {
 		min += 0.05 * dist;
 		max -= 0.05 * dist;
 	}
-	
-	
+
 	/**
 	 * Gets the min max distance.
 	 *
@@ -73,7 +87,7 @@ public class Percept extends AmoebaAgent {
 			return 0;
 		return Math.abs(max - min);
 	}
-	
+
 	/**
 	 * Gets the value.
 	 *
@@ -82,7 +96,7 @@ public class Percept extends AmoebaAgent {
 	public double getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * Checks if is enum.
 	 *
@@ -90,6 +104,10 @@ public class Percept extends AmoebaAgent {
 	 */
 	public boolean isEnum() {
 		return isEnum;
+	}
+	
+	public void setEnum(boolean isEnum) {
+		this.isEnum = isEnum;
 	}
 
 	/*
@@ -110,11 +128,5 @@ public class Percept extends AmoebaAgent {
 
 	public void updateContextProjectionEnd(Context context) {
 		contextProjections.get(context).updateEnd();
-	}
-	
-	
-	@Override
-	protected int computeExecutionOrderLayer() {
-		return 0;
 	}
 }

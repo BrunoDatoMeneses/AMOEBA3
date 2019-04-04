@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	
+	<StartingAgents>
+		<Sensor Name="px1" Source="x1"></Sensor>
+		<Sensor Name="px2" Source="x2"></Sensor>
+		<Sensor Name="px3" Source="x3"></Sensor>
+		<Sensor Name="px4" Source="x4"></Sensor>
+		<Sensor Name="px5" Source="x5"></Sensor>
+		<Sensor Name="px6" Source="x6"></Sensor>
+		<Sensor Name="px7" Source="x7"></Sensor>
+		<Sensor Name="px8" Source="x8"></Sensor>
+		<Sensor Name="px9" Source="x9"></Sensor>
+		<Sensor Name="px10" Source="x10"></Sensor>
+		<Sensor Name="px11" Source="x11"></Sensor>
+		<Sensor Name="px12" Source="x12"></Sensor>
+		<Sensor Name="px13" Source="x13"></Sensor>
+		<Sensor Name="px14" Source="x14"></Sensor>
+		<Sensor Name="px15" Source="x15"></Sensor>
+		<Sensor Name="px16" Source="x16"></Sensor>
+		<Sensor Name="px17" Source="x17"></Sensor>
+		<Sensor Name="px18" Source="x18"></Sensor>
+		<Sensor Name="px19" Source="x19"></Sensor>
+		<Sensor Name="px20" Source="x20"></Sensor>
+		<Sensor Name="px21" Source="x21"></Sensor>
+		<Sensor Name="px22" Source="x22"></Sensor>
+		<Sensor Name="px23" Source="x23"></Sensor>
+		<Sensor Name="px24" Source="x24"></Sensor>
+		<Sensor Name="px25" Source="x25"></Sensor>
+		<Sensor Name="px26" Source="x26"></Sensor>
+		<Sensor Name="px27" Source="x27"></Sensor>
+		<Sensor Name="px28" Source="x28"></Sensor>
+		<Sensor Name="px29" Source="x29"></Sensor>
+		<Sensor Name="px30" Source="x30"></Sensor>
+		<Sensor Name="px31" Source="x31"></Sensor>
+		<Sensor Name="px32" Source="x32"></Sensor>
+		<Sensor Name="px33" Source="x33"></Sensor>
+		<Sensor Name="px34" Source="x34"></Sensor>
+		<Sensor Name="px35" Source="x35"></Sensor>
+		<Sensor Name="px36" Source="x36"></Sensor>
+		<Sensor Name="px37" Source="x37"></Sensor>
+		<Sensor Name="px38" Source="x38"></Sensor>
+		<Sensor Name="px39" Source="x39"></Sensor>
+		<Sensor Name="px40" Source="x40"></Sensor>
+		<Sensor Name="px41" Source="x41"></Sensor>
+		<Sensor Name="px42" Source="x42"></Sensor>
+		<Sensor Name="px43" Source="x43"></Sensor>
+		<Sensor Name="px44" Source="x44"></Sensor>
+		<Sensor Name="px45" Source="x45"></Sensor>
+		<Sensor Name="px46" Source="x46"></Sensor>
+		<Sensor Name="px47" Source="x47"></Sensor>
+		<Sensor Name="px48" Source="x48"></Sensor>
+		<Sensor Name="px49" Source="x49"></Sensor>
+		<Sensor Name="px50" Source="x50"></Sensor>
+		<Sensor Name="px51" Source="x51"></Sensor>
+		<Sensor Name="px52" Source="x52"></Sensor>
+		<Sensor Name="px53" Source="x53"></Sensor>
+		<Sensor Name="px54" Source="x54"></Sensor>
+		<Sensor Name="px55" Source="x55"></Sensor>
+		<Sensor Name="px56" Source="x56"></Sensor>
+		<Sensor Name="px57" Source="x57"></Sensor>
+		<Sensor Name="px58" Source="x58"></Sensor>
+		<Sensor Name="px59" Source="x59"></Sensor>
+		<Sensor Name="px60" Source="x60"></Sensor>
+		<Sensor Name="px61" Source="x61"></Sensor>
+		<Sensor Name="px62" Source="x62"></Sensor>
+		<Sensor Name="px63" Source="x63"></Sensor>
+		<Sensor Name="px64" Source="x64"></Sensor>
+		<Sensor Name="px65" Source="x65"></Sensor>
+		<Sensor Name="px66" Source="x66"></Sensor>
+		<Sensor Name="px67" Source="x67"></Sensor>
+		<Sensor Name="px68" Source="x68"></Sensor>
+		<Sensor Name="px69" Source="x69"></Sensor>
+		<Sensor Name="px70" Source="x70"></Sensor>
+		<Sensor Name="px71" Source="x71"></Sensor>
+		<Sensor Name="px72" Source="x72"></Sensor>
+		<Sensor Name="px73" Source="x73"></Sensor>
+		<Sensor Name="px74" Source="x74"></Sensor>
+		<Sensor Name="px75" Source="x75"></Sensor>
+		<Sensor Name="px76" Source="x76"></Sensor>
+		<Sensor Name="px77" Source="x77"></Sensor>
+		<Sensor Name="px78" Source="x78"></Sensor>
+		<Sensor Name="px79" Source="x79"></Sensor>
+		<Sensor Name="px80" Source="x80"></Sensor>
+		<Sensor Name="px81" Source="x81"></Sensor>
+		<Sensor Name="px82" Source="x82"></Sensor>
+		<Sensor Name="px83" Source="x83"></Sensor>
+		<Sensor Name="px84" Source="x84"></Sensor>
+		<Sensor Name="px85" Source="x85"></Sensor>
+		<Sensor Name="px86" Source="x86"></Sensor>
+		<Sensor Name="px87" Source="x87"></Sensor>
+		<Sensor Name="px88" Source="x88"></Sensor>
+		<Sensor Name="px89" Source="x89"></Sensor>
+		<Sensor Name="px90" Source="x90"></Sensor>
+		<Sensor Name="px91" Source="x91"></Sensor>
+		<Sensor Name="px92" Source="x92"></Sensor>
+		<Sensor Name="px93" Source="x93"></Sensor>
+		<Sensor Name="px94" Source="x94"></Sensor>
+		<Sensor Name="px95" Source="x95"></Sensor>
+		<Sensor Name="px96" Source="x96"></Sensor>
+		<Sensor Name="px97" Source="x97"></Sensor>
+		<Sensor Name="px98" Source="x98"></Sensor>
+		<Sensor Name="px99" Source="x99"></Sensor>
+		<Sensor Name="px100" Source="x100"></Sensor>
+
+	  	<Controller Name="Controller" Oracle="test">
+              <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
+              <InexactMargin InexactAllowed="500.0" AugmentationInexactError="2.5" DiminutionInexactError="0.2" MinInexactAllowed="0.05" NConflictBeforeInexactAugmentation="40" NSuccessBeforeInexactDiminution="80" />
+        </Controller> 
+
+
+			
+	</StartingAgents>
+	
+	
+</System>

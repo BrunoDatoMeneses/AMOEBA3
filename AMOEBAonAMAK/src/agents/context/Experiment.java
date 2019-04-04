@@ -1,7 +1,6 @@
 package agents.context;
 
 import java.util.LinkedHashMap;
-
 import agents.percept.Percept;
 
 /**
