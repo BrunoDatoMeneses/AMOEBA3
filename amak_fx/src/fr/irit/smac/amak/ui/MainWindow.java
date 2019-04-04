@@ -7,6 +7,7 @@ import javax.management.InstanceAlreadyExistsException;
 
 import fr.irit.smac.amak.Information;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -183,7 +184,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.stage.setOnCloseRequest(onClose);
+		Platform.runLater(() -> instance.stage.setOnCloseRequest(onClose));
 	}
 	
 	/**
@@ -206,7 +207,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.stage.getIcons().add(new Image(filename));
+		Platform.runLater(() -> instance.stage.getIcons().add(new Image(filename)));
 	}
 	
 	/**
@@ -229,7 +230,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.stage.setTitle(title);
+		Platform.runLater(() -> instance.stage.setTitle(title));
 	}
 	
 	/**
@@ -256,7 +257,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.optionsMenu.getItems().add(menuItem);
+		Platform.runLater(() -> instance.optionsMenu.getItems().add(menuItem));
 	}
 	
 	/**
@@ -279,7 +280,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.toolbarPanel.getChildren().add(toolbar);
+		Platform.runLater(() -> instance.toolbarPanel.getChildren().add(toolbar));
 	}
 	
 	/**
@@ -325,7 +326,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.splitPane.getItems().set(1, panel);
+		Platform.runLater(() -> instance.splitPane.getItems().set(1, panel));
 	}
 	
 	/**
@@ -371,6 +372,6 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		instance.tabbedPanel.getTabs().add(new Tab(title, panel));
+		Platform.runLater(() -> instance.tabbedPanel.getTabs().add(new Tab(title, panel)));
 	}
 }

@@ -379,7 +379,7 @@ public class Context extends AmoebaAgent {
 
 		drawable = VUI.get().createRectangle(0, 0, 10, 10);
 		drawable.setLayer(1);
-		drawable.setColor(new Color(173, 79, 9, 90));
+		drawable.setColor(new Color(173/255, 79/255, 9/255, 90/255));
 	}
 	
 	
@@ -441,6 +441,6 @@ public class Context extends AmoebaAgent {
 			g = 255.0;
 			b = 255.0;
 		}
-		drawable.setColor(new Color(r.intValue(), g.intValue(), b.intValue(), 90));
+		drawable.setColor(new Color(r.intValue()/255, g.intValue()/255, b.intValue()/255, 90/255));
 	}
 }

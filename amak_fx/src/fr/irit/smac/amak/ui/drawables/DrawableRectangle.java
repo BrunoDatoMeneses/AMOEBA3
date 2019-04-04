@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.ui.VUI;
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -10,7 +11,7 @@ public class DrawableRectangle extends Drawable {
 	public DrawableRectangle(VUI vui, double dx, double dy, double width, double height) {
 		super(vui, dx+width/2, dy+height/2, width, height);
 		rectangle = new Rectangle();
-		vui.getCanvas().getChildren().add(rectangle);
+		Platform.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
 	}
 
 	@Override

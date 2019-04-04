@@ -21,7 +21,7 @@ public class Main {
 		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 
 		//example for using the learn method
-		amoeba.setNoRenderUpdate(true);
+		amoeba.setNoRenderUpdate(false);
 		amoeba.allowGraphicalScheduler(false);
 		int nbCycle = 10000;
 		for(int i = 0; i < nbCycle; ++i) {
