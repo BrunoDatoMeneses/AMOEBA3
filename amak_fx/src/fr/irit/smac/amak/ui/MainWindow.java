@@ -184,7 +184,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		Platform.runLater(() -> instance.stage.setOnCloseRequest(onClose));
+		instance.stage.setOnCloseRequest(onClose);
 	}
 	
 	/**

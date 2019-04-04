@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.ui.MainWindow;
 import kernel.AMOEBA;
 import kernel.BackupSystem;
 import kernel.IBackupSystem;
@@ -13,6 +14,7 @@ import kernel.World;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
+		MainWindow.instance();
 		experiment();
 	}
 
@@ -31,7 +33,7 @@ public class Main {
 		// Load a configuration matching the studied system
 		File file = new File("resources\\twoDimensionsLauncher.xml");
 		backupSystem.loadXML(file);
-		
+		/*
 		// We deny the possibility to change simulation speed with the UI
 		amoeba.allowGraphicalScheduler(false);
 		// We allow rendering
@@ -65,5 +67,6 @@ public class Main {
 		// We allow simulation control with the UI
 		amoeba.allowGraphicalScheduler(true);
 		System.out.println("End main");
+		*/
 	}
 }

@@ -26,4 +26,13 @@ public class DrawableRectangle extends Drawable {
 			rectangle.setFill(color);
 	}
 
+	@Override
+	protected void _hide() {
+		Platform.runLater(() -> vui.getCanvas().getChildren().remove(rectangle));
+	}
+
+	@Override
+	public void _show() {
+		Platform.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
+	}
 }

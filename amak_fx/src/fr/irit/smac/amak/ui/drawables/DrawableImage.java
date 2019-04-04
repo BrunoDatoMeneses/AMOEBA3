@@ -19,10 +19,7 @@ public class DrawableImage extends Drawable {
 		super(vui, dx, dy, 0, 0);
 		image = new ImageView(new Image(filename));
 		this.setFilename(filename);
-		Platform.runLater(() -> {
-			// Update UI here.
-			vui.getCanvas().getChildren().add(image);
-		});
+		Platform.runLater(() ->	vui.getCanvas().getChildren().add(image));
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {
@@ -54,5 +51,15 @@ public class DrawableImage extends Drawable {
 		image.setY(top() - getHeight() / 2);
 		image.setFitWidth(getRenderedWidth());
 		image.setFitHeight(getRenderedHeight());
+	}
+	
+	@Override
+	protected void _hide() {
+		image.setVisible(false);
+	}
+
+	@Override
+	public void _show() {
+		image.setVisible(true);
 	}
 }

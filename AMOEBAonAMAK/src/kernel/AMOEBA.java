@@ -1,7 +1,5 @@
 package kernel;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,9 +11,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
@@ -25,6 +20,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import chartVisualization.LoopNCS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -34,9 +30,8 @@ import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import fr.irit.smac.lxplot.LxPlot;
-import fr.irit.smac.lxplot.commons.ChartType;
-import fr.irit.smac.lxplot.interfaces.ILxPlotChart;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import ncs.NCS;
 
 /**
@@ -59,11 +54,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean renderUpdate = false;
 
 	private Drawable point;
-	private ILxPlotChart loopNCS;
-	private ILxPlotChart allNCS;
-	private ILxPlotChart nbAgent;
-	private ILxPlotChart errors;
-	private JToggleButton toggleRender;
+	private LoopNCS loopNCS;
+	//TODO
+	//private ILxPlotChart allNCS;
+	//private ILxPlotChart nbAgent;
+	//private ILxPlotChart errors;
+	private ToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
 
 	/**
@@ -94,28 +90,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// amoeba and agent
 		VUI.get().setDefaultView(200, 0, 0);
 		point = VUI.get().createPoint(0, 0);
-		loopNCS = LxPlot.getChart("This loop NCS", ChartType.LINE, 1000);
-		allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
-		nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
-		errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
+		//loopNCS = new LoopNCS("This loop NCS", 1000);
+		//TODO 
+		//allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
+		//nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
+		//errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
 
 		// update render button
-		toggleRender = new JToggleButton("Update Render");
-		ItemListener itemListener = new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				int state = itemEvent.getStateChange();
-				if (state == ItemEvent.SELECTED) {
-					renderUpdate = true;
-				} else {
-					renderUpdate = false;
-				}
-			}
-		};
-		toggleRender.addItemListener(itemListener);
+		toggleRender = new ToggleButton("Update Render");
+		toggleRender.setOnAction(evt -> renderUpdate = toggleRender.isSelected());
 		toggleRender.setSelected(renderUpdate);
-
-		JToolBar tb = new JToolBar();
-		tb.add(toggleRender);
+		ToolBar tb = new ToolBar();
+		tb.getItems().add(toggleRender);
 		MainWindow.addToolbar(tb);
 	}
 
@@ -132,23 +118,23 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 			for (NCS ncs : NCS.values()) {
-				loopNCS.add(ncs.name(), cycle, thisLoopNCS.get(ncs));
-				allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
+				//loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
+				//allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
 			}
+//TODO
+			//nbAgent.add("Percepts", cycle, getPercepts().size());
+			//nbAgent.add("Contexts", cycle, getContexts().size());
+			//nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
 
-			nbAgent.add("Percepts", cycle, getPercepts().size());
-			nbAgent.add("Contexts", cycle, getContexts().size());
-			nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
-
-			errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
-			errors.add("Error Allowed", cycle, head.getErrorAllowed());
-			errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
+			//errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
+			//errors.add("Error Allowed", cycle, head.getErrorAllowed());
+			//errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
 
 			// @note (Labbeti) Test added to avoid crash when head has just been created.
 			if (!sortedErrors.isEmpty()) {
-				errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+				//errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 			}
 		}
 	}
@@ -311,7 +297,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
-			schedulerToolbar.getComponent(0).setEnabled(allow);
+			schedulerToolbar.setDisable(!allow);
 		}
 	}
 

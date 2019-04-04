@@ -362,12 +362,15 @@ public abstract class Drawable {
 	public Drawable show() {
 		return this.setVisible(true);
 	}
+	
+	protected abstract void _hide();
 
 	/**
 	 * 
 	 * @return
 	 */
 	public Drawable hide() {
+		_hide();
 		return this.setVisible(false);
 	}
 
@@ -378,6 +381,8 @@ public abstract class Drawable {
 	public boolean isVisible() {
 		return visible;
 	}
+	
+	public abstract void _show();
 
 	/**
 	 * 
@@ -386,6 +391,10 @@ public abstract class Drawable {
 	 */
 	public Drawable setVisible(boolean visible) {
 		this.visible = visible;
+		if (visible)
+			_show();
+		else
+			_hide();
 		update();
 		return this;
 	}
