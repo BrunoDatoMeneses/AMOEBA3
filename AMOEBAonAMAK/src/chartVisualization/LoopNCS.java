@@ -26,9 +26,24 @@ public class LoopNCS {
 	private int cur_items = 0;
 
 	/**
+	 * Number of NCS
+	 */
+	private final int n_ncs = NCS.values().length;
+
+	/**
+	 * Number of NCS added this loop
+	 */
+	private int cur_ncs = 0;
+
+	/**
 	 * The chart itself
 	 */
 	private LineChart<Number, Number> chart;
+
+	/**
+	 * The x axis
+	 */
+	private NumberAxis xAxis;
 
 	/**
 	 * The lock to avoid parallel issues
@@ -51,21 +66,25 @@ public class LoopNCS {
 	public LoopNCS(String title, int max_item) {
 		this.max_item = max_item;
 
-		NumberAxis xAxis = new NumberAxis();
-		xAxis.setLabel("Cycle");
+		xAxis = new NumberAxis("Cycle", 0, max_item, max_item/10);
+		xAxis.setForceZeroInRange(false);
 		NumberAxis yAxis = new NumberAxis();
 		yAxis.setLabel("Number of NCS");
+		yAxis.setAnimated(false);
 
 		chart = new LineChart<Number, Number>(xAxis, yAxis);
 		chart.setTitle(title);
 
+		
 		for (NCS ncs : NCS.values()) {
 			Series<Number, Number> serie = new Series<>();
 			serie.setName(ncs.toString());
 			chart.getData().add(serie);
 			ncsData.put(ncs, serie);
 		}
-
+		
+		chart.getStylesheets().add("chartVisualization/chart.css");
+		
 		Pane p = new Pane();
 		p.getChildren().add(chart);
 		chart.prefWidthProperty().bind(p.widthProperty());
@@ -87,13 +106,20 @@ public class LoopNCS {
 		lock.lock();
 		Platform.runLater(() -> {
 			if (cur_items < max_item) {
-				ncsData.get(ncsName).getData().add(new Data<Number, Number>(numCycle, numNCS));
+				++cur_ncs;
+				if (cur_ncs == n_ncs) {
+					++cur_items;
+					cur_ncs = 0;
+				}
 			} else {
-				Data<Number, Number> data = ncsData.get(ncsName).getData().get(cur_items % max_item);
-				data.setXValue(numCycle);
-				data.setYValue(numNCS);
+				ncsData.get(ncsName).getData().remove(0);
 			}
-			++cur_items;
+			ncsData.get(ncsName).getData().add(new Data<Number, Number>(numCycle, numNCS));
+			if (numCycle % max_item == 0) {
+				xAxis.setLowerBound(numCycle);
+				xAxis.setUpperBound(numCycle + max_item);
+			}
+
 		});
 		lock.unlock();
 	}

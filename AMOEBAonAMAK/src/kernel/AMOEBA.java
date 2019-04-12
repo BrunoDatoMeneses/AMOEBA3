@@ -90,7 +90,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// amoeba and agent
 		VUI.get().setDefaultView(200, 0, 0);
 		point = VUI.get().createPoint(0, 0);
-		//loopNCS = new LoopNCS("This loop NCS", 1000);
+		loopNCS = new LoopNCS("This loop NCS", 100);
 		//TODO 
 		//allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
 		//nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
@@ -118,7 +118,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 			for (NCS ncs : NCS.values()) {
-				//loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
+				loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
 				//allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
 			}
 //TODO

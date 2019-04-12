@@ -1,0 +1,158 @@
+/* Colors of JavaFX chart series legend */
+.default-color0.chart-serie-line {
+	-fx-stroke: black;
+}
+.default-color0.chart-line-symbol {
+	-fx-background-color: black, white;
+}
+.default-color1.chart-serie-line {
+	-fx-stroke: darkcyan;
+}
+.default-color1.chart-line-symbol {
+	-fx-background-color: darkcyan, white;
+}
+.default-color2.chart-serie-line {
+	-fx-stroke: crimson;
+}
+.default-color2.chart-line-symbol {
+	-fx-background-color: crimson, white;
+}
+.default-color3.chart-serie-line {
+	-fx-stroke: coral;
+}
+.default-color3.chart-line-symbol {
+	-fx-background-color: coral, white;
+}
+.default-color4.chart-serie-line {
+	-fx-stroke: brown;
+}
+.default-color4.chart-line-symbol {
+	-fx-background-color: brown, white;
+}
+.default-color5.chart-serie-line {
+	-fx-stroke: mediumseagreen;
+}
+.default-color5.chart-line-symbol {
+	-fx-background-color: mediumseagreen, white;
+}
+.default-color6.chart-serie-line {
+	-fx-stroke: mediumblue;
+}
+.default-color6.chart-line-symbol {
+	-fx-background-color: mediumblue, white;
+}
+.default-color7.chart-serie-line {
+	-fx-stroke: darkorchid;
+}
+.default-color7.chart-line-symbol {
+	-fx-background-color: darkorchid, white;
+}
+.default-color8.chart-serie-line {
+	-fx-stroke: magenta;
+}
+.default-color8.chart-line-symbol {
+	-fx-background-color: magenta, white;
+}
+.default-color9.chart-serie-line {
+	-fx-stroke: dark-grey;
+}
+.default-color9.chart-line-symbol {
+	-fx-background-color: dark-grey, white;
+}
+.default-color10.chart-serie-line {
+	-fx-stroke: gold;
+}
+.default-color10.chart-line-symbol {
+	-fx-background-color: gold, white;
+}
+.default-color11.chart-serie-line {
+	-fx-stroke: light-green;
+}
+.default-color11.chart-line-symbol {
+	-fx-background-color: light-green, white;
+}
+.default-color12.chart-serie-line {
+	-fx-stroke: olive;
+}
+.default-color12.chart-line-symbol {
+	-fx-background-color: olive, white;
+}
+/* Colors of JavaFX chart series */
+.chart-series-line.series0 {
+	-fx-stroke: black;
+}
+.chart-line-symbols.serie0 {
+	-fx-background-color: black, white;
+}
+.chart-series-line.series1 {
+	-fx-stroke: darkcyan;
+}
+.chart-line-symbols.serie1 {
+	-fx-background-color: darkcyan, white;
+}
+.chart-series-line.series2 {
+	-fx-stroke: crimson;
+}
+.chart-line-symbols.serie2 {
+	-fx-background-color: crimson, white;
+}
+.chart-series-line.series3 {
+	-fx-stroke: coral;
+}
+.chart-line-symbols.serie3 {
+	-fx-background-color: coral, white;
+}
+.chart-series-line.series4 {
+	-fx-stroke: brown;
+}
+.chart-line-symbols.serie4 {
+	-fx-background-color: brown, white;
+}
+.chart-series-line.series5 {
+	-fx-stroke: mediumseagreen;
+}
+.chart-line-symbols.serie5 {
+	-fx-background-color: mediumseagreen, white;
+}
+.chart-series-line.series6 {
+	-fx-stroke: mediumblue;
+}
+.chart-line-symbols.serie6 {
+	-fx-background-color: mediumblue, white;
+}
+.chart-series-line.series7 {
+	-fx-stroke: darkorchid;
+}
+.chart-line-symbols.serie7 {
+	-fx-background-color: darkorchid, white;
+}
+.chart-series-line.series8 {
+	-fx-stroke: magenta;
+}
+.chart-line-symbols.serie8 {
+	-fx-background-color: magenta, white;
+}
+.chart-series-line.series9 {
+	-fx-stroke: dark-grey;
+}
+.chart-line-symbols.serie9 {
+	-fx-background-color: dark-grey, white;
+}
+.chart-series-line.series10 {
+	-fx-stroke: gold;
+}
+.chart-line-symbols.serie10 {
+	-fx-background-color: gold, white;
+}
+.chart-series-line.series11 {
+	-fx-stroke: light-green;
+}
+.chart-line-symbols.serie11 {
+	-fx-background-color: light-green, white;
+}
+.chart-series-line.series12 {
+	-fx-stroke: olive;
+}
+.chart-line-symbols.serie12 {
+	-fx-background-color: olive, white;
+}
