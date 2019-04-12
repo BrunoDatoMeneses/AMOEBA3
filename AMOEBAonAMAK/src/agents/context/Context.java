@@ -258,7 +258,7 @@ public class Context extends AmoebaAgent {
 
 		drawable = VUI.get().createRectangle(0, 0, 10, 10);
 		drawable.setLayer(1);
-		drawable.setColor(new Color((double) 173/255, (double) 79/255, (double) 9/255, (double) 90/255));
+		drawable.setColor(new Color(173d/255d, 79d/255d, 9d/255d, 90d/255d));
 	}
 
 	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
@@ -315,7 +315,7 @@ public class Context extends AmoebaAgent {
 			g = 255.0;
 			b = 255.0;
 		}
-		drawable.setColor(new Color((double) r.intValue()/255, (double) g.intValue()/255, (double) b.intValue()/255, (double) 90/255));
+		drawable.setColor(new Color((double) r.intValue()/255d, (double) g.intValue()/255d, (double) b.intValue()/255d, 90d/255d));
 	}
 
 	public void setPerceptValidity(Percept percept) {

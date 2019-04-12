@@ -16,8 +16,8 @@ public class DrawableString extends Drawable {
 	@Override
 	public void _onDraw() {
 		textZone.setFill(color);
-		textZone.setX(left() - getWidth()/2);
-		textZone.setY(top() - getHeight()/2);
+		textZone.setX(left());
+		textZone.setY(top());
 	}
 
 	public void setText(String text) {

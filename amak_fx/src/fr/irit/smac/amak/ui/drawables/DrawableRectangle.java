@@ -16,8 +16,8 @@ public class DrawableRectangle extends Drawable {
 
 	@Override
 	public void _onDraw() {
-		rectangle.setX(left() - getWidth() / 2);
-		rectangle.setY(top() - getHeight() / 2);
+		rectangle.setX(left());
+		rectangle.setY(top());
 		rectangle.setWidth(getRenderedWidth());
 		rectangle.setHeight(getRenderedHeight());
 		if (strokeMode)

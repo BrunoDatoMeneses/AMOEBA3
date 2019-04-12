@@ -317,7 +317,6 @@ public class VUI {
 		drawablesLock.lock();
 		drawables.add(d);
 		drawablesLock.unlock();
-		updateCanvas();
 	}
 
 	/**

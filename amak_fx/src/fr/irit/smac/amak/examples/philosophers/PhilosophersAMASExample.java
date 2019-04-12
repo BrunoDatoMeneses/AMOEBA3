@@ -26,7 +26,7 @@ public class PhilosophersAMASExample extends Amas<TableExample> {
 		comp.setPrefSize(200, 100);
 		toolbar.getItems().add(comp);
 		MainWindow.addToolbar(toolbar);
-		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9, 0.9, 0.9, 0.5)).setFixed().setLayer(5);
+		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9d, 0.9d, 0.9d, 0.5d)).setFixed().setLayer(5);
 
 		VUI.get().createRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10);
 		VUI.get().createString(45, 25, "Hungry").setFixed().setLayer(10);

@@ -47,8 +47,8 @@ public class DrawableImage extends Drawable {
 
 	@Override
 	public void _onDraw() {
-		image.setX(left() - getWidth() / 2);
-		image.setY(top() - getHeight() / 2);
+		image.setX(left());
+		image.setY(top());
 		image.setFitWidth(getRenderedWidth());
 		image.setFitHeight(getRenderedHeight());
 	}

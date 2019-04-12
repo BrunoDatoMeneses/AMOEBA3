@@ -24,7 +24,7 @@ public class AntHillExample extends Amas<WorldExample> {
 	@Override
 	protected void onRenderingInitialization() {
 
-		VUI.get().createRectangle(90, 20, 180, 40).setColor(new Color(0.9, 0.9, 0.9, 0.8)).setFixed().setLayer(5);
+		VUI.get().createRectangle(90, 20, 180, 40).setColor(new Color(0.9d, 0.9d, 0.9d, 0.8d)).setFixed().setLayer(5);
 
 		VUI.get().createImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10);
 		antsCountLabel = (DrawableString) VUI.get().createString(45, 25, "Ants count").setFixed().setLayer(10);

@@ -208,32 +208,9 @@ public abstract class Drawable {
 	 *            The pane container
 	 */
 	public void onDraw(Pane pane) {
-		if (isVisible() && isOnScreen()) {
+		if (isVisible()) {
 			_onDraw();
 		}
-	}
-
-	/**
-	 * Is the object on screen ?
-	 * 
-	 * @return true if object is on the screen
-	 */
-	private boolean isOnScreen() {
-		return (isPointOnScreen(left(), top()) || isPointOnScreen(left(), bottom())
-				|| isPointOnScreen(right(), bottom()) || isPointOnScreen(right(), top()));
-	}
-
-	/**
-	 * Is a given coordinate on screen
-	 * 
-	 * @param x
-	 *            the horizontal position
-	 * @param y
-	 *            the vertical position
-	 * @return true if the point is on the screen
-	 */
-	private boolean isPointOnScreen(double x, double y) {
-		return x >= 0 && x <= vui.getCanvasWidth() && y >= 0 && y <= vui.getCanvasHeight();
 	}
 
 	/**
