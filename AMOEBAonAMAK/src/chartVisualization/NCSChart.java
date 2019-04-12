@@ -74,6 +74,7 @@ public class NCSChart {
 
 		chart = new LineChart<Number, Number>(xAxis, yAxis);
 		chart.setTitle(title);
+		chart.setCreateSymbols(false);
 
 		/**
 		 * @note (Rollafon)

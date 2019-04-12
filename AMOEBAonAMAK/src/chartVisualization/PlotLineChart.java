@@ -65,12 +65,11 @@ public class PlotLineChart {
 	 * @param n_series:
 	 *            the number of series to plot
 	 */
-	public PlotLineChart(String title, int max_item, int n_series, String xLabel, String yLabel,
-			List<String> serieNames) {
+	public PlotLineChart(String title, int max_item, int n_series, String yLabel, List<String> serieNames) {
 		this.max_item = max_item;
 		this.n_series = n_series;
 
-		xAxis = new NumberAxis(xLabel, 0, max_item, max_item / 10);
+		xAxis = new NumberAxis("Cycle", 0, max_item, max_item / 10);
 		xAxis.setForceZeroInRange(false);
 		NumberAxis yAxis = new NumberAxis();
 		yAxis.setLabel(yLabel);
@@ -78,6 +77,7 @@ public class PlotLineChart {
 
 		chart = new LineChart<Number, Number>(xAxis, yAxis);
 		chart.setTitle(title);
+		chart.setCreateSymbols(false);
 
 		/**
 		 * @note (Rollafon) Be aware that for more than 13 series, the color cycle will
@@ -111,7 +111,7 @@ public class PlotLineChart {
 	 * @param numY:
 	 *            the corresponding y value
 	 */
-	public void addData(String serieName, int numCycle, int numNCS) {
+	public void addData(String serieName, int numX, double numY) {
 		lock.lock();
 		Platform.runLater(() -> {
 			if (cur_items < max_item) {
@@ -123,14 +123,16 @@ public class PlotLineChart {
 			} else {
 				serieData.get(serieName).getData().remove(0);
 			}
-			serieData.get(serieName).getData().add(new Data<Number, Number>(numCycle, numNCS));
-			if (numCycle % max_item == 0) {
-				xAxis.setLowerBound(numCycle);
-				xAxis.setUpperBound(numCycle + max_item);
+			serieData.get(serieName);
+			serieData.get(serieName).getData();
+			serieData.get(serieName).getData().add(new Data<Number, Number>(numX, numY));
+			if (numX % max_item == 0) {
+				xAxis.setLowerBound(numX);
+				xAxis.setUpperBound(numX + max_item);
 			}
 			// This case is possible when the rendering was previously off
-			else if (numCycle > xAxis.getUpperBound()) {
-				int min = numCycle - (numCycle % max_item);
+			else if (numX > xAxis.getUpperBound()) {
+				int min = numX - (numX % max_item);
 				xAxis.setLowerBound(min);
 				xAxis.setUpperBound(min + max_item);
 			}

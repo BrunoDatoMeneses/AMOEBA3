@@ -47,27 +47,27 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
 	private StudiedSystem studiedSystem;
 	private boolean useOracle = true;
-  
+
 	private HashSet<Context> validContexts;
 	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
-	
+
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate = false;
 
 	private Drawable point;
 	private NCSChart loopNCS;
-	//TODO
 	private NCSChart allNCS;
 	private PlotLineChart nbAgent;
-	//private ILxPlotChart errors;
+	private PlotLineChart errors;
 	private ToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
 	 * 
-	 * @param studiedSystem the studied system
+	 * @param studiedSystem
+	 *            the studied system
 	 */
 	public AMOEBA(World environment, StudiedSystem studiedSystem) {
 		super(environment, Scheduling.HIDDEN);
@@ -92,16 +92,19 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// amoeba and agent
 		VUI.get().setDefaultView(200, 0, 0);
 		point = VUI.get().createPoint(0, 0);
-		loopNCS = new NCSChart("This loop NCS", 1000);
-		//TODO 
-		allNCS = new NCSChart("All time NCS", 1000);
+		loopNCS = new NCSChart("This loop NCS", 500);
+		allNCS = new NCSChart("All time NCS", 500);
 		List<String> agentsTypes = new LinkedList<>();
 		agentsTypes.add("Percepts");
 		agentsTypes.add("Contexts");
 		agentsTypes.add("Activated");
-		nbAgent = new PlotLineChart("Number of agents", 100, 3, "Cycle", "Number of agents", agentsTypes);
-		//nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
-		//errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
+		nbAgent = new PlotLineChart("Number of agents", 500, 3, "Number of agents", agentsTypes);
+		List<String> errorTypes = new LinkedList<>();
+		errorTypes.add("Mean criticity");
+		errorTypes.add("Error allowed");
+		errorTypes.add("Inexact allowed");
+		errorTypes.add("Median criticity");
+		errors = new PlotLineChart("Errors", 500, 4, "Coefficient", errorTypes);
 
 		// update render button
 		toggleRender = new ToggleButton("Update Render");
@@ -128,20 +131,19 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
 				allNCS.addData(ncs, cycle, allTimeNCS.get(ncs));
 			}
-//TODO
 			nbAgent.addData("Percepts", cycle, getPercepts().size());
 			nbAgent.addData("Contexts", cycle, getContexts().size());
 			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent());
 
-			//errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
-			//errors.add("Error Allowed", cycle, head.getErrorAllowed());
-			//errors.add("Inexact Allowed", cycle, head.getInexactAllowed());
+			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity());
+			errors.addData("Error allowed", cycle, head.getErrorAllowed());
+			errors.addData("Inexact allowed", cycle, head.getInexactAllowed());
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
 
 			// @note (Labbeti) Test added to avoid crash when head has just been created.
 			if (!sortedErrors.isEmpty()) {
-				//errors.add("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 			}
 		}
 	}
@@ -157,21 +159,19 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		validContexts = null;
 		environment.resetNbActivatedAgent();
 	}
-	
+
 	/**
-	 * Define what is done during a cycle, 
-	 * most importantly it launch agents.
+	 * Define what is done during a cycle, most importantly it launch agents.
 	 * 
-	 * Every 1000 cycles, all Context are launched, allowing to
-	 * delete themselves if they're too small. To change this behavior 
-	 * you have to modify this method. 
+	 * Every 1000 cycles, all Context are launched, allowing to delete themselves if
+	 * they're too small. To change this behavior you have to modify this method.
 	 */
 	@Override
 	public void cycle() {
 		cycle++;
-		
+
 		onSystemCycleBegin();
-		
+
 		// run percepts
 		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
@@ -190,28 +190,27 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		// it is sometime useful to run all context agent
 		// especially to check if they're not too small,
 		// or after reactivating rendering.
-		if(cycle%1000 == 0) {
+		if (cycle % 1000 == 0) {
 			runAll = true;
 		}
-		
+
 		Stream<Context> contextStream = null;
-		if(runAll) {
-			contextStream = getContexts().stream(); //update all context
+		if (runAll) {
+			contextStream = getContexts().stream(); // update all context
 			runAll = false;
 		} else {
 			HashSet<Context> vcontexts = getValidContexts();
-			if(vcontexts == null) {
+			if (vcontexts == null) {
 				vcontexts = new HashSet<>();
-			} 
-			contextStream = vcontexts.stream(); //or only valid ones
+			}
+			contextStream = vcontexts.stream(); // or only valid ones
 		}
 		// run contexts
-		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous())
-				.collect(Collectors.toList());
+		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());
 
 		for (Context agent : synchronousContexts) {
@@ -227,12 +226,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		// run head
 		List<Head> heads = new ArrayList<>();
 		heads.add(head);
-		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous())
-				.collect(Collectors.toList());
+		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous()).collect(Collectors.toList());
 		Collections.sort(synchronousHeads, new AgentOrderComparator());
 
 		for (Head agent : synchronousHeads) {
@@ -254,7 +252,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		addPendingAgents();
 
 		onSystemCycleEnd();
-		
+
 		if (!Configuration.commandLineMode)
 			onUpdateRender();
 
@@ -298,8 +296,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	/**
-	 * Activate or deactivate the graphical scheduler. 
-	 * Allowing ordDenying the user to change the simulation speed.
+	 * Activate or deactivate the graphical scheduler. Allowing ordDenying the user
+	 * to change the simulation speed.
+	 * 
 	 * @param allow
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
@@ -318,7 +317,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		this.head = null;
 		super.removePendingAgents();
 	}
-	
+
 	public void onLoadEnded() {
 		super.addPendingAgents();
 	}
@@ -340,6 +339,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Activate or deactivate rendering of agents at runtime.
+	 * 
 	 * @param renderUpdate
 	 */
 	public void setRenderUpdate(boolean renderUpdate) {
@@ -352,6 +352,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Set input used by percepts and oracle.
+	 * 
 	 * @param perceptionsAndActions
 	 */
 	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
@@ -360,6 +361,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Get the last prediction from the system.
+	 * 
 	 * @return
 	 */
 	public double getAction() {
@@ -391,34 +393,37 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		return percepts;
 	}
-	
+
 	/**
-	 * Update the set of valid context.
-	 * The update is done with an intersect of the previous and new set.
+	 * Update the set of valid context. The update is done with an intersect of the
+	 * previous and new set.
 	 * 
 	 * Synchronized with a writeLock.
-	 * @param new validContextsn set.
+	 * 
+	 * @param new
+	 *            validContextsn set.
 	 */
-	public void updateValidContexts(HashSet<Context> validContexts){
+	public void updateValidContexts(HashSet<Context> validContexts) {
 		validContextLock.writeLock().lock();
-		if(this.validContexts == null) {
+		if (this.validContexts == null) {
 			this.validContexts = validContexts;
 		} else {
 			this.validContexts.retainAll(validContexts);
 		}
 		validContextLock.writeLock().unlock();
 	}
-	
+
 	/**
 	 * Return the current set of valid contexts.
 	 * 
 	 * Synchronized with a readLock.
+	 * 
 	 * @return
 	 */
 	public HashSet<Context> getValidContexts() {
 		HashSet<Context> ret;
 		validContextLock.readLock().lock();
-		if( validContexts == null) {
+		if (validContexts == null) {
 			ret = null;
 		} else {
 			ret = new HashSet<>(validContexts);
@@ -435,7 +440,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public boolean isCreationOfNewContext() {
 		return creationOfNewContext;
 	}
-	
+
 	/**
 	 * Tell AMOEBA to run all (contexts) agent for the next cycle.
 	 */
