@@ -1,6 +1,7 @@
 package chartVisualization;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,9 +13,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.layout.Pane;
-import ncs.NCS;
 
-public class NCSChart {
+public class PlotLineChart {
 	/**
 	 * The max item it can have
 	 */
@@ -26,14 +26,14 @@ public class NCSChart {
 	private int cur_items = 0;
 
 	/**
-	 * Number of NCS
+	 * Number of series to plot
 	 */
-	private final int n_ncs = NCS.values().length;
+	private int n_series;
 
 	/**
-	 * Number of NCS kinds added this loop
+	 * To know if there are series not updated this loop
 	 */
-	private int cur_ncs = 0;
+	private int cur_serie = 0;
 
 	/**
 	 * The chart itself
@@ -51,9 +51,9 @@ public class NCSChart {
 	private ReentrantLock lock = new ReentrantLock();
 
 	/**
-	 * The map that link data serie to a NCS type
+	 * The map that link data serie to the name of this serie
 	 */
-	private Map<NCS, XYChart.Series<Number, Number>> ncsData = new HashMap<>();
+	private Map<String, XYChart.Series<Number, Number>> serieData = new HashMap<>();
 
 	/**
 	 * Create the chart with the given name
@@ -62,34 +62,38 @@ public class NCSChart {
 	 *            the title of the chart
 	 * @param max_item:
 	 *            the max item it can have
+	 * @param n_series:
+	 *            the number of series to plot
 	 */
-	public NCSChart(String title, int max_item) {
+	public PlotLineChart(String title, int max_item, int n_series, String xLabel, String yLabel,
+			List<String> serieNames) {
 		this.max_item = max_item;
+		this.n_series = n_series;
 
-		xAxis = new NumberAxis("Cycle", 0, max_item, max_item/10);
+		xAxis = new NumberAxis(xLabel, 0, max_item, max_item / 10);
 		xAxis.setForceZeroInRange(false);
 		NumberAxis yAxis = new NumberAxis();
-		yAxis.setLabel("Number of NCS");
+		yAxis.setLabel(yLabel);
 		yAxis.setAnimated(false);
 
 		chart = new LineChart<Number, Number>(xAxis, yAxis);
 		chart.setTitle(title);
 
 		/**
-		 * @note (Rollafon)
-		 * Be aware that for more than 13 NCS kinds, the color cycle will be repeated.
-		 * That means that the 14th color will be the same as the 1st, the 15th as the 2nd, and so on. 
-		 * If the need is to have more color, check and modify the chart.css file.
+		 * @note (Rollafon) Be aware that for more than 13 series, the color cycle will
+		 *       be repeated. That means that the 14th color will be the same as the
+		 *       1st, the 15th as the 2nd, and so on. If the need is to have more color,
+		 *       check and modify the chart.css file.
 		 */
-		for (NCS ncs : NCS.values()) {
+		for (String s : serieNames) {
 			Series<Number, Number> serie = new Series<>();
-			serie.setName(ncs.toString());
+			serie.setName(s);
 			chart.getData().add(serie);
-			ncsData.put(ncs, serie);
+			serieData.put(s, serie);
 		}
-		
+
 		chart.getStylesheets().add("chartVisualization/chart.css");
-		
+
 		Pane p = new Pane();
 		p.getChildren().add(chart);
 		chart.prefWidthProperty().bind(p.widthProperty());
@@ -100,26 +104,26 @@ public class NCSChart {
 	/**
 	 * Add a data to the chart
 	 * 
-	 * @param ncsName:
-	 *            The name of the ncs
-	 * @param numCycle:
-	 *            The cycle numero
-	 * @param numNCS:
-	 *            the number of NCS on this cycle
+	 * @param serieName:
+	 *            the name of the serie to be updated
+	 * @param numX:
+	 *            the x value to be added
+	 * @param numY:
+	 *            the corresponding y value
 	 */
-	public void addData(NCS ncsName, int numCycle, int numNCS) {
+	public void addData(String serieName, int numCycle, int numNCS) {
 		lock.lock();
 		Platform.runLater(() -> {
 			if (cur_items < max_item) {
-				++cur_ncs;
-				if (cur_ncs == n_ncs) {
+				++cur_serie;
+				if (cur_serie == n_series) {
 					++cur_items;
-					cur_ncs = 0;
+					cur_serie = 0;
 				}
 			} else {
-				ncsData.get(ncsName).getData().remove(0);
+				serieData.get(serieName).getData().remove(0);
 			}
-			ncsData.get(ncsName).getData().add(new Data<Number, Number>(numCycle, numNCS));
+			serieData.get(serieName).getData().add(new Data<Number, Number>(numCycle, numNCS));
 			if (numCycle % max_item == 0) {
 				xAxis.setLowerBound(numCycle);
 				xAxis.setUpperBound(numCycle + max_item);
@@ -130,7 +134,6 @@ public class NCSChart {
 				xAxis.setLowerBound(min);
 				xAxis.setUpperBound(min + max_item);
 			}
-
 		});
 		lock.unlock();
 	}

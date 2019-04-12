@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -20,6 +21,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import chartVisualization.PlotLineChart;
 import chartVisualization.NCSChart;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
@@ -57,7 +59,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private NCSChart loopNCS;
 	//TODO
 	private NCSChart allNCS;
-	//private ILxPlotChart nbAgent;
+	private PlotLineChart nbAgent;
 	//private ILxPlotChart errors;
 	private ToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
@@ -93,6 +95,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		loopNCS = new NCSChart("This loop NCS", 1000);
 		//TODO 
 		allNCS = new NCSChart("All time NCS", 1000);
+		List<String> agentsTypes = new LinkedList<>();
+		agentsTypes.add("Percepts");
+		agentsTypes.add("Contexts");
+		agentsTypes.add("Activated");
+		nbAgent = new PlotLineChart("Number of agents", 100, 3, "Cycle", "Number of agents", agentsTypes);
 		//nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
 		//errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
 
@@ -122,9 +129,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				allNCS.addData(ncs, cycle, allTimeNCS.get(ncs));
 			}
 //TODO
-			//nbAgent.add("Percepts", cycle, getPercepts().size());
-			//nbAgent.add("Contexts", cycle, getContexts().size());
-			//nbAgent.add("Activated", cycle, environment.getNbActivatedAgent());
+			nbAgent.addData("Percepts", cycle, getPercepts().size());
+			nbAgent.addData("Contexts", cycle, getContexts().size());
+			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent());
 
 			//errors.add("Mean criticity", cycle, head.getAveragePredictionCriticity());
 			//errors.add("Error Allowed", cycle, head.getErrorAllowed());
