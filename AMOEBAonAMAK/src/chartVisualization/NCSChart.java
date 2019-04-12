@@ -14,7 +14,7 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.layout.Pane;
 import ncs.NCS;
 
-public class LoopNCS {
+public class NCSChart {
 	/**
 	 * The max item it can have
 	 */
@@ -63,7 +63,7 @@ public class LoopNCS {
 	 * @param max_item:
 	 *            the max item it can have
 	 */
-	public LoopNCS(String title, int max_item) {
+	public NCSChart(String title, int max_item) {
 		this.max_item = max_item;
 
 		xAxis = new NumberAxis("Cycle", 0, max_item, max_item/10);
@@ -75,7 +75,12 @@ public class LoopNCS {
 		chart = new LineChart<Number, Number>(xAxis, yAxis);
 		chart.setTitle(title);
 
-		
+		/**
+		 * @note (Rollafon)
+		 * Be aware that for more than 13 NCS kinds, the color cycle will be repeated.
+		 * That means that the 14th color will be the same as the 1st, the 15th as the 2nd, and so on. 
+		 * If the need is to have more color, check and modify the chart.css file.
+		 */
 		for (NCS ncs : NCS.values()) {
 			Series<Number, Number> serie = new Series<>();
 			serie.setName(ncs.toString());

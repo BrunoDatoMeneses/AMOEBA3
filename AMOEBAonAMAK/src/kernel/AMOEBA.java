@@ -20,7 +20,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import chartVisualization.LoopNCS;
+import chartVisualization.NCSChart;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -54,9 +54,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean renderUpdate = false;
 
 	private Drawable point;
-	private LoopNCS loopNCS;
+	private NCSChart loopNCS;
 	//TODO
-	//private ILxPlotChart allNCS;
+	private NCSChart allNCS;
 	//private ILxPlotChart nbAgent;
 	//private ILxPlotChart errors;
 	private ToggleButton toggleRender;
@@ -90,9 +90,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// amoeba and agent
 		VUI.get().setDefaultView(200, 0, 0);
 		point = VUI.get().createPoint(0, 0);
-		loopNCS = new LoopNCS("This loop NCS", 100);
+		loopNCS = new NCSChart("This loop NCS", 1000);
 		//TODO 
-		//allNCS = LxPlot.getChart("All time NCS", ChartType.LINE, 1000);
+		allNCS = new NCSChart("All time NCS", 1000);
 		//nbAgent = LxPlot.getChart("Number of agents", ChartType.LINE, 1000);
 		//errors = LxPlot.getChart("Errors", ChartType.LINE, 1000);
 
@@ -119,7 +119,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 			for (NCS ncs : NCS.values()) {
 				loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
-				//allNCS.add(ncs.name(), cycle, allTimeNCS.get(ncs));
+				allNCS.addData(ncs, cycle, allTimeNCS.get(ncs));
 			}
 //TODO
 			//nbAgent.add("Percepts", cycle, getPercepts().size());
