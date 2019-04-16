@@ -152,79 +152,81 @@ public class VUI {
 	 *            The title used for the vui
 	 */
 	private VUI(String title) {
-		panel = new BorderPane();
+		Platform.runLater(() -> {
+			panel = new BorderPane();
 
-		HBox statusPanel = new HBox();
-		statusLabel = new Label("status");
-		statusLabel.setTextAlignment(TextAlignment.LEFT);
-		statusPanel.getChildren().add(statusLabel);
-		panel.setBottom(statusPanel);
+			HBox statusPanel = new HBox();
+			statusLabel = new Label("status");
+			statusLabel.setTextAlignment(TextAlignment.LEFT);
+			statusPanel.getChildren().add(statusLabel);
+			panel.setBottom(statusPanel);
 
-		Button resetButton = new Button("Reset");
-		resetButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				zoom = defaultZoom;
-				worldCenterX = defaultWorldCenterX;
-				worldCenterY = defaultWorldCenterY;
-				updateCanvas();
-			}
-		});
-		statusPanel.getChildren().add(resetButton);
+			Button resetButton = new Button("Reset");
+			resetButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					zoom = defaultZoom;
+					worldCenterX = defaultWorldCenterX;
+					worldCenterY = defaultWorldCenterY;
+					updateCanvas();
+				}
+			});
+			statusPanel.getChildren().add(resetButton);
 
-		canvas = new Pane();
-		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				lastDragX = event.getX();
-				lastDragY = event.getY();
-			}
-		});
-		canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				lastDragX = null;
-				lastDragY = null;
-			}
-		});
-		canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				try {
-					double transX = screenToWorldDistance(event.getX() - lastDragX);
-					double transY = screenToWorldDistance(event.getY() - lastDragY);
-					worldCenterX += transX;
-					worldCenterY += transY;
-					worldOffsetX += transX;
-					worldOffsetY += transY;
+			canvas = new Pane();
+			canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
 					lastDragX = event.getX();
 					lastDragY = event.getY();
-					updateCanvas();
-				} catch (Exception ez) {
-					// Catch exception occurring when mouse is out of the canvas
 				}
-			}
+			});
+			canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					lastDragX = null;
+					lastDragY = null;
+				}
+			});
+			canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					try {
+						double transX = screenToWorldDistance(event.getX() - lastDragX);
+						double transY = screenToWorldDistance(event.getY() - lastDragY);
+						worldCenterX += transX;
+						worldCenterY += transY;
+						worldOffsetX += transX;
+						worldOffsetY += transY;
+						lastDragX = event.getX();
+						lastDragY = event.getY();
+						updateCanvas();
+					} catch (Exception ez) {
+						// Catch exception occurring when mouse is out of the canvas
+					}
+				}
+			});
+
+			canvas.setOnScroll(new EventHandler<ScrollEvent>() {
+				@Override
+				public void handle(ScrollEvent event) {
+					double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+					double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+					zoom += event.getDeltaY() / event.getMultiplierY() * 10;
+					if (zoom < 10)
+						zoom = 10;
+
+					double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+					double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+					worldCenterX -= wdx2 - wdx;
+					worldCenterY -= wdy2 - wdy;
+					updateCanvas();
+				}
+			});
+
+			panel.setCenter(canvas);
+			MainWindow.addTabbedPanel("VUI #" + title, panel);
 		});
-
-		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
-			@Override
-			public void handle(ScrollEvent event) {
-				double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-				double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
-				zoom += event.getDeltaY() / event.getMultiplierY() * 10;
-				if (zoom < 10)
-					zoom = 10;
-
-				double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-				double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
-				worldCenterX -= wdx2 - wdx;
-				worldCenterY -= wdy2 - wdy;
-				updateCanvas();
-			}
-		});
-
-		panel.setCenter(canvas);
-		MainWindow.addTabbedPanel("VUI #" + title, panel);
 	}
 
 	/**

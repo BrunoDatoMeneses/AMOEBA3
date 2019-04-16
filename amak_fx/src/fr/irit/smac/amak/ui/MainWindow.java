@@ -31,7 +31,8 @@ import javafx.stage.WindowEvent;
  * This window is the main one of an AMAS developed using AMAK. It contains a
  * toolbar panel and various spaces for panels
  * 
- * @author of the original version (the Swing one) Alexandre Perles, Marcillaud Guilhem
+ * @author of the original version (the Swing one) Alexandre Perles, Marcillaud
+ *         Guilhem
  *
  */
 public class MainWindow extends Application {
@@ -83,85 +84,90 @@ public class MainWindow extends Application {
 	private static ReentrantLock startLock = new ReentrantLock();
 	private static Condition waiting = startLock.newCondition();
 	/**
-	 * Boolean used in instance() function to forbid multiple calls of Application.launch()
+	 * Boolean used in instance() function to forbid multiple calls of
+	 * Application.launch()
 	 */
 	private static boolean isCreated = false;
-	
+
 	/**
 	 * Create the frame.
 	 * 
-	 * @throws InstanceAlreadyExistsException if the MainWindow has already been instantiated.
-	 * This constructor should be used by the Application of JavaFX only.
+	 * @throws InstanceAlreadyExistsException
+	 *             if the MainWindow has already been instantiated. This constructor
+	 *             should be used by the Application of JavaFX only.
 	 */
 	public MainWindow() throws InstanceAlreadyExistsException {
 		super();
 		if (instance == null)
 			instance = this;
-		else throw new InstanceAlreadyExistsException();
+		else
+			throw new InstanceAlreadyExistsException();
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		startLock.lock();
-		// Creation of scene and root group
-		primaryStage.setTitle("AMAK");
-		AnchorPane root = new AnchorPane();
-		Scene scene = new Scene(root, 450, 300);
-		stage = primaryStage;
-		stage.setScene(scene);
-		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				System.exit(0);
-			}
+		Platform.runLater(() -> {
+			startLock.lock();
+			// Creation of scene and root group
+			primaryStage.setTitle("AMAK");
+			AnchorPane root = new AnchorPane();
+			Scene scene = new Scene(root, 450, 300);
+			stage = primaryStage;
+			stage.setScene(scene);
+			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					System.exit(0);
+				}
+			});
+
+			// Border organization of the scene
+			BorderPane organizationPane = new BorderPane();
+			root.getChildren().add(organizationPane);
+			organizationPane.prefHeightProperty().bind(stage.heightProperty());
+			organizationPane.prefWidthProperty().bind(stage.widthProperty());
+
+			// Creation of the toolbar (Bottom)
+			toolbarPanel = new FlowPane();
+			organizationPane.setBottom(toolbarPanel);
+
+			// Creation of the split pane (Center)
+			splitPane = new SplitPane();
+			splitPane.setOrientation(Orientation.HORIZONTAL);
+			organizationPane.setCenter(splitPane);
+
+			// Creation of the left part of the split pane (Center Left)
+			AnchorPane left = new AnchorPane();
+			splitPane.getItems().add(left);
+
+			// Creation of the right part of the split pane (Center Right)
+			tabbedPanel = new TabPane();
+			splitPane.getItems().add(tabbedPanel);
+
+			// Creation of the menu bar (Top)
+			menuBar = new MenuBar();
+			optionsMenu = new Menu("Options");
+			organizationPane.setTop(menuBar);
+
+			// Creation of the close menu item
+			MenuItem menuItem = new MenuItem("Close");
+			menuItem.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					System.exit(0);
+				}
+			});
+			optionsMenu.getItems().add(menuItem);
+
+			menuBar.getMenus().add(optionsMenu);
+			menuBar.getMenus().add(new Menu("AMAK v" + Information.VERSION));
+
+			startEnded = true;
+			waiting.signal();
+			startLock.unlock();
+
+			stage.show();
 		});
-		
-		// Border organization of the scene
-		BorderPane organizationPane = new BorderPane();
-		root.getChildren().add(organizationPane);
-		organizationPane.prefHeightProperty().bind(stage.heightProperty());
-		organizationPane.prefWidthProperty().bind(stage.widthProperty());
-		
-		// Creation of the toolbar (Bottom)
-		toolbarPanel = new FlowPane();
-		organizationPane.setBottom(toolbarPanel);
-
-		// Creation of the split pane (Center)
-		splitPane = new SplitPane();
-		splitPane.setOrientation(Orientation.HORIZONTAL);
-		organizationPane.setCenter(splitPane);
-
-		// Creation of the left part of the split pane (Center Left)
-		AnchorPane left = new AnchorPane();
-		splitPane.getItems().add(left);
-		
-		// Creation of the right part of the split pane (Center Right)
-		tabbedPanel = new TabPane();
-		splitPane.getItems().add(tabbedPanel);
-
-		// Creation of the menu bar (Top)
-		menuBar = new MenuBar();
-		optionsMenu = new Menu("Options");
-		organizationPane.setTop(menuBar);
-		
-		// Creation of the close menu item
-		MenuItem menuItem = new MenuItem("Close");
-		menuItem.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				System.exit(0);
-			}
-		});
-		optionsMenu.getItems().add(menuItem);
-		
-		menuBar.getMenus().add(optionsMenu);
-		menuBar.getMenus().add(new Menu("AMAK v" + Information.VERSION));
-		
-		startEnded = true;
-		waiting.signal();
-		startLock.unlock();
-		
-		stage.show();
 	}
 
 	/**
@@ -186,7 +192,7 @@ public class MainWindow extends Application {
 		}
 		instance.stage.setOnCloseRequest(onClose);
 	}
-	
+
 	/**
 	 * Change the icon of the window
 	 * 
@@ -209,7 +215,7 @@ public class MainWindow extends Application {
 		}
 		Platform.runLater(() -> instance.stage.getIcons().add(new Image(filename)));
 	}
-	
+
 	/**
 	 * Change the title of the main window
 	 * 
@@ -232,7 +238,7 @@ public class MainWindow extends Application {
 		}
 		Platform.runLater(() -> instance.stage.setTitle(title));
 	}
-	
+
 	/**
 	 * Add a button in the menu options
 	 * 
@@ -259,7 +265,7 @@ public class MainWindow extends Application {
 		}
 		Platform.runLater(() -> instance.optionsMenu.getItems().add(menuItem));
 	}
-	
+
 	/**
 	 * Add a toolBar
 	 * 
@@ -282,7 +288,7 @@ public class MainWindow extends Application {
 		}
 		Platform.runLater(() -> instance.toolbarPanel.getChildren().add(toolbar));
 	}
-	
+
 	/**
 	 * Set a panel to the left
 	 * 
@@ -305,7 +311,7 @@ public class MainWindow extends Application {
 		}
 		instance().splitPane.getItems().set(0, panel);
 	}
-	
+
 	/**
 	 * Set a panel to the right
 	 * 
@@ -328,7 +334,7 @@ public class MainWindow extends Application {
 		}
 		Platform.runLater(() -> instance.splitPane.getItems().set(1, panel));
 	}
-	
+
 	/**
 	 * Return the unique instance of MainWindow, may create it.
 	 * 
@@ -339,17 +345,17 @@ public class MainWindow extends Application {
 		if (!isCreated) {
 			isCreated = true;
 			Thread ui = new Thread(new Runnable() {
-			    @Override
-			    public void run() {
+				@Override
+				public void run() {
 					Application.launch(MainWindow.class);
-			    }
+				}
 			});
 			ui.start();
 		}
 		instanceLock.unlock();
 		return instance;
 	}
-	
+
 	/**
 	 * Add a panel with a tab
 	 * 

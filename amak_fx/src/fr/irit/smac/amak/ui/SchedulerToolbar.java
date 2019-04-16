@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import fr.irit.smac.amak.Scheduler;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -79,7 +80,7 @@ public class SchedulerToolbar extends ToolBar {
 				getSlider().setValue(1);
 			}
 		});
-		getItems().add(getSlider());
+		Platform.runLater(() -> getItems().add(getSlider()));
 		setPrefSize(220, 120);
 	}
 
@@ -93,8 +94,6 @@ public class SchedulerToolbar extends ToolBar {
 			runController = new Slider(0, 7, 1);
 			runController.setOrientation(Orientation.HORIZONTAL);
 
-			// Hashtable is not recommended anymore and should be replaced by an HashMap but
-			// JSlider requires Hashtable so Hashtable it will have.
 			final HashMap<Double, Label> labelTable = new HashMap<>();
 			labelTable.put(0d, new Label("Step"));
 			labelTable.put(1d, new Label("Stop"));
