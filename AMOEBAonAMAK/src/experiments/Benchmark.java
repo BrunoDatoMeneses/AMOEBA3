@@ -24,13 +24,13 @@ public class Benchmark {
 	 * the time it took to make the nbRequest after that number of cycle, 
 	 * and the mean error value of these request.
 	 * 
-	 * @param a configured AMOEBA, ready to be used
-	 * @param the studied system used to learn (can be null if nbLeatn = 0)
-	 * @param the studied system used for request (can be the same as learn, can be null if nbRequest = 0)
-	 * @param the maximum number of learn cycle to be done, if 0 no learn will be done, but a measure will be taken nonetheless
-	 * @param the number of request that will be done at each measure, if 0 no request will be done
-	 * @param how many learn between measure
-	 * @param the function used to measure error, if null, will use squared differences
+	 * @param amoeba a configured AMOEBA, ready to be used
+	 * @param learnSystem the studied system used to learn (can be null if nbLeatn = 0)
+	 * @param requestSystem the studied system used for request (can be the same as learn, can be null if nbRequest = 0)
+	 * @param nbLearn the maximum number of learn cycle to be done, if 0 no learn will be done, but a measure will be taken nonetheless
+	 * @param nbRequest the number of request that will be done at each measure, if 0 no request will be done
+	 * @param measureEveryNLearn how many learn between measure
+	 * @param error the function used to measure error, if null, will use squared differences
 	 * @return a list containing each measure, a measure is a list with this format : [numLearn, timeLearn, timeRequest, meanErrorRequest] 
 	 */
 	public static List<List<Double>> benchmark(IAMOEBA amoeba, StudiedSystem learnSystem, StudiedSystem requestSystem,
@@ -47,6 +47,7 @@ public class Benchmark {
 			
 			// learn one cycle
 			learnSystem.playOneStep();
+			learnSystem.playOneStep();
 			HashMap<String, Double> out = learnSystem.getOutput();
 			start = System.currentTimeMillis();
 			amoeba.learn(out);
@@ -62,6 +63,7 @@ public class Benchmark {
 				long tRequest = 0;
 				double meanError = 0;
 				for(int j = 0; j < nbRequest; ++j) {
+					requestSystem.playOneStep();
 					requestSystem.playOneStep();
 					HashMap<String, Double> reqOut = requestSystem.getOutput();
 					

@@ -65,7 +65,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
-	 * 
+	 *
 	 * @param studiedSystem
 	 *            the studied system
 	 */
@@ -162,7 +162,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Define what is done during a cycle, most importantly it launch agents.
-	 * 
+	 *
 	 * Every 1000 cycles, all Context are launched, allowing to delete themselves if
 	 * they're too small. To change this behavior you have to modify this method.
 	 */
@@ -298,7 +298,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Activate or deactivate the graphical scheduler. Allowing ordDenying the user
 	 * to change the simulation speed.
-	 * 
+	 *
 	 * @param allow
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
@@ -339,7 +339,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Activate or deactivate rendering of agents at runtime.
-	 * 
+	 *
 	 * @param renderUpdate
 	 */
 	public void setRenderUpdate(boolean renderUpdate) {
@@ -352,7 +352,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Set input used by percepts and oracle.
-	 * 
+	 *
 	 * @param perceptionsAndActions
 	 */
 	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
@@ -361,7 +361,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Get the last prediction from the system.
-	 * 
+	 *
 	 * @return
 	 */
 	public double getAction() {
@@ -397,11 +397,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Update the set of valid context. The update is done with an intersect of the
 	 * previous and new set.
-	 * 
+	 *
 	 * Synchronized with a writeLock.
-	 * 
-	 * @param new
-	 *            validContextsn set.
+	 * @param validContexts new validContexts set.
 	 */
 	public void updateValidContexts(HashSet<Context> validContexts) {
 		validContextLock.writeLock().lock();
@@ -415,9 +413,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Return the current set of valid contexts.
-	 * 
+	 *
 	 * Synchronized with a readLock.
-	 * 
+	 *
 	 * @return
 	 */
 	public HashSet<Context> getValidContexts() {
