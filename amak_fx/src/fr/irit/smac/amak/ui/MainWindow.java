@@ -44,28 +44,28 @@ public class MainWindow extends Application {
 	/**
 	 * The window itself
 	 */
-	private Stage stage;
+	public Stage stage;
 	/**
 	 * The panel which contains the toolbar
 	 */
-	private FlowPane toolbarPanel;
+	public FlowPane toolbarPanel;
 	/**
 	 * The main panel is split in two panels. This allows to dynamically resize
 	 * these two panels.
 	 */
-	private SplitPane splitPane;
+	public SplitPane splitPane;
 	/**
 	 * The menu bar of the window
 	 */
-	private MenuBar menuBar;
+	public MenuBar menuBar;
 	/**
 	 * The option menu
 	 */
-	private Menu optionsMenu;
+	public Menu optionsMenu;
 	/**
 	 * The panel in which panels with tab can be added
 	 */
-	private TabPane tabbedPanel;
+	public TabPane tabbedPanel;
 	/**
 	 * For an AMAK process it can only be one instance of MainWindow
 	 */
@@ -354,6 +354,15 @@ public class MainWindow extends Application {
 		}
 		instanceLock.unlock();
 		return instance;
+	}
+	
+	/**
+	 * Indicate if an instance of MainWindow exist.
+	 * 
+	 * @return true if an instance of MainWindow exist.
+	 */
+	public static boolean isInstance() {
+		return (instance != null);
 	}
 
 	/**

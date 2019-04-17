@@ -14,7 +14,11 @@ import kernel.World;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
+		// Although instantiating the MainWindow before usage is optional, we recommend doing it for better stability.
+		// It also allows you to change some of its behavior before creating an AMOEBA.
+		// If you use Configuration.commandLineMode = True , then you should skip it. 
 		MainWindow.instance();
+		
 		example();
 	}
 

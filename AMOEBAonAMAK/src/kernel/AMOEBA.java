@@ -108,7 +108,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 		// update render button
 		toggleRender = new ToggleButton("Update Render");
-		toggleRender.setOnAction(evt -> renderUpdate = toggleRender.isSelected());
+		toggleRender.setOnAction(evt -> {
+			renderUpdate = toggleRender.isSelected(); 
+			if(renderUpdate)
+				nextCycleRunAllAgents();
+		});
 		toggleRender.setSelected(renderUpdate);
 		ToolBar tb = new ToolBar();
 		tb.getItems().add(toggleRender);
@@ -320,6 +324,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public void onLoadEnded() {
 		super.addPendingAgents();
+		nextCycleRunAllAgents();
 	}
 
 	@Override

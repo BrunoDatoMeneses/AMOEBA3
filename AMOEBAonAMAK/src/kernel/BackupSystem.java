@@ -30,8 +30,10 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import experiments.F_XY_System;
-import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.ui.MainWindow;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
 
 /**
  * @author Labbeti
@@ -51,6 +53,8 @@ public class BackupSystem implements IBackupSystem {
 
 	public BackupSystem(AMOEBA amoeba) {
 		this.amoeba = amoeba;
+		if(MainWindow.isInstance())
+			setupGraphicalTool();
 	}
 
 	// -------------------- Public Methods --------------------
@@ -446,35 +450,37 @@ public class BackupSystem implements IBackupSystem {
 		contextElement.addContent(experimentsElement);
 	}
 
-	// -------------------- DEBUG methods --------------------
+	private void setupGraphicalTool() {
+		MainWindow mw = MainWindow.instance();	
+		// TODO remove if they exist items Save and Load in menu Option.
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().addAll(
+				new FileChooser.ExtensionFilter("XML", "*.xml"),
+                new FileChooser.ExtensionFilter("All", "*.*")
+            );
 
-	@SuppressWarnings("unused")
-	public static void main(String[] args) {
-		File file = new File("./resources/twoDimensionsLauncher.xml");
-		File srcFile = new File("./resources/save1.xml");
-		File trgFile = new File("./resources/save2.xml");
-
-		Configuration.commandLineMode = false;
-		World world = new World();
-		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
-		IBackupSystem saveState = new BackupSystem(amoeba);
-
-		saveState.loadXML(srcFile);
-
-		amoeba.setRenderUpdate(false);
-		amoeba.allowGraphicalScheduler(false);
-
-		int nbCycles = 1;
-		System.out.println("DEBUG: Learning with " + nbCycles + " cycle(s).");
-		for (int i = 0; i < nbCycles; ++i) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
-		}
-
-		amoeba.setRenderUpdate(true);
-		amoeba.allowGraphicalScheduler(true);
-
-		saveState.saveXML(trgFile);
+		// Creation of the load menu item
+		EventHandler<ActionEvent> eventLoad = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.getScheduler().stop();
+				File file = fileChooser.showOpenDialog(mw.stage);
+				if(file != null)
+					loadXML(file);
+			}
+		};
+		MainWindow.addMenuItem("Load", eventLoad);
+		
+		// Creation of the save menu item
+		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.getScheduler().stop();
+				File file = fileChooser.showSaveDialog(mw.stage);
+				if(file != null)
+					saveXML(file);
+			}
+		};
+		MainWindow.addMenuItem("Save", eventSave);
 	}
 }
