@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.ui.VUI;
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -223,7 +224,7 @@ public abstract class Drawable {
 	 */
 	public void update() {
 		if (vui != null)
-			vui.updateCanvas();
+			Platform.runLater(() -> vui.updateCanvas());
 	}
 
 	/**
