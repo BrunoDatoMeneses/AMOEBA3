@@ -270,28 +270,40 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
 		
 		regression = new Regression(nParameters,true);
-		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 		for (Experiment exp : experimentsList) {
+			
 			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
 			
-			//System.out.println(exp.getValuesAsLinkedHashMap().toString());
+			System.out.println(exp.getValuesAsLinkedHashMap().toString());
 			for (int i = 0 ; i < exp.getValuesAsArray().length ; i++ ) {
-				//System.out.print(exp.getValuesAsArray()[i] + "   " );
+				System.out.print(exp.getValuesAsArray()[i] + "   " );
 			}
-			//System.out.println(exp.getOracleProposition() + "   " );
+			System.out.println(exp.getOracleProposition() + "   " );
 		}
 		
 		//System.out.println("Number of experiments : " + experimentsList.size());
 		
-		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		
 		
 		while (regression.getN() < experimentsList.get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
+			
 			regression.addObservation(experimentsList.get(0).getValuesAsArray(), experimentsList.get(0).getOracleProposition());
+			
+			System.out.println("Observations " + regression.getN());
+			
+			System.out.println(experimentsList.get(0).getValuesAsLinkedHashMap().toString());
+			for (int i = 0 ; i < experimentsList.get(0).getValuesAsArray().length ; i++ ) {
+				System.out.print(experimentsList.get(0).getValuesAsArray()[i] + "   " );
+			}
+			System.out.println(experimentsList.get(0).getOracleProposition() + "   " );
 		}
 		
 
 		
 		coefs = regression.regress().getParameterEstimates();
+		
+		System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 		
 	}
 

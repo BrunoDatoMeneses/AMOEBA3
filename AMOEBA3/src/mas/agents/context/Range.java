@@ -449,14 +449,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 				endIncrement *=2;
 			}
 			
-			System.out.println(world.getScheduler().getTick() + " " +
-					this.context.getName() + " " +
-					this.percept.getName()+ " " +
-					lastEndDirection + " " +
-					" -- " +
-					endCriticality + " " +
-					endIncrement 
-					);
+//			System.out.println(world.getScheduler().getTick() + " " +
+//					this.context.getName() + " " +
+//					this.percept.getName()+ " " +
+//					lastEndDirection + " " +
+//					" -- " +
+//					endCriticality + " " +
+//					endIncrement 
+//					);
 			
 			
 			this.setEnd(end - endIncrement);
@@ -644,14 +644,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 			}
 			
 			
-			System.out.println(world.getScheduler().getTick() + " " +
-					this.context.getName() + " " +
-					this.percept.getName()+ " " +
-					lastStartDirection + " " +
-					" -- " +
-					startCriticality + " " +
-					startIncrement 
-					);
+//			System.out.println(world.getScheduler().getTick() + " " +
+//					this.context.getName() + " " +
+//					this.percept.getName()+ " " +
+//					lastStartDirection + " " +
+//					" -- " +
+//					startCriticality + " " +
+//					startIncrement 
+//					);
 			
 			this.setStart(start + startIncrement);
 		}
@@ -864,7 +864,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 			//////System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" + mininimalRange + " ~~~ " + (end - start));
 		}
 		
-		return (end - start) < mininimalRange && !this.isPerceptEnum();
+		return ((end - start) < (percept.getMappingErrorAllowed()/2)) && !this.isPerceptEnum();
 	}
 
 	/**
@@ -1680,6 +1680,35 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 	
 	public double distance(Range otherRange) {
 		return Math.abs(this.getCenter() - otherRange.getCenter()) - this.getRadius() - otherRange.getRadius();
+	}
+	
+
+	
+	public double distanceForVolume(Range otherRange) {
+		double centerDistance = Math.abs(this.getCenter() - otherRange.getCenter());
+		
+		if(centerDistance + otherRange.getRadius() < this.getRadius()) {
+			return otherRange.getRadius()*2;
+		}
+		else if(centerDistance + this.getRadius() < otherRange.getRadius()) {
+			return this.getRadius()*2;
+		}
+		else {
+			return centerDistance - this.getRadius() - otherRange.getRadius();
+		}
+			
+	}
+	
+	public double distanceForMaxOrMin(Range otherRange) {
+		double centerDistance = Math.abs(this.getCenter() - otherRange.getCenter());
+		
+		if((centerDistance + otherRange.getRadius() < this.getRadius()) ||  (centerDistance + this.getRadius() < otherRange.getRadius())){
+			return 0.0;
+		}
+		else {
+			return centerDistance - this.getRadius() - otherRange.getRadius();
+		}
+			
 	}
 	
 	public double startDistance(Range otherRange) {

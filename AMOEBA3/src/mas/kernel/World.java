@@ -102,6 +102,8 @@ public class World implements Serializable {
 		return mappingErrorAllowed;
 	}
 	
+	
+	
 	public double getContextCreationPercentage() {
 		return contextCreationPercentage;
 	}
@@ -895,7 +897,7 @@ public class World implements Serializable {
 	
 	public double getContextCreationNeighborhood(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return pct.getRadiusContextForCreation();
+		return pct.getRadiusContextForCreation()*2;
 	}
 	
 	public double getContextNeighborhood(Context ctxt, Percept pct) {

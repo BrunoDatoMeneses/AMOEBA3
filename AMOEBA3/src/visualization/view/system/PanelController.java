@@ -82,6 +82,16 @@ public class PanelController extends JPanel implements ScheduledItem {
 	/** The dataset binary. */
 	XYSeriesCollection datasetSpatialCriticality;
 	
+	/** The chart panel spatial criticality. */
+	/* spatial criticality chart */
+	ChartPanel chartPanelMappingCriticality;
+	
+	/** The chart binary. */
+	JFreeChart chartMappingCriticality;
+	
+	/** The dataset binary. */
+	XYSeriesCollection datasetMappingCriticality;
+	
 	/** The controller. */
 	Head controller;
 	
@@ -158,6 +168,13 @@ public class PanelController extends JPanel implements ScheduledItem {
 		chartPanelSpatialCriticality = new ChartPanel(chartSpatialCriticality);
 		chartPanelSpatialCriticality.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
 		this.add(chartPanelSpatialCriticality);
+		
+		/* Create mapping criticality chart */
+		datasetMappingCriticality = createDatasetMappingCriticality();
+		JFreeChart chartMappingCriticality = createChartMappingCriticality();
+		chartPanelMappingCriticality = new ChartPanel(chartMappingCriticality);
+		chartPanelMappingCriticality.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
+		this.add(chartPanelMappingCriticality);
 
 	}
 
@@ -277,6 +294,22 @@ public class PanelController extends JPanel implements ScheduledItem {
 		collection.addSeries(new XYSeries("spatialCriticality"));
 		collection.addSeries(new XYSeries("zero"));
 		collection.addSeries(new XYSeries("spatialGeneralization"));
+		
+
+		return collection;
+	}
+	
+	private XYSeriesCollection createDatasetMappingCriticality() {
+
+		XYSeriesCollection collection = new XYSeriesCollection();
+
+		
+		
+		collection.addSeries(new XYSeries("averagelocalOverlapMappingCriticality"));
+		collection.addSeries(new XYSeries("averagelocalVoidMappingCriticality"));
+		collection.addSeries(new XYSeries("averagelocalOpenVoidMappingCriticality"));
+		collection.addSeries(new XYSeries("allowedMappingCriticality"));
+		
 		
 
 		return collection;
@@ -417,6 +450,29 @@ public class PanelController extends JPanel implements ScheduledItem {
 				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 	}
 	
+	private JFreeChart createChartMappingCriticality() {
+
+		// create subplot 1...
+		final XYDataset data1 = datasetMappingCriticality;
+		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
+		final NumberAxis rangeAxis1 = new NumberAxis("Mapping criticality");
+		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
+		subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+
+		// parent plot...
+		final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(
+				new NumberAxis("Tick"));
+		plot.setGap(10.0);
+
+		// add the subplots...
+		plot.add(subplot1, 1);
+		plot.setOrientation(PlotOrientation.VERTICAL);
+
+		// return a new chart containing the overlaid plot...
+		return new JFreeChart("Mapping criticality",
+				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+	}
+	
 	/* (non-Javadoc)
 	 * @see view.system.ScheduledItem#update()
 	 */
@@ -445,6 +501,33 @@ public class PanelController extends JPanel implements ScheduledItem {
 		datasetSpatialCriticality.getSeries("spatialCriticality").add(world.getScheduler().getTick(),controller.getAverageSpatialCriticality());
 		datasetSpatialCriticality.getSeries("zero").add(world.getScheduler().getTick(),0.0);
 		//datasetSpatialCriticality.getSeries("spatialGeneralization").add(world.getScheduler().getTick(),controller.getSpatialGeneralizationScore());
+		
+		if(controller.criticalities.getCriticalityMean("localOverlapMappingCriticality") == null) {
+			datasetMappingCriticality.getSeries("averagelocalOverlapMappingCriticality").add(world.getScheduler().getTick(),0.0);
+		}else {
+			datasetMappingCriticality.getSeries("averagelocalOverlapMappingCriticality").add(world.getScheduler().getTick(),controller.criticalities.getCriticalityMean("localOverlapMappingCriticality"));
+		}
+		
+		if(controller.criticalities.getCriticalityMean("localVoidMappingCriticality") == null) {
+			datasetMappingCriticality.getSeries("averagelocalVoidMappingCriticality").add(world.getScheduler().getTick(),0.0);
+		}else {
+			datasetMappingCriticality.getSeries("averagelocalVoidMappingCriticality").add(world.getScheduler().getTick(),controller.criticalities.getCriticalityMean("localVoidMappingCriticality"));
+		}
+		
+		if(controller.criticalities.getCriticalityMean("localOpenVoidMappingCriticality") == null) {
+			datasetMappingCriticality.getSeries("averagelocalOpenVoidMappingCriticality").add(world.getScheduler().getTick(),0.0);
+		}else {
+			datasetMappingCriticality.getSeries("averagelocalOpenVoidMappingCriticality").add(world.getScheduler().getTick(),controller.criticalities.getCriticalityMean("localOpenVoidMappingCriticality"));
+		}
+		
+		
+		
+		
+
+		
+		
+		
+		datasetMappingCriticality.getSeries("allowedMappingCriticality").add(world.getScheduler().getTick(),controller.getMappingErrorAllowed());
 		
 	}
 

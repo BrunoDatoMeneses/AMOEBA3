@@ -55,11 +55,11 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Square */
-		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
+		return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y;
 		//return 5*x - 8*y ;
 		
-		/* Triange */
-		return (y > x) ? 2*x + y : 5*x - 8*y;
+		/* Triangle */
+		//return (y > x) ? 2*x + y : 5*x - 8*y;
 		
 		/* Split */
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;

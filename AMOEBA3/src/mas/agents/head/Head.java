@@ -15,6 +15,7 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
 import mas.agents.context.CustomComparator;
+import mas.agents.localModel.LocalModelMillerRegression;
 import mas.agents.messages.Message;
 import mas.agents.messages.MessageType;
 import mas.agents.context.CustomComparator;
@@ -37,9 +38,13 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	HashMap<Percept,Double> currentSituation = new HashMap<Percept,Double>();
 	
+	public Criticalities criticalities;
+	public Criticalities endogenousCriticalities;
+	
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	private ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
 	
+	private HashMap<Percept,ArrayList<Context>> partiallyActivatedContextInNeighbors = new HashMap<Percept,ArrayList<Context>>();
 	private HashMap<Percept,ArrayList<Context>> partiallyActivatedContexts = new HashMap<Percept,ArrayList<Context>>();
 	private HashMap<Percept,ArrayList<Context>> partialNeighborContexts = new HashMap<Percept,ArrayList<Context>>();
 	
@@ -52,18 +57,6 @@ public class Head extends AbstractHead implements Cloneable{
 	private ArrayList<Context> contextsInCompetition = new ArrayList<Context>();
 	
 	
-	private ArrayList<Double> xLastCriticityValues = new ArrayList<Double>();
-	private ArrayList<Double> xLastSpatialCriticalityValues = new ArrayList<Double>();
-	
-	private ArrayList<Double> xLastCriticityValuesCopy = new ArrayList<Double>();
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlaps = new ArrayList<Double>();
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence = new ArrayList<Double>();
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence = new ArrayList<Double>();
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = new ArrayList<Double>();
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume = new ArrayList<Double>();
-	
-	private ArrayList<Double> xLastCriticityValuesEndoActivatedContextsSharedIncompetence = new ArrayList<Double>();
-	
 	public ArrayList<NCSMemory> NCSMemories = new ArrayList<NCSMemory>();
 
 	
@@ -75,6 +68,7 @@ public class Head extends AbstractHead implements Cloneable{
 	private int nConflictBeforeAugmentation = 1;
 	private int nSuccessBeforeDiminution = 50;
 	private int perfIndicator = 1;
+	private int perfMappingIndicator = 1;
 	private int nConflictBeforeInexactAugmentation = 2;
 	private int nSuccessBeforeInexactDiminution = 50;
 	private int perfIndicatorInexact = 0;
@@ -96,19 +90,9 @@ public class Head extends AbstractHead implements Cloneable{
 	private double oldOracleValue;
 	private double criticity;
 	private double oldCriticity;
-	private double averagePredictionCriticity;
+
 	
-	private double averagePredictionCriticityCopy;
-	private double averagePredictionCriticityEndoActivatedContextsOverlaps;
-	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence;
-	private double averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence;
-	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
-	private double averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume;
-	private double averagePredictionCriticityEndoActivatedContextsSharedIncompetence;
-	
-	private double spatialCriticality = 0;
 	private double spatialGeneralizationScore = 0;
-	private double averageSpatialCriticality = 0;
 	
 	private double errorAllowed  = 1.0;
 	private double augmentationFactorError = 1.05;
@@ -118,6 +102,7 @@ public class Head extends AbstractHead implements Cloneable{
 	private double augmentationInexactError = 1.8;
 	private double diminutionInexactError = 0.6;
 	private double minInexactAllowed = 0.5;
+	private double mappingErrorAllowed;
 	
 	
 	private boolean noCreation = true;
@@ -219,11 +204,20 @@ public class Head extends AbstractHead implements Cloneable{
 		minConfidence = Double.POSITIVE_INFINITY;
 		
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
+			partiallyActivatedContextInNeighbors.put(pct, new ArrayList<Context>());
 			partiallyActivatedContexts.put(pct, new ArrayList<Context>());
 			partialNeighborContexts.put(pct, new ArrayList<Context>());
 			requestSurroundings.put(pct, new Pair<Context,Context>(null,null));
 			sharedIncompetenceContextPairs.put(pct, new Pair<Context,Context>(null,null));
 			}
+		
+		mappingErrorAllowed =world.getMappingErrorAllowed();// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+		
+		criticalities = new Criticalities(numberOfCriticityValuesForAverage);
+		
+		endogenousCriticalities = new Criticalities(numberOfCriticityValuesForAverageforVizualisation);
+		
+		
 	}
 
 	/* (non-Javadoc)
@@ -240,6 +234,11 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	public void addPartiallyActivatedContext(Percept nonValidPercept,Context validContextExecptOnTheNonValidPercept) {
 		partiallyActivatedContexts.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
+		//////////System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
+	} 
+	
+	public void addPartiallyActivatedContextInNeighbors(Percept nonValidPercept,Context validContextExecptOnTheNonValidPercept) {
+		partiallyActivatedContextInNeighbors.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
 		//////////System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
 	} 
 	
@@ -326,16 +325,18 @@ public class Head extends AbstractHead implements Cloneable{
 
 		/*Compute the criticity. Will be used by context agents.*/
 		criticity = Math.abs(oracleValue - prediction);
+		criticalities.addCriticality("predictionCriticality", criticity);
 
 		/*If we have a bestcontext, send a selection message to it*/
 		if (bestContext != null) {
 			//functionSelected = bestContext.getFunction().getFormula(bestContext);
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
+			world.trace(new ArrayList<String>(Arrays.asList(bestContext.getName(), "*********************************************************************************************************** BEST CONTEXT")));
 		}
 		playExecutionTime = System.currentTimeMillis() - playExecutionTime;	
 		
 		endogenousExecutionTime = System.currentTimeMillis();
-		//endogenousPlay();
+		endogenousPlay();
 		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
 		
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
@@ -363,20 +364,68 @@ public class Head extends AbstractHead implements Cloneable{
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 		
 		memoryCreationExecutionTime = System.currentTimeMillis();
-		//NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
+		NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
 		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 		
 		otherExecutionTime = System.currentTimeMillis();
-		spatialCriticality = (getMinMaxVolume() - getVolumeOfAllContexts())/getMinMaxVolume();
+		criticalities.addCriticality("spatialCriticality", (getMinMaxVolume() - getVolumeOfAllContexts())/getMinMaxVolume());
 		
 		
 		spatialGeneralizationScore = getVolumeOfAllContexts()/world.getScheduler().getContexts().size();
 		
 		double globalConfidence = 0;
+		
 		for(Context ctxt : world.getScheduler().getContextsAsContext() ) {
 			globalConfidence += ctxt.getConfidence();
 		}
 		globalConfidence = globalConfidence / world.getScheduler().getContextsAsContext().size();
+		
+		double localMappingCriticality = 0.0;
+
+		
+		
+		System.out.println("-------------------------------------");
+		if(activatedNeighborsContexts.size()>1) {
+			
+			for(Percept pct : world.getScheduler().getPercepts()) {
+					
+				if(partiallyActivatedContextInNeighbors.get(pct).size()>1) {
+					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
+				}			
+			}
+			
+			int i = 1;
+			for(Context ctxt : activatedNeighborsContexts ) {
+						
+				for(Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
+					
+					//if(nearestLocalNeighbor(ctxt, otherCtxt)) {
+						
+						AbstractPair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
+						System.out.println("DISTANCE : " + distanceAndPercept.getA() + " " + distanceAndPercept.getB());
+						if(distanceAndPercept.getA()<0) {
+							criticalities.addCriticality("localOverlapMappingCriticality", Math.abs(distanceAndPercept.getA()));
+						}
+						else if(distanceAndPercept.getA()>0 && distanceAndPercept.getB() != null) {
+							criticalities.addCriticality("localVoidMappingCriticality", distanceAndPercept.getA());
+						}
+						else {
+							criticalities.addCriticality("localOpenVoidMappingCriticality", distanceAndPercept.getA());
+						}
+
+					//}
+					
+				}
+				i++;
+			
+						
+			}
+		
+		}
+
+		
+		mappingErrorAllowed =world.getMappingErrorAllowed();// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+		
 		
 		evolutionCriticalityPrediction = (lembda * evolutionCriticalityPrediction) + ((1-lembda)*currentCriticalityPrediction);
 		evolutionCriticalityMapping = (lembda * evolutionCriticalityMapping) + ((1-lembda)*currentCriticalityMapping);
@@ -401,6 +450,24 @@ public class Head extends AbstractHead implements Cloneable{
 		return spatialGeneralizationScore;
 	}
 	
+	
+	private boolean nearestLocalNeighbor(Context ctxt1, Context ctxt2) {
+		
+		boolean nearestLocalNeighborTest = false;
+		
+		for(Percept pct : world.getScheduler().getPercepts()) {
+			
+			if(partiallyActivatedContextInNeighbors.get(pct).contains(ctxt1) && partiallyActivatedContextInNeighbors.get(pct).contains(ctxt2)) {
+				nearestLocalNeighborTest = nearestLocalNeighborTest || (Math.abs(partiallyActivatedContextInNeighbors.get(pct).indexOf(ctxt1) - partiallyActivatedContextInNeighbors.get(pct).indexOf(ctxt2)) == 1);
+			}			
+			 
+		}
+		
+		return nearestLocalNeighborTest;		
+	}
+	
+	
+	
 	public double getMinMaxVolume() {
 		double minMaxVolume = 1;
 		for(Percept pct : world.getScheduler().getPercepts()) {
@@ -418,7 +485,7 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	public double getSpatialCriticality() {
-		return spatialCriticality;
+		return criticalities.getCriticality("spatialCriticality");
 	}
 	
 	/**
@@ -1021,8 +1088,10 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		for (Context ctxt : activatedNeighborsContexts) {
 
-			if(!activatedContexts.contains(ctxt))
-			ctxt.NCSDetection_Uselessness();
+			if(!activatedContexts.contains(ctxt)) {
+				ctxt.NCSDetection_Uselessness();
+			}
+			
 		}
 	}
 	
@@ -1098,18 +1167,27 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	}
 	
-	public Context getNearestBetterContext(ArrayList<Context> allContext, double currentError) {
-		Context nearest = null;
-		for (Context c : allContext) {
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && Math.abs((c.getActionProposal() - oracleValue)) <  currentError &&  c != newContext && !c.isDying()) {
-				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest) ) {
-					nearest = c;
+	public Context getBetterContext(Context selectedContext, ArrayList<Context> contextNeighbors, double currentError) {
+		Context betterContext = null;
+		Double lowestError = currentError + 0.0001;
+		AbstractPair<Boolean, Double> betterContextAndError;
+		for (Context c : contextNeighbors) {
+			
+			if(c!=selectedContext) {
+				if(c.getExperiments().size()>world.getScheduler().getPercepts().size()) {
+					betterContextAndError = selectedContext.tryAlternativeModel(c.getLocalModel());
+					if (betterContextAndError.getA() && betterContextAndError.getB() <  lowestError &&  c != newContext && !c.isDying()) {
+						betterContext = c;
+						lowestError = betterContextAndError.getB();
+					}
 				}
+				
 			}
+			
+			
 		}
 		
-		
-		return nearest;
+		return betterContext;
 		
 	}
 	
@@ -1275,136 +1353,68 @@ public class Head extends AbstractHead implements Cloneable{
 	 * Update statistical informations.
 	 */
 	private void updateStatisticalInformations() {
-		xLastCriticityValues.add(criticity);
-		xLastSpatialCriticalityValues.add(spatialCriticality);
 		
-		averagePredictionCriticity = 0;
-		for (Double d : xLastCriticityValues) {
-			averagePredictionCriticity += d;
-		}
-		averagePredictionCriticity /= xLastCriticityValues.size();
-		
-		averageSpatialCriticality = 0;
-		
-		for(Double d : xLastSpatialCriticalityValues) {
-			averageSpatialCriticality = averageSpatialCriticality +  d;
-			
-		}
-		
-		averageSpatialCriticality /= xLastSpatialCriticalityValues.size();
-		
-		
-		
-		if (xLastCriticityValues.size() >= numberOfCriticityValuesForAverage) {
-			xLastCriticityValues.remove(0);
-		}
-		
-		if (xLastSpatialCriticalityValues.size() >= numberOfCriticityValuesForAverage) {
-			xLastSpatialCriticalityValues.remove(0);
-		}
+		criticalities.updateMeans();
 		
 		if(severalActivatedContexts()) {
-			xLastCriticityValuesCopy.add(criticity);
-			xLastCriticityValuesEndoActivatedContextsOverlaps.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps));
-			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
-			xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
-			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
-			xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
-			xLastCriticityValuesEndoActivatedContextsSharedIncompetence.add(Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence));
 			
+			endogenousCriticalities.addCriticality("predictionCriticality", criticity);
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapspredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps));
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapsWorstDimInfluencepredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidencepredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidencepredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumepredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
+			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality", Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence));
 
-		//	averagePredictionCriticity = ((averagePredictionCriticity * averagePredictionCriticityWeight) + criticity) / (averagePredictionCriticityWeight + 1);
-		//	averagePredictionCriticityWeight++;
+			endogenousCriticalities.updateMeans();
 			
 			
-			averagePredictionCriticityCopy = 0;
-			averagePredictionCriticityEndoActivatedContextsOverlaps= 0;
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence= 0;
-			averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence= 0;
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence= 0;
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume = 0;
-			averagePredictionCriticityEndoActivatedContextsSharedIncompetence= 0;
-			
-			for (Double d : xLastCriticityValuesCopy) {
-				averagePredictionCriticityCopy += d;
-			}
-			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlaps) {
-				averagePredictionCriticityEndoActivatedContextsOverlaps += d;
-			}
-			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence) {
-				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence += d;
-			}
-			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence) {
-				averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence += d;
-			}
-			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence) {
-				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence += d;
-			}
-			for (Double d : xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume) {
-				averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume += d;
-			}
-			
-			for (Double d : xLastCriticityValuesEndoActivatedContextsSharedIncompetence) {
-				averagePredictionCriticityEndoActivatedContextsSharedIncompetence += d;
-			}
-			
-			averagePredictionCriticityCopy /= xLastCriticityValuesCopy.size();
-			averagePredictionCriticityEndoActivatedContextsOverlaps /= xLastCriticityValuesEndoActivatedContextsOverlaps.size();
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.size();
-			averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence /= xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.size();
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.size();
-			averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume /= xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.size();
-			averagePredictionCriticityEndoActivatedContextsSharedIncompetence /= xLastCriticityValuesEndoActivatedContextsSharedIncompetence.size();
-			
-
-			if (xLastCriticityValuesCopy.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesCopy.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsOverlaps.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsOverlaps.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluence.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsOverlapsInfluenceWithoutConfidence.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume.remove(0);
-			}
-			if (xLastCriticityValuesEndoActivatedContextsSharedIncompetence.size() >= numberOfCriticityValuesForAverageforVizualisation) {
-				xLastCriticityValuesEndoActivatedContextsSharedIncompetence.remove(0);
-			}
 		}
 		
 		
 		
 		//////////System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
 		
-		if (averagePredictionCriticity > errorAllowed) {
+		if (criticalities.getCriticalityMean("predictionCriticality") > errorAllowed) {
 			perfIndicator--;
 		} else {
 			perfIndicator++;
-		}		
-		
-		if (averagePredictionCriticity > inexactAllowed) {
-			perfIndicatorInexact--;
-		} else {
-			perfIndicatorInexact++;
 		}
+		
+//		if (averageMappingCriticity > mappingErrorAllowed) {
+//			perfMappingIndicator--;
+//		}
+//		else {
+//			perfMappingIndicator++;
+//		}
+		
+
+		
+		
+		if (perfMappingIndicator <= nConflictBeforeAugmentation * (-1)) {
+			perfMappingIndicator = 0;
+			//mappingErrorAllowed += augmentationFactorError * averageMappingCriticity;
+			//world.setMappingErrorAllowed(mappingErrorAllowed);
+			//////////System.out.println("いいいいいいいいいいい  augmentationFactorError :" + augmentationFactorError);
+		}
+		
+		if (perfMappingIndicator >= nSuccessBeforeDiminution) {
+			perfMappingIndicator = 0;
+			//mappingErrorAllowed -= diminutionFactorError * averageMappingCriticity;
+			//world.setMappingErrorAllowed(mappingErrorAllowed);
+			//////////System.out.println("いいいいいいいいいいい  diminutionFactorError :" + diminutionFactorError);
+		}
+		
 		
 		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
 			perfIndicator = 0;
-			errorAllowed += augmentationFactorError * averagePredictionCriticity;
+			errorAllowed += augmentationFactorError * criticalities.getCriticalityMean("predictionCriticality");
 			//////////System.out.println("いいいいいいいいいいい  augmentationFactorError :" + augmentationFactorError);
 		}
 		
 		if (perfIndicator >= nSuccessBeforeDiminution) {
 			perfIndicator = 0;
-			errorAllowed -= diminutionFactorError * averagePredictionCriticity;
+			errorAllowed -= diminutionFactorError * criticalities.getCriticalityMean("predictionCriticality");
 			//////////System.out.println("いいいいいいいいいいい  diminutionFactorError :" + diminutionFactorError);
 			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
 		}
@@ -1686,30 +1696,34 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @return the average prediction criticity
 	 */
 	public double getAveragePredictionCriticity() {
-		return averagePredictionCriticity;
+		return criticalities.getCriticalityMean("predictionCriticality");
 	}
+	
+	
+
+	
 	public double getAveragePredictionCriticityCopy() {
-		return averagePredictionCriticityCopy;
+		return endogenousCriticalities.getCriticalityMean("predictionCriticality");
 	}
 	public double getAveragePredictionCriticityEndoActivatedContextsOverlaps() {
-		return averagePredictionCriticityEndoActivatedContextsOverlaps;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsOverlapspredictionCriticality");
 	}
 	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence() {
-		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluence;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsOverlapsWorstDimInfluencepredictionCriticality");
 	}
 	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence() {
-		return averagePredictionCriticityEndoActivatedContextsOverlapsInfluenceWithoutConfidence;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidencepredictionCriticality");
 	}
 	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() {
-		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidencepredictionCriticality");
 	}
 	public double getAveragePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume() {
-		return averagePredictionCriticityEndoActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumepredictionCriticality");
 	}
 	
 	
 	public double getAveragePredictionCriticityEndoActivatedContextsSharedIncompetence() {
-		return averagePredictionCriticityEndoActivatedContextsSharedIncompetence;
+		return endogenousCriticalities.getCriticalityMean("endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality");
 	}
 
 
@@ -1719,9 +1733,9 @@ public class Head extends AbstractHead implements Cloneable{
 	 *
 	 * @param averagePredictionCriticity the new average prediction criticity
 	 */
-	public void setAveragePredictionCriticity(double averagePredictionCriticity) {
-		this.averagePredictionCriticity = averagePredictionCriticity;
-	}
+//	public void setAveragePredictionCriticity(double averagePredictionCriticity) {
+//		this.averagePredictionCriticity = averagePredictionCriticity;
+//	}
 
 	/**
 	 * Gets the average prediction criticity weight.
@@ -2149,6 +2163,7 @@ public class Head extends AbstractHead implements Cloneable{
 		contextsNeighborsByInfluence.clear();
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			partiallyActivatedContexts.get(pct).clear();
+			partiallyActivatedContextInNeighbors.get(pct).clear();
 			partialNeighborContexts.get(pct).clear();
 		}
 	}
@@ -2216,7 +2231,7 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	
 	public double getAverageSpatialCriticality() {
-		return averageSpatialCriticality;
+		return criticalities.getCriticalityMean("spatialCriticality");
 	}
 	
 	public void setBadCurrentCriticalityPrediction() {
@@ -2232,6 +2247,24 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 
+	public double fact(double n) {
+		
+		if(n==0) {
+			return 1;
+		}
+		else {
+			return n*fact(n-1);
+		}
+	}
+	
+	public double combinationsWithoutRepetitions(double n) {
+		if(n==2) return 1;
+		else return fact(n) / (2*(fact(n)-2));
+	}
+	
+	public double getMappingErrorAllowed() {
+		return mappingErrorAllowed;
+	}
 	
 }
 

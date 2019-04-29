@@ -319,7 +319,7 @@ public class MainPanel extends JPanel{
 		toolBar.add(simulationSpeedSlider);
 		
 		valueForOnLineTestingSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 20, 20);
+                0, 10, 10);
 		
 		class OnlineSliderListener implements ChangeListener {
 		    public void stateChanged(ChangeEvent e) {
@@ -336,7 +336,7 @@ public class MainPanel extends JPanel{
 		
 		
 		//Turn on labels at major tick marks.
-		valueForOnLineTestingSlider.setMajorTickSpacing(5);
+		valueForOnLineTestingSlider.setMajorTickSpacing(2);
 		valueForOnLineTestingSlider.setMinorTickSpacing(1);
 		valueForOnLineTestingSlider.setPaintTicks(true);
 		valueForOnLineTestingSlider.setPaintLabels(true);

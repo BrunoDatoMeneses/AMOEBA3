@@ -17,6 +17,7 @@ import mas.kernel.Config;
 import mas.kernel.World;
 import mas.agents.Agent;
 import mas.agents.SystemAgent;
+import mas.agents.context.CenterRangeComparator;
 import mas.agents.context.Context;
 import mas.agents.context.ContextOverlap;
 import mas.agents.context.CustomComparator;
@@ -52,6 +53,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	
 	private CustomComparator rangeStartComparator =  new CustomComparator(this, "start");
 	private CustomComparator rangeEndComparator =  new CustomComparator(this, "end");
+	private CenterRangeComparator centerComparator = new CenterRangeComparator(this);
 	
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -454,6 +456,24 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		for(Context ctxt: sortedContextbyEndRanges) {
 			////////System.out.println(ctxt.getRanges().get(this).getEnd());
 		}
+	}
+	
+	public void sortOnStartRanges(ArrayList<Context> contextsSet){
+		
+		Collections.sort(contextsSet, rangeStartComparator);
+		
+	}
+	
+	public void sortOnCenterOfRanges(ArrayList<Context> contextsSet){
+		
+		Collections.sort(contextsSet, centerComparator);
+		
+	}
+	
+	public void sortOnEndRanges(ArrayList<Context> contextsSet){
+		
+		Collections.sort(contextsSet, rangeEndComparator);
+		
 	}
 	
 	public void updateSortedRanges(Context context, String range) {
