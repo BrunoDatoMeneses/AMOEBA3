@@ -21,8 +21,8 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import chartVisualization.PlotLineChart;
 import chartVisualization.NCSChart;
+import chartVisualization.PlotLineChart;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -32,6 +32,7 @@ import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
+import javafx.application.Platform;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import ncs.NCS;
@@ -54,6 +55,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate = false;
+	
+	private int cycleWithoutRender = 0;
 
 	private Drawable point;
 	private NCSChart loopNCS;
@@ -107,7 +110,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		errors = new PlotLineChart("Errors", 500, 4, "Coefficient", errorTypes);
 
 		// update render button
-		toggleRender = new ToggleButton("Update Render");
+		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {
 			renderUpdate = toggleRender.isSelected(); 
 			if(renderUpdate)
@@ -121,11 +124,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	@Override
 	protected void onUpdateRender() {
-		if (cycle % 1000 == 0) {
-			Log.inform("AMOEBA", "Cycle " + cycle);
-		}
-
-		if (renderUpdate) {
+		if (isRenderUpdate()) {
 			List<Percept> percepts = getPercepts();
 			point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
 
@@ -149,11 +148,26 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			if (!sortedErrors.isEmpty()) {
 				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 			}
+			
+			Platform.runLater(() -> {resetCycleWithoutRender();});
 		}
 	}
 
 	@Override
 	protected void onSystemCycleBegin() {
+		if (cycle % 1000 == 0) {
+			Log.inform("AMOEBA", "Cycle " + cycle);
+		}
+
+		if(isRenderUpdate()) {
+			incrementCycleWithoutRender();
+			if(getCycleWithoutRender() > 10) {
+				setRenderUpdate(false);
+				Log.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
+						+ "To reactiavte it, slow down the simulation and toggle the \"Allow Rendering\" button.");
+			}
+		}
+		
 		if (studiedSystem != null) {
 			studiedSystem.playOneStep();
 			perceptionsAndActionState = studiedSystem.getOutput();
@@ -162,6 +176,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		head.clearAllUseableContextLists();
 		validContexts = null;
 		environment.resetNbActivatedAgent();
+	}
+	
+	synchronized private void incrementCycleWithoutRender() {
+		cycleWithoutRender += 1;
+	}
+	
+	synchronized private void resetCycleWithoutRender() {
+		cycleWithoutRender = 0;
+	}
+	
+	synchronized private int getCycleWithoutRender() {
+		return cycleWithoutRender;
 	}
 
 	/**
@@ -351,7 +377,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
 			toggleRender.setSelected(renderUpdate);
-			nextCycleRunAllAgents();
+			if(renderUpdate == true)
+				nextCycleRunAllAgents();
 		}
 	}
 
@@ -452,7 +479,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public boolean isRenderUpdate() {
-		return renderUpdate;
+		return !Configuration.commandLineMode && renderUpdate;
 	}
 
 	public boolean isUseOracle() {
