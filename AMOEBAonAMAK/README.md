@@ -1,9 +1,6 @@
 # AMOEBA on AMAK
 An AMOEBA3 port on AMAK.
 
-## Install with Eclipse
-Import AMOEBAonAMAK and amak as eclipse projects, add amak as a project dependency for AMOEBAonAMAK. Add *jdom2* and *apache commons math* as jar dependencies.
-
 ## Quick start
 ```Java
 // Create a world and a studied system for your amoeba
