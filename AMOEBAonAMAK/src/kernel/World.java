@@ -25,7 +25,7 @@ public class World extends Environment {
 	 * 
 	 */
 	public World() {
-		super(Scheduling.DEFAULT);
+		super(Scheduling.HIDDEN);
 
 		for (NCS ncs : NCS.values()) {
 			numberOfNCS.put(ncs, 0);

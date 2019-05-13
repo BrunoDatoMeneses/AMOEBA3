@@ -11,9 +11,11 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
+import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
+import javafx.application.Platform;
 
 /**
  * This class must be overridden by multi-agent systems
@@ -77,6 +79,13 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * This semaphore is meant to synchronize the agents after the perception phase
 	 */
 	protected final Semaphore perceptionPhaseSemaphore = new Semaphore(0);
+	
+	/**
+	 * This semaphore is used to force the amas to wait for all graphical update
+	 * to finish. Used for {@link Configuration#waitForGUI}.
+	 * @see Configuration#waitForGUI
+	 */
+	protected final Semaphore renderingPhaseSemaphore = new Semaphore(0);
 
 	/**
 	 * The executionPolicy informs if agents must wait each other after the
@@ -322,9 +331,25 @@ public class Amas<E extends Environment> implements Schedulable {
 		addPendingAgents();
 
 		onSystemCycleEnd();
-		if (!Configuration.commandLineMode)
-
+		
+		if (!Configuration.commandLineMode) {
 			onUpdateRender();
+			
+			if(Configuration.waitForGUI) {
+				// we put an action in JavaFX rendering queue
+				Platform.runLater(() -> {
+					renderingPhaseSemaphore.release();
+				});
+				// and wait for it to finish
+				try {
+					renderingPhaseSemaphore.acquire();
+				} catch (InterruptedException e) {
+					Log.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					e.printStackTrace();
+				}
+				// now the queue should be clear
+			}
+		}
 
 	}
 

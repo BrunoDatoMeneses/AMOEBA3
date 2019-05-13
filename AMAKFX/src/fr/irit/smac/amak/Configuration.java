@@ -32,4 +32,13 @@ public class Configuration {
 	 * HIDDEN or DEFAULT
 	 */
 	public static boolean commandLineMode = false;
+	
+	/**
+	 * By default AMAK will wait for all graphical update to finish before
+	 * moving on to the next cycle. This will likely slow down your amas, but 
+	 * you'll be able to see it in real time.
+	 * If you set it to false, you have to make sure that the GUI can keep up,
+	 * or else you may experience freeze on the GUI.
+	 */
+	public static boolean waitForGUI = true;
 }

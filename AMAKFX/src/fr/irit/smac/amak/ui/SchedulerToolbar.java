@@ -81,7 +81,6 @@ public class SchedulerToolbar extends ToolBar {
 			}
 		});
 		Platform.runLater(() -> getItems().add(getSlider()));
-		setPrefSize(220, 120);
 	}
 
 	/**

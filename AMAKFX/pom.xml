@@ -4,25 +4,31 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-        <groupId>AMOEBA</groupId>
-        <artifactId>AMOEBA-parent</artifactId>
-        <version>1.0</version>
-    </parent>
-    <artifactId>AMAKFX</artifactId>
-    <packaging>jar</packaging>
+		<groupId>AMOEBA</groupId>
+		<artifactId>AMOEBA-parent</artifactId>
+		<version>1.0</version>
+	</parent>
+	<artifactId>AMAKFX</artifactId>
+	<packaging>jar</packaging>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>tests</testSourceDirectory>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
-	        <groupId>org.junit.jupiter</groupId>
-	        <artifactId>junit-jupiter-engine</artifactId>
-	        <version>5.3.1</version>
-    	</dependency>
-	
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart-fx</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
 		<!-- Local jars dependencies -->
 		<dependency>
 			<groupId>agent-messaging</groupId>
@@ -31,7 +37,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/AdditionalLibraries/agent-messaging-0.2.jar</systemPath>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>avt</groupId>
 			<artifactId>avt</artifactId>
@@ -39,7 +45,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/AdditionalLibraries/avt.jar</systemPath>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>json-simple</groupId>
 			<artifactId>json-simple</artifactId>
@@ -47,7 +53,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/AdditionalLibraries/json-simple-1.1.jar</systemPath>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>xstream</groupId>
 			<artifactId>xstream</artifactId>

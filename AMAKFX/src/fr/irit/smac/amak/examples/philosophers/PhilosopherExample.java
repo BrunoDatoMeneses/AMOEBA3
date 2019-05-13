@@ -3,6 +3,7 @@ package fr.irit.smac.amak.examples.philosophers;
 import java.util.Random;
 
 import fr.irit.smac.amak.Agent;
+import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
@@ -38,11 +39,6 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 * The id of the philosopher
 	 */
 	private int id;
-	
-	/**
-	 * Class to plot statistics
-	 */
-	private static PhilosophersStatistics philosophersStatistics = new PhilosophersStatistics("Eaten pastas");
 
 	/**
 	 * States philosophers can be in
@@ -98,7 +94,6 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 */
 	public PhilosopherExample(int id, PhilosophersAMASExample amas, ForkExample left, ForkExample right) {
 		super(amas, id, left, right);
-		philosophersStatistics.addPhilosopher(id, 0);
 	}
 
 	@Override
@@ -110,7 +105,6 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 
 	@Override
 	protected void onRenderingInitialization() {
-
 		double x = 100 * Math.cos(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
 		double y = 100 * Math.sin(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
 		drawableRectangle = VUI.get().createRectangle(x, y, 20, 20);
@@ -173,7 +167,8 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 
 	@Override
 	protected void onUpdateRender() {
-		philosophersStatistics.updatePhilosopher(id, eatenPastas);
+		System.out.println(id+" "+eatenPastas);
+		amas.plot.addData("Eaten pasta", id, eatenPastas);
 		switch (state) {
 		case EATING:
 			drawableRectangle.setColor(Color.BLUE);

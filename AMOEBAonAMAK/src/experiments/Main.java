@@ -14,11 +14,10 @@ import kernel.World;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		// Although instantiating the MainWindow before usage is optional, we recommend doing it for better stability.
+		// Instantiating the MainWindow before usage.
 		// It also allows you to change some of its behavior before creating an AMOEBA.
 		// If you use Configuration.commandLineMode = True , then you should skip it. 
 		MainWindow.instance();
-		
 		example();
 	}
 
@@ -27,6 +26,7 @@ public class Main {
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
 		Configuration.allowedSimultaneousAgentsExecution = 8;
+		Configuration.waitForGUI = true;
 
 		// Create a World, a Studied System, and an AMOEBA
 		World world = new World();
@@ -50,7 +50,7 @@ public class Main {
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 1000;
+		int nbCycle = 5000;
 		for (int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -21,13 +20,13 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import chartVisualization.NCSChart;
-import chartVisualization.PlotLineChart;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.ui.AmakPlot;
+import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
@@ -59,10 +58,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private int cycleWithoutRender = 0;
 
 	private Drawable point;
-	private NCSChart loopNCS;
-	private NCSChart allNCS;
-	private PlotLineChart nbAgent;
-	private PlotLineChart errors;
+	private AmakPlot loopNCS;
+	private AmakPlot allNCS;
+	private AmakPlot nbAgent;
+	private AmakPlot errors;
 	private ToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
 
@@ -95,19 +94,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// amoeba and agent
 		VUI.get().setDefaultView(200, 0, 0);
 		point = VUI.get().createPoint(0, 0);
-		loopNCS = new NCSChart("This loop NCS", 500);
-		allNCS = new NCSChart("All time NCS", 500);
-		List<String> agentsTypes = new LinkedList<>();
-		agentsTypes.add("Percepts");
-		agentsTypes.add("Contexts");
-		agentsTypes.add("Activated");
-		nbAgent = new PlotLineChart("Number of agents", 500, 3, "Number of agents", agentsTypes);
-		List<String> errorTypes = new LinkedList<>();
-		errorTypes.add("Mean criticity");
-		errorTypes.add("Error allowed");
-		errorTypes.add("Inexact allowed");
-		errorTypes.add("Median criticity");
-		errors = new PlotLineChart("Errors", 500, 4, "Coefficient", errorTypes);
+		loopNCS = new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS");
+		allNCS = new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS");
+		nbAgent = new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents");
+		errors = new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients");
 
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
@@ -158,11 +148,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (cycle % 1000 == 0) {
 			Log.inform("AMOEBA", "Cycle " + cycle);
 		}
-
+		
 		if(isRenderUpdate()) {
 			incrementCycleWithoutRender();
+			/* deactivate render update and stop simulation if UI is too far
+			 * behind the simulation (10 cycles)
+			 */
 			if(getCycleWithoutRender() > 10) {
 				setRenderUpdate(false);
+				Platform.runLater(()->{
+					// we (sadly) have to put it inside a runlater to correctly update the slider
+					getScheduler().stop(); 
+				});
 				Log.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
 						+ "To reactiavte it, slow down the simulation and toggle the \"Allow Rendering\" button.");
 			}
@@ -283,8 +280,24 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 		onSystemCycleEnd();
 
-		if (!Configuration.commandLineMode)
+		if (!Configuration.commandLineMode) {
 			onUpdateRender();
+			
+			if(Configuration.waitForGUI) {
+				// we put an action in JavaFX rendering queue
+				Platform.runLater(() -> {
+					renderingPhaseSemaphore.release();
+				});
+				// and wait for it to finish
+				try {
+					renderingPhaseSemaphore.acquire();
+				} catch (InterruptedException e) {
+					Log.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					e.printStackTrace();
+				}
+				// now the queue should be clear
+			}
+		}
 
 	}
 

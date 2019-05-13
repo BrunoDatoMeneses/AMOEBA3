@@ -3,6 +3,8 @@ package fr.irit.smac.amak.examples.philosophers;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.ui.AmakPlot;
+import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.VUI;
 import javafx.application.Platform;
@@ -13,19 +15,24 @@ import javafx.scene.paint.Color;
 public class PhilosophersAMASExample extends Amas<TableExample> {
 	private Label comp;
 	private PhilosopherExample[] ps;
+	
+	public AmakPlot plot;
 
 	public PhilosophersAMASExample(TableExample env) {
 		super(env, Scheduling.DEFAULT);
+	}
+	
+	@Override
+	protected void onRenderingInitialization() {
+		super.onRenderingInitialization();
+		plot = new AmakPlot("Eaten pasten", ChartType.BAR, "Philosophers", "Number of eaten pastas");
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
 		Configuration.executionPolicy = ExecutionPolicy.TWO_PHASES;
-		ToolBar toolbar = new ToolBar();
 		comp = new Label("Cycle");
-		comp.setPrefSize(200, 100);
-		toolbar.getItems().add(comp);
-		MainWindow.addToolbar(toolbar);
+		MainWindow.addToolbar(comp);
 		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9d, 0.9d, 0.9d, 0.5d)).setFixed().setLayer(5);
 
 		VUI.get().createRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10);

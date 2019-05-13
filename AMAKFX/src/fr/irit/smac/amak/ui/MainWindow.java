@@ -1,6 +1,8 @@
 package fr.irit.smac.amak.ui;
 
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -11,6 +13,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -48,7 +51,7 @@ public class MainWindow extends Application {
 	/**
 	 * The panel which contains the toolbar
 	 */
-	public FlowPane toolbarPanel;
+	public ToolBar toolbarPanel;
 	/**
 	 * The main panel is split in two panels. This allows to dynamically resize
 	 * these two panels.
@@ -88,6 +91,10 @@ public class MainWindow extends Application {
 	 * Application.launch()
 	 */
 	private static boolean isCreated = false;
+	/**
+	 * A semaphore that will bloc instance() if no instance exist yet
+	 */
+	private static Semaphore instanceCreated = new Semaphore(0);
 
 	/**
 	 * Create the frame.
@@ -98,76 +105,73 @@ public class MainWindow extends Application {
 	 */
 	public MainWindow() throws InstanceAlreadyExistsException {
 		super();
-		if (instance == null)
+		if (instance == null) {
 			instance = this;
-		else
+			instanceCreated.release();
+		} else {
 			throw new InstanceAlreadyExistsException();
+		}
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Platform.runLater(() -> {
-			startLock.lock();
-			// Creation of scene and root group
-			primaryStage.setTitle("AMAK");
-			AnchorPane root = new AnchorPane();
-			Scene scene = new Scene(root, 450, 300);
-			stage = primaryStage;
-			stage.setScene(scene);
-			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent event) {
-					System.exit(0);
-				}
-			});
-
-			// Border organization of the scene
-			BorderPane organizationPane = new BorderPane();
-			root.getChildren().add(organizationPane);
-			organizationPane.prefHeightProperty().bind(stage.heightProperty());
-			organizationPane.prefWidthProperty().bind(stage.widthProperty());
-
-			// Creation of the toolbar (Bottom)
-			toolbarPanel = new FlowPane();
-			organizationPane.setBottom(toolbarPanel);
-
-			// Creation of the split pane (Center)
-			splitPane = new SplitPane();
-			splitPane.setOrientation(Orientation.HORIZONTAL);
-			organizationPane.setCenter(splitPane);
-
-			// Creation of the left part of the split pane (Center Left)
-			AnchorPane left = new AnchorPane();
-			splitPane.getItems().add(left);
-
-			// Creation of the right part of the split pane (Center Right)
-			tabbedPanel = new TabPane();
-			splitPane.getItems().add(tabbedPanel);
-
-			// Creation of the menu bar (Top)
-			menuBar = new MenuBar();
-			optionsMenu = new Menu("Options");
-			organizationPane.setTop(menuBar);
-
-			// Creation of the close menu item
-			MenuItem menuItem = new MenuItem("Close");
-			menuItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					System.exit(0);
-				}
-			});
-			optionsMenu.getItems().add(menuItem);
-
-			menuBar.getMenus().add(optionsMenu);
-			menuBar.getMenus().add(new Menu("AMAK v" + Information.VERSION));
-
-			startEnded = true;
-			waiting.signal();
-			startLock.unlock();
-
-			stage.show();
+		startLock.lock();
+		// Border organization of the scene
+		BorderPane organizationPane = new BorderPane();
+		// Creation of scene
+		primaryStage.setTitle("AMAK");
+		Scene scene = new Scene(organizationPane, 450, 300);
+		stage = primaryStage;
+		stage.setScene(scene);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				System.exit(0);
+			}
 		});
+		organizationPane.prefHeightProperty().bind(stage.heightProperty());
+		organizationPane.prefWidthProperty().bind(stage.widthProperty());
+
+		// Creation of the toolbar (Bottom)
+		toolbarPanel = new ToolBar();
+		organizationPane.setBottom(toolbarPanel);
+
+		// Creation of the split pane (Center)
+		splitPane = new SplitPane();
+		splitPane.setOrientation(Orientation.HORIZONTAL);
+		organizationPane.setCenter(splitPane);
+
+		// Creation of the left part of the split pane (Center Left)
+		AnchorPane left = new AnchorPane();
+		splitPane.getItems().add(left);
+
+		// Creation of the right part of the split pane (Center Right)
+		tabbedPanel = new TabPane();
+		splitPane.getItems().add(tabbedPanel);
+
+		// Creation of the menu bar (Top)
+		menuBar = new MenuBar();
+		optionsMenu = new Menu("Options");
+		organizationPane.setTop(menuBar);
+
+		// Creation of the close menu item
+		MenuItem menuItem = new MenuItem("Close");
+		menuItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				System.exit(0);
+			}
+		});
+		optionsMenu.getItems().add(menuItem);
+
+		menuBar.getMenus().add(optionsMenu);
+		menuBar.getMenus().add(new Menu("AMAK v" + Information.VERSION));
+
+		startEnded = true;
+		waiting.signal();
+		startLock.unlock();
+
+		stage.show();
 	}
 
 	/**
@@ -272,7 +276,7 @@ public class MainWindow extends Application {
 	 * @param toolbar
 	 *            The ToolBar.
 	 */
-	public static void addToolbar(ToolBar toolbar) {
+	public static void addToolbar(Node tool) {
 		instance();
 		if (!startEnded) {
 			startLock.lock();
@@ -286,7 +290,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		Platform.runLater(() -> instance.toolbarPanel.getChildren().add(toolbar));
+		Platform.runLater(() -> instance.toolbarPanel.getItems().add(tool));
 	}
 
 	/**
@@ -295,7 +299,7 @@ public class MainWindow extends Application {
 	 * @param panel
 	 *            The panel
 	 */
-	public static void setLeftPanel(Pane panel) {
+	public static void setLeftPanel(Node panel) {
 		instance();
 		if (!startEnded) {
 			startLock.lock();
@@ -318,7 +322,7 @@ public class MainWindow extends Application {
 	 * @param panel
 	 *            The panel
 	 */
-	public static void setRightPanel(Pane panel) {
+	public static void setRightPanel(Node panel) {
 		instance();
 		if (!startEnded) {
 			startLock.lock();
@@ -352,6 +356,12 @@ public class MainWindow extends Application {
 			});
 			ui.start();
 		}
+		try {
+			instanceCreated.acquire();
+			instanceCreated.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		instanceLock.unlock();
 		return instance;
 	}
@@ -373,7 +383,7 @@ public class MainWindow extends Application {
 	 * @param panel
 	 *            The panel to add
 	 */
-	public static void addTabbedPanel(String title, Pane panel) {
+	public static void addTabbedPanel(String title, Node panel) {
 		instance();
 		if (!startEnded) {
 			startLock.lock();
@@ -387,6 +397,7 @@ public class MainWindow extends Application {
 				startLock.unlock();
 			}
 		}
-		Platform.runLater(() -> instance.tabbedPanel.getTabs().add(new Tab(title, panel)));
+		Tab t = new Tab(title, panel);
+		Platform.runLater(() -> instance.tabbedPanel.getTabs().add(t));
 	}
 }
