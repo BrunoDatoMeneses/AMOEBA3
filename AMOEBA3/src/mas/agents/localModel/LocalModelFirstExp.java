@@ -22,8 +22,8 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	 *
 	 * @param world the world
 	 */
-	public LocalModelFirstExp(World world) {
-		super(world);
+	public LocalModelFirstExp(World world, Context associatedContext) {
+		super(world, associatedContext);
 	}
 
 	/* (non-Javadoc)
@@ -81,6 +81,30 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 
 	@Override
 	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getProposition(Experiment experiment) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String coefsToString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double distance(Experiment experiment) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

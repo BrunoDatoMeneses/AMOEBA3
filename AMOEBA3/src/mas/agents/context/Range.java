@@ -446,7 +446,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 				endIncrement /=2;
 			}
 			else if(endCriticality == 0) {
-				endIncrement *=2;
+				endIncrement = Math.min(percept.getRadiusContextForCreation(), endIncrement*2);
+				//endIncrement *=2;
 			}
 			
 //			System.out.println(world.getScheduler().getTick() + " " +
@@ -606,7 +607,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 			if(startCriticality == 1) {
 				startIncrement /=3;
 			}
-			else if(endCriticality == 0) {
+			else if(startCriticality == 0) {
 				
 				startIncrement = Math.min(percept.getRadiusContextForCreation(), startIncrement*2);
 				//startIncrement *=2;
@@ -639,8 +640,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 			if(startCriticality == 1) {
 				startIncrement /=2;
 			}
-			else if(endCriticality == 0) {
-				startIncrement *=2;
+			else if(startCriticality == 0) {
+				startIncrement = Math.min(percept.getRadiusContextForCreation(), startIncrement*2);
+				//startIncrement *=2;
 			}
 			
 			
@@ -1533,32 +1535,32 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 			this.percept.updateSortedRanges(this.context, "start");
 			context.getWorld().getScheduler().addLastmodifiedContext(context);
 			
-			if(!this.inNeighborhood()) {
-			//if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation())) {
-				if(!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.addNonValidNeighborPercept(this.percept);
-				}
-			}
-			else {
-				if(this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.removeNonValidNeighborPercept(this.percept);
-				}
-			}
-			
-			this.context.updateRequestNeighborState();
-			
-			if(!this.contains2(percept.getValue())) {
-					if(!this.context.getNonValidPercepts().contains(this.percept)) {
-						this.context.addNonValidPercept(this.percept);
-					}
-				}
-				else {
-					if(this.context.getNonValidPercepts().contains(this.percept)) {
-						this.context.removeNonValidPercept(this.percept);
-					}
-				}
-			
-			this.context.updateActivatedContexts();
+//			if(!this.inNeighborhood()) {
+//			//if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation())) {
+//				if(!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
+//					this.context.addNonValidNeighborPercept(this.percept);
+//				}
+//			}
+//			else {
+//				if(this.context.getNonValidNeighborPercepts().contains(this.percept)) {
+//					this.context.removeNonValidNeighborPercept(this.percept);
+//				}
+//			}
+//			
+//			this.context.updateRequestNeighborState();
+//			
+//			if(!this.contains2(percept.getValue())) {
+//					if(!this.context.getNonValidPercepts().contains(this.percept)) {
+//						this.context.addNonValidPercept(this.percept);
+//					}
+//				}
+//				else {
+//					if(this.context.getNonValidPercepts().contains(this.percept)) {
+//						this.context.removeNonValidPercept(this.percept);
+//					}
+//				}
+//			
+//			this.context.updateActivatedContexts();
 			
 			world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "SET START", ""+newStartValue)));
 		
@@ -1602,32 +1604,32 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 			this.percept.updateSortedRanges(this.context, "end");
 			context.getWorld().getScheduler().addLastmodifiedContext(context);
 			
-			if(!this.inNeighborhood()) {
-			//if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation())) {
-				if(!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.addNonValidNeighborPercept(this.percept);
-				}
-			}
-			else {
-				if(this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.removeNonValidNeighborPercept(this.percept);
-				}
-			}
-			
-			this.context.updateRequestNeighborState();
-			
-			if(!this.contains2(percept.getValue())) {
-				if(!this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.addNonValidPercept(this.percept);
-				}
-			}
-			else {
-				if(this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.removeNonValidPercept(this.percept);
-				}
-			}
-		
-			this.context.updateActivatedContexts();
+//			if(!this.inNeighborhood()) {
+//			//if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation())) {
+//				if(!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
+//					this.context.addNonValidNeighborPercept(this.percept);
+//				}
+//			}
+//			else {
+//				if(this.context.getNonValidNeighborPercepts().contains(this.percept)) {
+//					this.context.removeNonValidNeighborPercept(this.percept);
+//				}
+//			}
+//			
+//			this.context.updateRequestNeighborState();
+//			
+//			if(!this.contains2(percept.getValue())) {
+//				if(!this.context.getNonValidPercepts().contains(this.percept)) {
+//					this.context.addNonValidPercept(this.percept);
+//				}
+//			}
+//			else {
+//				if(this.context.getNonValidPercepts().contains(this.percept)) {
+//					this.context.removeNonValidPercept(this.percept);
+//				}
+//			}
+//		
+//			this.context.updateActivatedContexts();
 			
 			world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "SET END", ""+newEndValue)));
 			

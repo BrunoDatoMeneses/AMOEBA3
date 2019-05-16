@@ -79,12 +79,12 @@ public class World implements Serializable {
 	
 	
 	//BUREAU
-	private int xGraphSize = 2700;
-	private int yGraphSize = 1500;
+//	private int xGraphSize = 2700;
+//	private int yGraphSize = 1500;
 	
 	//REUNION
-//	private int xGraphSize = 1200;
-//	private int yGraphSize = 600;
+	private int xGraphSize = 1200;
+	private int yGraphSize = 600;
 	
 	public double increment_up = 0.05;
 	public double increment_down = 0.05;
@@ -109,11 +109,11 @@ public class World implements Serializable {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-//		String message = "" +this.getScheduler().getTick();
-//		for(String info : infos) {
-//			message += " " + info;
-//		}
-//		System.out.println(message);
+		String message = "" +this.getScheduler().getTick();
+		for(String info : infos) {
+			message += " " + info;
+		}
+		System.out.println(message);
 	}
 	
 	/**
@@ -732,13 +732,13 @@ public class World implements Serializable {
 	public LocalModelAgent buildLocalModel(Context context) {
 		
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			return new LocalModelMillerRegression(this);
+			return new LocalModelMillerRegression(this, context);
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp(this);
+			return new LocalModelFirstExp(this, context);
 		}
 		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage(this);
+			return new LocalModelAverage(this, context);
 		}
 		return null;
 	}

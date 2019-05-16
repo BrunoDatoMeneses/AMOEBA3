@@ -19,13 +19,16 @@ import mas.agents.messages.Message;
  */
 public abstract class LocalModelAgent extends SystemAgent implements Serializable, Cloneable{
 
+	Context context;
+	
 	/**
 	 * Instantiates a new local model agent.
 	 *
 	 * @param world the world
 	 */
-	public LocalModelAgent(World world) {
+	public LocalModelAgent(World world, Context associatedContext) {
 		super(world);
+		context = associatedContext;
 	}
 
 	/* (non-Javadoc)
@@ -50,6 +53,7 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context);
+	public abstract double getProposition(Experiment experiment);
 	
 	public abstract double getProposition(Context context, ContextOverlap contextOverlap);
 	
@@ -84,6 +88,9 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	public abstract void updateModel(Context context);
 	
 	public abstract void updateModelWithExperiments(ArrayList<Experiment> experimentsList);
+	public abstract void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight);
+	public abstract String coefsToString();
+	public abstract double distance(Experiment experiment);
 	
 	public abstract double[] getCoef();
 	

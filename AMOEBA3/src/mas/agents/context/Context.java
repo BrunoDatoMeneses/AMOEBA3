@@ -158,7 +158,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.confidence = fatherContext.confidence;	
 		if (fatherContext.world.getLocalModel() == TypeLocalModel.MILLER_REGRESSION) {
 			
-			this.localModel = new LocalModelMillerRegression(world);
+			this.localModel = new LocalModelMillerRegression(world,this);
 			//this.formulaLocalModel = ((LocalModelMillerRegression) bestNearestContext.localModel).getFormula(bestNearestContext);
 			double[] coef = ((LocalModelMillerRegression) fatherContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
@@ -166,13 +166,13 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		} else if (fatherContext.world.getLocalModel() == TypeLocalModel.FIRST_EXPERIMENT) {
 			
-			this.localModel = new LocalModelFirstExp(fatherContext.world);
+			this.localModel = new LocalModelFirstExp(fatherContext.world,this);
 			//this.formulaLocalModel = ((LocalModelFirstExp) bestNearestContext.localModel).getFormula(bestNearestContext);
 			this.actionProposition = ((LocalModelFirstExp) fatherContext.localModel).getProposition(fatherContext);
 			
 		} else if (fatherContext.world.getLocalModel() == TypeLocalModel.AVERAGE) {
 			
-			this.localModel = new LocalModelAverage(fatherContext.world);
+			this.localModel = new LocalModelAverage(fatherContext.world,this);
 			//this.formulaLocalModel = ((LocalModelAverage) bestNearestContext.localModel).getFormula(bestNearestContext);
 			this.actionProposition = ((LocalModelAverage) fatherContext.localModel).getProposition(fatherContext);
 			
@@ -265,7 +265,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.confidence = bestNearestContext.confidence;	
 		if (bestNearestContext.world.getLocalModel() == TypeLocalModel.MILLER_REGRESSION) {
 			
-			this.localModel = new LocalModelMillerRegression(world);
+			this.localModel = new LocalModelMillerRegression(world,this);
 			//this.formulaLocalModel = ((LocalModelMillerRegression) bestNearestContext.localModel).getFormula(bestNearestContext);
 			double[] coef = ((LocalModelMillerRegression) bestNearestContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
@@ -273,13 +273,13 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		} else if (bestNearestContext.world.getLocalModel() == TypeLocalModel.FIRST_EXPERIMENT) {
 			
-			this.localModel = new LocalModelFirstExp(bestNearestContext.world);
+			this.localModel = new LocalModelFirstExp(bestNearestContext.world,this);
 			//this.formulaLocalModel = ((LocalModelFirstExp) bestNearestContext.localModel).getFormula(bestNearestContext);
 			this.actionProposition = ((LocalModelFirstExp) bestNearestContext.localModel).getProposition(bestNearestContext);
 			
 		} else if (bestNearestContext.world.getLocalModel() == TypeLocalModel.AVERAGE) {
 			
-			this.localModel = new LocalModelAverage(bestNearestContext.world);
+			this.localModel = new LocalModelAverage(bestNearestContext.world,this);
 			//this.formulaLocalModel = ((LocalModelAverage) bestNearestContext.localModel).getFormula(bestNearestContext);
 			this.actionProposition = ((LocalModelAverage) bestNearestContext.localModel).getProposition(bestNearestContext);
 			
@@ -624,17 +624,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		this.activations = c.activations;
 		this.confidence = c.confidence;	
 		if (c.world.getLocalModel() == TypeLocalModel.MILLER_REGRESSION) {
-			this.localModel = new LocalModelMillerRegression(c.world);
+			this.localModel = new LocalModelMillerRegression(c.world,this);
 			//this.formulaLocalModel = ((LocalModelMillerRegression) c.localModel).getFormula(c);
 			double[] coef = ((LocalModelMillerRegression) c.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) c.localModel).getProposition(c);
 		} else if (c.world.getLocalModel() == TypeLocalModel.FIRST_EXPERIMENT) {
-			this.localModel = new LocalModelFirstExp(c.world);
+			this.localModel = new LocalModelFirstExp(c.world,this);
 			//this.formulaLocalModel = ((LocalModelFirstExp) c.localModel).getFormula(c);
 			this.actionProposition = ((LocalModelFirstExp) c.localModel).getProposition(c);
 		} else if (c.world.getLocalModel() == TypeLocalModel.AVERAGE) {
-			this.localModel = new LocalModelAverage(c.world);
+			this.localModel = new LocalModelAverage(c.world,this);
 			//this.formulaLocalModel = ((LocalModelAverage) c.localModel).getFormula(c);
 			this.actionProposition = ((LocalModelAverage) c.localModel).getProposition(c);
 		}
@@ -959,7 +959,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	
 	private void setModelFromBetterContext(Context betterContext) {
-		localModel = new LocalModelMillerRegression(world);
+		localModel = new LocalModelMillerRegression(world,this);
 		
 		this.confidence = betterContext.getConfidence();	
 		
@@ -977,6 +977,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 
 		//addNewExperiment();
 		
+		System.out.println(localModel.distance(getCurrentExperiment()) + "******************************************************************DISTANCE TO MODEL : " );
+		
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
 			
 			
@@ -988,10 +990,12 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
 			}
 			else {
+				System.out.println("OLD COEFS " + localModel.coefsToString());
 				LocalModelAgent newBetterModel = tryNewExperiment();
 				
 				if(newBetterModel!=null) {
 					localModel = newBetterModel;
+					System.out.println("NEW COEFS " + localModel.coefsToString());
 					world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
 					
 				}
@@ -1002,12 +1006,74 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			}
 			
 		}else {
-			
+			System.out.println("OLD COEFS " + localModel.coefsToString());
+			//localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
+			//addCurrentExperimentTo(experiments);
+			System.out.println("NEW COEFS " + localModel.coefsToString());
 			confidence++;
 			
 		}
 		
-		mappingCriticality = 0.0;
+//		mappingCriticality = 0.0;
+//		if(head.getActivatedNeighborsContexts().size()>0) {
+//			for(Context ctxt : head.getActivatedNeighborsContexts()) {
+//				mappingCriticality += this.distance(ctxt);
+//			}
+//			mappingCriticality /= head.getActivatedNeighborsContexts().size();
+//		}
+
+		
+		//NCSDetection_OverMapping();	
+		
+	}
+	
+	
+	public void analyzeResults3(Head head, Context closestContextToOracle) {
+
+		
+		if (head.getCriticity(this) < head.getErrorAllowed()) {
+			
+			confidence++;	
+			
+		}else {
+			if(this != closestContextToOracle){
+				this.solveNCS_Conflict(head);
+			}
+		}
+		
+//		if (head.getCriticity(this) > head.getErrorAllowed()) {
+//			
+//			
+//			Context betterContext = null;//head.getBetterContext(this,head.getActivatedNeighborsContexts(), getErrorOnAllExperiments());
+//			
+//			if(betterContext != null) {
+//				System.out.println(this.getName() + "<---" + betterContext.getName());
+//				this.setModelFromBetterContext(betterContext);				
+//				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
+//			}
+//			else {
+//				System.out.println("OLD COEFS " + localModel.coefsToString());
+//				LocalModelAgent newBetterModel = tryNewExperiment();
+//				
+//				if(tryNewExperiment2()) {
+//					System.out.println("NEW COEFS " + localModel.coefsToString());
+//					world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
+//				}
+//				else {
+//					solveNCS_Conflict(head);
+//					this.world.getScheduler().addAlteredContext(this);
+//				}
+//			}
+//			
+//		}else {
+//			System.out.println("OLD COEFS " + localModel.coefsToString());
+//			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
+//			System.out.println("NEW COEFS " + localModel.coefsToString());
+//			confidence++;
+//			
+//		}
+		
+//		mappingCriticality = 0.0;
 //		if(head.getActivatedNeighborsContexts().size()>0) {
 //			for(Context ctxt : head.getActivatedNeighborsContexts()) {
 //				mappingCriticality += this.distance(ctxt);
@@ -1241,9 +1307,24 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		experimentsList.add(exp);
 	}
 	
+	public Experiment getCurrentExperiment() {
+		ArrayList<Percept> percepts = world.getAllPercept();
+		Experiment exp = new Experiment(this);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, pct.getValue());
+		}
+		exp.setOracleProposition(headAgent.getOracleValue());
+		
+		return exp;
+	}
+	
 	private LocalModelAgent tryNewExperiment() {
 		
-		LocalModelAgent possibleNewlocalModel = new LocalModelMillerRegression(world);
+		LocalModelAgent possibleNewlocalModel = new LocalModelMillerRegression(world,this);
+		
+		
+		
+		
 		
 		ArrayList<Experiment> newExperimentsList = new ArrayList<Experiment>();
 		newExperimentsList.addAll(experiments);
@@ -1265,6 +1346,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 		else return null;
 	}
+	
+	private boolean tryNewExperiment2() {
+		
+		if(localModel.distance(getCurrentExperiment())<10.0) {
+			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
+			return true;
+		}
+		 return false;
+	}
+	
+	
 	
 	public AbstractPair<Boolean, Double> tryAlternativeModel(LocalModelAgent alternativeModel) {
 		
@@ -1309,7 +1401,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	}
 	
-	private void solveNCS_Conflict(Head head) {
+	public void solveNCS_Conflict(Head head) {
 
 		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "*********************************************************************************************************** SOLVE NCS CONFLICT")));
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
@@ -2913,6 +3005,10 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 	public LocalModelAgent getLocalModel() {
 		return localModel;
 	}
+	
+	public void setLocalModel(LocalModelAgent model) {
+		 localModel = model;
+	}
 
 	
 	public void addContext(Context ctxt) {
@@ -3043,5 +3139,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 	public double getMappingCriticality() {
 		return mappingCriticality;
 	}
+	
+	
 
 }
