@@ -104,6 +104,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		super(world);
 		buildContext(head, bestNearestContext);
 		world.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
+		NCSDetection_Uselessness();
 		
 		//////System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
 		//////System.out.println(this.toStringFull());
@@ -849,6 +850,21 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 		
 	}
+	
+	public void updateActivatedContextsCopyForUpdate(){ //faire le update dans le head attention partial et full
+		
+		if(nonValidPercepts.size() == 0) {
+			
+			//////System.out.println("VALID NEIGHBOR : " + this.getName());
+
+			
+			world.getScheduler().getHeadAgent().addActivatedContextCopy(this);
+		}
+		else {
+			world.getScheduler().getHeadAgent().removeActivatedContextCopy(this);
+		}
+		
+	}
 
 	public void clearNonValidPerceptNeighbors() {
 		nonValidNeightborPercepts.clear();
@@ -1192,7 +1208,34 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		return minDistance;
 	}
 	
+	public void NCSDetection_BetterNeighbor() {
+		
+		Context closestContextToOracle = this;
+		double minDistanceToOraclePrediction = getLocalModel().distance(this.getCurrentExperiment());
+		double currentDistanceToOraclePrediction = 0.0;
+		
+		for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
+			
+			if(ctxt!=this) {
+				currentDistanceToOraclePrediction = ctxt.getLocalModel().distance(this.getCurrentExperiment());
+				if(currentDistanceToOraclePrediction<minDistanceToOraclePrediction) {
+					minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+					closestContextToOracle = ctxt;
+				}
+			}
+			
+		}
+		
+		if(closestContextToOracle!=this) {
+			solveNCS_BetterNeighbor(closestContextToOracle);
+		}
+		
+	}
 	
+	public void solveNCS_BetterNeighbor(Context betterContext) {
+		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(), "*********************************************************************************************************** SOLVE NCS BETTER NEIGHBOR")));
+		localModel = new LocalModelMillerRegression(world, this, betterContext.getLocalModel().getCoef());
+	}
 	
 	public void NCSDetection_OverMapping() {
 		
@@ -1282,6 +1325,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		
 	}
+	
+	
 	
 	private void addCurrentExperiment() {
 		ArrayList<Percept> percepts = world.getAllPercept();
@@ -1654,7 +1699,12 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 						}
 					}
 					else if(percept.contextIncludedIn(bestContext,this)) {
-						//vol = Math.abs(percept.getEndRangeProjection(bestContext) - percept.getStartRangeProjection(this)); TODO
+						world.trace(new ArrayList<String>(Arrays.asList("INCLUSION :",percept.getName() ,bestContext.getName(), this.getName())));
+						vol = Math.abs(percept.getEndRangeProjection(bestContext) - percept.getStartRangeProjection(bestContext));
+						if(vol<volumeLost) {
+							volumeLost = vol;
+							perceptWithBiggerImpact = percept;
+						}
 					}
 					
 				}

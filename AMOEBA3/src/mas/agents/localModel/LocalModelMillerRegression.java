@@ -352,7 +352,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		coefs = regression.regress().getParameterEstimates();
 		
-		System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 		
 	}
 	

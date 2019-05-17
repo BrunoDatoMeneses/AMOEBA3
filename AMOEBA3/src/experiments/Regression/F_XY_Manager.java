@@ -1,4 +1,4 @@
-package experiments.twoDimensionsLaunchers;
+package experiments.Regression;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -47,6 +47,12 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
 		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
 	}
+	
+	public void playOneStepConstrained(double[] constrains) {
+				
+		x = constrains[0] + (Math.random()*(constrains[1] - constrains[0]));
+		y = constrains[0] + (Math.random()*(constrains[1] - constrains[0]));
+	}
 
 	
 	public double model(double x, double y) {
@@ -80,6 +86,19 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		out.put("oracle",result);
 		return out;
 	}
+	
+	public HashMap<String, Double> getOriginOutput() {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		result = model(0, 0);
+		
+		out.put("px",x);
+		out.put("py",y);
+		out.put("oracle",result);
+		return out;
+	}
+	
+	
 	
 	
 	public HashMap<String, Double> getOutputRequest(HashMap<String, Double> values) {

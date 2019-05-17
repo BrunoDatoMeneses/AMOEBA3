@@ -294,6 +294,14 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		}
 		return max;
 	}
+	
+	public void setMin(double value) {
+		min = value;
+	}
+	
+	public void setMax(double value) {
+		max = value;
+	}
 
 	/**
 	 * Gets the activated context.

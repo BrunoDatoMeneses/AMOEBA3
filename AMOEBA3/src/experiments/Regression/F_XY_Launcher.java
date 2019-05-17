@@ -1,8 +1,9 @@
-package experiments.twoDimensionsLaunchers;
+package experiments.Regression;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import mas.agents.localModel.TypeLocalModel;
+import mas.agents.percept.Percept;
 import mas.init.amoeba.AMOEBAFactory;
 import mas.kernel.AMOEBA;
 
@@ -34,14 +35,37 @@ public class F_XY_Launcher implements Serializable {
 		/* Other parameters */
 		amoeba.setRememberState(false);
 		amoeba.setGenerateCSV(false);
-		amoeba.getScheduler().getHeadAgent().learningSpeed = 0.5;
+		
 
 		F_XY_Manager f_XY_Manager = new F_XY_Manager(50.0);
 		
-		amoeba.setManager(f_XY_Manager);
+		for(Percept pct : amoeba.getScheduler().getPercepts()) {
+			pct.setMin(-100.0);
+			pct.setMax(100.0);
+		}
+		
+		amoeba.getScheduler().getHeadAgent().learningSpeed = 0.5;
+		
+		for(Percept pct : amoeba.getScheduler().getPercepts()) {
+			System.out.println(pct.getName() + " Min " + pct.getMin());
+			System.out.println(pct.getName() + " Max " + pct.getMax());
+		}
+		
+		amoeba.setRunning(true);
+		
+		amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOriginOutput()));
 
+		
+		double[] constrains = new double[2];
+		
+		constrains[0] = amoeba.getScheduler().getContextsAsContext().get(0).getRanges().get(amoeba.getScheduler().getPercepts().get(0)).getStart();
+		constrains[1] = amoeba.getScheduler().getContextsAsContext().get(0).getRanges().get(amoeba.getScheduler().getPercepts().get(0)).getEnd();
+
+		
+		//amoeba.setRunning(false);
+		
 		int i = 0;
-		while(i<10000) {
+		while(amoeba.getScheduler().getHeadAgent().getCriticity()>0.001 || i==0) {
 			
 			//System.out.println("Running :" + amoeba.isRunning());
 			try        
@@ -62,8 +86,8 @@ public class F_XY_Launcher implements Serializable {
 				
 			}else if(amoeba.isRunning()) {
 				
-				/*Random samples of the studied system */
-				f_XY_Manager.playOneStep(0);
+				/*Random samples on the unique context */
+				f_XY_Manager.playOneStepConstrained(constrains);
 				
 				/*This is a learning step of AMOEBA*/
 				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
@@ -73,8 +97,8 @@ public class F_XY_Launcher implements Serializable {
 			else if(amoeba.getPlayOneStep()) {
 				
 				amoeba.setPlayOneStep(false);
-				/*Random samples of the studied system */
-				f_XY_Manager.playOneStep(0);
+				/*Random samples on the unique context */
+				f_XY_Manager.playOneStepConstrained(constrains);
 				
 				/*This is a learning step of AMOEBA*/
 				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));

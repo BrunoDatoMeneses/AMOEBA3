@@ -43,6 +43,7 @@ public class Head extends AbstractHead implements Cloneable{
 	public Criticalities endogenousCriticalities;
 	
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
+	private ArrayList<Context> activatedContextsCopyForUpdates = new ArrayList<Context>();
 	private ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
 	
 	private HashMap<Percept,ArrayList<Context>> partiallyActivatedContextInNeighbors = new HashMap<Percept,ArrayList<Context>>();
@@ -153,7 +154,7 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	public long otherExecutionTimeSum= 0;
 	
-	
+	public double learningSpeed = 0.25;
 
 	/**
 	 * Sets the data for error margin.
@@ -385,7 +386,7 @@ public class Head extends AbstractHead implements Cloneable{
 
 		
 		
-		System.out.println("-------------------------------------");
+		//System.out.println("-------------------------------------");
 		if(activatedNeighborsContexts.size()>1) {
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
@@ -1036,7 +1037,10 @@ public class Head extends AbstractHead implements Cloneable{
 		activatedContextsCopy.addAll(activatedContexts);
 		
 		for(Context ctxt : activatedContextsCopy) {
-			ctxt.NCSDetection_OverMapping();
+			if(!ctxt.isDying()) {
+				ctxt.NCSDetection_OverMapping();
+			}
+			
 		}
 	}
 	
@@ -1056,8 +1060,8 @@ public class Head extends AbstractHead implements Cloneable{
 		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
 		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())){
 			
-			//Context c = getNearestGoodContext(activatedNeighborsContexts);
-			Context c = getSmallestGoodContext(activatedNeighborsContexts);
+			Context c = getNearestGoodContext(activatedNeighborsContexts);
+			//Context c = getSmallestGoodContext(activatedNeighborsContexts);
 			if(c!=null) {
 				////////System.out.println("Nearest good context : " + c.getName());
 			}
@@ -1101,6 +1105,13 @@ public class Head extends AbstractHead implements Cloneable{
 		/*All context which proposed itself must analyze its proposition*/
 		
 		
+		for(Context ctxt : activatedNeighborsContexts) {
+			
+			ctxt.NCSDetection_BetterNeighbor();
+			
+		}
+		
+		
 		if(activatedContexts.size()>1) {
 			Context closestContextToOracle = null;
 			double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
@@ -1118,20 +1129,22 @@ public class Head extends AbstractHead implements Cloneable{
 					
 			}
 			
-			System.out.println(closestContextToOracle.getLocalModel().distance(closestContextToOracle.getCurrentExperiment()) + " ******************************************************************DISTANCE TO MODEL : " );
-			System.out.println("OLD COEFS " + closestContextToOracle.getLocalModel().coefsToString());
-			closestContextToOracle.getLocalModel().updateModelWithExperimentAndWeight(closestContextToOracle.getCurrentExperiment(),0.5);
+			//System.out.println(closestContextToOracle.getLocalModel().distance(closestContextToOracle.getCurrentExperiment()) + " ******************************************************************DISTANCE TO MODEL : " );
+			//System.out.println("OLD COEFS " + closestContextToOracle.getLocalModel().coefsToString());
+			closestContextToOracle.getLocalModel().updateModelWithExperimentAndWeight(closestContextToOracle.getCurrentExperiment(),learningSpeed);
 			System.out.println("NEW COEFS " + closestContextToOracle.getLocalModel().coefsToString());
 			
+			activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
 			for (Context activatedContext : activatedContexts) {	
 				activatedContext.analyzeResults3(this, closestContextToOracle);
-				
-				
+					
 			}
+			activatedContexts = activatedContextsCopyForUpdates;
+			
 		}else if(activatedContexts.size() == 1) {
 			
 			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment());
-			System.out.println(distanceToOracleForActivatedContext + " ******************************************************************DISTANCE TO MODEL : " );
+			//System.out.println(distanceToOracleForActivatedContext + " ******************************************************************DISTANCE TO MODEL : " );
 			if(activatedNeighborsContexts.size()>1) {
 				
 				Context closestContextToOracle = null;
@@ -1148,8 +1161,8 @@ public class Head extends AbstractHead implements Cloneable{
 				}
 				
 				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
-					System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-					activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),0.5);
+					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+					activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed);
 					System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 					
 				}else {
@@ -1159,8 +1172,8 @@ public class Head extends AbstractHead implements Cloneable{
 
 				
 			}else {
-				System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-				activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),0.5);
+				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+				activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed);
 				System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 				
 				
@@ -2208,9 +2221,26 @@ public class Head extends AbstractHead implements Cloneable{
 		}	
 	}
 	
+	public void addActivatedContextCopy(Context ctxt) {
+		if(!activatedContextsCopyForUpdates.contains(ctxt)) {
+			activatedContextsCopyForUpdates.add(ctxt);
+			
+			//System.out.println(world.getScheduler().getTick() + " ACTIVATED CONTEXTS");
+			for(Context cxt : activatedContextsCopyForUpdates) {
+				//System.out.println("--> " + cxt.getName());
+			}
+		}	
+	}
+	
 	public void removeActivatedContext(Context ctxt) {
 		if(activatedContexts.contains(ctxt)) {
 			activatedContexts.remove(ctxt);
+		}	
+	}
+	
+	public void removeActivatedContextCopy(Context ctxt) {
+		if(activatedContextsCopyForUpdates.contains(ctxt)) {
+			activatedContextsCopyForUpdates.remove(ctxt);
 		}	
 	}
 	

@@ -2153,7 +2153,7 @@ private void startPanelController() {
 		toolBarInfo.setVisible(true);
 		System.out.println("node pushed : " + id);
 		requestPosition = viewer.getDefaultView().getCamera().transformPxToGu(mouseEvent.getX(), mouseEvent.getY());
-		System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
+		//System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
 
 		if(world.getScheduler().getContextByName(id)!=null) {
 			Context pushedContext = world.getScheduler().getContextByName(id);
@@ -2591,7 +2591,7 @@ private void startPanelController() {
 		//System.out.println("getPoint " + mouseEvent.getPoint() + " " + this.getSize());
 		//graph.getNode("origin").
 		requestPosition = viewer.getDefaultView().getCamera().transformPxToGu(mouseEvent.getX(), mouseEvent.getY());
-		System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
+		//System.out.println("POSITION :" + requestPosition.x + " ; " + requestPosition.y + " ; " + requestPosition.z);
 		
 		
 		if(SwingUtilities.isRightMouseButton(e)){

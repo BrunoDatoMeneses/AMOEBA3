@@ -109,11 +109,11 @@ public class World implements Serializable {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-		String message = "" +this.getScheduler().getTick();
-		for(String info : infos) {
-			message += " " + info;
-		}
-		System.out.println(message);
+//		String message = "" +this.getScheduler().getTick();
+//		for(String info : infos) {
+//			message += " " + info;
+//		}
+//		System.out.println(message);
 	}
 	
 	/**

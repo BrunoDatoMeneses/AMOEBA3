@@ -10,6 +10,7 @@ import mas.agents.percept.Percept;
 public class NCSMemory {
 
 	private ArrayList<Context> contexts = new ArrayList<Context>();
+	private ArrayList<Context> NCSContexts = new ArrayList<Context>();
 	private ArrayList<Context> partiallyActivatedContexts = new ArrayList<Context>();
 	private ArrayList<Context> otherContexts = new ArrayList<Context>();
 	private ArrayList<Percept> percepts = new ArrayList<Percept>();
@@ -35,7 +36,7 @@ public class NCSMemory {
 				percepts.add( new Percept(pct));
 			}
 			for(Context ctxt : concernContexts) {
-				contexts.add(new Context(ctxt));
+				NCSContexts.add(new Context(ctxt));
 			}
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
@@ -51,6 +52,12 @@ public class NCSMemory {
 					otherContexts.add(new Context(ctx));
 				}
 			}
+			
+			for(Context ctx : world.getScheduler().getContextsAsContext()) {
+				contexts.add(new Context(ctx));
+
+			}
+			
 			head = (Head)world.getScheduler().getHeadAgent().clone();
 			tick = world.getScheduler().getTick();
 		}
@@ -86,7 +93,7 @@ public class NCSMemory {
 		
 		
 		
-		for(Context ctxt : contexts) {
+		for(Context ctxt : NCSContexts) {
 			if(bestContextExo != null) {
 				if(ctxt.getName().equals(bestContextExo.getName())) {
 					string += "BEST CONTEXT EXO\n";
@@ -169,8 +176,13 @@ public class NCSMemory {
 		return head;
 	}
 	
+	
 	public ArrayList<Context> getContexts(){
 		return contexts;
+	}
+	
+	public ArrayList<Context> getNCSContexts(){
+		return NCSContexts;
 	}
 	
 	public ArrayList<Context> getOtherContexts(){
