@@ -3,7 +3,6 @@ package fr.irit.smac.amak.examples.philosophers;
 import java.util.Random;
 
 import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
@@ -166,8 +165,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	}
 
 	@Override
-	protected void onUpdateRender() {
-		System.out.println(id+" "+eatenPastas);
+	public void onUpdateRender() {
 		amas.plot.addData("Eaten pasta", id, eatenPastas);
 		switch (state) {
 		case EATING:

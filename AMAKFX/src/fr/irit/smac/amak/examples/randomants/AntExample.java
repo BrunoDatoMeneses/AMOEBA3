@@ -72,7 +72,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 	}
 
 	@Override
-	protected void onUpdateRender() {
+	public void onUpdateRender() {
 		image.move(dx, dy);
 		image.setAngle(angle);
 	}

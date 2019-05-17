@@ -50,7 +50,7 @@ public class Main {
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 5000;
+		int nbCycle = 1000;
 		for (int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
@@ -71,9 +71,8 @@ public class Main {
 
 		// Activate rendering back
 		amoeba.setRenderUpdate(true);
-		// After activating rendering we need to run a cycle to update agents
-		// We use a request call to avoid change in context
-		amoeba.request(studiedSystem.getOutput());
+		// After activating rendering we need to update agent's visualization
+		amoeba.updateAgentsVisualisation();
 		// We allow simulation control with the UI
 		amoeba.allowGraphicalScheduler(true);
 

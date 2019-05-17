@@ -129,4 +129,8 @@ public class Percept extends AmoebaAgent {
 	public void updateContextProjectionEnd(Context context) {
 		contextProjections.get(context).updateEnd();
 	}
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

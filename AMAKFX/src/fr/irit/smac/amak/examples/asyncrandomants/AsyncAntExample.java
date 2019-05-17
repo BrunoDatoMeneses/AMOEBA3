@@ -91,7 +91,7 @@ public class AsyncAntExample extends Agent<AsyncAntsAMASExample, AsyncWorldExamp
 	}
 
 	@Override
-	protected void onUpdateRender() {
+	public void onUpdateRender() {
 		image.move(dx, dy);
 		image.setAngle(angle);
 	}

@@ -1,16 +1,19 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.scene.text.Text;
 
 public class DrawableString extends Drawable {
 	private Text textZone;
 
-	public DrawableString(VUI vui, double dx, double dy, String text) {
-		super(vui, dx+0.5, dy+0.5, 1, 1);
+	public DrawableString(double dx, double dy, String text) {
+		super(dx+0.5, dy+0.5, 1, 1);
 		textZone = new Text(text);
-		Platform.runLater(() -> vui.getCanvas().getChildren().add(textZone));
+	}
+	
+	@Override
+	public void onAddedToVUI() {
+		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(textZone));
 	}
 
 	@Override

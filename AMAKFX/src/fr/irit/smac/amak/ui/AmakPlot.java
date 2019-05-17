@@ -7,9 +7,9 @@ import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.util.Duration;
 
 /**
@@ -23,11 +23,11 @@ public class AmakPlot {
 	
 	/* STATIC */
 	/**
-	 * True by default. Improve performance of charts in big dataset (>5000).
-	 * Set it to false if you wish more detailed chart when zooming.
+	 * False by default. Improve performance of charts in big dataset (>5000).
+	 * At the price a lower quality and fidelity.
 	 * @see org.jfree.chart.renderer.xy.SamplingXYLineRenderer
 	 */
-	public static boolean useSamplingRenderer = true;
+	public static boolean useSamplingRenderer = false;
 	
 	public static void add(AmakPlot chart) {
 		MainWindow.addTabbedPanel(chart.name, new ChartViewer(chart.chart));
@@ -68,6 +68,7 @@ public class AmakPlot {
 			System.err.println("AmakPlot : unknow ChartType \""+chartType+"\".");
 			break;
 		}
+		chart.setAntiAlias(false);
 		add(this);
 	}
 	
@@ -150,7 +151,7 @@ public class AmakPlot {
 			tl.play();
 		}
 		
-		Platform.runLater(() -> {
+		RunLaterHelper.runLater(() -> {
 			if(seriesCollection.getSeriesIndex(seriesName) == -1) {
 				seriesCollection.addSeries(new XYSeries(seriesName));
 			}

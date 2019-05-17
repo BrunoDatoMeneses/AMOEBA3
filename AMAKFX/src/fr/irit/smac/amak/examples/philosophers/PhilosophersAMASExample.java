@@ -3,13 +3,12 @@ package fr.irit.smac.amak.examples.philosophers;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
 import javafx.scene.paint.Color;
 
 public class PhilosophersAMASExample extends Amas<TableExample> {
@@ -69,7 +68,7 @@ public class PhilosophersAMASExample extends Amas<TableExample> {
 
 	@Override
 	protected void onSystemCycleBegin() {
-		Platform.runLater(() -> {
+		RunLaterHelper.runLater(() -> {
 			comp.setText("Cycle " + getCycle());
 		});
 	}

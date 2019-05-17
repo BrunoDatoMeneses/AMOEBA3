@@ -25,15 +25,21 @@ import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import javafx.application.Platform;
+import gui.ContextExplorer;
+import gui.ContextMenuVUI;
+import gui.DimensionSelector;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
 import ncs.NCS;
 
 /**
@@ -64,6 +70,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private AmakPlot errors;
 	private ToggleButton toggleRender;
 	private SchedulerToolbar schedulerToolbar;
+	private DimensionSelector dimensionSelector;
+	private ContextExplorer contextExplorer;
+	private Menu windowMenu;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
@@ -107,16 +116,35 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				nextCycleRunAllAgents();
 		});
 		toggleRender.setSelected(renderUpdate);
-		ToolBar tb = new ToolBar();
-		tb.getItems().add(toggleRender);
-		MainWindow.addToolbar(tb);
+		MainWindow.addToolbar(toggleRender);
+		
+		// dimension selector
+		dimensionSelector = new DimensionSelector(this);
+		MainWindow.addToolbar(dimensionSelector);
+		
+		// Context explorer
+		contextExplorer = new ContextExplorer(this);
+		MainWindow.setLeftPanel(contextExplorer);
+		windowMenu = new Menu("Window");
+		MenuItem miContextExplorer = new MenuItem("Context Explorer");
+		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				MainWindow.setLeftPanel(contextExplorer);
+			}
+		});
+		windowMenu.getItems().add(miContextExplorer);
+		MainWindow.addMenu(windowMenu);
+		
+		// contextMenu "Request Here" on VUI
+		new ContextMenuVUI(this); //the ContextMenu add itself to the VUI
+		
 	}
 
 	@Override
 	protected void onUpdateRender() {
 		if (isRenderUpdate()) {
-			List<Percept> percepts = getPercepts();
-			point.move(percepts.get(0).getValue(), percepts.get(1).getValue());
+			point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
 
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
@@ -139,7 +167,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
 			}
 			
-			Platform.runLater(() -> {resetCycleWithoutRender();});
+			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
 	}
 
@@ -156,7 +184,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			 */
 			if(getCycleWithoutRender() > 10) {
 				setRenderUpdate(false);
-				Platform.runLater(()->{
+				RunLaterHelper.runLater(()->{
 					// we (sadly) have to put it inside a runlater to correctly update the slider
 					getScheduler().stop(); 
 				});
@@ -285,7 +313,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			
 			if(Configuration.waitForGUI) {
 				// we put an action in JavaFX rendering queue
-				Platform.runLater(() -> {
+				RunLaterHelper.runLater(() -> {
 					renderingPhaseSemaphore.release();
 				});
 				// and wait for it to finish
@@ -364,6 +392,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void onLoadEnded() {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
+		dimensionSelector.update();
 	}
 
 	@Override
@@ -497,5 +526,20 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public boolean isUseOracle() {
 		return useOracle;
+	}
+	
+	public void updateAgentsVisualisation() {
+		for(Agent<? extends Amas<World>, World> a : getAgents()) {
+			a.onUpdateRender();
+		}
+		point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
+	}
+	
+	/**
+	 * The tool telling which dimension to display
+	 * @return
+	 */
+	public DimensionSelector getDimensionSelector() {
+		return dimensionSelector;
 	}
 }

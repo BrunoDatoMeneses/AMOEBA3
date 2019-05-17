@@ -1,9 +1,7 @@
 package agents.context;
 
-import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +12,9 @@ import agents.head.Head;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import gui.ContextRectangle;
+import gui.ContextVisualizations;
+import javafx.scene.paint.Color;
 import kernel.AMOEBA;
 import ncs.NCS;
 
@@ -27,11 +27,16 @@ public class Context extends AmoebaAgent {
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
-	private HashMap<Percept, Boolean> perceptValidities = new HashMap<Percept, Boolean>();
 	private LocalModel localModel;
 	private double confidence = 0;
+	
+	/**
+	 * The number of time the context was activated (present in validContext).
+	 * Used for visualization.
+	 */
+	private int activations = 0;
 
-	private transient DrawableRectangle drawable;
+	private ContextVisualizations visualizations;
 
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
@@ -72,7 +77,6 @@ public class Context extends AmoebaAgent {
 		super(amoeba);
 		this.ranges = new HashMap<>();
 		this.experiments = experiments;
-		this.perceptValidities = new HashMap<>();
 		this.confidence = confidence;
 		this.localModel = localModel;
 
@@ -100,6 +104,7 @@ public class Context extends AmoebaAgent {
 	protected void onAct() {
 		
 		if(amas.getValidContexts().contains(this)) {
+			activations++;
 			headAgent.proposition(this);
 		}
 		
@@ -176,6 +181,27 @@ public class Context extends AmoebaAgent {
 	public String toString() {
 		return "Context :" + this.getName();
 	}
+	
+	public String toStringFull() {
+		String s = "";
+		s += "Context : " + getName() + "\n";
+		s += "\n";
+		
+		s += "Model : ";
+		s += this.localModel.getCoefsFormula() + "\n";
+		s += "\n";
+		
+		s += "Number of activations : " + activations + "\n";
+		s += "Action proposed : " + this.getActionProposal() + "\n";
+		s += "Number of experiments : " + experiments.size() + "\n";
+		s += "Confidence : " + confidence + "\n";
+		s += "Local model : " + localModel.getFormula(this) + "\n";
+		
+		s += "\n";
+		s += "Possible neighbours : \n";
+		
+		return s;
+	}
 
 	private void updateExperiments() {
 		ArrayList<Percept> var = amas.getPercepts();
@@ -244,7 +270,7 @@ public class Context extends AmoebaAgent {
 			percept.deleteContextProjection(this);
 		}
 		if (!Configuration.commandLineMode) {
-			drawable.hide();
+			visualizations.getDrawable().hide();
 		}
 		super.destroy();
 	}
@@ -254,11 +280,11 @@ public class Context extends AmoebaAgent {
 	 */
 	@Override
 	protected void onRenderingInitialization() {
-		amas.getAgents();
+		visualizations = new ContextVisualizations(this);
 
-		drawable = VUI.get().createRectangle(0, 0, 10, 10);
-		drawable.setLayer(1);
-		drawable.setColor(new Color(173d/255d, 79d/255d, 9d/255d, 90d/255d));
+		VUI.get().add(visualizations.getDrawable());
+		visualizations.getDrawable().setLayer(1);
+		visualizations.getDrawable().setColor(new Color(173d/255d, 79d/255d, 9d/255d, 90d/255d));
 	}
 
 	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
@@ -268,15 +294,13 @@ public class Context extends AmoebaAgent {
 	@Override
 	protected void updateRender() {
 		// update position
-		Set<Percept> sP = ranges.keySet();
-		Iterator<Percept> iter = sP.iterator();
-		Percept p1 = iter.next();
-		Percept p2 = iter.next();
+		Percept p1 = amas.getDimensionSelector().d1();
+		Percept p2 = amas.getDimensionSelector().d2();
 		double x = ranges.get(p1).getStart() + (ranges.get(p1).getLenght() / 2);
 		double y = ranges.get(p2).getStart() + (ranges.get(p2).getLenght() / 2);
-		drawable.move(x, y);
-		drawable.setWidth(ranges.get(p1).getLenght());
-		drawable.setHeight(ranges.get(p2).getLenght());
+		visualizations.getDrawable().move(x, y);
+		visualizations.getDrawable().setWidth(ranges.get(p1).getLenght());
+		visualizations.getDrawable().setHeight(ranges.get(p2).getLenght());
 
 		// Update colors
 		Double r = 0.0;
@@ -315,11 +339,7 @@ public class Context extends AmoebaAgent {
 			g = 255.0;
 			b = 255.0;
 		}
-		drawable.setColor(new Color((double) r.intValue()/255d, (double) g.intValue()/255d, (double) b.intValue()/255d, 90d/255d));
-	}
-
-	public void setPerceptValidity(Percept percept) {
-		perceptValidities.put(percept, true);
+		visualizations.getDrawable().setColor(new Color((double) r.intValue()/255d, (double) g.intValue()/255d, (double) b.intValue()/255d, 90d/255d));
 	}
 
 	public double getActionProposal() {
@@ -421,5 +441,13 @@ public class Context extends AmoebaAgent {
 
 	public HashMap<Percept, Range> getRanges() {
 		return ranges;
+	}
+	
+	/**
+	 * Get the graphical representation of the context.
+	 * @return the {@link ContextRectangle} representing the context.
+	 */
+	public ContextVisualizations getVisualizations() {
+		return visualizations;
 	}
 }

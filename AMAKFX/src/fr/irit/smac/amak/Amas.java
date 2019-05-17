@@ -12,10 +12,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
 
 /**
  * This class must be overridden by multi-agent systems
@@ -337,7 +337,7 @@ public class Amas<E extends Environment> implements Schedulable {
 			
 			if(Configuration.waitForGUI) {
 				// we put an action in JavaFX rendering queue
-				Platform.runLater(() -> {
+				RunLaterHelper.runLater(() -> {
 					renderingPhaseSemaphore.release();
 				});
 				// and wait for it to finish

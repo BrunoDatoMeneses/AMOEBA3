@@ -209,7 +209,7 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 	 * This method should be used to update the representation of the agent for
 	 * example in a VUI
 	 */
-	protected void onUpdateRender() {
+	public void onUpdateRender() {
 
 	}
 

@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Set;
 
 import fr.irit.smac.amak.Scheduler;
-import javafx.application.Platform;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.ToolBar;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 /**
@@ -17,26 +17,19 @@ import javafx.util.StringConverter;
  * @author Alexandre Perles
  *
  */
-public class SchedulerToolbar extends ToolBar {
-	/**
-	 * Unique ID meant to handle serialization correctly
-	 */
-	private static final long serialVersionUID = 2152445838931621997L;
+public class SchedulerToolbar extends VBox {
 
 	/**
 	 * The slider which controls the speed
 	 */
 	private Slider runController;
+	
+	private Label label;
 
 	/**
 	 * The scheduler to which the toolbar is associated
 	 */
 	private Scheduler scheduler;
-
-	/**
-	 * The title of the toolbar
-	 */
-	private String title;
 
 	/**
 	 * Constructor of the toolbar
@@ -49,7 +42,8 @@ public class SchedulerToolbar extends ToolBar {
 	 */
 	public SchedulerToolbar(String title, Scheduler scheduler) {
 		super();
-		this.title = title;
+		label = new Label(title);
+		label.setLabelFor(getSlider());
 		this.scheduler = scheduler;
 		this.scheduler.setOnStop(s -> getSlider().setValue(1));
 		this.scheduler.addOnChange(s -> {
@@ -80,7 +74,7 @@ public class SchedulerToolbar extends ToolBar {
 				getSlider().setValue(1);
 			}
 		});
-		Platform.runLater(() -> getItems().add(getSlider()));
+		RunLaterHelper.runLater(() -> getChildren().addAll(label, getSlider()));
 	}
 
 	/**

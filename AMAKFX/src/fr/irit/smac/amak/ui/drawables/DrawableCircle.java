@@ -1,17 +1,20 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class DrawableCircle extends Drawable {
 	private Circle circle;
 	
-	public DrawableCircle(VUI vui, double dx, double dy, double size) {
-		super(vui, dx, dy, size, size);
+	public DrawableCircle(double dx, double dy, double size) {
+		super(dx, dy, size, size);
 		circle = new Circle();
-		Platform.runLater(() -> vui.getCanvas().getChildren().add(circle));
+	}
+	
+	@Override
+	public void onAddedToVUI() {
+		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(circle));
 	}
 
 	@Override

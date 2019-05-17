@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -15,11 +14,15 @@ public class DrawableImage extends Drawable {
 	private ImageView image;
 	private static Map<String, Image> loadedImages = new HashMap<>();
 
-	public DrawableImage(VUI vui, double dx, double dy, String filename) {
-		super(vui, dx, dy, 0, 0);
+	public DrawableImage(double dx, double dy, String filename) {
+		super(dx, dy, 0, 0);
 		image = new ImageView(new Image(filename));
 		this.setFilename(filename);
-		Platform.runLater(() ->	vui.getCanvas().getChildren().add(image));
+	}
+	
+	@Override
+	public void onAddedToVUI() {
+		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(image));
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {

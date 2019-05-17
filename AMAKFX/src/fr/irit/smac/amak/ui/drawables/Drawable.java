@@ -1,7 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -194,8 +194,7 @@ public abstract class Drawable {
 	 * @param height
 	 *            the real height
 	 */
-	protected Drawable(VUI vui, double dx, double dy, double width, double height) {
-		this.vui = vui;
+	protected Drawable(double dx, double dy, double width, double height) {
 		x = dx;
 		y = dy;
 		this.width = width;
@@ -224,7 +223,7 @@ public abstract class Drawable {
 	 */
 	public void update() {
 		if (vui != null)
-			Platform.runLater(() -> vui.updateCanvas());
+			RunLaterHelper.runLater(() -> vui.updateCanvas());
 	}
 
 	/**
@@ -307,6 +306,14 @@ public abstract class Drawable {
 		update();
 		return this;
 	}
+	
+	/**
+	 * The color of the drawable.
+	 * @return
+	 */
+	public Color getColor() {
+		return color;
+	}
 
 	/**
 	 * 
@@ -375,5 +382,12 @@ public abstract class Drawable {
 			_hide();
 		update();
 		return this;
+	}
+	
+	/**
+	 * Called when a drawable is added to a VUI.
+	 * If there's thing to add to the canvas, it's done here.
+	 */
+	public void onAddedToVUI() {
 	}
 }

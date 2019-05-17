@@ -1,17 +1,20 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.ui.VUI;
-import javafx.application.Platform;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class DrawableRectangle extends Drawable {
-	private Rectangle rectangle;
+	public Rectangle rectangle;
 
-	public DrawableRectangle(VUI vui, double dx, double dy, double width, double height) {
-		super(vui, dx+width/2, dy+height/2, width, height);
+	public DrawableRectangle(double dx, double dy, double width, double height) {
+		super(dx+width/2, dy+height/2, width, height);
 		rectangle = new Rectangle();
-		Platform.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
+	}
+	
+	@Override
+	public void onAddedToVUI() {
+		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(rectangle));
 	}
 
 	@Override
@@ -28,11 +31,11 @@ public class DrawableRectangle extends Drawable {
 
 	@Override
 	protected void _hide() {
-		Platform.runLater(() -> vui.getCanvas().getChildren().remove(rectangle));
+		RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().remove(rectangle));
 	}
 
 	@Override
 	public void _show() {
-		Platform.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
+		RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
 	}
 }

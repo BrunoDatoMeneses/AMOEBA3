@@ -7,21 +7,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.amak.ui.drawables.DrawableImage;
 import fr.irit.smac.amak.ui.drawables.DrawablePoint;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import fr.irit.smac.amak.ui.drawables.DrawableString;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
 /**
@@ -152,13 +158,13 @@ public class VUI {
 	 *            The title used for the vui
 	 */
 	private VUI(String title) {
-		Platform.runLater(() -> {
+		RunLaterHelper.runLater(() -> {
 			panel = new BorderPane();
 
-			HBox statusPanel = new HBox();
+			ToolBar statusPanel = new ToolBar();
 			statusLabel = new Label("status");
 			statusLabel.setTextAlignment(TextAlignment.LEFT);
-			statusPanel.getChildren().add(statusLabel);
+			statusPanel.getItems().add(statusLabel);
 			panel.setBottom(statusPanel);
 
 			Button resetButton = new Button("Reset");
@@ -171,9 +177,16 @@ public class VUI {
 					updateCanvas();
 				}
 			});
-			statusPanel.getChildren().add(resetButton);
+			statusPanel.getItems().add(resetButton);
 
 			canvas = new Pane();
+			canvas.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
+			// clip the canvas (avoid drawing outside of it)
+			Rectangle clip = new Rectangle(0, 0, 0, 0);
+			clip.widthProperty().bind(canvas.widthProperty());
+			clip.heightProperty().bind(canvas.heightProperty());
+			canvas.setClip(clip);
+			
 			canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
@@ -316,6 +329,7 @@ public class VUI {
 	 */
 	public void add(Drawable d) {
 		d.setPanel(this);
+		d.onAddedToVUI();
 		drawablesLock.lock();
 		drawables.add(d);
 		drawablesLock.unlock();
@@ -337,7 +351,7 @@ public class VUI {
 			d.onDraw(canvas);
 		drawablesLock.unlock();
 
-		Platform.runLater(() -> {
+		RunLaterHelper.runLater(() -> {
 			statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
 		});
 	}
@@ -408,7 +422,7 @@ public class VUI {
 	 * @return the point object
 	 */
 	public DrawablePoint createPoint(double dx, double dy) {
-		DrawablePoint drawablePoint = new DrawablePoint(this, dx, dy);
+		DrawablePoint drawablePoint = new DrawablePoint(dx, dy);
 		add(drawablePoint);
 		return drawablePoint;
 	}
@@ -427,7 +441,7 @@ public class VUI {
 	 * @return the rectangle object
 	 */
 	public DrawableRectangle createRectangle(double x, double y, double w, double h) {
-		DrawableRectangle d = new DrawableRectangle(this, x, y, w, h);
+		DrawableRectangle d = new DrawableRectangle(x, y, w, h);
 		add(d);
 		return d;
 	}
@@ -463,7 +477,7 @@ public class VUI {
 	 * @return the created image
 	 */
 	public DrawableImage createImage(double dx, double dy, String filename) {
-		DrawableImage image = new DrawableImage(this, dx, dy, filename);
+		DrawableImage image = new DrawableImage(dx, dy, filename);
 		add(image);
 		return image;
 	}
@@ -480,7 +494,7 @@ public class VUI {
 	 * @return the created string
 	 */
 	public DrawableString createString(int dx, int dy, String text) {
-		DrawableString ds = new DrawableString(this, dx, dy, text);
+		DrawableString ds = new DrawableString(dx, dy, text);
 		add(ds);
 		return ds;
 	}
