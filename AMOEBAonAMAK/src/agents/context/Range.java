@@ -1,7 +1,8 @@
 package agents.context;
 
-import agents.percept.Percept;
 import java.io.Serializable;
+
+import agents.percept.Percept;
 
 /**
  * The Class Range.

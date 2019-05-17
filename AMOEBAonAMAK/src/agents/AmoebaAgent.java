@@ -2,14 +2,14 @@ package agents;
 
 import java.io.Serializable;
 
-import fr.irit.smac.amak.CommunicatingAgent;
+import fr.irit.smac.amak.Agent;
 import kernel.AMOEBA;
 import kernel.World;
 
 /**
  * The base class for all AMOEBA agents
  */
-public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> implements Serializable {
+public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serializable {
 	private static final long serialVersionUID = 1L;
 	// Attributes
 	protected String name;
@@ -29,7 +29,7 @@ public abstract class AmoebaAgent extends CommunicatingAgent<AMOEBA, World> impl
 	}
 
 	@Override
-	protected void onUpdateRender() {
+	public void onUpdateRender() {
 		super.onUpdateRender();
 		amas.getEnvironment().incrementNbActivatedAgent();
 		if (amas.isRenderUpdate()) {
