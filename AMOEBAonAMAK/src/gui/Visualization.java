@@ -21,4 +21,9 @@ public interface Visualization {
 	 * @param event
 	 */
 	public void onEvent(Event event);
+	
+	/**
+	 * Force the visualization to update itself
+	 */
+	public void update();
 }

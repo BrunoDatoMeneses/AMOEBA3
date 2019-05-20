@@ -10,11 +10,8 @@ import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.VUI;
-import gui.ContextRectangle;
-import gui.ContextVisualizations;
-import javafx.scene.paint.Color;
+import gui.ContextRendererFX;
+import gui.RenderStrategy;
 import kernel.AMOEBA;
 import ncs.NCS;
 
@@ -23,6 +20,10 @@ import ncs.NCS;
  * 
  */
 public class Context extends AmoebaAgent {
+	// STATIC ---
+	public static Class<? extends RenderStrategy> defaultRenderStrategy =  ContextRendererFX.class;
+	// ----------
+	
 	private static final long serialVersionUID = 1L;
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
@@ -35,8 +36,6 @@ public class Context extends AmoebaAgent {
 	 * Used for visualization.
 	 */
 	private int activations = 0;
-
-	private ContextVisualizations visualizations;
 
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
@@ -116,6 +115,16 @@ public class Context extends AmoebaAgent {
 			}
 		}
 		
+	}
+	
+	@Override
+	protected void onRenderingInitialization() {
+		try {
+			setRenderStrategy(defaultRenderStrategy.newInstance());
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		super.onRenderingInitialization();
 	}
 
 	// ---------------------------- NCS Resolutions ----------------------------
@@ -269,77 +278,7 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : percepts) {
 			percept.deleteContextProjection(this);
 		}
-		if (!Configuration.commandLineMode) {
-			visualizations.getDrawable().hide();
-		}
 		super.destroy();
-	}
-
-	/**
-	 * @warning: for now just in 2 dimensions
-	 */
-	@Override
-	protected void onRenderingInitialization() {
-		visualizations = new ContextVisualizations(this);
-
-		VUI.get().add(visualizations.getDrawable());
-		visualizations.getDrawable().setLayer(1);
-		visualizations.getDrawable().setColor(new Color(173d/255d, 79d/255d, 9d/255d, 90d/255d));
-	}
-
-	public double normalizePositiveValues(double upperBound, double dispersion, double value) {
-		return upperBound * 2 * (-0.5 + 1 / (1 + Math.exp(-value / dispersion)));
-	}
-
-	@Override
-	protected void updateRender() {
-		// update position
-		Percept p1 = amas.getDimensionSelector().d1();
-		Percept p2 = amas.getDimensionSelector().d2();
-		double x = ranges.get(p1).getStart() + (ranges.get(p1).getLenght() / 2);
-		double y = ranges.get(p2).getStart() + (ranges.get(p2).getLenght() / 2);
-		visualizations.getDrawable().move(x, y);
-		visualizations.getDrawable().setWidth(ranges.get(p1).getLenght());
-		visualizations.getDrawable().setHeight(ranges.get(p2).getLenght());
-
-		// Update colors
-		Double r = 0.0;
-		Double g = 0.0;
-		Double b = 0.0;
-		double[] coefs = localModel.getCoefs();
-		if (coefs.length > 0) {
-			if (coefs.length == 1) {
-				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-				if (b.isNaN())
-					b = 0.0;
-			} else if (coefs.length == 0) {
-				g = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-				b = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-				if (g.isNaN())
-					g = 0.0;
-				if (b.isNaN())
-					b = 0.0;
-			} else if (coefs.length >= 3) {
-				r = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-				g = normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-				b = normalizePositiveValues(255, 5, Math.abs(coefs[2]));
-				if (r.isNaN())
-					r = 0.0;
-				if (g.isNaN())
-					g = 0.0;
-				if (b.isNaN())
-					b = 0.0;
-			} else {
-				r = 255.0;
-				g = 255.0;
-				b = 255.0;
-			}
-		} else {
-			r = 255.0;
-			g = 255.0;
-			b = 255.0;
-		}
-		visualizations.getDrawable().setColor(new Color((double) r.intValue()/255d, (double) g.intValue()/255d, (double) b.intValue()/255d, 90d/255d));
 	}
 
 	public double getActionProposal() {
@@ -443,11 +382,7 @@ public class Context extends AmoebaAgent {
 		return ranges;
 	}
 	
-	/**
-	 * Get the graphical representation of the context.
-	 * @return the {@link ContextRectangle} representing the context.
-	 */
-	public ContextVisualizations getVisualizations() {
-		return visualizations;
+	public LocalModel getLocalModel() {
+		return localModel;
 	}
 }

@@ -25,7 +25,7 @@ public class ContextRectangle extends DrawableRectangle implements Visualization
 		rectangle.addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				context.getVisualizations().dispatchEvent(event);
+				AmoebaWindow.instance().getContextVisualizations(context).dispatchEvent(event);
 			}
 		});
 	}

@@ -27,19 +27,8 @@ import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
-import fr.irit.smac.amak.ui.AmakPlot.ChartType;
-import fr.irit.smac.amak.ui.MainWindow;
-import fr.irit.smac.amak.ui.SchedulerToolbar;
-import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.ContextExplorer;
-import gui.ContextMenuVUI;
+import gui.AmoebaWindow;
 import gui.DimensionSelector;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToggleButton;
 import ncs.NCS;
 
 /**
@@ -59,20 +48,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
-	private boolean renderUpdate = false;
+	public boolean renderUpdate = false;
 	
 	private int cycleWithoutRender = 0;
-
-	private Drawable point;
-	private AmakPlot loopNCS;
-	private AmakPlot allNCS;
-	private AmakPlot nbAgent;
-	private AmakPlot errors;
-	private ToggleButton toggleRender;
-	private SchedulerToolbar schedulerToolbar;
-	private DimensionSelector dimensionSelector;
-	private ContextExplorer contextExplorer;
-	private Menu windowMenu;
 
 	/**
 	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
@@ -92,60 +70,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onInitialAgentsCreation() {
 	}
-
+	
 	@Override
 	protected void onRenderingInitialization() {
-		super.onRenderingInitialization();
-		// scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("AMOEBA", getScheduler());
-		MainWindow.addToolbar(schedulerToolbar);
-
-		// amoeba and agent
-		VUI.get().setDefaultView(200, 0, 0);
-		point = VUI.get().createPoint(0, 0);
-		loopNCS = new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS");
-		allNCS = new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS");
-		nbAgent = new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents");
-		errors = new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients");
-
-		// update render button
-		toggleRender = new ToggleButton("Allow Rendering");
-		toggleRender.setOnAction(evt -> {
-			renderUpdate = toggleRender.isSelected(); 
-			if(renderUpdate)
-				nextCycleRunAllAgents();
-		});
-		toggleRender.setSelected(renderUpdate);
-		MainWindow.addToolbar(toggleRender);
-		
-		// dimension selector
-		dimensionSelector = new DimensionSelector(this);
-		MainWindow.addToolbar(dimensionSelector);
-		
-		// Context explorer
-		contextExplorer = new ContextExplorer(this);
-		MainWindow.setLeftPanel(contextExplorer);
-		windowMenu = new Menu("Window");
-		MenuItem miContextExplorer = new MenuItem("Context Explorer");
-		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				MainWindow.setLeftPanel(contextExplorer);
-			}
-		});
-		windowMenu.getItems().add(miContextExplorer);
-		MainWindow.addMenu(windowMenu);
-		
-		// contextMenu "Request Here" on VUI
-		new ContextMenuVUI(this); //the ContextMenu add itself to the VUI
-		
+		AmoebaWindow.instance().initialize(this);
 	}
 
 	@Override
 	protected void onUpdateRender() {
 		if (isRenderUpdate()) {
-			point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
+			AmoebaWindow window = AmoebaWindow.instance();
+			window.point.move(window.dimensionSelector.d1().getValue(), window.dimensionSelector.d2().getValue());
 
+			AmakPlot loopNCS = window.getPlot("This loop NCS");
+			AmakPlot allNCS = window.getPlot("All time NCS");
+			AmakPlot nbAgent = window.getPlot("Number of agents");
+			AmakPlot errors = window.getPlot("Errors");
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 			for (NCS ncs : NCS.values()) {
@@ -374,7 +314,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
-			schedulerToolbar.setDisable(!allow);
+			AmoebaWindow.instance().schedulerToolbar.setDisable(!allow);
 		}
 	}
 
@@ -392,7 +332,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void onLoadEnded() {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
-		dimensionSelector.update();
+		AmoebaWindow.instance().dimensionSelector.update();
 	}
 
 	@Override
@@ -418,7 +358,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
-			toggleRender.setSelected(renderUpdate);
+			AmoebaWindow.instance().toggleRender.setSelected(renderUpdate);
 			if(renderUpdate == true)
 				nextCycleRunAllAgents();
 		}
@@ -532,7 +472,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
 		}
-		point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
 	}
 	
 	/**
@@ -540,6 +480,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public DimensionSelector getDimensionSelector() {
-		return dimensionSelector;
+		return AmoebaWindow.instance().dimensionSelector;
 	}
 }

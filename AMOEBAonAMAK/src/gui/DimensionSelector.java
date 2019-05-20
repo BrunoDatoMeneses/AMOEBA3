@@ -28,18 +28,6 @@ public class DimensionSelector extends HBox {
 		this.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(dim1, dim2);
 		this.update();
-		dim1.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				onChange();
-			}
-		});
-		dim2.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				onChange();
-			}
-		});
 	}
 	
 	/**
@@ -49,6 +37,8 @@ public class DimensionSelector extends HBox {
 	public void update() {
 		ArrayList<Percept> perceptNames = amoeba.getPercepts();
 		Semaphore done = new Semaphore(0);
+		dim1.setOnAction(null);
+		dim2.setOnAction(null);
 		RunLaterHelper.runLater(() -> {
 			dim1.getItems().clear();
 			dim2.getItems().clear();
@@ -68,6 +58,18 @@ public class DimensionSelector extends HBox {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		dim1.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				onChange();
+			}
+		});
+		dim2.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				onChange();
+			}
+		});
 	}
 	
 	/**

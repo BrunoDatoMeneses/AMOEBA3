@@ -16,11 +16,11 @@ public class MiniContextRectangle extends ContextRectangle {
 	private StackPane stack;
 	private Label label;
 	private boolean activated;
+	private ContextRectangle original;
 	
 	public MiniContextRectangle(ContextRectangle original) {
 		super(0, 0, 60, 30, original.context);
-		rectangle.setFill(original.rectangle.getFill());
-		rectangle.setStyle(original.rectangle.getStyle());
+		this.original = original;
 		stack = new StackPane();
 		label = new Label(context.getName());
 		activated = false;
@@ -46,4 +46,10 @@ public class MiniContextRectangle extends ContextRectangle {
 			}
 		}
 	}
+	
+	@Override
+		public void update() {
+			rectangle.setFill(original.rectangle.getFill());
+			rectangle.setStyle(original.rectangle.getStyle());
+		}
 }

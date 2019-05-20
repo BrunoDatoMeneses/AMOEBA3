@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.MainWindow;
+import gui.AmoebaWindow;
 import kernel.AMOEBA;
 import kernel.BackupSystem;
 import kernel.IBackupSystem;
@@ -17,7 +17,7 @@ public class Main {
 		// Instantiating the MainWindow before usage.
 		// It also allows you to change some of its behavior before creating an AMOEBA.
 		// If you use Configuration.commandLineMode = True , then you should skip it. 
-		MainWindow.instance();
+		AmoebaWindow.instance();
 		example();
 	}
 

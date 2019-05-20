@@ -12,6 +12,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -20,6 +21,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import kernel.AMOEBA;
 
+/**
+ * A piece of GUI allowing to see and look for contexts.
+ * @author Hugo
+ *
+ */
 public class ContextExplorer extends ScrollPane {
 
 	private AMOEBA amoeba;
@@ -79,6 +85,17 @@ public class ContextExplorer extends ScrollPane {
 
 		vbox.getChildren().addAll(hboxButtons, search, contextsPane);
 		update();
+		
+		// Add to main window
+		AmoebaWindow.setLeftPanel(this);
+		MenuItem miContextExplorer = new MenuItem("Context Explorer");
+		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				AmoebaWindow.setLeftPanel(ContextExplorer.this);
+			}
+		});
+		AmoebaWindow.addToMenu("Window", miContextExplorer);
 	}
 
 	/**
@@ -86,20 +103,23 @@ public class ContextExplorer extends ScrollPane {
 	 */
 	public void update() {
 		contextList = amoeba.getContexts();
-		// very crude color sort, we only look at red.
+		// crude color sort
 		contextList.sort(new Comparator<Context>() {
 			@Override
 			public int compare(Context o1, Context o2) {
-				Color c1 = o1.getVisualizations().getDrawable().getColor();
-				Color c2 = o2.getVisualizations().getDrawable().getColor();
-				return (int) ((c1.getRed()*255)-(c2.getRed()*255));
+				Color c1 = AmoebaWindow.instance().getContextVisualizations(o1).getDrawable().getColor();
+				Color c2 = AmoebaWindow.instance().getContextVisualizations(o2).getDrawable().getColor();
+				double score1 = c1.getRed()*100 + c1.getGreen()*10 + c1.getBlue();
+				double score2 = c2.getRed()*100 + c2.getGreen()*10 + c2.getBlue();
+				return (int) ((score1 - score2)*10);
 			}
 		});
 		cpVBox.getChildren().clear();
 		Pattern p = Pattern.compile(search.getText());
 		for(Context c : contextList) {
 			if(p.matcher(c.toStringFull()).find()) {
-				cpVBox.getChildren().add(c.getVisualizations().getMini().getNode());
+				AmoebaWindow.instance().getContextVisualizations(c).getMini().update();
+				cpVBox.getChildren().add(AmoebaWindow.instance().getContextVisualizations(c).getMini().getNode());
 			}
 		}
 	}

@@ -469,7 +469,7 @@ public class BackupSystem implements IBackupSystem {
 					loadXML(file);
 			}
 		};
-		MainWindow.addMenuItem("Load", eventLoad);
+		MainWindow.addOptionsItem("Load", eventLoad);
 		
 		// Creation of the save menu item
 		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
@@ -481,6 +481,6 @@ public class BackupSystem implements IBackupSystem {
 					saveXML(file);
 			}
 		};
-		MainWindow.addMenuItem("Save", eventSave);
+		MainWindow.addOptionsItem("Save", eventSave);
 	}
 }

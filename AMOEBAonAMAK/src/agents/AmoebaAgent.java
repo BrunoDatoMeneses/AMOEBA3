@@ -3,6 +3,7 @@ package agents;
 import java.io.Serializable;
 
 import fr.irit.smac.amak.Agent;
+import gui.RenderStrategy;
 import kernel.AMOEBA;
 import kernel.World;
 
@@ -14,6 +15,8 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	// Attributes
 	protected String name;
 	private boolean dying;
+	
+	protected RenderStrategy renderStrategy;
 
 	/**
 	 * Instantiate a new agent attached to an amoeba
@@ -29,18 +32,19 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	}
 
 	@Override
-	public void onUpdateRender() {
-		super.onUpdateRender();
-		amas.getEnvironment().incrementNbActivatedAgent();
-		if (amas.isRenderUpdate()) {
-			updateRender();
-		}
+	protected void onRenderingInitialization() {
+		if(renderStrategy != null)
+			renderStrategy.initialize(this);
 	}
-
-	/**
-	 * Rendering that can be deactivated at runtime
-	 */
-	protected void updateRender() {
+	
+	@Override
+	public void onUpdateRender() {
+		amas.getEnvironment().incrementNbActivatedAgent();
+		if(renderStrategy != null) {
+			if (amas.isRenderUpdate()) {
+				renderStrategy.render(this);
+			}
+		}
 	}
 
 	public void setName(String name) {
@@ -51,6 +55,9 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	public void destroy() {
 		dying = true;
 		super.destroy();
+		if(renderStrategy != null) {
+			renderStrategy.delete(this);
+		}
 	}
 
 	public String getName() {
@@ -59,5 +66,9 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 
 	public boolean isDying() {
 		return dying;
+	}
+	
+	public void setRenderStrategy(RenderStrategy renderStrategy) {
+		this.renderStrategy = renderStrategy;
 	}
 }
