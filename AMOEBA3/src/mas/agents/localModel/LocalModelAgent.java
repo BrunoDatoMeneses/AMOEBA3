@@ -88,7 +88,7 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	public abstract void updateModel(Context context);
 	
 	public abstract void updateModelWithExperiments(ArrayList<Experiment> experimentsList);
-	public abstract void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight);
+	public abstract void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPointsForRegression);
 	public abstract String coefsToString();
 	public abstract double distance(Experiment experiment);
 	

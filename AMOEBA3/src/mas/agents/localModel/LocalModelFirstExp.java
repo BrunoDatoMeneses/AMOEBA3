@@ -86,7 +86,7 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 	}
 
 	@Override
-	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight) {
+	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
 		// TODO Auto-generated method stub
 		
 	}

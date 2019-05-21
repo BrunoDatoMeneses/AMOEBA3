@@ -2,6 +2,7 @@ package mas.agents.localModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import mas.kernel.World;
 import mas.agents.AbstractPair;
@@ -356,17 +357,20 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 	}
 	
-	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight) {
+	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
 		
 		regression = new Regression(nParameters,true);
 		//System.out.println("***********************************************************************************************************************************************************");
 		
-		int numberOfPoints = 20;
-		
-		AbstractPair<double[][], double[]> artificialSituations = getHomogeneouslyDistributedArtificialExperiments((int)(numberOfPoints - (numberOfPoints*weight)));
+		//AbstractPair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
+		AbstractPair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		
 		//System.out.println("ARTIFICIAL ");
-		for (int i =0;i<(int)(numberOfPoints - (numberOfPoints*weight));i++) {
+		int numberOfArtificialPoints = artificialSituations.getB().length;
+		
+		System.out.println("NUMBER OF REAL ARTIFICIAL POINTS: " + numberOfArtificialPoints);
+		for (int i =0;i<numberOfArtificialPoints;i++) {
+		//for (int i =0;i<(int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight));i++) {
 			
 			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);
 			
@@ -379,7 +383,15 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		}
 		
 		//System.out.println("XP");
-		for (int i =0;i<(int)(numberOfPoints*weight);i++) {
+		int numberOfXPPoints;
+		if(numberOfArtificialPoints != (int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight))) {
+			numberOfXPPoints = (int)(weight*numberOfArtificialPoints/(1-weight));
+		}
+		else {
+			numberOfXPPoints = (int)(numberOfPointsForRegression*weight);
+		}
+		System.out.println("NUMBER OF XP POINTS: " + numberOfXPPoints);
+		for (int i =0;i<numberOfXPPoints;i++) {
 			
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
@@ -407,7 +419,101 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 	}
 	
-	private AbstractPair<double[][], double[]> getHomogeneouslyDistributedArtificialExperiments(int amount){
+	private AbstractPair<double[][], double[]> getEquallyDistributedArtificialExperiments(int amount){
+		
+		
+
+		
+		int[] nbPointsByPercept = new int[world.getScheduler().getPercepts().size()];
+		
+		ArrayList<Double> pointsByPercept[] = new ArrayList[world.getScheduler().getPercepts().size()];
+		
+		int totalNumberOfPoints = 1;
+		
+		for(int i = 0 ; i < world.getScheduler().getPercepts().size() ; i++) {
+			
+			double startRange = this.context.getRanges().get(world.getScheduler().getPercepts().get(i)).getStart();
+			double endRange = this.context.getRanges().get(world.getScheduler().getPercepts().get(i)).getEnd();			
+			
+			nbPointsByPercept[i] = (int)(amount*this.context.rangeLengthRatio(world.getScheduler().getPercepts().get(i)));
+			pointsByPercept[i] = new ArrayList<Double>();
+
+			totalNumberOfPoints *= nbPointsByPercept[i];
+			
+			
+			for(int j=0;j<=nbPointsByPercept[i]-1;j++) {
+				pointsByPercept[i].add(startRange + ((endRange-startRange)/(nbPointsByPercept[i]-1))*j );
+			}
+			
+		}
+		
+		int[] perceptIndices = new int[world.getScheduler().getPercepts().size()];
+		for(int i = 0 ; i < world.getScheduler().getPercepts().size() ; i++) {
+			perceptIndices[i] = 0;
+		}
+
+		
+		int i = 0;
+		boolean test = true;
+		double[][] artificalExperiments = new double[totalNumberOfPoints][nParameters];
+		double[] artificalResults = new double[totalNumberOfPoints];
+
+		while(test) {
+			
+			for(int j = 0;j<nParameters;j++) {
+				
+				artificalExperiments[i][j] = pointsByPercept[j].get(perceptIndices[j]);
+				
+			}
+			artificalResults[i] = this.getProposition(context, artificalExperiments[i]);
+			
+			test = nextMultiDimCounter(perceptIndices, nbPointsByPercept);
+			
+			i++;
+			
+		}
+		System.out.println("NUMBER OF REAL ARTIFICIAL POINTS: " + i + " "+ totalNumberOfPoints);
+		
+//		for(int k = 0;k<totalNumberOfPoints;k++) {
+//			for (int j = 0 ; j < nParameters ; j++ ) {
+//				System.out.print(artificalExperiments[k][j] + "   " );
+//			}
+//			System.out.println(artificalResults[k] + "   " );
+//		}
+		
+		
+		
+		return new AbstractPair<double[][], double[]>(artificalExperiments, artificalResults);
+	}
+	
+	private boolean nextMultiDimCounter(int[] indices, int[] bounds){
+		
+		
+		
+		for(int i = 0; i<indices.length;i++) {
+			
+			if(indices[i]==bounds[i]-1) {
+				if(i==indices.length-1) {
+					indices[i]=0;
+					return false;
+				}
+				else {
+					indices[i]=0;
+				}				
+			}
+			else {
+				indices[i] += 1;
+				return true;
+			}
+			
+		}
+		
+		return false;
+
+		
+	}
+	
+	private AbstractPair<double[][], double[]> getRandomlyDistributedArtificialExperiments(int amount){
 		
 		double[][] artificalExperiments = new double[amount][nParameters];
 		double[] artificalResults = new double[amount];

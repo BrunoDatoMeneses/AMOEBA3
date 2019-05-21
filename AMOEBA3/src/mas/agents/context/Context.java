@@ -1395,13 +1395,25 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private boolean tryNewExperiment2() {
 		
 		if(localModel.distance(getCurrentExperiment())<10.0) {
-			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
+			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5,100);
 			return true;
 		}
 		 return false;
 	}
 	
+	public double sumOfRangesLengths() {
+		double sum = 0;
+		
+		for(Percept pct : world.getScheduler().getPercepts()) {
+			sum += this.getRanges().get(pct).getLenght();
+		}
+		
+		return sum;
+	}
 	
+	public double rangeLengthRatio(Percept pct) {
+		return this.getRanges().get(pct).getLenght()/sumOfRangesLengths();
+	}
 	
 	public AbstractPair<Boolean, Double> tryAlternativeModel(LocalModelAgent alternativeModel) {
 		

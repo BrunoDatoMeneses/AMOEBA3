@@ -45,6 +45,7 @@ public class F_XY_Launcher implements Serializable {
 		}
 		
 		amoeba.getScheduler().getHeadAgent().learningSpeed = 0.5;
+		amoeba.getScheduler().getHeadAgent().numberOfPointsForRegression = 50;
 		
 		for(Percept pct : amoeba.getScheduler().getPercepts()) {
 			System.out.println(pct.getName() + " Min " + pct.getMin());

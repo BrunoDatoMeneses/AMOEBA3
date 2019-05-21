@@ -155,6 +155,7 @@ public class Head extends AbstractHead implements Cloneable{
 	public long otherExecutionTimeSum= 0;
 	
 	public double learningSpeed = 0.25;
+	public int numberOfPointsForRegression = 50;
 
 	/**
 	 * Sets the data for error margin.
@@ -1131,7 +1132,7 @@ public class Head extends AbstractHead implements Cloneable{
 			
 			//System.out.println(closestContextToOracle.getLocalModel().distance(closestContextToOracle.getCurrentExperiment()) + " ******************************************************************DISTANCE TO MODEL : " );
 			//System.out.println("OLD COEFS " + closestContextToOracle.getLocalModel().coefsToString());
-			closestContextToOracle.getLocalModel().updateModelWithExperimentAndWeight(closestContextToOracle.getCurrentExperiment(),learningSpeed);
+			closestContextToOracle.getLocalModel().updateModelWithExperimentAndWeight(closestContextToOracle.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
 			System.out.println("NEW COEFS " + closestContextToOracle.getLocalModel().coefsToString());
 			
 			activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
@@ -1162,7 +1163,7 @@ public class Head extends AbstractHead implements Cloneable{
 				
 				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
 					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-					activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed);
+					activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
 					System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 					
 				}else {
@@ -1173,7 +1174,7 @@ public class Head extends AbstractHead implements Cloneable{
 				
 			}else {
 				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-				activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed);
+				activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
 				System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 				
 				
