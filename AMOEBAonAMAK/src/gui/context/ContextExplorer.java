@@ -6,17 +6,21 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import agents.context.Context;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.MainWindow;
 import gui.AmoebaWindow;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -47,7 +51,7 @@ public class ContextExplorer extends ScrollPane {
 		vbox.setFillWidth(true);
 		this.setContent(vbox);
 
-		// refresh and close button
+		// refresh, close, and collapseAll button
 		HBox hboxButtons = new HBox();
 		Button refresh = new Button("Refresh");
 		refresh.setOnAction(new EventHandler<ActionEvent>() {
@@ -63,7 +67,14 @@ public class ContextExplorer extends ScrollPane {
 				MainWindow.setLeftPanel(null);
 			}
 		});
-		hboxButtons.getChildren().addAll(refresh, close);
+		Button collapseAll = new Button("Collapse all");
+		collapseAll.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				collapseAll();
+			}
+		});
+		hboxButtons.getChildren().addAll(refresh, close, collapseAll);
 
 		// search bar
 		search = new TextField();
@@ -123,5 +134,14 @@ public class ContextExplorer extends ScrollPane {
 				cpVBox.getChildren().add(AmoebaWindow.instance().getContextVisualizations(c).getMini().getNode());
 			}
 		}
+	}
+	
+	private void collapseAll() {
+		contextList = amoeba.getContexts();
+		for(Context c : contextList) {
+			ContextVisualizations vizu = AmoebaWindow.instance().getContextVisualizations(c);
+			vizu.getMini().collapse();
+		}
+		update();
 	}
 }

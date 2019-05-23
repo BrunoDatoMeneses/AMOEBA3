@@ -36,20 +36,27 @@ public class MiniContextRectangle extends ContextRectangle {
 	
 	@Override
 	protected void onMouseClick(MouseEvent event) {
-		if(event.getButton() == MouseButton.PRIMARY) {
-			activated = !activated;
-			update();
-		}
+		activated = !activated;
+		update();
 	}
 	
 	@Override
-		public void update() {
-			rectangle.setFill(original.rectangle.getFill());
-			rectangle.setStyle(original.rectangle.getStyle());
-			if(activated) {
-				label.setText(context.toStringFull());
-			} else {
-				label.setText(context.getName());
-			}
+	public void update() {
+		rectangle.setFill(original.rectangle.getFill());
+		rectangle.setStyle(original.rectangle.getStyle());
+		if(activated) {
+			label.setText(context.toStringFull());
+		} else {
+			label.setText(context.getName());
 		}
+		label.autosize();
+	}
+	
+	/**
+	 * Set text to the (small) name of the context
+	 */
+	public void collapse() {
+		activated = false;
+		label.setText(context.getName());
+	}
 }
