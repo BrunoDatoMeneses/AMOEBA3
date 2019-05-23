@@ -11,6 +11,7 @@ import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
+import gui.context.ContextVisualizations;
 import javafx.application.Application;
 import javafx.scene.control.Menu;
 import javafx.scene.control.ToggleButton;
@@ -27,11 +28,12 @@ public class AmoebaWindow extends MainWindow {
 	
 	private HashMap<Context, ContextVisualizations> contextVisualizationMap = new HashMap<>();
 	
+	public VUI mainVUI;
+	
 	public Drawable point;
 	public ToggleButton toggleRender;
 	public SchedulerToolbar schedulerToolbar;
 	public DimensionSelector dimensionSelector;
-	public ContextExplorer contextExplorer;
 	public Menu windowMenu;
 	
 	public AmoebaWindow() throws InstanceAlreadyExistsException {
@@ -40,13 +42,15 @@ public class AmoebaWindow extends MainWindow {
 	
 	public void initialize(AMOEBA amoeba) {
 		
+		mainVUI = VUI.get("2D");
+		mainVUI.setDefaultView(200, 0, 0);
+		
 		// scheduler toolbar
 		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());
 		AmoebaWindow.addToolbar(schedulerToolbar);	
 		
 		// amoeba and agent
-		VUI.get().setDefaultView(200, 0, 0);
-		point = VUI.get().createPoint(0, 0);
+		point = mainVUI.createAndAddPoint(0, 0);
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
@@ -55,13 +59,13 @@ public class AmoebaWindow extends MainWindow {
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {
-			amoeba.renderUpdate = toggleRender.isSelected(); 
-			if(amoeba.renderUpdate) {
+			amoeba.setRenderUpdate(toggleRender.isSelected()); 
+			if(amoeba.isRenderUpdate()) {
 				amoeba.updateAgentsVisualisation();
 				amoeba.nextCycleRunAllAgents();
 			}
 		});
-		toggleRender.setSelected(amoeba.renderUpdate);
+		toggleRender.setSelected(amoeba.isRenderUpdate());
 		AmoebaWindow.addToolbar(toggleRender);
 		
 		// dimension selector
@@ -69,7 +73,7 @@ public class AmoebaWindow extends MainWindow {
 		AmoebaWindow.addToolbar(dimensionSelector);
 		
 		// contextMenu "Request Here" on VUI
-		new ContextMenuVUI(amoeba); //the ContextMenu add itself to the VUI
+		new ContextMenuVUI(amoeba, mainVUI); //the ContextMenu add itself to the VUI
 	}
 	
 	/**

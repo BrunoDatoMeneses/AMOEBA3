@@ -371,6 +371,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * {@link Amas#onRenderingInitialization}
 	 */
 	protected void onUpdateRender() {
+		VUI.get().updateCanvas();
 	}
 
 	/**

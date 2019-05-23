@@ -1,8 +1,9 @@
-package gui;
+package gui.context;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import fr.irit.smac.amak.ui.VUI;
+import gui.AmoebaWindow;
+import gui.RenderStrategy;
 import javafx.scene.paint.Color;
 
 /**
@@ -12,22 +13,19 @@ import javafx.scene.paint.Color;
  */
 public class ContextRendererFX implements RenderStrategy {
 	
-	private static ContextExplorer contextExplorer;
+	public static ContextExplorer contextExplorer;
 
 	@Override
 	public void render(Object object) {
 		Context context = (Context) object;
 		ContextVisualizations vizu = AmoebaWindow.instance().getContextVisualizations(context);
-		// update position
-		Percept p1 = context.getAmas().getDimensionSelector().d1();
-		Percept p2 = context.getAmas().getDimensionSelector().d2();
-		double x = context.getRanges().get(p1).getStart() + (context.getRanges().get(p1).getLenght() / 2);
-		double y = context.getRanges().get(p2).getStart() + (context.getRanges().get(p2).getLenght() / 2);
-		vizu.getDrawable().move(x, y);
-		vizu.getDrawable().setWidth(context.getRanges().get(p1).getLenght());
-		vizu.getDrawable().setHeight(context.getRanges().get(p2).getLenght());
+		
+		updatePosition(context, vizu);
+		
+		updateColor(context, vizu);
+	}
 
-		// Update colors
+	private void updateColor(Context context, ContextVisualizations vizu) {
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
@@ -65,7 +63,16 @@ public class ContextRendererFX implements RenderStrategy {
 			b = 255.0;
 		}
 		vizu.getDrawable().setColor(new Color((double) r.intValue()/255d, (double) g.intValue()/255d, (double) b.intValue()/255d, 90d/255d));
-	
+	}
+
+	private void updatePosition(Context context, ContextVisualizations vizu) {
+		Percept p1 = context.getAmas().getDimensionSelector().d1();
+		Percept p2 = context.getAmas().getDimensionSelector().d2();
+		double x = context.getRanges().get(p1).getStart() + (context.getRanges().get(p1).getLenght() / 2);
+		double y = context.getRanges().get(p2).getStart() + (context.getRanges().get(p2).getLenght() / 2);
+		vizu.getDrawable().move(x, y);
+		vizu.getDrawable().setWidth(context.getRanges().get(p1).getLenght());
+		vizu.getDrawable().setHeight(context.getRanges().get(p2).getLenght());
 	}
 	
 	private double normalizePositiveValues(double upperBound, double dispersion, double value) {
@@ -76,9 +83,7 @@ public class ContextRendererFX implements RenderStrategy {
 	public void initialize(Object object) {
 		Context context = (Context) object;
 		ContextVisualizations vizu = AmoebaWindow.instance().getContextVisualizations(context);
-		VUI.get().add(vizu.getDrawable());
-		vizu.getDrawable().setLayer(1);
-		vizu.getDrawable().setColor(new Color(173d/255d, 79d/255d, 9d/255d, 90d/255d));
+		vizu.getDrawable(); // create the drawable if it does not exist
 		
 		if(contextExplorer == null) {
 			contextExplorer = new ContextExplorer(context.getAmas());
@@ -88,7 +93,7 @@ public class ContextRendererFX implements RenderStrategy {
 	@Override
 	public void delete(Object object) {
 		Context context = (Context) object;
-		AmoebaWindow.instance().getContextVisualizations(context).getDrawable().hide();
+		AmoebaWindow.instance().getContextVisualizations(context).getDrawable().delete();
 		AmoebaWindow.instance().removeContextVisualization(context);
 	}
 

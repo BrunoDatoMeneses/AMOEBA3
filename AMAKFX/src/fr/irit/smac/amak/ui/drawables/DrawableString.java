@@ -1,6 +1,8 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import fr.irit.smac.amak.ui.VUI;
+import javafx.scene.Node;
 import javafx.scene.text.Text;
 
 public class DrawableString extends Drawable {
@@ -9,11 +11,6 @@ public class DrawableString extends Drawable {
 	public DrawableString(double dx, double dy, String text) {
 		super(dx+0.5, dy+0.5, 1, 1);
 		textZone = new Text(text);
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(textZone));
 	}
 
 	@Override
@@ -35,5 +32,10 @@ public class DrawableString extends Drawable {
 	@Override
 	public void _show() {
 		textZone.setVisible(true);
+	}
+
+	@Override
+	public Node getNode() {
+		return textZone;
 	}
 }

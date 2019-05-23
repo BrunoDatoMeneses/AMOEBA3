@@ -10,8 +10,8 @@ import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import gui.ContextRendererFX;
 import gui.RenderStrategy;
+import gui.context.ContextRendererFX;
 import kernel.AMOEBA;
 import ncs.NCS;
 

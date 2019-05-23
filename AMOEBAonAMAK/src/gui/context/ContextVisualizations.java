@@ -1,9 +1,11 @@
-package gui;
+package gui.context;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import agents.context.Context;
+import gui.AmoebaWindow;
+import gui.Visualization;
 import javafx.event.Event;
 
 /**
@@ -28,8 +30,15 @@ public class ContextVisualizations {
 	 * @param event
 	 */
 	public void dispatchEvent(Event event) {
-		for(Visualization v : visualizations) {
-			v.onEvent(event);
+		if("MOUSE_CLICKED".equals(event.getEventType().getName())) {
+			if(context.getRenderStrategy() instanceof ContextRendererFX) {
+				ContextRendererFX.contextExplorer.update();
+			}
+		}
+		synchronized (visualizations) {
+			for(Visualization v : visualizations) {
+				v.onEvent(event);
+			}
 		}
 	}
 	
@@ -38,9 +47,10 @@ public class ContextVisualizations {
 	 * @return
 	 */
 	public ContextRectangle getDrawable() {
-		if(drawable == null) {
+		if(!context.isDying() && drawable == null) {
 			drawable = new ContextRectangle(0, 0, 10, 10, context);
 			visualizations.add(drawable);
+			AmoebaWindow.instance().mainVUI.add(drawable);
 		}
 		return drawable;
 	}
@@ -51,7 +61,7 @@ public class ContextVisualizations {
 	 * @return
 	 */
 	public MiniContextRectangle getMini() {
-		if(mini == null) {
+		if(!context.isDying() && mini == null) {
 			mini = new MiniContextRectangle(getDrawable());
 			visualizations.add(mini);
 		}

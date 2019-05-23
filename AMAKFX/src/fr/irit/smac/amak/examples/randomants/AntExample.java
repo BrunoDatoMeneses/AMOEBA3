@@ -40,7 +40,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get().createImage(dx, dy, "file:Resources/ant.png");
+		image = VUI.get().createAndAddImage(dx, dy, "file:Resources/ant.png");
 	}
 
 	/**

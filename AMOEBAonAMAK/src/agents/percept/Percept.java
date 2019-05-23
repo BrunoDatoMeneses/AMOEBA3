@@ -96,6 +96,16 @@ public class Percept extends AmoebaAgent {
 	public double getValue() {
 		return value;
 	}
+	
+	/**
+	 * Set the value of the percept.
+	 * Useful when loading a save.
+	 * 
+	 * @param value
+	 */
+	public void setValue(double value) {
+		this.value = value;
+	}
 
 	/**
 	 * Checks if is enum.

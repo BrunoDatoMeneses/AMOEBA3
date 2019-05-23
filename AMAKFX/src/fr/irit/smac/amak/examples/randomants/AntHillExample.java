@@ -17,17 +17,17 @@ public class AntHillExample extends Amas<WorldExample> {
 
 	@Override
 	protected void onInitialConfiguration() {
-		DrawableRectangle d = VUI.get().createRectangle(0, 0, 800, 600);
+		DrawableRectangle d = VUI.get().createAndAddRectangle(0, 0, 800, 600);
 		d.setStrokeOnly();
 	}
 
 	@Override
 	protected void onRenderingInitialization() {
 
-		VUI.get().createRectangle(90, 20, 180, 40).setColor(new Color(0.9d, 0.9d, 0.9d, 0.8d)).setFixed().setLayer(5);
+		VUI.get().createAndAddRectangle(90, 20, 180, 40).setColor(new Color(0.9d, 0.9d, 0.9d, 0.8d)).setFixed().setLayer(5);
 
-		VUI.get().createImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10);
-		antsCountLabel = (DrawableString) VUI.get().createString(45, 25, "Ants count").setFixed().setLayer(10);
+		VUI.get().createAndAddImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10);
+		antsCountLabel = (DrawableString) VUI.get().createAndAddString(45, 25, "Ants count").setFixed().setLayer(10);
 	}
 
 	@Override

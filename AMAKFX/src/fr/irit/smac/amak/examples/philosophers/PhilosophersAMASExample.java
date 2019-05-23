@@ -32,16 +32,16 @@ public class PhilosophersAMASExample extends Amas<TableExample> {
 		Configuration.executionPolicy = ExecutionPolicy.TWO_PHASES;
 		comp = new Label("Cycle");
 		MainWindow.addToolbar(comp);
-		VUI.get().createRectangle(55, 45, 110, 90).setColor(new Color(0.9d, 0.9d, 0.9d, 0.5d)).setFixed().setLayer(5);
+		VUI.get().createAndAddRectangle(55, 45, 110, 90).setColor(new Color(0.9d, 0.9d, 0.9d, 0.5d)).setFixed().setLayer(5);
 
-		VUI.get().createRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10);
-		VUI.get().createString(45, 25, "Hungry").setFixed().setLayer(10);
+		VUI.get().createAndAddRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10);
+		VUI.get().createAndAddString(45, 25, "Hungry").setFixed().setLayer(10);
 
-		VUI.get().createRectangle(20, 45, 20, 20).setColor(Color.BLUE).setFixed().setLayer(10);
-		VUI.get().createString(45, 50, "Eating").setFixed().setLayer(10);
+		VUI.get().createAndAddRectangle(20, 45, 20, 20).setColor(Color.BLUE).setFixed().setLayer(10);
+		VUI.get().createAndAddString(45, 50, "Eating").setFixed().setLayer(10);
 
-		VUI.get().createRectangle(20, 70, 20, 20).setColor(Color.GREEN).setFixed().setLayer(10);
-		VUI.get().createString(45, 75, "Thinking").setFixed().setLayer(10);
+		VUI.get().createAndAddRectangle(20, 70, 20, 20).setColor(Color.GREEN).setFixed().setLayer(10);
+		VUI.get().createAndAddString(45, 75, "Thinking").setFixed().setLayer(10);
 	}
 
 	@Override

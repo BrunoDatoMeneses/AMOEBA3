@@ -1,7 +1,10 @@
-package gui;
+package gui.context;
 
 import agents.context.Context;
+import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import gui.AmoebaWindow;
+import gui.Visualization;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -61,6 +64,11 @@ public class ContextRectangle extends DrawableRectangle implements Visualization
 	@Override
 	public Node getNode() {
 		return rectangle;
+	}
+
+	@Override
+	public void update() {
+		vui.updateCanvas();
 	}
 
 }

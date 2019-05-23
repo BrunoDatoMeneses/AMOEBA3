@@ -120,7 +120,7 @@ public class Benchmark {
 		World world = new World();
 		AMOEBA amoeba = new AMOEBA(world, learnSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		backupSystem.loadXML(file);
+		backupSystem.load(file);
 		benchmark(amoeba, learnSystem, learnSystem, 100, 100, 100, null);
 		// ---------------
 		System.out.println("Starting benchmark.");
@@ -131,7 +131,7 @@ public class Benchmark {
 			world = new World();
 			amoeba = new AMOEBA(world, null);
 			backupSystem = new BackupSystem(amoeba);
-			backupSystem.loadXML(file);
+			backupSystem.load(file);
 			List<List<Double>> bench = benchmark(amoeba, learnSystem, learnSystem, 0, 10000, 1000, null);
 			System.out.println("Thd "+thd+" "+bench);
 			results.add(bench);

@@ -1,4 +1,4 @@
-package gui;
+package gui.context;
 
 import java.util.Comparator;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.regex.PatternSyntaxException;
 
 import agents.context.Context;
 import fr.irit.smac.amak.ui.MainWindow;
+import gui.AmoebaWindow;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;

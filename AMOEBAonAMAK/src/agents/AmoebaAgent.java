@@ -40,7 +40,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	@Override
 	public void onUpdateRender() {
 		amas.getEnvironment().incrementNbActivatedAgent();
-		if(renderStrategy != null) {
+		if(renderStrategy != null && !isDying()) {
 			if (amas.isRenderUpdate()) {
 				renderStrategy.render(this);
 			}
@@ -54,10 +54,10 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	@Override
 	public void destroy() {
 		dying = true;
-		super.destroy();
 		if(renderStrategy != null) {
 			renderStrategy.delete(this);
 		}
+		super.destroy();
 	}
 
 	public String getName() {
@@ -70,5 +70,9 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	
 	public void setRenderStrategy(RenderStrategy renderStrategy) {
 		this.renderStrategy = renderStrategy;
+	}
+	
+	public RenderStrategy getRenderStrategy() {
+		return renderStrategy;
 	}
 }

@@ -1,8 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.VUI;
-import javafx.scene.layout.Pane;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
 /**
@@ -25,7 +24,68 @@ public abstract class Drawable {
 	 * The width of the object
 	 */
 	private double width;
+	
+	/**
+	 * The real height
+	 */
+	protected double height;
 
+	/**
+	 * Does only the border must be displayed ?
+	 */
+	protected boolean strokeMode = false;
+
+	/**
+	 * The color of the object
+	 */
+	protected Color color = Color.BLACK;
+	
+	/**
+	 * The VUI on which the object is drawn
+	 */
+	protected VUI vui;
+	
+	/**
+	 * The order of drawing. An higher layer is drawn on top of the other.
+	 */
+	protected int layer = 0;
+	
+	/**
+	 * The angle of rotation of the object
+	 */
+	private double angle;
+	
+	/**
+	 * A fixed object doesn't move with the view. It can be used for HUD
+	 */
+	private boolean fixed = false;
+	
+	/**
+	 * Must the object be drawn ?
+	 */
+	private boolean visible = true;
+
+	/**
+	 * Constructor of the object
+	 * 
+	 * @param vui
+	 *            the VUI on which the object must be drawn
+	 * @param dx
+	 *            the x real position
+	 * @param dy
+	 *            the y real position
+	 * @param width
+	 *            the real width
+	 * @param height
+	 *            the real height
+	 */
+	protected Drawable(double dx, double dy, double width, double height) {
+		x = dx;
+		y = dy;
+		this.width = width;
+		this.height = height;
+	}
+	
 	/**
 	 * Compute the width as it must be displayed on screen. Given the zoom factor,
 	 * the width displayed can be different than the real width.
@@ -47,7 +107,6 @@ public abstract class Drawable {
 	 */
 	public void setWidth(double width) {
 		this.width = width;
-		update();
 	}
 
 	/**
@@ -71,7 +130,6 @@ public abstract class Drawable {
 	 */
 	public void setHeight(double height) {
 		this.height = height;
-		update();
 	}
 
 	/**
@@ -92,40 +150,7 @@ public abstract class Drawable {
 		return height;
 	}
 
-	/**
-	 * The real height
-	 */
-	protected double height;
-
-	/**
-	 * Does only the border must be displayed ?
-	 */
-	protected boolean strokeMode = false;
-
-	/**
-	 * The color of the object
-	 */
-	protected Color color = Color.BLACK;
-	/**
-	 * The VUI on which the object is drawn
-	 */
-	protected VUI vui;
-	/**
-	 * The order of drawing. An higher layer is drawn on top of the other.
-	 */
-	protected int layer = 0;
-	/**
-	 * The angle of rotation of the object
-	 */
-	private double angle;
-	/**
-	 * A fixed object doesn't move with the view. It can be used for HUD
-	 */
-	private boolean fixed = false;
-	/**
-	 * Must the object be drawn ?
-	 */
-	private boolean visible = true;
+	
 
 	/**
 	 * Getter for the fixed attribute
@@ -163,7 +188,6 @@ public abstract class Drawable {
 	 */
 	public Drawable setLayer(int layer) {
 		this.layer = layer;
-		update();
 		return this;
 	}
 
@@ -176,38 +200,14 @@ public abstract class Drawable {
 	 */
 	public Drawable setAngle(double angle2) {
 		this.angle = angle2;
-		update();
 		return this;
-	}
-
-	/**
-	 * Constructor of the object
-	 * 
-	 * @param vui
-	 *            the VUI on which the object must be drawn
-	 * @param dx
-	 *            the x real position
-	 * @param dy
-	 *            the y real position
-	 * @param width
-	 *            the real width
-	 * @param height
-	 *            the real height
-	 */
-	protected Drawable(double dx, double dy, double width, double height) {
-		x = dx;
-		y = dy;
-		this.width = width;
-		this.height = height;
 	}
 
 	/**
 	 * Draw the object if visible and if on screen
 	 * 
-	 * @param pane
-	 *            The pane container
 	 */
-	public void onDraw(Pane pane) {
+	public void onDraw() {
 		if (isVisible()) {
 			_onDraw();
 		}
@@ -217,21 +217,13 @@ public abstract class Drawable {
 	 * Method that must be overrided to draw
 	 */
 	public abstract void _onDraw();
-	
-	/**
-	 * Method called when the VUI must be refreshed
-	 */
-	public void update() {
-		if (vui != null)
-			RunLaterHelper.runLater(() -> vui.updateCanvas());
-	}
 
 	/**
 	 * Set the associated VUI
 	 * 
 	 * @param vectorialUI
 	 */
-	public void setPanel(VUI vectorialUI) {
+	public void setVUI(VUI vectorialUI) {
 		vui = vectorialUI;
 	}
 
@@ -290,7 +282,6 @@ public abstract class Drawable {
 	 */
 	public Drawable setStrokeOnly() {
 		strokeMode = true;
-		update();
 		return this;
 	}
 
@@ -303,7 +294,6 @@ public abstract class Drawable {
 		if (color == this.color)
 			return this;
 		this.color = color;
-		update();
 		return this;
 	}
 	
@@ -326,7 +316,6 @@ public abstract class Drawable {
 			return this;
 		this.x = dx;
 		this.y = dy;
-		update();
 		return this;
 	}
 
@@ -336,7 +325,6 @@ public abstract class Drawable {
 	 */
 	public Drawable setFixed() {
 		this.fixed = true;
-		update();
 		return this;
 	}
 
@@ -380,14 +368,19 @@ public abstract class Drawable {
 			_show();
 		else
 			_hide();
-		update();
 		return this;
 	}
 	
 	/**
-	 * Called when a drawable is added to a VUI.
-	 * If there's thing to add to the canvas, it's done here.
+	 * The graphical element that is displayed
+	 * @return
 	 */
-	public void onAddedToVUI() {
+	public abstract Node getNode();
+	
+	/**
+	 * Remove the drawable from its VUI
+	 */
+	public void delete() {
+		vui.remove(this);
 	}
 }

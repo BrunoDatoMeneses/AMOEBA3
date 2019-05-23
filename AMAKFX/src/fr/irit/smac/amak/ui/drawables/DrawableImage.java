@@ -5,6 +5,8 @@ import java.util.Map;
 
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import fr.irit.smac.amak.ui.VUI;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -18,11 +20,6 @@ public class DrawableImage extends Drawable {
 		super(dx, dy, 0, 0);
 		image = new ImageView(new Image(filename));
 		this.setFilename(filename);
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(image));
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {
@@ -64,5 +61,10 @@ public class DrawableImage extends Drawable {
 	@Override
 	public void _show() {
 		image.setVisible(true);
+	}
+
+	@Override
+	public Node getNode() {
+		return image;
 	}
 }

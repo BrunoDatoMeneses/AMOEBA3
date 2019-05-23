@@ -17,17 +17,18 @@ import kernel.AMOEBA;
  *
  */
 public class ContextMenuVUI extends ContextMenu {
+	
 	private double reqHereX;
 	private double reqHereY;
 	
-	public ContextMenuVUI(AMOEBA amoeba) {
+	public ContextMenuVUI(AMOEBA amoeba, VUI vui) {
 		// "request here" menu item
 		MenuItem reqHere = new MenuItem("Request Here");
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				double x = VUI.get().screenToWorldX(reqHereX);
-				double y = VUI.get().screenToWorldY(reqHereY);
+				double x = vui.screenToWorldX(reqHereX);
+				double y = vui.screenToWorldY(reqHereY);
 				HashMap<String, Double> req = new HashMap<String, Double>();
 				req.put(amoeba.getDimensionSelector().d1().getName(), x);
 				req.put(amoeba.getDimensionSelector().d2().getName(), y);
@@ -39,12 +40,12 @@ public class ContextMenuVUI extends ContextMenu {
 		this.getItems().add(reqHere);
 		
 		// show context menu on context menu event from VUI's canvas
-		VUI.get().getCanvas().setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+		vui.getCanvas().setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
 			public void handle(ContextMenuEvent event) {
 				reqHereX = event.getX();
 				reqHereY = event.getY();
-				ContextMenuVUI.this.show(VUI.get().getCanvas(), event.getScreenX(), event.getScreenY());
+				ContextMenuVUI.this.show(vui.getCanvas(), event.getScreenX(), event.getScreenY());
 			}
 		});
 	}

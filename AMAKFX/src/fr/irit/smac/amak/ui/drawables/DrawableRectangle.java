@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -10,11 +11,6 @@ public class DrawableRectangle extends Drawable {
 	public DrawableRectangle(double dx, double dy, double width, double height) {
 		super(dx+width/2, dy+height/2, width, height);
 		rectangle = new Rectangle();
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(rectangle));
 	}
 
 	@Override
@@ -37,5 +33,10 @@ public class DrawableRectangle extends Drawable {
 	@Override
 	public void _show() {
 		RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
+	}
+
+	@Override
+	public Node getNode() {
+		return rectangle;
 	}
 }

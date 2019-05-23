@@ -1,4 +1,4 @@
-package gui;
+package gui.context;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -37,13 +37,8 @@ public class MiniContextRectangle extends ContextRectangle {
 	@Override
 	protected void onMouseClick(MouseEvent event) {
 		if(event.getButton() == MouseButton.PRIMARY) {
-			if(activated) {
-				label.setText(context.getName());
-				activated = false;
-			} else {
-				label.setText(context.toStringFull());
-				activated = true;
-			}
+			activated = !activated;
+			update();
 		}
 	}
 	
@@ -51,5 +46,10 @@ public class MiniContextRectangle extends ContextRectangle {
 		public void update() {
 			rectangle.setFill(original.rectangle.getFill());
 			rectangle.setStyle(original.rectangle.getStyle());
+			if(activated) {
+				label.setText(context.toStringFull());
+			} else {
+				label.setText(context.getName());
+			}
 		}
 }

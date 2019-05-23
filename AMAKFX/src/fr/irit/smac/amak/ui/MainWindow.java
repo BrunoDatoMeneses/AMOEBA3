@@ -1,6 +1,8 @@
 package fr.irit.smac.amak.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -8,6 +10,7 @@ import javax.management.InstanceAlreadyExistsException;
 import fr.irit.smac.amak.Information;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -109,7 +112,7 @@ public class MainWindow extends Application {
 			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
-					System.exit(0);
+					Platform.exit();
 				}
 			});
 	
@@ -140,13 +143,21 @@ public class MainWindow extends Application {
 	}
 
 	/**
-	 * Add a close action to the listener
+	 * Add an action when the JavaFX app close.
 	 * 
 	 * @param onClose
 	 *            The action to be executed when the window is closed
 	 */
-	public static void addOnCloseAction(EventHandler<WindowEvent> onClose) {
-		instance().stage.setOnCloseRequest(onClose);
+	public static void addOnCloseAction(Runnable onClose) {
+		instance().closeActions.add(onClose);
+	}
+	
+	private List<Runnable> closeActions = new ArrayList<>();
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		closeActions.forEach(Runnable::run);
+		System.exit(0);
 	}
 
 	/**
