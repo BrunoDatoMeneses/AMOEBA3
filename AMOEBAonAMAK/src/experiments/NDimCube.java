@@ -92,4 +92,9 @@ public class NDimCube implements StudiedSystem{
 				
 		return modelresult;
 	}
+
+	@Override
+	public double requestOracle(HashMap<String, Double> request) {
+		return 0;
+	}
 }

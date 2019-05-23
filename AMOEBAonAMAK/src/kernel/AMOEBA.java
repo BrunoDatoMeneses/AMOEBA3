@@ -42,10 +42,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public SaveHelper saver;
 	
+	/**
+	 * The system studied by the amoeba.
+	 */
+	public StudiedSystem studiedSystem;
+	
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
-	private StudiedSystem studiedSystem;
 	private boolean useOracle = true;
 
 	private HashSet<Context> validContexts;

@@ -220,4 +220,9 @@ public class MNIST_System implements StudiedSystem {
 		}
 		
 	}
+
+	@Override
+	public double requestOracle(HashMap<String, Double> request) {
+		return 0;
+	}
 }

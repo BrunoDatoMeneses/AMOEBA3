@@ -20,5 +20,13 @@ public interface StudiedSystem {
 	 * @return the output
 	 */
 	public HashMap<String, Double> getOutput();
+	
+	/**
+	 * Ask the studied system to provide an oracle for a specific input.
+	 * 
+	 * @param request the input we wish to get an oracle.
+	 * @return the oracle value.
+	 */
+	public double requestOracle(HashMap<String, Double> request);
 
 }
