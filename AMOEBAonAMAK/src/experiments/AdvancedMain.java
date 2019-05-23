@@ -46,6 +46,9 @@ public class AdvancedMain {
 		// A window appeared, allowing to control the simulation, but if you try to run it
 		// it will crash (there's no percepts !). We need to load a configuration :
 		
+		// Change how new Context are rendered.
+		//Context.defaultRenderStrategy = NoneRenderer.class;
+		
 		// Create a backup system for the AMOEBA
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		// Load a configuration matching the studied system

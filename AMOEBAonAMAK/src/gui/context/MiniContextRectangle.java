@@ -36,8 +36,10 @@ public class MiniContextRectangle extends ContextRectangle {
 	
 	@Override
 	protected void onMouseClick(MouseEvent event) {
-		activated = !activated;
-		update();
+		if(event.getButton() == MouseButton.PRIMARY) {
+			activated = !activated;
+			update();
+		}
 	}
 	
 	@Override

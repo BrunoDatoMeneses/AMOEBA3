@@ -6,21 +6,17 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import agents.context.Context;
-import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.MainWindow;
 import gui.AmoebaWindow;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -119,8 +115,8 @@ public class ContextExplorer extends ScrollPane {
 		contextList.sort(new Comparator<Context>() {
 			@Override
 			public int compare(Context o1, Context o2) {
-				Color c1 = AmoebaWindow.instance().getContextVisualizations(o1).getDrawable().getColor();
-				Color c2 = AmoebaWindow.instance().getContextVisualizations(o2).getDrawable().getColor();
+				Color c1 = ((ContextRendererFX)o1.getRenderStrategy()).getDrawable().getColor();
+				Color c2 = ((ContextRendererFX)o2.getRenderStrategy()).getDrawable().getColor();
 				double score1 = c1.getRed()*100 + c1.getGreen()*10 + c1.getBlue();
 				double score2 = c2.getRed()*100 + c2.getGreen()*10 + c2.getBlue();
 				return (int) ((score1 - score2)*10);
@@ -130,8 +126,8 @@ public class ContextExplorer extends ScrollPane {
 		Pattern p = Pattern.compile(search.getText());
 		for(Context c : contextList) {
 			if(p.matcher(c.toStringFull()).find()) {
-				AmoebaWindow.instance().getContextVisualizations(c).getMini().update();
-				cpVBox.getChildren().add(AmoebaWindow.instance().getContextVisualizations(c).getMini().getNode());
+				((ContextRendererFX)c.getRenderStrategy()).getMini().update();
+				cpVBox.getChildren().add(((ContextRendererFX)c.getRenderStrategy()).getMini().getNode());
 			}
 		}
 	}
@@ -139,8 +135,7 @@ public class ContextExplorer extends ScrollPane {
 	private void collapseAll() {
 		contextList = amoeba.getContexts();
 		for(Context c : contextList) {
-			ContextVisualizations vizu = AmoebaWindow.instance().getContextVisualizations(c);
-			vizu.getMini().collapse();
+			((ContextRendererFX)c.getRenderStrategy()).getMini().collapse();
 		}
 		update();
 	}

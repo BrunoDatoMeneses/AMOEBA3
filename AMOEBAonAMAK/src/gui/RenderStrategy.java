@@ -1,29 +1,33 @@
 package gui;
 
+import gui.context.ContextRendererFX;
+
 /**
- * Strategy on how to render on object.
+ * Strategy on how to render an object.
+ * See {@link ContextRendererFX} for example on how to extends this class.
  * @author Hugo
- *
- * @param <E> class of the object to be rendered.
  */
-public interface RenderStrategy {
+public abstract class RenderStrategy {
 	
 	/**
-	 * Called when the render of an object need to be initialized.
-	 * @param object object to be rendered.
+	 * @param o the object to be rendered
 	 */
-	public void initialize(Object object);
+	public RenderStrategy(Object o) {
+	}
 	
 	/**
-	 * Called to render an object.
-	 * @param object object to be rendered.
+	 * Called when the rendered object need to be initialized
 	 */
-	public void render(Object object);
+	abstract public void initialize();
 	
 	/**
-	 * Called when the render of an object is no longer needed.
-	 * @param object object to be rendered.
+	 * Called to render the object.
 	 */
-	public void delete(Object object);
+	abstract public void render();
+	
+	/**
+	 * Called when the render of the object is no longer needed.
+	 */
+	abstract public void delete();
 
 }

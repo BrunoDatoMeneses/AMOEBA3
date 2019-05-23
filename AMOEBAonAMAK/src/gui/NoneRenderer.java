@@ -5,18 +5,22 @@ package gui;
  * @author Hugo
  *
  */
-public class NoneRenderer implements RenderStrategy {
+public class NoneRenderer extends RenderStrategy {
 
-	@Override
-	public void initialize(Object object) {
+	public NoneRenderer(Object o) {
+		super(o);
 	}
 
 	@Override
-	public void render(Object object) {
+	public void initialize() {
+	}
+
+	@Override
+	public void render() {
 	}
 	
 	@Override
-	public void delete(Object object) {
+	public void delete() {
 	}
 
 }

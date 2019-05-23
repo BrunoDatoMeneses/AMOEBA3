@@ -1,5 +1,7 @@
 package agents.context;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,8 +122,9 @@ public class Context extends AmoebaAgent {
 	@Override
 	protected void onRenderingInitialization() {
 		try {
-			setRenderStrategy(defaultRenderStrategy.newInstance());
-		} catch (InstantiationException | IllegalAccessException e) {
+			Constructor<? extends RenderStrategy> constructor = defaultRenderStrategy.getConstructor(Object.class);
+			setRenderStrategy(constructor.newInstance(this));
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		super.onRenderingInitialization();

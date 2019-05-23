@@ -34,7 +34,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	@Override
 	protected void onRenderingInitialization() {
 		if(renderStrategy != null)
-			renderStrategy.initialize(this);
+			renderStrategy.initialize();
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 		amas.getEnvironment().incrementNbActivatedAgent();
 		if(renderStrategy != null && !isDying()) {
 			if (amas.isRenderUpdate()) {
-				renderStrategy.render(this);
+				renderStrategy.render();
 			}
 		}
 	}
@@ -55,7 +55,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	public void destroy() {
 		dying = true;
 		if(renderStrategy != null) {
-			renderStrategy.delete(this);
+			renderStrategy.delete();
 		}
 		super.destroy();
 	}

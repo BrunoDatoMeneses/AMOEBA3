@@ -16,7 +16,6 @@ import gui.SaveExplorer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
-import javafx.stage.WindowEvent;
 
 /**
  * An helper class that handle save, autosave, and load needs of an AMOEBA.

@@ -1,9 +1,7 @@
 package gui.context;
 
 import agents.context.Context;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
-import gui.AmoebaWindow;
 import gui.Visualization;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -28,7 +26,7 @@ public class ContextRectangle extends DrawableRectangle implements Visualization
 		rectangle.addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				AmoebaWindow.instance().getContextVisualizations(context).dispatchEvent(event);
+				((ContextRendererFX)context.getRenderStrategy()).dispatchEvent(event);
 			}
 		});
 	}

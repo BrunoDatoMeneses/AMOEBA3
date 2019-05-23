@@ -4,14 +4,12 @@ import java.util.HashMap;
 
 import javax.management.InstanceAlreadyExistsException;
 
-import agents.context.Context;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.context.ContextVisualizations;
 import javafx.application.Application;
 import javafx.scene.control.Menu;
 import javafx.scene.control.ToggleButton;
@@ -25,8 +23,6 @@ import kernel.AMOEBA;
 public class AmoebaWindow extends MainWindow {
 
 	private HashMap<String, AmakPlot> plots = new HashMap<>();
-	
-	private HashMap<Context, ContextVisualizations> contextVisualizationMap = new HashMap<>();
 	
 	public VUI mainVUI;
 	
@@ -110,16 +106,4 @@ public class AmoebaWindow extends MainWindow {
 	public AmakPlot getPlot(String name) {
 		return plots.get(name);
 	}
-	
-	public ContextVisualizations getContextVisualizations(Context context) {
-		if(!contextVisualizationMap.containsKey(context)) {
-			contextVisualizationMap.put(context, new ContextVisualizations(context));
-		}
-		return contextVisualizationMap.get(context);
-	}
-	
-	public void removeContextVisualization(Context context) {
-		contextVisualizationMap.remove(context);
-	}
-
 }
