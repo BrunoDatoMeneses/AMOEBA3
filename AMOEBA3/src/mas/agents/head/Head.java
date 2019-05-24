@@ -339,7 +339,7 @@ public class Head extends AbstractHead implements Cloneable{
 		playExecutionTime = System.currentTimeMillis() - playExecutionTime;	
 		
 		endogenousExecutionTime = System.currentTimeMillis();
-		endogenousPlay();
+		//endogenousPlay();
 		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
 		
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
@@ -367,7 +367,7 @@ public class Head extends AbstractHead implements Cloneable{
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 		
 		memoryCreationExecutionTime = System.currentTimeMillis();
-		NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
+		//NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
 		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 		
 		otherExecutionTime = System.currentTimeMillis();
@@ -1108,7 +1108,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		for(Context ctxt : activatedNeighborsContexts) {
 			
-			ctxt.NCSDetection_BetterNeighbor();
+			//ctxt.NCSDetection_BetterNeighbor();
 			
 		}
 		
@@ -1132,8 +1132,8 @@ public class Head extends AbstractHead implements Cloneable{
 			
 			//System.out.println(closestContextToOracle.getLocalModel().distance(closestContextToOracle.getCurrentExperiment()) + " ******************************************************************DISTANCE TO MODEL : " );
 			//System.out.println("OLD COEFS " + closestContextToOracle.getLocalModel().coefsToString());
-			closestContextToOracle.getLocalModel().updateModelWithExperimentAndWeight(closestContextToOracle.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-			System.out.println("NEW COEFS " + closestContextToOracle.getLocalModel().coefsToString());
+			closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+			//System.out.println("NEW COEFS " + closestContextToOracle.getLocalModel().coefsToString());
 			
 			activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
 			for (Context activatedContext : activatedContexts) {	
@@ -1163,8 +1163,8 @@ public class Head extends AbstractHead implements Cloneable{
 				
 				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
 					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-					activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-					System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+					activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+					//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 					
 				}else {
 					//LocalModelAgent remplacementModel = new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef().clone());
@@ -1174,8 +1174,8 @@ public class Head extends AbstractHead implements Cloneable{
 				
 			}else {
 				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-				activatedContexts.get(0).getLocalModel().updateModelWithExperimentAndWeight(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-				System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+				//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
 				
 				
 			}

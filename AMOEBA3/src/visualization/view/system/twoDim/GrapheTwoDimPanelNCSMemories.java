@@ -1656,7 +1656,7 @@ Head head = (Head)agent;
 		
 		
 		
-		System.out.println("Create graph system");
+		//System.out.println("Create graph system");
 		graph = new SingleGraph("SYSTEM");
 
 		viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);

@@ -326,7 +326,7 @@ public class GrapheSystemPanel extends JPanel implements ViewerListener, MouseIn
 	 * Creates the graph.
 	 */
 	private void createGraph() {
-		System.out.println("Create graph system");
+		//System.out.println("Create graph system");
 		graph = new SingleGraph("SYSTEM");
 		for (String name : world.getAgents().keySet()) {
 			SystemAgent a = world.getAgents().get(name);

@@ -74,6 +74,8 @@ public class World implements Serializable {
 	
 	private double mappingErrorAllowed = 0.1;
 	
+	public int regressionPoints = 0;
+	
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
 	
@@ -124,7 +126,7 @@ public class World implements Serializable {
 	 * @param blackbox the blackbox
 	 */
 	public World (Scheduler scheduler, File systemFile) {
-		System.out.println("---Initialize the world---");
+		//System.out.println("---Initialize the world---");
 		
 		this.scheduler = scheduler;
 		//this.blackbox = blackbox;
@@ -148,7 +150,7 @@ public class World implements Serializable {
 		
 		setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		
-		System.out.println("---End initialize the world---");
+		//System.out.println("---End initialize the world---");
 	}
 
 	
@@ -163,7 +165,7 @@ public class World implements Serializable {
 		try {
 			document = sxb.build(systemFile);
 		    Element racine = document.getRootElement();
-		    System.out.println(racine.getName());
+		    //System.out.println(racine.getName());
 		    
 		    learning = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("allowed"));
 		    creationOfNewContext = Boolean.parseBoolean(racine.getChild("Configuration").getChild("Learning").getAttributeValue("creationOfNewContext"));
@@ -187,7 +189,7 @@ public class World implements Serializable {
 		    	Head a = new Head(this);
 		    	a.setName(element.getAttributeValue("Name"));
 		    	//a.setOracle( blackbox.getBlackBoxAgents().get(element.getAttributeValue("Oracle")));
-		    	System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
+		    	//System.out.print("CREATION OF CONTEXT : " + this.creationOfNewContext);
 		    	a.setNoCreation(!creationOfNewContext);
 		    	
 		    	scheduler.registerAgent(a);	   

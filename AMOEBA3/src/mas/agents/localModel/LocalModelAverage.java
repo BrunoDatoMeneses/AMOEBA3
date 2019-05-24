@@ -112,4 +112,16 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 		return 0;
 	}
 
+	@Override
+	public ArrayList<Experiment> getFirstExperiments() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

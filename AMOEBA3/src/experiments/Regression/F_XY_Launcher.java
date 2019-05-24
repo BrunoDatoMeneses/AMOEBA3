@@ -16,6 +16,9 @@ public class F_XY_Launcher implements Serializable {
 
 	public static final boolean viewer = true;
 	public static final boolean verboseriticity = true;
+	public static final double oracleNoiseRange = 1.0;
+	public static final double learningSpeed = 0.01;
+	public static final int regressionPoints = 100;
 
 	public static void main(String[] args) {
 		launch(viewer);
@@ -44,13 +47,10 @@ public class F_XY_Launcher implements Serializable {
 			pct.setMax(100.0);
 		}
 		
-		amoeba.getScheduler().getHeadAgent().learningSpeed = 0.5;
-		amoeba.getScheduler().getHeadAgent().numberOfPointsForRegression = 50;
+		amoeba.getScheduler().getHeadAgent().learningSpeed = learningSpeed;
+		amoeba.getScheduler().getHeadAgent().numberOfPointsForRegression = regressionPoints;
 		
-		for(Percept pct : amoeba.getScheduler().getPercepts()) {
-			System.out.println(pct.getName() + " Min " + pct.getMin());
-			System.out.println(pct.getName() + " Max " + pct.getMax());
-		}
+		
 		
 		amoeba.setRunning(true);
 		
@@ -63,10 +63,11 @@ public class F_XY_Launcher implements Serializable {
 		constrains[1] = amoeba.getScheduler().getContextsAsContext().get(0).getRanges().get(amoeba.getScheduler().getPercepts().get(0)).getEnd();
 
 		
-		//amoeba.setRunning(false);
+		amoeba.setRunning(false);
 		
 		int i = 0;
-		while(amoeba.getScheduler().getHeadAgent().getCriticity()>0.001 || i==0) {
+		while(i<10000) {
+		//while((amoeba.getScheduler().getHeadAgent().getCriticity()>0.001 || i==0) && i!=1000) {
 			
 			//System.out.println("Running :" + amoeba.isRunning());
 			try        
@@ -91,7 +92,7 @@ public class F_XY_Launcher implements Serializable {
 				f_XY_Manager.playOneStepConstrained(constrains);
 				
 				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
+				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputWithNoise(oracleNoiseRange)));
 				
 				i++;
 			}
@@ -102,11 +103,15 @@ public class F_XY_Launcher implements Serializable {
 				f_XY_Manager.playOneStepConstrained(constrains);
 				
 				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
+				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputWithNoise(oracleNoiseRange)));
 				
 				i++;
 				
 				
+			}
+			
+			if(amoeba.getScheduler().getHeadAgent().getCriticity()>1000000.0) {
+				i=1000;
 			}
  
 			

@@ -54,6 +54,8 @@ public class AMOEBA extends Thread {
 	
 	
 	
+	
+	
 	//private HashMap<String,Output> perceptionsAndActionState = new HashMap<String,Output>();
 	
 
@@ -80,7 +82,7 @@ public class AMOEBA extends Thread {
 		
 		JFrame frame = null;
 		
-		printStartInfo();
+		//printStartInfo();
 		this.viewer = viewer;
 		
 		world.setAmoeba(this);

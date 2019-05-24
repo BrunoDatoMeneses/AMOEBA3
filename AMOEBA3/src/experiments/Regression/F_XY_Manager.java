@@ -53,6 +53,12 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		x = constrains[0] + (Math.random()*(constrains[1] - constrains[0]));
 		y = constrains[0] + (Math.random()*(constrains[1] - constrains[0]));
 	}
+	
+	public void playOneStepConstrainedWithNoise(double[] constrains, double noiseRange) {
+		
+		x = constrains[0] + (Math.random()*(constrains[1] - constrains[0]))  - noiseRange/2 + Math.random()*noiseRange ;
+		y = constrains[0] + (Math.random()*(constrains[1] - constrains[0]))  - noiseRange/2 + Math.random()*noiseRange ;
+	}
 
 	
 	public double model(double x, double y) {
@@ -62,7 +68,7 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		
 		/* Square */
 		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y : 5*x - 8*y ;
-		return 5*x - 8*y ;
+		return 5*x - 8*y + 3;
 		
 		/* Triangle */
 		//return (y > x) ? 2*x + y : 5*x - 8*y;
@@ -80,6 +86,17 @@ public class F_XY_Manager implements StudiedSystem, Serializable{
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
 		result = model(x, y);
+		
+		out.put("px",x);
+		out.put("py",y);
+		out.put("oracle",result);
+		return out;
+	}
+	
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		result = model(x, y) - noiseRange/2 + Math.random()*noiseRange ;
 		
 		out.put("px",x);
 		out.put("py",y);

@@ -1234,7 +1234,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	public void solveNCS_BetterNeighbor(Context betterContext) {
 		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(), "*********************************************************************************************************** SOLVE NCS BETTER NEIGHBOR")));
-		localModel = new LocalModelMillerRegression(world, this, betterContext.getLocalModel().getCoef());
+		localModel = new LocalModelMillerRegression(world, this, betterContext.getLocalModel().getCoef(), betterContext.getLocalModel().getFirstExperiments());
 	}
 	
 	public void NCSDetection_OverMapping() {

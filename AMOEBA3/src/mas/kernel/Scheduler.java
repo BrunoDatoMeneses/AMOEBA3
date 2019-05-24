@@ -241,9 +241,9 @@ public class Scheduler implements Serializable{
 	
 	private void ticksUpdate() {
 		tick++;
-		if (tick%moduloMeasure == 0) {
-			Config.print("Tick : " + tick + "  " + (System.nanoTime() - time) +"ns", -7);
-		}
+//		if (tick%moduloMeasure == 0) {
+//			Config.print("Tick : " + tick + "  " + (System.nanoTime() - time) +"ns", -7);
+//		}
 	}
 	
 	public void scheduledItemsAndView() {
