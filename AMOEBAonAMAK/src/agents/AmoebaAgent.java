@@ -33,8 +33,6 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 
 	@Override
 	protected void onRenderingInitialization() {
-		if(renderStrategy != null)
-			renderStrategy.initialize();
 	}
 	
 	@Override
@@ -69,7 +67,9 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	}
 	
 	public void setRenderStrategy(RenderStrategy renderStrategy) {
+		if(this.renderStrategy != null) this.renderStrategy.delete();
 		this.renderStrategy = renderStrategy;
+		if(this.renderStrategy != null) this.renderStrategy.initialize();
 	}
 	
 	public RenderStrategy getRenderStrategy() {

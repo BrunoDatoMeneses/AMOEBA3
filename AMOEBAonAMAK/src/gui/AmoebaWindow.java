@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.management.InstanceAlreadyExistsException;
 
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.AmakPlot.ChartType;
 import fr.irit.smac.amak.ui.MainWindow;
@@ -40,6 +41,7 @@ public class AmoebaWindow extends MainWindow {
 		
 		mainVUI = VUI.get("2D");
 		mainVUI.setDefaultView(200, 0, 0);
+		AmoebaWindow.addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
 		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());
@@ -66,7 +68,7 @@ public class AmoebaWindow extends MainWindow {
 		
 		// dimension selector
 		dimensionSelector = new DimensionSelector(amoeba);
-		AmoebaWindow.addToolbar(dimensionSelector);
+		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
 		
 		// contextMenu "Request Here" on VUI
 		new ContextMenuVUI(amoeba, mainVUI); //the ContextMenu add itself to the VUI

@@ -12,7 +12,7 @@ import java.util.List;
 
 import fr.irit.smac.amak.ui.MainWindow;
 import gui.AmoebaWindow;
-import gui.SaveExplorer;
+import gui.saveExplorer.SaveExplorer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
@@ -93,19 +93,8 @@ public class SaveHelper {
 					try {
 						deleteDirectoryRecursion(dir);
 					} catch (IOException e) {
-						System.err.println("Failed to delete saves files on close. Trying again in 10s.");
 						e.printStackTrace();
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
-						try {
-							deleteDirectoryRecursion(dir);
-						} catch (IOException e1) {
-							System.err.println("Failed to delete saves files on close.");
-							e1.printStackTrace();
-						}
+						System.err.println("Failed to delete saves files on close.");
 					}
 				}
 			});
@@ -172,8 +161,8 @@ public class SaveHelper {
 	 */
 	public List<Path> listAutoSaves() {
 		List<Path> l = new ArrayList<>();
-		try {
-			Files.newDirectoryStream(dirAuto).iterator().forEachRemaining(l::add);
+		try (DirectoryStream<Path> d = Files.newDirectoryStream(dirAuto)){
+			d.iterator().forEachRemaining(l::add);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Cannot read saves list. Empty list returned.");
@@ -186,8 +175,8 @@ public class SaveHelper {
 	 */
 	public List<Path> listManualSaves() {
 		List<Path> l = new ArrayList<>();
-		try {
-			Files.newDirectoryStream(dirManual).iterator().forEachRemaining(l::add);
+		try (DirectoryStream<Path> d = Files.newDirectoryStream(dirManual)){
+			d.iterator().forEachRemaining(l::add);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Cannot read saves list. Empty list returned.");

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import agents.context.Context;
-import fr.irit.smac.amak.ui.MainWindow;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import gui.AmoebaWindow;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -60,7 +60,7 @@ public class ContextExplorer extends ScrollPane {
 		close.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				MainWindow.setLeftPanel(null);
+				AmoebaWindow.instance().mainVUI.getPanel().setLeft(null);
 			}
 		});
 		Button collapseAll = new Button("Collapse all");
@@ -94,13 +94,13 @@ public class ContextExplorer extends ScrollPane {
 		vbox.getChildren().addAll(hboxButtons, search, contextsPane);
 		update();
 		
-		// Add to main window
-		AmoebaWindow.setLeftPanel(this);
+		// Add to main vui
+		RunLaterHelper.runLater(()->AmoebaWindow.instance().mainVUI.getPanel().setLeft(this));
 		MenuItem miContextExplorer = new MenuItem("Context Explorer");
 		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				AmoebaWindow.setLeftPanel(ContextExplorer.this);
+				AmoebaWindow.instance().mainVUI.getPanel().setLeft(ContextExplorer.this);
 			}
 		});
 		AmoebaWindow.addToMenu("Window", miContextExplorer);

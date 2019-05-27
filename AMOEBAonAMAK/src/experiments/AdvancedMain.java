@@ -69,7 +69,7 @@ public class AdvancedMain {
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 1000;
+		int nbCycle = 100;
 		for (int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());

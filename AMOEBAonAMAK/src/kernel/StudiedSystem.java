@@ -1,12 +1,13 @@
 package kernel;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Any system studied by an instance of AMOEBA must implement this interface.
  * 
  */
-public interface StudiedSystem {
+public interface StudiedSystem extends Serializable{
 
 	/**
 	 * When the scheduler of AMOEBA has run one cycle, playOneStep is called to

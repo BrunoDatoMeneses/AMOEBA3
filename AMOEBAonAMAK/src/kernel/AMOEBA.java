@@ -369,6 +369,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
 		AmoebaWindow.instance().dimensionSelector.update();
+		updateAgentsVisualisation();
 	}
 
 	@Override

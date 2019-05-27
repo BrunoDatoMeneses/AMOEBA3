@@ -32,7 +32,10 @@ public class DrawableRectangle extends Drawable {
 
 	@Override
 	public void _show() {
-		RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().add(rectangle));
+		RunLaterHelper.runLater(() -> {
+			if(!vui.getCanvas().getChildren().contains(rectangle))
+				vui.getCanvas().getChildren().add(rectangle);
+		});
 	}
 
 	@Override

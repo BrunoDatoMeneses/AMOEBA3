@@ -41,6 +41,11 @@ import javafx.scene.text.TextAlignment;
  */
 public class VUI {
 	/**
+	 * The toolbar of the VUI.
+	 */
+	public ToolBar toolbar;
+	
+	/**
 	 * List of objects currently being drawn by the VUI
 	 */
 	private List<Drawable> drawables = new LinkedList<>();
@@ -163,11 +168,11 @@ public class VUI {
 		RunLaterHelper.runLater(() -> {
 			panel = new BorderPane();
 
-			ToolBar statusPanel = new ToolBar();
+			toolbar = new ToolBar();
 			statusLabel = new Label("status");
 			statusLabel.setTextAlignment(TextAlignment.LEFT);
-			statusPanel.getItems().add(statusLabel);
-			panel.setBottom(statusPanel);
+			toolbar.getItems().add(statusLabel);
+			panel.setBottom(toolbar);
 
 			Button resetButton = new Button("Reset");
 			resetButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -179,7 +184,7 @@ public class VUI {
 					updateCanvas();
 				}
 			});
-			statusPanel.getItems().add(resetButton);
+			toolbar.getItems().add(resetButton);
 
 			canvas = new Pane();
 			canvas.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -240,7 +245,6 @@ public class VUI {
 			});
 
 			panel.setCenter(canvas);
-			MainWindow.addTabbedPanel("VUI #" + title, panel);
 			
 			done.release();
 		});
@@ -358,6 +362,16 @@ public class VUI {
 		drawablesLock.unlock();
 		RunLaterHelper.runLater(()-> canvas.getChildren().remove(d.getNode()));
 		updateCanvas();
+	}
+	
+	/**
+	 * Remove all drawables from the VUI.
+	 */
+	public void clear() {
+		drawablesLock.lock();
+		drawables.clear();
+		RunLaterHelper.runLater(()->canvas.getChildren().clear());
+		drawablesLock.unlock();
 	}
 
 	/**
@@ -526,5 +540,9 @@ public class VUI {
 
 	public Pane getCanvas() {
 		return canvas;
+	}
+	
+	public BorderPane getPanel() {
+		return panel;
 	}
 }
