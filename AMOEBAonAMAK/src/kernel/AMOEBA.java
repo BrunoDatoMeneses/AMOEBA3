@@ -143,7 +143,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.inform("AMOEBA", "Cycle " + cycle);
+			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
 		}
 		
 		if(isRenderUpdate()) {
@@ -157,7 +157,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 					// we (sadly) have to put it inside a runlater to correctly update the slider
 					getScheduler().stop(); 
 				});
-				Log.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
+				Log.defaultLog.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
 						+ "To reactiavte it, slow down the simulation and toggle the \"Allow Rendering\" button.");
 			}
 		}
@@ -296,7 +296,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				try {
 					renderingPhaseSemaphore.acquire();
 				} catch (InterruptedException e) {
-					Log.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					Log.defaultLog.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
 					e.printStackTrace();
 				}
 				// now the queue should be clear
@@ -452,10 +452,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * Synchronized with a writeLock.
 	 * @param validContexts new validContexts set.
 	 */
+	@SuppressWarnings("unchecked")
 	public void updateValidContexts(HashSet<Context> validContexts) {
 		validContextLock.writeLock().lock();
 		if (this.validContexts == null) {
-			this.validContexts = validContexts;
+			this.validContexts = (HashSet<Context>) validContexts.clone();
 		} else {
 			this.validContexts.retainAll(validContexts);
 		}

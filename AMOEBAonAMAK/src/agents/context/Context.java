@@ -26,7 +26,6 @@ public class Context extends AmoebaAgent {
 	public static Class<? extends RenderStrategy> defaultRenderStrategy =  ContextRendererFX.class;
 	// ----------
 	
-	private static final long serialVersionUID = 1L;
 	private Head headAgent;
 	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
 	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
@@ -105,6 +104,7 @@ public class Context extends AmoebaAgent {
 	protected void onAct() {
 		
 		if(amas.getValidContexts().contains(this)) {
+			logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			activations++;
 			headAgent.proposition(this);
 		}

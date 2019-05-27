@@ -132,7 +132,7 @@ public class MNIST_System implements StudiedSystem {
 		boolean benchmark = true;
 		if(benchmark) { 
 			System.out.println("AMOEBA benchmark with MNIST");
-			Log.minLevel = Log.Level.FATAL;
+			Log.defaultMinLevel = Log.Level.FATAL;
 			Configuration.commandLineMode = true;
 			
 			File file = new File("resources\\mnist.xml");

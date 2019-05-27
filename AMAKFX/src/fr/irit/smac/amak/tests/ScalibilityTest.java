@@ -17,12 +17,12 @@ public class ScalibilityTest {
 	private long startTime;
 
 	public ScalibilityTest() {
-		Log.minLevel = Log.Level.INFORM;
+		Log.defaultMinLevel = Log.Level.INFORM;
 		runAmasWithNAgents(1);
 	}
 
 	private void runAmasWithNAgents(int i) {
-		Log.inform("Global state", "start i:%d", i);
+		Log.defaultLog.inform("Global state", "start i:%d", i);
 		MyAMAS amas = new MyAMAS(new MyEnvironment(), Scheduling.HIDDEN, new Integer(i));
 		amas.getScheduler().setOnStop(s -> {
 			int nextI = i;
@@ -41,7 +41,7 @@ public class ScalibilityTest {
 				nextI = 1000;
 				break;
 			default:
-				Log.inform("Global state", "end");
+				Log.defaultLog.inform("Global state", "end");
 				return;
 			}
 			runAmasWithNAgents(nextI);

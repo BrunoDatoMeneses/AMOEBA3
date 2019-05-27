@@ -13,7 +13,6 @@ import kernel.AMOEBA;
  *
  */
 public class Percept extends AmoebaAgent {
-	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 
@@ -54,7 +53,8 @@ public class Percept extends AmoebaAgent {
 			} 
 			amas.updateValidContexts(validContextProjection);
 		}
-
+		
+		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
 	}
 
 	/**

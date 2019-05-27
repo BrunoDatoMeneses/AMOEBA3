@@ -1,5 +1,8 @@
 package fr.irit.smac.amak.tools;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -72,27 +75,54 @@ public class Log {
 	/**
 	 * Unique index for log lines
 	 */
-	private static int idx = 1;
+	private int idx = 1;
 	/**
 	 * The action that must be executed each time a log line is created
 	 */
-	private static Consumer<String> action = null;
+	private  List<Consumer<String>> actions = null;
 	/**
 	 * Default action to execute when no one is provided
 	 */
-	private static Consumer<String> defaultAction = (s) -> {
+	private static List<Consumer<String>> defaultAction = new ArrayList<Consumer<String>>();
+	static {
+		defaultAction.add((s) -> {
 		System.out.println(s);
 		System.out.flush();
-	};
+		});
+	}
 	/**
-	 * The minimum level that should be displayed
+	 * The default minimum level that should be displayed
 	 */
-	public static Level minLevel = Level.DEBUG;
+	public static Level defaultMinLevel = Level.DEBUG;
+	
+	private Level minLevel = null;
+	
 	/**
 	 * Global flag telling if the user has been informed about the fact that log
 	 * shouldn't be disabled
 	 */
 	private static boolean alreadyInformed = false;
+	
+	/**
+	 * The default logger. Use this logger for unspecific, global logging.
+	 */
+	public static Log defaultLog = new Log();
+	
+	private static HashMap<String, Log> loggers = new HashMap<String, Log>();
+	
+	/**
+	 * Get or create a logger. <br/>
+	 * A new logger copy the behavior of the default logger
+	 * until told otherwise (when a callback is added for example). 
+	 * @param name name of the logger
+	 * @return
+	 */
+	public static Log get(String name) {
+		if(!loggers.containsKey(name)) {
+			loggers.put(name, new Log());
+		}
+		return loggers.get(name);
+	}
 
 	/**
 	 * Log a line with log level set to debug
@@ -104,7 +134,7 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void debug(final String _tag, final String _text, final Object... params) {
+	public void debug(final String _tag, final String _text, final Object... params) {
 		log(Level.DEBUG, _tag, _text, params);
 	}
 
@@ -118,7 +148,7 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void error(final String _tag, final String _text, final Object... params) {
+	public void error(final String _tag, final String _text, final Object... params) {
 		log(Level.ERROR, _tag, _text, params);
 	}
 
@@ -132,7 +162,7 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void fatal(final String _tag, final String _text, final Object... params) {
+	public void fatal(final String _tag, final String _text, final Object... params) {
 		log(Level.FATAL, _tag, _text, params);
 	}
 
@@ -141,8 +171,8 @@ public class Log {
 	 * 
 	 * @return the action
 	 */
-	private static Consumer<String> getAction() {
-		return action == null ? defaultAction : action;
+	private List<Consumer<String>> getActions() {
+		return actions == null ? defaultAction : actions;
 	}
 
 	/**
@@ -155,7 +185,7 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void important(final String _tag, final String _text, final Object... params) {
+	public void important(final String _tag, final String _text, final Object... params) {
 		log(Level.IMPORTANT, _tag, _text, params);
 	}
 
@@ -169,14 +199,14 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void inform(final String _tag, final String _text, final Object... params) {
+	public void inform(final String _tag, final String _text, final Object... params) {
 		log(Level.INFORM, _tag, _text, params);
 	}
 
 	/**
 	 * Inform the user that logs shouldn't be disabled
 	 */
-	private static void informOnce() {
+	private void informOnce() {
 		if (!alreadyInformed) {
 			System.out.println("/!\\ Logs are disabled. Prefer the use of minimum level.");
 			alreadyInformed = true;
@@ -195,12 +225,13 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	private static void log(final Level _level, final String _tag, final String _text, final Object... params) {
+	private void log(final Level _level, final String _tag, final String _text, final Object... params) {
 		if (enabled) {
-			if (_level.isGE(minLevel)) {
+			if (_level.isGE(getMinLevel())) {
 				if (_level != Level.DEBUG || _tag.matches(debugTagFilter)) {
-					getAction().accept(
-							String.format("[%6s]	%6d/%s: %s", _tag, idx++, _level, String.format(_text, params)));
+					getActions().forEach(
+						item->item.accept(String.format("[%6s]	%6d/%s: %s", _tag, idx++, _level, String.format(_text, params)))
+					);
 				}
 			}
 		} else {
@@ -209,13 +240,17 @@ public class Log {
 	}
 
 	/**
-	 * Set the action that must be used for logging lines
+	 * Add an action that will be used for logging lines. <br/>
+	 * The logger will no longer use the default behavior.
 	 * 
 	 * @param _action
 	 *            the action used for logging
 	 */
-	public static void setCallback(final Consumer<String> _action) {
-		action = _action;
+	public void addCallback(final Consumer<String> _action) {
+		if(actions == null) {
+			actions = new ArrayList<Consumer<String>>();
+		}
+		actions.add(_action);
 	}
 
 	/**
@@ -228,8 +263,33 @@ public class Log {
 	 * @param params
 	 *            Parameters for the text (as in String.format)
 	 */
-	public static void warning(final String _tag, final String _text, final Object... params) {
+	public void warning(final String _tag, final String _text, final Object... params) {
 		log(Level.WARNING, _tag, _text, params);
+	}
+	
+	/**
+	 * Set the minimum level for this logger
+	 * @param minLevel
+	 */
+	public void setMinLevel(Level minLevel) {
+		this.minLevel = minLevel;
+	}
+	
+	/**
+	 * Get the minimum level for this logger. <br/>
+	 * If the minimum level is lower than the default minimum level, return the default minimum level.
+	 * @return
+	 */
+	public Level getMinLevel() {
+		if(minLevel == null) {
+			return defaultMinLevel;
+		} else {
+			return minLevel.isGE(defaultMinLevel) ? minLevel : defaultMinLevel;
+		}
+	}
+	
+	public boolean isDefaultActions() {
+		return actions == null;
 	}
 
 }

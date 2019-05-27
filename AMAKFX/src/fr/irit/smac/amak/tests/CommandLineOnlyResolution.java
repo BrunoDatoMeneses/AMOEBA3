@@ -27,7 +27,7 @@ public class CommandLineOnlyResolution {
 		}
 		@Override
 		protected void onSystemCycleEnd() {
-			Log.debug("test", "yolo");
+			Log.defaultLog.debug("test", "yolo");
 		}
 	}
 	public class MyEnv extends Environment {

@@ -45,7 +45,7 @@ public class NDimCube implements StudiedSystem{
 			if(i+1 < dimension)
 				print += ", ";
 		}
-		Log.inform("NDimCube", print);
+		Log.defaultLog.inform("NDimCube", print);
 	}
 	
 	@Override

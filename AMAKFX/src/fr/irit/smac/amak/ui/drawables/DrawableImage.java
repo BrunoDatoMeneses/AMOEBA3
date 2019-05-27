@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.VUI;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,11 +32,11 @@ public class DrawableImage extends Drawable {
 		try {
 			image.setImage(loadByFilename(this.filename));
 		} catch (NullPointerException | IllegalArgumentException e) {
-			Log.error("AMAK", "Can't find/load the file %s", this.filename);
+			Log.defaultLog.error("AMAK", "Can't find/load the file %s", this.filename);
 			try {
 				image.setImage(loadByFilename("file:Resources/unavailable.png"));
 			} catch (NullPointerException | IllegalArgumentException e1) {
-				Log.fatal("AMAK", "Can't load resources belonging to AMAK. Bad things may happen.");
+				Log.defaultLog.fatal("AMAK", "Can't load resources belonging to AMAK. Bad things may happen.");
 			}
 		}
 		setWidth(this.image.getFitWidth());

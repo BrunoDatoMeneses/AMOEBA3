@@ -1,8 +1,7 @@
 package agents;
 
-import java.io.Serializable;
-
 import fr.irit.smac.amak.Agent;
+import fr.irit.smac.amak.tools.Loggable;
 import gui.RenderStrategy;
 import kernel.AMOEBA;
 import kernel.World;
@@ -10,8 +9,7 @@ import kernel.World;
 /**
  * The base class for all AMOEBA agents
  */
-public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serializable {
-	private static final long serialVersionUID = 1L;
+public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggable {
 	// Attributes
 	protected String name;
 	private boolean dying;
@@ -25,6 +23,13 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 	public AmoebaAgent(AMOEBA amas) {
 		super(amas);
 		this.dying = false;
+	}
+	
+	@Override
+	protected void onReady() {
+		// TODO Auto-generated method stub
+		super.onReady();
+		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s ready.", toString());
 	}
 
 	@Override
@@ -56,6 +61,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Serial
 			renderStrategy.delete();
 		}
 		super.destroy();
+		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s destroyed.", toString());
 	}
 
 	public String getName() {

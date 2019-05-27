@@ -108,7 +108,7 @@ public class Benchmark {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Log.minLevel = Log.Level.FATAL;
+		Log.defaultMinLevel = Log.Level.FATAL;
 		Configuration.commandLineMode = true;
 		
 		File file = new File("resources\\100DimensionsLauncherTrained1000.xml");

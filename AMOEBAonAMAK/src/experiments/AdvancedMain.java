@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import agents.context.Context;
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.tools.Log;
 import gui.AmoebaWindow;
 import gui.NoneRenderer;
 import javafx.beans.value.ChangeListener;
@@ -69,7 +70,7 @@ public class AdvancedMain {
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 100;
+		int nbCycle = 1000;
 		for (int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
@@ -79,6 +80,9 @@ public class AdvancedMain {
 		
 		// We create a manual save point
 		amoeba.saver.newManualSave("TestManualSave");
+		
+		// We set the log level to INFORM, to avoid debug logs that slow down simulation
+		Log.defaultMinLevel = Log.Level.INFORM;
 		
 		// We deactivate rendering
 		amoeba.setRenderUpdate(false);

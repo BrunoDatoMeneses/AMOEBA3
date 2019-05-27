@@ -9,7 +9,7 @@ import fr.irit.smac.amak.tools.Log;
 public class Test {
 
 	public static void main(String[] args) {
-		Log.minLevel = Log.Level.DEBUG;
+		Log.defaultMinLevel = Log.Level.DEBUG;
 		new Test();
 	}
 
@@ -37,7 +37,7 @@ public class Test {
 
 		@Override
 		protected void onAct() {
-			Log.debug(toString(), getExecutionOrder()+"");
+			Log.defaultLog.debug(toString(), getExecutionOrder()+"");
 		}
 	}
 
@@ -54,7 +54,7 @@ public class Test {
 
 		@Override
 		protected void onAct() {
-			Log.debug(toString(), getExecutionOrder()+"");
+			Log.defaultLog.debug(toString(), getExecutionOrder()+"");
 		}
 	}
 

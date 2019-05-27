@@ -51,7 +51,7 @@ public class ContextMenuVUI extends ContextMenu {
 				req.put(amoeba.getDimensionSelector().d2().getName(), y);
 				req.put("oracle", 0.0);
 				double res = amoeba.request(req);
-				Log.inform("AMOEBA", "Request Here for x:"+x+" y:"+y+" -> "+res+".");
+				Log.defaultLog.inform("AMOEBA", "Request Here for x:"+x+" y:"+y+" -> "+res+".");
 			}
 		});
 		this.getItems().add(reqHere);
