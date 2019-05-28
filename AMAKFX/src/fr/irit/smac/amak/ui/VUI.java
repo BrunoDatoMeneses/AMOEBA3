@@ -134,11 +134,14 @@ public class VUI {
 	 * @return the default VUI
 	 */
 	public static VUI get() {
+		if(!instances.containsKey("Default"))
+			MainWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
 		return get("Default");
 	}
 
 	/**
-	 * Create or get a VUI
+	 * Create or get a VUI.<br/>
+	 * You have add its panel to the MainWindow yourself.
 	 * 
 	 * @param id
 	 *            The unique id of the VUI

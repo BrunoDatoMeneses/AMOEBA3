@@ -11,6 +11,11 @@
 	<artifactId>AMAKFX</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<skip.assembly>false</skip.assembly>
+		<main.class>fr.irit.smac.amak.examples.philosophers.PhilosophersLaunchExample</main.class>
+	</properties>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>tests</testSourceDirectory>

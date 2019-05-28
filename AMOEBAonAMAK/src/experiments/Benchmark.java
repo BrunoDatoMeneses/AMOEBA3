@@ -40,6 +40,7 @@ public class Benchmark {
 			execRequest(nbRequestCycle, args[4]);
 		}
 		
+		System.exit(0);
 	}
 	
 	private static void execLearn(int nbCycle, String configFile) {
@@ -54,6 +55,7 @@ public class Benchmark {
 		
 		double start = System.currentTimeMillis();
 		for(int i = 0; i < nbCycle; i++) {
+			ss.playOneStep();
 			amoeba.learn(ss.getOutput());
 			criticity.add(amoeba.getHeads().get(0).getCriticity());
 		}
@@ -62,7 +64,7 @@ public class Benchmark {
 		bs.save(new File("benchmark_learning_out.xml"));
 		
 		System.out.println("Criticities :\n"+criticity);
-		System.out.println("Learning done in "+((end-start)*1000));
+		System.out.println("Learning done in "+((end-start)/1000));
 	}
 	
 	private static void execRequest(int nbCycle, String configFile) {
@@ -77,13 +79,14 @@ public class Benchmark {
 		
 		double start = System.currentTimeMillis();
 		for(int i = 0; i < nbCycle; i++) {
+			ss.playOneStep();
 			amoeba.request(ss.getOutput());
 			criticity.add(amoeba.getHeads().get(0).getCriticity());
 		}
 		double end = System.currentTimeMillis();
 		
 		System.out.println("Criticities :\n"+criticity);
-		System.out.println("Requests done in "+((end-start)*1000));
+		System.out.println("Requests done in "+((end-start)/1000));
 	}
 
 }

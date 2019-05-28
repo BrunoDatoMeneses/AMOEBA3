@@ -1,6 +1,12 @@
 # AMAKFX and AMOEBAonAMAK 
 
-## Install
+Tested with openjdk 11.
+
+## Build Jar with dependencies
+`mvn clean compile assembly:single`
+Note that the resulting jars are not platform independant. 
+
+## Use with Eclipse
 Clone this repo and import it as a Maven project.
 There is one parent project `AMOEBA-parent` and two modules `AMOEBAonAMAK` and `AMAKFX`.
 
@@ -10,8 +16,5 @@ AMOEBA-parent
   | AMAKFX
   | AMOEBAonAMAK
 ```
-
-AMAKFX use JavaFX, it is no longer included in jdk 11 and later, so you may have to install it yourself from the [official website](https://openjfx.io/).
-
 For more detail on [AMOEBAonAMAK](AMOEBAonAMAK/README.md) or [AMAKFX](AMAKFX/README.md), check their respective README.
 
