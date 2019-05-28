@@ -147,7 +147,7 @@ public class MNIST_System implements StudiedSystem {
 			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 			IBackupSystem backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
-			Benchmark.benchmark(amoeba, learnSystem, requestSystem, 100, 100, 50, null);
+			BenchmarkThreading.benchmark(amoeba, learnSystem, requestSystem, 100, 100, 50, null);
 			System.out.println("Done. Starting benchmark.");
 			// ---------------
 			List<List<List<Double>>> results = new ArrayList<>();
@@ -160,7 +160,7 @@ public class MNIST_System implements StudiedSystem {
 				amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 				backupSystem = new BackupSystem(amoeba);
 				backupSystem.load(file);
-				List<List<Double>> bench = Benchmark.benchmark(amoeba, learnSystem, requestSystem, 1000, 500, 100, null);
+				List<List<Double>> bench = BenchmarkThreading.benchmark(amoeba, learnSystem, requestSystem, 1000, 500, 100, null);
 				System.out.println("Thd "+thd+" "+bench);
 				results.add(bench);
 			}
