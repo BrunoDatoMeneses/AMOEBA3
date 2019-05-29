@@ -13,7 +13,6 @@ import kernel.BackupSystem;
 import kernel.IAMOEBA;
 import kernel.IBackupSystem;
 import kernel.StudiedSystem;
-import kernel.World;
 
 public class BenchmarkThreading {
 
@@ -117,8 +116,8 @@ public class BenchmarkThreading {
 		// setup cache --- (very important to reduce impact of the 1st measure)
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		StudiedSystem learnSystem = new NDimCube(50.0, 100);
-		World world = new World();
-		AMOEBA amoeba = new AMOEBA(world, learnSystem);
+		AMOEBA amoeba = new AMOEBA();
+		amoeba.setStudiedSystem(learnSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		backupSystem.load(file);
 		benchmark(amoeba, learnSystem, learnSystem, 100, 100, 100, null);
@@ -128,8 +127,7 @@ public class BenchmarkThreading {
 		for(int thd = 1; thd <= 8; thd *= 2) {
 			Configuration.allowedSimultaneousAgentsExecution = thd;
 			learnSystem = new NDimCube(50.0, 100);
-			world = new World();
-			amoeba = new AMOEBA(world, null);
+			amoeba = new AMOEBA();
 			backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
 			List<List<Double>> bench = benchmark(amoeba, learnSystem, learnSystem, 0, 10000, 1000, null);

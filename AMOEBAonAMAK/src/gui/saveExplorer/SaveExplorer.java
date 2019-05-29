@@ -1,21 +1,16 @@
 package gui.saveExplorer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Scanner;
 
 import agents.percept.Percept;
+import fr.irit.smac.amak.tools.SerializeBase64;
 import fr.irit.smac.amak.ui.VUI;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -69,7 +64,7 @@ public class SaveExplorer extends VBox {
 	
 	@FXML protected void handleLaunchA(ActionEvent event) {
 		try {
-			exec(SaveExplorer.class, comboBoxA.getValue(), serializeToString(amoeba.studiedSystem));
+			exec(SaveExplorer.class, comboBoxA.getValue(), SerializeBase64.serialize(amoeba.studiedSystem));
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} 
@@ -77,7 +72,7 @@ public class SaveExplorer extends VBox {
 	
 	@FXML protected void handleLaunchM(ActionEvent event) {
 		try {
-			exec(SaveExplorer.class, comboBoxM.getValue(), serializeToString(amoeba.studiedSystem));
+			exec(SaveExplorer.class, comboBoxM.getValue(), SerializeBase64.serialize(amoeba.studiedSystem));
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} 
@@ -206,42 +201,12 @@ public class SaveExplorer extends VBox {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		System.out.println("New AMOEBA launched.");
-		AMOEBA amoeba = new AMOEBA(args[0], (StudiedSystem)serializeFromString(args[1]));
+		AMOEBA amoeba = new AMOEBA(args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
 		amoeba.saver.deleteFolderOnClose = false;
 		//amoeba.allowGraphicalScheduler(false);
 		for(Percept p : amoeba.getPercepts()) {
 			p.setValue(amoeba.getPerceptionsOrAction(p.getName()));
 		}
 		amoeba.updateAgentsVisualisation();
-	}
-	
-	/**
-	 * Seralize into a string using base64
-	 * @param o
-	 * @return
-	 * @throws IOException
-	 */
-	private static String serializeToString(Serializable o) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream( baos );
-        oos.writeObject( o );
-        oos.close();
-        return Base64.getEncoder().encodeToString(baos.toByteArray()); 
-	}
-	
-	/**
-	 * Deserialze from a string using base64
-	 * @param s
-	 * @return
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	private static Object serializeFromString(String s) throws IOException, ClassNotFoundException {
-        byte [] data = Base64.getDecoder().decode( s );
-        ObjectInputStream ois = new ObjectInputStream( 
-                                        new ByteArrayInputStream(  data ) );
-        Object o  = ois.readObject();
-        ois.close();
-        return o;
 	}
 }

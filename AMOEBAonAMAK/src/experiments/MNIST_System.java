@@ -16,7 +16,6 @@ import kernel.AMOEBA;
 import kernel.BackupSystem;
 import kernel.IBackupSystem;
 import kernel.StudiedSystem;
-import kernel.World;
 
 /**
  * A system using the MNIST database in the CSV format.
@@ -142,8 +141,7 @@ public class MNIST_System implements StudiedSystem {
 			Configuration.allowedSimultaneousAgentsExecution = 1;
 			StudiedSystem learnSystem = new MNIST_System("../../mnist/mnist_train.csv");
 			StudiedSystem requestSystem = new MNIST_System("../../mnist/mnist_test.csv");
-			World world = new World();
-			AMOEBA amoeba = new AMOEBA(world, null);
+			AMOEBA amoeba = new AMOEBA();
 			amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 			IBackupSystem backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
@@ -155,8 +153,7 @@ public class MNIST_System implements StudiedSystem {
 				Configuration.allowedSimultaneousAgentsExecution = thd;
 				learnSystem = new MNIST_System("../../mnist/mnist_train.csv");
 				requestSystem = new MNIST_System("../../mnist/mnist_test.csv");
-				world = new World();
-				amoeba = new AMOEBA(world, null);
+				amoeba = new AMOEBA();
 				amoeba.setLocalModel(TypeLocalModel.AVERAGE);
 				backupSystem = new BackupSystem(amoeba);
 				backupSystem.load(file);
@@ -185,11 +182,11 @@ public class MNIST_System implements StudiedSystem {
 			//Non benchmark usage :
 			StudiedSystem studiedSystem = new MNIST_System("..\\..\\mnist\\mnist_train.csv");
 			File file = new File("resources\\mnist.xml");
-			World world = new World();
 			Configuration.commandLineMode = false;
 			Configuration.allowedSimultaneousAgentsExecution = 8;
 	
-			AMOEBA amoeba = new AMOEBA(world, studiedSystem);
+			AMOEBA amoeba = new AMOEBA();
+			amoeba.setStudiedSystem(studiedSystem);
 			IBackupSystem backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
 			

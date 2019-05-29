@@ -3,11 +3,9 @@ package experiments;
 import java.io.File;
 import java.io.IOException;
 
-import agents.context.Context;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import gui.AmoebaWindow;
-import gui.NoneRenderer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
@@ -16,7 +14,6 @@ import kernel.BackupSystem;
 import kernel.IBackupSystem;
 import kernel.SaveHelper;
 import kernel.StudiedSystem;
-import kernel.World;
 
 /**
  * A more advanced and complete main.
@@ -40,10 +37,13 @@ public class AdvancedMain {
 		Configuration.allowedSimultaneousAgentsExecution = 8;
 		Configuration.waitForGUI = true;
 
-		// Create a World, a Studied System, and an AMOEBA
-		World world = new World();
+		// Create an AMOEBA
+		AMOEBA amoeba = new AMOEBA();
+		// Create a studied system and add it to the amoeba.
+		// Adding a studied system to an amoeba allow you to control the learning speed (the simulation : how many cycles per second)
+		// with amoeba's scheduler, graphically or programmatically.
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
+		amoeba.setStudiedSystem(studiedSystem);
 		// A window appeared, allowing to control the simulation, but if you try to run it
 		// it will crash (there's no percepts !). We need to load a configuration :
 		
@@ -53,13 +53,15 @@ public class AdvancedMain {
 		// Create a backup system for the AMOEBA
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		// Load a configuration matching the studied system
-		File file = new File("resources\\twoDimensionsLauncher.xml");
+		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		// Note : if you intend to use a SaveHelper, you can use SaveHelper.load instead of a BackupSystem
 		
 		// We add an optional saver, allowing us to autosave the amoeba at each cycle.
+		// The SaveHelper also add graphical tools to save and load AMOEBA's state.
 		amoeba.saver = new SaveHelper(amoeba);
-		// Autosave slow execution, if you want fast training, set saver to null.
+		// Autosave slow execution, if you want fast training, set saver to null,
+		// or saver.autoSave = false.
 
 		// The amoeba is ready to be used.
 		// Next we show how to control it with code :

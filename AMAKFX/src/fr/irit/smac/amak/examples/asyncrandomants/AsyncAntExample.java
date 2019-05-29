@@ -59,7 +59,7 @@ public class AsyncAntExample extends Agent<AsyncAntsAMASExample, AsyncWorldExamp
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get().createAndAddImage(dx, dy, "file:Resources/ant.png");
+		image = VUI.get().createAndAddImage(dx, dy, "file:resources/ant.png");
 	}
 
 	/**

@@ -68,9 +68,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @param studiedSystem
 	 *            the studied system
 	 */
-	public AMOEBA(World environment, StudiedSystem studiedSystem) {
-		super(environment, Scheduling.HIDDEN);
-		this.studiedSystem = studiedSystem;
+	public AMOEBA() {
+		super(new World(), Scheduling.HIDDEN);
 	}
 	
 	/**
@@ -524,7 +523,19 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return AmoebaWindow.instance().dimensionSelector;
 	}
 	
+	/**
+	 * Get the last perception.
+	 * @return
+	 */
 	public HashMap<String, Double> getPerceptionsAndActionState() {
 		return perceptionsAndActionState;
+	}
+	
+	/**
+	 * Set the studied system that will be used to learn with the internal scheduler.
+	 * @param studiedSystem
+	 */
+	public void setStudiedSystem(StudiedSystem studiedSystem) {
+		this.studiedSystem = studiedSystem;
 	}
 }

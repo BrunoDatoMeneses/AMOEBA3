@@ -1,8 +1,6 @@
 package experiments;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import fr.irit.smac.amak.Configuration;
@@ -10,7 +8,6 @@ import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
 import kernel.BackupSystem;
 import kernel.StudiedSystem;
-import kernel.World;
 
 public class Benchmark {
 
@@ -46,7 +43,7 @@ public class Benchmark {
 	private static void execLearn(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" learning cycles.");
 		
-		AMOEBA amoeba = new AMOEBA(new World(), null);
+		AMOEBA amoeba = new AMOEBA();
 		BackupSystem bs = new BackupSystem(amoeba);
 		bs.load(new File(configFile));
 		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());
@@ -70,7 +67,7 @@ public class Benchmark {
 	private static void execRequest(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" request cycles.");
 		
-		AMOEBA amoeba = new AMOEBA(new World(), null);
+		AMOEBA amoeba = new AMOEBA();
 		BackupSystem bs = new BackupSystem(amoeba);
 		bs.load(new File(configFile));
 		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());
