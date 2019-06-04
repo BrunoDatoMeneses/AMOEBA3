@@ -59,9 +59,10 @@ public class XmlConfigGenerator {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+		
 		String XMLConfigFile = "nDimensionLauncher.xml";
 		
-		XmlConfigGenerator.makeXML(XMLConfigFile, 4);
+		XmlConfigGenerator.makeXML(XMLConfigFile, 2);
 		
 		
 	}

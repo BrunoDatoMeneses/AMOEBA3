@@ -75,7 +75,7 @@ public class World implements Serializable {
 	private double mappingErrorAllowed = 0.1;
 	
 	public int regressionPoints = 0;
-	
+	 
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
 	
@@ -111,11 +111,11 @@ public class World implements Serializable {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-//		String message = "" +this.getScheduler().getTick();
-//		for(String info : infos) {
-//			message += " " + info;
-//		}
-//		System.out.println(message);
+		String message = "" +this.getScheduler().getTick();
+		for(String info : infos) {
+			message += " " + info;
+		}
+		System.out.println(message);
 	}
 	
 	/**

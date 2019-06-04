@@ -110,7 +110,7 @@ public class AMOEBA extends Thread {
 			
 			frame.pack();
 			
-			scheduler.setView(mainPanel);	
+			scheduler.setView(mainPanel);	 
 			scheduler.setWorld(world);
 			this.setScheduler(scheduler);
 			this.start(false);

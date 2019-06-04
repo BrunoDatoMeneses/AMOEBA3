@@ -9,6 +9,9 @@
 	<StartingAgents>
 		<Sensor Name="px0" Source="x0"></Sensor>
 		<Sensor Name="px1" Source="x1"></Sensor>
+		<Sensor Name="px2" Source="x2"></Sensor>
+		<Sensor Name="px3" Source="x3"></Sensor>
+		<Sensor Name="px4" Source="x4"></Sensor>
 		<Controller Name="Controller" Oracle="test"></Controller>
 
 	</StartingAgents>

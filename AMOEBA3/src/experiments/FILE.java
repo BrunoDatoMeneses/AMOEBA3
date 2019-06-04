@@ -12,6 +12,7 @@ public class FILE {
 	
 	PrintWriter pw;
 
+	String manualMessage;
 	
 	public FILE(String folder, String name){
 		    try {
@@ -56,6 +57,18 @@ public class FILE {
 			message += info + ";"  ;
 		}
 		pw.println(message);
+	} 
+	
+	public void initManualMessage() {
+		manualMessage = "";
+	}
+	
+	public void addManualMessage(String subMessage) {
+		manualMessage += subMessage + ";";
+	}
+	
+	public void sendManualMessage() {
+		pw.println(manualMessage);
 	}
 	
 public static void main(String[] args) {

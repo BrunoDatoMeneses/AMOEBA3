@@ -10,6 +10,7 @@ import mas.kernel.Config;
 import mas.kernel.Launcher;
 import mas.kernel.NCSMemory;
 import mas.kernel.World;
+import mas.Quadruplet;
 import mas.agents.AbstractPair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
@@ -311,6 +312,7 @@ public class Head extends AbstractHead implements Cloneable{
 		playExecutionTime = System.currentTimeMillis();	
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); //using highest confidence 
+			//selectBestContextWithDistanceToModel();
 		}
 		else {
 			bestContext = lastUsedContext;
@@ -343,7 +345,7 @@ public class Head extends AbstractHead implements Cloneable{
 		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
 		
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
-		selfAnalysationOfContexts2();
+		selfAnalysationOfContexts3();
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
 		
 		world.getAmoeba().PAUSE("BEFORE HEAD NCS ");
@@ -363,11 +365,11 @@ public class Head extends AbstractHead implements Cloneable{
 		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
 		
 		overmappingNCSExecutionTime = System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 		
 		memoryCreationExecutionTime = System.currentTimeMillis();
-		//NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
+		NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"End cycle"));
 		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 		
 		otherExecutionTime = System.currentTimeMillis();
@@ -1102,85 +1104,54 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	private void selfAnalysationOfContexts2() {
-		////////System.out.println(world.getScheduler().getTick());
-		/*All context which proposed itself must analyze its proposition*/
-		
-		
-		for(Context ctxt : activatedNeighborsContexts) {
+
 			
-			//ctxt.NCSDetection_BetterNeighbor();
-			
-		}
-		
 		
 		if(activatedContexts.size()>1) {
-			Context closestContextToOracle = null;
-			double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
-			double currentDistanceToOraclePrediction = 0.0;
-			
-			
-			
-			for (Context activatedContext : activatedContexts) {
-				////////System.out.println(activatedContexts.get(i).getName());
-				currentDistanceToOraclePrediction = activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment());
-				if(currentDistanceToOraclePrediction<minDistanceToOraclePrediction) {
-					minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-					closestContextToOracle = activatedContext;
-				}
-					
-			}
-			
-			//System.out.println(closestContextToOracle.getLocalModel().distance(closestContextToOracle.getCurrentExperiment()) + " ******************************************************************DISTANCE TO MODEL : " );
-			//System.out.println("OLD COEFS " + closestContextToOracle.getLocalModel().coefsToString());
-			closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-			//System.out.println("NEW COEFS " + closestContextToOracle.getLocalModel().coefsToString());
-			
-			activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
-			for (Context activatedContext : activatedContexts) {	
-				activatedContext.analyzeResults3(this, closestContextToOracle);
-					
-			}
-			activatedContexts = activatedContextsCopyForUpdates;
+			selfAnalysationOfContextOnSeveralActivatedContexts();
 			
 		}else if(activatedContexts.size() == 1) {
 			
-			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment());
-			//System.out.println(distanceToOracleForActivatedContext + " ******************************************************************DISTANCE TO MODEL : " );
-			if(activatedNeighborsContexts.size()>1) {
-				
-				Context closestContextToOracle = null;
-				double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
-				double currentDistanceToOraclePrediction = 0.0; 
-				for(Context contextNeighbor : activatedNeighborsContexts) {
-					if(contextNeighbor != activatedContexts.get(0)) {
-						currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
-						if(currentDistanceToOraclePrediction<minDistanceToOraclePredictionInNeighbors) {
-							minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-							closestContextToOracle = contextNeighbor;
-						} 
-					}
-				}
-				
-				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
-					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-					activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-					//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-					
-				}else {
-					//LocalModelAgent remplacementModel = new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef().clone());
-					//activatedContexts.get(0).setLocalModel(remplacementModel);
-				}
-
-				
-			}else {
-				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-				//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-				
-				
-			}
+//			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment());
+//			//System.out.println(distanceToOracleForActivatedContext + " ******************************************************************DISTANCE TO MODEL : " );
+//			if(activatedNeighborsContexts.size()>1) {
+//				
+//				Context closestContextToOracle = null;
+//				double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
+//				double currentDistanceToOraclePrediction = 0.0; 
+//				for(Context contextNeighbor : activatedNeighborsContexts) {
+//					if(contextNeighbor != activatedContexts.get(0)) {
+//						currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
+//						if(currentDistanceToOraclePrediction<minDistanceToOraclePredictionInNeighbors) {
+//							minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
+//							closestContextToOracle = contextNeighbor;
+//						} 
+//					}
+//				}
+//				
+//				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
+//					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+//					activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+//					//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+//					
+//				}else {
+//					closestContextToOracle.solveNCS_IncompetentHead(this);
+//					//activatedContexts.get(0).setLocalModel(new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef(),closestContextToOracle.getLocalModel().getFirstExperiments()));
+//					//LocalModelAgent remplacementModel = new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef().clone());
+//					//activatedContexts.get(0).setLocalModel(remplacementModel);
+//					
+//				}
+//
+//				
+//			}else {
+//				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+//				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+//				//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
+//				
+//				
+//			}
 			
-			activatedContexts.get(0).analyzeResults3(this, activatedContexts.get(0));
+			selfAnalysationOfContextOnUniqueActivatedContext();
 			
 			
 		}
@@ -1194,6 +1165,142 @@ public class Head extends AbstractHead implements Cloneable{
 			}
 			
 		}
+	}
+	
+	private void selfAnalysationOfContexts3() {
+
+			
+		
+		if(activatedContexts.size()>1) {
+			
+			selfAnalysationOfContextOnSeveralActivatedContexts();
+			
+		}else if(activatedContexts.size() == 1) {	
+			
+			selfAnalysationOfContextOnUniqueActivatedContext();
+			
+		}
+			
+		for (Context ctxt : activatedNeighborsContexts) {
+
+			if(!activatedContexts.contains(ctxt)) {
+				ctxt.NCSDetection_Uselessness();
+			}
+			
+		}
+	}
+
+	private void selfAnalysationOfContextOnUniqueActivatedContext() {
+		
+		
+		if(activatedNeighborsContexts.size()>0) {
+			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment());
+			Quadruplet<Context, Double, Context, Double> closestAndFarestContextsToPredictionWithDistance = closestAndFarestContextsToPrediction();
+			
+			double distanceToMin = Math.abs(distanceToOracleForActivatedContext - closestAndFarestContextsToPredictionWithDistance.getB());
+			double distanceToMax = Math.abs(distanceToOracleForActivatedContext - closestAndFarestContextsToPredictionWithDistance.getD());
+			
+			if(distanceToMin<distanceToMax) {
+				world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",activatedContexts.get(0).getName(),  ""+distanceToOracleForActivatedContext)));
+				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+				
+			}
+		}else {
+			world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",activatedContexts.get(0).getName(),  ""+activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment())))); 
+			activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+		}
+		
+		
+		
+		//world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",activatedContexts.get(0).getName(),  ""+activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment())))); 
+		//activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+		activatedContexts.get(0).analyzeResults3(this, activatedContexts.get(0));
+	}
+
+	private AbstractPair<Context, Double> maxModelDistanceToOraclePredictionInNeighbors() {
+		Context farestContextToOracle = null;
+		double maxDistanceToOraclePredictionInNeighbors = Double.NEGATIVE_INFINITY;
+		double currentDistanceToOraclePrediction = 0.0; 
+		for(Context contextNeighbor : activatedNeighborsContexts) {
+			if(contextNeighbor != activatedContexts.get(0)) {
+				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
+				world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",contextNeighbor.getName(),  ""+currentDistanceToOraclePrediction)));
+				if(currentDistanceToOraclePrediction>maxDistanceToOraclePredictionInNeighbors) {
+					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
+					farestContextToOracle = contextNeighbor;
+				} 
+			}
+		}
+		return new AbstractPair<Context, Double>(farestContextToOracle, maxDistanceToOraclePredictionInNeighbors);
+	}
+	
+	private AbstractPair<Context, Double> minModelDistanceToOraclePredictionInNeighbors() {
+		Context closestContextToOracle = null;
+		double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
+		double currentDistanceToOraclePrediction = 0.0; 
+		for(Context contextNeighbor : activatedNeighborsContexts) {
+			if(contextNeighbor != activatedContexts.get(0)) {
+				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
+				world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",contextNeighbor.getName(),  ""+currentDistanceToOraclePrediction)));
+				if(currentDistanceToOraclePrediction<minDistanceToOraclePredictionInNeighbors) {
+					minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
+					closestContextToOracle = contextNeighbor;
+				} 
+			}
+		}
+		return new AbstractPair<Context, Double>(closestContextToOracle, minDistanceToOraclePredictionInNeighbors);
+	}
+	
+	private Quadruplet<Context, Double, Context, Double> closestAndFarestContextsToPrediction() {
+		Context farestContextToOracle = null;
+		double maxDistanceToOraclePredictionInNeighbors = Double.NEGATIVE_INFINITY;
+		Context closestContextToOracle = null;
+		double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
+		
+		double currentDistanceToOraclePrediction = 0.0; 
+		for(Context contextNeighbor : activatedNeighborsContexts) {
+			if(contextNeighbor != activatedContexts.get(0)) {
+				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
+				world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",contextNeighbor.getName(),  ""+currentDistanceToOraclePrediction)));
+				if(currentDistanceToOraclePrediction>maxDistanceToOraclePredictionInNeighbors) {
+					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
+					farestContextToOracle = contextNeighbor;
+				} 
+				if(currentDistanceToOraclePrediction<minDistanceToOraclePredictionInNeighbors) {
+					minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
+					closestContextToOracle = contextNeighbor;
+				} 
+			}
+		}
+		return new Quadruplet<Context, Double, Context, Double>(closestContextToOracle, minDistanceToOraclePredictionInNeighbors, farestContextToOracle, maxDistanceToOraclePredictionInNeighbors);
+	}
+
+	private void selfAnalysationOfContextOnSeveralActivatedContexts() {
+		
+		Context closestContextToOracle = null;
+		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
+		double currentDistanceToOraclePrediction = 0.0;
+				
+		
+		for (Context activatedContext : activatedContexts) {
+			currentDistanceToOraclePrediction = activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment());
+			
+			world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",activatedContext.getName(),  ""+activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment())))); 
+			if(currentDistanceToOraclePrediction<minDistanceToOraclePrediction) {
+				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+				closestContextToOracle = activatedContext;
+			}
+				
+		}
+		
+		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+		
+		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
+		for (Context activatedContext : activatedContexts) {	
+			activatedContext.analyzeResults3(this, closestContextToOracle);
+				
+		}
+		activatedContexts = activatedContextsCopyForUpdates;
 	}
 	
 	private void setNearestContextAsBestContext() {
@@ -1572,11 +1679,32 @@ public class Head extends AbstractHead implements Cloneable{
 
 		bc = activatedContexts.get(0);
 		double currentConfidence = bc.getConfidence();
+		
 
 		for (Context context : activatedContexts) {
 			if (context.getConfidence() > currentConfidence) {
 				bc  = context;
 				currentConfidence = bc.getConfidence();
+			}
+		}
+		bestContext = bc;
+	}
+	
+	private void selectBestContextWithDistanceToModel() {
+		
+		Context bc;
+		
+
+		bc = activatedContexts.get(0);
+		double distanceToModel = bc.getLocalModel().distance(bc.getCurrentExperiment());
+		double currentDistanceToModel;
+
+		for (Context context : activatedContexts) {
+			
+			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			if (currentDistanceToModel < distanceToModel) {
+				bc  = context;
+				distanceToModel = currentDistanceToModel;
 			}
 		}
 		bestContext = bc;

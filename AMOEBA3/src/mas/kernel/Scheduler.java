@@ -754,8 +754,8 @@ public class Scheduler implements Serializable{
 	public void setManualRequest(Point3 position){		
 		
 		
-		requestPosition.put("px",position.x);
-		requestPosition.put("py",position.y);
+		requestPosition.put("px1",position.x);
+		requestPosition.put("px0",position.y);
 		requestPosition.put("oracle",0.0);
 		
 		
@@ -763,7 +763,7 @@ public class Scheduler implements Serializable{
 		
 	}
 	
-	public HashMap<String, Double> getManualRequest(){				
+	public HashMap<String, Double> getManualRequest(){			 	
 		
 		manualRequest = false;
 		

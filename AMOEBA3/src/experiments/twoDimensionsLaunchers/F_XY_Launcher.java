@@ -54,7 +54,7 @@ public class F_XY_Launcher implements Serializable {
 			}
 			
 			
-			if(amoeba.getScheduler().requestAsked()) {
+			if(amoeba.getScheduler().requestAsked()) { 
 				amoeba.manual = true;
 				//System.out.println("                                                                                                     MANUAL REQUEST");
 				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputRequest(amoeba.getScheduler().getManualRequest())));

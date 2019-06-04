@@ -297,6 +297,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 //		experiments.add(newPoint);
 //		localModel.updateModel(this);
 		
+		localModel.updateModel(this.getCurrentExperiment(),world.getScheduler().getHeadAgent().learningSpeed,world.getScheduler().getHeadAgent().numberOfPointsForRegression);
+		
 		this.world.getScheduler().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 		this.world.startAgent(this);
@@ -396,7 +398,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		firstPoint.setOracleProposition(this.headAgent.getOracleValue());
 		//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP", firstPoint.toString())));
 		experiments.add(firstPoint);
-		localModel.updateModel(this);
+		
+		localModel.updateModel(this.getCurrentExperiment(),world.getScheduler().getHeadAgent().learningSpeed,world.getScheduler().getHeadAgent().numberOfPointsForRegression);
 		this.world.getScheduler().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 		this.world.startAgent(this);
@@ -1016,7 +1019,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 					
 				}
 				else {
-					solveNCS_Conflict(head);
+					solveNCS_BadPrediction(head);
 					this.world.getScheduler().addAlteredContext(this);
 				}
 			}
@@ -1052,9 +1055,10 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			confidence++;	
 			
 		}else {
-			if(this != closestContextToOracle){
-				this.solveNCS_Conflict(head);
+			if(this != closestContextToOracle) {
+				this.solveNCS_BadPrediction(head);
 			}
+			
 		}
 		
 //		if (head.getCriticity(this) > head.getErrorAllowed()) {
@@ -1234,7 +1238,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	public void solveNCS_BetterNeighbor(Context betterContext) {
 		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(), "*********************************************************************************************************** SOLVE NCS BETTER NEIGHBOR")));
-		localModel = new LocalModelMillerRegression(world, this, betterContext.getLocalModel().getCoef(), betterContext.getLocalModel().getFirstExperiments());
+		localModel = new LocalModelMillerRegression(world, this, betterContext.getLocalModel().getCoef(), betterContext.getLocalModel().getFirstExperiments()); 
 	}
 	
 	public void NCSDetection_OverMapping() {
@@ -1313,7 +1317,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 				modelsDifference += Math.abs(this.getLocalModel().getCoef()[i] - ctxt.getLocalModel().getCoef()[i]);
 			}
 			
-			world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(), ""+modelsDifference, "MODELS DIFFERENCE", ""+ errorAllowed)));
+			//world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(), ""+modelsDifference, "MODELS DIFFERENCE", ""+ errorAllowed)));
 			if(modelsDifference<errorAllowed) {
 				return true;
 			}else {
@@ -1458,7 +1462,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	}
 	
-	public void solveNCS_Conflict(Head head) {
+	public void solveNCS_BadPrediction(Head head) {
 
 		world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "*********************************************************************************************************** SOLVE NCS CONFLICT")));
 		world.raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);		
@@ -2519,7 +2523,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 
 		
 		if (head.getCriticity(this) > head.getErrorAllowed()) {
-			solveNCS_Conflict(head);
+			solveNCS_BadPrediction(head);
 			this.world.getScheduler().addAlteredContext(this);
 		}
 		else {		

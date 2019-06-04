@@ -2,6 +2,7 @@ package mas.agents.localModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import mas.kernel.World;
@@ -364,8 +365,10 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	
 	public void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
 		
+		world.trace(new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
+		
 		if(firstExperiments.size()< (nParameters + 2)) {
-			firstExperiments.add(newExperiment);
+			firstExperiments.add(newExperiment); 
 			updateModel();
 			
 		}else {
@@ -373,7 +376,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		}
 		
 		
-		//System.out.println("FST XP " + firstExperiments.size());
+		world.trace(new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
 	}
 	
 	public void updateModel() {
@@ -625,13 +628,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 
 	}
 	
-	public String coefsToString() {
-		String coefsString = "";
-		for(int i=0;i<coefs.length;i++) {
-			coefsString += coefs[i] + " ";
-		}
-		return coefsString;
-	}
+
 	
 	
 	public double distance(Experiment experiment) {
@@ -661,6 +658,16 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	
 	public ArrayList<Experiment> getFirstExperiments() {
 		return firstExperiments;
+	}
+	
+	public String coefsToString() {
+		String coefsString = "";
+		if(coefs != null) {
+			for(int i=0; i<coefs.length; i ++) {
+				coefsString += coefs[i]  + "\t";
+			}
+		}
+		return coefsString;
 	}
 
 }

@@ -43,11 +43,23 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 		for(int i = 0; i<dimension; i++) {
 			x[i] = 0.0;
 			
-			modelCoefs1[i] = (int) (Math.random() * 255);
-			modelCoefs2[i] = (int) (Math.random() * 255);
+			modelCoefs1[i] = (int) (Math.random() * 500 - 255);
+			modelCoefs2[i] = (int) (Math.random() * 500 - 255);
 		}
-		modelCoefs1[dimension] = (int) (Math.random() * 255);
-		modelCoefs2[dimension] = (int) (Math.random() * 255);
+		modelCoefs1[dimension] = (int) (Math.random() * 500 - 255);
+		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
+		
+		
+		System.out.print(modelCoefs1[modelCoefs1.length-1] + "\t");
+		for(int i =0;i<modelCoefs1.length-1;i++) {
+			System.out.print(modelCoefs1[i] + "\t");
+		}
+		System.out.println("");
+		System.out.print(modelCoefs2[modelCoefs2.length-1] + "\t");
+		for(int i =0;i<modelCoefs2.length-1;i++) {
+			System.out.print(modelCoefs2[i] + "\t");
+		}
+		System.out.println("");
 	}
 	
 	
@@ -99,6 +111,23 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 		
 	}
 	
+	public double model(double x0, double x1) {
+		
+		/* Disc */
+		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		
+		/* Square */
+		return (x1 > -spaceSize && x1 < spaceSize && x0 < spaceSize && x0 > -spaceSize) ? model1(x0,x1) : model2(x0,x1) ;
+		//return model1();
+		
+		/* Triangle */
+		//return (y > x) ? 2*x + y : 5*x - 8*y;
+		
+		/* Split */
+		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
+		
+	}
+	
 	public double model1() {
 		double result = 0.0;
 		for(int i = 0; i<dimension;i++) {
@@ -113,6 +142,22 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 		for(int i = 0; i<dimension;i++) {
 			result += x[i]*modelCoefs2[i];
 		}
+		result += modelCoefs2[dimension];
+		return result;		
+	}
+	
+	public double model1(double x0, double x1) {
+		double result = 0.0;
+		result += x0*modelCoefs1[0];
+		result += x1*modelCoefs1[1];
+		result += modelCoefs1[dimension];
+		return result;		
+	}
+	
+	public double model2(double x0, double x1) {
+		double result = 0.0;
+		result += x0*modelCoefs2[0];
+		result += x1*modelCoefs2[1];
 		result += modelCoefs2[dimension];
 		return result;		
 	}
@@ -174,14 +219,14 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 	public HashMap<String, Double> getOutputRequest(HashMap<String, Double> values) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-//		double xValue = values.get("px");
-//		double yValue = values.get("py");
-//		
-//		result = model(xValue, yValue);
-//		
-//		out.put("px",xValue);
-//		out.put("py",yValue);
-//		out.put("oracle",result);
+		double xValue = values.get("px0");
+		double yValue = values.get("px1");
+		
+		result = model(xValue, yValue);
+		
+		out.put("px0",xValue);
+		out.put("px1",yValue);
+		out.put("oracle",result);
 		return out;
 	}
 

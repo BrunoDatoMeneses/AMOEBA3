@@ -18,9 +18,9 @@ public class F_N_Launcher implements Serializable {
 
 	public static final boolean viewer = true;
 	public static final double oracleNoiseRange = 10;
-	public static final double learningSpeed = 0.01;
-	public static final int regressionPoints = 100;
-	public static final int dimension = 30	;
+	public static final double learningSpeed = 0.001;
+	public static final int regressionPoints = 1000;
+	public static final int dimension = 2	;
 
 	public static void main(String[] args) {
 		launch(viewer);
@@ -30,7 +30,7 @@ public class F_N_Launcher implements Serializable {
 		
 		String XMLConfigFile = "nDimensionLauncher.xml";
 		
-		XmlConfigGenerator.makeXML(XMLConfigFile, dimension);
+		//XmlConfigGenerator.makeXML(XMLConfigFile, dimension);
 	
 		
 		

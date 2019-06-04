@@ -401,19 +401,19 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		
 		for (Context ctxt : ncsMemory.getOtherContexts()) {
 
-			drawContexts(ctxt, 50);
+			drawContexts(ctxt, 100);
 			
 		}
 		
 		for (Context ctxt : ncsMemory.getContexts()) {
 
-			drawContexts(ctxt, 200);
+			drawContexts(ctxt, 100);
 			
 		}
 		
 		for (Context ctxt : ncsMemory.getPartiallyActivatedContexts()) {
 
-			drawContexts(ctxt, 50);
+			drawContexts(ctxt, 100);
 			
 		}
 	
@@ -505,55 +505,47 @@ public class GrapheTwoDimPanelNCSMemories extends JPanel implements ViewerListen
 		}
 		
 		
+		double upperBound = 255;
+		double dispersion = 100;
+		
+		//node.addAttribute("ui.class","ContextColorDynamic");
+		//node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
+//		node.setAttribute("ui.color", 0.0 ); 
+		
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
 		double[] coefs = ctxt.getLocalModel().getCoef();
 		//System.out.println("COEFS : " + coefs.length);
-		if(coefs.length>0) {
-			if(coefs.length==1) {
-				//System.out.println(coefs[0]);	
-				b = normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-				if(b.isNaN()) {
-					b = 0.0;
-				}
-			}
-			else if(coefs.length==2) {
-				//System.out.println(coefs[0] + " " + coefs[1]);
-				g =  normalizePositiveValues(255, 5, Math.abs(coefs[0]));
-				b =  normalizePositiveValues(255, 5, Math.abs(coefs[1]));
-				if(g.isNaN()) {
-					g = 0.0;
-				}
-				if(b.isNaN()) {
-					b = 0.0;
-				}
-			}
-			else if(coefs.length>=3) {
-				//System.out.println(coefs[0] + " " + coefs[1] + " " + coefs[2]);
-				r =  normalizePositiveValues(255, 5,  Math.abs(coefs[0]));
-				g =  normalizePositiveValues(255, 5,  Math.abs(coefs[1]));
-				b =  normalizePositiveValues(255, 5,  Math.abs(coefs[2]));
-				if(r.isNaN()) {
-					r = 0.0;
-				}
-				if(g.isNaN()) {
-					g = 0.0;
-				}
-				if(b.isNaN()) {
-					b = 0.0;
-				}
-			}
-			else {
+		
+		if(coefs.length>=3) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[1]));
+			b =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[2]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
 				r = 255.0;
-				g = 255.0;
-				b = 255.0;
+				g = 0.0;
+				b = 0.0;
 			}
-		}
-		else {
-			r = 255.0;
+		}else if(coefs.length==2) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[1]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
+				r = 255.0;
+				g = 0.0;
+			}
+		}else if(coefs.length==1) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
+				r = 255.0;
+			}
+		}else {
+			r = 0.0;
 			g = 255.0;
-			b = 255.0;
+			b = 0.0;
 		}
 		
 		node.addAttribute("ui.class","RGBAColor");

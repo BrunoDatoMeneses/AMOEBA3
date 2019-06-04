@@ -17,10 +17,11 @@ public class F_N_Launcher implements Serializable {
 
 
 	public static final boolean viewer = true;
-	public static final double oracleNoiseRange = 0.1;
-	public static final double learningSpeed = 0.01;
-	public static final int regressionPoints = 100;
-	public static final int dimension = 3	;
+	public static final double oracleNoiseRange = 0.0;
+	public static final double learningSpeed = 0.001;
+	public static final int regressionPoints = 1000;
+	public static final int dimension = 2	;
+	public static final double spaceSize = 50.0	;
 
 	public static void main(String[] args) {
 		launch(viewer);
@@ -30,7 +31,7 @@ public class F_N_Launcher implements Serializable {
 		
 		String XMLConfigFile = "nDimensionLauncher.xml";
 		
-		XmlConfigGenerator.makeXML(XMLConfigFile, dimension);
+		
 	
 		
 		
@@ -42,13 +43,14 @@ public class F_N_Launcher implements Serializable {
 		
 		/* Error parameter */
 		amoeba.setDataForErrorMargin(1, 0.5, 0.5, 1, 20000, 20000);
+		//amoeba.setDataForErrorMargin(1000, 0.5, 0.5, 1, 20, 20);
 		
 		/* Other parameters */
 		amoeba.setRememberState(false);
 		amoeba.setGenerateCSV(false);
 		
 
-		F_N_Manager f_N_Manager = new F_N_Manager(50.0, dimension);
+		F_N_Manager f_N_Manager = new F_N_Manager(spaceSize, dimension);
 		
 		
 		amoeba.getScheduler().getHeadAgent().learningSpeed = learningSpeed;

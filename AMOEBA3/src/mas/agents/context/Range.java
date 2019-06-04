@@ -391,7 +391,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	private void adaptEnd(double oracleValue, double increment) {
-		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT")));
+		world.trace(new ArrayList<String>(Arrays.asList(""+increment, "INCREMENT"))); 
 		
 		classicEndAdapt(oracleValue, increment);
 		//adaptEndWithSplitting(oracleValue, increment);
