@@ -267,7 +267,7 @@ public class Head extends AbstractHead implements Cloneable{
 			currentSituation.put(pct, pct.getValue());
 		}
 		
-		////////System.out.println("HEAD ACTIVATED CONTEXT :" + activatedContexts.size());
+
 		nPropositionsReceived = activatedContexts.size();
 		newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);		
@@ -282,17 +282,12 @@ public class Head extends AbstractHead implements Cloneable{
 
 		
 		
-		/* useOracle means that data are labeled*/
 		if (useOracle) {	
 			playWithOracle();
 		}
 		else {
 			playWithoutOracle();
-			//updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		}
-		//¤¤
-		
-		
 		
 		updateStatisticalInformations(); ///regarder dans le détail, possible que ce pas trop utile
 		
@@ -301,8 +296,6 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		newContext = null;
 		
-		//////////System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Error allowded :" + errorAllowed);
-		//////////System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Inexact allowded :" + inexactAllowed);
 	}
 	
 	
@@ -326,18 +319,16 @@ public class Head extends AbstractHead implements Cloneable{
 			setNearestContextAsBestContext();
 		}
 		
-		
-
 		/*Compute the criticity. Will be used by context agents.*/
 		criticity = Math.abs(oracleValue - prediction);
 		criticalities.addCriticality("predictionCriticality", criticity);
 
 		/*If we have a bestcontext, send a selection message to it*/
 		if (bestContext != null) {
-			//functionSelected = bestContext.getFunction().getFormula(bestContext);
 			sendExpressMessage(this, MessageType.SELECTION, bestContext);
 			world.trace(new ArrayList<String>(Arrays.asList(bestContext.getName(), "*********************************************************************************************************** BEST CONTEXT")));
 		}
+		
 		playExecutionTime = System.currentTimeMillis() - playExecutionTime;	
 		
 		endogenousExecutionTime = System.currentTimeMillis();
@@ -389,7 +380,6 @@ public class Head extends AbstractHead implements Cloneable{
 
 		
 		
-		//System.out.println("-------------------------------------");
 		if(activatedNeighborsContexts.size()>1) {
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
@@ -1050,9 +1040,11 @@ public class Head extends AbstractHead implements Cloneable{
 	private void NCSDetection_Concurrence() {
 		/*If result is good, shrink redundant context (concurrence NCS)*/
 		if (bestContext != null && criticity <= this.errorAllowed) {
+			
 			for (int i = 0 ; i < activatedContexts.size() ; i++) {
+				
 				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && this.getCriticity(activatedContexts.get(i)) <= this.errorAllowed) {
-			//		////////System.out.println("Shrink context " + contexts.get(i).getName());
+					
 					activatedContexts.get(i).solveNCS_Concurrence(this);
 				}
 			}
@@ -1065,12 +1057,7 @@ public class Head extends AbstractHead implements Cloneable{
 			
 			Context c = getNearestGoodContext(activatedNeighborsContexts);
 			//Context c = getSmallestGoodContext(activatedNeighborsContexts);
-			if(c!=null) {
-				////////System.out.println("Nearest good context : " + c.getName());
-			}
-			else {
-				////////System.out.println("Nearest good context : null");
-			}
+			
 			if (c!=null) c.solveNCS_IncompetentHead(this);
 			bestContext = c;
 			
@@ -1537,15 +1524,11 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	private Context createNewContext(Context bestNearestCtxt) {
-		//	////////System.out.println("Creation d'un nouveau contexte : " + contexts.size());
+
 			newContextWasCreated = true;
-//			if (contexts.size() != 0) {
-//				System.exit(0);
-//			}
 			world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
 			Context context;
 			if (firstContext) {
-				//////System.out.println(bestNearestCtxt.toStringFull());
 				context = new Context(world, this, bestNearestCtxt);
 				Config.print("new context agent", 3);
 			}
@@ -1581,7 +1564,6 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		
 		
-		//////////System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Average Prediction Criticity :" + averagePredictionCriticity);
 		
 		if (criticalities.getCriticalityMean("predictionCriticality") > errorAllowed) {
 			perfIndicator--;
@@ -1589,12 +1571,7 @@ public class Head extends AbstractHead implements Cloneable{
 			perfIndicator++;
 		}
 		
-//		if (averageMappingCriticity > mappingErrorAllowed) {
-//			perfMappingIndicator--;
-//		}
-//		else {
-//			perfMappingIndicator++;
-//		}
+
 		
 
 		

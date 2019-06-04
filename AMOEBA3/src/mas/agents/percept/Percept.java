@@ -160,25 +160,14 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	 * Most the other methods are remnant, used to use binary tree 
 	 */
 	public void play() {
+	
 		
-		
-		
-		super.play();
-				
+		super.play();			
 		oldValue = value;
-		//value = sensor.getValue();
-		//////////System.out.println(this.name);
 		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name); 
 		ajustMinMax(); 
 		computeContextProjectionValidity();
 		
-		
-		
-		
-		//ENDO
-		//overlapsDetection();
-		//overlapNotification();
-		//displayContextProjections();
 
 	}	
 	

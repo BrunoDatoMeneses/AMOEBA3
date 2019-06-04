@@ -69,9 +69,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	private ArrayList<Percept> nonValidNeightborPercepts = new ArrayList<Percept>();
 	
 	
-	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
-	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
-	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
+
 
 	
 	
@@ -105,18 +103,13 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		world.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		NCSDetection_Uselessness();
 		
-		//////System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
-		//////System.out.println(this.toStringFull());
-		//////System.out.println(bestNearestContext.toStringFull());
+
 	}
 	
 	public Context(World world, Head head, Context fatherContext, HashMap<Percept,Pair<Double,Double>> contextDimensions) {
 		super(world);
 		buildContext(head, fatherContext, contextDimensions);
 		world.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
-		//////System.out.println("=======================================================================" +this.getName() + " <-- " + bestNearestContext.getName());
-		//////System.out.println(this.toStringFull());
-		//////System.out.println(bestNearestContext.toStringFull());
 	}
 	
 	
@@ -193,7 +186,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
-		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+
 		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
 		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
 		
@@ -211,7 +204,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		}
 		
-		overlaps =  new HashMap<Context,String>();
+
 		
 		//world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
 		for(Experiment exp : experiments) {
@@ -241,13 +234,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		for (Percept v : var) {
 			Range r;
-			
-			
-			//////System.out.println("MAX RADIUS FOR CONTEXT CREATION AFTER TEST"  + v.getName() + " " + radius + " / " + (radius/v.getRadiusContextForCreation()));
-
 			Pair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v);
-			
-			////System.out.println("MAX RADIUS FOR CONTEXT CREATION "  + v.getName() + " < " + radiuses.getA() + " , "  + radiuses.getB() + " > / < " + (radiuses.getA()/v.getRadiusContextForCreation()) + " , " + (radiuses.getB()/v.getRadiusContextForCreation()) + " >");
 			
 			r = new Range(this, v.getValue() - radiuses.getA(), v.getValue() + radiuses.getB(), 0, true, true, v, world);
 					
@@ -287,14 +274,6 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 
 		this.experiments = new ArrayList<Experiment>();
 		experiments.addAll(bestNearestContext.getExperiments());
-//		Experiment newPoint = new Experiment(this);
-//		
-//		for(Percept pct : ranges.keySet()) {
-//			newPoint.addDimension(pct, pct.getValue());
-//		}
-//		newPoint.setOracleProposition(this.headAgent.getOracleValue());
-//		experiments.add(newPoint);
-//		localModel.updateModel(this);
 		
 		localModel.updateModel(this.getCurrentExperiment(),world.getScheduler().getHeadAgent().learningSpeed,world.getScheduler().getHeadAgent().numberOfPointsForRegression);
 		
@@ -308,7 +287,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
-		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+
 		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
 		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
 		
@@ -326,12 +305,8 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		}
 		
-		overlaps =  new HashMap<Context,String>();
+
 		
-		//world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-		for(Experiment exp : experiments) {
-			//System.out.println(exp.toString());
-		}
 	}
 	
 	
@@ -409,7 +384,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			perceptNeighborhoodValidities.put(percept, false);
 		}
 		
-		contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
+
 		nearestNeighbours = new HashMap<Percept , HashMap<String, Context>>();
 		otherContextsDistancesByPercept = new HashMap<Context , HashMap<Percept, Pair<Double,Integer>>>();
 		
@@ -427,7 +402,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		}
 		
-		overlaps =  new HashMap<Context,String>();
+
 		
 		////System.out.println("NEW CONTEXT " + this.getName());
 		displayRanges();
@@ -727,17 +702,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		super.play();
 		
-		
-		//world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "NON VALID PERCEPTS")));
-//		for(Percept pct : nonValidPercepts) {
-//			//System.out.println("--> " + pct.getName());
-//		}
-		
+				
 		if(nonValidPercepts.size() == 0) {
 
 			sendMessage(getActionProposal(), MessageType.PROPOSAL, headAgent);
 			Config.print("Message envoyé", 4);
-			//System.out.println(world.getScheduler().getTick() + " " + this.name + " VALID");
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
 				world.getScheduler().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
@@ -751,14 +720,10 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 		if(nonValidNeightborPercepts.size() == 0) {
 			
-			//////System.out.println("VALID NEIGHBOR : " + this.getName());
-
-			////System.out.println(world.getScheduler().getTick() + " " + this.getName() + " " + "VALID");
 			world.getScheduler().getHeadAgent().addRequestNeighbor(this);
 		}
 		else if(nonValidNeightborPercepts.size() == 1){
 			world.getScheduler().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0),this);
-			////System.out.println(world.getScheduler().getTick() + " " + this.getName() + " " + "PARTIALLY VALID" + " " + nonValidNeightborPercepts.get(0).getName());
 		}
 		
 		if ( (nonValidNeightborPercepts.size() == 0) &&  (nonValidPercepts.size() == 1) ) {
@@ -767,59 +732,17 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 		}
 		
-		
-
-		
-
-		
-
-		//assert computeValidityByPercepts() == (nonValidPercepts.size() == 0) : "Erreur Valid Non Valid";
-		
+			
 		
 		this.activations = 0;
 		this.valid = false;
 
-		
-		
-		
+	
 		// Reset percepts validities
 		for(Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
 			perceptNeighborhoodValidities.put(percept, false);
 		}
-		
-		
-		
-//		nonValidPercepts.clear();
-		//nonValidNeightborPercepts.clear();
-		
-		//ENDO
-//		for (Percept v : ranges.keySet()) {
-//			if (ranges.get(v).isTooSmall()){
-//				solveNCS_Uselessness(headAgent);
-//				break;
-//			}
-//		}
-		/*NCSDetections();
-		
-		for(Context ctxt : contextOverlapsByPercept.keySet()) {
-			contextOverlapsByPerceptSave.put(ctxt, new HashMap<Percept,Boolean>());
-			for(Percept p : ranges.keySet()) {
-				contextOverlapsByPerceptSave.get(ctxt).put(p, contextOverlapsByPercept.get(ctxt).get(p));
-			}
-		}
-
-		contextOverlapsByPercept.clear();*/
-		
-		
-		Random rand = new Random();
-		
-//		if( this.getConfidence()  <= 0 && tickCreation + 125 < world.getScheduler().getTick() ) {
-//			//////System.out.println(world.getScheduler().getTick() +" " + this.getName()+ " " + "solveNCS_Uselessness");
-//			world.raiseNCS(NCS.CONTEXT_USELESSNESS);
-//			this.die();
-//		}
-		
 		
 	}
 	
@@ -2618,17 +2541,7 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 	
 	
 	
-	public void setPerceptOverlap(Percept percept, Context context) {
-		if(!contextOverlapsByPercept.keySet().contains(context)) {
-			contextOverlapsByPercept.put(context, new HashMap<Percept,Boolean>());
-			
-			for(Percept p : ranges.keySet()) {
-				contextOverlapsByPercept.get(context).put(p, false);
-			}
-		}
-		
-		contextOverlapsByPercept.get(context).put(percept, true);
-	}
+	
 	
 	
 	
@@ -2687,102 +2600,11 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 	
 	
 	
-	public Boolean computeOverlapsBySelectedPercepts(ArrayList<Percept> selectedPercepts, Context context) {
-		Boolean test = true;
-		
-		test = true;
-		for(Percept percept : selectedPercepts) {
-			test = test && contextOverlapsByPercept.get(context).get(percept);
-		}
-		if(test) {
-			//neigbours.put(context, "Overlap");
-		}
-		
-		
-		return test;
-	}
 	
-	public HashMap<String , ArrayList<Context>> getSortedPossibleNeigbours(Percept percept) {
-		
-		ArrayList<Percept> otherPercetps = new ArrayList<Percept>();; 
-		ArrayList<Context> contextOverlapedInOtherPercepts = new ArrayList<Context>();
-		boolean contextOverlapedInOtherPerceptsTest = true;
-		
-		for(Percept p : ranges.keySet()) {
-			if(p != percept) {
-				otherPercetps.add(p);
-			}
-		}
-		
-		
-		for(Context ctxt : contextOverlapsByPercept.keySet()) {
-			contextOverlapedInOtherPerceptsTest = true;
-			for(Percept otherPctpt: otherPercetps) {
-				contextOverlapedInOtherPerceptsTest = contextOverlapedInOtherPerceptsTest && contextOverlapsByPercept.get(ctxt).get(otherPctpt);
-			}
-			if(contextOverlapedInOtherPerceptsTest) {
-				contextOverlapedInOtherPercepts.add(ctxt);
-				if(!possibleNeighbours.contains(ctxt)) {
-					possibleNeighbours.add(ctxt);
-				}
-				
-			}
-		}
-		
-		 
-		 HashMap<String , ArrayList<Context>> sortedRangesSubGroup = new HashMap<String , ArrayList<Context>>();
-		 sortedRangesSubGroup.put("start", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "start"));
-		 sortedRangesSubGroup.put("end", percept.getSortedRangesSubGroup(contextOverlapedInOtherPercepts, "end"));
-		
-		 return sortedRangesSubGroup;
-	}
 	
-	public void getNearestNeighbours(){
-		
-		HashMap<Percept,  HashMap<String , ArrayList<Context>>> localSortedPossibleNeigbours = new HashMap<Percept,  HashMap<String , ArrayList<Context>>>();
-		
-		for(Percept p : ranges.keySet()) {
-			
-			sortedPossibleNeighbours.get(p).clear();
-			nearestNeighbours.get(p).clear();
-			neighbours.clear();
-			
-		}
-		
-		for(Percept p : ranges.keySet()) {
-			
-			localSortedPossibleNeigbours.put(p,getSortedPossibleNeigbours(p));
-			localSortedPossibleNeigbours.get(p).get("start").add(this);
-			localSortedPossibleNeigbours.get(p).get("end").add(this);
-			
-			
-			
-			Collections.sort(localSortedPossibleNeigbours.get(p).get("start"), p.customRangeComparators.get("start"));
-			Collections.sort(localSortedPossibleNeigbours.get(p).get("end"), p.customRangeComparators.get("end"));
-			
-			sortedPossibleNeighbours.get(p).put("start", localSortedPossibleNeigbours.get(p).get("start"));
-			sortedPossibleNeighbours.get(p).put("end", localSortedPossibleNeigbours.get(p).get("end"));
-			
-			
-			
-		}
-		
-		for(Percept p : ranges.keySet()) {
-			
-			
-			Context startNeighbour = getNearestContextBySortedPerceptAndRange(localSortedPossibleNeigbours.get(p), p, "start");
-			Context endNeighbour = getNearestContextBySortedPerceptAndRange(localSortedPossibleNeigbours.get(p), p, "end");
-			
-			
-			nearestNeighbours.get(p).put("end", startNeighbour);
-			nearestNeighbours.get(p).put("start", endNeighbour);
-			
-			neighbours.add(startNeighbour);
-			neighbours.add(endNeighbour);
-		}
-		
-		
-	}
+	
+	
+	
 	
 	
 	

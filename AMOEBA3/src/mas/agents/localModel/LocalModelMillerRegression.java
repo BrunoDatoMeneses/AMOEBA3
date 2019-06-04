@@ -79,23 +79,17 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see agents.localModel.LocalModelAgent#computeAMessage(agents.messages.Message)
-	 */
+
 	@Override
 	public void computeAMessage(Message m) {
 	}
 
-	/* (non-Javadoc)
-	 * @see agents.localModel.LocalModelAgent#getProposition(agents.context.Context)
-	 */
+
 	public double getProposition(Context context) {
 			
 		ArrayList<Percept> percepts = world.getAllPercept();
 		
-//		if (context.getExperiments().size() == 1) {
-//			return context.getExperiments().get(0).getOracleProposition();
-//		}
+
 			
 		double result = coefs[0];
 
@@ -117,9 +111,6 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		ArrayList<Percept> percepts = world.getAllPercept();
 		
-//		if (context.getExperiments().size() == 1) {
-//			return context.getExperiments().get(0).getOracleProposition();
-//		}
 			
 		double result = coefs[0];
 
@@ -177,19 +168,14 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see agents.localModel.LocalModelAgent#getProposition(agents.context.Context, agents.Percept, agents.Percept, double, double)
-	 */
+
 	public double getProposition(Context context, Percept p1, Percept p2, double v1, double v2) {
 		
-	//	//System.out.println("get proposition");
-	//	LinkedHashMap<Percept,Double> values = new LinkedHashMap<Percept,Double>();
+
 		
 		ArrayList<Percept> var = world.getAllPercept();
 		
-//		if (context.getExperiments().size() == 1) {
-//			return context.getExperiments().get(0).getOracleProposition();
-//		}
+
 		
 		regression = new Regression(nParameters,true);
 		for (Experiment exp : context.getExperiments()) {
@@ -203,22 +189,17 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		double[] coef = regression.regress().getParameterEstimates();
 		
-		//
-	//	for (int i = 0 ; i < coef.length ; i++ ) {
-	//		//System.out.print(var.get(i).getName() + " coef : " + coef[i] + "   " );
-	//	}
-	//	//System.out.println();
 		
 		double[] tabv = {v1,v2};
 		
 		double result = coef[0];
-	//	//System.out.println("Result 0" + " : " + result);
+
 		if (coef[0] == Double.NaN) System.exit(0);
 		for (int i = 1 ; i < coef.length ; i++) {
 			if (Double.isNaN(coef[i])) coef[i] = 0;
 			result += coef[i]*tabv[i-1];
 		}
-//		//System.out.println("Result final" + " : " + result);
+
 		return result;
 
 	
@@ -299,16 +280,10 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		for (Experiment exp : context.getExperiments()) {
 			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
 			
-			//System.out.println(exp.getValuesAsLinkedHashMap().toString());
-			for (int i = 0 ; i < exp.getValuesAsArray().length ; i++ ) {
-				//System.out.print(exp.getValuesAsArray()[i] + "   " );
-			}
-			//System.out.println(exp.getOracleProposition() + "   " );
+		
 		}
 		
-		//System.out.println("Number of experiments : " + context.getExperiments().size());
-		
-		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+
 		
 		while (regression.getN() < context.getExperiments().get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
 			regression.addObservation(context.getExperiments().get(0).getValuesAsArray(), context.getExperiments().get(0).getOracleProposition());
@@ -324,21 +299,15 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
 		
 		regression = new Regression(nParameters,true);
-		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
+	
 		for (Experiment exp : experimentsList) {
 			
 			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
 			
-			//System.out.println(exp.getValuesAsLinkedHashMap().toString());
-			for (int i = 0 ; i < exp.getValuesAsArray().length ; i++ ) {
-				//System.out.print(exp.getValuesAsArray()[i] + "   " );
-			}
-			//System.out.println(exp.getOracleProposition() + "   " );
+	
 		}
 		
-		//System.out.println("Number of experiments : " + experimentsList.size());
-		
-		
+			
 		
 		while (regression.getN() < experimentsList.get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
 			
@@ -357,7 +326,6 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		coefs = regression.regress().getParameterEstimates();
 		
-		//System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 		
 	}
 	
@@ -390,14 +358,13 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		}
 		
 		int i = 0;
-		while (regression.getN() < nParameters + 2) { //TODO : to improve ?
+		while (regression.getN() < nParameters + 2) { 
 			
 			regression.addObservation(firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition());
 			i++;
 		}
 		
 
-		
 		coefs = regression.regress().getParameterEstimates();
 		
 	}
@@ -406,8 +373,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPoints) {
 		
 		regression = new Regression(nParameters,true);
-		//System.out.println("***********************************************************************************************************************************************************");
-		
+
 		
 		int numberOfPointsForRegression = numberOfPoints;
 		if(numberOfPointsForRegression < (nParameters+2)) {
@@ -417,24 +383,14 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		//Pair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		
-		//System.out.println("ARTIFICIAL ");
+
 		int numberOfArtificialPoints = artificialSituations.getB().length;
-		
-		//System.out.println("NUMBER OF REAL ARTIFICIAL POINTS: " + numberOfArtificialPoints);
 		for (int i =0;i<numberOfArtificialPoints;i++) {
-		//for (int i =0;i<(int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight));i++) {
 			
-			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);
-			
-			
-			//System.out.println(artificialSituations.getA()[i].toString());
-			for (int j = 0 ; j < nParameters ; j++ ) {
-				//System.out.print(artificialSituations.getA()[i][j] + "   " );
-			}
-			//System.out.println(artificialSituations.getB()[i] + "   " );
+			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);	
 		}
 		
-		//System.out.println("XP");
+
 		int numberOfXPPoints;
 		if(numberOfArtificialPoints != (int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight))) {
 			numberOfXPPoints = (int)(weight*numberOfArtificialPoints/(1-weight));
@@ -442,20 +398,16 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		else {
 			numberOfXPPoints = (int)(numberOfPointsForRegression*weight);
 		}
-		//System.out.println("NUMBER OF XP POINTS: " + numberOfXPPoints);
+
 		for (int i =0;i<numberOfXPPoints;i++) {
 			
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
 			
-			//System.out.println(newExperiment.getValuesAsLinkedHashMap().toString());
-			for (int j = 0 ; j < newExperiment.getValuesAsArray().length ; j++ ) {
-				//System.out.print(newExperiment.getValuesAsArray()[j] + "   " );
-			}
-			//System.out.println(newExperiment.getOracleProposition() + "   " );
+	
 		}
 		
-		while (regression.getN() < newExperiment.getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
+		while (regression.getN() < newExperiment.getValuesAsLinkedHashMap().size() + 2) { 
 			
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
@@ -469,7 +421,6 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		world.regressionPoints = numberOfXPPoints + numberOfArtificialPoints;
 		
-		//System.out.println("***********************************************************************************************************************************************************");
 		
 	}
 	
@@ -526,14 +477,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 			i++;
 			
 		}
-		//System.out.println("NUMBER OF REAL ARTIFICIAL POINTS: " + i + " "+ totalNumberOfPoints);
-		
-//		for(int k = 0;k<totalNumberOfPoints;k++) {
-//			for (int j = 0 ; j < nParameters ; j++ ) {
-//				System.out.print(artificalExperiments[k][j] + "   " );
-//			}
-//			System.out.println(artificalResults[k] + "   " );
-//		}
+
 		
 		
 		
