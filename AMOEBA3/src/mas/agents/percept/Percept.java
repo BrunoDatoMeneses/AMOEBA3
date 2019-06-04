@@ -19,7 +19,6 @@ import mas.agents.Agent;
 import mas.agents.SystemAgent;
 import mas.agents.context.CenterRangeComparator;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
 import mas.agents.context.CustomComparator;
 import mas.agents.context.Range;
 import mas.agents.messages.Message;
@@ -39,8 +38,8 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 	protected ArrayList<Agent> targets = new ArrayList<Agent>();
 	protected ArrayList<Agent> activatedContext = new ArrayList<Agent>();
 	
-	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	public HashMap<String, PerceptOverlap> perceptOverlaps = new HashMap<String, PerceptOverlap>();
+	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>(); 
+
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
 	
 	
@@ -140,7 +139,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		
 		this.contextProjections = new HashMap<Context, ContextProjection>();
 		
-		this.perceptOverlaps = new HashMap<String, PerceptOverlap>();
+
 		
 		this.sortedRanges.put("start", new ArrayList<Context>());
 		this.sortedRanges.put("end", new ArrayList<Context>());
@@ -169,7 +168,7 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		oldValue = value;
 		//value = sensor.getValue();
 		//////////System.out.println(this.name);
-		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name);
+		value = this.getWorld().getScheduler().getPerceptionsOrAction(this.name); 
 		ajustMinMax(); 
 		computeContextProjectionValidity();
 		
@@ -667,44 +666,9 @@ public class Percept extends SystemAgent implements Serializable,Cloneable {
 		
 	}
 	
-	public void overlapNotification() {
-		for(PerceptOverlap perceptOverlap : perceptOverlaps.values()) {
-			ArrayList<Context> contexts = perceptOverlap.getContexts();
-			contexts.get(0).setPerceptOverlap(this, contexts.get(1));
-			contexts.get(1).setPerceptOverlap(this, contexts.get(0));
-		}
-	}
 
-	public void overlapsDetection() {
-		
-		perceptOverlaps.clear();
-		
-		ArrayList<Context> computedContexts = new ArrayList<Context>(); 
-		for(Context selectedContext : contextProjections.keySet()) {
-			
-			for(Context testedContext : contextProjections.keySet()) {
-				
-				if((testedContext != selectedContext) && (!computedContexts.contains(testedContext))){
-					if(overlapBetweenContexts(selectedContext, testedContext)) {
-						
-						String overlapName = selectedContext.getName() + testedContext.getName();						
-						HashMap<String, Double> overlapRanges = getOverlapRangesBetweenContexts(selectedContext, testedContext);
-						
-						PerceptOverlap overlap = new PerceptOverlap(world, selectedContext, testedContext, overlapRanges.get("start"), overlapRanges.get("end"), overlapName);
-						perceptOverlaps.put(overlapName, overlap);
-					}
-				}
-			}
-			
-			computedContexts.add(selectedContext);
-		}
-		
-		computedContexts.clear();
-	}
+
 	
-	public void overlapDeletion(ContextOverlap contextOverlap) {
-		perceptOverlaps.remove(contextOverlap.getName()); 
-	}
 	
 	public boolean overlapBetweenContexts(Context context1, Context context2) {
 		

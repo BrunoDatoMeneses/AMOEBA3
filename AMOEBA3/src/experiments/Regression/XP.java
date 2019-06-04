@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import experiments.FILE;
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.localModel.TypeLocalModel;
 import mas.agents.percept.Percept;
 import mas.init.amoeba.AMOEBAFactory;
@@ -31,7 +31,7 @@ public class XP {
 		ArrayList<Integer> numbersOfRegressionPoints = new ArrayList<Integer>(Arrays.asList(20,40,60,80,90,100,200));
 		
 
-		AbstractPair<Integer, Integer> XPResults = new AbstractPair<Integer, Integer>(null,null);
+		Pair<Integer, Integer> XPResults = new Pair<Integer, Integer>(null,null);
 		
 		System.out.println("LEARNING SPEEDS");
 		for(Double learningSpeed : learningSpeeds) {
@@ -68,7 +68,7 @@ public class XP {
 	}
 	
 	
-	public static AbstractPair<Integer, Integer> XPStep(FILE file, int numberOfPointsForRegression, double learningSpeed) {
+	public static Pair<Integer, Integer> XPStep(FILE file, int numberOfPointsForRegression, double learningSpeed) {
 		
 		/*Here we create AMOEBA.*/
 		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(false,"BadContext_solver.xml");
@@ -116,6 +116,6 @@ public class XP {
 				}
 			
 		}	
-		return new AbstractPair<Integer, Integer>(i-1, amoeba.getScheduler().getWorld().regressionPoints);
+		return new Pair<Integer, Integer>(i-1, amoeba.getScheduler().getWorld().regressionPoints);
 	}
 }

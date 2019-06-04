@@ -10,7 +10,7 @@ import org.hamcrest.core.IsNull;
 import mas.agents.percept.Percept;
 import mas.kernel.World;
 import mas.ncs.NCS;
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.Agent;
 import mas.agents.messages.MessageType;
 
@@ -1011,8 +1011,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),overlappingContextRanges.getContext().getName())));
 		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
 		
-		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensions = new HashMap<Percept,AbstractPair<Double,Double>>();
-		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,AbstractPair<Double,Double>>();
+		HashMap<Percept,Pair<Double,Double>> newContextDimensions = new HashMap<Percept,Pair<Double,Double>>();
+		HashMap<Percept,Pair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,Pair<Double,Double>>();
 		Double center;
 		double length = increment;
 		
@@ -1057,9 +1057,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 		
 		
 		//if(this.context.getLocalModel().getCoef()[world.getScheduler().getPercepts().size()] != 0.0) { // if model
-			newContextDimensions.put(this.percept, new AbstractPair<Double, Double>(center, length));
-			newContextDimensionsBis.put(this.percept, new AbstractPair<Double, Double>(center, length));
-			ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+			newContextDimensions.put(this.percept, new Pair<Double, Double>(center, length));
+			newContextDimensionsBis.put(this.percept, new Pair<Double, Double>(center, length));
+			ArrayList<Pair<Double, Double>> centersAndLengths = new ArrayList<Pair<Double, Double>>();
 			boolean newContext = true;
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
@@ -1077,11 +1077,11 @@ public class Range implements Serializable, Comparable, Cloneable {
 							newContext = false;
 						}
 						else if(centersAndLengths.size()==1) {
-							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensions.put(pct, new Pair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
 						}
 						else if(centersAndLengths.size()==2){
-							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
-							newContextDimensionsBis.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
+							newContextDimensions.put(pct, new Pair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensionsBis.put(pct, new Pair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
 						}				
 					}					
 				}
@@ -1123,8 +1123,8 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 		
 		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
 		
-		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensions = new HashMap<Percept,AbstractPair<Double,Double>>();
-		HashMap<Percept,AbstractPair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,AbstractPair<Double,Double>>();
+		HashMap<Percept,Pair<Double,Double>> newContextDimensions = new HashMap<Percept,Pair<Double,Double>>();
+		HashMap<Percept,Pair<Double,Double>> newContextDimensionsBis = new HashMap<Percept,Pair<Double,Double>>();
 		Double center;
 		double length;
 		
@@ -1173,9 +1173,9 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 		
 		
 		//if(this.context.getLocalModel().getCoef()[world.getScheduler().getPercepts().size()] != 0.0) { // if model
-			newContextDimensions.put(this.percept, new AbstractPair<Double, Double>(center, length));
-			newContextDimensionsBis.put(this.percept, new AbstractPair<Double, Double>(center, length));
-			ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+			newContextDimensions.put(this.percept, new Pair<Double, Double>(center, length));
+			newContextDimensionsBis.put(this.percept, new Pair<Double, Double>(center, length));
+			ArrayList<Pair<Double, Double>> centersAndLengths = new ArrayList<Pair<Double, Double>>();
 			boolean newContext = true;
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
@@ -1193,11 +1193,11 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 							newContext = false;
 						}
 						else if(centersAndLengths.size()==1) {
-							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensions.put(pct, new Pair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
 						}
 						else if(centersAndLengths.size()==2){
-							newContextDimensions.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
-							newContextDimensionsBis.put(pct, new AbstractPair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
+							newContextDimensions.put(pct, new Pair<Double, Double>(centersAndLengths.get(0).getA(), centersAndLengths.get(0).getB()));
+							newContextDimensionsBis.put(pct, new Pair<Double, Double>(centersAndLengths.get(1).getA(), centersAndLengths.get(1).getB()));
 						}				
 					}					
 				}
@@ -1237,9 +1237,9 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 		return range.getStart() <= this.getStart() && this.getEnd() <= range.getEnd();
 	}
 	
-	public ArrayList<AbstractPair<Double, Double>> getCentersAndLengthsOfNonOverlapingZones(Range overlappingRange) {
+	public ArrayList<Pair<Double, Double>> getCentersAndLengthsOfNonOverlapingZones(Range overlappingRange) {
 		
-		ArrayList<AbstractPair<Double, Double>> centersAndLengths = new ArrayList<AbstractPair<Double, Double>>();
+		ArrayList<Pair<Double, Double>> centersAndLengths = new ArrayList<Pair<Double, Double>>();
 		
 		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), overlappingRange.getContext().getName(), "SEEK NON OVERLAPING")));
 		
@@ -1250,22 +1250,22 @@ public void setOnConcurentOverlap(Range overlappingContextRanges, double border)
 			double center2 = (overlappingRange.getEnd() + this.getEnd()) / 2;
 			double length1 = overlappingRange.getStart()-this.getStart();
 			double length2 = this.getEnd() - overlappingRange.getEnd() ;
-			centersAndLengths.add(new AbstractPair<Double, Double>(center1, length1));
-			centersAndLengths.add(new AbstractPair<Double, Double>(center2, length2));
+			centersAndLengths.add(new Pair<Double, Double>(center1, length1));
+			centersAndLengths.add(new Pair<Double, Double>(center2, length2));
 		}
 		else if(this.getStart() < overlappingRange.getStart() && overlappingRange.getStart() < this.getEnd()) {
 			
 			world.trace(new ArrayList<String>(Arrays.asList("START", this.percept.getName())));
 			double center = (this.getStart() + overlappingRange.getStart() ) / 2;
 			double length = overlappingRange.getStart()-this.getStart();
-			centersAndLengths.add(new AbstractPair<Double, Double>(center, length));
+			centersAndLengths.add(new Pair<Double, Double>(center, length));
 		}
 		else if(this.getStart() < overlappingRange.getEnd() && overlappingRange.getEnd() < this.getEnd()) {
 			
 			world.trace(new ArrayList<String>(Arrays.asList("END", this.percept.getName())));
 			double center = (overlappingRange.getEnd() + this.getEnd()) / 2;
 			double length = this.getEnd() - overlappingRange.getEnd();
-			centersAndLengths.add(new AbstractPair<Double, Double>(center, length));
+			centersAndLengths.add(new Pair<Double, Double>(center, length));
 		}
 		
 

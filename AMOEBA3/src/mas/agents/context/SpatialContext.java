@@ -2,28 +2,28 @@ package mas.agents.context;
 
 import java.util.HashMap;
 
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.percept.Percept;
 
 public class SpatialContext {
 
-	private HashMap<Percept, AbstractPair<Double, Double>> ranges = new HashMap<Percept, AbstractPair<Double, Double>>();
+	private HashMap<Percept, Pair<Double, Double>> ranges = new HashMap<Percept, Pair<Double, Double>>();
 	
 	
 	
-	public SpatialContext(Context ctxt) {
+	public SpatialContext(Context ctxt) { 
 		
 		for(Percept pct : ctxt.getRanges().keySet()) {
-			ranges.put(pct, new  AbstractPair<Double, Double>(ctxt.getRanges().get(pct).getStart(), ctxt.getRanges().get(pct).getEnd()));
+			ranges.put(pct, new  Pair<Double, Double>(ctxt.getRanges().get(pct).getStart(), ctxt.getRanges().get(pct).getEnd()));
 		}
 		
 	}
 	
-	public void setRange(Percept pct, AbstractPair<Double, Double> range) {
+	public void setRange(Percept pct, Pair<Double, Double> range) {
 		ranges.put(pct, range);
 	}
 	
-	public AbstractPair<Double, Double> getRange(Percept pct){
+	public Pair<Double, Double> getRange(Percept pct){
 		return ranges.get(pct);
 	}
 	

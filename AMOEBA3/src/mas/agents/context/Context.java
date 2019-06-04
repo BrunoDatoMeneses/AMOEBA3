@@ -12,13 +12,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.math3.util.Pair;
+
 
 import mas.kernel.Config;
 import mas.kernel.NCSMemory;
 import mas.kernel.World;
 import mas.ncs.NCS;
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.head.Head;
@@ -72,8 +72,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPercept = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context, HashMap<Percept, Boolean>> contextOverlapsByPerceptSave = new HashMap<Context, HashMap<Percept, Boolean>>();
 	public HashMap<Context,String> overlaps = new HashMap<Context,String>();
-	public ArrayList<ContextOverlap> contextOverlaps = new ArrayList<ContextOverlap>();
-	public ArrayList<ContextVoid> contextVoids = new ArrayList<ContextVoid>();
+
 	
 	
 	public HashMap<Percept , HashMap<String, Context>> nearestNeighbours;
@@ -111,7 +110,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		//////System.out.println(bestNearestContext.toStringFull());
 	}
 	
-	public Context(World world, Head head, Context fatherContext, HashMap<Percept,AbstractPair<Double,Double>> contextDimensions) {
+	public Context(World world, Head head, Context fatherContext, HashMap<Percept,Pair<Double,Double>> contextDimensions) {
 		super(world);
 		buildContext(head, fatherContext, contextDimensions);
 		world.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
@@ -121,7 +120,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	}
 	
 	
-	private void buildContext (Head headAgent, Context fatherContext, HashMap<Percept,AbstractPair<Double,Double>> contextDimensions) {
+	private void buildContext (Head headAgent, Context fatherContext, HashMap<Percept,Pair<Double,Double>> contextDimensions) {
 		
 		
 		this.tickCreation = world.getScheduler().getTick();
@@ -246,7 +245,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 			
 			//////System.out.println("MAX RADIUS FOR CONTEXT CREATION AFTER TEST"  + v.getName() + " " + radius + " / " + (radius/v.getRadiusContextForCreation()));
 
-			AbstractPair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			Pair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v);
 			
 			////System.out.println("MAX RADIUS FOR CONTEXT CREATION "  + v.getName() + " < " + radiuses.getA() + " , "  + radiuses.getB() + " > / < " + (radiuses.getA()/v.getRadiusContextForCreation()) + " , " + (radiuses.getB()/v.getRadiusContextForCreation()) + " >");
 			
@@ -376,7 +375,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		for (Percept v : var) {
 			Range r;
 			
-			AbstractPair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			Pair<Double, Double> radiuses = world.getScheduler().getHeadAgent().getMaxRadiusesForContextCreation(v); 
 			
 			r = new Range(this, v.getValue() - radiuses.getA(), v.getValue() + radiuses.getB(), 0, true, true, v, world);
 			
@@ -490,7 +489,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		return contexts;
 	}
 	
-	public void expand() {
+	public void expand() { 
 		
 		ArrayList<Context> neighborsOnOneDirection;
 		HashMap<Percept,SpatialContext>  alternativeContexts = new HashMap<Percept,SpatialContext>();
@@ -508,7 +507,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 								
 					neighborsOnOneDirection = getContextsOnAPerceptDirectionFromContextsNeighbors(world.getScheduler().getHeadAgent().getActivatedNeighborsContexts(), pctDirectionForExpanding, alternativeContexts.get(fixedPct));
 						
-					AbstractPair<Double,Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(neighborsOnOneDirection, pctDirectionForExpanding);
+					Pair<Double,Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(neighborsOnOneDirection, pctDirectionForExpanding);
 					alternativeContexts.get(fixedPct).expandEnd(pctDirectionForExpanding, expandingRadiuses.getB());
 					alternativeContexts.get(fixedPct).expandStart(pctDirectionForExpanding, expandingRadiuses.getA());
 				}
@@ -541,11 +540,11 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	}
 	
-	public AbstractPair<Double,Double> getMaxExpansionsForContextExpansionAfterCreation(ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
+	public Pair<Double,Double> getMaxExpansionsForContextExpansionAfterCreation(ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
 		
 		double startRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getStart());
 		double endRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getEnd());
-		AbstractPair<Double,Double> maxExpansions = new AbstractPair<Double,Double>(
+		Pair<Double,Double> maxExpansions = new Pair<Double,Double>(
 				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation, 
 						Math.abs(pct.getMin()- ranges.get(pct).getStart())),
 				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation, 
@@ -877,12 +876,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		nonValidPercepts.clear();
 	}
 
-	private void NCSDetections() {
-		
-		NCSDetection_Overlap();
 
-		
-	}
 	
 	public void displayOtherContextsDistances() {
 		////////System.out.println("Other Context Distances : " + this.getName());
@@ -895,17 +889,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 	}
 	
-	private void NCSDetection_Overlap() {
-		
-		computeOverlapsByPercepts();
-		getNearestNeighbours();
-		
-		
-//		for(Context ctxt: overlaps.keySet()) {
-//			ctxt.getOverlapType(this);
-//		}
-		
-	}
+
 
 
 	private void getOverlapType(Context context) {
@@ -1134,7 +1118,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	
 	
-	public AbstractPair<Double, Percept> distance(Context ctxt) {
+	public Pair<Double, Percept> distance(Context ctxt) {
 		double minDistance = Double.POSITIVE_INFINITY;
 		double maxDistance = Double.NEGATIVE_INFINITY;
 		double currentDistance = 0.0;
@@ -1162,13 +1146,13 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		}
 		
 		if(overlapCounts == world.getScheduler().getPercepts().size()) {
-			return new AbstractPair<Double, Percept>(-minDistance, null);
+			return new Pair<Double, Percept>(-minDistance, null);
 		}
 		else if(overlapCounts == (world.getScheduler().getPercepts().size() -1)){
-			return new AbstractPair<Double, Percept>(voidDistance, voidPercept);
+			return new Pair<Double, Percept>(voidDistance, voidPercept);
 		}
 		else {
-			return new AbstractPair<Double, Percept>(maxDistance, null);
+			return new Pair<Double, Percept>(maxDistance, null);
 		}
 				
 
@@ -1419,7 +1403,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		return this.getRanges().get(pct).getLenght()/sumOfRangesLengths();
 	}
 	
-	public AbstractPair<Boolean, Double> tryAlternativeModel(LocalModelAgent alternativeModel) {
+	public Pair<Boolean, Double> tryAlternativeModel(LocalModelAgent alternativeModel) {
 		
 		boolean betterModelTest = true;
 		double sumError = 0.0;
@@ -1433,7 +1417,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	
 		
-		return new AbstractPair<Boolean, Double>(betterModelTest,sumError);
+		return new Pair<Boolean, Double>(betterModelTest,sumError);
 	}
 	
 	public Double getErrorOnAllExperiments() {
@@ -1477,7 +1461,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
 
-		AbstractPair<Percept, Context> perceptForAdapatationAndOverlapingContext = getPerceptForAdaptationWithOverlapingContext(percepts);			
+		Pair<Percept, Context> perceptForAdapatationAndOverlapingContext = getPerceptForAdaptationWithOverlapingContext(percepts);			
 		Percept p = perceptForAdapatationAndOverlapingContext.getA();
 		
 //		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
@@ -1770,35 +1754,7 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 	
 	
 	
-	private Percept getPerceptWithLesserImpactOnVolume(Context consideredContext, ContextOverlap contextOverlap) {
-		Percept p = null;
-		double volumeLost = Double.MAX_VALUE;
-		double vol;
-		
-		for (Percept percept : ranges.keySet()) {
-			
-			vol = 1.0;
-			
-			if (!ranges.get(percept).isPerceptEnum()) {
-				
-				vol *= contextOverlap.getLenghtByPercept(percept);
-
-				for (Percept p2 : ranges.keySet()) {
-					if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-						
-						vol *= ranges.get(p2).getLenght();
-					}
-				}
-				
-				if (vol < volumeLost) {
-					volumeLost = vol;
-					p = percept;
-				}
-			}
-		}
-		////////System.out.println("percept " + p.getName());
-		return p;
-	}
+	
 	
 	
 
@@ -1848,7 +1804,7 @@ public double getOverlappingVolume(Context overlappingCtxt) {
 	return volume;
 }
 
-private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(ArrayList<Percept> percepts) {
+private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(ArrayList<Percept> percepts) {
 	Percept perceptForAdapation = null;
 	Context overlapingContext = null;
 	double minDistanceToFrontier = Double.MAX_VALUE;
@@ -1901,7 +1857,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 
 }
 
-	return new AbstractPair<Percept, Context>(perceptForAdapation,overlapingContext);
+	return new Pair<Percept, Context>(perceptForAdapation,overlapingContext);
 }
 
 
@@ -1974,9 +1930,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 		return localModel.getProposition(this);
 	}
 	
-	public double getOverlapActionProposal(ContextOverlap contextOverlap) {
-		return localModel.getProposition(this, contextOverlap);
-	}
+
 
 
 	/**
@@ -2624,19 +2578,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 		return Math.abs(this.getRanges().get(pct).distanceForMaxOrMin(ctxt.getRanges().get(pct)));
 	}
 	
-	public void shrinkRangesToJoinBordersOnOverlap(Context consideredContext, ContextOverlap contextOverlap) {
-		ArrayList<Percept> percepts = new ArrayList<Percept>();
-		percepts.addAll(ranges.keySet());
-		
-		Percept perceptWithLesserImpact = getPerceptWithLesserImpactOnVolume(consideredContext, contextOverlap);
-		if (perceptWithLesserImpact == null) {
-			this.die();
-		}else {
-			ranges.get(perceptWithLesserImpact).matchBorderWith(consideredContext);
-		}
-		
-		//perceptWithLesserImpact.overlapDeletion(contextOverlap);
-	}
+	
 
 	
 	/* (non-Javadoc)
@@ -2743,44 +2685,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 	}
 	
 	
-	public Boolean computeOverlapsByPercepts() {
-		Boolean test = true;
-		
-		overlaps.clear();
-		contextOverlaps.clear();
-		//this.world.getScheduler().clearContextOverlaps();
-		
-		for(Context context : contextOverlapsByPercept.keySet()) {
-			test = true;
-			for(Percept percept : ranges.keySet()) {
-				test = test && contextOverlapsByPercept.get(context).get(percept);
-			}
-			
-			if(test && !context.overlapComputed(this)) {
-							
-				
-				overlaps.put(context, "Overlap");
-				
-				HashMap<Percept,HashMap<String,Double>> overlapRanges = new HashMap<Percept,HashMap<String,Double>>();
-				for(Percept percept : ranges.keySet()) {
-					overlapRanges.put(percept, new HashMap<String,Double>());
-					////////System.out.println("CONTEXT 1" + context.getName() + " CONTEXT2" + this.getName());
-					double startRange = percept.getOverlapRangesBetweenContexts(this, context).get("start");
-					double endRange = percept.getOverlapRangesBetweenContexts(this, context).get("end");
-					overlapRanges.get(percept).put("start", startRange);
-					overlapRanges.get(percept).put("end", endRange);
-				}
-				ContextOverlap overlap = new ContextOverlap(world, this, context, overlapRanges);
-				contextOverlaps.add(overlap);	
-				this.world.getScheduler().addContextOverlap(overlap);
-				
-				
-			}
-		}
-		
-		
-		return test;
-	}
+	
 	
 	public Boolean computeOverlapsBySelectedPercepts(ArrayList<Percept> selectedPercepts, Context context) {
 		Boolean test = true;
@@ -2879,107 +2784,10 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 		
 	}
 	
-	public void computeNearestNeighbour() {
-		
-		//////////System.out.println("VOISINS : " + neighbours.size());
-		for(Context neighbourContext : neighbours) {
-			
-			
-			if(neighbourContext != null){
-				ContextVoid computedVoid = neighbourContext.voidComputed(this);
-				if(computedVoid != null) {
-					contextVoids.add(computedVoid);
-				}
-				else {
-					voidDetection(neighbourContext);
-				}
-			}
-			
-		}
-		
-		
-	}
 	
 	
-	//Context void creation between this the current context on the one in arg
-	public void voidDetection(Context context) {
-		boolean noVoid = false;
-		HashMap<Percept,Double> voidPosition = new HashMap<Percept,Double>();
-		HashMap<Percept,Double> voidWidth = new HashMap<Percept,Double>();
-		
-		
-		for(Percept percept : ranges.keySet()) {	
-			
-			double thisStart = this.getRanges().get(percept).getStart();
-			double thisEnd = this.getRanges().get(percept).getEnd();
-			double ctxtStart = context.getRanges().get(percept).getStart();
-			double ctxtEnd = context.getRanges().get(percept).getEnd();
-			
-			double perceptPosition = 0d; 
-			double perceptWidth = 0d;
-			
-			//////////System.out.println(context.getName() + "\n" +contextOverlapsByPerceptSave);
-			if(contextOverlapsByPerceptSave.get(context).get(percept)) {
 	
-				
-				
-				
-				
-				if( percept.contextIncludedIn(this, context) ) {
-					perceptPosition = (thisStart + thisEnd) / 2 ;
-					perceptWidth = thisEnd - thisStart;
-				}
-				else if( percept.contextIncludedIn(context, this) ) {
-					perceptPosition = (ctxtStart + ctxtEnd) / 2 ;
-					perceptWidth = ctxtEnd - ctxtStart;
-				}
-				else if( percept.contextOrder(this, context) ) {
-					perceptPosition = (ctxtStart + thisEnd) / 2 ;
-					perceptWidth = thisEnd - ctxtStart;
-				}
-				else if( percept.contextOrder(context, this) ) {
-					perceptPosition = (thisStart + ctxtEnd) / 2 ;
-					perceptWidth = ctxtEnd - thisStart;
-				}
-				else {
-					////////System.out.println("PROBLEM !!!!!!!!!!!!!!!!! Void detection" );
-				}
-				
-
-				voidPosition.put(percept, perceptPosition);
-				voidWidth.put(percept, perceptWidth);
-				
-			}
-			else {
-				
-				if(ctxtEnd + 1.0 < thisStart) {
-					perceptPosition = (ctxtEnd +  thisStart)/2 ;
-					perceptWidth = thisStart - ctxtEnd;
-					
-					voidPosition.put(percept, perceptPosition);
-					voidWidth.put(percept, perceptWidth);
-				}
-				else if(thisEnd + 1.0 < ctxtStart) {
-					perceptPosition = (thisEnd +  ctxtStart)/2 ;
-					perceptWidth = ctxtStart - thisEnd;
-					
-					voidPosition.put(percept, perceptPosition);
-					voidWidth.put(percept, perceptWidth);
-				}
-				else {
-					////////System.out.println("NO VOID !");
-					noVoid = true;
-				}
-			}
-			
-		}
-		
-		if(!noVoid) {
-			ContextVoid currentVoid = new ContextVoid(world, this, context, voidPosition, voidWidth);
-			contextVoids.add(currentVoid);
-			getWorld().getScheduler().contextVoids.add(currentVoid);
-		}
-	}
+	
 	
 	public Context getNearestContextBySortedPerceptAndRange(HashMap<String , ArrayList<Context>> sortedPossibleNeigbours, Percept percept, String range) {
 		
@@ -3036,29 +2844,12 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 
 
 
-	public boolean overlapComputed(Context context) {
-		for(ContextOverlap contextOverlap : contextOverlaps) {
-			if(contextOverlap.overlapComputedBy(context)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
 
 
 
-	public void deleteOverlap(ContextOverlap contextOverlap) {
-		contextOverlaps.remove(contextOverlap);
-	}
 
-	public ContextVoid voidComputed(Context context) {
-		for(ContextVoid contextVoid : contextVoids) {
-			if(contextVoid.voidComputedBy(context)) {
-				return contextVoid;
-			}
-		}
-		return null;
-	}
+
 
 
 
@@ -3107,7 +2898,7 @@ private AbstractPair<Percept, Context> getPerceptForAdaptationWithOverlapingCont
 	public Integer getContextDistanceUpdateTick(Context ctxt, Percept pct) {
 		if(otherContextsDistancesByPercept.get(ctxt) != null) {
 			if(otherContextsDistancesByPercept.get(ctxt).get(pct) != null) {
-				return otherContextsDistancesByPercept.get(ctxt).get(pct).getSecond();
+				return otherContextsDistancesByPercept.get(ctxt).get(pct).getB();
 			}
 			
 		}

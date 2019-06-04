@@ -38,7 +38,7 @@ public class Criticalities implements Cloneable{
 		
 		if (lastValues.get(name).size() >= temporalWindowSize) {
 			lastValues.get(name).remove(0);
-		}
+		} 
 	}
 	
 	public double getCriticality(String name) {

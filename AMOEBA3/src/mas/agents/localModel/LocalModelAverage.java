@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import mas.kernel.World;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
 import mas.agents.context.Experiment;
 
 // TODO: Auto-generated Javadoc
@@ -66,11 +65,7 @@ public class LocalModelAverage extends LocalModelAgent implements Serializable{
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public double getProposition(Context context, ContextOverlap contextOverlap) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+
 	
 	public double[] getCoef() {
 		return new double[1];

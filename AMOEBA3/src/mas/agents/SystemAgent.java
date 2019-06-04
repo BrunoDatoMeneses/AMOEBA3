@@ -13,7 +13,7 @@ import mas.kernel.World;
 public abstract class SystemAgent extends Agent implements Serializable,Cloneable {
 
 
-	protected World world;
+	protected World world; 
 
 
 	public SystemAgent(World world) {

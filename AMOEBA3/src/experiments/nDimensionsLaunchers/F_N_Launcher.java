@@ -18,8 +18,8 @@ public class F_N_Launcher implements Serializable {
 
 	public static final boolean viewer = true;
 	public static final double oracleNoiseRange = 0.0;
-	public static final double learningSpeed = 0.001;
-	public static final int regressionPoints = 1000;
+	public static final double learningSpeed = 0.01;
+	public static final int regressionPoints = 100;
 	public static final int dimension = 2	;
 	public static final double spaceSize = 50.0	;
 

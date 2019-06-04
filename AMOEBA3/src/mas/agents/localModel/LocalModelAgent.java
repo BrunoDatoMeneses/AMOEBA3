@@ -8,7 +8,7 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
+
 import mas.agents.context.Experiment;
 import mas.agents.messages.Message;
 
@@ -55,7 +55,7 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	public abstract double getProposition(Context context);
 	public abstract double getProposition(Experiment experiment);
 	
-	public abstract double getProposition(Context context, ContextOverlap contextOverlap);
+
 	
 	public abstract double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment);
 	

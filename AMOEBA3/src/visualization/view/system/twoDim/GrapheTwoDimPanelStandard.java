@@ -77,8 +77,6 @@ import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.SystemAgent;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
-import mas.agents.context.ContextVoid;
 import mas.agents.context.Experiment;
 import mas.agents.context.Range;
 import mas.agents.head.Head;
@@ -1700,65 +1698,10 @@ private void startPanelController() {
 	}
 	
 	
-	public void drawOverlap(ContextOverlap contextOverlap){
-		Node node;
-		if (graph.getNode(contextOverlap.getName()) != null) {
-			node = graph.getNode(contextOverlap.getName());
-		} else {
-			graph.addNode(contextOverlap.getName());
-			node = graph.getNode(contextOverlap.getName());
-			node.addAttribute("ui.class", contextOverlap.getClass().getSimpleName());
-			node.addAttribute("ui.label", contextOverlap.getName());
-		}
-
-		node.addAttribute("EXIST", true);
-		
-		double lengthX = contextOverlap.getRanges(comboDimX.getSelectedItem()).get("end") 
-				- contextOverlap.getRanges(comboDimX.getSelectedItem()).get("start");
-		double lengthY = contextOverlap.getRanges(comboDimY.getSelectedItem()).get("end")
-				- contextOverlap.getRanges(comboDimY.getSelectedItem()).get("start");
-		
-		node.setAttribute("xyz", contextOverlap.getRanges(comboDimX.getSelectedItem()).get("start") + (0.5*lengthX),
-		contextOverlap.getRanges(comboDimY.getSelectedItem()).get("start") + (0.5*lengthY), 0);
-		
-		node.addAttribute("ui.style", "size: " + doubleFormat.format(lengthX) + "gu, " + doubleFormat.format(lengthY) +"gu;");
-		node.addAttribute("ui.class","Rectangle");
-		
-		//node.addAttribute("ui.color", Color.RED);
-		node.addAttribute("ui.class","OverlapColor");
-
-	}
 	
 	
-	public void drawVoid(ContextVoid contextVoid){
-		Node node;
-		if (graph.getNode(contextVoid.getName()) != null) {
-			node = graph.getNode(contextVoid.getName());
-		} else {
-			graph.addNode(contextVoid.getName());
-			node = graph.getNode(contextVoid.getName());
-			node.addAttribute("ui.class", contextVoid.getClass().getSimpleName());
-			node.addAttribute("ui.label", contextVoid.getName());
-		}
-
-		node.addAttribute("EXIST", true);
-		
-		
-		node.setAttribute("xyz", contextVoid.getPositionByString(comboDimX.getSelectedItem()) ,
-				contextVoid.getPositionByString(comboDimY.getSelectedItem()), 0);
-		
-		double XWidth = contextVoid.getWidthByString(comboDimX.getSelectedItem());
-		double YWidth = contextVoid.getWidthByString(comboDimY.getSelectedItem());
-		
-		node.addAttribute("ui.style", "size: " + doubleFormat.format( XWidth ) + "gu, " + doubleFormat.format( YWidth ) +"gu;");
-		node.addAttribute("ui.class","Rectangle");
-		
-		//node.addAttribute("ui.color", Color.RED);
-		node.addAttribute("ui.class","VoidColorDynamic");
-		node.setAttribute("ui.color", 0.1 ); 
-		//node.addAttribute("ui.class","VoidColor");
-
-	}
+	
+	
 	
 	public void drawRectangle (Node node, Context context) {
 		
@@ -1908,50 +1851,12 @@ private void startPanelController() {
 		}
 		
 		
-		for(ContextVoid contextVoid : world.getScheduler().contextVoids) {
-			Node node = graph.getNode(contextVoid.getName());
-			node.addAttribute("ui.class","VoidColorDynamic");
-			
-			if(context.contextVoids.contains(contextVoid)) {
-				node.setAttribute("ui.color", 1 ); 
-			}
-			else {
-				node.setAttribute("ui.color", 0.1 ); 
-			}
-			
-			
-		}
+		
 		
 		
 	}
 	
-	public void highlightVoidContexts(ContextVoid contextVoid) {
-		
-		
-		double min = Double.POSITIVE_INFINITY;
-		double max = Double.NEGATIVE_INFINITY;
-		
-		for (String name : world.getAgents().keySet()) {
-			SystemAgent a = world.getAgents().get(name);
-			if (a instanceof Context) {
-				double val = ((Context) a).getActionProposal();
-				if (val < min) {
-					min = val;
-				}
-				if (val > max) {
-					max = val;
-				}
-			}
-
-		}	
-		
-		for (Context ctxt :  contextVoid.getSurroundingContexts()) {
-
-				Node node = graph.getNode(ctxt.getName());
-				node.addAttribute("ui.class","ContextColorDynamic");
-				node.setAttribute("ui.color", 0.5 ); 
-		}
-	}
+	
 	
 	public void highlightContexts(Context context) {
 		
@@ -2057,11 +1962,7 @@ private void startPanelController() {
 				node.addAttribute("ui.class","ContextColorDynamic");
 				node.setAttribute("ui.color", (n.getActionProposal() - min) / (max - min) ); 
 				//node.setAttribute("ui.color", 0.5 );  
-				for(ContextVoid contextVoid : n.contextVoids) {
-					Node node2 = graph.getNode(contextVoid.getName());
-					node2.addAttribute("ui.class","VoidColorDynamic");
-					node2.setAttribute("ui.color", 1 ); 
-				}
+				 
 			}
 	
 		}
@@ -2159,30 +2060,7 @@ private void startPanelController() {
 			}
 
 		}
-		else if(world.getScheduler().getContextOverlapByName(id)!=null) {
-			ContextOverlap pushedContextOverlap = world.getScheduler().getContextOverlapByName(id);
-			setContextOverlapTextAreaInfo(id);
-			
-			if (sliderValue == currentTick || (!rememberState)) {
-				if (rightClick) {
-					popupMenuForOverlapVisualization(id);
-					rightClick = false;
-				}
-			}
-			
-		}
-		else if(world.getScheduler().getContextVoidByName(id)!=null) {
-			ContextVoid pushedContextVoid = world.getScheduler().getContextVoidByName(id);
-			setContextVoidTextAreaInfo(id);
-			
-			if (sliderValue == currentTick || (!rememberState)) {
-				if (rightClick) {
-					popupMenuForVoidVisualization(id);
-					rightClick = false;
-				}
-			}
-			
-		}
+		
 		else {
 			if (rightClick) {
 				popupMenuForVoidVisualization(id);
@@ -2239,65 +2117,9 @@ private void startPanelController() {
 		
 	}
 	
-	private void setContextOverlapTextAreaInfo(String id) {
-		System.out.println("Context Overlap pushed : " + id);
-		
-		String info = "";
-		if (rememberState) {
-			Observation o = getObservationByTick(sliderValue);
-			if (o != null) {
-				ContextOverlap contextOverlap = world.getScheduler().getContextOverlapByName(id);
-				if ( contextOverlap != null ) {
-					info = "State :" + sliderValue + "\n";
-					info = info.concat(contextOverlap.toString());
-					info = info.replace("Current", "\nCurrent");
-					info = info.replace("AVT", "\nAVT");
-				} else {
-					info = "No context";
-				}
-				
-			} 
-			
-		} else {
-			info = "State :" + currentTick + "\n";
-			info = info.concat(world.getScheduler().getContextOverlapByName(id).toString());
-			info = info.replace("Current", "\nCurrent");
-			info = info.replace("AVT", "\nAVT");
-		}
-		
-		textarea.setText(info);
-		
-	}
 	
-	private void setContextVoidTextAreaInfo(String id) {
-		System.out.println("Context Void pushed : " + id);
-		
-		String info = "";
-		if (rememberState) {
-			Observation o = getObservationByTick(sliderValue);
-			if (o != null) {
-				ContextVoid contextVoid = world.getScheduler().getContextVoidByName(id);
-				if ( contextVoid != null ) {
-					info = "State :" + sliderValue + "\n";
-					info = info.concat(contextVoid.toString());
-					info = info.replace("Current", "\nCurrent");
-					info = info.replace("AVT", "\nAVT");
-				} else {
-					info = "No context";
-				}
-				
-			} 
-			
-		} else {
-			info = "State :" + currentTick + "\n";
-			info = info.concat(world.getScheduler().getContextVoidByName(id).toString());
-			info = info.replace("Current", "\nCurrent");
-			info = info.replace("AVT", "\nAVT");
-		}
-		
-		textarea.setText(info);
-		
-	}
+	
+	
 	
 	/**
 	 * Start panel criterion.
@@ -2387,8 +2209,6 @@ private void startPanelController() {
 		itemRecolorAll.addActionListener(e -> {recolorAllContexts();});
 		JMenuItem itemUdateView = new JMenuItem("Update View");
 		itemUdateView.addActionListener(e -> {update();});
-		JMenuItem itemUdateOverlapsAndNeighbours = new JMenuItem("Update Overlaps and Neighbours");
-		itemUdateOverlapsAndNeighbours.addActionListener(e -> {updateOverlapsAndNeighbours();});
 		JMenuItem itemShowExperiments = new JMenuItem("Show Experiments");
 		itemShowExperiments.addActionListener(e -> {showExperiments(id);});
 		JMenuItem itemKill = new JMenuItem("Kill");
@@ -2403,7 +2223,6 @@ private void startPanelController() {
 	    popup.add(itemShowAll);
 	    popup.add(itemRecolorAll);
 	    popup.add(itemUdateView);
-	    popup.add(itemUdateOverlapsAndNeighbours);
 	    popup.add(itemShowExperiments);
 	    popup.add(itemKill);
 	    popup.add(itemManualRequest);
@@ -2439,12 +2258,8 @@ private void startPanelController() {
 	
 	public void popupMenuForVoidVisualization(String id) {
 		JPopupMenu popup = new JPopupMenu("Visualization");
-		JMenuItem itemShowContextNeighbours = new JMenuItem("Contexts");
-		itemShowContextNeighbours.addActionListener(e -> {hightlightContextVoid(id);});
 		JMenuItem itemShowAll = new JMenuItem("Both");
 		
-	    itemShowAll.addActionListener( e -> {hightlightContextVoid(id);});
-	    popup.add(itemShowContextNeighbours);
 	    popup.add(itemShowAll);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 	}
@@ -2452,19 +2267,11 @@ private void startPanelController() {
 	public void popupMenuForOverlapVisualization(String id) {
 		
 		JPopupMenu popup = new JPopupMenu("Visualization");
-		JMenuItem itemSolvsNCS = new JMenuItem("Solve Overlap NCS");
-		itemSolvsNCS.addActionListener(e -> {solveNCSByClick(id);});
-		JMenuItem itemSolveAllNCS = new JMenuItem("Solve All Overlaps NCS");
-		itemSolveAllNCS.addActionListener(e -> {solveAllNCSByClick(id);});
 		JMenuItem itemUdateView = new JMenuItem("Update View");
 		itemUdateView.addActionListener(e -> {update();});
-		JMenuItem itemUdateOverlapsAndNeighbours = new JMenuItem("Update Overlaps and Neighbours");
-		itemUdateOverlapsAndNeighbours.addActionListener(e -> {updateOverlapsAndNeighbours();});
  
-	    popup.add(itemSolvsNCS);
-	    popup.add(itemSolveAllNCS);
+
 	    popup.add(itemUdateView);
-	    popup.add(itemUdateOverlapsAndNeighbours);
 	    popup.show(this, this.getX() + mouseEvent.getX(), this.getY() + mouseEvent.getY());
 		
 	}
@@ -2484,43 +2291,13 @@ private void startPanelController() {
 		
 	}
 	
-	private void hightlightContextVoid(String id) {
-		highlightVoidContexts(world.getScheduler().getContextVoidByName(id));
-	}
 	
 	
-	private void updateOverlapsAndNeighbours() {
-		
-		for(Percept percept : world.getScheduler().getPercepts()) {
-			percept.overlapsDetection();
-			percept.overlapNotification();
-		}
-		
-		for(Context context : world.getScheduler().getContextsAsContext()) {
-			
-			context.computeOverlapsByPercepts();
-			context.getNearestNeighbours();
-		}
-		
-		update();
-	}
 	
-	public void solveAllNCSByClick(String id) {
-		//TODO ERREUR ICI car je supprime des éléments de la liste et je la lis je pense...
-		for(ContextOverlap contextOverlap : world.getScheduler().getContextOverlaps()) {
-			contextOverlap.solveNCS_Overlap(0.1d);
-			System.out.println(contextOverlap.getName());
 	
-			
-			update();
-		}
-		
-		world.getScheduler().clearContextOverlaps();
-	}
 	
-	public void solveNCSByClick(String id) {
-		world.getScheduler().getContextOverlapByName(id).solveNCS_Overlap(0.1d);
-	}
+	
+	
 
 	/**
 	 * Popup visualization 2 dim.

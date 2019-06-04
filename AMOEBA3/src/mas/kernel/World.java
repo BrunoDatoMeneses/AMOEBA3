@@ -72,9 +72,9 @@ public class World implements Serializable {
 	
 	private double growingPercent = 0.2;
 	
-	private double mappingErrorAllowed = 0.1;
+	private double mappingErrorAllowed = 0.1;// TODO remove from here --> head agent
 	
-	public int regressionPoints = 0;
+	public int regressionPoints = 0; // TODO remove from here 
 	 
 //	private int xGraphSize = 2500;
 //	private int yGraphSize = 1500;
@@ -104,8 +104,7 @@ public class World implements Serializable {
 		return mappingErrorAllowed;
 	}
 	
-	
-	
+		
 	public double getContextCreationPercentage() {
 		return contextCreationPercentage;
 	}

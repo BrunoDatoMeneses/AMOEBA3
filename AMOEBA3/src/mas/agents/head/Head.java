@@ -11,7 +11,7 @@ import mas.kernel.Launcher;
 import mas.kernel.NCSMemory;
 import mas.kernel.World;
 import mas.Quadruplet;
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
@@ -54,8 +54,8 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private ArrayList<Context> contextsNeighborsByInfluence = new ArrayList<Context>();
 	
-	private HashMap<Percept,Pair<Context,Context>> requestSurroundings = new HashMap<Percept,Pair<Context,Context>>();
-	private HashMap<Percept,Pair<Context,Context>> sharedIncompetenceContextPairs = new HashMap<Percept,Pair<Context,Context>>();
+	private HashMap<Percept,ContextPair<Context,Context>> requestSurroundings = new HashMap<Percept,ContextPair<Context,Context>>();
+	private HashMap<Percept,ContextPair<Context,Context>> sharedIncompetenceContextPairs = new HashMap<Percept,ContextPair<Context,Context>>();
 	
 	private ArrayList<Context> contextsInCompetition = new ArrayList<Context>();
 	
@@ -211,8 +211,8 @@ public class Head extends AbstractHead implements Cloneable{
 			partiallyActivatedContextInNeighbors.put(pct, new ArrayList<Context>());
 			partiallyActivatedContexts.put(pct, new ArrayList<Context>());
 			partialNeighborContexts.put(pct, new ArrayList<Context>());
-			requestSurroundings.put(pct, new Pair<Context,Context>(null,null));
-			sharedIncompetenceContextPairs.put(pct, new Pair<Context,Context>(null,null));
+			requestSurroundings.put(pct, new ContextPair<Context,Context>(null,null));
+			sharedIncompetenceContextPairs.put(pct, new ContextPair<Context,Context>(null,null));
 			}
 		
 		mappingErrorAllowed =world.getMappingErrorAllowed();// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
@@ -385,7 +385,7 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		globalConfidence = globalConfidence / world.getScheduler().getContextsAsContext().size();
 		
-		double localMappingCriticality = 0.0;
+
 
 		
 		
@@ -394,7 +394,7 @@ public class Head extends AbstractHead implements Cloneable{
 			
 			for(Percept pct : world.getScheduler().getPercepts()) {
 					
-				if(partiallyActivatedContextInNeighbors.get(pct).size()>1) {
+				if(partiallyActivatedContextInNeighbors.get(pct).size()>1) { 
 					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
 				}			
 			}
@@ -406,7 +406,7 @@ public class Head extends AbstractHead implements Cloneable{
 					
 					//if(nearestLocalNeighbor(ctxt, otherCtxt)) {
 						
-						AbstractPair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
+						Pair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
 						//System.out.println("DISTANCE : " + distanceAndPercept.getA() + " " + distanceAndPercept.getB());
 						if(distanceAndPercept.getA()<0) {
 							criticalities.addCriticality("localOverlapMappingCriticality", Math.abs(distanceAndPercept.getA()));
@@ -717,7 +717,7 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	private void computeNearestContextsByPercept(Percept pct) {
-		Pair<Context,Context> nearestContexts = new Pair(null, null);
+		ContextPair<Context,Context> nearestContexts = new ContextPair(null, null);
 		boolean startNeighbor = false;
 		boolean endNeighbor = false;
 		
@@ -928,7 +928,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		;
 		
-		Pair<Context, Context> closestContexts = new Pair<Context,Context>(null, null);
+		ContextPair<Context, Context> closestContexts = new ContextPair<Context,Context>(null, null);
 		double smallestDistanceBetweenContexts = Double.POSITIVE_INFINITY;
 		double currentDistance;
 		
@@ -979,7 +979,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	}
 	
-	private Double compareClosestContextPairModels(Pair<Context,Context> closestContexts) {
+	private Double compareClosestContextPairModels(ContextPair<Context,Context> closestContexts) {
 		Double difference = 0.0;
 		
 		if(closestContexts.getL().getLocalModel().getCoef().length == closestContexts.getR().getLocalModel().getCoef().length) {
@@ -1009,7 +1009,7 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	
 		boolean newContextCreated = false;
-		AbstractPair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
+		Pair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
 		
 		if(activatedContexts.size() == 0) {
 			
@@ -1217,7 +1217,7 @@ public class Head extends AbstractHead implements Cloneable{
 		activatedContexts.get(0).analyzeResults3(this, activatedContexts.get(0));
 	}
 
-	private AbstractPair<Context, Double> maxModelDistanceToOraclePredictionInNeighbors() {
+	private Pair<Context, Double> maxModelDistanceToOraclePredictionInNeighbors() {
 		Context farestContextToOracle = null;
 		double maxDistanceToOraclePredictionInNeighbors = Double.NEGATIVE_INFINITY;
 		double currentDistanceToOraclePrediction = 0.0; 
@@ -1231,10 +1231,10 @@ public class Head extends AbstractHead implements Cloneable{
 				} 
 			}
 		}
-		return new AbstractPair<Context, Double>(farestContextToOracle, maxDistanceToOraclePredictionInNeighbors);
+		return new Pair<Context, Double>(farestContextToOracle, maxDistanceToOraclePredictionInNeighbors);
 	}
 	
-	private AbstractPair<Context, Double> minModelDistanceToOraclePredictionInNeighbors() {
+	private Pair<Context, Double> minModelDistanceToOraclePredictionInNeighbors() {
 		Context closestContextToOracle = null;
 		double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
 		double currentDistanceToOraclePrediction = 0.0; 
@@ -1248,7 +1248,7 @@ public class Head extends AbstractHead implements Cloneable{
 				} 
 			}
 		}
-		return new AbstractPair<Context, Double>(closestContextToOracle, minDistanceToOraclePredictionInNeighbors);
+		return new Pair<Context, Double>(closestContextToOracle, minDistanceToOraclePredictionInNeighbors);
 	}
 	
 	private Quadruplet<Context, Double, Context, Double> closestAndFarestContextsToPrediction() {
@@ -1378,7 +1378,7 @@ public class Head extends AbstractHead implements Cloneable{
 	public Context getBetterContext(Context selectedContext, ArrayList<Context> contextNeighbors, double currentError) {
 		Context betterContext = null;
 		Double lowestError = currentError + 0.0001;
-		AbstractPair<Boolean, Double> betterContextAndError;
+		Pair<Boolean, Double> betterContextAndError;
 		for (Context c : contextNeighbors) {
 			
 			if(c!=selectedContext) {
@@ -1405,7 +1405,7 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param allContext the all context
 	 * @return the distance to nearest good context
 	 */
-	private AbstractPair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Context> contextNeighbors) {
+	private Pair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Context> contextNeighbors) {
 		double d = Double.MAX_VALUE;
 		Context nearestGoodContext = null;
 		for (Context c : contextNeighbors) {
@@ -1416,7 +1416,7 @@ public class Head extends AbstractHead implements Cloneable{
 				}
 			}
 		}
-		return new AbstractPair<Context, Double>(nearestGoodContext,d);
+		return new Pair<Context, Double>(nearestGoodContext,d);
 		
 	}
 	
@@ -2292,7 +2292,7 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	
-	public HashMap<Percept, Pair<Context, Context>> getRequestSurroundings() {
+	public HashMap<Percept, ContextPair<Context, Context>> getRequestSurroundings() {
 		return requestSurroundings;
 	}
 	
@@ -2434,15 +2434,15 @@ public class Head extends AbstractHead implements Cloneable{
 		
 	}
 	
-	public AbstractPair<Double,Double> getMaxRadiusesForContextCreation(Percept pct) {
-		AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(
+	public Pair<Double,Double> getMaxRadiusesForContextCreation(Percept pct) {
+		Pair<Double,Double> maxRadiuses = new Pair<Double,Double>(
 				Math.min(pct.getRadiusContextForCreation(), 
 						Math.abs(pct.getMin()- pct.getValue())),
 				Math.min(pct.getRadiusContextForCreation(), 
 						Math.abs(pct.getMax()-pct.getValue())));
 		
-		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
-		//AbstractPair<Double,Double> maxRadiuses = new AbstractPair<Double,Double>(Math.abs(pct.getMin()- pct.getValue()),Math.abs(pct.getMax()-pct.getValue()));
+		//Pair<Double,Double> maxRadiuses = new Pair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
+		//Pair<Double,Double> maxRadiuses = new Pair<Double,Double>(Math.abs(pct.getMin()- pct.getValue()),Math.abs(pct.getMax()-pct.getValue()));
 	
 		double currentStartRadius;
 		double currentEndRadius;

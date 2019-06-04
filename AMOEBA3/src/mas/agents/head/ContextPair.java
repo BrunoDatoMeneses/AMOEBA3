@@ -3,18 +3,18 @@ package mas.agents.head;
 import mas.agents.context.Context;
 import mas.agents.percept.Percept;
 
-public class Pair<Context1,Context2> {
+public class ContextPair<Context1,Context2> {
 
 	private Context l;
     private Context r;
-    public Pair(Context l, Context r){
+    public ContextPair(Context l, Context r){
         this.l = l;
         this.r = r;
     }
     public Context getL(){ return l; }
     public Context getR(){ return r; }
     public void setL(Context l){ this.l = l; }
-    public void setR(Context r){ this.r = r; }
+    public void setR(Context r){ this.r = r; } 
 	
     
     public void print(Percept p) {

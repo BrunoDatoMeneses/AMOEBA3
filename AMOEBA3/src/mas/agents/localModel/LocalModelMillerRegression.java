@@ -6,11 +6,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import mas.kernel.World;
-import mas.agents.AbstractPair;
+import mas.Pair;
 import mas.agents.Agent;
 import mas.agents.percept.Percept;
 import mas.agents.context.Context;
-import mas.agents.context.ContextOverlap;
 import mas.agents.context.Experiment;
 import mas.agents.messages.Message;
 
@@ -415,8 +414,8 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 			numberOfPointsForRegression += numberOfPointsForRegression*((int)((nParameters+2)/numberOfPointsForRegression));
 		}
 
-		AbstractPair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
-		//AbstractPair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
+		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
+		//Pair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		
 		//System.out.println("ARTIFICIAL ");
 		int numberOfArtificialPoints = artificialSituations.getB().length;
@@ -474,7 +473,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 	}
 	
-	private AbstractPair<double[][], double[]> getEquallyDistributedArtificialExperiments(int amount){
+	private Pair<double[][], double[]> getEquallyDistributedArtificialExperiments(int amount){
 		
 		
 
@@ -538,7 +537,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 		
 		
-		return new AbstractPair<double[][], double[]>(artificalExperiments, artificalResults);
+		return new Pair<double[][], double[]>(artificalExperiments, artificalResults);
 	}
 	
 	private boolean nextMultiDimCounter(int[] indices, int[] bounds){
@@ -568,7 +567,7 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		
 	}
 	
-	private AbstractPair<double[][], double[]> getRandomlyDistributedArtificialExperiments(int amount){
+	private Pair<double[][], double[]> getRandomlyDistributedArtificialExperiments(int amount){
 		
 		double[][] artificalExperiments = new double[amount][nParameters];
 		double[] artificalResults = new double[amount];
@@ -588,45 +587,10 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 			
 		}
 		
-		return new AbstractPair<double[][], double[]>(artificalExperiments, artificalResults);
+		return new Pair<double[][], double[]>(artificalExperiments, artificalResults);
 	}
 
-	@Override
-	public double getProposition(Context context, ContextOverlap contextOverlap) {
-		
-			ArrayList<Percept> var = world.getAllPercept();
-			
-//			if (context.getExperiments().size() == 1) {
-//				return context.getExperiments().get(0).getOracleProposition();
-//			}
-			
-
-			//
-		/*	for (int i = 0 ; i < coef.length ; i++ ) {
-				//System.out.print(coef[i] + "   " );
-			}
-			//System.out.println();*/
-			
-			
-			double result = coefs[0];
-		//	//System.out.println("Result 0" + " : " + result);
-			if (coefs[0] == Double.NaN) System.exit(0);
-			
-			for (int i = 1 ; i < coefs.length ; i++) {
-				if (Double.isNaN(coefs[i])) coefs[i] = 0;
-				
-				result += coefs[i] * contextOverlap.getMiddleValue(var.get(i-1));
-				
-		//		//System.out.println("Result " + i + " : " + result);
-		//		//System.out.print(var.get(i-1).getName() + " coef : " + coef[i] + "   " );
-			}
-//			//System.out.println("Result final" + " : " + result);
-
-
-			
-			return result;
-
-	}
+	
 	
 
 	

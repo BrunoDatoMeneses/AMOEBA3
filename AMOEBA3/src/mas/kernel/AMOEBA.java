@@ -46,10 +46,9 @@ public class AMOEBA extends Thread {
 	private boolean viewer = true;
 	private boolean csv = true;
 	
-	private F_XY_Manager manager;
-	
-	public int temporisation;
-	public boolean manual = false;
+	private F_XY_Manager manager; //OLD VISUALIZATION
+	public int temporisation; //OLD VISUALIZATION
+	public boolean manual = false; //OLD VISUALIZATION
 	
 	
 	

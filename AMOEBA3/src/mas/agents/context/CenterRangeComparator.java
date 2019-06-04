@@ -24,6 +24,6 @@ public class CenterRangeComparator implements Comparator<Context>, Serializable{
     	
         return r1.compareTo(r2);
 
-    }
+    } 
     
 }

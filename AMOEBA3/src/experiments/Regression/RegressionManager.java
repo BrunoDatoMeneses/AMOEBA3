@@ -3,7 +3,6 @@ package experiments.Regression;
 import java.util.ArrayList;
 
 import mas.Pair;
-import mas.agents.AbstractPair;
 import mas.agents.context.Context;
 import mas.agents.context.Experiment;
 import mas.agents.localModel.Regression;
