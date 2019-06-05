@@ -368,7 +368,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
 		if(!Configuration.commandLineMode) {
-			AmoebaWindow.instance().dimensionSelector.update();
+			AmoebaWindow.instance().dimensionSelector.update(getPercepts());
 			updateAgentsVisualisation();
 		}
 	}
@@ -513,6 +513,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
 		AmoebaWindow.instance().mainVUI.updateCanvas();
+		AmoebaWindow.instance().point.toFront();
 	}
 	
 	/**

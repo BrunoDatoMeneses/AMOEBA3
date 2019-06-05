@@ -34,6 +34,18 @@
 			<version>1.0.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-javafx</artifactId>
+			<version>11.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-dashicons-pack</artifactId>
+			<version>11.3.4</version>
+		</dependency>
+
 		<!-- Local jars dependencies -->
 		<dependency>
 			<groupId>agent-messaging</groupId>

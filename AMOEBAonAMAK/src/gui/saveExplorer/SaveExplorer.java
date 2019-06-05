@@ -12,9 +12,11 @@ import java.util.Scanner;
 import agents.percept.Percept;
 import fr.irit.smac.amak.tools.SerializeBase64;
 import fr.irit.smac.amak.ui.VUI;
+import gui.DimensionSelector;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
@@ -95,6 +97,23 @@ public class SaveExplorer extends VBox {
 		if(iter.hasNext()) comboBoxA.setValue(iter.next());
 	}
 	
+	@FXML protected void handlePrevM(ActionEvent event) {
+		 ListIterator<String> iter = comboBoxM.getItems().listIterator();
+		// get to combo box position
+		while(iter.hasNext() && (!iter.next().equals(comboBoxM.getValue())));
+		
+		if(iter.hasPrevious()) iter.previous();
+		if(iter.hasPrevious()) comboBoxM.setValue(iter.previous());
+	}
+	
+	@FXML protected void handleNextM(ActionEvent event) {
+		 ListIterator<String> iter = comboBoxM.getItems().listIterator();
+		// get to combo box position
+		while(iter.hasNext() && (!iter.next().equals(comboBoxM.getValue())));
+		
+		if(iter.hasNext()) comboBoxM.setValue(iter.next());
+	}
+	
 	@FXML protected void handleLoadA(ActionEvent event) {
 		amoeba.saver.load(comboBoxA.getValue());
 	}
@@ -163,12 +182,29 @@ public class SaveExplorer extends VBox {
 	public void quickDisplay(Path path) {
 		VUI vui = VUI.get("Save Explorer");
 		if(!this.getChildren().contains(vui.getPanel())) {
+			vui.setDefaultView(200, 0, 0);
 			this.getChildren().add(vui.getPanel());
 			VBox.setVgrow(vui.getPanel(), Priority.SOMETIMES);
 		}
-		vui.clear();
-		if(path != null)
-			DrawFromXml.draw(vui, path);
+		if(path != null) {
+			
+			//get or add dimension selector
+			DimensionSelector ds;
+			if(vui.toolbar.getItems().size() == 4) {
+				ds = (DimensionSelector) vui.toolbar.getItems().get(3);
+			} else {
+				ds = DrawFromXml.createDimensionSelector(path);
+				vui.toolbar.getItems().add(3, ds);
+			}
+			
+			DrawFromXml.draw(vui, path, ds.d1().getName(), ds.d2().getName());
+			ds.setOnChange(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					DrawFromXml.draw(vui, path, ds.d1().getName(), ds.d2().getName());
+				}
+			});
+		}
 		vui.updateCanvas();
 	}
 	

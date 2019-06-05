@@ -38,6 +38,9 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 
 	@Override
 	protected void onRenderingInitialization() {
+		if(renderStrategy != null) {
+			renderStrategy.initialize();
+		}
 	}
 	
 	@Override

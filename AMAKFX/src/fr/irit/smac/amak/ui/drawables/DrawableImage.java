@@ -7,6 +7,7 @@ import fr.irit.smac.amak.tools.Log;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 public class DrawableImage extends Drawable {
 
@@ -18,6 +19,7 @@ public class DrawableImage extends Drawable {
 		super(dx, dy, 0, 0);
 		image = new ImageView(new Image(filename));
 		this.setFilename(filename);
+		defaultInit();
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {
@@ -64,5 +66,10 @@ public class DrawableImage extends Drawable {
 	@Override
 	public Node getNode() {
 		return image;
+	}
+	
+	@Override
+	protected void onMouseEntered(MouseEvent event) {
+		image.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
 	}
 }

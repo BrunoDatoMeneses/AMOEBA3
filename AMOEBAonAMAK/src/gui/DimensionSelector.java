@@ -1,6 +1,6 @@
 package gui;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import agents.percept.Percept;
@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
-import kernel.AMOEBA;
 
 /**
  * A graphical tool for selecting the dimensions to display
@@ -21,35 +20,34 @@ import kernel.AMOEBA;
 public class DimensionSelector extends HBox {
 	private ComboBox<Percept> dim1 = new ComboBox<>();
 	private ComboBox<Percept> dim2 = new ComboBox<>();
-	private AMOEBA amoeba;
+	private EventHandler<ActionEvent> onChange;
 	
-	public DimensionSelector(AMOEBA amoeba) {
-		this.amoeba = amoeba;
+	public DimensionSelector(List<Percept> percepts, EventHandler<ActionEvent> onChange) {
 		this.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(dim1, dim2);
-		this.update();
+		this.onChange = onChange;
+		this.update(percepts);
 	}
 	
 	/**
 	 * Update percepts list
 	 * @param amoeba
 	 */
-	public void update() {
-		ArrayList<Percept> perceptNames = amoeba.getPercepts();
+	public void update(List<Percept> percepts) {
 		Semaphore done = new Semaphore(0);
 		dim1.setOnAction(null);
 		dim2.setOnAction(null);
 		RunLaterHelper.runLater(() -> {
 			dim1.getItems().clear();
 			dim2.getItems().clear();
-			dim1.setItems(FXCollections.observableList(perceptNames));
-			dim2.setItems(FXCollections.observableList(perceptNames));
-			if(perceptNames.size() >= 2) {
-				dim1.setValue(perceptNames.get(0));
-				dim2.setValue(perceptNames.get(1));
-			} else if (perceptNames.size() == 1) {
-				dim1.setValue(perceptNames.get(0));
-				dim2.setValue(perceptNames.get(0));
+			dim1.setItems(FXCollections.observableList(percepts));
+			dim2.setItems(FXCollections.observableList(percepts));
+			if(percepts.size() >= 2) {
+				dim1.setValue(percepts.get(0));
+				dim2.setValue(percepts.get(1));
+			} else if (percepts.size() == 1) {
+				dim1.setValue(percepts.get(0));
+				dim2.setValue(percepts.get(0));
 			}
 			done.release();
 		});
@@ -58,18 +56,8 @@ public class DimensionSelector extends HBox {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		dim1.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				onChange();
-			}
-		});
-		dim2.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				onChange();
-			}
-		});
+		dim1.setOnAction(onChange);
+		dim2.setOnAction(onChange);
 	}
 	
 	/**
@@ -89,9 +77,12 @@ public class DimensionSelector extends HBox {
 	}
 	
 	/**
-	 * Called when selected the dimensions have changed
+	 * Set the handler called when selected dimension change.
+	 * @param onChange
 	 */
-	private void onChange() {
-		amoeba.updateAgentsVisualisation();
+	public void setOnChange(EventHandler<ActionEvent> onChange) {
+		this.onChange = onChange;
+		dim1.setOnAction(onChange);
+		dim2.setOnAction(onChange);
 	}
 }

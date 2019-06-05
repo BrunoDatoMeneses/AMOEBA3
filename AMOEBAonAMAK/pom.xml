@@ -34,6 +34,7 @@
 			<artifactId>javafx-fxml</artifactId>
 			<version>11</version>
 		</dependency>
+
 		<!-- AMAK -->
 		<dependency>
 			<groupId>AMOEBA</groupId>

@@ -38,21 +38,19 @@ public class Percept extends AmoebaAgent {
 		validContextProjection = new HashSet<Context>();
 		
 		// To avoid unnecessary tests, we only compute validity on context
-		// validated by percepts that had finished before us
+		// validated by percepts that have finished before us
 		HashSet<Context> contexts = amas.getValidContexts();
 		if(contexts == null) {
 			// If we are one of the first percept to run, we compute validity on all contexts
 			contexts = new HashSet<>(amas.getContexts());
 		}
 		
-		if(!contexts.isEmpty()) {
-			for (Context c : contexts) {
-				if (contextProjections.get(c).contains(this.value)) {
-					validContextProjection.add(c);
-				}
-			} 
-			amas.updateValidContexts(validContextProjection);
-		}
+		for (Context c : contexts) {
+			if (contextProjections.get(c).contains(this.value)) {
+				validContextProjection.add(c);
+			}
+		} 
+		amas.updateValidContexts(validContextProjection);
 		
 		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
 	}

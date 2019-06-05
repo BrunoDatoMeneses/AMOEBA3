@@ -11,6 +11,12 @@ public class DrawableRectangle extends Drawable {
 	public DrawableRectangle(double dx, double dy, double width, double height) {
 		super(dx+width/2, dy+height/2, width, height);
 		rectangle = new Rectangle();
+		defaultInit();
+	}
+	
+	@Override
+	public Drawable move(double dx, double dy) {
+		return super.move(dx+getWidth()/2, dy+getHeight()/2);
 	}
 
 	@Override

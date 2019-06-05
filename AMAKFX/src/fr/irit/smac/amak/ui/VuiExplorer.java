@@ -1,44 +1,44 @@
-package gui.context;
+package fr.irit.smac.amak.ui;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import agents.context.Context;
 import fr.irit.smac.amak.tools.RunLaterHelper;
-import gui.AmoebaWindow;
+import fr.irit.smac.amak.ui.drawables.Drawable;
+import fr.irit.smac.amak.ui.drawables.DrawableDefaultMini;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import kernel.AMOEBA;
 
 /**
  * A piece of GUI allowing to see and look for contexts.
  * @author Hugo
  *
  */
-public class ContextExplorer extends ScrollPane {
+public class VuiExplorer extends ScrollPane {
 
-	private AMOEBA amoeba;
-	private List<Context> contextList;
-
+	private VUI vui;
+	
 	private VBox vbox;
 	private TitledPane contextsPane;
 	private VBox cpVBox;
 	private TextField search;
+	private CheckBox autoRefresh;
 
-	public ContextExplorer(AMOEBA amoeba) {
-		this.amoeba = amoeba;
+	public VuiExplorer(VUI vui) {
+		this.vui = vui;
 
 		this.setMaxWidth(Double.MAX_VALUE);
 		this.setMaxHeight(Double.MAX_VALUE);
@@ -60,7 +60,7 @@ public class ContextExplorer extends ScrollPane {
 		close.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				AmoebaWindow.instance().mainVUI.getPanel().setLeft(null);
+				vui.getPanel().setLeft(null);
 			}
 		});
 		Button collapseAll = new Button("Collapse all");
@@ -71,7 +71,11 @@ public class ContextExplorer extends ScrollPane {
 			}
 		});
 		hboxButtons.getChildren().addAll(refresh, close, collapseAll);
-
+		
+		// check box
+		autoRefresh = new CheckBox("Auto refresh");
+		autoRefresh.setTooltip(new Tooltip("Try to automatically refresh the VUI explorer when the VUI is updated."));
+		
 		// search bar
 		search = new TextField();
 		search.setPromptText("regular expression");
@@ -89,34 +93,33 @@ public class ContextExplorer extends ScrollPane {
 		});
 
 		cpVBox = new VBox();
-		contextsPane = new TitledPane("Contexts", cpVBox);
+		contextsPane = new TitledPane("Drawables", cpVBox);
 
-		vbox.getChildren().addAll(hboxButtons, search, contextsPane);
+		vbox.getChildren().addAll(hboxButtons, autoRefresh, search, contextsPane);
 		update();
 		
-		// Add to main vui
-		RunLaterHelper.runLater(()->AmoebaWindow.instance().mainVUI.getPanel().setLeft(this));
-		MenuItem miContextExplorer = new MenuItem("Context Explorer");
-		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				AmoebaWindow.instance().mainVUI.getPanel().setLeft(ContextExplorer.this);
-			}
-		});
-		AmoebaWindow.addToMenu("Window", miContextExplorer);
+		// Add to vui
+		RunLaterHelper.runLater(()->vui.getPanel().setLeft(this));
+
 	}
 
+	public void update(boolean auto) {
+		if(auto && autoRefresh.isSelected()) {
+			update();
+		}
+	}
+	
 	/**
 	 * Update the list of context
 	 */
 	public void update() {
-		contextList = amoeba.getContexts();
+		List<Drawable> drawableList = vui.getDrawables();
 		// crude color sort
-		contextList.sort(new Comparator<Context>() {
+		drawableList.sort(new Comparator<Drawable>() {
 			@Override
-			public int compare(Context o1, Context o2) {
-				Color c1 = ((ContextRendererFX)o1.getRenderStrategy()).getDrawable().getColor();
-				Color c2 = ((ContextRendererFX)o2.getRenderStrategy()).getDrawable().getColor();
+			public int compare(Drawable o1, Drawable o2) {
+				Color c1 = (o1.getColor());
+				Color c2 = (o2.getColor());
 				double score1 = c1.getRed()*100 + c1.getGreen()*10 + c1.getBlue();
 				double score2 = c2.getRed()*100 + c2.getGreen()*10 + c2.getBlue();
 				return (int) ((score1 - score2)*10);
@@ -124,19 +127,31 @@ public class ContextExplorer extends ScrollPane {
 		});
 		cpVBox.getChildren().clear();
 		Pattern p = Pattern.compile(search.getText());
-		for(Context c : contextList) {
-			if(p.matcher(c.toStringFull()).find()) {
-				((ContextRendererFX)c.getRenderStrategy()).getMini().update();
-				cpVBox.getChildren().add(((ContextRendererFX)c.getRenderStrategy()).getMini().getNode());
+		for(Drawable d : drawableList) {
+			if(d.showInExplorer && d.isVisible()) {
+				if(p.matcher(d.getInfo()).find()) {
+					Drawable mini = d.getLinkedDrawable("mini");
+					if(mini == null) {
+						mini = new DrawableDefaultMini(d);
+					}
+					cpVBox.getChildren().add(mini.getNode());
+					mini.onDraw();
+				}
 			}
 		}
 	}
 	
 	private void collapseAll() {
-		contextList = amoeba.getContexts();
-		for(Context c : contextList) {
-			((ContextRendererFX)c.getRenderStrategy()).getMini().collapse();
+		List<Drawable> drawableList = vui.getDrawables();
+		for(Drawable d : drawableList) {
+			if(d.showInExplorer && d.isVisible()) {
+				Drawable mini = d.getLinkedDrawable("mini");
+				if(mini == null) {
+					mini = new DrawableDefaultMini(d);
+				}
+				mini.collapse();
+				mini.onDraw();
+			}
 		}
-		update();
 	}
 }

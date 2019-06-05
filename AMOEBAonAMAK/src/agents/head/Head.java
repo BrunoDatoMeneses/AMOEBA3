@@ -13,7 +13,6 @@ import ncs.NCS;
  * The Class Head.
  */
 public class Head extends AmoebaAgent {
-	private static final long serialVersionUID = 1L;
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;

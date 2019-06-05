@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.management.InstanceAlreadyExistsException;
 
+import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.AmakPlot.ChartType;
@@ -12,8 +13,12 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import kernel.AMOEBA;
 
 /**
@@ -49,6 +54,7 @@ public class AmoebaWindow extends MainWindow {
 		
 		// amoeba and agent
 		point = mainVUI.createAndAddPoint(0, 0);
+		point.setName("Cursor");
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
@@ -67,11 +73,19 @@ public class AmoebaWindow extends MainWindow {
 		AmoebaWindow.addToolbar(toggleRender);
 		
 		// dimension selector
-		dimensionSelector = new DimensionSelector(amoeba);
+		dimensionSelector = new DimensionSelector(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.updateAgentsVisualisation();
+			}
+		});
 		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
 		
 		// contextMenu "Request Here" on VUI
 		new ContextMenuVUI(amoeba, mainVUI); //the ContextMenu add itself to the VUI
+		
+		// manual save button
+		AmoebaWindow.addToolbar(newManualSaveButton(amoeba));
 	}
 	
 	/**
@@ -107,5 +121,21 @@ public class AmoebaWindow extends MainWindow {
 	
 	public AmakPlot getPlot(String name) {
 		return plots.get(name);
+	}
+	
+	public Button newManualSaveButton(AMOEBA amoeba) {
+		Button button = new Button("Quick save");
+		button.setTooltip(new Tooltip("Create a new save point. You will be able to find it in 'Save Explorer' -> 'Manual Saves'"));
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				if(amoeba.saver != null) {
+					amoeba.saver.newManualSave("manualSaveButton");
+				} else {
+					Log.defaultLog.error("Main Window", "Cannot make a save point of an amoeba without saver");
+				}
+			}
+		});
+		return button;
 	}
 }

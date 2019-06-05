@@ -12,8 +12,8 @@ import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import gui.ContextRendererFX;
 import gui.RenderStrategy;
-import gui.context.ContextRendererFX;
 import kernel.AMOEBA;
 import ncs.NCS;
 
@@ -27,8 +27,8 @@ public class Context extends AmoebaAgent {
 	// ----------
 	
 	private Head headAgent;
-	private HashMap<Percept, Range> ranges = new HashMap<Percept, Range>();
-	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
+	private HashMap<Percept, Range> ranges;
+	private ArrayList<Experiment> experiments;
 	private LocalModel localModel;
 	private double confidence = 0;
 	
@@ -40,10 +40,9 @@ public class Context extends AmoebaAgent {
 
 	public Context(AMOEBA amoeba, Head head) {
 		super(amoeba);
-		setName(String.valueOf(this.hashCode()));
 		Experiment firstPoint = new Experiment();
 
-		List<Percept> percepts = amoeba.getPercepts();
+		List<Percept> percepts = getAmas().getPercepts();
 		for (Percept percept : percepts) {
 			double length = Math.abs(percept.getMinMaxDistance()) / 4.0;
 			Range range = new Range(this, percept.getValue() - length, percept.getValue() + length, 0, true, true,
@@ -52,11 +51,10 @@ public class Context extends AmoebaAgent {
 
 			firstPoint.addDimension(percept, percept.getValue());
 		}
-		firstPoint.setProposition(amoeba.getHeads().get(0).getOracleValue());
+		firstPoint.setProposition(getAmas().getHeads().get(0).getOracleValue());
 		experiments.add(firstPoint);
-		localModel = amoeba.buildLocalModel(this);
-
-		buildModel(amoeba, head, amoeba.getPercepts());
+		localModel = getAmas().buildLocalModel(this);
+		buildModel(getAmas(), head, amoeba.getPercepts());
 	}
 
 	/**
@@ -89,6 +87,14 @@ public class Context extends AmoebaAgent {
 		}
 
 		buildModel(amoeba, head, percepts);
+	}
+	
+	@Override
+	protected void onInitialization() {
+		super.onInitialization();
+		ranges = new HashMap<Percept, Range>();
+		experiments = new ArrayList<Experiment>();
+		setName(String.valueOf(this.hashCode()));
 	}
 
 	private final void buildModel(AMOEBA amoeba, Head head, List<Percept> percepts) {

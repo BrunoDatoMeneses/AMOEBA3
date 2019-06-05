@@ -20,6 +20,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Background;
@@ -44,6 +45,12 @@ public class VUI {
 	 * The toolbar of the VUI.
 	 */
 	public ToolBar toolbar;
+	
+	/**
+	 * The VUI explorer.
+	 * @see VuiExplorer
+	 */
+	private VuiExplorer vuiExplorer;
 	
 	/**
 	 * List of objects currently being drawn by the VUI
@@ -249,6 +256,19 @@ public class VUI {
 
 			panel.setCenter(canvas);
 			
+			//add VuiExplorer
+			vuiExplorer = new VuiExplorer(this);
+			panel.setLeft(vuiExplorer);
+			Button veButton = new Button("VUI explorer");
+			veButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					panel.setLeft(vuiExplorer);
+				}
+			});
+			veButton.setTooltip(new Tooltip("Show the VUI explorer if it was hidden."));
+			toolbar.getItems().add(veButton);
+			
 			done.release();
 		});
 		try {
@@ -396,6 +416,8 @@ public class VUI {
 		RunLaterHelper.runLater(() -> {
 			statusLabel.setText(String.format("Zoom: %.2f Center: (%.2f,%.2f)", zoom, worldCenterX, worldCenterY));
 		});
+		
+		RunLaterHelper.runLater(()-> vuiExplorer.update(true));
 	}
 
 	/**
@@ -547,5 +569,9 @@ public class VUI {
 	
 	public BorderPane getPanel() {
 		return panel;
+	}
+	
+	public List<Drawable> getDrawables() {
+		return drawables;
 	}
 }

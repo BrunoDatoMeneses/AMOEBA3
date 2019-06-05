@@ -1,7 +1,5 @@
 package gui;
 
-import gui.context.ContextRendererFX;
-
 /**
  * Strategy on how to render an object.
  * See {@link ContextRendererFX} for example on how to extends this class.

@@ -1,7 +1,5 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.VUI;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -25,6 +23,7 @@ public class DrawableCircle extends Drawable {
 			circle.setFill(Color.TRANSPARENT);
 		else
 			circle.setFill(color);
+		defaultInit();
 	}
 
 	@Override

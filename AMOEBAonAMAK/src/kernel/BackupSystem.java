@@ -239,7 +239,7 @@ public class BackupSystem implements IBackupSystem {
 
 		// -- Load attributes
 		String contextName = contextElement.getAttributeValue("Name");
-		String localModelName = contextElement.getAttributeValue("LocalModel");
+		String localModelName = contextElement.getChild("LocalModel").getAttributeValue("Type");
 		TypeLocalModel type = TypeLocalModel.valueOf(localModelName);
 		LocalModel localModel;
 		switch (type) {
@@ -414,15 +414,34 @@ public class BackupSystem implements IBackupSystem {
 		// -- Saving Experiments
 		ArrayList<Experiment> experiments = context.getExperiments();
 		saveExperiments(experiments, contextElement);
+		
+		// -- Saving Local Model
+		saveLocalModel(context, contextElement);
 
 		// -- Add attributes
 		List<Attribute> agentAttributes = new ArrayList<>();
 		agentAttributes.add(new Attribute("Name", String.valueOf(context.getName())));
-		agentAttributes.add(new Attribute("LocalModel", context.getFunction().getType().name()));
 		agentAttributes.add(new Attribute("Confidence", String.valueOf(context.getConfidence())));
+		agentAttributes.add(new Attribute("ActionsProposal", context.getActionProposal()+""));
+		agentAttributes.add(new Attribute("Activated", amoeba.getValidContexts().contains(context)+""));
 
 		contextElement.setAttributes(agentAttributes);
 		presetContextsElement.addContent(contextElement);
+	}
+
+	private void saveLocalModel(Context context, Element contextElement) {
+		Element localModelElement = new Element("LocalModel");
+		localModelElement.setAttribute("Type", context.getFunction().getType().name());
+		
+		Element coefs = new Element("Coefs");
+		List<Element> coefsElements = new ArrayList<>();
+		for(double c : context.getFunction().getCoefs()) {
+			coefsElements.add(new Element("Value").setAttribute("v", c+""));
+		}
+		coefs.addContent(coefsElements);
+		
+		localModelElement.addContent(coefs);
+		contextElement.addContent(localModelElement);		
 	}
 
 	private void saveRanges(Map<Percept, Range> ranges, Element contextElement) {

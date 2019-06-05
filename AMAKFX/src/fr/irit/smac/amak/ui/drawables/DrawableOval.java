@@ -1,7 +1,5 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.VUI;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
@@ -12,6 +10,7 @@ public class DrawableOval extends Drawable {
 	public DrawableOval(double dx, double dy, double width, double height) {
 		super(dx, dy, width, height);
 		ellipse = new Ellipse();
+		defaultInit();
 	}
 
 	@Override

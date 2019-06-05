@@ -95,6 +95,11 @@ public class NDimCube implements StudiedSystem{
 
 	@Override
 	public double requestOracle(HashMap<String, Double> request) {
-		return 0;
+		if(request.get("px1") > 0) {
+			return getModelResult(1);
+		}
+		else {
+			return getModelResult(2);
+		}
 	}
 }

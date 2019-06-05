@@ -1,7 +1,5 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.VUI;
 import javafx.scene.Node;
 import javafx.scene.text.Text;
 
