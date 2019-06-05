@@ -15,6 +15,7 @@ public class World extends Environment {
 	private HashMap<NCS,Integer> numberOfNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> allTimeNCS = new HashMap<NCS,Integer>();
 	private HashMap<NCS,Integer> thisLoopNCS = new HashMap<NCS,Integer>();
+	
 	private int nbActivatedAgent;
 	private double AVT_acceleration = 2;
 	private double AVT_deceleration = 1. / 3.0;

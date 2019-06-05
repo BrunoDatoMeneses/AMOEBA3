@@ -69,7 +69,9 @@ public class AmakPlot {
 			break;
 		}
 		chart.setAntiAlias(false);
-		add(this);
+		if(autoAdd) {
+			add(this);
+		}
 	}
 	
 	/**
@@ -134,28 +136,47 @@ public class AmakPlot {
 	
 	/**
 	 * Add or update a data point
-	 * There might be a slight delay before updating the GUI, to improve
-	 * performance at high speed.
+	 * There might be a slight delay before updating the GUI, to improve performance at high speed.
+	 * @param seriesName
+	 * @param x horizontal axis, if already exist, will be overwritten 
+	 * @param y vertical axis
+	 * @param notify if true will update the GUI.
+	 */
+	public void addData(Comparable seriesName, Number x, Number y, boolean notify) {
+		if(notify) {
+			seriesCollection.setNotify(false);
+			// Only update chart every 500ms if needed
+			if(!getNotifySent()) {
+				setNotifySent();
+				Timeline tl = new Timeline(new KeyFrame(
+						Duration.millis(1000), 
+						ae -> {seriesCollection.setNotify(true);; resetNotifySent();}));
+				tl.play();
+			}
+			
+			RunLaterHelper.runLater(() -> {
+				if(seriesCollection.getSeriesIndex(seriesName) == -1) {
+					seriesCollection.addSeries(new XYSeries(seriesName));
+				}
+				seriesCollection.getSeries(seriesName).addOrUpdate(x, y);
+			});
+		} else {
+			seriesCollection.setNotify(false);
+			if(seriesCollection.getSeriesIndex(seriesName) == -1) {
+				seriesCollection.addSeries(new XYSeries(seriesName));
+			}
+			seriesCollection.getSeries(seriesName).addOrUpdate(x, y);
+		}
+	}
+	
+	/**
+	 * Add or update a data point
+	 * There might be a slight delay before updating the GUI, to improve performance at high speed.
 	 * @param seriesName
 	 * @param x horizontal axis, if already exist, will be overwritten 
 	 * @param y vertical axis
 	 */
 	public void addData(Comparable seriesName, Number x, Number y) {
-		seriesCollection.setNotify(false);
-		// Only update chart every 500ms if needed
-		if(!getNotifySent()) {
-			setNotifySent();
-			Timeline tl = new Timeline(new KeyFrame(
-					Duration.millis(1000), 
-					ae -> {seriesCollection.setNotify(true);; resetNotifySent();}));
-			tl.play();
-		}
-		
-		RunLaterHelper.runLater(() -> {
-			if(seriesCollection.getSeriesIndex(seriesName) == -1) {
-				seriesCollection.addSeries(new XYSeries(seriesName));
-			}
-			seriesCollection.getSeries(seriesName).addOrUpdate(x, y);
-		});
+		addData(seriesName, x, y, true);
 	}
 }

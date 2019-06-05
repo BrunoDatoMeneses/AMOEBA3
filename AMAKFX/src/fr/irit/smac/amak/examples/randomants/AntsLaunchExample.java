@@ -12,9 +12,9 @@ public class AntsLaunchExample {
 		new AntHillExample(env);
 		
 		Pane panel = new Pane();
-		panel.getChildren().add(new Label("<html><b>AntHill simulation</b><br/><br/>"
-				+ "Ants move randomly.<br />"
-				+ "This demo is here to show AMAK<br />rendering capacities.</html>"));
+		panel.getChildren().add(new Label("AntHill simulation\n"
+				+ "Ants move randomly.\n"
+				+ "This demo is here to show AMAK rendering capacities.\n"));
 		MainWindow.setLeftPanel(panel);
 	}
 }

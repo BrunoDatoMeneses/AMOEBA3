@@ -1,6 +1,6 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
+import javafx.scene.Node;
 import javafx.scene.shape.Line;
 
 public class DrawableLine extends Drawable {
@@ -9,11 +9,7 @@ public class DrawableLine extends Drawable {
 	public DrawableLine(double dx, double dy, double tx, double ty) {
 		super(0, 0, 0, 0);
 		line = new Line(dx, dy, tx, ty);
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(line));
+		defaultInit();
 	}
 
 	@Override
@@ -32,7 +28,6 @@ public class DrawableLine extends Drawable {
 		line.setStartY(dy);
 		line.setEndX(tx);
 		line.setEndY(ty);
-		update();
 	}
 
 	@Override
@@ -43,5 +38,10 @@ public class DrawableLine extends Drawable {
 	@Override
 	public void _show() {
 		line.setVisible(true);
+	}
+
+	@Override
+	public Node getNode() {
+		return line;
 	}
 }

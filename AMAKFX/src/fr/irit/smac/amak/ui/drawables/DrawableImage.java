@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.tools.RunLaterHelper;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 public class DrawableImage extends Drawable {
 
@@ -18,11 +19,7 @@ public class DrawableImage extends Drawable {
 		super(dx, dy, 0, 0);
 		image = new ImageView(new Image(filename));
 		this.setFilename(filename);
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(image));
+		defaultInit();
 	}
 
 	private Image loadByFilename(String filename) throws NullPointerException, IllegalArgumentException {
@@ -37,11 +34,11 @@ public class DrawableImage extends Drawable {
 		try {
 			image.setImage(loadByFilename(this.filename));
 		} catch (NullPointerException | IllegalArgumentException e) {
-			Log.error("AMAK", "Can't find/load the file %s", this.filename);
+			Log.defaultLog.error("AMAK", "Can't find/load the file %s", this.filename);
 			try {
 				image.setImage(loadByFilename("file:Resources/unavailable.png"));
 			} catch (NullPointerException | IllegalArgumentException e1) {
-				Log.fatal("AMAK", "Can't load resources belonging to AMAK. Bad things may happen.");
+				Log.defaultLog.fatal("AMAK", "Can't load resources belonging to AMAK. Bad things may happen.");
 			}
 		}
 		setWidth(this.image.getFitWidth());
@@ -64,5 +61,15 @@ public class DrawableImage extends Drawable {
 	@Override
 	public void _show() {
 		image.setVisible(true);
+	}
+
+	@Override
+	public Node getNode() {
+		return image;
+	}
+	
+	@Override
+	protected void onMouseEntered(MouseEvent event) {
+		image.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
 	}
 }

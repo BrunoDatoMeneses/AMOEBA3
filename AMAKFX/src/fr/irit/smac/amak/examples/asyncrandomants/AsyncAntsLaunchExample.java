@@ -1,7 +1,9 @@
 package fr.irit.smac.amak.examples.asyncrandomants;
 
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.examples.randomants.AntExample;
+import fr.irit.smac.amak.examples.randomants.AntHillExample;
+import fr.irit.smac.amak.examples.randomants.WorldExample;
 import fr.irit.smac.amak.ui.MainWindow;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -21,11 +23,11 @@ public class AsyncAntsLaunchExample {
 	 *            Main arguments
 	 */
 	public static void main(String[] args) {
-		Configuration.allowedSimultaneousAgentsExecution = 5;
-		AsyncWorldExample env = new AsyncWorldExample();
-		AsyncAntsAMASExample amas = new AsyncAntsAMASExample(env, Scheduling.UI);
+		Configuration.allowedSimultaneousAgentsExecution = 4;
+		WorldExample env = new WorldExample();
+		AntHillExample amas = new AntHillExample(env);
 		for (int i = 0; i < 50; i++)
-			new AsyncAntExample(amas, 0, 0);
+			new AntExample(amas, 0, 0);
 		
 		Pane panel = new Pane();
 		String content = "Async AntHill simulation\n\n" + "Ants move randomly.\n"

@@ -10,7 +10,7 @@ public interface IBackupSystem {
 	 * @param file The file you want to read. It is supposed to be a text file with
 	 *             XML format.
 	 */
-	public void loadXML(File file);
+	public void load(File file);
 	
 	/**
 	 * Save into a file the current model of AMOEBA (agents and some variables in
@@ -20,7 +20,7 @@ public interface IBackupSystem {
 	 *       just after load will result in a XML file without any agents.
 	 * @param file The file where you want to insert the model.
 	 */
-	public void saveXML(File file);
+	public void save(File file);
 	
 	/**
 	 * Allow to load preset context. Default at true.
@@ -33,5 +33,11 @@ public interface IBackupSystem {
 	 * @return
 	 */
 	public boolean isLoadPresetContext();
+	
+	/**
+	 * Get the file extension used by the backup system.
+	 * @return the file extension.
+	 */
+	public String getExtension();
 	
 }

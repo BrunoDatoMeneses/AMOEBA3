@@ -27,19 +27,8 @@ import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
-import fr.irit.smac.amak.ui.AmakPlot.ChartType;
-import fr.irit.smac.amak.ui.MainWindow;
-import fr.irit.smac.amak.ui.SchedulerToolbar;
-import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.ContextExplorer;
-import gui.ContextMenuVUI;
+import gui.AmoebaWindow;
 import gui.DimensionSelector;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToggleButton;
 import ncs.NCS;
 
 /**
@@ -48,10 +37,19 @@ import ncs.NCS;
  */
 public class AMOEBA extends Amas<World> implements IAMOEBA {
 	// -- Attributes
+	/**
+	 * Utility to save, autosave, and load amoebas.
+	 */
+	public SaveHelper saver;
+	
+	/**
+	 * The system studied by the amoeba.
+	 */
+	public StudiedSystem studiedSystem;
+	
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
-	private StudiedSystem studiedSystem;
 	private boolean useOracle = true;
 
 	private HashSet<Context> validContexts;
@@ -59,30 +57,32 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
-	private boolean renderUpdate = false;
+	private boolean renderUpdate;
 	
 	private int cycleWithoutRender = 0;
 
-	private Drawable point;
-	private AmakPlot loopNCS;
-	private AmakPlot allNCS;
-	private AmakPlot nbAgent;
-	private AmakPlot errors;
-	private ToggleButton toggleRender;
-	private SchedulerToolbar schedulerToolbar;
-	private DimensionSelector dimensionSelector;
-	private ContextExplorer contextExplorer;
-	private Menu windowMenu;
-
 	/**
-	 * Instantiates a new amoeba. Create an AMOEBA coupled with a studied system
+	 * Instantiates a new, empty, amoeba.
+	 * For ease of use, consider using {@link AMOEBA#AMOEBA(String, StudiedSystem)}.
 	 *
 	 * @param studiedSystem
 	 *            the studied system
 	 */
-	public AMOEBA(World environment, StudiedSystem studiedSystem) {
-		super(environment, Scheduling.HIDDEN);
+	public AMOEBA() {
+		super(new World(), Scheduling.HIDDEN);
+	}
+	
+	/**
+	 * Intantiate a default amoeba from a config file.
+	 * 
+	 * @param path path to the config file.
+	 */
+	public AMOEBA(String path, StudiedSystem studiedSystem) {
+		super(new World(), Scheduling.HIDDEN);
 		this.studiedSystem = studiedSystem;
+		setRenderUpdate(true);
+		saver = new SaveHelper(this);
+		saver.load(path);
 	}
 
 	@Override
@@ -92,81 +92,49 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onInitialAgentsCreation() {
 	}
-
+	
 	@Override
 	protected void onRenderingInitialization() {
-		super.onRenderingInitialization();
-		// scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("AMOEBA", getScheduler());
-		MainWindow.addToolbar(schedulerToolbar);
-
-		// amoeba and agent
-		VUI.get().setDefaultView(200, 0, 0);
-		point = VUI.get().createPoint(0, 0);
-		loopNCS = new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS");
-		allNCS = new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS");
-		nbAgent = new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents");
-		errors = new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients");
-
-		// update render button
-		toggleRender = new ToggleButton("Allow Rendering");
-		toggleRender.setOnAction(evt -> {
-			renderUpdate = toggleRender.isSelected(); 
-			if(renderUpdate)
-				nextCycleRunAllAgents();
-		});
-		toggleRender.setSelected(renderUpdate);
-		MainWindow.addToolbar(toggleRender);
-		
-		// dimension selector
-		dimensionSelector = new DimensionSelector(this);
-		MainWindow.addToolbar(dimensionSelector);
-		
-		// Context explorer
-		contextExplorer = new ContextExplorer(this);
-		MainWindow.setLeftPanel(contextExplorer);
-		windowMenu = new Menu("Window");
-		MenuItem miContextExplorer = new MenuItem("Context Explorer");
-		miContextExplorer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				MainWindow.setLeftPanel(contextExplorer);
-			}
-		});
-		windowMenu.getItems().add(miContextExplorer);
-		MainWindow.addMenu(windowMenu);
-		
-		// contextMenu "Request Here" on VUI
-		new ContextMenuVUI(this); //the ContextMenu add itself to the VUI
-		
+		AmoebaWindow.instance().initialize(this);
 	}
 
 	@Override
 	protected void onUpdateRender() {
-		if (isRenderUpdate()) {
-			point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
+		// Update statistics
+		if(AmoebaWindow.isInstance()) {
+			AmoebaWindow window = AmoebaWindow.instance();
 
+			AmakPlot loopNCS = window.getPlot("This loop NCS");
+			AmakPlot allNCS = window.getPlot("All time NCS");
+			AmakPlot nbAgent = window.getPlot("Number of agents");
+			AmakPlot errors = window.getPlot("Errors");
+			boolean notify = isRenderUpdate();
+			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
 			HashMap<NCS, Integer> allTimeNCS = environment.getAllTimeNCS();
 			for (NCS ncs : NCS.values()) {
-				loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs));
-				allNCS.addData(ncs, cycle, allTimeNCS.get(ncs));
+				loopNCS.addData(ncs, cycle, thisLoopNCS.get(ncs), notify);
+				allNCS.addData(ncs, cycle, allTimeNCS.get(ncs), notify);
 			}
-			nbAgent.addData("Percepts", cycle, getPercepts().size());
-			nbAgent.addData("Contexts", cycle, getContexts().size());
-			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent());
+			nbAgent.addData("Percepts", cycle, getPercepts().size(), notify);
+			nbAgent.addData("Contexts", cycle, getContexts().size(), notify);
+			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent(), notify);
 
-			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity());
-			errors.addData("Error allowed", cycle, head.getErrorAllowed());
-			errors.addData("Inexact allowed", cycle, head.getInexactAllowed());
+			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity(), notify);
+			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
+			errors.addData("Inexact allowed", cycle, head.getInexactAllowed(), notify);
 			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
 			Collections.sort(sortedErrors);
 
 			// @note (Labbeti) Test added to avoid crash when head has just been created.
 			if (!sortedErrors.isEmpty()) {
-				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2));
+				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2), notify);
 			}
-			
+		}
+		
+		if (isRenderUpdate()) {
+			AmoebaWindow.instance().mainVUI.updateCanvas();
+			updateAgentsVisualisation();
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
 	}
@@ -174,7 +142,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.inform("AMOEBA", "Cycle " + cycle);
+			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
 		}
 		
 		if(isRenderUpdate()) {
@@ -188,7 +156,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 					// we (sadly) have to put it inside a runlater to correctly update the slider
 					getScheduler().stop(); 
 				});
-				Log.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
+				Log.defaultLog.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
 						+ "To reactiavte it, slow down the simulation and toggle the \"Allow Rendering\" button.");
 			}
 		}
@@ -213,6 +181,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	synchronized private int getCycleWithoutRender() {
 		return cycleWithoutRender;
+	}
+	
+	@Override
+	protected void onSystemCycleEnd() {
+		super.onSystemCycleEnd();
+		if(saver != null)
+			saver.autosave();
 	}
 
 	/**
@@ -320,7 +295,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				try {
 					renderingPhaseSemaphore.acquire();
 				} catch (InterruptedException e) {
-					Log.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					Log.defaultLog.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
 					e.printStackTrace();
 				}
 				// now the queue should be clear
@@ -374,7 +349,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
-			schedulerToolbar.setDisable(!allow);
+			AmoebaWindow.instance().schedulerToolbar.setDisable(!allow);
 		}
 	}
 
@@ -392,7 +367,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void onLoadEnded() {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
-		dimensionSelector.update();
+		if(!Configuration.commandLineMode) {
+			AmoebaWindow.instance().dimensionSelector.update(getPercepts());
+			updateAgentsVisualisation();
+		}
 	}
 
 	@Override
@@ -418,7 +396,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
-			toggleRender.setSelected(renderUpdate);
+			AmoebaWindow.instance().toggleRender.setSelected(renderUpdate);
 			if(renderUpdate == true)
 				nextCycleRunAllAgents();
 		}
@@ -475,10 +453,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * Synchronized with a writeLock.
 	 * @param validContexts new validContexts set.
 	 */
+	@SuppressWarnings("unchecked")
 	public void updateValidContexts(HashSet<Context> validContexts) {
 		validContextLock.writeLock().lock();
 		if (this.validContexts == null) {
-			this.validContexts = validContexts;
+			this.validContexts = (HashSet<Context>) validContexts.clone();
 		} else {
 			this.validContexts.retainAll(validContexts);
 		}
@@ -521,7 +500,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public boolean isRenderUpdate() {
-		return !Configuration.commandLineMode && renderUpdate;
+		return (!Configuration.commandLineMode) && renderUpdate;
 	}
 
 	public boolean isUseOracle() {
@@ -532,7 +511,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
 		}
-		point.move(dimensionSelector.d1().getValue(), dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().mainVUI.updateCanvas();
+		AmoebaWindow.instance().point.toFront();
 	}
 	
 	/**
@@ -540,6 +521,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public DimensionSelector getDimensionSelector() {
-		return dimensionSelector;
+		return AmoebaWindow.instance().dimensionSelector;
+	}
+	
+	/**
+	 * Get the last perception.
+	 * @return
+	 */
+	public HashMap<String, Double> getPerceptionsAndActionState() {
+		return perceptionsAndActionState;
+	}
+	
+	/**
+	 * Set the studied system that will be used to learn with the internal scheduler.
+	 * @param studiedSystem
+	 */
+	public void setStudiedSystem(StudiedSystem studiedSystem) {
+		this.studiedSystem = studiedSystem;
 	}
 }

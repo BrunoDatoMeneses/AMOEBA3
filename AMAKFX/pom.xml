@@ -11,6 +11,11 @@
 	<artifactId>AMAKFX</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<skip.assembly>false</skip.assembly>
+		<main.class>fr.irit.smac.amak.examples.philosophers.PhilosophersLaunchExample</main.class>
+	</properties>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>tests</testSourceDirectory>
@@ -27,6 +32,18 @@
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart-fx</artifactId>
 			<version>1.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-javafx</artifactId>
+			<version>11.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-dashicons-pack</artifactId>
+			<version>11.3.4</version>
 		</dependency>
 
 		<!-- Local jars dependencies -->

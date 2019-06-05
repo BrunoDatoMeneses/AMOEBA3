@@ -45,7 +45,7 @@ public class NDimCube implements StudiedSystem{
 			if(i+1 < dimension)
 				print += ", ";
 		}
-		Log.inform("NDimCube", print);
+		Log.defaultLog.inform("NDimCube", print);
 	}
 	
 	@Override
@@ -91,5 +91,15 @@ public class NDimCube implements StudiedSystem{
 		}
 				
 		return modelresult;
+	}
+
+	@Override
+	public double requestOracle(HashMap<String, Double> request) {
+		if(request.get("px1") > 0) {
+			return getModelResult(1);
+		}
+		else {
+			return getModelResult(2);
+		}
 	}
 }

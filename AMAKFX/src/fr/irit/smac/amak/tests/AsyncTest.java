@@ -17,15 +17,15 @@ public class AsyncTest {
 	public AsyncTest() {
 		Configuration.allowedSimultaneousAgentsExecution = 10;
 
-		Log.minLevel = Log.Level.DEBUG;
+		Log.defaultMinLevel = Log.Level.DEBUG;
 		runAmas();
 	}
 
 	private void runAmas() {
 		MyAMAS amas = new MyAMAS(new MyEnvironment(), Scheduling.DEFAULT);
 		amas.getScheduler().setOnStop(s -> {
-			Log.inform("time", "Threads used: %d", Configuration.allowedSimultaneousAgentsExecution);
-			Log.inform("time", "Elapsed time: %s", Profiler.endHR("amas"));
+			Log.defaultLog.inform("time", "Threads used: %d", Configuration.allowedSimultaneousAgentsExecution);
+			Log.defaultLog.inform("time", "Elapsed time: %s", Profiler.endHR("amas"));
 		});
 		Profiler.start("amas");
 
@@ -75,7 +75,7 @@ public class AsyncTest {
 
 		@Override
 		protected void onAgentCycleEnd() {
-			Log.debug("AsyncTest", "Agent #%d cycle %d", getId(), myCycle);
+			Log.defaultLog.debug("AsyncTest", "Agent #%d cycle %d", getId(), myCycle);
 		}
 	}
 

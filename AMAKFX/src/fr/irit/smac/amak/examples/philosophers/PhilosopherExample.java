@@ -106,9 +106,10 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	protected void onRenderingInitialization() {
 		double x = 100 * Math.cos(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
 		double y = 100 * Math.sin(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
-		drawableRectangle = VUI.get().createRectangle(x, y, 20, 20);
-		drawableLeftFork = VUI.get().createRectangle(x - 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide();
-		drawableRightFork = VUI.get().createRectangle(x + 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide();
+		drawableRectangle = VUI.get().createAndAddRectangle(x, y, 20, 20);
+		drawableRectangle.setName("Philosopher "+getId());
+		drawableLeftFork = VUI.get().createAndAddRectangle(x - 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
+		drawableRightFork = VUI.get().createAndAddRectangle(x + 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
 
 	}
 
@@ -166,6 +167,11 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 
 	@Override
 	public void onUpdateRender() {
+		drawableRectangle.setInfo(
+			"Philosopher "+getId()+" :\n"+
+			"State : "+state+"\n"+
+			"Eaten pastas : "+eatenPastas+"."
+		);
 		amas.plot.addData("Eaten pasta", id, eatenPastas);
 		switch (state) {
 		case EATING:

@@ -1,81 +1,53 @@
 package experiments;
 
-import java.io.File;
 import java.io.IOException;
 
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.MainWindow;
+import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.tools.SerializeBase64;
+import gui.AmoebaWindow;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
-import kernel.IBackupSystem;
 import kernel.StudiedSystem;
-import kernel.World;
 
 public class Main {
 
-	public static void main(String[] args) throws IOException {
-		// Instantiating the MainWindow before usage.
-		// It also allows you to change some of its behavior before creating an AMOEBA.
-		// If you use Configuration.commandLineMode = True , then you should skip it. 
-		MainWindow.instance();
-		example();
-	}
-
-	private static void example() throws IOException {
-
-		// Set AMAK configuration before creating an AMOEBA
-		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 8;
-		Configuration.waitForGUI = true;
-
-		// Create a World, a Studied System, and an AMOEBA
-		World world = new World();
-		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		AMOEBA amoeba = new AMOEBA(world, studiedSystem);
-		// A window appeared, allowing to control the simulation, but if you try to run it
-		// it will crash (there's no percepts !). We need to load a configuration :
-
-		// Create a backup system for the AMOEBA
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		// Load a configuration matching the studied system
-		File file = new File("resources\\twoDimensionsLauncher.xml");
-		backupSystem.loadXML(file);
-
-		// The amoeba is ready to be used.
-		// Next we show how to control it with code :
-
-		// We deny the possibility to change simulation speed with the UI
-		amoeba.allowGraphicalScheduler(false);
-		// We allow rendering
-		amoeba.setRenderUpdate(true);
-		long start = System.currentTimeMillis();
-		// We run some learning cycles
-		int nbCycle = 1000;
-		for (int i = 0; i < nbCycle; ++i) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
+	/**
+	 * Launch an amoeba from a config file and a serialized studied system. <br/>
+	 * A serialized F_XY_System : rO0ABXNyABdleHBlcmltZW50cy5GX1hZX1N5c3RlbZo0im9N3R7/AgAGWgAJZmlyc3RTdGVwRAAGcmVzdWx0RAAJc3BhY2VTaXplRAABeEQAAXlMAAlnZW5lcmF0b3J0ABJMamF2YS91dGlsL1JhbmRvbTt4cAEAAAAAAAAAAEBJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHA=
+	 * @param args comandLineMode configFile serializedBase64StudiedSystem
+	 */
+	public static void main(String[] args) {
+		if(args.length != 3) {
+			System.err.println("Usage : comandLineMode configFile serializedBase64StudiedSystem");
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("Done in : " + (end - start) / 1000.0);
-
-		// We deactivate rendering
-		amoeba.setRenderUpdate(false);
-		// Do some more learning
-		start = System.currentTimeMillis();
-		for (int i = 0; i < nbCycle; ++i) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
+		Configuration.commandLineMode = Boolean.valueOf(args[0]);
+		String configFile = args[1];
+		String b64StudiedSystem = args[2];
+		
+		if(!Configuration.commandLineMode) {
+			AmoebaWindow.instance();
 		}
-		end = System.currentTimeMillis();
-		System.out.println("Done in : " + (end - start) / 1000.0);
-
-		// Activate rendering back
-		amoeba.setRenderUpdate(true);
-		// After activating rendering we need to update agent's visualization
-		amoeba.updateAgentsVisualisation();
-		// We allow simulation control with the UI
-		amoeba.allowGraphicalScheduler(true);
-
-		System.out.println("End main");
+		
+		StudiedSystem ss;
+		try {
+			ss = (StudiedSystem)SerializeBase64.deserialize(b64StudiedSystem);
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.println("A");
+			Log.defaultLog.error("INIT", "Cannot deserialize %s as a studied system.", b64StudiedSystem);
+			e.printStackTrace();
+			ss = null;
+		}
+		
+		System.out.println("Creating the amoeba");
+		AMOEBA amoeba = new AMOEBA(configFile, ss);
+		
+		synchronized (Thread.currentThread()){
+			try {
+				Thread.currentThread().wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }

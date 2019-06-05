@@ -344,7 +344,7 @@ public class Amas<E extends Environment> implements Schedulable {
 				try {
 					renderingPhaseSemaphore.acquire();
 				} catch (InterruptedException e) {
-					Log.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					Log.defaultLog.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
 					e.printStackTrace();
 				}
 				// now the queue should be clear
@@ -371,6 +371,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * {@link Amas#onRenderingInitialization}
 	 */
 	protected void onUpdateRender() {
+		VUI.get().updateCanvas();
 	}
 
 	/**

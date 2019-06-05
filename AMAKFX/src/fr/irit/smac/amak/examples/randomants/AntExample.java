@@ -5,6 +5,9 @@ import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableImage;
 
 public class AntExample extends Agent<AntHillExample, WorldExample> {
+	
+	private boolean dead = false; 
+	
 	/**
 	 * X coordinate of the ant in the world
 	 */
@@ -40,7 +43,8 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get().createImage(dx, dy, "file:Resources/ant.png");
+		image = VUI.get().createAndAddImage(dx, dy, "file:resources/ant.png");
+		image.setName("Ant "+getId());
 	}
 
 	/**
@@ -62,7 +66,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 			dy += getAmas().getEnvironment().getHeight();
 
 		if (amas.getEnvironment().getRandom().nextDouble() < 0.001) {
-			image.setFilename("file:Resources/ant_dead.png");
+			dead = true;
 			destroy();
 		}
 
@@ -75,5 +79,10 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 	public void onUpdateRender() {
 		image.move(dx, dy);
 		image.setAngle(angle);
+		image.setInfo("Ant "+getId()+"\nPosition "+dx+" "+dy+"\nAngle "+angle);
+		if(dead) {
+			image.setFilename("file:Resources/ant_dead.png");
+			image.setInfo("Ant "+getId()+"\nPosition "+dx+" "+dy+"\nAngle "+angle+"\nDead");
+		}
 	}
 }

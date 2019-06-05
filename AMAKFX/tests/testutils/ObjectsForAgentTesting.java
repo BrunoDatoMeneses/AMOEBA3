@@ -4,6 +4,7 @@ import org.junit.Before;
 
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.CommunicatingAgent;
+import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
 
@@ -19,6 +20,8 @@ public class ObjectsForAgentTesting {
 
 	@Before
 	public void setup() {
+		Configuration.commandLineMode = true;
+		
 		env = new TestEnv();
 		amas = new TestAMAS(env);
 		Object params[] = {};
@@ -35,7 +38,7 @@ public class ObjectsForAgentTesting {
 
 	public class TestEnv extends Environment {
 		public TestEnv() {
-			super(Scheduling.DEFAULT);
+			super(Scheduling.HIDDEN);
 		}
 	}
 

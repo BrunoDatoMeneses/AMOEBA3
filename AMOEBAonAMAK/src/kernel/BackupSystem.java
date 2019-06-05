@@ -30,10 +30,6 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import fr.irit.smac.amak.ui.MainWindow;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.stage.FileChooser;
 
 /**
  * @author Labbeti
@@ -53,14 +49,12 @@ public class BackupSystem implements IBackupSystem {
 
 	public BackupSystem(AMOEBA amoeba) {
 		this.amoeba = amoeba;
-		if(MainWindow.isInstance())
-			setupGraphicalTool();
 	}
 
 	// -------------------- Public Methods --------------------
 
 	@Override
-	public void loadXML(File file) {
+	public void load(File file) {
 		amoeba.clearAgents();
 		perceptsByName.clear();
 
@@ -82,7 +76,7 @@ public class BackupSystem implements IBackupSystem {
 	}
 
 	@Override
-	public void saveXML(File file) {
+	public void save(File file) {
 		Element elemSystem = new Element("System");
 		Document doc = new Document(elemSystem);
 
@@ -94,8 +88,8 @@ public class BackupSystem implements IBackupSystem {
 		XMLOutputter xml = new XMLOutputter();
 		xml.setFormat(Format.getPrettyFormat());
 
-		try {
-			xml.output(doc, new FileWriter(file));
+		try (FileWriter fw = new FileWriter(file)){
+			xml.output(doc, fw);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,6 +101,11 @@ public class BackupSystem implements IBackupSystem {
 	
 	public boolean isLoadPresetContext() {
 		return loadPresetContext;
+	}
+	
+	@Override
+	public String getExtension() {
+		return "xml";
 	}
 
 	// -------------------- Private methods --------------------
@@ -159,7 +158,18 @@ public class BackupSystem implements IBackupSystem {
 
 	private void loadPresetContexts(Element systemElement) {
 		Element presetContextsElement = systemElement.getChild("PresetContexts");
-		List<Element> contextsElement = presetContextsElement.getChildren();
+		
+		Element lastPerceptionsAndActionState = presetContextsElement.getChild("LastPerceptionsAndActionState");
+		if(lastPerceptionsAndActionState != null) {
+			HashMap<String, Double> perceptionAndAction = new HashMap<>();
+			for(Attribute att : lastPerceptionsAndActionState.getAttributes()) {
+				perceptionAndAction.put(att.getName(), Double.valueOf(att.getValue()));
+			}
+			amoeba.setPerceptionsAndActionState(perceptionAndAction);
+		}
+		
+		List<Element> contextsElement = presetContextsElement.getChildren("Context");
+		
 
 		for (Element contextElement : contextsElement) {
 			loadContext(contextElement);
@@ -229,7 +239,7 @@ public class BackupSystem implements IBackupSystem {
 
 		// -- Load attributes
 		String contextName = contextElement.getAttributeValue("Name");
-		String localModelName = contextElement.getAttributeValue("LocalModel");
+		String localModelName = contextElement.getChild("LocalModel").getAttributeValue("Type");
 		TypeLocalModel type = TypeLocalModel.valueOf(localModelName);
 		LocalModel localModel;
 		switch (type) {
@@ -322,9 +332,19 @@ public class BackupSystem implements IBackupSystem {
 		rootElement.addContent(startingAgentsElement);
 	}
 
-	private void savePresetContexts(Element rootElement) {
+	private void savePresetContexts(Element rootElement) {		
 		List<Context> contexts = amoeba.getContexts();
 		Element presetContextsElement = new Element("PresetContexts");
+		
+		Element lastPerceptionsAndActionState = new Element("LastPerceptionsAndActionState");
+		HashMap<String, Double> perceptionAndAction = amoeba.getPerceptionsAndActionState();
+		List<Attribute> attributes = new ArrayList<>();
+		for(String key : perceptionAndAction.keySet()) {
+			attributes.add(new Attribute(key, ""+perceptionAndAction.get(key)));
+		}
+		lastPerceptionsAndActionState.setAttributes(attributes);
+		presetContextsElement.addContent(lastPerceptionsAndActionState);
+		
 		presetContextsElement.addContent(new Comment(" Nb contexts = " + String.valueOf(contexts.size()) + " "));
 
 		for (Context context : contexts) {
@@ -394,15 +414,34 @@ public class BackupSystem implements IBackupSystem {
 		// -- Saving Experiments
 		ArrayList<Experiment> experiments = context.getExperiments();
 		saveExperiments(experiments, contextElement);
+		
+		// -- Saving Local Model
+		saveLocalModel(context, contextElement);
 
 		// -- Add attributes
 		List<Attribute> agentAttributes = new ArrayList<>();
 		agentAttributes.add(new Attribute("Name", String.valueOf(context.getName())));
-		agentAttributes.add(new Attribute("LocalModel", context.getFunction().getType().name()));
 		agentAttributes.add(new Attribute("Confidence", String.valueOf(context.getConfidence())));
+		agentAttributes.add(new Attribute("ActionsProposal", context.getActionProposal()+""));
+		agentAttributes.add(new Attribute("Activated", amoeba.getValidContexts().contains(context)+""));
 
 		contextElement.setAttributes(agentAttributes);
 		presetContextsElement.addContent(contextElement);
+	}
+
+	private void saveLocalModel(Context context, Element contextElement) {
+		Element localModelElement = new Element("LocalModel");
+		localModelElement.setAttribute("Type", context.getFunction().getType().name());
+		
+		Element coefs = new Element("Coefs");
+		List<Element> coefsElements = new ArrayList<>();
+		for(double c : context.getFunction().getCoefs()) {
+			coefsElements.add(new Element("Value").setAttribute("v", c+""));
+		}
+		coefs.addContent(coefsElements);
+		
+		localModelElement.addContent(coefs);
+		contextElement.addContent(localModelElement);		
 	}
 
 	private void saveRanges(Map<Percept, Range> ranges, Element contextElement) {
@@ -448,39 +487,5 @@ public class BackupSystem implements IBackupSystem {
 			experimentsElement.addContent(experimentElement);
 		}
 		contextElement.addContent(experimentsElement);
-	}
-
-	private void setupGraphicalTool() {
-		MainWindow mw = MainWindow.instance();	
-		// TODO remove if they exist items Save and Load in menu Option.
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().addAll(
-				new FileChooser.ExtensionFilter("XML", "*.xml"),
-                new FileChooser.ExtensionFilter("All", "*.*")
-            );
-
-		// Creation of the load menu item
-		EventHandler<ActionEvent> eventLoad = new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
-				File file = fileChooser.showOpenDialog(mw.stage);
-				if(file != null)
-					loadXML(file);
-			}
-		};
-		MainWindow.addMenuItem("Load", eventLoad);
-		
-		// Creation of the save menu item
-		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
-				File file = fileChooser.showSaveDialog(mw.stage);
-				if(file != null)
-					saveXML(file);
-			}
-		};
-		MainWindow.addMenuItem("Save", eventSave);
 	}
 }

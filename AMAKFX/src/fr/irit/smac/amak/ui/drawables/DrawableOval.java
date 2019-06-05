@@ -1,6 +1,6 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import fr.irit.smac.amak.tools.RunLaterHelper;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 
@@ -10,11 +10,7 @@ public class DrawableOval extends Drawable {
 	public DrawableOval(double dx, double dy, double width, double height) {
 		super(dx, dy, width, height);
 		ellipse = new Ellipse();
-	}
-	
-	@Override
-	public void onAddedToVUI() {
-		RunLaterHelper.runLater(()-> vui.getCanvas().getChildren().add(ellipse));
+		defaultInit();
 	}
 
 	@Override
@@ -39,5 +35,10 @@ public class DrawableOval extends Drawable {
 	@Override
 	public void _show() {
 		ellipse.setVisible(true);
+	}
+
+	@Override
+	public Node getNode() {
+		return ellipse;
 	}
 }

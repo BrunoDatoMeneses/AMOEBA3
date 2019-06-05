@@ -31,12 +31,12 @@ public class Order {
 		@Override
 		protected void onSystemCycleEnd() {
 			if (!firstFound) {
-				Log.debug("test","First is MAS");
+				Log.defaultLog.debug("test","First is MAS");
 				firstFound = true;
 			}
 			
 			if (!lastExecutedWasEnvironment) {
-				Log.fatal("test", "last executed was not the environment");
+				Log.defaultLog.fatal("test", "last executed was not the environment");
 				System.exit(-1);
 			}
 			lastExecutedWasEnvironment = false;
@@ -50,7 +50,7 @@ public class Order {
 		@Override
 		public void onCycle() {
 			if (!firstFound) {
-				Log.debug("test","First is Environment");
+				Log.defaultLog.debug("test","First is Environment");
 				firstFound = true;
 			}
 			

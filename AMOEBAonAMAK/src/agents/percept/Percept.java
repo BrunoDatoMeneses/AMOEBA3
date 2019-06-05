@@ -13,7 +13,6 @@ import kernel.AMOEBA;
  *
  */
 public class Percept extends AmoebaAgent {
-	private static final long serialVersionUID = 1L;
 	private HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 
@@ -39,22 +38,21 @@ public class Percept extends AmoebaAgent {
 		validContextProjection = new HashSet<Context>();
 		
 		// To avoid unnecessary tests, we only compute validity on context
-		// validated by percepts that had finished before us
+		// validated by percepts that have finished before us
 		HashSet<Context> contexts = amas.getValidContexts();
 		if(contexts == null) {
 			// If we are one of the first percept to run, we compute validity on all contexts
 			contexts = new HashSet<>(amas.getContexts());
 		}
 		
-		if(!contexts.isEmpty()) {
-			for (Context c : contexts) {
-				if (contextProjections.get(c).contains(this.value)) {
-					validContextProjection.add(c);
-				}
-			} 
-			amas.updateValidContexts(validContextProjection);
-		}
-
+		for (Context c : contexts) {
+			if (contextProjections.get(c).contains(this.value)) {
+				validContextProjection.add(c);
+			}
+		} 
+		amas.updateValidContexts(validContextProjection);
+		
+		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
 	}
 
 	/**
@@ -95,6 +93,16 @@ public class Percept extends AmoebaAgent {
 	 */
 	public double getValue() {
 		return value;
+	}
+	
+	/**
+	 * Set the value of the percept.
+	 * Useful when loading a save.
+	 * 
+	 * @param value
+	 */
+	public void setValue(double value) {
+		this.value = value;
 	}
 
 	/**

@@ -148,7 +148,7 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 
 	protected void setAsynchronous() {
 		if (currentPhase != Phase.INITIALIZING)
-			Log.fatal("AMAK", "Asynchronous mode must be set during the initialization");
+			Log.defaultLog.fatal("AMAK", "Asynchronous mode must be set during the initialization");
 		this.synchronous = false;
 	}
 	/**
@@ -309,7 +309,7 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 				amas.informThatAgentDecisionAndActionAreFinished();
 				break;
 			default:
-				Log.fatal("AMAK", "An agent is being run in an invalid phase (%s)", currentPhase);
+				Log.defaultLog.fatal("AMAK", "An agent is being run in an invalid phase (%s)", currentPhase);
 			}
 		} else if (executionPolicy == ExecutionPolicy.ONE_PHASE) {
 			onePhaseCycle();
