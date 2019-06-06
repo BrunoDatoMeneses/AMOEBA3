@@ -7,6 +7,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * Drawable to point things on the VUI, use a '+' icon as graphical representation.
+ * @author Hugo
+ *
+ */
 public class DrawablePoint extends Drawable {
 
 	private FontIcon icon;

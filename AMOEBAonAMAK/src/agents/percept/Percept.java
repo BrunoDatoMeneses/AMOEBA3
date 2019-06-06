@@ -29,12 +29,37 @@ public class Percept extends AmoebaAgent {
 
 	@Override
 	protected void onAct() {
-		value = amas.getPerceptionsOrAction(name);
+		value = amas.getPerceptions(name);
 		ajustMinMax();
 		computeContextProjectionValidity();
 	}
 
 	public void computeContextProjectionValidity() {
+		/* The algorithm used here :
+		 * 
+		 * Variables :
+		 * global set allContexts
+		 * global set validContexts
+		 * local set myValidContexts
+		 * 
+		 * Algorithm : for each percept do :
+		 * myValidContexts <- validContexts
+		 * if myValidContexts = null then
+		 * 		myValidContexts <- allContexts
+		 * fi
+		 * 
+		 * for context in myValidContext do
+		 * 		if not isValid(context) then
+		 * 			myValidContexts.remove(context)
+		 * 		fi
+		 * done
+		 * 
+		 * validContexts <- intersect(validContexts, myValidContexts)
+		 * #we use an intersect to allow multithreading, avoiding that a percept override the work of another
+		 * 
+		 */
+		
+		
 		validContextProjection = new HashSet<Context>();
 		
 		// To avoid unnecessary tests, we only compute validity on context

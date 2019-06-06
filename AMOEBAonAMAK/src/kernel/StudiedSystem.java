@@ -3,6 +3,8 @@ package kernel;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import agents.percept.Percept;
+
 /**
  * Any system studied by an instance of AMOEBA must implement this interface.
  * 
@@ -10,15 +12,14 @@ import java.util.HashMap;
 public interface StudiedSystem extends Serializable{
 
 	/**
-	 * When the scheduler of AMOEBA has run one cycle, playOneStep is called to
-	 * allow the studied system to perform it's own cycle.
+	 * Tell the StudiedSystem to advance its simulation of one step
 	 */
 	public void playOneStep();
 
 	/**
-	 * Gets the output.
+	 * Gets the output for the current step.
 	 * 
-	 * @return the output
+	 * @return an {@link HashMap} containing a value for each {@link Percept} of an {@link AMOEBA} and a value for the oracle.
 	 */
 	public HashMap<String, Double> getOutput();
 	

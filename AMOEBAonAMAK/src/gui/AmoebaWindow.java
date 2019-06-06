@@ -20,6 +20,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import kernel.AMOEBA;
+import kernel.SaveHelper;
 
 /**
  * The main window for AMOEBA GUI.
@@ -28,8 +29,11 @@ import kernel.AMOEBA;
  */
 public class AmoebaWindow extends MainWindow {
 
-	private HashMap<String, AmakPlot> plots = new HashMap<>();
+	protected HashMap<String, AmakPlot> plots = new HashMap<>();
 	
+	/**
+	 * The main {@link VUI} for AMOEBA, by default it's the 2D representation of the contexts.
+	 */
 	public VUI mainVUI;
 	
 	public Drawable point;
@@ -52,7 +56,7 @@ public class AmoebaWindow extends MainWindow {
 		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());
 		AmoebaWindow.addToolbar(schedulerToolbar);	
 		
-		// amoeba and agent
+		// plots
 		point = mainVUI.createAndAddPoint(0, 0);
 		point.setName("Cursor");
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
@@ -119,10 +123,33 @@ public class AmoebaWindow extends MainWindow {
 		return (AmoebaWindow) instance;
 	}
 	
+	/**
+	 * Get an existing {@link AmakPlot}. 
+	 * @param name name of the plot to get
+	 * @return an existing plot.
+	 * @see AmoebaWindow#addPlot(String, AmakPlot)
+	 */
 	public AmakPlot getPlot(String name) {
 		return plots.get(name);
 	}
 	
+	/**
+	 * Add an {@link AmakPlot} to le map of plots. Allowing for easy access with {@code AmoebaWindow.instance().getPlot(name)}
+	 * @param name name of the plot to add
+	 * @param plot the plot to add
+	 * @see AmoebaWindow#getPlot(String)
+	 */
+	public void addPlot(String name, AmakPlot plot) {
+		plots.put(name, plot);
+	}
+	
+	/**
+	 * Create a button 'Quick Save' button, when clicked create a manual save point using an amoeba's saver.
+	 * @param amoeba
+	 * @return
+	 * @see AMOEBA#saver
+	 * @see SaveHelper#newManualSave(String)
+	 */
 	public Button newManualSaveButton(AMOEBA amoeba) {
 		Button button = new Button("Quick save");
 		button.setTooltip(new Tooltip("Create a new save point. You will be able to find it in 'Save Explorer' -> 'Manual Saves'"));

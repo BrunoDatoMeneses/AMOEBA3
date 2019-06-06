@@ -24,10 +24,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import kernel.AMOEBA;
+import kernel.SaveHelper;
 import kernel.StudiedSystem;
 
 /**
- * Graphical element to browse and load (auto)save for a specific amoeba. 
+ * Graphical element to browse and load (auto)saves for a specific amoeba. 
+ * @see SaveHelper
+ * @see AMOEBA
  * @author Hugo
  *
  */
@@ -38,19 +41,24 @@ public class SaveExplorer extends VBox {
 	@FXML private ComboBox<String> comboBoxA;
 	@FXML private ComboBox<String> comboBoxM;
 	
+	/**
+	 * create a SaveExplorer for an AMOEBA.
+	 * The amoeba MUST have a working {@link AMOEBA#saver}.
+	 * @param amoeba
+	 * @see SaveHelper
+	 */
 	public SaveExplorer(AMOEBA amoeba) {
 		this.amoeba = amoeba;
 		try {
+			//load the fxml for THIS SaveExplorer
 			VBox root = FXMLLoader.load(getClass().getResource("SaveExplorer.fxml"), null, null, new Callback<Class<?>, Object>() {
 				@Override
 				public Object call(Class<?> param) {
 					return SaveExplorer.this;
 				}
 			});
-			//System.out.println(root.getChildren());
 			this.getChildren().add(root);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -60,6 +68,7 @@ public class SaveExplorer extends VBox {
 		
 	}
 	
+	// Handler, A : Auto saves, M : Manual saves. --------
 	@FXML protected void handleRefresh(ActionEvent event) {
 		update();
 	}
@@ -129,7 +138,11 @@ public class SaveExplorer extends VBox {
 	@FXML protected void handlePreviewM(ActionEvent event) {
 		quickDisplay(Paths.get(comboBoxM.getValue()));
 	}
+	// ---------------------------------------------------
 	
+	/**
+	 * Update the list of available saves
+	 */
 	public void update() {
 		comboBoxA.getItems().clear();
 		List<Path> la = amoeba.saver.listAutoSaves();
@@ -165,6 +178,10 @@ public class SaveExplorer extends VBox {
 		}
 	}
 	
+	/**
+	 * Configure a ComboBox to display a preview when its value is changed
+	 * @param cb
+	 */
 	private void quickDisplayCombobox(ComboBox<String> cb) {
 		cb.valueProperty().addListener(new ChangeListener<String>() {
 			@Override
@@ -176,10 +193,10 @@ public class SaveExplorer extends VBox {
 	}
 	
 	/**
-	 * Create the preview of a save file
-	 * @param path
+	 * Create/update the preview in the SaveExplorer based on a save file.
+	 * @param path path to the save file to preview
 	 */
-	public void quickDisplay(Path path) {
+	private void quickDisplay(Path path) {
 		VUI vui = VUI.get("Save Explorer");
 		if(!this.getChildren().contains(vui.getPanel())) {
 			vui.setDefaultView(200, 0, 0);
@@ -241,7 +258,7 @@ public class SaveExplorer extends VBox {
 		amoeba.saver.deleteFolderOnClose = false;
 		//amoeba.allowGraphicalScheduler(false);
 		for(Percept p : amoeba.getPercepts()) {
-			p.setValue(amoeba.getPerceptionsOrAction(p.getName()));
+			p.setValue(amoeba.getPerceptions(p.getName()));
 		}
 		amoeba.updateAgentsVisualisation();
 	}
