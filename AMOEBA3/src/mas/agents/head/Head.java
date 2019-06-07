@@ -68,23 +68,14 @@ public class Head extends AbstractHead implements Cloneable{
 	private int numberOfCriticityValuesForAverage = 100;
 	private int numberOfCriticityValuesForAverageforVizualisation = 300;
 	
-	private int nConflictBeforeAugmentation = 1;
-	private int nSuccessBeforeDiminution = 50;
-	private int perfIndicator = 1;
-	private int perfMappingIndicator = 1;
-	private int nConflictBeforeInexactAugmentation = 2;
-	private int nSuccessBeforeInexactDiminution = 50;
-	private int perfIndicatorInexact = 0;
+	
 	
 	private double prediction;
 	private Double endogenousPredictionActivatedContextsOverlaps =0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence=0.0;
-	
 	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence=0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence=0.0;
-	
 	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume=0.0;
-	
 	private Double endogenousPredictionActivatedContextsSharedIncompetence=0.0;
 	private Double endogenousPredictionNContexts=0.0;
 	private Double endogenousPredictionNContextsByInfluence=0.0;
@@ -92,20 +83,16 @@ public class Head extends AbstractHead implements Cloneable{
 	private double oracleValue;
 	private double oldOracleValue;
 	private double criticity;
+	private double distanceToRegression;
 	private double oldCriticity;
 
 	
 	private double spatialGeneralizationScore = 0;
 	
-	private double errorAllowed  = 1.0;
-	private double augmentationFactorError = 1.05;
-	private double diminutionFactorError = 0.9;
-	private double minErrorAllowed = 1.00;
-	private double inexactAllowed  = 0.4;
-	private double augmentationInexactError = 1.8;
-	private double diminutionInexactError = 0.6;
-	private double minInexactAllowed = 0.5;
-	private double mappingErrorAllowed;
+
+	DynamicPerformance predictionPerformance;
+	DynamicPerformance regressionPerformance;
+	DynamicPerformance mappingPerformance;
 	
 	
 	private boolean noCreation = true;
@@ -157,50 +144,23 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	public double learningSpeed = 0.25;
 	public int numberOfPointsForRegression = 50;
+	
+	public boolean contextNotFinished = false;
 
-	/**
-	 * Sets the data for error margin.
-	 *
-	 * @param errorAllowed the error allowed
-	 * @param augmentationFactorError the augmentation factor error
-	 * @param diminutionFactorError the diminution factor error
-	 * @param minErrorAllowed the min error allowed
-	 * @param nConflictBeforeAugmentation the n conflict before augmentation
-	 * @param nSuccessBeforeDiminution the n success before diminution
-	 */
+	
 	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError, double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
-		this.errorAllowed = errorAllowed;
-		this.augmentationFactorError = augmentationFactorError;
-		this.diminutionFactorError = diminutionFactorError;
-		this.minErrorAllowed = minErrorAllowed;
-		this.nConflictBeforeAugmentation = nConflictBeforeAugmentation;
-		this.nSuccessBeforeDiminution = nSuccessBeforeDiminution;
+		
+		predictionPerformance = new DynamicPerformance(nSuccessBeforeDiminution, nConflictBeforeAugmentation, errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed);
+	
+		regressionPerformance = new DynamicPerformance(100, 100, 3000, 0.5, 0.5, 1);
+		
+		mappingPerformance = new DynamicPerformance(100000, 1000000, world.getMappingErrorAllowed(), 1.1, 0.9, 1);
 	}
 	
-	/**
-	 * Sets the data for inexact margin.
-	 *
-	 * @param inexactAllowed the inexact allowed
-	 * @param augmentationInexactError the augmentation inexact error
-	 * @param diminutionInexactError the diminution inexact error
-	 * @param minInexactAllowed the min inexact allowed
-	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact augmentation
-	 * @param nSuccessBeforeInexactDiminution the n success before inexact diminution
-	 */
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError, double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation, int nSuccessBeforeInexactDiminution) {
-		this.inexactAllowed = inexactAllowed;
-		this.augmentationInexactError = augmentationInexactError;
-		this.diminutionInexactError = diminutionInexactError;
-		this.minInexactAllowed = minInexactAllowed;
-		this.nConflictBeforeInexactAugmentation = nConflictBeforeInexactAugmentation;
-		this.nSuccessBeforeInexactDiminution = nSuccessBeforeInexactDiminution;
-	}
-
-	/**
-	 * Instantiates a new head.
-	 *
-	 * @param world the world
-	 */
+	
+	
+	
+	
 	public Head(World world) {
 		super(world);
 		
@@ -215,18 +175,17 @@ public class Head extends AbstractHead implements Cloneable{
 			sharedIncompetenceContextPairs.put(pct, new ContextPair<Context,Context>(null,null));
 			}
 		
-		mappingErrorAllowed =world.getMappingErrorAllowed();// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+		   
+		//mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+
 		
 		criticalities = new Criticalities(numberOfCriticityValuesForAverage);
-		
 		endogenousCriticalities = new Criticalities(numberOfCriticityValuesForAverageforVizualisation);
 		
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see agents.head.AbstractHead#computeAMessage(agents.messages.Message)
-	 */
+
 	@Override
 	public void computeAMessage(Message m) {
 		// contexts.clear();
@@ -238,17 +197,17 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	public void addPartiallyActivatedContext(Percept nonValidPercept,Context validContextExecptOnTheNonValidPercept) {
 		partiallyActivatedContexts.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
-		//////////System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
+
 	} 
 	
 	public void addPartiallyActivatedContextInNeighbors(Percept nonValidPercept,Context validContextExecptOnTheNonValidPercept) {
 		partiallyActivatedContextInNeighbors.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
-		//////////System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
+
 	} 
 	
 	public void addPartialRequestNeighborContext(Percept nonValidPercept,Context validContextNeighborExecptOnTheNonValidPercept) {
 		partialNeighborContexts.get(nonValidPercept).add(validContextNeighborExecptOnTheNonValidPercept);
-		//////////System.out.println(pct.getName() + " " + partialyActivatedContexts.get(pct).size());
+
 	} 
 
 	/**
@@ -336,7 +295,7 @@ public class Head extends AbstractHead implements Cloneable{
 		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
 		
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
-		selfAnalysationOfContexts3();
+		selfAnalysationOfContexts4();
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
 		
 		world.getAmoeba().PAUSE("BEFORE HEAD NCS ");
@@ -418,8 +377,8 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		}
 
-		
-		mappingErrorAllowed =world.getMappingErrorAllowed();// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+		mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(), world.getScheduler().getPercepts().size());
+
 		
 		
 		evolutionCriticalityPrediction = (lembda * evolutionCriticalityPrediction) + ((1-lembda)*currentCriticalityPrediction);
@@ -495,7 +454,7 @@ public class Head extends AbstractHead implements Cloneable{
 			noBestContext = false;
 			prediction = bestContext.getActionProposal();
 		} else {
-			////////System.out.println("NO BEST ...");
+
 			noBestContext = true;
 			ArrayList<Agent> allContexts = world.getScheduler().getContexts();
 			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
@@ -571,17 +530,17 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		Double endogenousSumTerm = 0.0;
 		Double endogenousNormalizationTerm = 0.0;
-		////////System.out.println("NEIGHBORS : " + activatedNeighborsContexts.size());
+
 		for(Context ctxt :activatedNeighborsContexts) {
 			endogenousSumTerm += ctxt.getInfluenceWithConfidence(currentSituation)*ctxt.getActionProposal();
 			endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
 		}
 		endogenousPredictionNContexts = endogenousSumTerm/endogenousNormalizationTerm;
-		////////System.out.println("ENDO PRED N CTXT : " + endogenousPredictionNContexts);
+
 		
 		// Endogenous prediction N contexts by influence //
 		
-		////////System.out.println("憺~憺~憺~憺~憺~憺~憺~憺~憺~憺~憺~~ INFLUENCES" + currentSituation);
+
 		
 		maxConfidence = Double.NEGATIVE_INFINITY;
 		minConfidence = Double.POSITIVE_INFINITY;
@@ -597,10 +556,10 @@ public class Head extends AbstractHead implements Cloneable{
 			
 			if(ctxt.getInfluenceWithConfidence(currentSituation)> 0.5) {
 				contextsNeighborsByInfluence.add(ctxt);
-				////////System.out.println(ctxt);
+
 			}
 		}
-		////////System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + minConfidence + " ; " + maxConfidence + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
 		
 		endogenousSumTerm = 0.0;
 		endogenousNormalizationTerm = 0.0;
@@ -666,7 +625,7 @@ public class Head extends AbstractHead implements Cloneable{
 		//Test if there are surrounding contexts
 		boolean testSurroudingContext = false;
 		
-		//////////System.out.println("SURROUNDING CONTEXTS ...");
+
 		for(Percept pct : this.world.getScheduler().getPercepts()) {
 			
 			computeNearestContextsByPercept(pct);			
@@ -677,7 +636,7 @@ public class Head extends AbstractHead implements Cloneable{
 		//displayContexts();
 		
 		for(Percept pcpt : this.world.getScheduler().getPercepts()) {
-			//////System.out.print("SURROUNDING CONTEXTS ... " + pcpt.getName() + " ");
+
 			requestSurroundings.get(pcpt).print(pcpt);
 			if(sharedIncompetenceContextPairs.get(pcpt) != null) {
 				if(sharedIncompetenceContextPairs.get(pcpt).containTwoContexts()) {
@@ -689,7 +648,7 @@ public class Head extends AbstractHead implements Cloneable{
 			
 		}
 		
-		//////////System.out.println("TEST SURROUNDING CONTEXTS ..." + testSurroudingContext);
+
 		return testSurroudingContext;
 	}
 	
@@ -698,11 +657,11 @@ public class Head extends AbstractHead implements Cloneable{
 		
 		
 		
-		////System.out.print(range + " ranges list" + "  ");
+		System.out.print(range + " ranges list" + "  ");
 		for(Context ctxt : list) {
-			////System.out.print(ctxt.getRanges().get(prct).getRange(range) + "  ");
+			System.out.print(ctxt.getRanges().get(prct).getRange(range) + "  ");
 		}
-		////////System.out.println(" ");
+		System.out.println(" ");
 		
 	}
 	
@@ -1039,11 +998,11 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void NCSDetection_Concurrence() {
 		/*If result is good, shrink redundant context (concurrence NCS)*/
-		if (bestContext != null && criticity <= this.errorAllowed) {
+		if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 			
 			for (int i = 0 ; i < activatedContexts.size() ; i++) {
 				
-				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && this.getCriticity(activatedContexts.get(i)) <= this.errorAllowed) {
+				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && this.getCriticity(activatedContexts.get(i)) <= predictionPerformance.getPerformanceIndicator()) {
 					
 					activatedContexts.get(i).solveNCS_Concurrence(this);
 				}
@@ -1053,7 +1012,7 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void NCSDetection_IncompetentHead() {
 		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
-		if (activatedContexts.isEmpty() || (criticity > this.errorAllowed && !oneOfProposedContextWasGood())){
+		if (activatedContexts.isEmpty() || (criticity > predictionPerformance.getPerformanceIndicator() && !oneOfProposedContextWasGood())){
 			
 			Context c = getNearestGoodContext(activatedNeighborsContexts);
 			//Context c = getSmallestGoodContext(activatedNeighborsContexts);
@@ -1167,6 +1126,60 @@ public class Head extends AbstractHead implements Cloneable{
 			selfAnalysationOfContextOnUniqueActivatedContext();
 			
 		}
+			
+		for (Context ctxt : activatedNeighborsContexts) {
+
+			if(!activatedContexts.contains(ctxt)) {
+				ctxt.NCSDetection_Uselessness();
+			}
+			
+		}
+	}
+	
+	private void selfAnalysationOfContexts4() {
+
+		double 	currentDistanceToOraclePrediction;
+		Context closestContextToOracle = null;
+		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
+		
+		for (Context activatedContext : activatedContexts) {
+			currentDistanceToOraclePrediction = activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment());
+			distanceToRegression = currentDistanceToOraclePrediction;
+			
+			
+			
+			
+			
+			contextNotFinished = false;
+			world.trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",activatedContext.getName(),  ""+activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment())))); 
+			if(!activatedContext.getLocalModel().finishedFirstExperiments()) {
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+				contextNotFinished = true;
+			}
+			
+			else if(currentDistanceToOraclePrediction<regressionPerformance.getPerformanceIndicator()) {
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
+				
+			}
+			
+			
+			if(currentDistanceToOraclePrediction<minDistanceToOraclePrediction) {
+				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+				closestContextToOracle = activatedContext;
+			}
+			
+			if(!contextNotFinished) {
+				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+			}
+				
+		}
+		
+		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
+		for (Context activatedContext : activatedContexts) {	
+			activatedContext.analyzeResults4(this, closestContextToOracle);
+				
+		}
+		activatedContexts = activatedContextsCopyForUpdates;
 			
 		for (Context ctxt : activatedNeighborsContexts) {
 
@@ -1332,7 +1345,7 @@ public class Head extends AbstractHead implements Cloneable{
 	public Context getNearestGoodContext(ArrayList<Context> allContext) {
 		Context nearest = null;
 		for (Context c : allContext) {
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator() && c != newContext && !c.isDying()) {
 				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest) ) {
 					nearest = c;
 				}
@@ -1350,7 +1363,7 @@ public class Head extends AbstractHead implements Cloneable{
 		double currentVolume;
 		for (Context c : neighbors) {
 			currentVolume = c.getVolume();
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator() && c != newContext && !c.isDying()) {
 				if (smallest == null || currentVolume < minVolume ) {
 					smallest = c;
 				}
@@ -1396,7 +1409,7 @@ public class Head extends AbstractHead implements Cloneable{
 		double d = Double.MAX_VALUE;
 		Context nearestGoodContext = null;
 		for (Context c : contextNeighbors) {
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c != newContext && !c.isDying()) {
+			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator() && c != newContext && !c.isDying()) {
 				if (getExternalDistanceToContext(c) < d ) {
 					d = getExternalDistanceToContext(c);
 					nearestGoodContext = c;
@@ -1489,7 +1502,7 @@ public class Head extends AbstractHead implements Cloneable{
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
-			if (oracleValue - c.getActionProposal() < errorAllowed) {
+			if (oracleValue - c.getActionProposal() < predictionPerformance.getPerformanceIndicator()) {
 				b = true;
 			}
 		}
@@ -1563,65 +1576,13 @@ public class Head extends AbstractHead implements Cloneable{
 		}
 		
 		
-		
-		
-		if (criticalities.getCriticalityMean("predictionCriticality") > errorAllowed) {
-			perfIndicator--;
-		} else {
-			perfIndicator++;
-		}
-		
-
-		
-
-		
-		
-		if (perfMappingIndicator <= nConflictBeforeAugmentation * (-1)) {
-			perfMappingIndicator = 0;
-			//mappingErrorAllowed += augmentationFactorError * averageMappingCriticity;
-			//world.setMappingErrorAllowed(mappingErrorAllowed);
-			//////////System.out.println("中中中中中中中中中中中  augmentationFactorError :" + augmentationFactorError);
-		}
-		
-		if (perfMappingIndicator >= nSuccessBeforeDiminution) {
-			perfMappingIndicator = 0;
-			//mappingErrorAllowed -= diminutionFactorError * averageMappingCriticity;
-			//world.setMappingErrorAllowed(mappingErrorAllowed);
-			//////////System.out.println("中中中中中中中中中中中  diminutionFactorError :" + diminutionFactorError);
+		predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
+		if(criticalities.getCriticalityMean("distanceToRegression")!=null){
+			regressionPerformance.update(criticalities.getCriticalityMean("distanceToRegression"));
 		}
 		
 		
-		if (perfIndicator <= nConflictBeforeAugmentation * (-1)) {
-			perfIndicator = 0;
-			errorAllowed += augmentationFactorError * criticalities.getCriticalityMean("predictionCriticality");
-			//////////System.out.println("中中中中中中中中中中中  augmentationFactorError :" + augmentationFactorError);
-		}
-		
-		if (perfIndicator >= nSuccessBeforeDiminution) {
-			perfIndicator = 0;
-			errorAllowed -= diminutionFactorError * criticalities.getCriticalityMean("predictionCriticality");
-			//////////System.out.println("中中中中中中中中中中中  diminutionFactorError :" + diminutionFactorError);
-			errorAllowed = Math.max(minErrorAllowed, errorAllowed);
-		}
-		
-		if (perfIndicatorInexact <= nConflictBeforeInexactAugmentation * (-1)) {
-			perfIndicatorInexact = 0;
-			inexactAllowed *= augmentationInexactError;
-			//////////System.out.println("中中中中中中中中中中中  augmentationInexactError :" + augmentationInexactError);
-		}
-		
-		if (perfIndicatorInexact >= nSuccessBeforeInexactDiminution) {
-			perfIndicatorInexact = 0;
-			inexactAllowed *= diminutionInexactError;
-			inexactAllowed = Math.max(minInexactAllowed, inexactAllowed);
-			//////////System.out.println("中中中中中中中中中中中  diminutionInexactError :" + diminutionInexactError);
-
-		}
-		
-//		inexactAllowed = averagePredictionCriticity / 2;
-//		errorAllowed = 3 * inexactAllowed;
-		
-		//numberOfCriticityValuesForAverage
+		//mappingPerformance.update(?);
 	}
 
 
@@ -1884,7 +1845,7 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @return the error allowed
 	 */
 	public double getErrorAllowed() {
-		return errorAllowed;
+		return predictionPerformance.getPerformanceIndicator();
 	}
 
 	/**
@@ -1893,7 +1854,7 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @param errorAllowed the new error allowed
 	 */
 	public void setErrorAllowed(double errorAllowed) {
-		this.errorAllowed = errorAllowed;
+		predictionPerformance.setPerformanceIndicator(errorAllowed);
 	}
 
 	/**
@@ -2005,145 +1966,9 @@ public class Head extends AbstractHead implements Cloneable{
 		this.functionSelected = functionSelected;
 	}
 
-	/**
-	 * Gets the inexact allowed.
-	 *
-	 * @return the inexact allowed
-	 */
-	public double getInexactAllowed() {
-		return inexactAllowed;
-	}
 
-	/**
-	 * Sets the inexact allowed.
-	 *
-	 * @param inexactAllowed the new inexact allowed
-	 */
-	public void setInexactAllowed(double inexactAllowed) {
-		this.inexactAllowed = inexactAllowed;
-	}
 
-	/**
-	 * Gets the augmentation factor error.
-	 *
-	 * @return the augmentation factor error
-	 */
-	public double getAugmentationFactorError() {
-		return augmentationFactorError;
-	}
 
-	/**
-	 * Sets the augmentation factor error.
-	 *
-	 * @param augmentationFactorError the new augmentation factor error
-	 */
-	public void setAugmentationFactorError(double augmentationFactorError) {
-		this.augmentationFactorError = augmentationFactorError;
-	}
-
-	/**
-	 * Gets the diminution factor error.
-	 *
-	 * @return the diminution factor error
-	 */
-	public double getDiminutionFactorError() {
-		return diminutionFactorError;
-	}
-
-	/**
-	 * Sets the diminution factor error.
-	 *
-	 * @param diminutionFactorError the new diminution factor error
-	 */
-	public void setDiminutionFactorError(double diminutionFactorError) {
-		this.diminutionFactorError = diminutionFactorError;
-	}
-
-	
-
-	
-
-	
-
-	
-
-	/**
-	 * Gets the min error allowed.
-	 *
-	 * @return the min error allowed
-	 */
-	public double getMinErrorAllowed() {
-		return minErrorAllowed;
-	}
-
-	/**
-	 * Sets the min error allowed.
-	 *
-	 * @param minErrorAllowed the new min error allowed
-	 */
-	public void setMinErrorAllowed(double minErrorAllowed) {
-		this.minErrorAllowed = minErrorAllowed;
-	}
-
-	/**
-	 * Gets the augmentation inexact error.
-	 *
-	 * @return the augmentation inexact error
-	 */
-	public double getAugmentationInexactError() {
-		return augmentationInexactError;
-	}
-
-	/**
-	 * Sets the augmentation inexact error.
-	 *
-	 * @param augmentationInexactError the new augmentation inexact error
-	 */
-	public void setAugmentationInexactError(double augmentationInexactError) {
-		this.augmentationInexactError = augmentationInexactError;
-	}
-
-	/**
-	 * Gets the diminution inexact error.
-	 *
-	 * @return the diminution inexact error
-	 */
-	public double getDiminutionInexactError() {
-		return diminutionInexactError;
-	}
-
-	/**
-	 * Sets the diminution inexact error.
-	 *
-	 * @param diminutionInexactError the new diminution inexact error
-	 */
-	public void setDiminutionInexactError(double diminutionInexactError) {
-		this.diminutionInexactError = diminutionInexactError;
-	}
-
-	
-
-	
-
-	
-
-	/**
-	 * Gets the min inexact allowed.
-	 *
-	 * @return the min inexact allowed
-	 */
-	public double getMinInexactAllowed() {
-		return minInexactAllowed;
-	}
-
-	/**
-	 * Sets the min inexact allowed.
-	 *
-	 * @param minInexactAllowed the new min inexact allowed
-	 */
-	public void setMinInexactAllowed(double minInexactAllowed) {
-		this.minInexactAllowed = minInexactAllowed;
-	}
 
 	/**
 	 * Gets the n propositions received.
@@ -2486,9 +2311,17 @@ public class Head extends AbstractHead implements Cloneable{
 	}
 	
 	public double getMappingErrorAllowed() {
-		return mappingErrorAllowed;
+		return mappingPerformance.getPerformanceIndicator();
 	}
 	
+	
+	public double getDistanceToRegression() {
+		return distanceToRegression;
+	}
+	
+	public double getDistanceToRegressionAllowed() {
+		return regressionPerformance.getPerformanceIndicator();
+	}
 }
 
 

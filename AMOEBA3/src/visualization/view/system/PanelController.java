@@ -92,6 +92,16 @@ public class PanelController extends JPanel implements ScheduledItem {
 	/** The dataset binary. */
 	XYSeriesCollection datasetMappingCriticality;
 	
+	/** The chart panel distances to models. */
+	/* distance to model chart */
+	ChartPanel chartPanelDistanceToModel;
+	
+	/** The chart binary. */
+	JFreeChart chartDistanceToModel;
+	
+	/** The dataset binary. */
+	XYSeriesCollection datasetDistanceToModel;
+	
 	/** The controller. */
 	Head controller;
 	
@@ -175,6 +185,13 @@ public class PanelController extends JPanel implements ScheduledItem {
 		chartPanelMappingCriticality = new ChartPanel(chartMappingCriticality);
 		chartPanelMappingCriticality.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
 		this.add(chartPanelMappingCriticality);
+		
+		/* Create distance to model chart */
+		datasetDistanceToModel = createDatasetDistanceToModel();
+		JFreeChart chartDistanceToModel = createChartDistanceToModel();
+		chartPanelDistanceToModel = new ChartPanel(chartDistanceToModel);
+		chartPanelDistanceToModel.setPreferredSize(new java.awt.Dimension(sizeX, sizeY));
+		this.add(chartPanelDistanceToModel);
 
 	}
 
@@ -309,6 +326,21 @@ public class PanelController extends JPanel implements ScheduledItem {
 		collection.addSeries(new XYSeries("averagelocalVoidMappingCriticality"));
 		collection.addSeries(new XYSeries("averagelocalOpenVoidMappingCriticality"));
 		collection.addSeries(new XYSeries("allowedMappingCriticality"));
+		
+		
+
+		return collection;
+	}
+	
+	private XYSeriesCollection createDatasetDistanceToModel() {
+
+		XYSeriesCollection collection = new XYSeriesCollection();
+
+		
+		
+		collection.addSeries(new XYSeries("distanceToModel"));
+		collection.addSeries(new XYSeries("averageDistanceToModel"));
+		collection.addSeries(new XYSeries("distanceToModelAllowed"));
 		
 		
 
@@ -473,6 +505,29 @@ public class PanelController extends JPanel implements ScheduledItem {
 				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 	}
 	
+	private JFreeChart createChartDistanceToModel() {
+
+		// create subplot 1...
+		final XYDataset data1 = datasetDistanceToModel;
+		final XYItemRenderer renderer1 = new StandardXYItemRenderer();
+		final NumberAxis rangeAxis1 = new NumberAxis("DistanceToModel");
+		final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
+		subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+
+		// parent plot...
+		final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(
+				new NumberAxis("Tick"));
+		plot.setGap(10.0);
+
+		// add the subplots...
+		plot.add(subplot1, 1);
+		plot.setOrientation(PlotOrientation.VERTICAL);
+
+		// return a new chart containing the overlaid plot...
+		return new JFreeChart("DistanceToModel",
+				JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+	}
+	
 	/* (non-Javadoc)
 	 * @see view.system.ScheduledItem#update()
 	 */
@@ -528,6 +583,10 @@ public class PanelController extends JPanel implements ScheduledItem {
 		
 		
 		datasetMappingCriticality.getSeries("allowedMappingCriticality").add(world.getScheduler().getTick(),controller.getMappingErrorAllowed());
+		
+		datasetDistanceToModel.getSeries("distanceToModel").add(world.getScheduler().getTick(), controller.getDistanceToRegression());
+		datasetDistanceToModel.getSeries("averageDistanceToModel").add(world.getScheduler().getTick(), controller.criticalities.getCriticalityMean("distanceToRegression"));
+		datasetDistanceToModel.getSeries("distanceToModelAllowed").add(world.getScheduler().getTick(), controller.getDistanceToRegressionAllowed());
 		
 	}
 

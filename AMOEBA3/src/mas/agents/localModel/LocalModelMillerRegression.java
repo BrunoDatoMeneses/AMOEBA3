@@ -577,5 +577,9 @@ public class LocalModelMillerRegression extends LocalModelAgent implements Seria
 		}
 		return coefsString;
 	}
+	
+	public boolean finishedFirstExperiments() {
+		return firstExperiments.size()>= (nParameters + 2);
+	}
 
 }

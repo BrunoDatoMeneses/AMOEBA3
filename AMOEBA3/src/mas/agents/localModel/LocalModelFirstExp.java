@@ -116,4 +116,10 @@ public class LocalModelFirstExp extends LocalModelAgent implements Serializable{
 		
 	}
 
+	@Override
+	public boolean finishedFirstExperiments() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

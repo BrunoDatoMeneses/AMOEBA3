@@ -31,7 +31,6 @@ public class AMOEBA_UI {
 	void init(){
 		amoeba.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoeba.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoeba.getScheduler().getHeadAgent().setDataForInexactMargin(0.1, 1, 1, 0.1, 10, 100);
 		amoeba.setAVT_acceleration(1.1f);
 		amoeba.setAVT_deceleration(0.1);
 		amoeba.setAVT_percentAtStart(0.1f);

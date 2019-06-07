@@ -9,9 +9,10 @@ public class StabilityXP {
 
 	public static final int dimension = 30	;
 	public static final int regressionPoints = 50;
-	public static final int cycles = 100000	;
+	public static final int cycles = 10000	;
 	public static final double spaceSize = 50.0	;
-	public static final double noise = 1.0	;
+	public static final double noiseMean = 0.0	;
+	public static final double noiseVariance = 0.1	;
 	public static final double coefsMarges = 255	;
 	
 	static double[] initCoefs = new double[dimension+1];
@@ -21,12 +22,13 @@ public class StabilityXP {
 		
 		
 		String fileName = fileName(new ArrayList<String>(Arrays.asList(
-				"03012019","RegressionStability",
+				"05012019","RegressionStability",
 				"Dim",""+dimension,
 				"RegressionPoints",""+regressionPoints,
 				"Cyles",""+cycles,
 				"SpaceSize",""+spaceSize,
-				"Noise",""+noise,
+				"NoiseMean",""+noiseMean,
+				"NoiseVariance",""+noiseVariance,
 				"CoefsMarges",""+coefsMarges
 				)));
 		
@@ -46,11 +48,11 @@ public class StabilityXP {
 		
 		for(int i=0;i<cycles;i++) {
 			
-			regressionManager.updateModelWithArtificialPoints(regressionPoints, noise);
+			regressionManager.updateModelWithArtificialPoints(regressionPoints, noiseMean, noiseVariance);
 			
 			updateErrors(regressionManager.getCoefs());
 			
-			if(i%100000==0) System.out.println(i);
+			if(i%100000==0 && i>0) System.out.println(i);
 			
 			writeMessage(file,errors,i);
 			
@@ -58,8 +60,10 @@ public class StabilityXP {
 		
 		display(regressionManager.getCoefs());
 		display(errors);
-		System.out.println(errorsSum());
-		System.out.println(((float)(errorsMean()*100)) + " %");
+
+		System.out.println("MEAN ERROR " + ((float)(errorsMean()*100)) + " %");
+		System.out.println("MAX ERROR " + ((float)(errorsMax()*100)) + " %");
+		
 		
 		file.close();
 		
@@ -115,6 +119,15 @@ public class StabilityXP {
 			mean+=errors[i];
 		}
 		return mean/errors.length;
+	}
+	
+	public static double errorsMax() {
+		double max = 0.0;
+		for(int i=0;i<errors.length;i++) {
+			if(errors[i]>max)
+			max=errors[i];
+		}
+		return max;
 	}
 	
 	public static String fileName(ArrayList<String> infos) {

@@ -22,9 +22,33 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		testCompteurTailleN();
+		testBruitGaussien();
 		
 	}
+	
+	public static void testBruitGaussien() {
+		
+		double noiseVariance = 0.1;
+		double noiseMean = 0;
+		
+		double max = 0;
+		
+		java.util.Random r = new java.util.Random();
+		
+		for(int i =0;i<100000;i++) {
+			double noise = r.nextGaussian() * Math.sqrt(noiseVariance) + noiseMean;
+			System.out.println(noise);
+			if(Math.abs(noise)>max) {
+				max = Math.abs(noise);
+			}
+		}
+		
+		System.out.println("-->" + max);
+		
+		
+		
+	}
+	
 	
 	public static void testCombinaisons() {
 		ArrayList<String> lettres = new ArrayList<String>();

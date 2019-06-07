@@ -399,72 +399,54 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 	
 	private void classicEndAdapt(double oracleValue, double increment) {
-		if (!(contains(oracleValue) == 0.0)) {  
+		if (!(contains(oracleValue) == 0.0)) {  // value not contained --> end range will grow (growing direction = 1)
 			
 			
-			if(lastEndDirection == -1) {
+			if(lastEndDirection == -1) { // opposite direction -> negative feedback
 				endCriticality = 1;
 			}
-			else if(lastEndDirection == 1) {
+			else if(lastEndDirection == 1) { // same direction -> positive feedback
 				endCriticality = 0;
 			}
-			lastEndDirection = 1;
+			lastEndDirection = 1;  // growing direction
 			
-			if(endCriticality == 1) {
+			if(endCriticality == 1) { // negative feedback -> increment decreases
 				endIncrement /=3;
 			}
-			else if(endCriticality == 0) {
+			else if(endCriticality == 0) { // positive feedback -> increment increases
 				endIncrement = Math.min(percept.getRadiusContextForCreation(), endIncrement*2);
 				//endIncrement *=2;
 			}
 			
-//			System.out.println(world.getScheduler().getTick() + " " +
-//					this.context.getName() + " " +
-//					this.percept.getName()+ " " +
-//					lastEndDirection + " " +
-//					 " ++ " +
-//					endCriticality + " " +
-//					endIncrement 
-//					);
 			
 			this.setEnd(end + endIncrement);
-			//this.setEnd(end + getIncrementDependingOnNeighboorDistances("end"));
-			//this.setEnd(end + getMaxIncrement("end")); 
 	} 
-	else {
+	else { // value contained --> end range will shrink (shrinking direction = -1)
 
 			
-			if(lastEndDirection == 1) {
+			if(lastEndDirection == 1) { // opposite direction -> negative feedback
 				endCriticality = 1;
 			}
-			else if(lastEndDirection == -1) {
+			else if(lastEndDirection == -1) { // same direction -> positive feedback
 				endCriticality = 0;
 			}
-			lastEndDirection = -1;
+			lastEndDirection = -1; // shrinking direction
 			
-			if(endCriticality == 1) {
+			if(endCriticality == 1) { // negative feedback -> increment decreases
 				endIncrement /=2;
 			}
-			else if(endCriticality == 0) {
+			else if(endCriticality == 0) { // positive feedback -> increment increases
 				endIncrement = Math.min(percept.getRadiusContextForCreation(), endIncrement*2);
 				//endIncrement *=2;
 			}
 			
-//			System.out.println(world.getScheduler().getTick() + " " +
-//					this.context.getName() + " " +
-//					this.percept.getName()+ " " +
-//					lastEndDirection + " " +
-//					" -- " +
-//					endCriticality + " " +
-//					endIncrement 
-//					);
 			
 			
 			this.setEnd(end - endIncrement);
-			//this.setEnd(end - getIncrementDependingOnNeighboorDistances("end"));
-	}
+
+		}
 	
-	//this.adaptEndUsingAVT(oracleValue);
+
 	}
 	
 	private void adaptEndWithSplitting(double oracleValue, double increment) {

@@ -93,6 +93,7 @@ public abstract class LocalModelAgent extends SystemAgent implements Serializabl
 	public abstract String coefsToString();
 	public abstract double distance(Experiment experiment);
 	public abstract ArrayList<Experiment> getFirstExperiments();
+	public abstract boolean finishedFirstExperiments();
 	
 	public abstract double[] getCoef();
 	

@@ -47,11 +47,11 @@ public class RegressionManager {
 	
 	
 	
-	public void updateModelWithArtificialPoints(int numberOfPoints, double noise) {
+	public void updateModelWithArtificialPoints(int numberOfPoints, double noiseMean, double noiseVariance) {
 		
 		regression = new Regression(dimension,true);
 		
-		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments(numberOfPoints, noise);
+		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments(numberOfPoints, noiseMean, noiseVariance);
 		
 			
 		for (int i =0;i<numberOfPoints;i++) {
@@ -82,7 +82,7 @@ public class RegressionManager {
 	}
 	
 	
-	private Pair<double[][], double[]> getRandomlyDistributedArtificialExperiments(int amount, double noise){
+	private Pair<double[][], double[]> getRandomlyDistributedArtificialExperiments(int amount, double noiseMean, double noiseVariance){
 		
 		double[][] artificalExperiments = new double[amount][dimension];
 		double[] artificalResults = new double[amount];
@@ -97,7 +97,7 @@ public class RegressionManager {
 				double endRange = spaceSize;
 				artificalExperiments[i][j] = startRange + (Math.random()*(endRange - startRange));
 			}
-			artificalResults[i] = this.getProposition(artificalExperiments[i], noise);
+			artificalResults[i] = this.getProposition(artificalExperiments[i], noiseMean, noiseVariance);
 			
 		}
 		
@@ -122,7 +122,7 @@ public class RegressionManager {
 		return result;
 	}
 	
-	public double getProposition(double[] situation, double noise) {
+	public double getProposition(double[] situation, double noiseMean, double noiseVariance) {
 		
 		
 		
@@ -137,7 +137,10 @@ public class RegressionManager {
 
 		}
 	
-		return result - noise + (Math.random()*2*noise);
+		java.util.Random r = new java.util.Random();
+		double noise = r.nextGaussian() * Math.sqrt(noiseVariance) + noiseMean;
+		
+		return result + noise;
 	}
 	
 }

@@ -1013,6 +1013,23 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		
 	}
 	
+	
+public void analyzeResults4(Head head, Context closestContextToOracle) {
+
+		
+		if (head.getCriticity(this) < head.getErrorAllowed()) {
+			
+			confidence++;	
+			
+		}else {
+			this.solveNCS_BadPrediction(head);
+			
+		}
+		
+
+		
+	}
+	
 //	public double distance(Context ctxt) {
 //		double totalDistance = 1.0;
 //		double currentDistance = 0.0;
@@ -2404,13 +2421,13 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 			this.world.getScheduler().addAlteredContext(this);
 		}
 		else {		
-			if (head.getCriticity(this) > head.getInexactAllowed()) {
-				solveNCS_ConflictInexact(head);
-			}
-			else {
-				confidence++;
-				//confidence = confidence * 2;
-			}
+//			if (head.getCriticity(this) > head.getInexactAllowed()) {
+//				solveNCS_ConflictInexact(head);
+//			}
+//			else {
+//				confidence++;
+//				//confidence = confidence * 2;
+//			}
 		}
 
 	}

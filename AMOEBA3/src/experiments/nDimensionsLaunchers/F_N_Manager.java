@@ -100,11 +100,11 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Square */
-		return (x[1] > -spaceSize && x[1] < spaceSize && x[0] < spaceSize && x[0] > -spaceSize) ? model1() : model2() ;
+		//return (x[1] > -spaceSize && x[1] < spaceSize && x[0] < spaceSize && x[0] > -spaceSize) ? model1() : model2() ;
 		//return model1();
 		
 		/* Triangle */
-		//return (y > x) ? 2*x + y : 5*x - 8*y;
+		return (x[1] > x[0]) ? model1() : model2();
 		
 		/* Split */
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;

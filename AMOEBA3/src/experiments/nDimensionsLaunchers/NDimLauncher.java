@@ -32,7 +32,6 @@ public class NDimLauncher implements Serializable {
 		
 		/* Error parameter */
 		amoeba.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
-		amoeba.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
 		
 		/* Other parameters */
 		amoeba.setRememberState(false);

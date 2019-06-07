@@ -68,7 +68,7 @@ public class Launcher implements Serializable {
 		//world.setBlackBox(blackBox);
 
 		scheduler.getHeadAgent().setDataForErrorMargin(3, 1.2, 0.8, 0.0, 10, 100);
-		scheduler.getHeadAgent().setDataForInexactMargin(0.5, 1.2, 0.8, 0.0, 10, 100);
+		
 		world.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		if (viewer) {
 			mainPanel.setWorld(world);

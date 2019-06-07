@@ -86,7 +86,6 @@ public class AMOEBA extends Thread {
 		
 		world.setAmoeba(this);
 		scheduler.getHeadAgent().setDataForErrorMargin(1, 1, 1, 1, 1, 100);
-		scheduler.getHeadAgent().setDataForInexactMargin(0.5, 1, 1, 0.5, 25, 100);
 		
 		
 		if (this.viewer) {
@@ -156,19 +155,7 @@ public class AMOEBA extends Thread {
 		scheduler.getHeadAgent().setDataForErrorMargin(errorAllowed,augmentationFactorError,diminutionFactorError,minErrorAllowed,nConflictBeforeAugmentation,nSuccessBeforeDiminution);
 	}
 	
-	/**
-	 * Sets the data for inexact margin.
-	 *
-	 * @param inexactAllowed the inexact allowed
-	 * @param augmentationInexactError the augmentation inexact error
-	 * @param diminutionInexactError the diminution inexact error
-	 * @param minInexactAllowed the min inexact allowed
-	 * @param nConflictBeforeInexactAugmentation the n conflict before inexact augmentation
-	 * @param nSuccessBeforeInexactDiminution the n success before inexact diminution
-	 */
-	public void setDataForInexactMargin(double inexactAllowed, double augmentationInexactError, double diminutionInexactError, double minInexactAllowed, int nConflictBeforeInexactAugmentation, int nSuccessBeforeInexactDiminution) {
-		scheduler.getHeadAgent().setDataForInexactMargin(inexactAllowed, augmentationInexactError, diminutionInexactError, minInexactAllowed, nConflictBeforeInexactAugmentation, nSuccessBeforeInexactDiminution);
-	}
+	
 	
 	/**
 	 * Sets the local model.

@@ -66,35 +66,30 @@ public class Chat_ClientServeur implements Runnable {
 
 		amoebaX.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoebaX.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoebaX.getScheduler().getHeadAgent().setDataForInexactMargin(0.1, 1, 1, 0.1, 10, 100);
 		amoebaX.setAVT_acceleration(1.1f);
 		amoebaX.setAVT_deceleration(0.1);
 		amoebaX.setAVT_percentAtStart(0.1f);
 		
 		amoebaY.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoebaY.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoebaY.getScheduler().getHeadAgent().setDataForInexactMargin(0.1, 1, 1, 0.1, 10, 100);
 		amoebaY.setAVT_acceleration(1.1f);
 		amoebaY.setAVT_deceleration(0.1);
 		amoebaY.setAVT_percentAtStart(0.1f);
 		
 		amoebaZ.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoebaZ.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoebaZ.getScheduler().getHeadAgent().setDataForInexactMargin(0.1, 1, 1, 0.1, 10, 100);
 		amoebaZ.setAVT_acceleration(1.1f);
 		amoebaZ.setAVT_deceleration(0.1);
 		amoebaZ.setAVT_percentAtStart(0.1f);
 		
 		amoebaVX.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoebaVX.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoebaVX.getScheduler().getHeadAgent().setDataForInexactMargin(0.05, 1, 1, 0.05, 10, 100);
 		amoebaVX.setAVT_acceleration(1.1f);
 		amoebaVX.setAVT_deceleration(0.1);
 		amoebaVX.setAVT_percentAtStart(0.1f);
 		
 		amoebaVZ.getScheduler().getWorld().setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoebaVZ.getScheduler().getHeadAgent().setDataForErrorMargin(0.1, 1, 1, 0.1, 10, 100);
-		amoebaVZ.getScheduler().getHeadAgent().setDataForInexactMargin(0.05, 1, 1, 0.05, 10, 100);
 		amoebaVZ.setAVT_acceleration(1.1f);
 		amoebaVZ.setAVT_deceleration(0.1);
 		amoebaVZ.setAVT_percentAtStart(0.1f);
