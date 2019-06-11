@@ -272,7 +272,7 @@ public class MainWindow extends Application {
 	 *            The panel to add
 	 */
 	public static void addTabbedPanel(String title, Node panel) {
-		Tab t = new Tab(title, panel);
+		Tab t = new DraggableTab(title, panel);
 		RunLaterHelper.runLater(() -> instance().tabbedPanel.getTabs().add(t));
 	}
 	
