@@ -2,24 +2,13 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
 
 /**
- * A render strategy for contexts using JavaFX.
- * <p>
- * Contexts have 2 visualizations that need to be rendered : 
- * <ul>
- * <li>a drawable {@link ContextRendererFX#getDrawable()} for the {@link VUI} </li>
- * <li>and a mini visualization {@link ContextRendererFX#getMini()} for the {@link ContextExplorer} </li>
- * </ul>
- * This class make sure that the 2 visualizations stay coherent.
- * <p>
- * If there's no {@link ContextExplorer} in the main window when
- * {@link ContextRendererFX#initialize()} is called, a new one is created and
- * added.
+ * A render strategy for contexts using AMAKFX tools.<br/>
+ * A Context is represented by a {@link DrawableRectangle} drawn onto {@link AmoebaWindow#mainVUI}.
  * 
  * @author Hugo
  *
@@ -66,7 +55,7 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	/**
-	 * Initialize the drawable, and may add a {@link ContextExplorer} to the main
+	 * Initialize the drawable.
 	 * window.
 	 */
 	@Override
@@ -83,7 +72,7 @@ public class ContextRendererFX extends RenderStrategy {
 
 
 	/**
-	 * Return the visualization for the VUI, may create it.
+	 * Return the visualization for the VUI, may create and add it to the VUI.
 	 * 
 	 * @return
 	 */

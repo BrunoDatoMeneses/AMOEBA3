@@ -72,7 +72,7 @@ public class Head extends AmoebaAgent {
 
 		activatedContexts.size();
 		setContextFromPropositionWasSelected(false);
-		oracleValue = this.amas.getPerceptionsOrAction("oracle");
+		oracleValue = this.amas.getPerceptions("oracle");
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -90,6 +90,9 @@ public class Head extends AmoebaAgent {
 		newContext = null;
 	}
 
+	/**
+	 * Play and use the oracle, allowing for learning.
+	 */
 	private void playWithOracle() {
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); // using highest confidence
@@ -120,7 +123,7 @@ public class Head extends AmoebaAgent {
 	}
 
 	/**
-	 * Play without oracle.
+	 * Play without oracle, no learning.
 	 */
 	private void playWithoutOracle() {
 

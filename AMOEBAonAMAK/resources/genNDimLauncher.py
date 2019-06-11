@@ -13,10 +13,10 @@ start = """<?xml version="1.0" encoding="UTF-8"?>
 	
 	<StartingAgents>
 """
-sensor = '\t\t<Sensor Name="px%d" Source="x%d"></Sensor>\n'
+sensor = '\t\t<Sensor Name="px%d" Enum="false">\n'
 
 end = """
-	  	<Controller Name="Controller" Oracle="test">
+	  	<Controller Name="Controller">
               <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
               <InexactMargin InexactAllowed="500.0" AugmentationInexactError="2.5" DiminutionInexactError="0.2" MinInexactAllowed="0.05" NConflictBeforeInexactAugmentation="40" NSuccessBeforeInexactDiminution="80" />
         </Controller> 

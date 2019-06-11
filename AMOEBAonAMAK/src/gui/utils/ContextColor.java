@@ -3,8 +3,21 @@ package gui.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import agents.context.Context;
+import agents.context.localModel.LocalModel;
+
+/**
+ * Tools for determining the color of a {@link Context} based on the coefficients of its {@link LocalModel}
+ * @author Hugo
+ *
+ */
 public class ContextColor {
 	
+	/**
+	 * Compute the color of a {@link Context} based on the coefficients of its {@link LocalModel}
+	 * @param coefs
+	 * @return
+	 */
 	public static double[] colorFromCoefs(double[] coefs) {
 		ArrayList<Double> c = new ArrayList<Double>();
 		for(double v : coefs)
@@ -12,6 +25,11 @@ public class ContextColor {
 		return colorFromCoefs(c);
 	}
 	
+	/**
+	 * Compute the color of a {@link Context} based on the coefficients of its {@link LocalModel}
+	 * @param coefs
+	 * @return
+	 */
 	public static double[] colorFromCoefs(List<Double> coefs) {
 		Double r = 0.0;
 		Double g = 0.0;

@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
 import kernel.AMOEBA;
 
 /**
- * The ContextMenu that is shown when right-clicking the VUI canvas
+ * The ContextMenu that is shown when right-clicking the {@link VUI} canvas
  * @author Hugo
  *
  */
@@ -29,6 +29,12 @@ public class ContextMenuVUI extends ContextMenu {
 	private double reqHereX;
 	private double reqHereY;
 	
+	/**
+	 * Create a {@link ContextMenu} suited for our needs, composed of 2 items : "Request Here" and "Learn here".<br/>
+	 * Set itself as the vui canvas {@link ContextMenu}. 
+	 * @param amoeba the amoeba where {@link AMOEBA#request(HashMap)} and {@link AMOEBA#learn(HashMap)} will be executed.
+	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUI}
+	 */
 	public ContextMenuVUI(AMOEBA amoeba, VUI vui) {
 		// "request here" menu item
 		setupRequestHereMenuItem(amoeba, vui);
@@ -63,6 +69,12 @@ public class ContextMenuVUI extends ContextMenu {
 		this.getItems().add(reqHere);
 	}
 	
+	/**
+	 * The "Request Here" action performed when the amoeba is 2D.<br/>
+	 * Execute a {@link AMOEBA#request(HashMap)} at the position of the click.
+	 * @param amoeba
+	 * @param vui
+	 */
 	private void reqTwoDimension(AMOEBA amoeba, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
@@ -74,6 +86,12 @@ public class ContextMenuVUI extends ContextMenu {
 		Log.defaultLog.inform("AMOEBA", "Request Here for x:"+x+" y:"+y+" -> "+res+".");
 	}
 	
+	/**
+	 * The "Request Here" action performed when the amoeba is not 2D.<br/>
+	 * Show a {@link Dialog} prompting the user to inputs value for the {@link AMOEBA#request(HashMap)}.
+	 * @param amoeba
+	 * @param vui
+	 */
 	private void reqNDimension(AMOEBA amoeba, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
@@ -138,6 +156,12 @@ public class ContextMenuVUI extends ContextMenu {
 		this.getItems().add(learnHere);
 	}
 	
+	/**
+	 * The "Learn Here" action performed when the amoeba is 2D.<br/>
+	 * Execute a {@link AMOEBA#learn(HashMap)} at the position of the click.
+	 * @param amoeba
+	 * @param vui
+	 */
 	private void learnTwoDimension(AMOEBA amoeba, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
@@ -148,6 +172,12 @@ public class ContextMenuVUI extends ContextMenu {
 		amoeba.learn(req);
 	}
 	
+	/**
+	 * The "Learn Here" action performed when the amoeba is not 2D.<br/>
+	 * Show a {@link Dialog} prompting the user to inputs value for the {@link AMOEBA#learn(HashMap)}.
+	 * @param amoeba
+	 * @param vui
+	 */
 	private void learnNDimebsion(AMOEBA amoeba, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);

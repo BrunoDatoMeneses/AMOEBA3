@@ -23,6 +23,9 @@ import javafx.stage.FileChooser;
  *
  */
 public class SaveHelper {
+	/**
+	 * Path to the saves' root directory. Default is 'saves'.
+	 */
 	public static final String savesRoot = "saves";
 	public static final String autosaveDirName = "autosave";
 	public static final String manualsaveDirName = "manual";
@@ -45,20 +48,27 @@ public class SaveHelper {
 	/**
 	 * Path to the autosave directory.
 	 */
-	public Path dirAuto;
+	private Path dirAuto;
 	
 	/**
 	 * Path to the manual save directory.
 	 */
-	public Path dirManual;
+	private Path dirManual;
 	
 	/**
 	 * Path to the save directory.
 	 */
-	public Path dir;
+	private Path dir;
 
 	private AMOEBA amoeba;
 
+	/**
+	 * Create a SaveHelper for an amoeba.<br/>
+	 * Saves are stored in {@link SaveHelper#savesRoot}, under a directory named after the amoeba and creation time of the SaveHelper.<br/>
+	 * Autosave for this SaveHelper can be deactivated with {@link SaveHelper#autoSave}.<br/>
+	 * By default, the save folder for this amoeba is deleted when the application is closed, this can be changed with {@link SaveHelper#deleteFolderOnClose}.
+	 * @param amoeba
+	 */
 	public SaveHelper(AMOEBA amoeba) {
 		this.amoeba = amoeba;
 		backupSystem = new BackupSystem(amoeba);
@@ -102,6 +112,11 @@ public class SaveHelper {
 		}
 	}
 
+	/**
+	 * Delete a directory and everything in it, recursively.
+	 * @param path
+	 * @throws IOException
+	 */
 	private void deleteDirectoryRecursion(Path path) throws IOException {
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
 			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {

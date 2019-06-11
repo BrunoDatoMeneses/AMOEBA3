@@ -25,9 +25,19 @@ import gui.DimensionSelector;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
 
+/**
+ * Class providing methods to draw a preview of an AMOEBA onto a VUI
+ * @author Hugo
+ *
+ */
 public class DrawFromXml {
 	private static final String PERCEPT_NODE = "Sensor";
 	
+	/**
+	 * Create a {@link DimensionSelector} based on a save file
+	 * @param path path to the save file
+	 * @return
+	 */
 	public static DimensionSelector createDimensionSelector(Path path) {
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc;
@@ -42,6 +52,7 @@ public class DrawFromXml {
 		}
 		return new DimensionSelector(new ArrayList<Percept>(perceptsByName.values()), null);
 	}
+	
 	private static void loadStartingAgents(Element systemElement, Map<String, Percept> perceptsByName) {
 		Element startingAgentsElement = systemElement.getChild("StartingAgents");
 		List<Element> agentsElement = startingAgentsElement.getChildren();
@@ -55,6 +66,7 @@ public class DrawFromXml {
 			}
 		}
 	}
+	
 	private static void loadSensor(Element sensorElement, Map<String, Percept> perceptsByName) {
 		Percept percept = new Percept(null);
 		percept.setName(sensorElement.getAttributeValue("Name"));
@@ -64,6 +76,15 @@ public class DrawFromXml {
 		perceptsByName.put(percept.getName(), percept);
 	}
 	
+	/**
+	 * Draw the preview of an AMOEBA from a save file onto a VUI.<br/>
+	 * You might want to use a {@link DimensionSelector} for the dim1 and dim2 parameters.
+	 * @param vui {@link VUI} on which the preview will be drawn
+	 * @param path path to the save file
+	 * @param dim1 percept name for the 1st dimension (usually x)
+	 * @param dim2 percept name for the 2nd dimension (usually y)
+	 * @see DrawFromXml#createDimensionSelector(Path)
+	 */
 	public static void draw(VUI vui, Path path, String dim1, String dim2) {
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc;
@@ -109,7 +130,7 @@ public class DrawFromXml {
 	}
 	
 	private static void loadContext(Element contextElement, String name, VUI vui, String d1, String d2) {
-		// -- Load Ranges
+		// Load Ranges
 		Element rangesElement = contextElement.getChild("Ranges");
 		Map<String, Double> starts = new HashMap<>();
 		Map<String, Double> ends = new HashMap<>();
@@ -118,6 +139,8 @@ public class DrawFromXml {
 		double l2 = ends.get(d2)-starts.get(d2);
 		double x = starts.get(d1);
 		double y = starts.get(d2);
+		
+		// Draw Ranges as 2D rectangle
 		Optional<Drawable> optRect = vui.getDrawables().stream().filter(d -> name.equals(d.getName())).findAny();
 		DrawableRectangle rectangle;
 		if(optRect.isPresent()) {
@@ -131,6 +154,8 @@ public class DrawFromXml {
 		Element localModelElement = contextElement.getChild("LocalModel");
 		List<Double> coefs = new ArrayList<>();
 		loadLocalModel(localModelElement, rectangle, coefs);
+		
+		// Load and set contexts infos
 		rectangle.setName("Context : "+contextElement.getAttributeValue("Name"));
 		String coefsString = "";
 		for(Double c : coefs) {

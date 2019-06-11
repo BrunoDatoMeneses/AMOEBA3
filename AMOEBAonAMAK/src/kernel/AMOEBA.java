@@ -49,7 +49,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
-	private HashMap<String, Double> perceptionsAndActionState = new HashMap<String, Double>();
+	private HashMap<String, Double> perceptions = new HashMap<String, Double>();
 	private boolean useOracle = true;
 
 	private HashSet<Context> validContexts;
@@ -163,7 +163,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		if (studiedSystem != null) {
 			studiedSystem.playOneStep();
-			perceptionsAndActionState = studiedSystem.getOutput();
+			perceptions = studiedSystem.getOutput();
 		}
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
@@ -342,7 +342,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	/**
-	 * Activate or deactivate the graphical scheduler. Allowing ordDenying the user
+	 * Activate or deactivate the graphical scheduler. Allowing or denying the user
 	 * to change the simulation speed.
 	 *
 	 * @param allow
@@ -364,6 +364,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super.removePendingAgents();
 	}
 
+	/**
+	 * Called when a {@link IBackupSystem} has finished loading the amoeba.
+	 */
 	public void onLoadEnded() {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
@@ -408,7 +411,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @param perceptionsAndActions
 	 */
 	public void setPerceptionsAndActionState(HashMap<String, Double> perceptionsAndActions) {
-		this.perceptionsAndActionState = perceptionsAndActions;
+		this.perceptions = perceptionsAndActions;
 	}
 
 	/**
@@ -483,8 +486,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return ret;
 	}
 
-	public Double getPerceptionsOrAction(String key) {
-		return this.perceptionsAndActionState.get(key);
+	/**
+	 * Get the value for a perception
+	 * @param key key of the perception
+	 * @return the value of the perception
+	 */
+	public Double getPerceptions(String key) {
+		return this.perceptions.get(key);
 	}
 
 	@Override
@@ -499,14 +507,25 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		runAll = true;
 	}
 
+	/**
+	 * Is rendering activated ?
+	 * @return
+	 */
 	public boolean isRenderUpdate() {
 		return (!Configuration.commandLineMode) && renderUpdate;
 	}
 
+	/**
+	 * Should AMOEBA use the oracle ? If false then AMOEBA will not learn.
+	 * @return
+	 */
 	public boolean isUseOracle() {
 		return useOracle;
 	}
 	
+	/**
+	 * Ask the agents to update their visualization, and update some UI element related to them.
+	 */
 	public void updateAgentsVisualisation() {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
@@ -529,7 +548,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public HashMap<String, Double> getPerceptionsAndActionState() {
-		return perceptionsAndActionState;
+		return perceptions;
 	}
 	
 	/**
