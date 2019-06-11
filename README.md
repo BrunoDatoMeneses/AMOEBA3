@@ -16,5 +16,5 @@ AMOEBA-parent
   | AMAKFX
   | AMOEBAonAMAK
 ```
-For more detail on [AMOEBAonAMAK](AMOEBAonAMAK/README.md) or [AMAKFX](AMAKFX/README.md), check their respective README.
+For more detail check the `documentation` directory.
 
