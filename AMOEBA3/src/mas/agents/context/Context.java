@@ -882,7 +882,19 @@ public class Context extends AbstractContext implements Serializable,Cloneable{
 		updateExperiments();
 	}
 	
+	public void solveNCS_ChildContext() {
+		world.getAmoeba().setActiveLearning(true);
+		HashMap<String, Double> request = new HashMap<String, Double>();
+		for(Percept pct : world.getScheduler().getPercepts()) {
+			request.put(pct.getName(), getRandomValueInRange(pct));
+		}
+		
+		world.getAmoeba().setSelfRequest(request);
+	}
 	
+	private Double getRandomValueInRange(Percept pct) {
+		return ranges.get(pct).getStart() + ranges.get(pct).getLenght()*Math.random();
+	}
 	
 	private void setModelFromBetterContext(Context betterContext) {
 		localModel = new LocalModelMillerRegression(world,this);
@@ -2446,7 +2458,10 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
 			////////System.out.println(pct.getName() + " " + contain);
 			if (!contain) {
-				ranges.get(pct).adapt(pct.getValue());
+				if(ranges.get(pct).getLenght()<(pct.getMappingErrorAllowed()*1.5)) {
+					ranges.get(pct).adapt(pct.getValue());
+				}
+				
 				//ranges.get(pct).extend(pct.getValue(), pct);
 				//world.getScheduler().getHeadAgent().NCSMemories.add(new NCSMemory(world, new ArrayList<Context>(),"Grow Range "+ pct.getName()));
 			}
@@ -2751,12 +2766,14 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 
 
 	public void NCSDetection_Uselessness() {
-		for (Percept v : ranges.keySet()) {
-			if (ranges.get(v).isTooSmall()){
-				solveNCS_Uselessness();
-				break;
-			}
-		}
+//		for (Percept v : ranges.keySet()) {
+//			if (ranges.get(v).isTooSmall()){
+//				solveNCS_Uselessness();
+//				break;
+//			}
+//		}
+		
+		
 //		if(!isDying) {
 //			for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
 //				if(ctxt != this) {

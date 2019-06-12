@@ -45,13 +45,14 @@ public class AMOEBA extends Thread {
 	private boolean controlMode = false;
 	private boolean viewer = true;
 	private boolean csv = true;
+	private boolean activeLearning = false;
 	
 	private F_XY_Manager manager; //OLD VISUALIZATION
 	public int temporisation; //OLD VISUALIZATION
 	public boolean manual = false; //OLD VISUALIZATION
 	
 	
-	
+	private HashMap<String, Double> selfRequest;
 	
 	
 	
@@ -136,7 +137,9 @@ public class AMOEBA extends Thread {
 		
 		
 
-	
+		selfRequest = new HashMap<String, Double>();
+		
+		
 		
 		
 	}
@@ -183,12 +186,23 @@ public class AMOEBA extends Thread {
 	 *
 	 * @param actions the actions
 	 */
-	public void learn(HashMap<String, Double> perceptionsActionState) {
+	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState) {
 		scheduler.setPerceptionsAndActionState(perceptionsActionState);
 		//updateOutputAgentsValues(perceptionsActionState);
 		scheduler.run();
+		
+		if(activeLearning) {
+			activeLearning = false;
+			return selfRequest;
+		}else {
+			return null;
+		}
+		
 	}
 	
+	public void setActiveLearning(boolean value) {
+		activeLearning = value;
+	}
 	
 	
 	/**
@@ -494,7 +508,7 @@ public class AMOEBA extends Thread {
 	}
 	
 	public void PAUSE(String message) {
-		//System.out.println(scheduler.getTick()+ " "  +message);
+		System.out.println(scheduler.getTick()+ " "  +message);
 		
 		if(!isRunning() && manual == false) {
 			while(!getPlayOneStep()) {
@@ -531,6 +545,10 @@ public class AMOEBA extends Thread {
 	
 	public F_XY_Manager getManager() {
 		return manager;
+	}
+	
+	public void setSelfRequest(HashMap<String, Double> request) {
+		selfRequest = request;
 	}
 
 }

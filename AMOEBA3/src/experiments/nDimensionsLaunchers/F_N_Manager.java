@@ -194,6 +194,26 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 		return out;
 	}
 	
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,  double noiseRange) {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		for(int i = 0; i<dimension; i++) {
+			
+			x[i] = amoebaRequest.get("px" + i);
+			
+		}
+		
+		result = model(x) - noiseRange/2 + Math.random()*noiseRange ;
+		
+		for(int i = 0; i<dimension; i++) {
+			
+			out.put("px" + i,x[i]);
+			
+		}
+		out.put("oracle",result);
+		return out;
+	}
+	
 	public HashMap<String, Double> getOriginOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
@@ -216,16 +236,17 @@ public class F_N_Manager implements StudiedSystem, Serializable{
 	
 	
 	
-	public HashMap<String, Double> getOutputRequest(HashMap<String, Double> values) {
+	public HashMap<String, Double> getOutputRequest2D(HashMap<String, Double> values) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		double xValue = values.get("px0");
-		double yValue = values.get("px1");
+		x[0] = values.get("px0");
+		x[1] = values.get("px1");
 		
-		result = model(xValue, yValue);
 		
-		out.put("px0",xValue);
-		out.put("px1",yValue);
+		result =  model(x);
+		
+		out.put("px0",x[0]);
+		out.put("px1",x[1]);
 		out.put("oracle",result);
 		return out;
 	}

@@ -32,7 +32,8 @@ public class F_N_Launcher implements Serializable {
 		String XMLConfigFile = "nDimensionLauncher.xml";
 		
 		
-	
+		HashMap<String,Double> amoebaSelfRequest = null;
+		boolean activeLearning = false;
 		
 		
 		/*Here we create AMOEBA.*/
@@ -78,34 +79,63 @@ public class F_N_Launcher implements Serializable {
 			}
 			
 			
+			
+			
 			if(amoeba.getScheduler().requestAsked()) {
 				amoeba.manual = true;
-				//System.out.println("                                                                                                     MANUAL REQUEST");
-				amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputRequest(amoeba.getScheduler().getManualRequest())));
+				System.out.println("                                                                                                     MANUAL REQUEST");
+				amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputRequest2D(amoeba.getScheduler().getManualRequest())));
 				amoeba.manual = false;
 				
 			}else if(amoeba.isRunning()) {
 				
-				/*Random samples on the unique context */
-				f_N_Manager.playOneStep(0);
+				if(activeLearning) {
+					activeLearning = false;
+					amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithAmoebaRequest(amoebaSelfRequest, oracleNoiseRange)));
+				}
+				else {
+					/*Random samples on the unique context */
+					f_N_Manager.playOneStep(0);
+					
+					/*This is a learning step of AMOEBA*/
+					amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithNoise(oracleNoiseRange)));
+				}
 				
-				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithNoise(oracleNoiseRange)));
+				
 				
 				i++;
 			}
 			else if(amoeba.getPlayOneStep()) {
 				
-				amoeba.setPlayOneStep(false);
-				/*Random samples on the unique context */
-				f_N_Manager.playOneStep(0);
+				System.out.println("                                                                                                     ONE STEP");
+				System.out.println("ACTIVE LEARNING : " + activeLearning);
 				
-				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithNoise(oracleNoiseRange)));
+				
+				amoeba.setPlayOneStep(false);
+				
+				
+				if(activeLearning) {
+					activeLearning = false;
+					amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithAmoebaRequest(amoebaSelfRequest, oracleNoiseRange)));
+				}else {
+					/*Random samples on the unique context */
+					f_N_Manager.playOneStep(0);
+					
+					/*This is a learning step of AMOEBA*/
+					amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(f_N_Manager.getOutputWithNoise(oracleNoiseRange)));
+				}
+				
+				System.out.println(amoebaSelfRequest);
 				
 				i++;
 				
 				
+			}
+			
+			if(amoebaSelfRequest != null) {
+				
+				
+				activeLearning = true;
 			}
 			
 			if(amoeba.getScheduler().getHeadAgent().getCriticity()>1000000.0) {

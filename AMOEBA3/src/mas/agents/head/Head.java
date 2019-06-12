@@ -298,7 +298,7 @@ public class Head extends AbstractHead implements Cloneable{
 		selfAnalysationOfContexts4();
 		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
 		
-		world.getAmoeba().PAUSE("BEFORE HEAD NCS ");
+		//world.getAmoeba().PAUSE("BEFORE HEAD NCS ");
 
 		incompetentHeadNCSExecutionTime =  System.currentTimeMillis();
 		NCSDetection_IncompetentHead();		/*If there isn't any proposition or only bad propositions, the head is incompetent. It needs help from a context.*/
@@ -308,7 +308,7 @@ public class Head extends AbstractHead implements Cloneable{
 		NCSDetection_Concurrence(); 		/*If result is good, shrink redundant context (concurrence NCS)*/
 		concurrenceNCSExecutionTime = System.currentTimeMillis() - concurrenceNCSExecutionTime;
 		
-		world.getAmoeba().PAUSE("BEFORE HEAD NCS CONTEXT CREATION");
+		//world.getAmoeba().PAUSE("BEFORE HEAD NCS CONTEXT CREATION");
 		
 		create_New_ContextNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Create_New_Context();	/*Finally, head agent check the need for a new context agent*/
@@ -323,6 +323,9 @@ public class Head extends AbstractHead implements Cloneable{
 		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 		
 		otherExecutionTime = System.currentTimeMillis();
+		
+		NCSDetection_ChildContext();
+		
 		criticalities.addCriticality("spatialCriticality", (getMinMaxVolume() - getVolumeOfAllContexts())/getMinMaxVolume());
 		
 		
@@ -1030,6 +1033,17 @@ public class Head extends AbstractHead implements Cloneable{
 			} */
 			
 		}
+	}
+	
+	private void NCSDetection_ChildContext() {
+		
+		if(!bestContext.getLocalModel().finishedFirstExperiments() && firstContext && world.getScheduler().getTick()>0) {
+			bestContext.solveNCS_ChildContext();
+			
+			
+		}
+		
+		
 	}
 	
 	private void selfAnalysationOfContexts() {
@@ -1863,7 +1877,13 @@ public class Head extends AbstractHead implements Cloneable{
 	 * @return the average prediction criticity
 	 */
 	public double getAveragePredictionCriticity() {
-		return criticalities.getCriticalityMean("predictionCriticality");
+		Double mean = criticalities.getCriticalityMean("predictionCriticality");
+		if(mean == null) {
+			return 0.0;
+		}
+		else {
+			return mean;
+		}
 	}
 	
 	
@@ -2279,7 +2299,12 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	
 	public double getAverageSpatialCriticality() {
-		return criticalities.getCriticalityMean("spatialCriticality");
+		Double mean = criticalities.getCriticalityMean("spatialCriticality");
+		if(mean == null) {
+			return 0.0;
+		}else {
+			return mean;
+		}
 	}
 	
 	public void setBadCurrentCriticalityPrediction() {
