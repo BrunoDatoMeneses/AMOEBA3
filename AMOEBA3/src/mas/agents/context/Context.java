@@ -1189,7 +1189,18 @@ public void analyzeResults4(Head head, Context closestContextToOracle) {
 				
 				fusionAcomplished = false;
 	
-				if(this.sameModelAs(ctxt, world.getScheduler().getHeadAgent().getErrorAllowed()/10) ) {
+				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
+				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
+				
+				
+				
+	
+				
+				//if(this.sameModelAs(ctxt, world.getScheduler().getHeadAgent().getErrorAllowed()/10) ) {
+				if((currentDistanceToOraclePrediction<world.getScheduler().getHeadAgent().getDistanceToRegressionAllowed()) && (otherContextDistanceToOraclePrediction<world.getScheduler().getHeadAgent().getDistanceToRegressionAllowed())) {
+					
+					world.trace(new ArrayList<String>(Arrays.asList("currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
+					
 					
 					for(Percept pct : ranges.keySet()) {
 						
@@ -1205,7 +1216,7 @@ public void analyzeResults4(Head head, Context closestContextToOracle) {
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
 									world.trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + world.getMappingErrorAllowed())));
-									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowed()) && (centerDifference< otherPct.getMappingErrorAllowed());
+									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowed()/2) && (centerDifference< otherPct.getMappingErrorAllowed()/2);
 								}
 							}
 							
@@ -2766,12 +2777,12 @@ private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(Arra
 
 
 	public void NCSDetection_Uselessness() {
-//		for (Percept v : ranges.keySet()) {
-//			if (ranges.get(v).isTooSmall()){
-//				solveNCS_Uselessness();
-//				break;
-//			}
-//		}
+		for (Percept v : ranges.keySet()) {
+			if (ranges.get(v).isTooSmall()){
+				solveNCS_Uselessness();
+				break;
+			}
+		}
 		
 		
 //		if(!isDying) {

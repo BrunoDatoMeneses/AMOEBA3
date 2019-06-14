@@ -315,7 +315,7 @@ public class Head extends AbstractHead implements Cloneable{
 		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
 		
 		overmappingNCSExecutionTime = System.currentTimeMillis();
-		//NCSDetection_Context_Overmapping();
+		NCSDetection_Context_Overmapping();
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 		
 		memoryCreationExecutionTime = System.currentTimeMillis();
@@ -992,7 +992,7 @@ public class Head extends AbstractHead implements Cloneable{
 		activatedContextsCopy.addAll(activatedContexts);
 		
 		for(Context ctxt : activatedContextsCopy) {
-			if(!ctxt.isDying()) {
+			if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
 				ctxt.NCSDetection_OverMapping();
 			}
 			
@@ -1037,11 +1037,15 @@ public class Head extends AbstractHead implements Cloneable{
 	
 	private void NCSDetection_ChildContext() {
 		
-		if(!bestContext.getLocalModel().finishedFirstExperiments() && firstContext && world.getScheduler().getTick()>0) {
-			bestContext.solveNCS_ChildContext();
-			
-			
+		if(bestContext!=null) {
+			if(!bestContext.getLocalModel().finishedFirstExperiments() && firstContext && world.getScheduler().getTick()>0 && !bestContext.isDying()) {
+				bestContext.solveNCS_ChildContext();
+				
+				
+			}
 		}
+		
+		
 		
 		
 	}

@@ -875,9 +875,17 @@ public class Range implements Serializable, Comparable, Cloneable {
 	public String toString() {
 		return ((start_inclu ? "[" : "]") + start + "," + end
 				+ (!end_inclu ? "[" : "]") + "  Current value : " + percept.getValue()
-				+ "  AVT_Start : " + AVT_deltaStart
-				+ "  AVT_End : " + AVT_deltaEnd );
+				+ "\n lastStartDirection : " + lastStartDirection
+				+ "\n lastEndDirection : " + lastEndDirection 
+				+ "\n startCriticality : " + startCriticality
+				+ "\n endCriticality : " + endCriticality
+				+ "\n startIncrement : " + startIncrement
+				+ "\n endIncrement : " + endIncrement
+
+				);
 	}
+	
+	
 
 	/**
 	 * Gets the context.
