@@ -222,4 +222,17 @@ public class MNIST_System implements StudiedSystem {
 	public double requestOracle(HashMap<String, Double> request) {
 		return 0;
 	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
+			double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

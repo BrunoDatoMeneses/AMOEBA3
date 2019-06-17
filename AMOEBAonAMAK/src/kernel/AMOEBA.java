@@ -296,12 +296,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	@Override
-	public void learn(HashMap<String, Double> perceptionsActionState) {
+	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState) {
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		studiedSystem = ss;
+		if(head.isActiveLearning()) {
+			head.setActiveLearning(false);
+			return head.getSelfRequest();
+		}else {
+			return null;
+		}
 	}
 
 	@Override

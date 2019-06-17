@@ -20,7 +20,7 @@ public interface IAMOEBA {
 	 * Run a learning cycle.
 	 * @param perceptionsActionState the output of your studied system.
 	 */
-	public void learn(HashMap<String, Double> perceptionsActionState);
+	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState);
 	
 	/**
 	 * Run a cycle without learning.

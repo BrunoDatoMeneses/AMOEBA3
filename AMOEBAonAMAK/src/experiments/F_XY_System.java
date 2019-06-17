@@ -55,4 +55,17 @@ public class F_XY_System implements StudiedSystem {
 	public double requestOracle(HashMap<String, Double> request) {
 		return getResult(request.get("px"), request.get("py"));
 	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
+			double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

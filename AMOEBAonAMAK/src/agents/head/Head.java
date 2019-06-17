@@ -81,6 +81,10 @@ public class Head extends AmoebaAgent {
 	private boolean firstContext = false;
 	private boolean newContextWasCreated = false;
 	private boolean contextFromPropositionWasSelected = false;
+	
+	private boolean activeLearning = false;
+	
+	private HashMap<String, Double> selfRequest;
 
 	Double maxConfidence;
 	Double minConfidence;
@@ -254,13 +258,16 @@ public class Head extends AmoebaAgent {
 		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
 
 		overmappingNCSExecutionTime = System.currentTimeMillis();
-		// NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 
 		memoryCreationExecutionTime = System.currentTimeMillis();
 		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 
 		otherExecutionTime = System.currentTimeMillis();
+		
+		NCSDetection_ChildContext();
+		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
 
@@ -824,6 +831,20 @@ public class Head extends AmoebaAgent {
 		getAmas().saver.newManualSave("SharedIncompetence");
 
 	}
+	
+	private void NCSDetection_ChildContext() {
+		
+		if(bestContext!=null) {
+			if(!bestContext.getLocalModel().finishedFirstExperiments() && firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+				bestContext.solveNCS_ChildContext();
+				
+				
+			}
+		}
+		
+		
+		
+	}
 
 	private Double compareClosestContextPairModels(ContextPair<Context, Context> closestContexts) {
 		Double difference = 0.0;
@@ -885,7 +906,7 @@ public class Head extends AmoebaAgent {
 		activatedContextsCopy.addAll(activatedContexts);
 
 		for (Context ctxt : activatedContextsCopy) {
-			if (!ctxt.isDying()) {
+			if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
 				ctxt.NCSDetection_OverMapping();
 			}
 
@@ -1753,7 +1774,15 @@ public class Head extends AmoebaAgent {
 	 * @return the average prediction criticity
 	 */
 	public double getAveragePredictionCriticity() {
-		return criticalities.getCriticalityMean("predictionCriticality");
+		Double mean = criticalities.getCriticalityMean("predictionCriticality");
+		if(mean == null) {
+			return 0.0;
+		}
+		else {
+			return mean;
+		}
+		
+		
 	}
 
 	public double getAveragePredictionCriticityCopy() {
@@ -2144,7 +2173,12 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getAverageSpatialCriticality() {
-		return criticalities.getCriticalityMean("spatialCriticality");
+		Double mean = criticalities.getCriticalityMean("spatialCriticality");
+		if(mean == null) {
+			return 0.0;
+		}else {
+			return mean;
+		}
 	}
 
 	public void setBadCurrentCriticalityPrediction() {
@@ -2186,6 +2220,26 @@ public class Head extends AmoebaAgent {
 	public double getDistanceToRegressionAllowed() {
 		return regressionPerformance.getPerformanceIndicator();
 	}
+	
+	
+	public boolean isActiveLearning() {
+		return activeLearning;
+	}
+	
+	public void setActiveLearning(boolean value) {
+		activeLearning = value;
+	}
+	
+	public HashMap<String, Double> getSelfRequest(){
+		return selfRequest;
+	}
+	
+	public void setSelfRequest(HashMap<String, Double> request){
+		selfRequest = request;
+	}
+	
+	
+	
 
 	// -----------------
 	// AMOEBAonAMAK ---
