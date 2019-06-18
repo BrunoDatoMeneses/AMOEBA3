@@ -1,8 +1,11 @@
 package fr.irit.smac.amak.ui;
 
+import java.awt.Color;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -63,12 +66,17 @@ public class AmakPlot {
 			if(useSamplingRenderer) {
 				chart.getXYPlot().setRenderer(new SamplingXYLineRenderer());
 			}
+			XYPlot plot = (XYPlot)chart.getPlot();
+			plot.setDomainGridlinesVisible(true);
+	        plot.setDomainGridlinePaint(Color.lightGray);
+	        plot.setRangeGridlinePaint(Color.lightGray);
 			break;
 		default:
 			System.err.println("AmakPlot : unknow ChartType \""+chartType+"\".");
 			break;
 		}
 		chart.setAntiAlias(false);
+		chart.getPlot().setBackgroundPaint(Color.WHITE);
 		if(autoAdd) {
 			add(this);
 		}

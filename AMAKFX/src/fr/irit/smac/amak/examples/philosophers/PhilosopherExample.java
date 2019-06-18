@@ -96,7 +96,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	}
 
 	@Override
-	protected void onInitialization() {
+	public void onInitialization() {
 		this.id = (int) params[0];
 		this.left = (ForkExample) params[1];
 		this.right = (ForkExample) params[2];

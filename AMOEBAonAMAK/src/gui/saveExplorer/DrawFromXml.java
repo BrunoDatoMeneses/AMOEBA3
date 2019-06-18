@@ -187,7 +187,7 @@ public class DrawFromXml {
 		for(Element e : localModelElement.getChild("Coefs").getChildren()) {
 			coefs.add(Double.valueOf(e.getAttributeValue("v")));
 		}
-		double[] c = ContextColor.colorFromCoefs(coefs);
+		Double[] c = ContextColor.colorFromCoefs(coefs);
 		rectangle.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
 	}
 }

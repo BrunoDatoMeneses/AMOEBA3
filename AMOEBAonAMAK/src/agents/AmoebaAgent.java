@@ -1,5 +1,7 @@
 package agents;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.tools.Loggable;
@@ -15,15 +17,18 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	protected String name;
 	private boolean dying;
 	
+	static AmoebaAgent lastDeath = null;
+	
 	protected RenderStrategy renderStrategy;
 
 	/**
 	 * Instantiate a new agent attached to an amoeba
 	 * @param the amoeba
 	 */
-	public AmoebaAgent(AMOEBA amas) {
-		super(amas);
+	public AmoebaAgent(AMOEBA amas, Object... params) {
+		super(amas, params);
 		this.dying = false;
+		assertTrue(this != lastDeath);
 	}
 	
 	@Override
@@ -70,6 +75,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 		}
 		super.destroy();
 		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s destroyed.", toString());
+		lastDeath = this;
 	}
 
 	/**

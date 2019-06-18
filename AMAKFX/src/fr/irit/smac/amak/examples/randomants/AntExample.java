@@ -36,7 +36,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 		super(amas, startX, startY);
 	}
 	@Override
-	protected void onInitialization() {
+	public void onInitialization() {
 		dx = (double) params[0];
 		dy = (double) params[1];
 	}

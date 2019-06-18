@@ -166,7 +166,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	/**
 	 * Effectively add agent to the system
 	 */
-	protected void addPendingAgents() {
+	public void addPendingAgents() {
 		// The double loop is required as the method onReady should only be called when
 		// all the agents have been added
 		synchronized (agentsPendingAddition) {

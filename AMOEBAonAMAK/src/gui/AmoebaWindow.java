@@ -13,10 +13,13 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
+import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import kernel.AMOEBA;
@@ -90,6 +93,17 @@ public class AmoebaWindow extends MainWindow {
 		
 		// manual save button
 		AmoebaWindow.addToolbar(newManualSaveButton(amoeba));
+		
+		Slider slider = new Slider(0, 0.1, 0.1);
+		slider.setShowTickLabels(true);
+		slider.setShowTickMarks(true);
+		slider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				amoeba.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+			}
+		});
+		AmoebaWindow.addToolbar(slider);
 	}
 	
 	/**

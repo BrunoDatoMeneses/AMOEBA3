@@ -18,7 +18,7 @@ public class ContextColor {
 	 * @param coefs
 	 * @return
 	 */
-	public static double[] colorFromCoefs(double[] coefs) {
+	public static Double[] colorFromCoefs(Double[] coefs) {
 		ArrayList<Double> c = new ArrayList<Double>();
 		for(double v : coefs)
 			c.add(v);
@@ -30,7 +30,7 @@ public class ContextColor {
 	 * @param coefs
 	 * @return
 	 */
-	public static double[] colorFromCoefs(List<Double> coefs) {
+	public static Double[] colorFromCoefs(List<Double> coefs) {
 		Double r = 0.0;
 		Double g = 0.0;
 		Double b = 0.0;
@@ -66,7 +66,7 @@ public class ContextColor {
 			g = 255.0;
 			b = 255.0;
 		}
-		double[] ret = new double[3];
+		Double[] ret = new Double[3];
 		ret[0] = r / 255.0d;
 		ret[1] = g / 255.0d;
 		ret[2] = b / 255.0d;

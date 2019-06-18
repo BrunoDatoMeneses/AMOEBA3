@@ -242,7 +242,7 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 	/**
 	 * Called before all agents are created
 	 */
-	protected void onInitialization() {
+	public void onInitialization() {
 
 	}
 

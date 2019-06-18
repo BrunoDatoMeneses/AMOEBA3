@@ -3,11 +3,7 @@ package kernel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,14 +48,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private HashMap<String, Double> perceptions = new HashMap<String, Double>();
 	private boolean useOracle = true;
 
-	private HashSet<Context> validContexts;
-	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
-
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate;
 	
 	private int cycleWithoutRender = 0;
+
+	private ArrayList<Context> spatiallyAlteredContext = new ArrayList<>();
+	private ArrayList<Context> lastModifiedContext = new ArrayList<>();
+
+	private ArrayList<Context> alteredContexts = new ArrayList<>();
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -87,10 +85,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	@Override
 	protected void onInitialConfiguration() {
-	}
-
-	@Override
-	protected void onInitialAgentsCreation() {
+		super.onInitialConfiguration();
+		getEnvironment().setAmoeba(this);
 	}
 	
 	@Override
@@ -122,14 +118,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
-			errors.addData("Inexact allowed", cycle, head.getInexactAllowed(), notify);
-			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
-			Collections.sort(sortedErrors);
-
-			// @note (Labbeti) Test added to avoid crash when head has just been created.
-			if (!sortedErrors.isEmpty()) {
-				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2), notify);
-			}
 		}
 		
 		if (isRenderUpdate()) {
@@ -165,10 +153,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			studiedSystem.playOneStep();
 			perceptions = studiedSystem.getOutput();
 		}
+		
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
-		validContexts = null;
 		environment.resetNbActivatedAgent();
+		spatiallyAlteredContext.clear();
+		lastModifiedContext.clear();
+		alteredContexts.clear();
+		for(Context ctxt : getContexts()) {
+			ctxt.clearNonValidPerceptNeighbors();
+			ctxt.clearNonValidPercepts();
+		}
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -224,20 +219,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// it is sometime useful to run all context agent
 		// especially to check if they're not too small,
 		// or after reactivating rendering.
-		if (cycle % 1000 == 0) {
+		//if (cycle % 1000 == 0) {
 			runAll = true;
-		}
+		//}
 
 		Stream<Context> contextStream = null;
 		if (runAll) {
 			contextStream = getContexts().stream(); // update all context
 			runAll = false;
 		} else {
-			HashSet<Context> vcontexts = getValidContexts();
-			if (vcontexts == null) {
-				vcontexts = new HashSet<>();
-			}
-			contextStream = vcontexts.stream(); // or only valid ones
+			//TODO
 		}
 		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
@@ -330,13 +321,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public LocalModel buildLocalModel(Context context) {
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			return new LocalModelMillerRegression(context.getRanges().size());
+			return new LocalModelMillerRegression(context);
 		}
 		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp();
+			return new LocalModelFirstExp(context);
 		}
 		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage();
+			return new LocalModelAverage(context);
 		}
 		return null;
 	}
@@ -450,43 +441,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	/**
-	 * Update the set of valid context. The update is done with an intersect of the
-	 * previous and new set.
-	 *
-	 * Synchronized with a writeLock.
-	 * @param validContexts new validContexts set.
-	 */
-	@SuppressWarnings("unchecked")
-	public void updateValidContexts(HashSet<Context> validContexts) {
-		validContextLock.writeLock().lock();
-		if (this.validContexts == null) {
-			this.validContexts = (HashSet<Context>) validContexts.clone();
-		} else {
-			this.validContexts.retainAll(validContexts);
-		}
-		validContextLock.writeLock().unlock();
-	}
-
-	/**
-	 * Return the current set of valid contexts.
-	 *
-	 * Synchronized with a readLock.
-	 *
-	 * @return
-	 */
-	public HashSet<Context> getValidContexts() {
-		HashSet<Context> ret;
-		validContextLock.readLock().lock();
-		if (validContexts == null) {
-			ret = null;
-		} else {
-			ret = new HashSet<>(validContexts);
-		}
-		validContextLock.readLock().unlock();
-		return ret;
-	}
-
-	/**
 	 * Get the value for a perception
 	 * @param key key of the perception
 	 * @return the value of the perception
@@ -557,5 +511,45 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void setStudiedSystem(StudiedSystem studiedSystem) {
 		this.studiedSystem = studiedSystem;
+	}
+	
+	public Head getHeadAgent() {
+		return head;
+	}
+	
+	public ArrayList<Context> getSpatiallyAlteredContext() {
+		return spatiallyAlteredContext;
+	}
+	
+	public void addSpatiallyAlteredContext(Context ctxt) {
+		spatiallyAlteredContext.add(ctxt);
+	}
+	
+	public void addLastmodifiedContext(Context context) {
+		if(!lastModifiedContext.contains(context)) {
+			lastModifiedContext.add(context);
+		}
+	}
+	
+	public ArrayList<Context> getLastModifiedContexts(){
+		return lastModifiedContext;
+	}
+	
+	/**
+	 * Adds the altered context.
+	 *
+	 * @param context the context
+	 */
+	public void addAlteredContext(Context context) {
+		alteredContexts.add(context);
+	}
+	
+	/**
+	 * Gets the altered contexts.
+	 *
+	 * @return the altered contexts
+	 */
+	public ArrayList<Context> getAlteredContexts() {
+		return alteredContexts;
 	}
 }

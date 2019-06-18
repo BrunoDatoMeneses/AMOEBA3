@@ -1,6 +1,9 @@
 package agents.context.localModel;
 
+import java.util.ArrayList;
+
 import agents.context.Context;
+import agents.context.Experiment;
 import agents.percept.Percept;
 
 /**
@@ -10,18 +13,14 @@ import agents.percept.Percept;
  */
 public abstract class LocalModel {
 
+	public Context context;
+
 	/**
 	 * Instantiates a new local model agent.
 	 */
-	public LocalModel() {
+	public LocalModel(Context associatedContext) {
+		context = associatedContext;
 	}
-
-	/**
-	 * Update model.
-	 *
-	 * @param context the context
-	 */
-	public abstract void updateModel(Context context);
 
 	/**
 	 * Gets the proposition.
@@ -30,15 +29,20 @@ public abstract class LocalModel {
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context);
+	public abstract double getProposition(Experiment experiment);
+	
 
+	
+	public abstract double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment);
+	
 	/**
 	 * Version of getProposition for 2D display.
 	 *
 	 * @param context the context
-	 * @param p1      the p 1
-	 * @param p2      the p 2
-	 * @param v1      the v 1
-	 * @param v2      the v 2
+	 * @param p1 the p 1
+	 * @param p2 the p 2
+	 * @param v1 the v 1
+	 * @param v2 the v 2
 	 * @return the proposition
 	 */
 	public abstract double getProposition(Context context, Percept p1, Percept p2, double v1, double v2);
@@ -50,10 +54,25 @@ public abstract class LocalModel {
 	 * @return the formula
 	 */
 	public abstract String getFormula(Context context);
-
 	public abstract String getCoefsFormula();
 
-	public abstract double[] getCoefs();
+	/**
+	 * Update model.
+	 *
+	 * @param context the context
+	 */
+	public abstract void updateModel(Context context);
+	
+	public abstract void updateModelWithExperiments(ArrayList<Experiment> experimentsList);
+	public abstract void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPointsForRegression);
+	public abstract void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression);
+	public abstract String coefsToString();
+	public abstract double distance(Experiment experiment);
+	public abstract ArrayList<Experiment> getFirstExperiments();
+	public abstract boolean finishedFirstExperiments();
+	
+	public abstract Double[] getCoef();
+	public abstract void setCoef(Double[] coef);
 
 	public abstract TypeLocalModel getType();
 }

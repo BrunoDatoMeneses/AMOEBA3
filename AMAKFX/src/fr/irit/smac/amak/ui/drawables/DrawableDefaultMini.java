@@ -12,9 +12,9 @@ public class DrawableDefaultMini extends Drawable {
 	
 	private Drawable original;
 	
-	private Rectangle rectangle;
-	private StackPane stack;
-	private Label label;
+	protected Rectangle rectangle;
+	protected StackPane stack;
+	protected Label label;
 	
 	public DrawableDefaultMini(Drawable original) {
 		super(0, 0, 0, 0);
@@ -30,6 +30,11 @@ public class DrawableDefaultMini extends Drawable {
 		original.addLinkedDrawable("mini", this);
 		this.addLinkedDrawable("original", original);
 		
+		defaultInit();
+	}
+	
+	@Override
+	protected void defaultInit() {
 		getNode().addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
