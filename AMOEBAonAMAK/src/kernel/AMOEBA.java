@@ -152,6 +152,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (studiedSystem != null) {
 			studiedSystem.playOneStep();
 			perceptions = studiedSystem.getOutput();
+			
+			
 		}
 		
 		environment.preCycleActions();
@@ -180,6 +182,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onSystemCycleEnd() {
+		
+		if(studiedSystem != null) {
+			if(head.isActiveLearning()) {
+				head.setActiveLearning(false);
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(head.getSelfRequest());
+				 
+			}
+		}
+		
 		super.onSystemCycleEnd();
 		if(saver != null)
 			saver.autosave();
@@ -302,12 +314,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		studiedSystem = ss;
-		if(head.isActiveLearning()) {
-			head.setActiveLearning(false);
-			return head.getSelfRequest();
-		}else {
-			return null;
-		}
+		
+		return null;
 	}
 
 	@Override

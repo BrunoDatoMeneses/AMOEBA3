@@ -26,7 +26,7 @@ public class World extends Environment {
 	private double AVT_deceleration = 1. / 3.0;
 	private double AVT_percentAtStart = 0.2;
 
-	public double mappingErrorAllowed = 0.1;// TODO remove from here --> head agent
+	public double mappingErrorAllowed = 0.05;// TODO remove from here --> head agent
 	
 	public int regressionPoints = 0; // TODO remove from here
 	

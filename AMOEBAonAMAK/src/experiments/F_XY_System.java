@@ -68,4 +68,16 @@ public class F_XY_System implements StudiedSystem {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setActiveLearning(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSelfRequest(HashMap<String, Double> request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

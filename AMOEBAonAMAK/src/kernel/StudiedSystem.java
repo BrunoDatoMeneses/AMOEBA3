@@ -34,5 +34,10 @@ public interface StudiedSystem extends Serializable{
 	 * @return the oracle value.
 	 */
 	public double requestOracle(HashMap<String, Double> request);
+	
+	public void setActiveLearning(boolean value);
+	
+	
+	public void setSelfRequest(HashMap<String, Double> request);
 
 }

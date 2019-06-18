@@ -74,28 +74,6 @@ public class F_N_Launcher implements Serializable {
 		
 
 	
-		
-//		int nbCycle = 1000;
-//		for (int i = 0; i < nbCycle; ++i) {
-//			if(activeLearning) {
-//				activeLearning = false;
-//				amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(studiedSystem.getOutputWithAmoebaRequest(amoebaSelfRequest, oracleNoiseRange)));
-//			}
-//			else {
-//				/*Random samples on the unique context */
-//				studiedSystem.playOneStep();
-//				
-//				/*This is a learning step of AMOEBA*/
-//				amoebaSelfRequest = amoeba.learn(new HashMap<String, Double>(studiedSystem.getOutputWithNoise(oracleNoiseRange)));
-//			}
-//				
-//			
-//
-//
-//			if(amoebaSelfRequest != null) {
-//				activeLearning = true;
-//			}
-//		}
 
 		
 	

@@ -30,6 +30,9 @@ public class F_N_Manager implements StudiedSystem{
 	
 	int dimension;
 	
+	HashMap<String,Double> selfRequest;
+	boolean activeLearning = false;
+	
 	/** The world. */
 	Random generator;
 	
@@ -70,12 +73,24 @@ public class F_N_Manager implements StudiedSystem{
 	 */
 	@Override
 	public void playOneStep() {
+		
+
+		
+		if(activeLearning) {
+			activeLearning = false;
 			
-		if (generator == null)	generator = new Random(29);
-			
-		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+			for(int i = 0 ; i < dimension ; i++) {
+				x[i] = selfRequest.get("px" + i);
+			}
 		}
+		else {
+			if (generator == null)	generator = new Random(29);
+			
+			for(int i = 0 ; i < dimension ; i++) {
+				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+			}
+		}
+		
 		
 	}
 	
@@ -112,7 +127,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		return (x[0] > 100*Math.exp(-(Math.pow(x[1]/50, 2))/2) -50) ? model1() : model2();
+		return (x[0] > 100*Math.exp(-(Math.pow(x[1]/25, 2))/2) -50) ? model1() : model2();
 		
 	}
 	
@@ -132,7 +147,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		return (x0 > 100*Math.exp(-(Math.pow(x1/50, 2))/2) -50) ? model1() : model2();
+		return (x0 > 100*Math.exp(-(Math.pow(x1/25, 2))/2) -50) ? model1() : model2();
 		
 	}
 	
@@ -280,6 +295,16 @@ public class F_N_Manager implements StudiedSystem{
 	@Override
 	public double requestOracle(HashMap<String, Double> request) {
 		return model(request.get("px0"), request.get("px1"));
+	}
+	
+	@Override
+	public void setActiveLearning(boolean value) {
+		activeLearning = value;
+	}
+	
+	@Override
+	public void setSelfRequest(HashMap<String, Double> request){
+		selfRequest = request;
 	}
 
 
