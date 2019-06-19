@@ -331,7 +331,7 @@ public class VUI {
 	 * @return the Y on screen distance
 	 */
 	public double worldToScreenY(double y) {
-		return (y + getWorldOffsetY()) * getZoomFactor();
+		return (-y + getWorldOffsetY()) * getZoomFactor();
 	}
 
 	/**
@@ -355,7 +355,7 @@ public class VUI {
 	 * @return the Y in the world distance
 	 */
 	public double screenToWorldY(double y) {
-		return y / getZoomFactor() - getWorldOffsetY();
+		return -y / getZoomFactor() + getWorldOffsetY();
 	}
 
 	/**
