@@ -23,12 +23,16 @@ public class F_N_Manager implements StudiedSystem{
 	int[] modelCoefs1;
 	int[] modelCoefs2;
 	
+	int[][] modelCoefs;
+	double[][] modelCenterZones;
+	
 	/** The first step. */
 	boolean firstStep = true;
 	
 	double spaceSize;
 	
 	int dimension;
+	int numberOfModels;
 	
 	HashMap<String,Double> selfRequest;
 	boolean activeLearning = false;
@@ -37,14 +41,30 @@ public class F_N_Manager implements StudiedSystem{
 	Random generator;
 	
 	
-	public F_N_Manager(double size, int dim) {
+	public F_N_Manager(double size, int dim, int nbOfModels) {
 		this.spaceSize= size;
 		dimension = dim;
+		numberOfModels = nbOfModels;
 		x = new double[dimension];
+		
+		modelCoefs = new int[nbOfModels][dim+1];
+		modelCenterZones = new double[nbOfModels][dim];
+		
+		
+		for(int nb = 0; nb<nbOfModels; nb++) {
+			for(int i = 0; i<dimension; i++) {
+				x[i] = 0.0;
+				
+				modelCoefs[nb][i] = (int) (Math.random() * 500 - 255);
+				modelCenterZones[nb][i] = (Math.random() - 0.5) * spaceSize * 4;
+			}
+			modelCoefs[nb][dimension] = (int) (Math.random() * 500 - 255);
+
+
+		}
 		
 		modelCoefs1 = new int[dim+1];
 		modelCoefs2 = new int[dim+1];
-		
 		for(int i = 0; i<dimension; i++) {
 			x[i] = 0.0;
 			
@@ -55,16 +75,24 @@ public class F_N_Manager implements StudiedSystem{
 		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
 		
 		
-		System.out.print(modelCoefs1[modelCoefs1.length-1] + "\t");
-		for(int i =0;i<modelCoefs1.length-1;i++) {
-			System.out.print(modelCoefs1[i] + "\t");
+		for(int nb = 0; nb<nbOfModels; nb++) {
+			System.out.print(modelCoefs[nb][dimension] + "\t");
+			for(int i =0;i<dimension;i++) {
+				System.out.print(modelCoefs[nb][i] + "\t");
+			}
+			System.out.println("");
 		}
-		System.out.println("");
-		System.out.print(modelCoefs2[modelCoefs2.length-1] + "\t");
-		for(int i =0;i<modelCoefs2.length-1;i++) {
-			System.out.print(modelCoefs2[i] + "\t");
-		}
-		System.out.println("");
+		
+//		System.out.print(modelCoefs1[modelCoefs1.length-1] + "\t");
+//		for(int i =0;i<modelCoefs1.length-1;i++) {
+//			System.out.print(modelCoefs1[i] + "\t");
+//		}
+//		System.out.println("");
+//		System.out.print(modelCoefs2[modelCoefs2.length-1] + "\t");
+//		for(int i =0;i<modelCoefs2.length-1;i++) {
+//			System.out.print(modelCoefs2[i] + "\t");
+//		}
+//		System.out.println("");
 	}
 	
 	
@@ -111,7 +139,7 @@ public class F_N_Manager implements StudiedSystem{
 	}
 
 	
-	public double model(double[] x) {
+	public double model() {
 		
 		/* Disc */
 		//return (x[1]*x[1] + x[0]*x[0] < spaceSize*spaceSize ) ? model1() :  model2();
@@ -127,7 +155,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		return (x[0] > 100*Math.exp(-(Math.pow(x[1]/25, 2))/2) -50) ? model1() : model2();
+		//return (x[1] > 100*Math.exp(-(Math.pow(x[0]/25, 2))/2) -50) ? model1() : model2();
 		
 		
 		/* Cercle */
@@ -137,12 +165,16 @@ public class F_N_Manager implements StudiedSystem{
 //		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
 		
 		
+		/* Disques */
+		return modelN();
+		
+		
 		
 	}
 	
 
 	
-	public double model(double x0, double x1) {
+	public double model(double[] xRequest) {
 		
 		/* Disc */
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
@@ -158,7 +190,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		return (x0 > 100*Math.exp(-(Math.pow(x1/25, 2))/2) -50) ? model1() : model2();
+		//return (xRequest[1] > 100*Math.exp(-(Math.pow(xRequest[0]/25, 2))/2) -50) ? model1() : model2();
 		
 		/* Cercle */
 //		double rho = Math.sqrt(x1*x1 + x0*x0);
@@ -166,6 +198,63 @@ public class F_N_Manager implements StudiedSystem{
 //		double width = 25.0;
 //		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
 		
+		/* Disques */
+		return modelN(xRequest);
+		
+	}
+	
+	
+	
+	private double modelN() {
+		
+		for(int nb = 0; nb<numberOfModels-1; nb++) {
+			
+			if(distance(x,modelCenterZones[nb]) < spaceSize) {
+				return modeli(nb);
+			}
+			
+		}
+		return modeli(numberOfModels-1);
+		
+	}
+	
+	private double modelN(double[] xRequest) {
+		
+		for(int nb = 0; nb<numberOfModels-1; nb++) {
+			
+			if(distance(xRequest,modelCenterZones[nb]) < spaceSize) {
+				return modeli(nb, xRequest);
+			}
+			
+		}
+		return modeli(numberOfModels-1, xRequest);
+		
+	}
+	
+	private double distance(double[] x1, double[] x2) {
+		double distance = 0;
+		for(int i = 0; i < x1.length; i ++) {
+			distance += Math.pow(x2[i] - x1[i], 2) ;
+		}
+		return Math.sqrt(distance);
+	}
+	
+	private double modeli(int modelNb) {
+		double result = 0.0;
+		for(int i = 0; i<dimension;i++) {
+			result += x[i]*modelCoefs[modelNb][i];
+		}
+		result += modelCoefs[modelNb][dimension];
+		return result;		
+	}
+	
+	private double modeli(int modelNb, double[] xRequest) {
+		double result = 0.0;
+		for(int i = 0; i<dimension;i++) {
+			result += xRequest[i]*modelCoefs[modelNb][i];
+		}
+		result += modelCoefs[modelNb][dimension];
+		return result;		
 	}
 	
 	public double model1() {
@@ -209,7 +298,7 @@ public class F_N_Manager implements StudiedSystem{
 	public HashMap<String, Double> getOutput() {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = model(x);
+		result = model();
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -223,7 +312,7 @@ public class F_N_Manager implements StudiedSystem{
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = model(x) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model() - noiseRange/2 + Math.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -243,7 +332,7 @@ public class F_N_Manager implements StudiedSystem{
 			
 		}
 		
-		result = model(x) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model() - noiseRange/2 + Math.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -262,7 +351,7 @@ public class F_N_Manager implements StudiedSystem{
 			
 		}
 		
-		result = model(x);
+		result = model();
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -283,7 +372,7 @@ public class F_N_Manager implements StudiedSystem{
 		x[1] = values.get("px1");
 		
 		
-		result =  model(x);
+		result =  model();
 		
 		out.put("px0",x[0]);
 		out.put("px1",x[1]);
@@ -311,7 +400,16 @@ public class F_N_Manager implements StudiedSystem{
 
 	@Override
 	public double requestOracle(HashMap<String, Double> request) {
-		return model(request.get("px0"), request.get("px1"));
+		
+		double[] xRequest = new double[request.size()];
+		
+		for(int i = 0; i<dimension; i++) {
+			
+			xRequest[i] = request.get("px" + i);
+			
+		}
+		
+		return model(xRequest);
 	}
 	
 	@Override

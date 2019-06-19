@@ -258,7 +258,7 @@ public class Head extends AmoebaAgent {
 		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
 
 		overmappingNCSExecutionTime = System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
 
 		memoryCreationExecutionTime = System.currentTimeMillis();

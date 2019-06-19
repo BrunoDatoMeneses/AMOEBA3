@@ -29,6 +29,7 @@ public class F_N_Launcher implements Serializable {
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2	;
 	public static final double spaceSize = 50.0	;
+	public static final int nbOfModels = 5	;
 
 	
 	public static void main(String[] args) throws IOException {
@@ -50,7 +51,7 @@ public class F_N_Launcher implements Serializable {
 		Configuration.waitForGUI = true;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/twoDimensionsLauncher.xml");
