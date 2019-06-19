@@ -117,7 +117,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return (x[1]*x[1] + x[0]*x[0] < spaceSize*spaceSize ) ? model1() :  model2();
 		
 		/* Square */
-		return (x[1] > -spaceSize && x[1] < spaceSize && x[0] < spaceSize && x[0] > -spaceSize) ? model1() : model2() ;
+		//return (x[1] > -spaceSize && x[1] < spaceSize && x[0] < spaceSize && x[0] > -spaceSize) ? model1() : model2() ;
 		//return model1();
 		
 		/* Triangle */
@@ -127,7 +127,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		//return (x[0] > 100*Math.exp(-(Math.pow(x[1]/25, 2))/2) -50) ? model1() : model2();
+		return (x[0] > 100*Math.exp(-(Math.pow(x[1]/25, 2))/2) -50) ? model1() : model2();
 		
 		
 		/* Cercle */
@@ -148,7 +148,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Square */
-		return (x1 > -spaceSize && x1 < spaceSize && x0 < spaceSize && x0 > -spaceSize) ? model1(x0,x1) : model2(x0,x1) ;
+		//return (x1 > -spaceSize && x1 < spaceSize && x0 < spaceSize && x0 > -spaceSize) ? model1(x0,x1) : model2(x0,x1) ;
 		//return model1();
 		
 		/* Triangle */
@@ -158,7 +158,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Exp */
-		//return (x0 > 100*Math.exp(-(Math.pow(x1/25, 2))/2) -50) ? model1() : model2();
+		return (x0 > 100*Math.exp(-(Math.pow(x1/25, 2))/2) -50) ? model1() : model2();
 		
 		/* Cercle */
 //		double rho = Math.sqrt(x1*x1 + x0*x0);
