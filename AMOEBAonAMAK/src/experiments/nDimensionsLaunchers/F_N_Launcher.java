@@ -46,7 +46,7 @@ public class F_N_Launcher implements Serializable {
 		
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 8;
+		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
 		
 		AMOEBA amoeba = new AMOEBA();
