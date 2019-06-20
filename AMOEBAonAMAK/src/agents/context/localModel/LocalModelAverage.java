@@ -126,4 +126,16 @@ public class LocalModelAverage extends LocalModel {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public double getMaxProposition(Context context) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMinProposition(Context context) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
