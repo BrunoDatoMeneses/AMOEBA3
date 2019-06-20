@@ -104,6 +104,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			AmakPlot allNCS = window.getPlot("All time NCS");
 			AmakPlot nbAgent = window.getPlot("Number of agents");
 			AmakPlot errors = window.getPlot("Errors");
+			AmakPlot distancesToModels = window.getPlot("Distances to models");
 			boolean notify = isRenderUpdate();
 			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -116,8 +117,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			nbAgent.addData("Contexts", cycle, getContexts().size(), notify);
 			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent(), notify);
 
-			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity(), notify);
+			errors.addData("Criticality", cycle, head.getCriticity(), notify);
+			errors.addData("Mean criticality", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
+			
+			distancesToModels.addData("Distance to model", cycle, head.getDistanceToRegression(), notify);
+			distancesToModels.addData("Average distance to model", cycle, head.criticalities.getCriticalityMean("distanceToRegression"), notify);
+			distancesToModels.addData("Allowed distance to model", cycle, head.getDistanceToRegressionAllowed(), notify);
 		}
 		
 		if (isRenderUpdate()) {

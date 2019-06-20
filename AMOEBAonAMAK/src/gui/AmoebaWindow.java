@@ -67,10 +67,12 @@ public class AmoebaWindow extends MainWindow {
 		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
 		rectangle.setName("Neighborhood");
 		rectangle.setColor(new Color(1, 1, 1, 0));
+		
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
 		plots.put("Errors", new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients"));
+		plots.put("Distances to models", new AmakPlot("Distances to models", ChartType.LINE, "Cycle", "Distances"));
 
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
