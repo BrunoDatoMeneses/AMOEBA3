@@ -29,6 +29,7 @@ public class F_N_Manager implements StudiedSystem{
 	/** The first step. */
 	boolean firstStep = true;
 	boolean randomExploration = false;
+	boolean spaceLimited = true;
 	double spaceSize;
 	
 	int dimension;
@@ -47,12 +48,19 @@ public class F_N_Manager implements StudiedSystem{
 	double explorationMaxVariation;
 	
 	
-	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation) {
+	/* Parameters */
+	private static final double gaussianCoef = 1000;
+	private static final double gaussianVariance = 25;
+	
+	
+	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace) {
 		this.spaceSize= size;
 		dimension = dim;
 		numberOfModels = nbOfModels;
 		normType = nrmType;
 		x = new double[dimension];
+		
+		spaceLimited = limiteToSpace;
 		
 		modelCoefs = new int[nbOfModels][dim+1];
 		modelCenterZones = new double[nbOfModels][dim];
@@ -151,8 +159,11 @@ public class F_N_Manager implements StudiedSystem{
 		
 		for(int i = 0 ; i < dimension ; i++) {
 			x[i] += explorationIncrement*explorationVector[i];
-			if(x[i]>2*spaceSize) x[i]= -2*spaceSize;
-			if(x[i]<-2*spaceSize) x[i]= 2*spaceSize;
+			if(spaceLimited) {
+				if(x[i]>2*spaceSize) x[i]= -2*spaceSize;
+				if(x[i]<-2*spaceSize) x[i]= 2*spaceSize;
+			}
+			
 		}
 
 		
@@ -202,11 +213,15 @@ public class F_N_Manager implements StudiedSystem{
 		
 		
 		/* Disques */
-		return modelN();
+		//return modelN();
 		
 		
-		
+		/* Gaussian model */
+		return gaussianModel();
 	}
+
+
+	
 	
 
 	
@@ -235,11 +250,28 @@ public class F_N_Manager implements StudiedSystem{
 //		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
 		
 		/* Disques */
-		return modelN(xRequest);
+		//return modelN(xRequest);
 		
+		
+		/* Gaussian model */
+		return gaussianModel(xRequest);
 	}
 	
+	private double gaussianModel() {
+		double result = 1.0;
+		for(int i=0;i<dimension;i++) {
+			result *= Math.exp(-(Math.pow(x[i]/gaussianVariance, 2))/2);
+		}
+		return gaussianCoef*result;
+	}
 	
+	private double gaussianModel(double[] xRequest) {
+		double result = 1.0;
+		for(int i=0;i<dimension;i++) {
+			result *= Math.exp(-(Math.pow(xRequest[i]/gaussianVariance, 2))/2);
+		}
+		return gaussianCoef*result;
+	}
 	
 	private double modelN() {
 		

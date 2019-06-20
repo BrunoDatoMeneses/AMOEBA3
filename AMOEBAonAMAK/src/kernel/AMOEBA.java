@@ -117,7 +117,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			nbAgent.addData("Contexts", cycle, getContexts().size(), notify);
 			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent(), notify);
 
-			errors.addData("Criticality", cycle, head.getCriticity(), notify);
+			errors.addData("Criticality", cycle, head.getNormalizedCriticicality(), notify);
 			errors.addData("Mean criticality", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
 			

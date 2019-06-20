@@ -66,7 +66,7 @@ public class Head extends AmoebaAgent {
 
 	private double oracleValue;
 	private double oldOracleValue;
-	private double criticity;
+	private double criticity = 0.0;
 	private double distanceToRegression;
 	private double oldCriticity;
 
@@ -88,6 +88,11 @@ public class Head extends AmoebaAgent {
 
 	Double maxConfidence;
 	Double minConfidence;
+	
+	Double maxPrediction = 1.0;
+	Double minPrediction = Double.POSITIVE_INFINITY;
+	
+	double normalizedCriticality = 0.0;
 
 	// Endogenous feedback
 	private boolean noBestContext;
@@ -137,7 +142,7 @@ public class Head extends AmoebaAgent {
 		predictionPerformance = new DynamicPerformance(nSuccessBeforeDiminution, nConflictBeforeAugmentation,
 				errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed);
 
-		regressionPerformance = new DynamicPerformance(100, 100, 3000, 0.5, 0.5, 1);
+		regressionPerformance = new DynamicPerformance(100, 100, 200, 0.5, 0.5, 1);
 
 		mappingPerformance = new DynamicPerformance(100000, 1000000, getEnvironment().getMappingErrorAllowed(), 1.1,
 				0.9, 1);
@@ -223,7 +228,7 @@ public class Head extends AmoebaAgent {
 
 		/* Compute the criticity. Will be used by context agents. */
 		criticity = Math.abs(oracleValue - prediction);
-		criticalities.addCriticality("predictionCriticality", criticity);
+		
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
@@ -1478,6 +1483,15 @@ public class Head extends AmoebaAgent {
 	 */
 	private void updateStatisticalInformations() {
 
+		
+		if(Math.abs(oracleValue)>maxPrediction) {
+			maxPrediction = Math.abs(oracleValue);
+		}
+		
+
+		normalizedCriticality = criticity/maxPrediction;
+		criticalities.addCriticality("predictionCriticality", normalizedCriticality);
+		
 		criticalities.updateMeans();
 
 		if (severalActivatedContexts()) {
@@ -1599,6 +1613,10 @@ public class Head extends AmoebaAgent {
 	 */
 	public double getCriticity() {
 		return criticity;
+	}
+	
+	public double getNormalizedCriticicality() {
+		return normalizedCriticality;
 	}
 
 	/**

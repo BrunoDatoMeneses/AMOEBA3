@@ -33,7 +33,7 @@ public class F_N_Launcher implements Serializable {
 	public static final int normType = 2	;
 	public static final boolean randomExploration = true;
 	public static final boolean limitedToSpaceZone = false;
-	public static final double mappingErrorAllowed = 0.1	;
+	public static final double mappingErrorAllowed = 0.05	;
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 1	;
 
@@ -77,22 +77,22 @@ public class F_N_Launcher implements Serializable {
 		
 		
 		/* XP PIERRE */
-		for (int i = 0; i < 1000; ++i) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
-		}
-		
-		for (int i = 0; i < 10; ++i) {
-			studiedSystem.playOneStep();
-			System.out.println(studiedSystem.getOutput());
-			System.out.println(amoeba.request(studiedSystem.getOutput()));
-			
-		}
-		
-		for(Context ctxt : amoeba.getContexts()) {
-			System.out.println(ctxt.toStringPierre());
-
-		}
+//		for (int i = 0; i < 1000; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//		}
+//		
+//		for (int i = 0; i < 10; ++i) {
+//			studiedSystem.playOneStep();
+//			System.out.println(studiedSystem.getOutput());
+//			System.out.println(amoeba.request(studiedSystem.getOutput()));
+//			
+//		}
+//		
+//		for(Context ctxt : amoeba.getContexts()) {
+//			System.out.println(ctxt.toStringPierre());
+//
+//		}
 		
 		
 		
