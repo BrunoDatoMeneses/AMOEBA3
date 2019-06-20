@@ -392,7 +392,8 @@ public class Head extends AmoebaAgent {
 		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
 
 		selectBestContext();
-		if (bestContext != this.lastUsedContext) {
+		//if (bestContext != this.lastUsedContext) {
+		if (bestContext != null) {
 			noBestContext = false;
 			prediction = bestContext.getActionProposal();
 		} else {
@@ -1536,17 +1537,21 @@ public class Head extends AmoebaAgent {
 	 */
 	private void selectBestContext() {
 
-		Context bc;
+		Context bc = null;
 
-		bc = activatedContexts.get(0);
-		double currentConfidence = bc.getConfidence();
+		if(activatedContexts.size()>0) {
+			bc = activatedContexts.get(0);
+			double currentConfidence = bc.getConfidence();
 
-		for (Context context : activatedContexts) {
-			if (context.getConfidence() > currentConfidence) {
-				bc = context;
-				currentConfidence = bc.getConfidence();
+			for (Context context : activatedContexts) {
+				if (context.getConfidence() > currentConfidence) {
+					bc = context;
+					currentConfidence = bc.getConfidence();
+				}
 			}
 		}
+		
+		
 		bestContext = bc;
 	}
 
