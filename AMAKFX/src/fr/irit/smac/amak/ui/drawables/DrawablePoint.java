@@ -26,11 +26,6 @@ public class DrawablePoint extends Drawable {
 			}
 		});
 	}
-	
-	@Override
-	public Drawable move(double dx, double dy) {
-		return super.move(dx, dy+getHeight());
-	}
 
 	@Override
 	public void _onDraw() {
