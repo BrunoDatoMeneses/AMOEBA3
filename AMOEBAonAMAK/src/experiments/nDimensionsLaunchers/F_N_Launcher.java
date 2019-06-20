@@ -29,8 +29,12 @@ public class F_N_Launcher implements Serializable {
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2	;
-	public static final double spaceSize = 50.0	;
+	public static final double spaceSize = 150.0	;
 	public static final int nbOfModels = 5	;
+	public static final boolean randomExploration = false;
+	public static final double mappingErrorAllowed = 0.04	;
+	public static final double explorationIncrement = 5.0	;
+	public static final double explorationWidht = 0.5	;
 
 	
 	public static void main(String[] args) throws IOException {
@@ -52,7 +56,7 @@ public class F_N_Launcher implements Serializable {
 		Configuration.waitForGUI = true;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, randomExploration, explorationIncrement,explorationWidht);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/twoDimensionsLauncher.xml");
@@ -73,6 +77,7 @@ public class F_N_Launcher implements Serializable {
 		
 		amoeba.getHeadAgent().learningSpeed = learningSpeed;
 		amoeba.getHeadAgent().numberOfPointsForRegression = regressionPoints;
+		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
 
 //		for (int i = 0; i < 1000; ++i) {

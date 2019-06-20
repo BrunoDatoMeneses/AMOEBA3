@@ -52,6 +52,10 @@ public class World extends Environment {
 	public double getMappingErrorAllowed() {
 		return mappingErrorAllowed;
 	}
+	
+	public void setMappingErrorAllowed(double value) {
+		mappingErrorAllowed = value;
+	}
 
 	public synchronized void raiseNCS(NCS ncs) {
 		thisLoopNCS.put(ncs, thisLoopNCS.get(ncs) + 1);

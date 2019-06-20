@@ -90,6 +90,8 @@ public class Percept extends AmoebaAgent {
 			min = value;
 		if (value > max)
 			max = value;
+		
+		System.out.println(this.getName() + " MIN : " + min + " MAX : " + max );
 
 		/*
 		 * In order to avoid big gap in min-max value in order to adapt with the system
