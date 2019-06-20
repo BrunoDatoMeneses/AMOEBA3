@@ -276,7 +276,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		for (int i = 1 ; i < coefs.length ; i++) {
 			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
 			
-			result += "\t" + coefs[i];
+			result += "\t" + coefs[i] + " (" + context.getAmas().getPercepts().get(i-1) +")";
 			
 		}
 		
