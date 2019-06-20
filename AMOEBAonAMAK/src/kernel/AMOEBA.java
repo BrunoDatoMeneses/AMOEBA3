@@ -499,6 +499,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			a.onUpdateRender();
 		}
 		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
+		AmoebaWindow.instance().rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()));
+		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 		AmoebaWindow.instance().point.toFront();
 	}

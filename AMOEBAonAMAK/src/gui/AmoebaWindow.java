@@ -22,6 +22,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import kernel.AMOEBA;
 import kernel.SaveHelper;
 
@@ -40,6 +41,7 @@ public class AmoebaWindow extends MainWindow {
 	public VUI mainVUI;
 	
 	public Drawable point;
+	public Drawable rectangle;
 	public ToggleButton toggleRender;
 	public SchedulerToolbar schedulerToolbar;
 	public DimensionSelector dimensionSelector;
@@ -62,6 +64,9 @@ public class AmoebaWindow extends MainWindow {
 		// plots
 		point = mainVUI.createAndAddPoint(0, 0);
 		point.setName("Cursor");
+		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
+		rectangle.setName("Neighborhood");
+		rectangle.setColor(new Color(1, 1, 1, 0));
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
