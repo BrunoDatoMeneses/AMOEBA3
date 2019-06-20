@@ -1984,6 +1984,16 @@ public class Context extends AmoebaAgent {
 		return "Context :" + this.getName();
 	}
 
+	public String toStringPierre() {
+		String s = "";
+		s += "Context : " + getName() + "\n";
+		s += "Model : ";
+		s += this.localModel.getCoefsFormula() + "\n";	
+		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
+		return s;
+	}
+	
 	public String toStringFull() {
 		String s = "";
 		s += "Context : " + getName() + "\n";

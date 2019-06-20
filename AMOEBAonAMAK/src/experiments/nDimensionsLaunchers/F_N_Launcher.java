@@ -31,10 +31,11 @@ public class F_N_Launcher implements Serializable {
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 5	;
 	public static final int normType = 2	;
-	public static final boolean randomExploration = false;
-	public static final double mappingErrorAllowed = 0.04	;
+	public static final boolean randomExploration = true;
+	public static final boolean limitedToSpaceZone = false;
+	public static final double mappingErrorAllowed = 0.1	;
 	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 0.5	;
+	public static final double explorationWidht = 1	;
 
 	
 	public static void main(String[] args) throws IOException {
@@ -56,7 +57,7 @@ public class F_N_Launcher implements Serializable {
 		Configuration.waitForGUI = true;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/twoDimensionsLauncher.xml");
@@ -74,15 +75,24 @@ public class F_N_Launcher implements Serializable {
 		amoeba.learn(studiedSystem.getOutput());
 		
 		
-//		for (int i = 0; i < 1000; ++i) {
-//			studiedSystem.playOneStep();
-//			amoeba.learn(studiedSystem.getOutput());
-//		}
-//		
-//		for(Context ctxt : amoeba.getContexts()) {
-//			System.out.println(ctxt.getName() + " " + ctxt.getLocalModel().getMaxProposition(ctxt) +  ctxt.getLocalModel().getMinProposition(ctxt) ) ;
-//
-//		}
+		
+		/* XP PIERRE */
+		for (int i = 0; i < 1000; ++i) {
+			studiedSystem.playOneStep();
+			amoeba.learn(studiedSystem.getOutput());
+		}
+		
+		for (int i = 0; i < 10; ++i) {
+			studiedSystem.playOneStep();
+			System.out.println(studiedSystem.getOutput());
+			System.out.println(amoeba.request(studiedSystem.getOutput()));
+			
+		}
+		
+		for(Context ctxt : amoeba.getContexts()) {
+			System.out.println(ctxt.toStringPierre());
+
+		}
 		
 		
 		
