@@ -33,6 +33,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	int dimension;
 	int numberOfModels;
+	int normType;
 	
 	double[] explorationVector;
 	
@@ -46,10 +47,11 @@ public class F_N_Manager implements StudiedSystem{
 	double explorationMaxVariation;
 	
 	
-	public F_N_Manager(double size, int dim, int nbOfModels, boolean rndExploration, double explIncrement, double explnVariation) {
+	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation) {
 		this.spaceSize= size;
 		dimension = dim;
 		numberOfModels = nbOfModels;
+		normType = nrmType;
 		x = new double[dimension];
 		
 		modelCoefs = new int[nbOfModels][dim+1];
@@ -266,7 +268,7 @@ public class F_N_Manager implements StudiedSystem{
 	}
 	
 	private double distance(double[] x1, double[] x2) {
-		return normeP(x1,x2,2);
+		return normeP(x1,x2,normType);
 	}
 	
 	private double norme1(double[] x1, double[] x2) {

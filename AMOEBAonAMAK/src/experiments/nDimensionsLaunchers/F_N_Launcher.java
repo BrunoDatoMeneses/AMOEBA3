@@ -24,16 +24,16 @@ import kernel.StudiedSystem;
 public class F_N_Launcher implements Serializable {
 
 
-	public static final boolean viewer = true;
 	public static final double oracleNoiseRange = 0.0;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2	;
-	public static final double spaceSize = 150.0	;
+	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 5	;
+	public static final int normType = 2	;
 	public static final boolean randomExploration = false;
 	public static final double mappingErrorAllowed = 0.04	;
-	public static final double explorationIncrement = 5.0	;
+	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 
 	
@@ -42,12 +42,12 @@ public class F_N_Launcher implements Serializable {
 		// It also allows you to change some of its behavior before creating an AMOEBA.
 		// If you use Configuration.commandLineMode = True , then you should skip it. 
 		AmoebaWindow.instance();
-		launch(viewer);
+		launch();
 	}
 	
 
 
-	public static void launch(boolean viewer) throws IOException{
+	public static void launch() throws IOException{
 		
 		
 		// Set AMAK configuration before creating an AMOEBA
@@ -56,30 +56,24 @@ public class F_N_Launcher implements Serializable {
 		Configuration.waitForGUI = true;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, randomExploration, explorationIncrement,explorationWidht);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
+		
 		amoeba.saver = new SaveHelper(amoeba);
 		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(true);
-
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
-		
-		
-			
-		HashMap<String,Double> amoebaSelfRequest = null;
-		boolean activeLearning = false;
-		
-		
-		
+		amoeba.setRenderUpdate(true);		
 		amoeba.getHeadAgent().learningSpeed = learningSpeed;
 		amoeba.getHeadAgent().numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
 
+		studiedSystem.playOneStep();
+		amoeba.learn(studiedSystem.getOutput());
+		
+		
 //		for (int i = 0; i < 1000; ++i) {
 //			studiedSystem.playOneStep();
 //			amoeba.learn(studiedSystem.getOutput());
