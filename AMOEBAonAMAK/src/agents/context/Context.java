@@ -62,6 +62,8 @@ public class Context extends AmoebaAgent {
 
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<>();
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<>();
+	
+	
 
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
@@ -1999,7 +2001,10 @@ public class Context extends AmoebaAgent {
 		// }
 		// s += "\n";
 		s += "\n";
-
+		
+		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
+		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
 

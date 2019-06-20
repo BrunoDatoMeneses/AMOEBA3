@@ -232,6 +232,28 @@ public class F_N_Manager implements StudiedSystem{
 	}
 	
 	private double distance(double[] x1, double[] x2) {
+		return normeP(x1,x2,50);
+	}
+	
+	private double norme1(double[] x1, double[] x2) {
+		double distance = 0;
+		for(int i = 0; i < x1.length; i ++) {
+			distance += Math.abs(x2[i] - x1[i]) ;
+		}
+		return distance;
+	}
+	
+	
+	
+	private double normeP(double[] x1, double[] x2, int p) {
+		double distance = 0;
+		for(int i = 0; i < x1.length; i ++) {
+			distance += Math.pow(Math.abs(x2[i] - x1[i]), p) ;
+		}
+		return Math.pow(distance, 1.0/p);
+	}
+	
+	private double norme2(double[] x1, double[] x2) {
 		double distance = 0;
 		for(int i = 0; i < x1.length; i ++) {
 			distance += Math.pow(x2[i] - x1[i], 2) ;

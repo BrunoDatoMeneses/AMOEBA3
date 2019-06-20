@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import agents.context.Context;
 import experiments.F_XY_System;
 import experiments.XmlConfigGenerator;
 import fr.irit.smac.amak.Configuration;
@@ -74,7 +75,18 @@ public class F_N_Launcher implements Serializable {
 		amoeba.getHeadAgent().numberOfPointsForRegression = regressionPoints;
 		
 
-	
+//		for (int i = 0; i < 1000; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//		}
+//		
+//		for(Context ctxt : amoeba.getContexts()) {
+//			System.out.println(ctxt.getName() + " " + ctxt.getLocalModel().getMaxProposition(ctxt) +  ctxt.getLocalModel().getMinProposition(ctxt) ) ;
+//
+//		}
+		
+		
+		
 
 		
 	
