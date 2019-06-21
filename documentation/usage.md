@@ -15,7 +15,8 @@ Depending on your problem, determine what AMOEBA should learn, and from what. Bu
 ## Create a config file
 A config file is a xml file used to initialize your amoeba. Most importantly it contain the list of percepts.
 
-Your config file should look like this :
+You can use `utils/genFiles.py` to generate your xml file based on a list of percept. `python genFiles.py MySystem false px py` will create `MySystem.xml` (and `MySystem.msg`, but ignore it if you don't use [AMOEBA and ROS](rosbridge.md)) containing something looking like the following example :
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <System>
@@ -32,7 +33,6 @@ Your config file should look like this :
 	
         <Controller Name="Controller">
             <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
-            <InexactMargin InexactAllowed="500.0" AugmentationInexactError="2.5" DiminutionInexactError="0.2" MinInexactAllowed="0.05" NConflictBeforeInexactAugmentation="40" NSuccessBeforeInexactDiminution="80" />
         </Controller> 
     </StartingAgents>
 	
@@ -42,6 +42,8 @@ With :
 - **Configuration** make sure `Learning` and `creationOfNewContext` are at `true` if you want to train your model.
 - **Sensor** represent one percept, make sure to remember the name, we will use it later. `Enum` tell AMOEBA whether or not the variable linked to this percept is continuous, or discrete. 
 - **Controller** these are hyperparameter for the AMOEBA, they affect how fast and how well an amoeba learn. They can be dynamically adjusted during training, AMOEBA even does it automatically ! You still might want to adjust `MinErrorAllowed` and `MinInexactAllowed`, as they're dependent on your problem.
+
+If you want to use AMOEBA with ROS, continue [here](rosbridge.md).
 
 ## Create your studied system java class
 We have to tell AMOEBA what we want it to learn. Although we can hand-feed an amoeba with our data, providing a studied system allow to make full use of the graphical user interface.

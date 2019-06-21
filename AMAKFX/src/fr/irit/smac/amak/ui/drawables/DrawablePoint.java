@@ -1,11 +1,9 @@
 package fr.irit.smac.amak.ui.drawables;
 
-import org.kordamp.ikonli.dashicons.Dashicons;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.SVGPath;
 
 /**
  * Drawable to point things on the VUI, use a '+' icon as graphical representation.
@@ -14,11 +12,11 @@ import javafx.scene.input.MouseEvent;
  */
 public class DrawablePoint extends Drawable {
 
-	private FontIcon icon;
+	private SVGPath svg = new SVGPath();
 	
 	public DrawablePoint(double dx, double dy) {
-		super(dx, dy, 10, 10);
-		icon = FontIcon.of(Dashicons.PLUS_LIGHT);
+		super(dx, dy, 0.5, 0.5);
+		svg.setContent("M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z");
 		getNode().addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -29,39 +27,39 @@ public class DrawablePoint extends Drawable {
 
 	@Override
 	public void _onDraw() {
-		icon.setFill(color);
-		icon.setIconSize((int)Math.ceil(getRenderedWidth()));
-		icon.setX(left());
-		icon.setY(top());
+		svg.setFill(color);
+		svg.setScaleX(getRenderedWidth());
+		svg.setScaleY(getRenderedHeight());
+		// the render has an offset, 10 look like a good value 
+		svg.setTranslateX(left()-10);
+		svg.setTranslateY(top()-10);
 	}
 
 	@Override
 	protected void _hide() {
-		icon.setVisible(false);
+		svg.setVisible(false);
 	}
 
 	@Override
 	public void _show() {
-		icon.setVisible(true);
+		svg.setVisible(true);
 	}
 
 	@Override
 	public Node getNode() {
-		return icon;
+		return svg;
 	}
 	
 	@Override
 	protected void onMouseExited(MouseEvent event) {
-		icon.setIconSize((int)Math.ceil(getRenderedWidth()));
-		icon.setX(left());
-		icon.setY(top());
+		svg.setScaleX(getRenderedWidth());
+		svg.setScaleY(getRenderedHeight());
 	}
 
 	@Override
 	protected void onMouseEntered(MouseEvent event) {
-		icon.setIconSize((int)Math.ceil(getRenderedWidth()*1.5));
-		icon.setX(left() - getRenderedWidth()*0.25 );
-		icon.setY(top() + getRenderedWidth()*0.25);
+		svg.setScaleX(getRenderedWidth()*1.5);
+		svg.setScaleY(getRenderedHeight()*1.5);
 	}
 
 }

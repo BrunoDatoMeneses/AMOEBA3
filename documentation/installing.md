@@ -16,7 +16,16 @@ Compile and run tests :
 
 Build an executable jar with all dependencies :
 
-`mvn clean compile assembly:single`
+```
+mvn clean compile assembly:single
+```
+
+You can change the main class of the executable jar with the argument `-Dmain.class=fully.qualified.Main`.
+
+Example :
+```
+mvn clean compile assembly:single -Dmain.class=ros.Main
+```
 
 Results are in `target` folder.
 
@@ -31,6 +40,8 @@ in `maven-compiler-plugin` by
 <source>1.8</source>
 <target>1.8</target>
 ```
+
+The resulting jar is not platform agnostic.
 
 ### Build with eclipse
 `File > Open project from file system`, select the folder `AMOEBA3`, eclipse should detect 3 maven projects :

@@ -397,7 +397,6 @@ public class Head extends AmoebaAgent {
 		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
 
 		selectBestContext();
-		//if (bestContext != this.lastUsedContext) {
 		if (bestContext != null) {
 			noBestContext = false;
 			prediction = bestContext.getActionProposal();
@@ -406,15 +405,23 @@ public class Head extends AmoebaAgent {
 			noBestContext = true;
 			ArrayList<Context> allContexts = getAmas().getContexts();
 			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
-			prediction = nearestContext.getActionProposal();
-			bestContext = nearestContext;
+			if(nearestContext != null) {
+				prediction = nearestContext.getActionProposal();
+				bestContext = nearestContext;
+			} else {
+				prediction = 0.0;
+			}
 		}
-		logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
-		// Config.print("With function : " +
-		// bestContext.getFunction().getFormula(bestContext), 0);
-		logger().debug("HEAD without oracle",
-				"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
-		// functionSelected = bestContext.getFunction().getFormula(bestContext);
+		if(bestContext != null) {
+			logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
+			// Config.print("With function : " +
+			// bestContext.getFunction().getFormula(bestContext), 0);
+			logger().debug("HEAD without oracle",
+					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+			// functionSelected = bestContext.getFunction().getFormula(bestContext);
+		} else {
+			logger().debug("HEAD without oracle", "No best context");
+		}
 		criticity = Math.abs(oracleValue - prediction);
 
 		endogenousPlay();
@@ -1550,10 +1557,9 @@ public class Head extends AmoebaAgent {
 	 * Select best context.
 	 */
 	private void selectBestContext() {
-
-		Context bc = null;
-
-		if(activatedContexts.size()>0) {
+		if(activatedContexts != null && !activatedContexts.isEmpty()) {
+			Context bc;
+	
 			bc = activatedContexts.get(0);
 			double currentConfidence = bc.getConfidence();
 
@@ -1563,10 +1569,10 @@ public class Head extends AmoebaAgent {
 					currentConfidence = bc.getConfidence();
 				}
 			}
+			bestContext = bc;
+		} else {
+			bestContext = null;
 		}
-		
-		
-		bestContext = bc;
 	}
 
 	private void selectBestContextWithDistanceToModel() {
