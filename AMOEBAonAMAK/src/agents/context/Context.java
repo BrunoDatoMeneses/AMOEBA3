@@ -58,7 +58,7 @@ public class Context extends AmoebaAgent {
 	private ArrayList<Percept> nonValidPercepts = new ArrayList<Percept>();
 	private ArrayList<Percept> nonValidNeightborPercepts = new ArrayList<Percept>();
 
-	private boolean valid;
+	//private boolean valid;
 
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<>();
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<>();
@@ -1914,6 +1914,22 @@ public class Context extends AmoebaAgent {
 
 	@Override
 	protected void onAct() {
+		
+		
+		//onActOpitmized();
+		onActOld();
+
+	}
+	
+	private void onActOpitmized() {
+		if(amas.getValidContexts().contains(this)) {
+			logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
+			activations++;
+			getAmas().getHeadAgent().proposition(this);
+		}
+	}
+	
+	private void onActOld() {
 
 		if (nonValidPercepts.size() == 0) {
 
@@ -1941,14 +1957,14 @@ public class Context extends AmoebaAgent {
 		}
 
 		this.activations = 0;
-		this.valid = false;
+		//this.valid = false;
 
 		// Reset percepts validities
 		for (Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
 			perceptNeighborhoodValidities.put(percept, false);
 		}
-
+		
 	}
 
 	/**

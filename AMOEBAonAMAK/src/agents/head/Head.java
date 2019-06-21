@@ -287,12 +287,12 @@ public class Head extends AmoebaAgent {
 
 		if (activatedNeighborsContexts.size() > 1) {
 
-			for (Percept pct : getAmas().getPercepts()) {
-
-				if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
-					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
-				}
-			}
+//			for (Percept pct : getAmas().getPercepts()) {
+//
+//				if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
+//					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
+//				}
+//			}
 
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
@@ -2107,6 +2107,11 @@ public class Head extends AmoebaAgent {
 	public ArrayList<Context> getActivatedNeighborsContexts() {
 		return activatedNeighborsContexts;
 	}
+	
+	public void setActivatedNeighborsContexts(ArrayList<Context> neighbors) {
+		activatedNeighborsContexts = neighbors;
+	}
+
 
 	public ArrayList<Context> getContextNeighborsByInfluence() {
 		return contextsNeighborsByInfluence;

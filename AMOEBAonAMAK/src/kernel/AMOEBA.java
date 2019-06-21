@@ -3,7 +3,10 @@ package kernel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +61,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private ArrayList<Context> lastModifiedContext = new ArrayList<>();
 
 	private ArrayList<Context> alteredContexts = new ArrayList<>();
+	
+	private HashSet<Context> validContexts;
+	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
+	
+	private HashSet<Context> neighborContexts ;
+	private ReadWriteLock neighborContextsLock = new ReentrantReadWriteLock();
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -164,6 +173,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
+		validContexts = null;
+		neighborContexts = null;
 		environment.resetNbActivatedAgent();
 		spatiallyAlteredContext.clear();
 		lastModifiedContext.clear();
@@ -246,8 +257,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			contextStream = getContexts().stream(); // update all context
 			runAll = false;
 		} else {
-			//TODO
+			HashSet<Context> vcontexts = getValidContexts();
+			if (vcontexts == null) {
+				vcontexts = new HashSet<>();
+			}
+			contextStream = vcontexts.stream(); // or only valid ones
 		}
+		
+		//getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
+		
+		
 		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
 		Collections.sort(synchronousContexts, new AgentOrderComparator());
@@ -575,4 +594,73 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public ArrayList<Context> getAlteredContexts() {
 		return alteredContexts;
 	}
+	
+	/**
+	 * Return the current set of valid contexts.
+	 *
+	 * Synchronized with a readLock.
+	 *
+	 * @return
+	 */
+	public HashSet<Context> getValidContexts() {
+		HashSet<Context> ret;
+		validContextLock.readLock().lock();
+		if (validContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(validContexts);
+		}
+		validContextLock.readLock().unlock();
+		return ret;
+	}
+	
+	/**
+	 * Update the set of valid context. The update is done with an intersect of the
+	 * previous and new set.
+	 *
+	 * Synchronized with a writeLock.
+	 * @param validContexts new validContexts set.
+	 */
+	@SuppressWarnings("unchecked")
+	public void updateNeighborContexts(HashSet<Context> neighborContexts) {
+		neighborContextsLock.writeLock().lock();
+		if (this.neighborContexts == null) {
+			this.neighborContexts = (HashSet<Context>) neighborContexts.clone();
+		} else {
+			this.neighborContexts.retainAll(neighborContexts);
+		}
+		neighborContextsLock.writeLock().unlock();
+	}
+	
+	public HashSet<Context> getNeighborContexts() {
+		HashSet<Context> ret;
+		neighborContextsLock.readLock().lock();
+		if (neighborContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(neighborContexts);
+		}
+		neighborContextsLock.readLock().unlock();
+		return ret;
+	}
+	
+	/**
+	 * Update the set of valid context. The update is done with an intersect of the
+	 * previous and new set.
+	 *
+	 * Synchronized with a writeLock.
+	 * @param validContexts new validContexts set.
+	 */
+	@SuppressWarnings("unchecked")
+	public void updateValidContexts(HashSet<Context> validContexts) {
+		validContextLock.writeLock().lock();
+		if (this.validContexts == null) {
+			this.validContexts = (HashSet<Context>) validContexts.clone();
+		} else {
+			this.validContexts.retainAll(validContexts);
+		}
+		validContextLock.writeLock().unlock();
+	}
+	
+	
 }
