@@ -248,9 +248,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// it is sometime useful to run all context agent
 		// especially to check if they're not too small,
 		// or after reactivating rendering.
-		//if (cycle % 1000 == 0) {
+		if (cycle % 1000 == 0) {
 			runAll = true;
-		//}
+		}
 
 		Stream<Context> contextStream = null;
 		if (runAll) {
@@ -264,7 +264,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			contextStream = vcontexts.stream(); // or only valid ones
 		}
 		
-		//getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
+		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
 		
 		
 		// run contexts

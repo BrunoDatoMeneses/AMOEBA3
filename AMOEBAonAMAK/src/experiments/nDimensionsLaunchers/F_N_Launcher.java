@@ -78,13 +78,14 @@ public class F_N_Launcher implements Serializable {
 		amoeba.learn(studiedSystem.getOutput());
 		
 		
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < nbCycle; ++i) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
-		}
-		long end = System.currentTimeMillis();
-		System.out.println("Done in : " + (end - start) );
+		/* AUTOMATIC */
+//		long start = System.currentTimeMillis();
+//		for (int i = 0; i < nbCycle; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//		}
+//		long end = System.currentTimeMillis();
+//		System.out.println("Done in : " + (end - start) );
 		
 		
 		/* XP PIERRE */

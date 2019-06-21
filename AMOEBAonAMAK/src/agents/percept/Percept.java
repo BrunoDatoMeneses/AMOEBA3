@@ -65,8 +65,8 @@ public class Percept extends AmoebaAgent {
 	public void onAct() {
 		value = getAmas().getPerceptions(this.name);
 		ajustMinMax();
-		//computeContextProjectionValidityOptimized();
-		computeContextProjectionValidity();
+		computeContextProjectionValidityOptimized();
+		//computeContextProjectionValidity();
 
 	}
 
@@ -127,11 +127,20 @@ public class Percept extends AmoebaAgent {
 			if (contextProjections.get(c).contains(this.value)) {
 				validContextProjection.add(c);
 			}
+		} 
+		amas.updateValidContexts(validContextProjection);
+		
+		HashSet<Context> neighborsContexts = amas.getNeighborContexts();
+		if(neighborsContexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
+			neighborsContexts = new HashSet<>(amas.getContexts());
+		}
+		
+		for (Context c : neighborsContexts) {
 			if(contextProjections.get(c).inNeighborhood()) {
 				neighborContextProjection.add(c);
 			}
 		} 
-		amas.updateValidContexts(validContextProjection);
 		amas.updateNeighborContexts(neighborContextProjection);
 		
 		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());

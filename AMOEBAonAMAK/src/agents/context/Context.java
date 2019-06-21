@@ -1916,8 +1916,8 @@ public class Context extends AmoebaAgent {
 	protected void onAct() {
 		
 		
-		//onActOpitmized();
-		onActOld();
+		onActOpitmized();
+		//onActOld();
 
 	}
 	
@@ -1935,24 +1935,24 @@ public class Context extends AmoebaAgent {
 
 			getAmas().getHeadAgent().proposition(this);
 
-			for (Percept pct : getAmas().getPercepts()) {
-				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
-			}
+//			for (Percept pct : getAmas().getPercepts()) {
+//				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
+//			}
 
 		} else if (nonValidPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
 		}
 
 		if (nonValidNeightborPercepts.size() == 0) {
 
 			getAmas().getHeadAgent().addRequestNeighbor(this);
 		} else if (nonValidNeightborPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
 		}
 
 		if ((nonValidNeightborPercepts.size() == 0) && (nonValidPercepts.size() == 1)) {
 
-			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
 
 		}
 

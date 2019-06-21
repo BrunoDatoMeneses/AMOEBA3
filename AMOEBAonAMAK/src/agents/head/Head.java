@@ -54,7 +54,7 @@ public class Head extends AmoebaAgent {
 	private int numberOfCriticityValuesForAverage = 100;
 	private int numberOfCriticityValuesForAverageforVizualisation = 300;
 
-	private double prediction;
+	private Double prediction;
 	private Double endogenousPredictionActivatedContextsOverlaps = 0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = 0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = 0.0;
@@ -178,6 +178,8 @@ public class Head extends AmoebaAgent {
 	@Override
 	public void onAct() {
 
+
+		
 		currentCriticalityPrediction = 0;
 		currentCriticalityMapping = 0;
 		currentCriticalityConfidence = 0;
@@ -406,15 +408,29 @@ public class Head extends AmoebaAgent {
 			noBestContext = true;
 			ArrayList<Context> allContexts = getAmas().getContexts();
 			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
-			prediction = nearestContext.getActionProposal();
-			bestContext = nearestContext;
+			if(nearestContext == null) {
+				prediction = 0.0;
+				bestContext = null;
+			}
+			else {
+				prediction = nearestContext.getActionProposal();
+				bestContext = nearestContext;
+			}
+			
 		}
-		logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
-		// Config.print("With function : " +
-		// bestContext.getFunction().getFormula(bestContext), 0);
-		logger().debug("HEAD without oracle",
-				"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
-		// functionSelected = bestContext.getFunction().getFormula(bestContext);
+		if(bestContext != null) {
+			logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
+			// Config.print("With function : " +
+			// bestContext.getFunction().getFormula(bestContext), 0);
+			logger().debug("HEAD without oracle",
+					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+			// functionSelected = bestContext.getFunction().getFormula(bestContext);
+			
+		}
+		else {
+			logger().debug("HEAD without oracle", "no Best context selected ");
+		}
+		
 		criticity = Math.abs(oracleValue - prediction);
 
 		endogenousPlay();
@@ -1248,7 +1264,7 @@ public class Head extends AmoebaAgent {
 		if (nearestContext != null) {
 			prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0;
+			prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
@@ -1260,7 +1276,7 @@ public class Head extends AmoebaAgent {
 		if (nearestContext != null) {
 			prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0;
+			prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
