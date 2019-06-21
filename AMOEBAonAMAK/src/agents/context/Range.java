@@ -794,7 +794,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if ((end - start) < percept.getMappingErrorAllowed() && (end - start) > 0) {
+		if((end - start) < percept.getMappingErrorAllowed()*0.5 && (end - start)>0) {
 			////// System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" +
 			////// mininimalRange + " ~~~ " + (end - start));
 		}
@@ -826,8 +826,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return ((start_inclu ? "[" : "]") + start + "," + end + (!end_inclu ? "[" : "]") + "  Current value : "
-				+ percept.getValue() + "  AVT_Start : " + AVT_deltaStart + "  AVT_End : " + AVT_deltaEnd);
+		return ((start_inclu ? "[" : "]") + start + "," + end
+				+ (!end_inclu ? "[" : "]") + "  Current value : " + percept.getValue()
+				+ "\n lastStartDirection : " + lastStartDirection
+				+ "\n lastEndDirection : " + lastEndDirection 
+				+ "\n startCriticality : " + startCriticality
+				+ "\n endCriticality : " + endCriticality
+				+ "\n startIncrement : " + startIncrement
+				+ "\n endIncrement : " + endIncrement
+
+				);
 	}
 
 	/**

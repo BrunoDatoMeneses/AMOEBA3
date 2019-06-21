@@ -30,6 +30,8 @@ public abstract class LocalModel {
 	 */
 	public abstract double getProposition(Context context);
 	public abstract double getProposition(Experiment experiment);
+	public abstract double getMaxProposition(Context context);
+	public abstract double getMinProposition(Context context);
 	
 
 	

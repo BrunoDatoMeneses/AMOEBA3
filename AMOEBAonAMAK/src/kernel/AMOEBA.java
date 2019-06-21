@@ -104,6 +104,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			AmakPlot allNCS = window.getPlot("All time NCS");
 			AmakPlot nbAgent = window.getPlot("Number of agents");
 			AmakPlot errors = window.getPlot("Errors");
+			AmakPlot distancesToModels = window.getPlot("Distances to models");
 			boolean notify = isRenderUpdate();
 			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -116,8 +117,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			nbAgent.addData("Contexts", cycle, getContexts().size(), notify);
 			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent(), notify);
 
-			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity(), notify);
+			errors.addData("Criticality", cycle, head.getNormalizedCriticicality(), notify);
+			errors.addData("Mean criticality", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
+			
+			distancesToModels.addData("Distance to model", cycle, head.getDistanceToRegression(), notify);
+			distancesToModels.addData("Average distance to model", cycle, head.criticalities.getCriticalityMean("distanceToRegression"), notify);
+			distancesToModels.addData("Allowed distance to model", cycle, head.getDistanceToRegressionAllowed(), notify);
 		}
 		
 		if (isRenderUpdate()) {
@@ -152,6 +158,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (studiedSystem != null) {
 			studiedSystem.playOneStep();
 			perceptions = studiedSystem.getOutput();
+			
+			
 		}
 		
 		environment.preCycleActions();
@@ -180,6 +188,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onSystemCycleEnd() {
+		
+		if(studiedSystem != null) {
+			if(head.isActiveLearning()) {
+				head.setActiveLearning(false);
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(head.getSelfRequest());
+				 
+			}
+		}
+		
 		super.onSystemCycleEnd();
 		if(saver != null)
 			saver.autosave();
@@ -296,12 +314,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	@Override
-	public void learn(HashMap<String, Double> perceptionsActionState) {
+	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState) {
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		studiedSystem = ss;
+		
+		return null;
 	}
 
 	@Override
@@ -485,6 +505,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			a.onUpdateRender();
 		}
 		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
+		AmoebaWindow.instance().rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()));
+		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 		AmoebaWindow.instance().point.toFront();
 	}

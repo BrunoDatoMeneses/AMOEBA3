@@ -102,4 +102,29 @@ public class NDimCube implements StudiedSystem{
 			return getModelResult(2);
 		}
 	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
+			double noiseRange) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setActiveLearning(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSelfRequest(HashMap<String, Double> request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

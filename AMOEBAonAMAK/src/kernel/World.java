@@ -26,7 +26,7 @@ public class World extends Environment {
 	private double AVT_deceleration = 1. / 3.0;
 	private double AVT_percentAtStart = 0.2;
 
-	public double mappingErrorAllowed = 0.1;// TODO remove from here --> head agent
+	public double mappingErrorAllowed = 0.04;// TODO remove from here --> head agent
 	
 	public int regressionPoints = 0; // TODO remove from here
 	
@@ -52,6 +52,10 @@ public class World extends Environment {
 	public double getMappingErrorAllowed() {
 		return mappingErrorAllowed;
 	}
+	
+	public void setMappingErrorAllowed(double value) {
+		mappingErrorAllowed = value;
+	}
 
 	public synchronized void raiseNCS(NCS ncs) {
 		thisLoopNCS.put(ncs, thisLoopNCS.get(ncs) + 1);
@@ -70,11 +74,11 @@ public class World extends Environment {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-		String message = "" +amoeba.getCycle();
-		for(String info : infos) {
-			message += " " + info;
-		}
-		System.out.println(message);
+//		String message = "" +amoeba.getCycle();
+//		for(String info : infos) {
+//			message += " " + info;
+//		}
+//		System.out.println(message);
 	}
 
 	public double getAVT_acceleration() {

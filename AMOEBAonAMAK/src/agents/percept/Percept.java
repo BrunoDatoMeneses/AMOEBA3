@@ -90,6 +90,8 @@ public class Percept extends AmoebaAgent {
 			min = value;
 		if (value > max)
 			max = value;
+		
+		
 
 		/*
 		 * In order to avoid big gap in min-max value in order to adapt with the system
@@ -107,7 +109,7 @@ public class Percept extends AmoebaAgent {
 	 * @return the min max distance
 	 */
 	public double getMinMaxDistance() {
-		if (min == Double.MAX_VALUE || max == Double.MIN_VALUE)
+		if (min == Double.MAX_VALUE || max == Double.MIN_VALUE) 
 			return 0;
 		return Math.abs(max - min);
 	}

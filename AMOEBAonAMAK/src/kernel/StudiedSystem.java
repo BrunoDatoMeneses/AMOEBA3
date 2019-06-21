@@ -23,6 +23,10 @@ public interface StudiedSystem extends Serializable{
 	 */
 	public HashMap<String, Double> getOutput();
 	
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange);
+	
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,  double noiseRange);
+	
 	/**
 	 * Ask the studied system to provide an oracle for a specific input.
 	 * 
@@ -30,5 +34,10 @@ public interface StudiedSystem extends Serializable{
 	 * @return the oracle value.
 	 */
 	public double requestOracle(HashMap<String, Double> request);
+	
+	public void setActiveLearning(boolean value);
+	
+	
+	public void setSelfRequest(HashMap<String, Double> request);
 
 }

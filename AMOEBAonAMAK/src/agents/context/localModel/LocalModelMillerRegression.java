@@ -109,6 +109,48 @@ public class LocalModelMillerRegression extends LocalModel{
 		return result;
 	}
 	
+	public double getMaxProposition(Context context) {
+		
+		ArrayList<Percept> percepts = context.getAmas().getPercepts();			
+		double result = coefs[0];
+
+		if (coefs[0] == Double.NaN) System.exit(0);
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			if(coefs[i]>0) {
+				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getEnd();
+			}
+			else {
+				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getStart();
+			}
+		}
+	
+		return result;
+	}
+	
+	public double getMinProposition(Context context) {
+		
+		ArrayList<Percept> percepts = context.getAmas().getPercepts();			
+		double result = coefs[0];
+
+		if (coefs[0] == Double.NaN) System.exit(0);
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			if(coefs[i]<0) {
+				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getEnd();
+			}
+			else {
+				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getStart();
+			}
+		}
+	
+		return result;
+	}
+	
 	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
 		
 
@@ -234,7 +276,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		for (int i = 1 ; i < coefs.length ; i++) {
 			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
 			
-			result += "\t" + coefs[i];
+			result += "\t" + coefs[i] + " (" + context.getAmas().getPercepts().get(i-1) +")";
 			
 		}
 		
