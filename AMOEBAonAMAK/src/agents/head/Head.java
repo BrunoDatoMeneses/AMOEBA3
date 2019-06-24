@@ -897,9 +897,11 @@ public class Head extends AmoebaAgent {
 		/* Finally, head agent check the need for a new context agent */
 
 		boolean newContextCreated = false;
-		Pair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
 
 		if (activatedContexts.size() == 0) {
+			
+			
+			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 
 			Context context;
 			if (nearestGoodContext.getA() != null) {
@@ -1371,6 +1373,32 @@ public class Head extends AmoebaAgent {
 			}
 		}
 		return new Pair<Context, Double>(nearestGoodContext, d);
+
+	}
+	
+	private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
+		double d = Double.MAX_VALUE;
+		Context bestContextInNeighbors = null;
+		
+		for (Context c : contextNeighbors) {
+			
+			double currentDistanceToOraclePrediction = c.getLocalModel()
+					.distance(c.getCurrentExperiment());
+			
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
+					"" + c.getLocalModel().distance(c.getCurrentExperiment()))));
+			
+			if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+				if(currentDistanceToOraclePrediction < d) {
+					d = currentDistanceToOraclePrediction;
+					bestContextInNeighbors = c;
+				}
+				
+
+			}
+			
+		}
+		return new Pair<Context, Double>(bestContextInNeighbors, d);
 
 	}
 
@@ -2178,9 +2206,13 @@ public class Head extends AmoebaAgent {
 	}
 
 	public Pair<Double, Double> getMaxRadiusesForContextCreation(Percept pct) {
+//		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
+//				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
+//				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMax() - pct.getValue())));
+		
 		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
-				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
-				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMax() - pct.getValue())));
+				pct.getRadiusContextForCreation(),
+				pct.getRadiusContextForCreation());
 
 		// Pair<Double,Double> maxRadiuses = new
 		// Pair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
