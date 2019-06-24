@@ -45,8 +45,8 @@ public class F_XY_System implements StudiedSystem {
 
 		result = getResult(x, y);
 
-		out.put("px", x);
-		out.put("py", y);
+		out.put("px0", x);
+		out.put("px1", y);
 		out.put("oracle", result);
 		return out;
 	}

@@ -1,7 +1,7 @@
 package experiments;
 
 
-//Packages à importer afin d'utiliser l'objet File
+//Packages a importer afin d'utiliser l'objet File
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

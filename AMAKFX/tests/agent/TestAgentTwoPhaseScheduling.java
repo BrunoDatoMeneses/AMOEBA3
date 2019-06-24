@@ -1,14 +1,15 @@
 package agent;
 
-import static org.junit.Assert.assertFalse;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.CommunicatingAgent;
@@ -25,8 +26,9 @@ public class TestAgentTwoPhaseScheduling {
 	private TestAMAS amas;
 	private static final Semaphore semaphoreToCreateBlockingState = new Semaphore(1);
 
-	@Before
+	@BeforeEach
 	public void setup() {
+		Configuration.commandLineMode = true;
 		ObjectsForAgentTesting o = new ObjectsForAgentTesting();
 		TestEnv env = o.new TestEnv();
 		amas = new TestAMAS(env);
@@ -53,7 +55,7 @@ public class TestAgentTwoPhaseScheduling {
 		System.out.println("main : wait for token");
 		boolean hasToken = semaphoreToWaitAgentEnding.tryAcquire(2, 10, TimeUnit.SECONDS);
 		System.out.println("main : token release or expire, hasToken=" + hasToken);
-		assertFalse("None token should be available !", hasToken);
+		assertFalse(hasToken, "None token should be available !");
 		assertEquals(1, perceptionIsDone.get());
 		assertEquals(0, decideAndActDoneWithoutAllPerceptions.get());
 	}

@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import fr.irit.smac.amak.messaging.IAmakEnvelope;
 import testutils.ObjectsForAgentTesting;
@@ -19,7 +19,7 @@ public class TestAgentMessagingFeature extends ObjectsForAgentTesting {
 
 	public ObjectsForMessagingTesting omt;
 	
-	@Before
+	@BeforeEach
 	public void omt() {
 		omt = new ObjectsForMessagingTesting(); 
 	}
@@ -45,7 +45,7 @@ public class TestAgentMessagingFeature extends ObjectsForAgentTesting {
  * Since I was never able to make it fail reliably, I suspect a badly designed test,
  * And decided to deactivate it.
  */
-	@Ignore @Test
+	@Disabled @Test
 	public void getAllReceivedMessagesSendWithRawID() throws InterruptedException {
 		communicantAgent1.run();
 		boolean sendingSuccessful = communicantAgent1.sendMessage(omt.MSG_1, ObjectsForAgentTesting.RAW_ID3);
@@ -89,7 +89,7 @@ public class TestAgentMessagingFeature extends ObjectsForAgentTesting {
 		assertEquals(omt.MSG_1, msg);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		omt.teardown();
 	}

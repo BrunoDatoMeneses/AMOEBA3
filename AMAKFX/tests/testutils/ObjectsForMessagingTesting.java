@@ -1,6 +1,8 @@
 package testutils;
 
-import org.junit.After;
+
+
+import org.junit.jupiter.api.AfterEach;
 
 import fr.irit.smac.amak.aid.AddressableAID;
 import fr.irit.smac.amak.internal.messaging.ImplMessagingServiceAgentMessaging;
@@ -52,7 +54,7 @@ public class ObjectsForMessagingTesting {
 		return address;
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		messagingServices.disposeAll();
 	}

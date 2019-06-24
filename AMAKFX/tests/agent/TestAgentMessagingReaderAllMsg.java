@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import fr.irit.smac.amak.messaging.IAmakEnvelope;
 import fr.irit.smac.amak.messaging.IAmakMessage;
@@ -53,7 +53,7 @@ public class TestAgentMessagingReaderAllMsg extends ObjectsForAgentTesting {
 	}
 
 
-	@After
+	@AfterEach
 	public void teardown() {
 		omt.teardown();
 	}
