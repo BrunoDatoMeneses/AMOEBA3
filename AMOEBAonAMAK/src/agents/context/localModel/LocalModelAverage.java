@@ -138,4 +138,10 @@ public class LocalModelAverage extends LocalModel {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public void setFirstExperiments(ArrayList<Experiment> frstExp) {
+		// TODO Auto-generated method stub
+		
+	}
 }

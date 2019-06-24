@@ -316,6 +316,8 @@ public class Context extends AmoebaAgent {
 
 		this.experiments = new ArrayList<Experiment>();
 		experiments.addAll(bestNearestContext.getExperiments());
+		
+		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
 		localModel.updateModel(this.getCurrentExperiment(), getAmas().getHeadAgent().learningSpeed,
 				getAmas().getHeadAgent().numberOfPointsForRegression);
@@ -443,11 +445,15 @@ public class Context extends AmoebaAgent {
 			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
 		double startRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getStart());
 		double endRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getEnd());
+//		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
+//				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation,
+//						Math.abs(pct.getMin() - ranges.get(pct).getStart())),
+//				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation,
+//						Math.abs(pct.getMax() - ranges.get(pct).getEnd())));
+		
 		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
-				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation,
-						Math.abs(pct.getMin() - ranges.get(pct).getStart())),
-				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation,
-						Math.abs(pct.getMax() - ranges.get(pct).getEnd())));
+				pct.getRadiusContextForCreation() - startRadiusFromCreation,
+				pct.getRadiusContextForCreation() - endRadiusFromCreation);
 
 		double currentStartExpansion;
 		double currentEndExpansion;

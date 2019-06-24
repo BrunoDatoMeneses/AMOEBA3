@@ -71,6 +71,7 @@ public abstract class LocalModel {
 	public abstract String coefsToString();
 	public abstract double distance(Experiment experiment);
 	public abstract ArrayList<Experiment> getFirstExperiments();
+	public abstract void setFirstExperiments( ArrayList<Experiment> frstExp);
 	public abstract boolean finishedFirstExperiments();
 	
 	public abstract Double[] getCoef();
