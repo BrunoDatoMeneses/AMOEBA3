@@ -1973,6 +1973,18 @@ public class Context extends AmoebaAgent {
 		}
 		
 	}
+	
+	public void computeContextNeighborsValidity() {
+
+		
+		if (nonValidNeightborPercepts.size() == 1) {
+			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidNeightborPercepts.get(0), this);
+		}
+
+
+
+		
+	}
 
 	/**
 	 * Sets the confidence.

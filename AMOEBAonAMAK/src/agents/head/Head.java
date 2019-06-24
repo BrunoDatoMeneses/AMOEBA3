@@ -165,8 +165,7 @@ public class Head extends AmoebaAgent {
 
 	}
 
-	public void addPartialRequestNeighborContext(Percept nonValidPercept,
-			Context validContextNeighborExecptOnTheNonValidPercept) {
+	public void addPartialRequestNeighborContext(Percept nonValidPercept, Context validContextNeighborExecptOnTheNonValidPercept) {
 		partialNeighborContexts.get(nonValidPercept).add(validContextNeighborExecptOnTheNonValidPercept);
 
 	}
@@ -289,12 +288,7 @@ public class Head extends AmoebaAgent {
 
 		if (activatedNeighborsContexts.size() > 1) {
 
-//			for (Percept pct : getAmas().getPercepts()) {
-//
-//				if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
-//					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
-//				}
-//			}
+
 
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
@@ -2315,6 +2309,28 @@ public class Head extends AmoebaAgent {
 	}
 	
 	
+	public void updatePartiallyActivatedNeighbors() {
+		
+		for(Percept pct: getAmas().getPercepts()) {
+			
+			pct.computeContextNeighborsValidity(activatedNeighborsContexts);
+			
+		}
+		
+		for(Context ctxt : activatedNeighborsContexts) {
+			
+			ctxt.computeContextNeighborsValidity();
+			
+		}
+		
+		for (Percept pct : getAmas().getPercepts()) {
+
+			if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
+				pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
+			}
+		}
+		
+	}
 	
 
 	// -----------------

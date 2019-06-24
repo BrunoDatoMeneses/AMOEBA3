@@ -85,6 +85,20 @@ public class Percept extends AmoebaAgent {
 		}
 	}
 	
+	public void computeContextNeighborsValidity(ArrayList<Context> contextNeighbors) {
+
+		for (ContextProjection contextProjection : contextProjections.values()) {
+
+			if(contextNeighbors.contains(contextProjection.getContext())) {
+				if (!contextProjection.contains(this.value)) {
+					contextProjection.getContext().addNonValidNeighborPercept(this);
+				} 
+			}
+			
+			
+		}
+	}
+	
 	public void computeContextProjectionValidityOptimized() {
 
 		/* The algorithm used here :
