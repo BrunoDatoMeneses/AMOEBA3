@@ -73,7 +73,10 @@ public class AmoebaWindow extends MainWindow {
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
 		plots.put("Errors", new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients"));
 		plots.put("Distances to models", new AmakPlot("Distances to models", ChartType.LINE, "Cycle", "Distances"));
-
+		plots.put("Global Mapping Criticality", new AmakPlot("Global Mapping Criticality", ChartType.LINE, "Cycle", "Criticalities"));
+		plots.put("Time Execution", new AmakPlot("Time Execution", ChartType.LINE, "Cycle", "Times"));
+		plots.put("Criticalities", new AmakPlot("Criticalities", ChartType.LINE, "Cycle", "Criticalities"));
+		
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {

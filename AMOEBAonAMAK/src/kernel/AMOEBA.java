@@ -114,6 +114,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			AmakPlot nbAgent = window.getPlot("Number of agents");
 			AmakPlot errors = window.getPlot("Errors");
 			AmakPlot distancesToModels = window.getPlot("Distances to models");
+			AmakPlot gloabalMappingCriticality = window.getPlot("Global Mapping Criticality");
+			AmakPlot timeExecution = window.getPlot("Time Execution");
+			AmakPlot criticalities = window.getPlot("Criticalities");
+			
+			
 			boolean notify = isRenderUpdate();
 			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -133,6 +138,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			distancesToModels.addData("Distance to model", cycle, head.getDistanceToRegression(), notify);
 			distancesToModels.addData("Average distance to model", cycle, head.criticalities.getCriticalityMean("distanceToRegression"), notify);
 			distancesToModels.addData("Allowed distance to model", cycle, head.getDistanceToRegressionAllowed(), notify);
+			
+			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
+			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
+			
+			timeExecution.addData("HeadPlay", cycle, head.playExecutionTimeSum, notify);
+			timeExecution.addData("EndogenousPlay", cycle, head.endogenousExecutionTime, notify);
+			timeExecution.addData("ContextSelfAnalisis", cycle, head.contextSelfAnalisisExecutionTimeSum, notify);
+			timeExecution.addData("IncompetentNCS", cycle, head.incompetentHeadNCSExecutionTimeSum, notify);
+			timeExecution.addData("ConcurrenceNCS", cycle, head.concurrenceNCSExecutionTimeSum, notify);
+			timeExecution.addData("NewContextNCS", cycle, head.create_New_ContextNCSExecutionTimeSum, notify);
+			timeExecution.addData("OvermappingNCS", cycle, head.overmappingNCSExecutionTimeSum, notify);
+			timeExecution.addData("Other", cycle, head.otherExecutionTimeSum, notify);
+			
+			criticalities.addData("Prediction", cycle, head.evolutionCriticalityPrediction, notify);
+			criticalities.addData("Mapping", cycle, head.evolutionCriticalityMapping, notify);
+			criticalities.addData("Confidence", cycle, head.evolutionCriticalityConfidence, notify);
 		}
 		
 		if (isRenderUpdate()) {

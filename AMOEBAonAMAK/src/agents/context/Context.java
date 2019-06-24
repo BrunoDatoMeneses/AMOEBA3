@@ -1085,6 +1085,7 @@ public class Context extends AmoebaAgent {
 
 		confidence -= 2;
 		getAmas().getHeadAgent().setBadCurrentCriticalityConfidence();
+		getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
