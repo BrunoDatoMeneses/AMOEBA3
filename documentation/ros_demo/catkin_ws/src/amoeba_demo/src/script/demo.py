@@ -2,6 +2,7 @@
 
 import time
 import rospy
+from std_srvs.srv import Empty
 from geometry_msgs.msg import Twist
 from amoeba_demo.msg import Amoeba_msg
 from turtlesim.msg import Pose
@@ -14,16 +15,34 @@ theta = 0
 lin_vel = 0
 ang_vel = 0
 
+prev_lin_vel = 0
+prev_ang_vel = 0
+
 
 def control():
     global learn
-    time.sleep(5)
+    time.sleep(3)
     rospy.loginfo("Learning ...")
-    for i in range(60):
+    for i in range(3):
+	rate.sleep()
 	forward(1)
+	rotate(1)
+ 	forward(1)
+	rotate(1)
+	forward(3)
+	rotate(1)
+	forward(1)
+	rotate(1)
+ 	forward(1)
+	rotate(1)
+	forward(3)
 	rotate(1)
     learn = False
     rospy.loginfo("replaying ...")
+    rospy.set_param('background_r', 150)
+    rospy.wait_for_service('clear')
+    clear_bg = rospy.ServiceProxy('clear', Empty)
+    clear_bg()
     while not rospy.is_shutdown():
 	askAmoeba()
 	
@@ -35,6 +54,8 @@ def forward(value):
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
     vel_msg.angular.z = 0
+    prev_lin_vel = value
+    prev_ang_vel = 0
     pubTurtle.publish(vel_msg)
     if learn :
 	pub(pubAmoebaLin, vel_msg.linear.x)
@@ -48,13 +69,15 @@ def rotate(value):
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
     vel_msg.angular.z = value
+    prev_lin_vel = 0
+    prev_ang_vel = value
     pubTurtle.publish(vel_msg)
     if learn :
 	pub(pubAmoebaRot, vel_msg.angular.z)
     rate.sleep()
 
 def askAmoeba():
-    global lin_vel, ang_vel
+    global lin_vel, ang_vel, prev_lin_vel, prev_ang_vel
     lin_vel = 0
     ang_vel = 0
     pub(pubAmoebaLin, 0)
@@ -67,6 +90,8 @@ def askAmoeba():
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
     vel_msg.angular.z = ang_vel
+    prev_lin_vel = lin_vel
+    prev_ang_vel = ang_vel
     pubTurtle.publish(vel_msg)
     rate.sleep()
 
@@ -76,6 +101,8 @@ def pub(publisher, oracle):
     msg.px = tx
     msg.py = ty
     msg.theta = theta
+    msg.prev_lin = prev_lin_vel
+    msg.prev_ang = prev_ang_vel
     msg.oracle = oracle
     publisher.publish(msg)
 

@@ -34,7 +34,9 @@ Scripts are provided, for ease of use.
 - `stop.sh` stop ROS process created by the demo.
 - `clean.sh` remove files created by the above scripts.
 
-The demo is a turtlesim doing circles. First we teach 2 amoebas for 60 cycle, then we ask amoeba to move the turtle.
+The demo is a turtlesim doing ovals. First we teach (blue background), then we ask amoeba to move the turtle (rose background). Keep in mind that the goal of the demo is to show exemple of ros integration with amoeba. It's not a demonstration of amoeba capabilities, so if the turtle does not learn, it's not a big problem.
+
+You can check that something is learned by looking at amoeba's window.
 
 The python node is at `documentation/ros_demo/catkin_ws/src/amoeba_demo/src/script/demo.py`
 

@@ -409,7 +409,10 @@ public class Head extends AmoebaAgent {
 				prediction = nearestContext.getActionProposal();
 				bestContext = nearestContext;
 			} else {
-				prediction = 0.0;
+				//TODO amoeba should not look globally, but right now there's no other strategy
+				System.err.println("Play without oracle : no nearest context in neighbors, searching globally.");
+				nearestContext = this.getNearestContext(getAmas().getContexts());
+				prediction = nearestContext.getActionProposal();
 			}
 		}
 		if(bestContext != null) {
