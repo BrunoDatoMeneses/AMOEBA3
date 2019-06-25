@@ -58,6 +58,7 @@ public class F_N_Launcher implements Serializable {
 		Configuration.commandLineMode = false;
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
+		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		AMOEBA amoeba = new AMOEBA();
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);

@@ -142,14 +142,20 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
 			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
 			
-			timeExecution.addData("HeadPlay", cycle, head.playExecutionTimeSum, notify);
-			timeExecution.addData("EndogenousPlay", cycle, head.endogenousExecutionTime, notify);
-			timeExecution.addData("ContextSelfAnalisis", cycle, head.contextSelfAnalisisExecutionTimeSum, notify);
-			timeExecution.addData("IncompetentNCS", cycle, head.incompetentHeadNCSExecutionTimeSum, notify);
-			timeExecution.addData("ConcurrenceNCS", cycle, head.concurrenceNCSExecutionTimeSum, notify);
-			timeExecution.addData("NewContextNCS", cycle, head.create_New_ContextNCSExecutionTimeSum, notify);
-			timeExecution.addData("OvermappingNCS", cycle, head.overmappingNCSExecutionTimeSum, notify);
-			timeExecution.addData("Other", cycle, head.otherExecutionTimeSum, notify);
+			timeExecution.addData("HeadPlay", cycle, head.executionTimesSums[0], notify);
+			timeExecution.addData("EndogenousPlay", cycle, head.executionTimesSums[1], notify);
+			timeExecution.addData("ContextSelfAnalisis", cycle, head.executionTimesSums[2], notify);
+			timeExecution.addData("IncompetentNCS", cycle, head.executionTimesSums[3], notify);
+			timeExecution.addData("ConcurrenceNCS", cycle, head.executionTimesSums[4], notify);
+			timeExecution.addData("NewContextNCS", cycle, head.executionTimesSums[5], notify);
+			timeExecution.addData("OvermappingNCS", cycle, head.executionTimesSums[6], notify);
+			timeExecution.addData("Other", cycle, head.executionTimesSums[7], notify);
+			timeExecution.addData("BestContextInNeighbors", cycle, head.executionTimesSums[8], notify);
+			timeExecution.addData("CreateContext", cycle, head.executionTimesSums[9], notify);
+			timeExecution.addData("UpdateStatitics", cycle, head.executionTimesSums[10], notify);
+			
+			
+			
 			
 			criticalities.addData("Prediction", cycle, head.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, head.evolutionCriticalityMapping, notify);

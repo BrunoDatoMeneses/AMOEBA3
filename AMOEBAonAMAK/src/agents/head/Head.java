@@ -107,29 +107,15 @@ public class Head extends AmoebaAgent {
 	private int currentCriticalityMapping = 0;
 	private int currentCriticalityConfidence = 0;
 
-	public long playExecutionTime;
-	public long endogenousExecutionTime;
-	public long contextSelfAnalisisExecutionTime;
+	
+	
+	public double[] executionTimes = new  double[20];
+	public  double[] executionTimesSums = new  double[20];
+	
 
-	public long incompetentHeadNCSExecutionTime;
-	public long concurrenceNCSExecutionTime;
-	public long create_New_ContextNCSExecutionTime;
-	public long overmappingNCSExecutionTime;
-	public long memoryCreationExecutionTime;
+	
 
-	public long otherExecutionTime;
-
-	public long playExecutionTimeSum = 0;
-	public long endogenousExecutionTimeSum = 0;
-	public long contextSelfAnalisisExecutionTimeSum = 0;
-
-	public long incompetentHeadNCSExecutionTimeSum = 0;
-	public long concurrenceNCSExecutionTimeSum = 0;
-	public long create_New_ContextNCSExecutionTimeSum = 0;
-	public long overmappingNCSExecutionTimeSum = 0;
-	public long memoryCreationExecutionTimeSum = 0;
-
-	public long otherExecutionTimeSum = 0;
+	
 
 	public double learningSpeed = 0.25;
 	public int numberOfPointsForRegression = 50;
@@ -150,6 +136,15 @@ public class Head extends AmoebaAgent {
 
 	public Head(AMOEBA amoeba) {
 		super(amoeba);
+		
+		for(int i =0 ; i< 20;i++) {
+			executionTimesSums[i]=0.0;
+		}
+		
+
+		
+		
+
 	}
 	
 	
@@ -211,7 +206,7 @@ public class Head extends AmoebaAgent {
 
 	private void playWithOracle() {
 
-		playExecutionTime = System.currentTimeMillis();
+		executionTimes[0]=System.currentTimeMillis();
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); // using highest confidence
 			// selectBestContextWithDistanceToModel();
@@ -238,39 +233,39 @@ public class Head extends AmoebaAgent {
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
-		playExecutionTime = System.currentTimeMillis() - playExecutionTime;
+		executionTimes[0]=System.currentTimeMillis()- executionTimes[0];
 
-		endogenousExecutionTime = System.currentTimeMillis();
+		executionTimes[1]=System.currentTimeMillis();
 		// endogenousPlay();
-		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
+		executionTimes[1]=System.currentTimeMillis()- executionTimes[1];
 
-		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
+		executionTimes[2]=System.currentTimeMillis();
 		selfAnalysationOfContexts4();
-		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
+		executionTimes[2]=System.currentTimeMillis()- executionTimes[2];
+		
 
-		incompetentHeadNCSExecutionTime = System.currentTimeMillis();
+		executionTimes[3]=System.currentTimeMillis();
 		NCSDetection_IncompetentHead(); /*
-										 * If there isn't any proposition or only bad propositions, the head is
-										 * incompetent. It needs help from a context.
-										 */
-		incompetentHeadNCSExecutionTime = System.currentTimeMillis() - incompetentHeadNCSExecutionTime;
+		 * If there isn't any proposition or only bad propositions, the head is
+		 * incompetent. It needs help from a context.
+		 */
+		executionTimes[3]=System.currentTimeMillis()- executionTimes[3];
+		
 
-		concurrenceNCSExecutionTime = System.currentTimeMillis();
+		executionTimes[4]=System.currentTimeMillis();
 		NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
-		concurrenceNCSExecutionTime = System.currentTimeMillis() - concurrenceNCSExecutionTime;
+		executionTimes[4]=System.currentTimeMillis()- executionTimes[4];
 
-		create_New_ContextNCSExecutionTime = System.currentTimeMillis();
+		executionTimes[5]=System.currentTimeMillis();
 		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
-		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
+		executionTimes[5]=System.currentTimeMillis()- executionTimes[5];
 
-		overmappingNCSExecutionTime = System.currentTimeMillis();
-		//NCSDetection_Context_Overmapping();
-		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
+		executionTimes[6]=System.currentTimeMillis();
+		NCSDetection_Context_Overmapping();
+		executionTimes[6]=System.currentTimeMillis()- executionTimes[6];
 
-		memoryCreationExecutionTime = System.currentTimeMillis();
-		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
 
-		otherExecutionTime = System.currentTimeMillis();
+		executionTimes[7]=System.currentTimeMillis();
 		
 		NCSDetection_ChildContext();
 		
@@ -328,19 +323,14 @@ public class Head extends AmoebaAgent {
 		evolutionCriticalityConfidence = (lembda * evolutionCriticalityConfidence)
 				+ ((1 - lembda) * currentCriticalityConfidence);
 
-		otherExecutionTime = System.currentTimeMillis() - otherExecutionTime;
+		
+		executionTimes[7]=System.currentTimeMillis()- executionTimes[7];
 
-		playExecutionTimeSum += playExecutionTime;
-		endogenousExecutionTimeSum += endogenousExecutionTime;
-		contextSelfAnalisisExecutionTimeSum += contextSelfAnalisisExecutionTime;
+		
+		for(int i = 0 ; i<20;i++) {
+			executionTimesSums[i] += executionTimes[i];
+		}			
 
-		incompetentHeadNCSExecutionTimeSum += incompetentHeadNCSExecutionTime;
-		concurrenceNCSExecutionTimeSum += concurrenceNCSExecutionTime;
-		create_New_ContextNCSExecutionTimeSum += create_New_ContextNCSExecutionTime;
-		overmappingNCSExecutionTimeSum += overmappingNCSExecutionTime;
-		memoryCreationExecutionTimeSum += memoryCreationExecutionTime;
-
-		otherExecutionTimeSum += otherExecutionTime;
 	}
 
 	public double getSpatialGeneralizationScore() {
@@ -890,13 +880,19 @@ public class Head extends AmoebaAgent {
 	private void NCSDetection_Create_New_Context() {
 		/* Finally, head agent check the need for a new context agent */
 
+		
+		
+		
 		boolean newContextCreated = false;
-
+		executionTimes[9]=System.currentTimeMillis();
 		if (activatedContexts.size() == 0) {
 			
-			
+			executionTimes[8]=System.currentTimeMillis();		
 			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
+			executionTimes[8]=System.currentTimeMillis()- executionTimes[8];
 
+			
+			
 			Context context;
 			if (nearestGoodContext.getA() != null) {
 				getEnvironment().trace(new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
@@ -910,12 +906,23 @@ public class Head extends AmoebaAgent {
 			bestContext = context;
 			newContext = context;
 			newContextCreated = true;
+			
+			
 		}
+		executionTimes[9]=System.currentTimeMillis()- executionTimes[9];
 
+
+		
+
+		
+		
+		executionTimes[10]=System.currentTimeMillis();
 		if (!newContextCreated) {
 			updateStatisticalInformations();
 		}
+		executionTimes[10]=System.currentTimeMillis()- executionTimes[10];
 
+		
 	}
 
 	private void NCSDetection_Context_Overmapping() {
@@ -972,6 +979,12 @@ public class Head extends AmoebaAgent {
 			 */
 
 		}
+	}
+	
+	private void NCSDetection_NearbyIncompetence() {
+		
+		
+		
 	}
 
 	private void selfAnalysationOfContexts() {
@@ -2207,6 +2220,8 @@ public class Head extends AmoebaAgent {
 		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
 				pct.getRadiusContextForCreation(),
 				pct.getRadiusContextForCreation());
+		
+		//return maxRadiuses;
 
 		// Pair<Double,Double> maxRadiuses = new
 		// Pair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());

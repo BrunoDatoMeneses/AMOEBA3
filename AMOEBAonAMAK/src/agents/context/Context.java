@@ -433,8 +433,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : ranges.keySet()) {
 			double startExpansion = Math.abs(ranges.get(pct).getStart() - biggerContextForCreation.getStart(pct));
 			double endExpansion = Math.abs(ranges.get(pct).getEnd() - biggerContextForCreation.getEnd(pct));
-			//// System.out.println("EXPANSION " + pct.getName() +" < " + startExpansion + "
-			//// , " + endExpansion + " > / < " +pct.getMin() + " , " +pct.getMax() + " >");
+			
 
 			ranges.get(pct).setStart(biggerContextForCreation.getStart(pct));
 			ranges.get(pct).setEnd(biggerContextForCreation.getEnd(pct));
@@ -443,6 +442,8 @@ public class Context extends AmoebaAgent {
 
 	public Pair<Double, Double> getMaxExpansionsForContextExpansionAfterCreation(
 			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
+		
+		
 		double startRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getStart());
 		double endRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getEnd());
 //		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
@@ -460,8 +461,7 @@ public class Context extends AmoebaAgent {
 
 		// for(Context ctxt:partialNeighborContexts.get(pct)) {
 		for (Context ctxt : contextNeighborsInOneDirection) {
-			//// System.out.println("DISTANCE " + pct.getName() + " " +
-			//// ctxt.getRanges().get(pct).centerDistance(pct.getValue()));
+
 			if (ctxt.getRanges().get(pct).centerDistance(pct.getValue()) < 0) {
 				// End radius
 				currentEndExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
@@ -858,7 +858,7 @@ public class Context extends AmoebaAgent {
 
 	public void NCSDetection_OverMapping() {
 		
-		boolean fusionAcomplished = false;
+
 		
 		
 		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
@@ -866,16 +866,11 @@ public class Context extends AmoebaAgent {
 			
 			if(ctxt != this && !ctxt.isDying()) {
 				
-				fusionAcomplished = false;
+
 	
 				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
 				
-				
-				
-	
-				
-				//if(this.sameModelAs(ctxt, world.getScheduler().getHeadAgent().getErrorAllowed()/10) ) {
 				if((currentDistanceToOraclePrediction<getAmas().getHeadAgent().getDistanceToRegressionAllowed()) && (otherContextDistanceToOraclePrediction<getAmas().getHeadAgent().getDistanceToRegressionAllowed())) {
 					
 					getEnvironment().trace(new ArrayList<String>(Arrays.asList("currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
@@ -886,7 +881,7 @@ public class Context extends AmoebaAgent {
 						boolean fusionTest = true;
 						
 						getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
-						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowed()){		
+						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowed()/2){		
 														
 							for(Percept otherPct : ranges.keySet()) {
 								
@@ -900,8 +895,7 @@ public class Context extends AmoebaAgent {
 							}
 							
 							if(fusionTest) {
-								solveNCS_OverMapping(ctxt,pct);
-								fusionAcomplished = true;
+								solveNCS_OverMapping(ctxt);
 							}
 							
 						}
@@ -914,18 +908,17 @@ public class Context extends AmoebaAgent {
 		
 	}
 
-	private void solveNCS_OverMapping(Context fusionContext, Percept perceptFusion) {
+	private void solveNCS_OverMapping(Context fusionContext) {
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS OVERMAPPING")));
 		getEnvironment().raiseNCS(NCS.CONTEXT_OVERMAPPING);
 
-		if (this.getRanges().get(perceptFusion).getCenter() < fusionContext.getRanges().get(perceptFusion)
-				.getCenter()) {
-			this.getRanges().get(perceptFusion).setEnd(fusionContext.getRanges().get(perceptFusion).getEnd());
-		} else {
-			this.getRanges().get(perceptFusion).setStart(fusionContext.getRanges().get(perceptFusion).getStart());
+		
+		for(Percept pct : getAmas().getPercepts()) {
+			this.getRanges().get(pct).setEnd(Math.max(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
+			this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
 		}
-
+		
 		this.setConfidence(Math.max(this.getConfidence(), fusionContext.getConfidence()));
 
 		fusionContext.destroy();
