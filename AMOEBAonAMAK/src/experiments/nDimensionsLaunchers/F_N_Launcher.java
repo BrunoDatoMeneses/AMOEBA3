@@ -29,13 +29,13 @@ public class F_N_Launcher implements Serializable {
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2	;
 	public static final double spaceSize = 50.0	;
-	public static final int nbOfModels = 5	;
+	public static final int nbOfModels = 3	;
 	public static final int normType = 2	;
 	public static final boolean randomExploration = true;
-	public static final boolean limitedToSpaceZone = false;
-	public static final double mappingErrorAllowed = 0.05	;
+	public static final boolean limitedToSpaceZone = true;
+	public static final double mappingErrorAllowed = 0.03	;
 	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 1	;
+	public static final double explorationWidht = 0.5	;
 	
 	public static final int nbCycle = 1000;
 	
