@@ -794,7 +794,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < percept.getMappingErrorAllowed()*0.5 && (end - start)>0) {
+		if((end - start) < percept.getMappingErrorAllowed()*0.1 && (end - start)>0) {
 			////// System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" +
 			////// mininimalRange + " ~~~ " + (end - start));
 		}
@@ -1446,16 +1446,18 @@ public class Range implements Serializable, Comparable, Cloneable {
 			////// " + (Math.abs(newStartValue-this.start)));
 		}
 
-		if ((Double) newStartValue != null) {
-			if (newStartValue < percept.getMin()) {
-				this.start = percept.getMin();
-
-			} else {
-				this.start = newStartValue;
-			}
-		} else {
-			this.start = newStartValue;
-		}
+//		if ((Double) newStartValue != null) {
+//			if (newStartValue < percept.getMin()) {
+//				this.start = percept.getMin();
+//
+//			} else {
+//				this.start = newStartValue;
+//			}
+//		} else {
+//			this.start = newStartValue;
+//		}
+		
+		this.start = newStartValue;
 
 		if (this.context != null) {
 			lastStartTickModification = this.context.getAmas().getCycle();
@@ -1507,15 +1509,17 @@ public class Range implements Serializable, Comparable, Cloneable {
 			////// System.out.println(context.getName() + " " + percept.getName() + " END "
 			////// + (Math.abs(newEndValue-this.end)));
 		}
-		if ((Double) newEndValue != null) {
-			if (newEndValue > percept.getMax()) {
-				this.end = percept.getMax();
-			} else {
-				this.end = newEndValue;
-			}
-		} else {
-			this.end = newEndValue;
-		}
+//		if ((Double) newEndValue != null) {
+//			if (newEndValue > percept.getMax()) {
+//				this.end = percept.getMax();
+//			} else {
+//				this.end = newEndValue;
+//			}
+//		} else {
+//			this.end = newEndValue;
+//		}
+		
+		this.end = newEndValue;
 
 		if (this.context != null) {
 			lastEndTickModification = context.getAmas().getCycle();
