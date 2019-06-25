@@ -58,7 +58,7 @@ public class Context extends AmoebaAgent {
 	private ArrayList<Percept> nonValidPercepts = new ArrayList<Percept>();
 	private ArrayList<Percept> nonValidNeightborPercepts = new ArrayList<Percept>();
 
-	private boolean valid;
+	//private boolean valid;
 
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<>();
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<>();
@@ -316,6 +316,8 @@ public class Context extends AmoebaAgent {
 
 		this.experiments = new ArrayList<Experiment>();
 		experiments.addAll(bestNearestContext.getExperiments());
+		
+		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
 		localModel.updateModel(this.getCurrentExperiment(), getAmas().getHeadAgent().learningSpeed,
 				getAmas().getHeadAgent().numberOfPointsForRegression);
@@ -443,11 +445,15 @@ public class Context extends AmoebaAgent {
 			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
 		double startRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getStart());
 		double endRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getEnd());
+//		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
+//				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation,
+//						Math.abs(pct.getMin() - ranges.get(pct).getStart())),
+//				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation,
+//						Math.abs(pct.getMax() - ranges.get(pct).getEnd())));
+		
 		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
-				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation,
-						Math.abs(pct.getMin() - ranges.get(pct).getStart())),
-				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation,
-						Math.abs(pct.getMax() - ranges.get(pct).getEnd())));
+				pct.getRadiusContextForCreation() - startRadiusFromCreation,
+				pct.getRadiusContextForCreation() - endRadiusFromCreation);
 
 		double currentStartExpansion;
 		double currentEndExpansion;
@@ -1079,6 +1085,7 @@ public class Context extends AmoebaAgent {
 
 		confidence -= 2;
 		getAmas().getHeadAgent().setBadCurrentCriticalityConfidence();
+		getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
 
 		ArrayList<Percept> percepts = new ArrayList<Percept>();
 		percepts.addAll(ranges.keySet());
@@ -1914,41 +1921,69 @@ public class Context extends AmoebaAgent {
 
 	@Override
 	protected void onAct() {
+		
+		
+		onActOpitmized();
+		//onActOld();
+
+	}
+	
+	private void onActOpitmized() {
+		if(amas.getValidContexts().contains(this)) {
+			logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
+			activations++;
+			getAmas().getHeadAgent().proposition(this);
+		}
+	}
+	
+	private void onActOld() {
 
 		if (nonValidPercepts.size() == 0) {
 
 			getAmas().getHeadAgent().proposition(this);
 
-			for (Percept pct : getAmas().getPercepts()) {
-				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
-			}
+//			for (Percept pct : getAmas().getPercepts()) {
+//				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
+//			}
 
 		} else if (nonValidPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
 		}
 
 		if (nonValidNeightborPercepts.size() == 0) {
 
 			getAmas().getHeadAgent().addRequestNeighbor(this);
 		} else if (nonValidNeightborPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
 		}
 
 		if ((nonValidNeightborPercepts.size() == 0) && (nonValidPercepts.size() == 1)) {
 
-			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
+			//getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
 
 		}
 
 		this.activations = 0;
-		this.valid = false;
+		//this.valid = false;
 
 		// Reset percepts validities
 		for (Percept percept : perceptValidities.keySet()) {
 			perceptValidities.put(percept, false);
 			perceptNeighborhoodValidities.put(percept, false);
 		}
+		
+	}
+	
+	public void computeContextNeighborsValidity() {
 
+		
+		if (nonValidNeightborPercepts.size() == 1) {
+			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidNeightborPercepts.get(0), this);
+		}
+
+
+
+		
 	}
 
 	/**

@@ -54,7 +54,7 @@ public class Head extends AmoebaAgent {
 	private int numberOfCriticityValuesForAverage = 100;
 	private int numberOfCriticityValuesForAverageforVizualisation = 300;
 
-	private double prediction;
+	private Double prediction;
 	private Double endogenousPredictionActivatedContextsOverlaps = 0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = 0.0;
 	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = 0.0;
@@ -165,8 +165,7 @@ public class Head extends AmoebaAgent {
 
 	}
 
-	public void addPartialRequestNeighborContext(Percept nonValidPercept,
-			Context validContextNeighborExecptOnTheNonValidPercept) {
+	public void addPartialRequestNeighborContext(Percept nonValidPercept, Context validContextNeighborExecptOnTheNonValidPercept) {
 		partialNeighborContexts.get(nonValidPercept).add(validContextNeighborExecptOnTheNonValidPercept);
 
 	}
@@ -178,6 +177,8 @@ public class Head extends AmoebaAgent {
 	@Override
 	public void onAct() {
 
+
+		
 		currentCriticalityPrediction = 0;
 		currentCriticalityMapping = 0;
 		currentCriticalityConfidence = 0;
@@ -287,12 +288,7 @@ public class Head extends AmoebaAgent {
 
 		if (activatedNeighborsContexts.size() > 1) {
 
-			for (Percept pct : getAmas().getPercepts()) {
 
-				if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
-					pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
-				}
-			}
 
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
@@ -422,9 +418,12 @@ public class Head extends AmoebaAgent {
 			logger().debug("HEAD without oracle",
 					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
 			// functionSelected = bestContext.getFunction().getFormula(bestContext);
-		} else {
-			logger().debug("HEAD without oracle", "No best context");
+			
 		}
+		else {
+			logger().debug("HEAD without oracle", "no Best context selected ");
+		}
+		
 		criticity = Math.abs(oracleValue - prediction);
 
 		endogenousPlay();
@@ -891,9 +890,11 @@ public class Head extends AmoebaAgent {
 		/* Finally, head agent check the need for a new context agent */
 
 		boolean newContextCreated = false;
-		Pair<Context, Double> nearestGoodContext = getNearestGoodContextWithDistance(activatedNeighborsContexts);
 
 		if (activatedContexts.size() == 0) {
+			
+			
+			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 
 			Context context;
 			if (nearestGoodContext.getA() != null) {
@@ -1258,7 +1259,7 @@ public class Head extends AmoebaAgent {
 		if (nearestContext != null) {
 			prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0;
+			prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
@@ -1270,7 +1271,7 @@ public class Head extends AmoebaAgent {
 		if (nearestContext != null) {
 			prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0;
+			prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
@@ -1365,6 +1366,32 @@ public class Head extends AmoebaAgent {
 			}
 		}
 		return new Pair<Context, Double>(nearestGoodContext, d);
+
+	}
+	
+	private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
+		double d = Double.MAX_VALUE;
+		Context bestContextInNeighbors = null;
+		
+		for (Context c : contextNeighbors) {
+			
+			double currentDistanceToOraclePrediction = c.getLocalModel()
+					.distance(c.getCurrentExperiment());
+			
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
+					"" + c.getLocalModel().distance(c.getCurrentExperiment()))));
+			
+			if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+				if(currentDistanceToOraclePrediction < d) {
+					d = currentDistanceToOraclePrediction;
+					bestContextInNeighbors = c;
+				}
+				
+
+			}
+			
+		}
+		return new Pair<Context, Double>(bestContextInNeighbors, d);
 
 	}
 
@@ -2116,6 +2143,11 @@ public class Head extends AmoebaAgent {
 	public ArrayList<Context> getActivatedNeighborsContexts() {
 		return activatedNeighborsContexts;
 	}
+	
+	public void setActivatedNeighborsContexts(ArrayList<Context> neighbors) {
+		activatedNeighborsContexts = neighbors;
+	}
+
 
 	public ArrayList<Context> getContextNeighborsByInfluence() {
 		return contextsNeighborsByInfluence;
@@ -2166,9 +2198,13 @@ public class Head extends AmoebaAgent {
 	}
 
 	public Pair<Double, Double> getMaxRadiusesForContextCreation(Percept pct) {
+//		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
+//				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
+//				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMax() - pct.getValue())));
+		
 		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
-				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
-				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMax() - pct.getValue())));
+				pct.getRadiusContextForCreation(),
+				pct.getRadiusContextForCreation());
 
 		// Pair<Double,Double> maxRadiuses = new
 		// Pair<Double,Double>(pct.getRadiusContextForCreation(),pct.getRadiusContextForCreation());
@@ -2271,6 +2307,28 @@ public class Head extends AmoebaAgent {
 	}
 	
 	
+	public void updatePartiallyActivatedNeighbors() {
+		
+		for(Percept pct: getAmas().getPercepts()) {
+			
+			pct.computeContextNeighborsValidity(activatedNeighborsContexts);
+			
+		}
+		
+		for(Context ctxt : activatedNeighborsContexts) {
+			
+			ctxt.computeContextNeighborsValidity();
+			
+		}
+		
+		for (Percept pct : getAmas().getPercepts()) {
+
+			if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
+				pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
+			}
+		}
+		
+	}
 	
 
 	// -----------------

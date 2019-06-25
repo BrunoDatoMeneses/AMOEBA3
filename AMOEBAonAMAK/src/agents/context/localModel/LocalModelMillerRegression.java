@@ -600,6 +600,10 @@ public class LocalModelMillerRegression extends LocalModel{
 		return firstExperiments;
 	}
 	
+	public void setFirstExperiments( ArrayList<Experiment> frstExp) {
+		firstExperiments = frstExp;
+	}
+	
 	public String coefsToString() {
 		String coefsString = "";
 		if(coefs != null) {

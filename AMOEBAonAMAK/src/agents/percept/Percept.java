@@ -3,6 +3,7 @@ package agents.percept;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.math3.exception.OutOfRangeException;
 
@@ -24,12 +25,14 @@ public class Percept extends AmoebaAgent {
 	protected ArrayList<Context> activatedContext = new ArrayList<>();
 
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-
+	private HashSet<Context> validContextProjection = new HashSet<Context>();
+	private HashSet<Context> neighborContextProjection = new HashSet<Context>();
+	
+	
+	
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
-
 	public ArrayList<Context> sortedContextbyStartRanges = new ArrayList<Context>();
 	public ArrayList<Context> sortedContextbyEndRanges = new ArrayList<Context>();
-
 	public HashMap<String, CustomComparator> customRangeComparators = new HashMap<String, CustomComparator>();
 
 	private CustomComparator rangeStartComparator = new CustomComparator(this, "start");
@@ -39,7 +42,7 @@ public class Percept extends AmoebaAgent {
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
 
-	private double oldValue;
+
 	private double value;
 	private boolean isEnum = false;
 
@@ -60,10 +63,10 @@ public class Percept extends AmoebaAgent {
 
 	@Override
 	public void onAct() {
-		oldValue = value;
 		value = getAmas().getPerceptions(this.name);
 		ajustMinMax();
-		computeContextProjectionValidity();
+		computeContextProjectionValidityOptimized();
+		//computeContextProjectionValidity();
 
 	}
 
@@ -81,6 +84,82 @@ public class Percept extends AmoebaAgent {
 			}
 		}
 	}
+	
+	public void computeContextNeighborsValidity(ArrayList<Context> contextNeighbors) {
+
+		for (ContextProjection contextProjection : contextProjections.values()) {
+
+			if(contextNeighbors.contains(contextProjection.getContext())) {
+				if (!contextProjection.contains(this.value)) {
+					contextProjection.getContext().addNonValidNeighborPercept(this);
+				} 
+			}
+			
+			
+		}
+	}
+	
+	public void computeContextProjectionValidityOptimized() {
+
+		/* The algorithm used here :
+		 * 
+		 * Variables :
+		 * global set allContexts
+		 * global set validContexts
+		 * local set myValidContexts
+		 * 
+		 * Algorithm : for each percept do :
+		 * myValidContexts <- validContexts
+		 * if myValidContexts = null then
+		 * 		myValidContexts <- allContexts
+		 * fi
+		 * 
+		 * for context in myValidContext do
+		 * 		if not isValid(context) then
+		 * 			myValidContexts.remove(context)
+		 * 		fi
+		 * done
+		 * 
+		 * validContexts <- intersect(validContexts, myValidContexts)
+		 * #we use an intersect to allow multithreading, avoiding that a percept override the work of another
+		 * 
+		 */
+		
+		
+		validContextProjection = new HashSet<Context>();
+		neighborContextProjection = new HashSet<Context>();
+		
+		// To avoid unnecessary tests, we only compute validity on context
+		// validated by percepts that have finished before us
+		HashSet<Context> contexts = amas.getValidContexts();
+		if(contexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
+			contexts = new HashSet<>(amas.getContexts());
+		}
+		
+		for (Context c : contexts) {
+			if (contextProjections.get(c).contains(this.value)) {
+				validContextProjection.add(c);
+			}
+		} 
+		amas.updateValidContexts(validContextProjection);
+		
+		HashSet<Context> neighborsContexts = amas.getNeighborContexts();
+		if(neighborsContexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
+			neighborsContexts = new HashSet<>(amas.getContexts());
+		}
+		
+		for (Context c : neighborsContexts) {
+			if(contextProjections.get(c).inNeighborhood()) {
+				neighborContextProjection.add(c);
+			}
+		} 
+		amas.updateNeighborContexts(neighborContextProjection);
+		
+		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
+	}
+
 
 	/**
 	 * Allow the percept to record the lower and higher value perceived.
@@ -190,23 +269,9 @@ public class Percept extends AmoebaAgent {
 		this.targets = targets;
 	}
 
-	/**
-	 * Gets the old value.
-	 *
-	 * @return the old value
-	 */
-	public double getOldValue() {
-		return oldValue;
-	}
 
-	/**
-	 * Sets the old value.
-	 *
-	 * @param oldValue the new old value
-	 */
-	public void setOldValue(double oldValue) {
-		this.oldValue = oldValue;
-	}
+
+
 
 	/**
 	 * Checks if is enum.

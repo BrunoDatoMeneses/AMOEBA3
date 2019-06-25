@@ -36,6 +36,9 @@ public class F_N_Launcher implements Serializable {
 	public static final double mappingErrorAllowed = 0.05	;
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 1	;
+	
+	public static final int nbCycle = 1000;
+	
 
 	
 	public static void main(String[] args) throws IOException {
@@ -74,6 +77,15 @@ public class F_N_Launcher implements Serializable {
 		studiedSystem.playOneStep();
 		amoeba.learn(studiedSystem.getOutput());
 		
+		
+		/* AUTOMATIC */
+//		long start = System.currentTimeMillis();
+//		for (int i = 0; i < nbCycle; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//		}
+//		long end = System.currentTimeMillis();
+//		System.out.println("Done in : " + (end - start) );
 		
 		
 		/* XP PIERRE */
