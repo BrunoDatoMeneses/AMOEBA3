@@ -10,6 +10,7 @@ import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -157,7 +158,7 @@ public class AmakPlot {
 			if(!getNotifySent()) {
 				setNotifySent();
 				Timeline tl = new Timeline(new KeyFrame(
-						Duration.millis(1000), 
+						Duration.millis(Configuration.plotMilliSecondsUpdate), 
 						ae -> {seriesCollection.setNotify(true);; resetNotifySent();}));
 				tl.play();
 			}
