@@ -3,7 +3,10 @@ package agents.head;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
@@ -82,9 +85,14 @@ public class Head extends AmoebaAgent {
 	private boolean newContextWasCreated = false;
 	private boolean contextFromPropositionWasSelected = false;
 	
-	private boolean activeLearning = false;
 	
-	private HashMap<String, Double> selfRequest;
+	
+	
+	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
+			      return r2.getPriority().compareTo(r1.getPriority());
+			   }
+			});
 
 	Double maxConfidence;
 	Double minConfidence;
@@ -851,6 +859,8 @@ public class Head extends AmoebaAgent {
 		
 		
 	}
+	
+	
 
 	private Double compareClosestContextPairModels(ContextPair<Context, Context> closestContexts) {
 		Double difference = 0.0;
@@ -982,7 +992,6 @@ public class Head extends AmoebaAgent {
 	}
 	
 	private void NCSDetection_NearbyIncompetence() {
-		
 		
 		
 	}
@@ -2308,19 +2317,21 @@ public class Head extends AmoebaAgent {
 	
 	
 	public boolean isActiveLearning() {
-		return activeLearning;
+		return isSelfRequest();
 	}
 	
-	public void setActiveLearning(boolean value) {
-		activeLearning = value;
-	}
+	
 	
 	public HashMap<String, Double> getSelfRequest(){
-		return selfRequest;
+		return endogenousRequests.poll().getRequest();
 	}
 	
-	public void setSelfRequest(HashMap<String, Double> request){
-		selfRequest = request;
+	public boolean isSelfRequest(){
+		return endogenousRequests.size()>0;
+	}
+	
+	public void addSelfRequest(HashMap<String, Double> request, int priority){
+		endogenousRequests.add(new EndogenousRequest(request, priority));
 	}
 	
 	

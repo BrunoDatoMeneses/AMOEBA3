@@ -926,13 +926,12 @@ public class Context extends AmoebaAgent {
 	}
 	
 	public void solveNCS_ChildContext() {
-		getAmas().getHeadAgent().setActiveLearning(true);
 		HashMap<String, Double> request = new HashMap<String, Double>();
 		for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct.getName(), getRandomValueInRange(pct));
 		}
 		
-		getAmas().getHeadAgent().setSelfRequest(request);
+		getAmas().getHeadAgent().addSelfRequest(request, 10);
 	}
 	
 	private Double getRandomValueInRange(Percept pct) {
