@@ -2,6 +2,8 @@ package gui.saveExplorer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -51,7 +53,8 @@ public class SaveExplorer extends VBox {
 		this.amoeba = amoeba;
 		try {
 			//load the fxml for THIS SaveExplorer
-			VBox root = FXMLLoader.load(getClass().getResource("SaveExplorer.fxml"), null, null, new Callback<Class<?>, Object>() {
+			URL url = getClass().getResource("SaveExplorer.fxml");
+			VBox root = FXMLLoader.load(url, null, null, new Callback<Class<?>, Object>() {
 				@Override
 				public Object call(Class<?> param) {
 					return SaveExplorer.this;

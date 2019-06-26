@@ -27,6 +27,12 @@
 			<resource>
 				<directory>resources</directory>
 			</resource>
+			<resource>
+				<directory>src</directory>
+				<includes>
+					<include>**/*.fxml</include>
+				</includes>
+			</resource>
 		</resources>
 		<pluginManagement>
 			<plugins>
