@@ -9,6 +9,7 @@ import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.percept.Percept;
 import kernel.AMOEBA;
+import kernel.AmoebaData;
 import utils.Pair;
 import utils.Quadruplet;
 import agents.context.CustomComparator;
@@ -22,12 +23,12 @@ import ncs.NCS;
  */
 public class Head extends AmoebaAgent {
 
+	// MEMBERS ---------------------
+	
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
 	private String functionSelected;
-
-	// private BlackBoxAgent oracle;
 
 	HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
 
@@ -49,102 +50,19 @@ public class Head extends AmoebaAgent {
 
 	private ArrayList<Context> contextsInCompetition = new ArrayList<Context>();
 
-	private int nPropositionsReceived;
-	private int averagePredictionCriticityWeight = 0;
-	private int numberOfCriticityValuesForAverage = 100;
-	private int numberOfCriticityValuesForAverageforVizualisation = 300;
-
-	private Double prediction;
-	private Double endogenousPredictionActivatedContextsOverlaps = 0.0;
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = 0.0;
-	private Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = 0.0;
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = 0.0;
-	private Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = 0.0;
-	private Double endogenousPredictionActivatedContextsSharedIncompetence = 0.0;
-	private Double endogenousPredictionNContexts = 0.0;
-	private Double endogenousPredictionNContextsByInfluence = 0.0;
-
-	private double oracleValue;
-	private double oldOracleValue;
-	private double criticity = 0.0;
-	private double distanceToRegression;
-	private double oldCriticity;
-
-	private double spatialGeneralizationScore = 0;
-
-	public DynamicPerformance predictionPerformance;
-	public DynamicPerformance regressionPerformance;
-	public DynamicPerformance mappingPerformance;
-
-	private boolean noCreation = true;
-	private boolean useOracle = true;
-	private boolean firstContext = false;
-	private boolean newContextWasCreated = false;
-	private boolean contextFromPropositionWasSelected = false;
-	
-	private boolean activeLearning = false;
-	
-	private HashMap<String, Double> selfRequest;
-
-	Double maxConfidence;
-	Double minConfidence;
-	
-	Double maxPrediction = 1.0;
-	Double minPrediction = Double.POSITIVE_INFINITY;
-	
-	double normalizedCriticality = 0.0;
-
-	// Endogenous feedback
-	private boolean noBestContext;
-
 	static double lembda = 0.99;
-
-	public double evolutionCriticalityPrediction = 0.5;
-	public double evolutionCriticalityMapping = 0.5;
-	public double evolutionCriticalityConfidence = 0.5;
-
-	private int currentCriticalityPrediction = 0;
-	private int currentCriticalityMapping = 0;
-	private int currentCriticalityConfidence = 0;
-
-	public long playExecutionTime;
-	public long endogenousExecutionTime;
-	public long contextSelfAnalisisExecutionTime;
-
-	public long incompetentHeadNCSExecutionTime;
-	public long concurrenceNCSExecutionTime;
-	public long create_New_ContextNCSExecutionTime;
-	public long overmappingNCSExecutionTime;
-	public long memoryCreationExecutionTime;
-
-	public long otherExecutionTime;
-
-	public long playExecutionTimeSum = 0;
-	public long endogenousExecutionTimeSum = 0;
-	public long contextSelfAnalisisExecutionTimeSum = 0;
-
-	public long incompetentHeadNCSExecutionTimeSum = 0;
-	public long concurrenceNCSExecutionTimeSum = 0;
-	public long create_New_ContextNCSExecutionTimeSum = 0;
-	public long overmappingNCSExecutionTimeSum = 0;
-	public long memoryCreationExecutionTimeSum = 0;
-
-	public long otherExecutionTimeSum = 0;
-
-	public double learningSpeed = 0.25;
-	public int numberOfPointsForRegression = 50;
-
-	public boolean contextNotFinished = false;
-
+	
+	// -----------------------------
+	
 	public void setDataForErrorMargin(double errorAllowed, double augmentationFactorError, double diminutionFactorError,
 			double minErrorAllowed, int nConflictBeforeAugmentation, int nSuccessBeforeDiminution) {
 
-		predictionPerformance = new DynamicPerformance(nSuccessBeforeDiminution, nConflictBeforeAugmentation,
+		getAmas().data.predictionPerformance = new DynamicPerformance(nSuccessBeforeDiminution, nConflictBeforeAugmentation,
 				errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed);
 
-		regressionPerformance = new DynamicPerformance(100, 100, 200, 0.5, 0.5, 1);
+		getAmas().data.regressionPerformance = new DynamicPerformance(100, 100, 200, 0.5, 0.5, 1);
 
-		mappingPerformance = new DynamicPerformance(100000, 1000000, getEnvironment().getMappingErrorAllowed(), 1.1,
+		getAmas().data.mappingPerformance = new DynamicPerformance(100000, 1000000, getEnvironment().getMappingErrorAllowed(), 1.1,
 				0.9, 1);
 	}
 
@@ -176,28 +94,26 @@ public class Head extends AmoebaAgent {
 	 */
 	@Override
 	public void onAct() {
-
-
 		
-		currentCriticalityPrediction = 0;
-		currentCriticalityMapping = 0;
-		currentCriticalityConfidence = 0;
+		getAmas().data.currentCriticalityPrediction = 0;
+		getAmas().data.currentCriticalityMapping = 0;
+		getAmas().data.currentCriticalityConfidence = 0;
 
 		for (Percept pct : getAmas().getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
 		}
 
-		nPropositionsReceived = activatedContexts.size();
-		newContextWasCreated = false;
+		getAmas().data.nPropositionsReceived = activatedContexts.size();
+		getAmas().data.newContextWasCreated = false;
 		setContextFromPropositionWasSelected(false);
-		oldOracleValue = oracleValue;
-		oracleValue = getAmas().getPerceptions("oracle");
+		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
+		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
 		bestContext = null;
 
-		if (useOracle) {
+		if (getAmas().data.useOracle) {
 			playWithOracle();
 		} else {
 			playWithoutOracle();
@@ -211,7 +127,7 @@ public class Head extends AmoebaAgent {
 
 	private void playWithOracle() {
 
-		playExecutionTime = System.currentTimeMillis();
+		getAmas().data.playExecutionTime = System.currentTimeMillis();
 		if (activatedContexts.size() > 0) {
 			selectBestContext(); // using highest confidence
 			// selectBestContextWithDistanceToModel();
@@ -221,14 +137,14 @@ public class Head extends AmoebaAgent {
 
 		if (bestContext != null) {
 			setContextFromPropositionWasSelected(true);
-			prediction = bestContext.getActionProposal();
+			getAmas().data.prediction = bestContext.getActionProposal();
 
 		} else { // happens only at the beginning
 			setNearestContextAsBestContext();
 		}
 
 		/* Compute the criticity. Will be used by context agents. */
-		criticity = Math.abs(oracleValue - prediction);
+		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
 		
 
 		/* If we have a bestcontext, send a selection message to it */
@@ -238,46 +154,46 @@ public class Head extends AmoebaAgent {
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
-		playExecutionTime = System.currentTimeMillis() - playExecutionTime;
+		getAmas().data.playExecutionTime = System.currentTimeMillis() - getAmas().data.playExecutionTime;
 
-		endogenousExecutionTime = System.currentTimeMillis();
+		getAmas().data.endogenousExecutionTime = System.currentTimeMillis();
 		// endogenousPlay();
-		endogenousExecutionTime = System.currentTimeMillis() - endogenousExecutionTime;
+		getAmas().data.endogenousExecutionTime = System.currentTimeMillis() - getAmas().data.endogenousExecutionTime;
 
-		contextSelfAnalisisExecutionTime = System.currentTimeMillis();
+		getAmas().data.contextSelfAnalisisExecutionTime = System.currentTimeMillis();
 		selfAnalysationOfContexts4();
-		contextSelfAnalisisExecutionTime = System.currentTimeMillis() - contextSelfAnalisisExecutionTime;
+		getAmas().data.contextSelfAnalisisExecutionTime = System.currentTimeMillis() - getAmas().data.contextSelfAnalisisExecutionTime;
 
-		incompetentHeadNCSExecutionTime = System.currentTimeMillis();
+		getAmas().data.incompetentHeadNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_IncompetentHead(); /*
 										 * If there isn't any proposition or only bad propositions, the head is
 										 * incompetent. It needs help from a context.
 										 */
-		incompetentHeadNCSExecutionTime = System.currentTimeMillis() - incompetentHeadNCSExecutionTime;
+		getAmas().data.incompetentHeadNCSExecutionTime = System.currentTimeMillis() - getAmas().data.incompetentHeadNCSExecutionTime;
 
-		concurrenceNCSExecutionTime = System.currentTimeMillis();
+		getAmas().data.concurrenceNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
-		concurrenceNCSExecutionTime = System.currentTimeMillis() - concurrenceNCSExecutionTime;
+		getAmas().data.concurrenceNCSExecutionTime = System.currentTimeMillis() - getAmas().data.concurrenceNCSExecutionTime;
 
-		create_New_ContextNCSExecutionTime = System.currentTimeMillis();
+		getAmas().data.create_New_ContextNCSExecutionTime = System.currentTimeMillis();
 		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
-		create_New_ContextNCSExecutionTime = System.currentTimeMillis() - create_New_ContextNCSExecutionTime;
+		getAmas().data.create_New_ContextNCSExecutionTime = System.currentTimeMillis() - getAmas().data.create_New_ContextNCSExecutionTime;
 
-		overmappingNCSExecutionTime = System.currentTimeMillis();
+		getAmas().data.overmappingNCSExecutionTime = System.currentTimeMillis();
 		//NCSDetection_Context_Overmapping();
-		overmappingNCSExecutionTime = System.currentTimeMillis() - overmappingNCSExecutionTime;
+		getAmas().data.overmappingNCSExecutionTime = System.currentTimeMillis() - getAmas().data.overmappingNCSExecutionTime;
 
-		memoryCreationExecutionTime = System.currentTimeMillis();
-		memoryCreationExecutionTime = System.currentTimeMillis() - memoryCreationExecutionTime;
+		getAmas().data.memoryCreationExecutionTime = System.currentTimeMillis();
+		getAmas().data.memoryCreationExecutionTime = System.currentTimeMillis() - getAmas().data.memoryCreationExecutionTime;
 
-		otherExecutionTime = System.currentTimeMillis();
+		getAmas().data.otherExecutionTime = System.currentTimeMillis();
 		
 		NCSDetection_ChildContext();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
 
-		spatialGeneralizationScore = getVolumeOfAllContexts() / getAmas().getContexts().size();
+		getAmas().data.spatialGeneralizationScore = getVolumeOfAllContexts() / getAmas().getContexts().size();
 
 		double globalConfidence = 0;
 
@@ -317,34 +233,34 @@ public class Head extends AmoebaAgent {
 			}
 
 		}
-
-		mappingPerformance.setPerformanceIndicator(getEnvironment().getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(),
+		
+		getAmas().data.mappingPerformance.setPerformanceIndicator(getEnvironment().getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(),
 		// world.getScheduler().getPercepts().size());
 
-		evolutionCriticalityPrediction = (lembda * evolutionCriticalityPrediction)
-				+ ((1 - lembda) * currentCriticalityPrediction);
-		evolutionCriticalityMapping = (lembda * evolutionCriticalityMapping)
-				+ ((1 - lembda) * currentCriticalityMapping);
-		evolutionCriticalityConfidence = (lembda * evolutionCriticalityConfidence)
-				+ ((1 - lembda) * currentCriticalityConfidence);
+		getAmas().data.evolutionCriticalityPrediction = (lembda * getAmas().data.evolutionCriticalityPrediction)
+				+ ((1 - lembda) * getAmas().data.currentCriticalityPrediction);
+		getAmas().data.evolutionCriticalityMapping = (lembda * getAmas().data.evolutionCriticalityMapping)
+				+ ((1 - lembda) * getAmas().data.currentCriticalityMapping);
+		getAmas().data.evolutionCriticalityConfidence = (lembda * getAmas().data.evolutionCriticalityConfidence)
+				+ ((1 - lembda) * getAmas().data.currentCriticalityConfidence);
 
-		otherExecutionTime = System.currentTimeMillis() - otherExecutionTime;
+		getAmas().data.otherExecutionTime = System.currentTimeMillis() - getAmas().data.otherExecutionTime;
 
-		playExecutionTimeSum += playExecutionTime;
-		endogenousExecutionTimeSum += endogenousExecutionTime;
-		contextSelfAnalisisExecutionTimeSum += contextSelfAnalisisExecutionTime;
+		getAmas().data.playExecutionTimeSum += getAmas().data.playExecutionTime;
+		getAmas().data.endogenousExecutionTimeSum += getAmas().data.endogenousExecutionTime;
+		getAmas().data.contextSelfAnalisisExecutionTimeSum += getAmas().data.contextSelfAnalisisExecutionTime;
 
-		incompetentHeadNCSExecutionTimeSum += incompetentHeadNCSExecutionTime;
-		concurrenceNCSExecutionTimeSum += concurrenceNCSExecutionTime;
-		create_New_ContextNCSExecutionTimeSum += create_New_ContextNCSExecutionTime;
-		overmappingNCSExecutionTimeSum += overmappingNCSExecutionTime;
-		memoryCreationExecutionTimeSum += memoryCreationExecutionTime;
+		getAmas().data.incompetentHeadNCSExecutionTimeSum += getAmas().data.incompetentHeadNCSExecutionTime;
+		getAmas().data.concurrenceNCSExecutionTimeSum += getAmas().data.concurrenceNCSExecutionTime;
+		getAmas().data.create_New_ContextNCSExecutionTimeSum += getAmas().data.create_New_ContextNCSExecutionTime;
+		getAmas().data.overmappingNCSExecutionTimeSum += getAmas().data.overmappingNCSExecutionTime;
+		getAmas().data.memoryCreationExecutionTimeSum += getAmas().data.memoryCreationExecutionTime;
 
-		otherExecutionTimeSum += otherExecutionTime;
+		getAmas().data.otherExecutionTimeSum += getAmas().data.otherExecutionTime;
 	}
 
 	public double getSpatialGeneralizationScore() {
-		return spatialGeneralizationScore;
+		return getAmas().data.spatialGeneralizationScore;
 	}
 
 	private boolean nearestLocalNeighbor(Context ctxt1, Context ctxt2) {
@@ -394,21 +310,21 @@ public class Head extends AmoebaAgent {
 
 		selectBestContext();
 		if (bestContext != null) {
-			noBestContext = false;
-			prediction = bestContext.getActionProposal();
+			getAmas().data.noBestContext = false;
+			getAmas().data.prediction = bestContext.getActionProposal();
 		} else {
 
-			noBestContext = true;
+			getAmas().data.noBestContext = true;
 			ArrayList<Context> allContexts = getAmas().getContexts();
 			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 			if(nearestContext != null) {
-				prediction = nearestContext.getActionProposal();
+				getAmas().data.prediction = nearestContext.getActionProposal();
 				bestContext = nearestContext;
 			} else {
 				//TODO amoeba should not look globally, but right now there's no other strategy
 				System.err.println("Play without oracle : no nearest context in neighbors, searching globally.");
 				nearestContext = this.getNearestContext(getAmas().getContexts());
-				prediction = nearestContext.getActionProposal();
+				getAmas().data.prediction = nearestContext.getActionProposal();
 			}
 		}
 		if(bestContext != null) {
@@ -424,23 +340,23 @@ public class Head extends AmoebaAgent {
 			logger().debug("HEAD without oracle", "no Best context selected ");
 		}
 		
-		criticity = Math.abs(oracleValue - prediction);
+		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
 
 		endogenousPlay();
 	}
 
 	private void endogenousPlay() {
 
-		endogenousPredictionActivatedContextsOverlaps = null;
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = null;
+		getAmas().data.endogenousPredictionActivatedContextsOverlaps = null;
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = null;
 
-		endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = null;
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = null;
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = null;
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = null;
 
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = null;
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = null;
 
-		endogenousPredictionActivatedContextsSharedIncompetence = null;
-		endogenousPredictionNContextsByInfluence = null;
+		getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = null;
+		getAmas().data.endogenousPredictionNContextsByInfluence = null;
 
 		for (Percept pcpt : getAmas().getPercepts()) {
 			requestSurroundings.get(pcpt).clear();
@@ -449,15 +365,15 @@ public class Head extends AmoebaAgent {
 		contextsInCompetition.clear();
 
 		if (uniqueActivatedContext()) {
-			endogenousPredictionActivatedContextsOverlaps = activatedContexts.get(0).getActionProposal();
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = activatedContexts.get(0)
+			getAmas().data.endogenousPredictionActivatedContextsOverlaps = activatedContexts.get(0).getActionProposal();
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = activatedContexts.get(0)
 					.getActionProposal();
-			endogenousPredictionActivatedContextsSharedIncompetence = activatedContexts.get(0).getActionProposal();
-			endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = activatedContexts.get(0)
+			getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = activatedContexts.get(0).getActionProposal();
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = activatedContexts.get(0)
 					.getActionProposal();
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = activatedContexts.get(0)
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = activatedContexts.get(0)
 					.getActionProposal();
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = activatedContexts.get(0)
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = activatedContexts.get(0)
 					.getActionProposal();
 			getAmas().saver.newManualSave("Unique Context");
 		} else if (severalActivatedContexts()) {
@@ -491,20 +407,20 @@ public class Head extends AmoebaAgent {
 			endogenousSumTerm += ctxt.getInfluenceWithConfidence(currentSituation) * ctxt.getActionProposal();
 			endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
 		}
-		endogenousPredictionNContexts = endogenousSumTerm / endogenousNormalizationTerm;
+		getAmas().data.endogenousPredictionNContexts = endogenousSumTerm / endogenousNormalizationTerm;
 
 		// Endogenous prediction N contexts by influence //
 
-		maxConfidence = Double.NEGATIVE_INFINITY;
-		minConfidence = Double.POSITIVE_INFINITY;
+		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
+		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
 		for (Context ctxt : getAmas().getContexts()) {
 
-			if (ctxt.getConfidence() > maxConfidence) {
-				maxConfidence = ctxt.getConfidence();
+			if (ctxt.getConfidence() > getAmas().data.maxConfidence) {
+				getAmas().data.maxConfidence = ctxt.getConfidence();
 			}
-			if (ctxt.getConfidence() < minConfidence) {
-				minConfidence = ctxt.getConfidence();
+			if (ctxt.getConfidence() < getAmas().data.minConfidence) {
+				getAmas().data.minConfidence = ctxt.getConfidence();
 			}
 
 			if (ctxt.getInfluenceWithConfidence(currentSituation) > 0.5) {
@@ -521,35 +437,35 @@ public class Head extends AmoebaAgent {
 				endogenousNormalizationTerm += ctxt.getInfluenceWithConfidence(currentSituation);
 			}
 
-			endogenousPredictionNContextsByInfluence = endogenousSumTerm / endogenousNormalizationTerm;
+			getAmas().data.endogenousPredictionNContextsByInfluence = endogenousSumTerm / endogenousNormalizationTerm;
 		}
 
-		if (endogenousPredictionActivatedContextsOverlaps == null) {
-			endogenousPredictionActivatedContextsOverlaps = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsOverlaps == null) {
+			getAmas().data.endogenousPredictionActivatedContextsOverlaps = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionActivatedContextsOverlapsWorstDimInfluence == null) {
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence == null) {
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence == null) {
-			endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence == null) {
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence == null) {
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence == null) {
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume == null) {
-			endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume == null) {
+			getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionActivatedContextsSharedIncompetence == null) {
-			endogenousPredictionActivatedContextsSharedIncompetence = prediction;
+		if (getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence == null) {
+			getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = getAmas().data.prediction;
 		}
 
-		if (endogenousPredictionNContextsByInfluence == null) {
-			endogenousPredictionNContextsByInfluence = prediction;
+		if (getAmas().data.endogenousPredictionNContextsByInfluence == null) {
+			getAmas().data.endogenousPredictionNContextsByInfluence = getAmas().data.prediction;
 		}
 	}
 
@@ -780,15 +696,15 @@ public class Head extends AmoebaAgent {
 
 			concernContexts.add(ctxt);
 		}
-		endogenousPredictionActivatedContextsOverlaps = endogenousSumTerm / endogenousNormalizationTerm;
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = endogenousSumTerm2
+		getAmas().data.endogenousPredictionActivatedContextsOverlaps = endogenousSumTerm / endogenousNormalizationTerm;
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = endogenousSumTerm2
 				/ endogenousNormalizationTerm2;
 
-		endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = endogenousSumTerm3
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = endogenousSumTerm3
 				/ endogenousNormalizationTerm3;
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = endogenousSumTerm4
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence = endogenousSumTerm4
 				/ endogenousNormalizationTerm4;
-		endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = endogenousSumTerm5
+		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume = endogenousSumTerm5
 				/ endogenousNormalizationTerm5;
 
 		getAmas().saver.newManualSave("Competition");
@@ -824,12 +740,12 @@ public class Head extends AmoebaAgent {
 		//////// :" + compareClosestContextPairModels(closestContexts));
 
 		if (compareClosestContextPairModels(closestContexts) < 10) {
-			endogenousPredictionActivatedContextsSharedIncompetence = (contextInfluenceL
+			getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = (contextInfluenceL
 					* closestContexts.getL().getActionProposal()
 					+ contextInfluenceR * closestContexts.getR().getActionProposal())
 					/ (contextInfluenceL + contextInfluenceR);
 		} else {
-			endogenousPredictionActivatedContextsSharedIncompetence = prediction;
+			getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = getAmas().data.prediction;
 		}
 
 //		double prediction = closestContexts.actionProposal(1.0);
@@ -850,7 +766,7 @@ public class Head extends AmoebaAgent {
 	private void NCSDetection_ChildContext() {
 		
 		if(bestContext!=null) {
-			if(!bestContext.getLocalModel().finishedFirstExperiments() && firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+			if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
 				bestContext.solveNCS_ChildContext();
 				
 				
@@ -932,12 +848,12 @@ public class Head extends AmoebaAgent {
 
 	private void NCSDetection_Concurrence() {
 		/* If result is good, shrink redundant context (concurrence NCS) */
-		if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
+		if (bestContext != null && getAmas().data.criticity <= getAmas().data.predictionPerformance.getPerformanceIndicator()) {
 
 			for (int i = 0; i < activatedContexts.size(); i++) {
 
 				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && this
-						.getCriticity(activatedContexts.get(i)) <= predictionPerformance.getPerformanceIndicator()) {
+						.getCriticity(activatedContexts.get(i)) <= getAmas().data.predictionPerformance.getPerformanceIndicator()) {
 
 					activatedContexts.get(i).solveNCS_Concurrence(this);
 				}
@@ -951,7 +867,7 @@ public class Head extends AmoebaAgent {
 		 * incompetent. It needs help from a context.
 		 */
 		if (activatedContexts.isEmpty()
-				|| (criticity > predictionPerformance.getPerformanceIndicator() && !oneOfProposedContextWasGood())) {
+				|| (getAmas().data.criticity > getAmas().data.predictionPerformance.getPerformanceIndicator() && !oneOfProposedContextWasGood())) {
 
 			Context c = getNearestGoodContext(activatedNeighborsContexts);
 			// Context c = getSmallestGoodContext(activatedNeighborsContexts);
@@ -969,23 +885,6 @@ public class Head extends AmoebaAgent {
 			 * 
 			 * } }
 			 */
-
-		}
-	}
-
-	private void selfAnalysationOfContexts() {
-		//////// System.out.println(world.getScheduler().getTick());
-		/* All context which proposed itself must analyze its proposition */
-		for (int i = 0; i < activatedContexts.size(); i++) {
-			//////// System.out.println(activatedContexts.get(i).getName());
-			activatedContexts.get(i).analyzeResults2(this);
-		}
-
-		for (Context ctxt : activatedNeighborsContexts) {
-
-			if (!activatedContexts.contains(ctxt)) {
-				ctxt.NCSDetection_Uselessness();
-			}
 
 		}
 	}
@@ -1079,20 +978,20 @@ public class Head extends AmoebaAgent {
 		for (Context activatedContext : activatedContexts) {
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
-			distanceToRegression = currentDistanceToOraclePrediction;
+			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
 
-			contextNotFinished = false;
+			getAmas().data.contextNotFinished = false;
 			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), learningSpeed,
-						numberOfPointsForRegression);
-				contextNotFinished = true;
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
+						getAmas().data.numberOfPointsForRegression);
+				getAmas().data.contextNotFinished = true;
 			}
 
-			else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), learningSpeed,
-						numberOfPointsForRegression);
+			else if (currentDistanceToOraclePrediction < getAmas().data.regressionPerformance.getPerformanceIndicator()) {
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
+						getAmas().data.numberOfPointsForRegression);
 
 			}
 
@@ -1101,7 +1000,7 @@ public class Head extends AmoebaAgent {
 				closestContextToOracle = activatedContext;
 			}
 
-			if (!contextNotFinished) {
+			if (!getAmas().data.contextNotFinished) {
 				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
 			}
 
@@ -1139,7 +1038,7 @@ public class Head extends AmoebaAgent {
 				getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",
 						activatedContexts.get(0).getName(), "" + distanceToOracleForActivatedContext)));
 				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-						learningSpeed, numberOfPointsForRegression);
+						getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
 
 			}
 		} else {
@@ -1147,7 +1046,7 @@ public class Head extends AmoebaAgent {
 					Arrays.asList("MODEL DISTANCE", activatedContexts.get(0).getName(), "" + activatedContexts.get(0)
 							.getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment()))));
 			activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-					learningSpeed, numberOfPointsForRegression);
+					getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
 		}
 
 		// world.trace(new ArrayList<String>(Arrays.asList("MODEL
@@ -1242,8 +1141,8 @@ public class Head extends AmoebaAgent {
 
 		}
 
-		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(), learningSpeed,
-				numberOfPointsForRegression);
+		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(), getAmas().data.learningSpeed,
+				getAmas().data.numberOfPointsForRegression);
 
 		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
 		for (Context activatedContext : activatedContexts) {
@@ -1257,9 +1156,9 @@ public class Head extends AmoebaAgent {
 		Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 
 		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();
+			getAmas().data.prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0.0;
+			getAmas().data.prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
@@ -1269,9 +1168,9 @@ public class Head extends AmoebaAgent {
 		Context nearestContext = this.getNearestGoodContext(activatedNeighborsContexts);
 
 		if (nearestContext != null) {
-			prediction = nearestContext.getActionProposal();
+			getAmas().data.prediction = nearestContext.getActionProposal();
 		} else {
-			prediction = 0.0;
+			getAmas().data.prediction = 0.0;
 		}
 
 		bestContext = nearestContext;
@@ -1293,7 +1192,7 @@ public class Head extends AmoebaAgent {
 	public Context getNearestGoodContext(ArrayList<Context> allContext) {
 		Context nearest = null;
 		for (Context c : allContext) {
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator()
+			if (Math.abs((c.getActionProposal() - getAmas().data.oracleValue)) <= getAmas().data.predictionPerformance.getPerformanceIndicator()
 					&& c != newContext && !c.isDying()) {
 				if (nearest == null || getExternalDistanceToContext(c) < getExternalDistanceToContext(nearest)) {
 					nearest = c;
@@ -1311,7 +1210,7 @@ public class Head extends AmoebaAgent {
 		double currentVolume;
 		for (Context c : neighbors) {
 			currentVolume = c.getVolume();
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator()
+			if (Math.abs((c.getActionProposal() - getAmas().data.oracleValue)) <= getAmas().data.predictionPerformance.getPerformanceIndicator()
 					&& c != newContext && !c.isDying()) {
 				if (smallest == null || currentVolume < minVolume) {
 					smallest = c;
@@ -1320,30 +1219,6 @@ public class Head extends AmoebaAgent {
 		}
 
 		return smallest;
-
-	}
-
-	public Context getBetterContext(Context selectedContext, ArrayList<Context> contextNeighbors, double currentError) {
-		Context betterContext = null;
-		Double lowestError = currentError + 0.0001;
-		Pair<Boolean, Double> betterContextAndError;
-		for (Context c : contextNeighbors) {
-
-			if (c != selectedContext) {
-				if (c.getExperiments().size() > getAmas().getPercepts().size()) {
-					betterContextAndError = selectedContext.tryAlternativeModel(c.getLocalModel());
-					if (betterContextAndError.getA() && betterContextAndError.getB() < lowestError && c != newContext
-							&& !c.isDying()) {
-						betterContext = c;
-						lowestError = betterContextAndError.getB();
-					}
-				}
-
-			}
-
-		}
-
-		return betterContext;
 
 	}
 
@@ -1357,7 +1232,7 @@ public class Head extends AmoebaAgent {
 		double d = Double.MAX_VALUE;
 		Context nearestGoodContext = null;
 		for (Context c : contextNeighbors) {
-			if (Math.abs((c.getActionProposal() - oracleValue)) <= predictionPerformance.getPerformanceIndicator()
+			if (Math.abs((c.getActionProposal() - getAmas().data.oracleValue)) <= getAmas().data.predictionPerformance.getPerformanceIndicator()
 					&& c != newContext && !c.isDying()) {
 				if (getExternalDistanceToContext(c) < d) {
 					d = getExternalDistanceToContext(c);
@@ -1381,7 +1256,7 @@ public class Head extends AmoebaAgent {
 			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
 					"" + c.getLocalModel().distance(c.getCurrentExperiment()))));
 			
-			if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+			if (currentDistanceToOraclePrediction < getAmas().data.regressionPerformance.getPerformanceIndicator()) {
 				if(currentDistanceToOraclePrediction < d) {
 					d = currentDistanceToOraclePrediction;
 					bestContextInNeighbors = c;
@@ -1465,7 +1340,7 @@ public class Head extends AmoebaAgent {
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
-			if (oracleValue - c.getActionProposal() < predictionPerformance.getPerformanceIndicator()) {
+			if (getAmas().data.oracleValue - c.getActionProposal() < getAmas().data.predictionPerformance.getPerformanceIndicator()) {
 				b = true;
 			}
 		}
@@ -1482,18 +1357,18 @@ public class Head extends AmoebaAgent {
 	private Context createNewContext() {
 		// ////////System.out.println("Creation d'un nouveau contexte : " +
 		// contexts.size());
-		newContextWasCreated = true;
+		getAmas().data.newContextWasCreated = true;
 //		if (contexts.size() != 0) {
 //			System.exit(0);
 //		}
 		getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
 		Context context;
-		if (firstContext) {
+		if (getAmas().data.firstContext) {
 			context = new Context(getAmas());
 			logger().debug("HEAD", "new context agent");
 		} else {
 			context = new Context(getAmas());
-			firstContext = true;
+			getAmas().data.firstContext = true;
 		}
 
 		return context;
@@ -1501,15 +1376,15 @@ public class Head extends AmoebaAgent {
 
 	private Context createNewContext(Context bestNearestCtxt) {
 
-		newContextWasCreated = true;
+		getAmas().data.newContextWasCreated = true;
 		getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
 		Context context;
-		if (firstContext) {
+		if (getAmas().data.firstContext) {
 			context = new Context(getAmas(), bestNearestCtxt);
 			logger().debug("HEAD", "new context agent");
 		} else {
 			context = new Context(getAmas());
-			firstContext = true;
+			getAmas().data.firstContext = true;
 		}
 
 		return context;
@@ -1521,48 +1396,48 @@ public class Head extends AmoebaAgent {
 	private void updateStatisticalInformations() {
 
 		
-		if(Math.abs(oracleValue)>maxPrediction) {
-			maxPrediction = Math.abs(oracleValue);
+		if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
+			getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
 		}
 		
 
-		normalizedCriticality = criticity/maxPrediction;
-		criticalities.addCriticality("predictionCriticality", normalizedCriticality);
+		getAmas().data.normalizedCriticality = getAmas().data.criticity/getAmas().data.maxPrediction;
+		criticalities.addCriticality("predictionCriticality", getAmas().data.normalizedCriticality);
 		
 		criticalities.updateMeans();
 
 		if (severalActivatedContexts()) {
 
-			endogenousCriticalities.addCriticality("predictionCriticality", criticity);
+			endogenousCriticalities.addCriticality("predictionCriticality", getAmas().data.criticity);
 			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapspredictionCriticality",
-					Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps));
+					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlaps));
 			endogenousCriticalities.addCriticality(
 					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluencepredictionCriticality",
-					Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
+					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
 			endogenousCriticalities.addCriticality(
 					"endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidencepredictionCriticality",
-					Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
+					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
 			endogenousCriticalities.addCriticality(
 					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidencepredictionCriticality",
-					Math.abs(oracleValue
-							- endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
+					Math.abs(getAmas().data.oracleValue
+							- getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
 			endogenousCriticalities.addCriticality(
 					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumepredictionCriticality",
-					Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
+					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
 			endogenousCriticalities.addCriticality(
 					"endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality",
-					Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence));
+					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence));
 
 			endogenousCriticalities.updateMeans();
 
 		}
 
-		predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
+		getAmas().data.predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
 		if (criticalities.getCriticalityMean("distanceToRegression") != null) {
-			regressionPerformance.update(criticalities.getCriticalityMean("distanceToRegression"));
+			getAmas().data.regressionPerformance.update(criticalities.getCriticalityMean("distanceToRegression"));
 		}
 
-		// mappingPerformance.update(?);
+		// getAmas().data.mappingPerformance.update(?);
 	}
 
 	/**
@@ -1648,11 +1523,11 @@ public class Head extends AmoebaAgent {
 	 * @return the criticity
 	 */
 	public double getCriticity() {
-		return criticity;
+		return getAmas().data.criticity;
 	}
 	
 	public double getNormalizedCriticicality() {
-		return normalizedCriticality;
+		return getAmas().data.normalizedCriticality;
 	}
 
 	/**
@@ -1661,7 +1536,7 @@ public class Head extends AmoebaAgent {
 	 * @return the no best context
 	 */
 	public boolean getNoBestContext() {
-		return noBestContext;
+		return getAmas().data.noBestContext;
 	}
 
 	/**
@@ -1671,7 +1546,7 @@ public class Head extends AmoebaAgent {
 	 * @return the criticity
 	 */
 	public double getCriticity(Context context) {
-		return Math.abs(oracleValue - context.getActionProposal());
+		return Math.abs(getAmas().data.oracleValue - context.getActionProposal());
 	}
 
 	/**
@@ -1680,7 +1555,7 @@ public class Head extends AmoebaAgent {
 	 * @param criticity the new criticity
 	 */
 	public void setCriticity(double criticity) {
-		this.criticity = criticity;
+		this.getAmas().data.criticity = criticity;
 	}
 
 	/**
@@ -1689,7 +1564,7 @@ public class Head extends AmoebaAgent {
 	 * @return the action
 	 */
 	public double getAction() {
-		return prediction;
+		return getAmas().data.prediction;
 	}
 
 	/**
@@ -1698,7 +1573,7 @@ public class Head extends AmoebaAgent {
 	 * @param action the new action
 	 */
 	public void setAction(double action) {
-		this.prediction = action;
+		this.getAmas().data.prediction = action;
 	}
 
 	/**
@@ -1725,7 +1600,7 @@ public class Head extends AmoebaAgent {
 	 * @return true, if is no creation
 	 */
 	public boolean isNoCreation() {
-		return noCreation;
+		return getAmas().data.noCreation;
 	}
 
 	/**
@@ -1734,7 +1609,7 @@ public class Head extends AmoebaAgent {
 	 * @param noCreation the new no creation
 	 */
 	public void setNoCreation(boolean noCreation) {
-		this.noCreation = noCreation;
+		this.getAmas().data.noCreation = noCreation;
 	}
 
 	/**
@@ -1761,7 +1636,7 @@ public class Head extends AmoebaAgent {
 	 * @return the oracle value
 	 */
 	public double getOracleValue() {
-		return oracleValue;
+		return getAmas().data.oracleValue;
 	}
 
 	/**
@@ -1770,7 +1645,7 @@ public class Head extends AmoebaAgent {
 	 * @param oracleValue the new oracle value
 	 */
 	public void setOracleValue(double oracleValue) {
-		this.oracleValue = oracleValue;
+		this.getAmas().data.oracleValue = oracleValue;
 	}
 
 	/**
@@ -1779,7 +1654,7 @@ public class Head extends AmoebaAgent {
 	 * @return the old oracle value
 	 */
 	public double getOldOracleValue() {
-		return oldOracleValue;
+		return getAmas().data.oldOracleValue;
 	}
 
 	/**
@@ -1788,7 +1663,7 @@ public class Head extends AmoebaAgent {
 	 * @param oldOracleValue the new old oracle value
 	 */
 	public void setOldOracleValue(double oldOracleValue) {
-		this.oldOracleValue = oldOracleValue;
+		this.getAmas().data.oldOracleValue = oldOracleValue;
 	}
 
 	/**
@@ -1797,7 +1672,7 @@ public class Head extends AmoebaAgent {
 	 * @return the old criticity
 	 */
 	public double getOldCriticity() {
-		return oldCriticity;
+		return getAmas().data.oldCriticity;
 	}
 
 	/**
@@ -1806,7 +1681,7 @@ public class Head extends AmoebaAgent {
 	 * @param oldCriticity the new old criticity
 	 */
 	public void setOldCriticity(double oldCriticity) {
-		this.oldCriticity = oldCriticity;
+		this.getAmas().data.oldCriticity = oldCriticity;
 	}
 
 	/**
@@ -1815,7 +1690,7 @@ public class Head extends AmoebaAgent {
 	 * @return the error allowed
 	 */
 	public double getErrorAllowed() {
-		return predictionPerformance.getPerformanceIndicator();
+		return getAmas().data.predictionPerformance.getPerformanceIndicator();
 	}
 
 	/**
@@ -1824,7 +1699,7 @@ public class Head extends AmoebaAgent {
 	 * @param errorAllowed the new error allowed
 	 */
 	public void setErrorAllowed(double errorAllowed) {
-		predictionPerformance.setPerformanceIndicator(errorAllowed);
+		getAmas().data.predictionPerformance.setPerformanceIndicator(errorAllowed);
 	}
 
 	/**
@@ -1893,7 +1768,7 @@ public class Head extends AmoebaAgent {
 	 * @return the average prediction criticity weight
 	 */
 	public int getAveragePredictionCriticityWeight() {
-		return averagePredictionCriticityWeight;
+		return getAmas().data.averagePredictionCriticityWeight;
 	}
 
 	/**
@@ -1903,7 +1778,7 @@ public class Head extends AmoebaAgent {
 	 *                                         weight
 	 */
 	public void setAveragePredictionCriticityWeight(int averagePredictionCriticityWeight) {
-		this.averagePredictionCriticityWeight = averagePredictionCriticityWeight;
+		this.getAmas().data.averagePredictionCriticityWeight = averagePredictionCriticityWeight;
 	}
 
 	/**
@@ -1928,7 +1803,7 @@ public class Head extends AmoebaAgent {
 	 * Change oracle connection.
 	 */
 	public void changeOracleConnection() {
-		useOracle = !useOracle;
+		getAmas().data.useOracle = !getAmas().data.useOracle;
 	}
 
 	/**
@@ -1955,7 +1830,7 @@ public class Head extends AmoebaAgent {
 	 * @return the n propositions received
 	 */
 	public int getnPropositionsReceived() {
-		return nPropositionsReceived;
+		return getAmas().data.nPropositionsReceived;
 	}
 
 	/**
@@ -1964,7 +1839,7 @@ public class Head extends AmoebaAgent {
 	 * @return true, if is new context was created
 	 */
 	public boolean isNewContextWasCreated() {
-		return newContextWasCreated;
+		return getAmas().data.newContextWasCreated;
 	}
 
 	/**
@@ -1973,7 +1848,7 @@ public class Head extends AmoebaAgent {
 	 * @return true, if is context from proposition was selected
 	 */
 	public boolean isContextFromPropositionWasSelected() {
-		return contextFromPropositionWasSelected;
+		return getAmas().data.contextFromPropositionWasSelected;
 	}
 
 	/**
@@ -1983,7 +1858,7 @@ public class Head extends AmoebaAgent {
 	 *                                          selected
 	 */
 	public void setContextFromPropositionWasSelected(boolean contextFromPropositionWasSelected) {
-		this.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
+		this.getAmas().data.contextFromPropositionWasSelected = contextFromPropositionWasSelected;
 	}
 
 	/**
@@ -1992,59 +1867,59 @@ public class Head extends AmoebaAgent {
 	 * @return the prediction
 	 */
 	public double getPrediction() {
-		return prediction;
+		return getAmas().data.prediction;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlaps() {
-		return endogenousPredictionActivatedContextsOverlaps;
+		return getAmas().data.endogenousPredictionActivatedContextsOverlaps;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluence() {
-		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluence;
+		return getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence() {
-		return endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence;
+		return getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence;
 	}
 
 	public Double getendogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence() {
-		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
+		return getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume() {
-		return endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume;
+		return getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsSharedIncompetence() {
-		return endogenousPredictionActivatedContextsSharedIncompetence;
+		return getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence;
 	}
 
 	public Double getEndogenousPredictionNContextsByInfluence() {
-		return endogenousPredictionNContextsByInfluence;
+		return getAmas().data.endogenousPredictionNContextsByInfluence;
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlaps);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlaps);
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluence);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence);
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidenceCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence);
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidenceCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence);
 	}
 
 	public Double getEndogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumeCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume);
 	}
 
 	public Double getEndogenousPredictionActivatedContextsSharedIncompetenceCriticity() {
-		return Math.abs(oracleValue - endogenousPredictionActivatedContextsSharedIncompetence);
+		return Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence);
 	}
 
 	/**
@@ -2053,7 +1928,7 @@ public class Head extends AmoebaAgent {
 	 * @param prediction the new prediction
 	 */
 	public void setPrediction(double prediction) {
-		this.prediction = prediction;
+		this.getAmas().data.prediction = prediction;
 	}
 
 	public ArrayList<Context> getPartiallyActivatedContexts(Percept pct) {
@@ -2250,15 +2125,15 @@ public class Head extends AmoebaAgent {
 	}
 
 	public void setBadCurrentCriticalityPrediction() {
-		currentCriticalityPrediction = 1;
+		getAmas().data.currentCriticalityPrediction = 1;
 	}
 
 	public void setBadCurrentCriticalityConfidence() {
-		currentCriticalityConfidence = 1;
+		getAmas().data.currentCriticalityConfidence = 1;
 	}
 
 	public void setBadCurrentCriticalityMapping() {
-		currentCriticalityMapping = 1;
+		getAmas().data.currentCriticalityMapping = 1;
 	}
 
 	public double fact(double n) {
@@ -2278,32 +2153,32 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getMappingErrorAllowed() {
-		return mappingPerformance.getPerformanceIndicator();
+		return getAmas().data.mappingPerformance.getPerformanceIndicator();
 	}
 
 	public double getDistanceToRegression() {
-		return distanceToRegression;
+		return getAmas().data.distanceToRegression;
 	}
 
 	public double getDistanceToRegressionAllowed() {
-		return regressionPerformance.getPerformanceIndicator();
+		return getAmas().data.regressionPerformance.getPerformanceIndicator();
 	}
 	
 	
 	public boolean isActiveLearning() {
-		return activeLearning;
+		return getAmas().data.activeLearning;
 	}
 	
 	public void setActiveLearning(boolean value) {
-		activeLearning = value;
+		getAmas().data.activeLearning = value;
 	}
 	
 	public HashMap<String, Double> getSelfRequest(){
-		return selfRequest;
+		return getAmas().data.selfRequest;
 	}
 	
 	public void setSelfRequest(HashMap<String, Double> request){
-		selfRequest = request;
+		getAmas().data.selfRequest = request;
 	}
 	
 	
@@ -2342,24 +2217,28 @@ public class Head extends AmoebaAgent {
 	}
 	
 	@Override
-	public void onInitialization() {
+	protected void onInitialization() {
 		super.onInitialization();
-		maxConfidence = Double.NEGATIVE_INFINITY;
-		minConfidence = Double.POSITIVE_INFINITY;
+		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
+		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
 		for (Percept pct : getAmas().getPercepts()) {
-			partiallyActivatedContextInNeighbors.put(pct, new ArrayList<Context>());
-			partiallyActivatedContexts.put(pct, new ArrayList<Context>());
-			partialNeighborContexts.put(pct, new ArrayList<Context>());
-			requestSurroundings.put(pct, new ContextPair<Context, Context>(null, null));
-			sharedIncompetenceContextPairs.put(pct, new ContextPair<Context, Context>(null, null));
+			addPercept(pct);
 		}
 
-		// mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());//
+		// getAmas().data.mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());//
 		// Math.pow(world.getMappingErrorAllowed(),
 		// world.getScheduler().getPercepts().size());
 
-		criticalities = new Criticalities(numberOfCriticityValuesForAverage);
-		endogenousCriticalities = new Criticalities(numberOfCriticityValuesForAverageforVizualisation);
+		criticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverage);
+		endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);
+	}
+
+	public void addPercept(Percept pct) {
+		partiallyActivatedContextInNeighbors.put(pct, new ArrayList<Context>());
+		partiallyActivatedContexts.put(pct, new ArrayList<Context>());
+		partialNeighborContexts.put(pct, new ArrayList<Context>());
+		requestSurroundings.put(pct, new ContextPair<Context, Context>(null, null));
+		sharedIncompetenceContextPairs.put(pct, new ContextPair<Context, Context>(null, null));
 	}
 }

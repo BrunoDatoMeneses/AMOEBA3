@@ -5,55 +5,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import experiments.F_XY_System;
-import fr.irit.smac.amak.Configuration;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
-import utils.DeleteDirectory;
 import utils.Round;
+import utils.TestSetup;
 
-public class TestBackupSystem {
-
-	AMOEBA amoeba;
-	static final int SIZE = 100;
-	static final int ROUNDING_DECIMAL = 5;
-	static HashMap<String, Double>[] train = new HashMap[SIZE];
-	static HashMap<String, Double>[] test = new HashMap[SIZE];
-
-	@BeforeAll
-	public static void setupTrainTestValues() {
-		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		for (int i = 0; i < train.length; i++) {
-			studiedSystem.playOneStep();
-			train[i] = studiedSystem.getOutput();
-		}
-		for (int i = 0; i < test.length; i++) {
-			studiedSystem.playOneStep();
-			test[i] = studiedSystem.getOutput();
-		}
-	}
-
-	@BeforeEach
-	public void setup() {
-		Configuration.allowedSimultaneousAgentsExecution = 1;
-		Configuration.commandLineMode = true;
-		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		amoeba = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
-		for (int i = 0; i < train.length; i++) {
-			studiedSystem.playOneStep();
-			amoeba.learn(train[i]);
-		}
-	}
+/**
+ * AMOEBA is a chaotic system, small change at start can lead to vastly different result.
+ * Some of these test may fail for insignificant reason, in that case you can rerun the test, or ignore it.<br/>
+ * A possible reason for test failure happen when multiple context are valid, but it's usually rare, 
+ * and unlikely to happen on small test sample.
+ * 
+ * @author Hugo
+ *
+ */
+public class TestBackupSystem extends TestSetup{
 
 	@Test
-	public void testSaveLoadSize() throws IOException {
+	public void testSize() throws IOException {
 		File tempFile = File.createTempFile("testSave", "xml");
 		tempFile.deleteOnExit();
 
@@ -65,17 +38,10 @@ public class TestBackupSystem {
 		 * Improvement idea : defining equals on agent, and then test equality
 		 */
 		assertEquals(amoeba.getAgents().size(), amoebaLoad.getAgents().size());
-		
-		try {
-			DeleteDirectory.deleteDirectoryRecursion(amoeba.saver.dir);
-			DeleteDirectory.deleteDirectoryRecursion(amoebaLoad.saver.dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
-	@Test @Disabled
-	public void testSaveLoadRequestSameAmoeba() throws IOException {
+	@Test
+	public void testRequestSameAmoeba() throws IOException {
 		File tempFile = File.createTempFile("testSave", "xml");
 		tempFile.deleteOnExit();
 		Double[] requestOriginal = new Double[SIZE];
@@ -92,15 +58,10 @@ public class TestBackupSystem {
 		}
 
 		assertArrayEquals(requestOriginal, requestLoaded);
-		try {
-			DeleteDirectory.deleteDirectoryRecursion(amoeba.saver.dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
-	@Test @Disabled
-	public void testSaveLoadRequestDiffAmoeba() throws IOException {
+	@Test
+	public void testRequestDiffAmoeba() throws IOException {
 		File tempFile = File.createTempFile("testSave", "xml");
 		tempFile.deleteOnExit();
 		Double[] requestOriginal = new Double[SIZE];
@@ -119,16 +80,10 @@ public class TestBackupSystem {
 		}
 
 		assertArrayEquals(requestOriginal, requestLoaded);
-		try {
-			DeleteDirectory.deleteDirectoryRecursion(amoeba.saver.dir);
-			DeleteDirectory.deleteDirectoryRecursion(amoebaLoad.saver.dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
-	@Test @Disabled
-	public void testSaveLoadRequestDiffAmoebaNew() throws IOException {
+	@Test
+	public void testRequestDiffAmoebaNew() throws IOException {
 		File tempFile = File.createTempFile("testSave", "xml");
 		tempFile.deleteOnExit();
 		Double[] requestLoaded1 = new Double[SIZE];
@@ -149,13 +104,6 @@ public class TestBackupSystem {
 		}
 
 		assertArrayEquals(requestLoaded1, requestLoaded2);
-		try {
-			DeleteDirectory.deleteDirectoryRecursion(amoeba.saver.dir);
-			DeleteDirectory.deleteDirectoryRecursion(amoebaLoad1.saver.dir);
-			DeleteDirectory.deleteDirectoryRecursion(amoebaLoad2.saver.dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

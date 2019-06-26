@@ -25,14 +25,11 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.Range;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.Amas;
+import utils.XMLSerialization;
 
 /**
  * @author Labbeti
@@ -47,6 +44,7 @@ public class BackupSystem implements IBackupSystem {
 	private AMOEBA amoeba;
 	private Map<String, Percept> perceptsByName = new HashMap<>();
 	private boolean loadPresetContext = true;
+	private boolean amoebaDataLoaded = false;
 
 	// -------------------- Constructor --------------------
 
@@ -126,6 +124,14 @@ public class BackupSystem implements IBackupSystem {
 		} catch (DataConversionException e) {
 			e.printStackTrace();
 		}
+		
+		// amoeba data
+		Element dataElement = configurationElement.getChild("Data");
+		if(dataElement != null) { // the data field is optionnal. We don't ask human to write it !
+			XMLSerialization<AmoebaData> decode = new XMLSerialization<>();
+			amoeba.data = decode.fromString(dataElement.getText());
+			amoebaDataLoaded = true;
+		}
 	}
 
 	private void loadStartingAgents(Element systemElement) {
@@ -173,9 +179,6 @@ public class BackupSystem implements IBackupSystem {
 		}
 		
 		amoeba.addPendingAgents();
-		for(Agent<? extends Amas<World>, World> a : amoeba.getAgents()) {
-			a.onInitialization();
-		}
 	}
 
 	private void loadPresetContexts(Element systemElement) {
@@ -201,25 +204,23 @@ public class BackupSystem implements IBackupSystem {
 		Head head = new Head(amoeba);
 		head.setName(controllerElement.getAttributeValue("Name"));
 		head.setNoCreation(!amoeba.isCreationOfNewContext());
-
-		// TODO (Labbeti): maybe set default values if you cant find errorMargin and
-		// inexactMargin ?
-		// head.setDataForErrorMargin(1000, 5, 0.4, 0.1, 40, 80);
-		// head.setDataForInexactMargin(500, 2.5, 0.2, 0.05, 40, 80);
-
-		Element errorMarginElement = controllerElement.getChild("ErrorMargin");
-		double errorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("ErrorAllowed"));
-		double augmentationFactorError = Double
-				.valueOf(errorMarginElement.getAttributeValue("AugmentationFactorError"));
-		double diminutionFactorError = Double.valueOf(errorMarginElement.getAttributeValue("DiminutionFactorError"));
-		double minErrorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("MinErrorAllowed"));
-		int nConflictBeforeAugmentation = Integer
-				.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
-		int nSuccessBeforeDiminution = Integer
-				.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
-		head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
-				nConflictBeforeAugmentation, nSuccessBeforeDiminution);
-
+		
+		if(!amoebaDataLoaded) {
+			// If no AmoebaData was loaded, then we need to initialize the head a bit more :
+			Element errorMarginElement = controllerElement.getChild("ErrorMargin");
+			double errorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("ErrorAllowed"));
+			double augmentationFactorError = Double
+					.valueOf(errorMarginElement.getAttributeValue("AugmentationFactorError"));
+			double diminutionFactorError = Double.valueOf(errorMarginElement.getAttributeValue("DiminutionFactorError"));
+			double minErrorAllowed = Double.valueOf(errorMarginElement.getAttributeValue("MinErrorAllowed"));
+			int nConflictBeforeAugmentation = Integer
+					.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
+			int nSuccessBeforeDiminution = Integer
+					.valueOf(errorMarginElement.getAttributeValue("NConflictBeforeAugmentation"));
+			head.setDataForErrorMargin(errorAllowed, augmentationFactorError, diminutionFactorError, minErrorAllowed,
+					nConflictBeforeAugmentation, nSuccessBeforeDiminution);
+		}
+		
 		amoeba.setHead(head);
 	}
 
@@ -237,47 +238,51 @@ public class BackupSystem implements IBackupSystem {
 	}
 
 	private void loadContext(Element contextElement) {
-		/*
-		 * Our save/load of preset context is vastly incomplete. Context created here are unlikely to work. 
-		 */
-		System.err.println("Warning : loading of preset context is strongly discouraged. The resulting AMOEBA is unlikely to work as expected.");
 		Context context = new Context(amoeba);
 		
 		// -- Load Ranges
 		Element rangesElement = contextElement.getChild("Ranges");
 		loadRanges(context, rangesElement);
 
-		// -- Load Experiments
-		Element experimentsElement = contextElement.getChild("Experiments");
-		loadExperiments(context, experimentsElement);
-
+		// -- Load Local Model
+		loadLocalModel(context, contextElement);
+		
 		// -- Load attributes
 		context.setName(contextElement.getAttributeValue("Name"));
-		Element localModelElement = contextElement.getChild("LocalModel");
+		context.setConfidence(Double.valueOf(contextElement.getAttributeValue("Confidence")));
+		for(Percept p : amoeba.getPercepts()) {
+			p.updateContextProjectionEnd(context);
+			p.updateContextProjectionStart(context);
+		}
+
+	}
+	
+	private void loadLocalModel(Context context, Element parentElement) {
+		Element localModelElement = parentElement.getChild("LocalModel");
+		
+		// -- Load Experiments
+		Element experimentsElement = localModelElement.getChild("Experiments");
+		ArrayList<Experiment> experiments = new ArrayList<>();
+		loadExperiments(experiments ,context, experimentsElement);
+		
+		// -- Load Model
 		String localModelName = localModelElement.getAttributeValue("Type");
 		TypeLocalModel type = TypeLocalModel.valueOf(localModelName);
-		List<Double> coefs = new ArrayList<>();
 		LocalModel localModel;
 		switch (type) {
-		case AVERAGE:
-			localModel = new LocalModelAverage(context);
-			break;
-		case FIRST_EXPERIMENT:
-			localModel = new LocalModelFirstExp(context);
-			break;
 		case MILLER_REGRESSION:
-			localModel = new LocalModelMillerRegression(context);
+			List<Double> coefs = new ArrayList<>();
 			for(Element e : localModelElement.getChild("Coefs").getChildren()) {
 				coefs.add(Double.valueOf(e.getAttributeValue("v")));
 			}
+			localModel = new LocalModelMillerRegression(context, coefs.toArray(new Double[coefs.size()]), experiments);
 			break;
 		default:
 			throw new IllegalArgumentException("Found unknown model " + localModelName + " in XML file. ");
 		}
-		localModel.setCoef(coefs.toArray(new Double[0]));
 		context.setLocalModel(localModel);
-		context.setConfidence(Double.valueOf(contextElement.getAttributeValue("Confidence")));
-
+		
+		
 	}
 
 	private void loadRanges(Context context, Element elemRanges) {
@@ -299,7 +304,7 @@ public class BackupSystem implements IBackupSystem {
 		context.setRanges(ranges);
 	}
 
-	private void loadExperiments(Context context, Element experimentsElement) {
+	private void loadExperiments(List<Experiment> experiments, Context context, Element experimentsElement) {
 		for (Element experimentElement : experimentsElement.getChildren()) {
 			Element valuesElement = experimentElement.getChild("Values");
 			Experiment experiment = new Experiment(context);
@@ -319,7 +324,7 @@ public class BackupSystem implements IBackupSystem {
 				Percept percept = perceptsByName.get(perceptName);
 				experiment.addDimension(percept, value);
 			}
-			context.addExperiment(experiment);
+			experiments.add(experiment);
 		}
 	}
 
@@ -331,8 +336,14 @@ public class BackupSystem implements IBackupSystem {
 		learningAttributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
 		learningAttributes.add(new Attribute("loadPresetContext", String.valueOf(isLoadPresetContext())));
 		learningElement.setAttributes(learningAttributes);
-
 		configurationElement.addContent(learningElement);
+		
+		// amoeba data
+		Element dataElement = new Element("Data");
+		XMLSerialization<AmoebaData> encode = new XMLSerialization<>();
+		dataElement.setText(encode.toString(amoeba.data));
+		configurationElement.addContent(dataElement);
+		
 		rootElement.addContent(configurationElement);
 	}
 
@@ -387,17 +398,17 @@ public class BackupSystem implements IBackupSystem {
 		Element errorMarginElement = new Element("ErrorMargin");
 		List<Attribute> errorAttributes = new ArrayList<>();
 		errorAttributes
-				.add(new Attribute("ErrorAllowed", String.valueOf(head.predictionPerformance.performanceIndicator)));
+				.add(new Attribute("ErrorAllowed", String.valueOf(head.getAmas().data.predictionPerformance.performanceIndicator)));
 		errorAttributes.add(new Attribute("AugmentationFactorError",
-				String.valueOf(head.predictionPerformance.augmentationFactor)));
+				String.valueOf(head.getAmas().data.predictionPerformance.augmentationFactor)));
 		errorAttributes.add(
-				new Attribute("DiminutionFactorError", String.valueOf(head.predictionPerformance.diminutionFactor)));
+				new Attribute("DiminutionFactorError", String.valueOf(head.getAmas().data.predictionPerformance.diminutionFactor)));
 		errorAttributes.add(
-				new Attribute("MinErrorAllowed", String.valueOf(head.predictionPerformance.minPerformanceIndicator)));
+				new Attribute("MinErrorAllowed", String.valueOf(head.getAmas().data.predictionPerformance.minPerformanceIndicator)));
 		errorAttributes.add(new Attribute("NConflictBeforeAugmentation",
-				String.valueOf(head.predictionPerformance.conflictsBeforeAugmentation)));
+				String.valueOf(head.getAmas().data.predictionPerformance.conflictsBeforeAugmentation)));
 		errorAttributes.add(new Attribute("NSuccessBeforeDiminution",
-				String.valueOf(head.predictionPerformance.successesBeforeDiminution)));
+				String.valueOf(head.getAmas().data.predictionPerformance.successesBeforeDiminution)));
 		errorMarginElement.setAttributes(errorAttributes);
 		controllerElement.addContent(errorMarginElement);
 
@@ -424,10 +435,6 @@ public class BackupSystem implements IBackupSystem {
 		HashMap<Percept, Range> ranges = context.getRanges();
 		saveRanges(ranges, contextElement);
 
-		// -- Saving Experiments
-		ArrayList<Experiment> experiments = context.getExperiments();
-		saveExperiments(experiments, contextElement);
-
 		// -- Saving Local Model
 		saveLocalModel(context, contextElement);
 
@@ -436,7 +443,7 @@ public class BackupSystem implements IBackupSystem {
 		agentAttributes.add(new Attribute("Name", String.valueOf(context.getName())));
 		agentAttributes.add(new Attribute("Confidence", String.valueOf(context.getConfidence())));
 		agentAttributes.add(new Attribute("ActionsProposal", context.getActionProposal() + ""));
-		agentAttributes.add(new Attribute("Activated", (context.getNonValidPercepts().size() == 0) + ""));
+		agentAttributes.add(new Attribute("Activated", (context.getAmas().getValidContexts().contains(context)) + ""));
 
 		contextElement.setAttributes(agentAttributes);
 		presetContextsElement.addContent(contextElement);
@@ -446,14 +453,19 @@ public class BackupSystem implements IBackupSystem {
 		Element localModelElement = new Element("LocalModel");
 		localModelElement.setAttribute("Type", context.getFunction().getType().name());
 
+		// save coef
 		Element coefs = new Element("Coefs");
 		List<Element> coefsElements = new ArrayList<>();
 		for (double c : context.getFunction().getCoef()) {
 			coefsElements.add(new Element("Value").setAttribute("v", c + ""));
 		}
 		coefs.addContent(coefsElements);
-
 		localModelElement.addContent(coefs);
+		
+		// -- Saving Experiments
+		ArrayList<Experiment> experiments = context.getLocalModel().getFirstExperiments();
+		saveExperiments(experiments, localModelElement);
+		
 		contextElement.addContent(localModelElement);
 	}
 
@@ -474,7 +486,7 @@ public class BackupSystem implements IBackupSystem {
 		contextElement.addContent(rangesElement);
 	}
 
-	private void saveExperiments(List<Experiment> experiments, Element contextElement) {
+	private void saveExperiments(List<Experiment> experiments, Element parentElement) {
 		Element experimentsElement = new Element("Experiments");
 		for (Experiment experiment : experiments) {
 			Map<Percept, Double> values = experiment.getValuesAsHashMap();
@@ -500,6 +512,6 @@ public class BackupSystem implements IBackupSystem {
 
 			experimentsElement.addContent(experimentElement);
 		}
-		contextElement.addContent(experimentsElement);
+		parentElement.addContent(experimentsElement);
 	}
 }

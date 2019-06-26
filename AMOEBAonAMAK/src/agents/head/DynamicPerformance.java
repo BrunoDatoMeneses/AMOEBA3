@@ -1,7 +1,10 @@
 package agents.head;
 
-public class DynamicPerformance {
+import java.io.Serializable;
 
+public class DynamicPerformance implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	public int successesBeforeDiminution;
 	public int conflictsBeforeAugmentation;
 	public double performanceIndicator;
@@ -12,6 +15,9 @@ public class DynamicPerformance {
 
 	public double minPerformanceIndicator;
 
+	// Required for serialization by XML
+	public DynamicPerformance() {};
+	
 	public DynamicPerformance(int nbSuccessesBeforeDiminution, int nbConflictsBeforeAugmentation,
 			double performanceIndicatorValue, double augmentationFactorValue, double diminutionFactorValue,
 			double minPerformanceIndicatorValue) {

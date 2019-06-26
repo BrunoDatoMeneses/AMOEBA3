@@ -115,5 +115,13 @@ public class ContextProjection implements Serializable {
 		return this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept))
 				|| this.contains(percept.getValue(), this.getRadius() / 2);
 	}
+	
+	public double getStart() {
+		return start;
+	}
+	
+	public double getEnd() {
+		return end;
+	}
 
 }

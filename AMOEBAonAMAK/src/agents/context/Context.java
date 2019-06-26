@@ -1,18 +1,13 @@
 package agents.context;
 
-import java.awt.TrayIcon.MessageType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -33,7 +28,6 @@ public class Context extends AmoebaAgent {
 	// ----------
 
 	private HashMap<Percept, Range> ranges;
-	private ArrayList<Experiment> experiments;
 	private LocalModel localModel;
 	private double confidence = 0;
 
@@ -105,9 +99,6 @@ public class Context extends AmoebaAgent {
 
 	/**
 	 * Builds the context.
-	 *
-	 * @param world     the world
-	 * @param headAgent the headAgent
 	 */
 	private void buildContext() {
 
@@ -140,10 +131,9 @@ public class Context extends AmoebaAgent {
 		firstPoint.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
 		// firstPoint.toString())));
-		experiments.add(firstPoint);
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().getHeadAgent().learningSpeed,
-				getAmas().getHeadAgent().numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
+				getAmas().data.numberOfPointsForRegression);
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 
@@ -172,9 +162,6 @@ public class Context extends AmoebaAgent {
 		//// System.out.println("NEW CONTEXT " + this.getName());
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-		for (Experiment exp : experiments) {
-			// System.out.println(exp.toString());
-		}
 	}
 
 	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
@@ -211,24 +198,7 @@ public class Context extends AmoebaAgent {
 			this.actionProposition = ((LocalModelMillerRegression) fatherContext.localModel)
 					.getProposition(fatherContext);
 
-		} else if (fatherContext.getLocalModel().getType() == TypeLocalModel.FIRST_EXPERIMENT) {
-
-			this.localModel = new LocalModelFirstExp(this);
-			// this.formulaLocalModel = ((LocalModelFirstExp)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelFirstExp) fatherContext.localModel).getProposition(fatherContext);
-
-		} else if (fatherContext.getLocalModel().getType() == TypeLocalModel.AVERAGE) {
-
-			this.localModel = new LocalModelAverage(this);
-			// this.formulaLocalModel = ((LocalModelAverage)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelAverage) fatherContext.localModel).getProposition(fatherContext);
-
 		}
-
-		this.experiments = new ArrayList<Experiment>();
-		experiments.addAll(fatherContext.getExperiments());
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -256,9 +226,6 @@ public class Context extends AmoebaAgent {
 		}
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-		for (Experiment exp : experiments) {
-			// System.out.println(exp.toString());
-		}
 	}
 
 	private void buildContext(Context bestNearestContext) {
@@ -296,31 +263,12 @@ public class Context extends AmoebaAgent {
 			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel)
 					.getProposition(bestNearestContext);
 
-		} else if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.FIRST_EXPERIMENT) {
-
-			this.localModel = new LocalModelFirstExp(this);
-			// this.formulaLocalModel = ((LocalModelFirstExp)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelFirstExp) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
-
-		} else if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.AVERAGE) {
-
-			this.localModel = new LocalModelAverage(this);
-			// this.formulaLocalModel = ((LocalModelAverage)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelAverage) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
-
 		}
-
-		this.experiments = new ArrayList<Experiment>();
-		experiments.addAll(bestNearestContext.getExperiments());
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().getHeadAgent().learningSpeed,
-				getAmas().getHeadAgent().numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
+				getAmas().data.numberOfPointsForRegression);
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -583,22 +531,6 @@ public class Context extends AmoebaAgent {
 
 	}
 
-	/**
-	 * Solve NC S conflict inexact.
-	 *
-	 * @param head the head
-	 */
-	private void solveNCS_ConflictInexact(Head head) {
-		////// System.out.println(world.getScheduler().getTick() +" " + this.getName()+
-		////// " " + "solveNCS_ConflictInexact");
-		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
-		if (true) {
-			confidence--;
-		}
-		// confidence = confidence * 0.5;
-		updateExperiments();
-	}
-
 	private void setModelFromBetterContext(Context betterContext) {
 		localModel = new LocalModelMillerRegression(this);
 
@@ -610,60 +542,6 @@ public class Context extends AmoebaAgent {
 
 		this.actionProposition = ((LocalModelMillerRegression) betterContext.getLocalModel())
 				.getProposition(betterContext);
-
-		this.experiments = new ArrayList<Experiment>();
-		experiments.addAll(betterContext.getExperiments());
-	}
-
-	public void analyzeResults2(Head head) {
-		// addNewExperiment();
-
-		System.out.println(localModel.distance(getCurrentExperiment())
-				+ "******************************************************************DISTANCE TO MODEL : ");
-
-		if (head.getCriticity(this) > head.getErrorAllowed()) {
-
-			Context betterContext = null;// head.getBetterContext(this,head.getActivatedNeighborsContexts(),
-											// getErrorOnAllExperiments());
-
-			if (betterContext != null) {
-				System.out.println(this.getName() + "<---" + betterContext.getName());
-				this.setModelFromBetterContext(betterContext);
-				getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
-			} else {
-				System.out.println("OLD COEFS " + localModel.coefsToString());
-				LocalModel newBetterModel = tryNewExperiment();
-
-				if (newBetterModel != null) {
-					localModel = newBetterModel;
-					System.out.println("NEW COEFS " + localModel.coefsToString());
-					getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
-
-				} else {
-					solveNCS_BadPrediction(head);
-					getAmas().addAlteredContext(this);
-				}
-			}
-
-		} else {
-			System.out.println("OLD COEFS " + localModel.coefsToString());
-			// localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
-			// addCurrentExperimentTo(experiments);
-			System.out.println("NEW COEFS " + localModel.coefsToString());
-			confidence++;
-
-		}
-
-//		mappingCriticality = 0.0;
-//		if(head.getActivatedNeighborsContexts().size()>0) {
-//			for(Context ctxt : head.getActivatedNeighborsContexts()) {
-//				mappingCriticality += this.distance(ctxt);
-//			}
-//			mappingCriticality /= head.getActivatedNeighborsContexts().size();
-//		}
-
-		// NCSDetection_OverMapping();
-
 	}
 
 	public void analyzeResults3(Head head, Context closestContextToOracle) {
@@ -963,9 +841,6 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	private void addCurrentExperiment() {
-		addCurrentExperimentTo(experiments);
-	}
 
 	private void addCurrentExperimentTo(ArrayList<Experiment> experimentsList) {
 		ArrayList<Percept> percepts = getAmas().getPercepts();
@@ -988,32 +863,6 @@ public class Context extends AmoebaAgent {
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
 
 		return exp;
-	}
-
-	private LocalModel tryNewExperiment() {
-
-		LocalModel possibleNewlocalModel = new LocalModelMillerRegression(this);
-
-		ArrayList<Experiment> newExperimentsList = new ArrayList<Experiment>();
-		newExperimentsList.addAll(experiments);
-		addCurrentExperimentTo(newExperimentsList);
-		possibleNewlocalModel.updateModelWithExperiments(newExperimentsList);
-		boolean betterModelTest = true;
-
-		for (Experiment exp : experiments) {
-			double oldModelError = Math.abs(localModel.getProposition(experiments, exp) - exp.getOracleProposition());
-			double newModelError = Math
-					.abs(possibleNewlocalModel.getProposition(newExperimentsList, exp) - exp.getOracleProposition());
-			// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"OLD MODEL",
-			// oldModelError+"", "NEW MODEL", "" + newModelError)));
-			betterModelTest = betterModelTest && (newModelError <= 0.00001 + oldModelError);
-		}
-
-		if (betterModelTest || (experiments.size() < (getAmas().getPercepts().size() + 1))) { // size
-			experiments = newExperimentsList;
-			return possibleNewlocalModel;
-		} else
-			return null;
 	}
 
 	private boolean tryNewExperiment2() {
@@ -1042,35 +891,7 @@ public class Context extends AmoebaAgent {
 		boolean betterModelTest = true;
 		double sumError = 0.0;
 
-		for (Experiment exp : experiments) {
-			double modelError = Math.abs(localModel.getProposition(experiments, exp) - exp.getOracleProposition());
-			double alternativeModelError = Math
-					.abs(alternativeModel.getProposition(experiments, exp) - exp.getOracleProposition());
-			betterModelTest = betterModelTest && (alternativeModelError <= 0.00001 + modelError);
-			sumError += alternativeModelError;
-		}
-
 		return new Pair<Boolean, Double>(betterModelTest, sumError);
-	}
-
-	public Double getErrorOnAllExperiments() {
-		double sumError = 0.0;
-
-		for (Experiment exp : experiments) {
-			double modelError = Math.abs(localModel.getProposition(experiments, exp) - exp.getOracleProposition());
-			sumError += modelError;
-		}
-
-		return sumError;
-	}
-
-	public double getPropositionOnExperiment(Experiment exp) {
-		return localModel.getProposition(experiments, exp);
-	}
-
-	private void addNewExperiment() {
-		addCurrentExperiment();
-		localModel.updateModel(this);
 	}
 
 	public void solveNCS_BadPrediction(Head head) {
@@ -1678,24 +1499,6 @@ public class Context extends AmoebaAgent {
 	}
 
 	/**
-	 * Update experiments.
-	 */
-	private void updateExperiments() {
-		// ////////System.out.println("Update experiments");
-		ArrayList<Percept> percepts = getAmas().getPercepts();
-		maxActivationsRequired = percepts.size();
-		Experiment exp = new Experiment(this);
-		for (Percept pct : percepts) {
-			exp.addDimension(pct, pct.getValue());
-		}
-		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
-
-		experiments.add(exp);
-		getAmas().addAlteredContext(this);
-		localModel.updateModel(this);
-	}
-
-	/**
 	 * Analyze results.
 	 *
 	 * @param head the head
@@ -1922,7 +1725,6 @@ public class Context extends AmoebaAgent {
 	@Override
 	protected void onAct() {
 		
-		
 		onActOpitmized();
 		//onActOld();
 
@@ -1996,10 +1798,9 @@ public class Context extends AmoebaAgent {
 	}
 
 	@Override
-	public void onInitialization() {
+	protected void onInitialization() {
 		super.onInitialization();
 		ranges = new HashMap<Percept, Range>();
-		experiments = new ArrayList<Experiment>();
 		setName(String.valueOf(this.hashCode()));
 	}
 
@@ -2098,10 +1899,6 @@ public class Context extends AmoebaAgent {
 		} else {
 			s += "Action proposed : " + this.getActionProposal() + "\n";
 		}
-		s += "Number of experiments : " + experiments.size() + "\n";
-		for (Experiment exp : experiments) {
-			s += exp.toString();
-		}
 
 		s += "Confidence : " + confidence + "\n";
 //		if (formulaLocalModel != null) {
@@ -2132,10 +1929,6 @@ public class Context extends AmoebaAgent {
 			s += "Action proposed : " + this.actionProposition + "\n";
 		} else {
 			s += "Action proposed : " + this.getActionProposal() + "\n";
-		}
-		s += "Number of experiments : " + experiments.size() + "\n";
-		for (Experiment exp : experiments) {
-			s += exp.toString();
 		}
 		s += "Confidence : " + confidence + "\n";
 		s += "Normalized confidence : " + getNormalizedConfidence() + "\n";
@@ -2185,10 +1978,6 @@ public class Context extends AmoebaAgent {
 		return confidence;
 	}
 
-	public ArrayList<Experiment> getExperiments() {
-		return experiments;
-	}
-
 	public LocalModel getFunction() {
 		return localModel;
 	}
@@ -2220,10 +2009,6 @@ public class Context extends AmoebaAgent {
 	 */
 	public void notifySelection() {
 		nSelection += 1;
-	}
-	
-	public void addExperiment(Experiment exp) {
-		experiments.add(exp);
 	}
 	
 	/**

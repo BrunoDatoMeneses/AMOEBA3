@@ -109,9 +109,12 @@ public class Experiment implements Serializable {
 			string += pct.getName() + " " + values.get(pct) + "\n";
 		}
 		string += "Oracle : " + oracleProposition + "\n";
-		double modelPropositionOnExp = context.getPropositionOnExperiment(this);
-		string += "Proposition : " + modelPropositionOnExp + "\n";
-		string += "Error : " + Math.abs(oracleProposition-modelPropositionOnExp) + "\n";
 		return string;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// if it look like a duck, and quack like a duck, it's a duck
+		return getClass().equals(obj.getClass()) && toString().equals(obj.toString());
 	}
 }

@@ -1,7 +1,6 @@
 package kernel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.stream.Stream;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -67,6 +64,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private HashSet<Context> neighborContexts ;
 	private ReadWriteLock neighborContextsLock = new ReentrantReadWriteLock();
+	
+	public AmoebaData data;
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -96,6 +95,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	protected void onInitialConfiguration() {
 		super.onInitialConfiguration();
 		getEnvironment().setAmoeba(this);
+		data = new AmoebaData();
 	}
 	
 	@Override
@@ -142,18 +142,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
 			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
 			
-			timeExecution.addData("HeadPlay", cycle, head.playExecutionTimeSum, notify);
-			timeExecution.addData("EndogenousPlay", cycle, head.endogenousExecutionTime, notify);
-			timeExecution.addData("ContextSelfAnalisis", cycle, head.contextSelfAnalisisExecutionTimeSum, notify);
-			timeExecution.addData("IncompetentNCS", cycle, head.incompetentHeadNCSExecutionTimeSum, notify);
-			timeExecution.addData("ConcurrenceNCS", cycle, head.concurrenceNCSExecutionTimeSum, notify);
-			timeExecution.addData("NewContextNCS", cycle, head.create_New_ContextNCSExecutionTimeSum, notify);
-			timeExecution.addData("OvermappingNCS", cycle, head.overmappingNCSExecutionTimeSum, notify);
-			timeExecution.addData("Other", cycle, head.otherExecutionTimeSum, notify);
+			timeExecution.addData("HeadPlay", cycle, data.playExecutionTimeSum, notify);
+			timeExecution.addData("EndogenousPlay", cycle, data.endogenousExecutionTime, notify);
+			timeExecution.addData("ContextSelfAnalisis", cycle, data.contextSelfAnalisisExecutionTimeSum, notify);
+			timeExecution.addData("IncompetentNCS", cycle, data.incompetentHeadNCSExecutionTimeSum, notify);
+			timeExecution.addData("ConcurrenceNCS", cycle, data.concurrenceNCSExecutionTimeSum, notify);
+			timeExecution.addData("NewContextNCS", cycle, data.create_New_ContextNCSExecutionTimeSum, notify);
+			timeExecution.addData("OvermappingNCS", cycle, data.overmappingNCSExecutionTimeSum, notify);
+			timeExecution.addData("Other", cycle, data.otherExecutionTimeSum, notify);
 			
-			criticalities.addData("Prediction", cycle, head.evolutionCriticalityPrediction, notify);
-			criticalities.addData("Mapping", cycle, head.evolutionCriticalityMapping, notify);
-			criticalities.addData("Confidence", cycle, head.evolutionCriticalityConfidence, notify);
+			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
+			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
+			criticalities.addData("Confidence", cycle, data.evolutionCriticalityConfidence, notify);
 		}
 		
 		if (isRenderUpdate()) {
@@ -250,7 +250,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// run percepts
 		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
-		Collections.sort(synchronousPercepts, new AgentOrderComparator());
+		//Collections.sort(synchronousPercepts, new AgentOrderComparator());
 
 		for (Percept agent : synchronousPercepts) {
 			executor.execute(agent);
@@ -290,7 +290,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		Collections.sort(synchronousContexts, new AgentOrderComparator());
+		//Collections.sort(synchronousContexts, new AgentOrderComparator());
 
 		for (Context agent : synchronousContexts) {
 			executor.execute(agent);
@@ -310,7 +310,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		List<Head> heads = new ArrayList<>();
 		heads.add(head);
 		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		Collections.sort(synchronousHeads, new AgentOrderComparator());
+		//Collections.sort(synchronousHeads, new AgentOrderComparator());
 
 		for (Head agent : synchronousHeads) {
 			executor.execute(agent);
@@ -380,16 +380,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public LocalModel buildLocalModel(Context context) {
-		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
+		switch (localModel) {
+		case MILLER_REGRESSION:
 			return new LocalModelMillerRegression(context);
+
+		default:
+			throw new IllegalArgumentException("Unknown model " + localModel + ".");
 		}
-		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp(context);
-		}
-		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage(context);
-		}
-		return null;
 	}
 
 	/**

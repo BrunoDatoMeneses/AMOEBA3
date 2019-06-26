@@ -36,34 +36,8 @@ public abstract class LocalModel {
 
 	
 	public abstract double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment);
-	
-	/**
-	 * Version of getProposition for 2D display.
-	 *
-	 * @param context the context
-	 * @param p1 the p 1
-	 * @param p2 the p 2
-	 * @param v1 the v 1
-	 * @param v2 the v 2
-	 * @return the proposition
-	 */
-	public abstract double getProposition(Context context, Percept p1, Percept p2, double v1, double v2);
 
-	/**
-	 * Gets the formula.
-	 *
-	 * @param context the context
-	 * @return the formula
-	 */
-	public abstract String getFormula(Context context);
 	public abstract String getCoefsFormula();
-
-	/**
-	 * Update model.
-	 *
-	 * @param context the context
-	 */
-	public abstract void updateModel(Context context);
 	
 	public abstract void updateModelWithExperiments(ArrayList<Experiment> experimentsList);
 	public abstract void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPointsForRegression);

@@ -68,7 +68,7 @@ public class DrawFromXml {
 	}
 	
 	private static void loadSensor(Element sensorElement, Map<String, Percept> perceptsByName) {
-		Percept percept = new Percept(null);
+		Percept percept = new Percept();
 		percept.setName(sensorElement.getAttributeValue("Name"));
 		boolean isEnum = Boolean.valueOf(sensorElement.getAttributeValue("Enum"));
 		percept.setEnum(isEnum);

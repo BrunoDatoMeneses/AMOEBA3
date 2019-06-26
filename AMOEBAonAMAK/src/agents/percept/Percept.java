@@ -28,8 +28,6 @@ public class Percept extends AmoebaAgent {
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 	private HashSet<Context> neighborContextProjection = new HashSet<Context>();
 	
-	
-	
 	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
 	public ArrayList<Context> sortedContextbyStartRanges = new ArrayList<Context>();
 	public ArrayList<Context> sortedContextbyEndRanges = new ArrayList<Context>();
@@ -49,7 +47,7 @@ public class Percept extends AmoebaAgent {
 	/**
 	 * Instantiates a new percept.
 	 *
-	 * @param world the world
+	 * @param amoeba
 	 */
 	public Percept(AMOEBA amoeba) {
 		super(amoeba);
@@ -59,6 +57,16 @@ public class Percept extends AmoebaAgent {
 
 		customRangeComparators.put("start", new CustomComparator(this, "start"));
 		customRangeComparators.put("end", new CustomComparator(this, "end"));
+		
+		getAmas().getHeadAgent().addPercept(this);
+	}
+	
+	/**
+	 * Instanriates a new percept, not linked to any amoeba.
+	 * USE FOR VISUALIZATION ONLY
+	 */
+	public Percept() {
+		super(null);
 	}
 
 	@Override
@@ -124,7 +132,6 @@ public class Percept extends AmoebaAgent {
 		 * #we use an intersect to allow multithreading, avoiding that a percept override the work of another
 		 * 
 		 */
-		
 		
 		validContextProjection = new HashSet<Context>();
 		neighborContextProjection = new HashSet<Context>();

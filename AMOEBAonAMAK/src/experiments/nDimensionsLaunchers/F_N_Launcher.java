@@ -69,8 +69,8 @@ public class F_N_Launcher implements Serializable {
 		amoeba.saver = new SaveHelper(amoeba);
 		amoeba.allowGraphicalScheduler(true);
 		amoeba.setRenderUpdate(true);		
-		amoeba.getHeadAgent().learningSpeed = learningSpeed;
-		amoeba.getHeadAgent().numberOfPointsForRegression = regressionPoints;
+		amoeba.data.learningSpeed = learningSpeed;
+		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
 

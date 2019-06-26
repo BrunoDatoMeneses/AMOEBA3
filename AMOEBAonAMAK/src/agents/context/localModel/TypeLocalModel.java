@@ -8,10 +8,6 @@ import java.io.Serializable;
  *
  */
 public enum TypeLocalModel implements Serializable {
-	/** The first experiment. */
-	FIRST_EXPERIMENT,
-	/** The average. */
-	AVERAGE,
 	/** The miller regression. */
 	MILLER_REGRESSION
 }
