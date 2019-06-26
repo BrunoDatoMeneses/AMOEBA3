@@ -1,7 +1,13 @@
 package experiments;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import agents.head.EndogenousRequest;
+ 
 
 
 
@@ -21,9 +27,50 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		testBruitGaussien();
+		testPriorityQueue();
+		
+
 		
 	}
+	
+	public static void testPriorityQueue() {
+		
+		Queue<EndogenousRequest> endogenousRequest = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+			   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
+				      return r2.getPriority().compareTo(r1.getPriority());
+				   }
+				});
+		
+		HashMap<String, Double> hm1 = new HashMap<String, Double>();
+		hm1.put("p1", 50.0);
+		HashMap<String, Double> hm2 = new HashMap<String, Double>();
+		hm2.put("p2", 50.0);
+		HashMap<String, Double> hm3 = new HashMap<String, Double>();
+		hm3.put("p3", 50.0);
+		HashMap<String, Double> hm4 = new HashMap<String, Double>();
+		hm4.put("p4", 50.0);
+		HashMap<String, Double> hm5 = new HashMap<String, Double>();
+		hm5.put("p5", 50.0);
+		HashMap<String, Double> hm6 = new HashMap<String, Double>();
+		hm6.put("p6", 50.0);
+		HashMap<String, Double> hm7 = new HashMap<String, Double>();
+		hm7.put("p7", 50.0);
+		endogenousRequest.add(new EndogenousRequest(hm1, 5));
+		endogenousRequest.add(new EndogenousRequest(hm2, 3));
+		endogenousRequest.add(new EndogenousRequest(hm3, 1));
+		endogenousRequest.add(new EndogenousRequest(hm4, 2));
+		endogenousRequest.add(new EndogenousRequest(hm5, 0));
+		endogenousRequest.add(new EndogenousRequest(hm6, 5));
+		endogenousRequest.add(new EndogenousRequest(hm7, 3));
+		
+		System.out.println(endogenousRequest);
+		
+		while(endogenousRequest.size()>0){
+			System.out.println(endogenousRequest.poll());
+		}
+		System.out.println(endogenousRequest.poll());
+	}
+	
 	
 	public static void testBruitGaussien() {
 		
