@@ -277,6 +277,8 @@ public class Head extends AmoebaAgent {
 		
 		NCSDetection_ChildContext();
 		
+		//NCSDetection_PotentialRequest();
+		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
 
@@ -991,8 +993,27 @@ public class Head extends AmoebaAgent {
 		}
 	}
 	
-	private void NCSDetection_NearbyIncompetence() {
+	private void NCSDetection_PotentialRequest() {
 		
+		System.out.println("ENDO REQUESTS " + endogenousRequests.size());
+		
+		if (activatedNeighborsContexts.size() > 1) {
+
+			int i = 1;
+			for (Context ctxt : activatedNeighborsContexts) {
+
+				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
+
+					EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
+					
+					if(potentialRequest != null) {
+						endogenousRequests.add(potentialRequest);
+					}
+
+				}
+				i++;
+			}
+		}
 		
 	}
 

@@ -151,6 +151,9 @@ public class F_N_Manager implements StudiedSystem{
 			
 		}
 		else if(activeLearning) {
+			
+			System.out.println("ACTIVE LEARNING " + selfRequest);
+			
 			activeLearning = false;
 			
 			for(int i = 0 ; i < dimension ; i++) {
@@ -318,8 +321,8 @@ public class F_N_Manager implements StudiedSystem{
 		}else {
 			xRequest = situation;
 		}
-		
-			
+		System.out.println(situation[0] + " " + situation[1]);
+		System.out.println(xRequest[0] + " " + xRequest[1]);	
 		if(xRequest[0] > 0 && xRequest[1] > 0) {
 			return 1;
 		}else if(xRequest[0] < 0 && xRequest[1] < 0){

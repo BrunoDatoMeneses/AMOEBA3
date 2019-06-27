@@ -15,6 +15,7 @@ import agents.context.localModel.LocalModelAverage;
 import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
+import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.percept.Percept;
 import gui.ContextRendererFX;
@@ -785,6 +786,82 @@ public class Context extends AmoebaAgent {
 		} else {
 			return new Pair<Double, Percept>(maxDistance, null);
 		}
+
+	}
+	
+	
+	
+	public EndogenousRequest overlapToEndogenousRequest(HashMap<Percept, Pair<Double, Double>> overlapBounds) {
+		HashMap<String, Double> request = new HashMap<String, Double>();
+		
+		for(Percept pct : overlapBounds.keySet()) {
+			
+			if(overlapBounds.get(pct) != null) {
+				
+				request.put(pct.getName(), (overlapBounds.get(pct).getB() - overlapBounds.get(pct).getA())/2);
+			}else {
+				System.out.println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤");
+			}
+			
+			
+		}
+		
+		return new EndogenousRequest(request, 5);
+	}
+	
+	public EndogenousRequest endogenousRequest(Context ctxt) {
+		
+		HashMap<Percept, Double> overlapDistances = new HashMap<Percept, Double>();
+		HashMap<Percept, Pair<Double, Double>> overlapBounds = new HashMap<Percept, Pair<Double, Double>>();
+		
+		double currentDistance = 0.0;
+
+		int overlapCounts = 0;
+		Percept voidPercept = null;
+		double voidDistance = 0.0;
+
+		for (Percept pct : getAmas().getPercepts()) {
+			currentDistance = this.distance(ctxt, pct);
+			
+			if(currentDistance<0) {
+				overlapCounts+=1;
+				overlapDistances.put(pct, Math.abs(currentDistance));
+				overlapBounds.put(pct, this.overlapBounds(ctxt, pct));
+			}
+			
+
+
+			if (currentDistance > 0) {
+				voidPercept = pct;
+				voidDistance = currentDistance / pct.getMinMaxDistance();
+			}
+
+			currentDistance = Math.abs(currentDistance);
+
+			
+
+		}
+
+		if (overlapCounts == getAmas().getPercepts().size()) {
+			
+			EndogenousRequest request = overlapToEndogenousRequest(overlapBounds);
+			if(request.getRequest() != null) {
+				return request;
+			}
+			else {
+				return null;
+				}
+			 
+			
+		}
+		else {
+			return null;
+		}
+//		} else if (overlapCounts == (getAmas().getPercepts().size() - 1)) {
+//			return new Pair<Double, Percept>(voidDistance, voidPercept);
+//		} else {
+//			return new Pair<Double, Percept>(maxDistance, null);
+//		}
 
 	}
 
@@ -1773,6 +1850,34 @@ public class Context extends AmoebaAgent {
 
 	private double distance(Context ctxt, Percept pct) {
 		return this.getRanges().get(pct).distance(ctxt.getRanges().get(pct));
+	}
+	
+	private Pair<Double,Double> overlapBounds(Context ctxt, Percept pct) {
+
+		
+		if (pct.contextIncludedIn(this, ctxt)) {
+			
+			return new Pair<Double, Double>(this.getRanges().get(pct).getStart(), this.getRanges().get(pct).getEnd());
+
+		} else if (pct.contextIncludedIn(ctxt, this)) {
+			
+			return new Pair<Double, Double>(ctxt.getRanges().get(pct).getStart(), ctxt.getRanges().get(pct).getEnd());
+			
+		} else if (pct.contextOrder(this, ctxt)) {
+			
+			return new Pair<Double, Double>(ctxt.getRanges().get(pct).getStart(), this.getRanges().get(pct).getEnd());
+			
+		} else if (pct.contextOrder(ctxt, this)) {
+			
+			return new Pair<Double, Double>(this.getRanges().get(pct).getStart(), ctxt.getRanges().get(pct).getEnd());
+
+		} else {
+
+			return null;
+		}
+		
+
+		
 	}
 
 	private double distanceForVolume(Context ctxt, Percept pct) {
