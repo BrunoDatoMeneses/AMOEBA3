@@ -277,7 +277,7 @@ public class Head extends AmoebaAgent {
 		
 		NCSDetection_ChildContext();
 		
-		//NCSDetection_PotentialRequest();
+		NCSDetection_PotentialRequest();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -303,7 +303,6 @@ public class Head extends AmoebaAgent {
 					// if(nearestLocalNeighbor(ctxt, otherCtxt)) {
 
 					Pair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
-					// System.out.println("DISTANCE : " + distanceAndPercept.getA() + " " +
 					// distanceAndPercept.getB());
 					if (distanceAndPercept.getA() < 0) {
 						criticalities.addCriticality("localOverlapMappingCriticality",
@@ -614,9 +613,7 @@ public class Head extends AmoebaAgent {
 
 		if (activatedContextInOtherPercepts.size() > 0) {
 
-			////////// System.out.println("Partially activated on other percepts than " +
-			////////// pct.getName() + " : " + activatedContextInOtherPercepts.size());
-			////////// System.out.println("Value " + pct.getValue());
+
 
 			CustomComparator rangeStartComparator = new CustomComparator(pct, "start");
 			Collections.sort(activatedContextInOtherPercepts, rangeStartComparator);
@@ -649,7 +646,7 @@ public class Head extends AmoebaAgent {
 				sharedIncompetenceContextPairs.put(pct, nearestContexts);
 			}
 		} else {
-			////////// System.out.println("=====================================================");
+
 		}
 
 	}
@@ -704,8 +701,7 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void NCS_EndogenousCompetition() {
-		//////// System.out.println("NCS Comptetition " +
-		//////// world.getScheduler().getTick());
+
 		// Creation of twin contexts to give the endogenous prediction
 
 		// 2 CTXT
@@ -821,8 +817,7 @@ public class Head extends AmoebaAgent {
 		double contextInfluenceL = closestContexts.getL().getInfluenceWithConfidence(currentSituation);
 		double contextInfluenceR = closestContexts.getR().getInfluenceWithConfidence(currentSituation);
 
-		//////// System.out.println("--------------------------------------------------DIFFERENCE
-		//////// :" + compareClosestContextPairModels(closestContexts));
+
 
 		if (compareClosestContextPairModels(closestContexts) < 10) {
 			endogenousPredictionActivatedContextsSharedIncompetence = (contextInfluenceL
@@ -995,7 +990,8 @@ public class Head extends AmoebaAgent {
 	
 	private void NCSDetection_PotentialRequest() {
 		
-		System.out.println("ENDO REQUESTS " + endogenousRequests.size());
+		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+
 		
 		if (activatedNeighborsContexts.size() > 1) {
 
@@ -1008,6 +1004,7 @@ public class Head extends AmoebaAgent {
 					
 					if(potentialRequest != null) {
 						endogenousRequests.add(potentialRequest);
+						getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST", ""+potentialRequest)));
 					}
 
 				}
@@ -1018,10 +1015,10 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void selfAnalysationOfContexts() {
-		//////// System.out.println(world.getScheduler().getTick());
+
 		/* All context which proposed itself must analyze its proposition */
 		for (int i = 0; i < activatedContexts.size(); i++) {
-			//////// System.out.println(activatedContexts.get(i).getName());
+
 			activatedContexts.get(i).analyzeResults2(this);
 		}
 
@@ -1524,8 +1521,7 @@ public class Head extends AmoebaAgent {
 	 * @return the context
 	 */
 	private Context createNewContext() {
-		// ////////System.out.println("Creation d'un nouveau contexte : " +
-		// contexts.size());
+
 		newContextWasCreated = true;
 //		if (contexts.size() != 0) {
 //			System.exit(0);
@@ -2116,9 +2112,7 @@ public class Head extends AmoebaAgent {
 	public boolean requestSurroundingContains(Context ctxt) {
 
 		for (Percept pct : requestSurroundings.keySet()) {
-			////////// System.out.println("REQUEST SURROUNDINGS " +
-			////////// requestSurroundings.get(pct).getL().getName() + " ; " +
-			////////// requestSurroundings.get(pct).getR().getName());
+
 			if (requestSurroundings.get(pct).contains(ctxt)) {
 				return true;
 			}
@@ -2137,8 +2131,7 @@ public class Head extends AmoebaAgent {
 
 	public void addRequestNeighbor(Context ctxt) {
 		if (!activatedNeighborsContexts.contains(ctxt)) {
-			//// System.out.println(world.getScheduler().getTick() + " " + ctxt.getName() +
-			//// " " + "VALID NEIGHBOR");
+
 			activatedNeighborsContexts.add(ctxt);
 		}
 	}
@@ -2147,9 +2140,9 @@ public class Head extends AmoebaAgent {
 		if (!activatedContexts.contains(ctxt)) {
 			activatedContexts.add(ctxt);
 
-			// System.out.println(world.getScheduler().getTick() + " ACTIVATED CONTEXTS");
+
 			for (Context cxt : activatedContexts) {
-				// System.out.println("--> " + cxt.getName());
+
 			}
 		}
 	}
@@ -2158,9 +2151,9 @@ public class Head extends AmoebaAgent {
 		if (!activatedContextsCopyForUpdates.contains(ctxt)) {
 			activatedContextsCopyForUpdates.add(ctxt);
 
-			// System.out.println(world.getScheduler().getTick() + " ACTIVATED CONTEXTS");
+
 			for (Context cxt : activatedContextsCopyForUpdates) {
-				// System.out.println("--> " + cxt.getName());
+
 			}
 		}
 	}
@@ -2179,8 +2172,7 @@ public class Head extends AmoebaAgent {
 
 	public void removeRequestNeighbor(Context ctxt) {
 		if (activatedNeighborsContexts.contains(ctxt)) {
-			//// System.out.println(world.getScheduler().getTick() + " " + ctxt.getName() +
-			//// " " + "NOT VALID NEIGHBOR ANYMORE");
+
 			activatedNeighborsContexts.remove(ctxt);
 		}
 	}
@@ -2200,7 +2192,7 @@ public class Head extends AmoebaAgent {
 
 	public void displayActivatedNeighborsContexts() {
 		for (Context ctxt : activatedNeighborsContexts) {
-			//////// System.out.println(ctxt.getName());
+
 		}
 	}
 
@@ -2231,8 +2223,7 @@ public class Head extends AmoebaAgent {
 		for (Context ctxt : activatedNeighborsContexts) {
 
 			currentRadius = ctxt.getRanges().get(pct).distance(pct.getValue());
-			//// System.out.println(ctxt.getName() + " " + pct.getName() + " " +
-			//// currentRadius + " " + maxRadius);
+
 			if (currentRadius < maxRadius && currentRadius > 0) {
 				maxRadius = currentRadius;
 			}
@@ -2385,8 +2376,7 @@ public class Head extends AmoebaAgent {
 	// -----------------
 
 	public void proposition(Context c) {
-//		System.out.println(c.getName());
-//		System.out.println(activatedContexts.size());
+
 		activatedContexts.add(c);
 	}
 	

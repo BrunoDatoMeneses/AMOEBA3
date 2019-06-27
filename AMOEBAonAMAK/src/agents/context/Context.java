@@ -170,12 +170,10 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		//// System.out.println("NEW CONTEXT " + this.getName());
+
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-		for (Experiment exp : experiments) {
-			// System.out.println(exp.toString());
-		}
+
 	}
 
 	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
@@ -257,9 +255,7 @@ public class Context extends AmoebaAgent {
 		}
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-		for (Experiment exp : experiments) {
-			// System.out.println(exp.toString());
-		}
+
 	}
 
 	private void buildContext(Context bestNearestContext) {
@@ -376,10 +372,7 @@ public class Context extends AmoebaAgent {
 		for (Context ctxtNeigbor : contextNeighbors) {
 			for (Percept pct : ranges.keySet()) {
 				if (pct != pctDirection) {
-					//// System.out.println("DISTANCE " + ctxtNeigbor.getName()+ " " +
-					//// pct.getName()+ " " + expandingContext.distance(pct,
-					//// ctxtNeigbor.getRanges().get(pct)) + " " + ( expandingContext.distance(pct,
-					//// ctxtNeigbor.getRanges().get(pct))<0)) ;
+
 					test = test && (expandingContext.distance(pct, ctxtNeigbor.getRanges().get(pct)) < -0.0001);
 				}
 			}
@@ -466,10 +459,7 @@ public class Context extends AmoebaAgent {
 			if (ctxt.getRanges().get(pct).centerDistance(pct.getValue()) < 0) {
 				// End radius
 				currentEndExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
-				//// System.out.println("DISTANCE 2 " + pct.getName() + " " +
-				//// ctxt.getRanges().get(pct).distance(ranges.get(pct)));
-				////// System.out.println(ctxt.getName() + " " + pct.getName() + " " +
-				//// currentRadius + " " + maxRadius);
+
 				if (currentEndExpansion < maxExpansions.getB() && currentEndExpansion >= -0.00001) {
 					if (Math.abs(currentEndExpansion) < 0.0001) {
 						currentEndExpansion = 0.0;
@@ -481,8 +471,7 @@ public class Context extends AmoebaAgent {
 			if (ctxt.getRanges().get(pct).centerDistance(pct.getValue()) > 0) {
 				// Start radius
 				currentStartExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
-				////// System.out.println(ctxt.getName() + " " + pct.getName() + " " +
-				////// currentRadius + " " + maxRadius);
+
 				if (currentStartExpansion < maxExpansions.getA() && currentStartExpansion >= -0.00001) {
 					if (Math.abs(currentStartExpansion) < 0.0001) {
 						currentEndExpansion = 0.0;
@@ -499,7 +488,7 @@ public class Context extends AmoebaAgent {
 	// TODO these methods look very similar, maybe factorization is possible ?
 	public void updateRequestNeighborState() { // faire le update dans le head attention partial et full
 		if (nonValidNeightborPercepts.size() == 0) {
-			////// System.out.println("VALID NEIGHBOR : " + this.getName());
+
 			getAmas().getHeadAgent().addRequestNeighbor(this);
 		} else {
 			getAmas().getHeadAgent().removeRequestNeighbor(this);
@@ -508,7 +497,7 @@ public class Context extends AmoebaAgent {
 
 	public void updateActivatedContexts() { // faire le update dans le head attention partial et full
 		if (nonValidPercepts.size() == 0) {
-			////// System.out.println("VALID NEIGHBOR : " + this.getName());
+
 			getAmas().getHeadAgent().addActivatedContext(this);
 		} else {
 			getAmas().getHeadAgent().removeActivatedContext(this);
@@ -517,7 +506,7 @@ public class Context extends AmoebaAgent {
 
 	public void updateActivatedContextsCopyForUpdate() { // faire le update dans le head attention partial et full
 		if (nonValidPercepts.size() == 0) {
-			////// System.out.println("VALID NEIGHBOR : " + this.getName());
+
 			getAmas().getHeadAgent().addActivatedContextCopy(this);
 		} else {
 			getAmas().getHeadAgent().removeActivatedContextCopy(this);
@@ -545,8 +534,7 @@ public class Context extends AmoebaAgent {
 	public void solveNCS_IncompetentHead(Head head) {
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS INCOMPETENT HEAD")));
-		////// System.out.println(world.getScheduler().getTick() +" " + this.getName()+
-		////// " " +"solveNCS_IncompetentHead");
+
 		getEnvironment().raiseNCS(NCS.HEAD_INCOMPETENT);
 		growRanges();
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
@@ -560,8 +548,7 @@ public class Context extends AmoebaAgent {
 	public void solveNCS_Concurrence(Head head) {
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CONCURENCE")));
-		////// System.out.println(world.getScheduler().getTick() +" " + this.getName()+
-		////// " " + "solveNCS_Concurrence");
+
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONCURRENCE);
 		this.shrinkRangesToJoinBorders(head.getBestContext());
 
@@ -590,8 +577,7 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	private void solveNCS_ConflictInexact(Head head) {
-		////// System.out.println(world.getScheduler().getTick() +" " + this.getName()+
-		////// " " + "solveNCS_ConflictInexact");
+
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_INEXACT);
 		if (true) {
 			confidence--;
@@ -797,10 +783,10 @@ public class Context extends AmoebaAgent {
 		for(Percept pct : overlapBounds.keySet()) {
 			
 			if(overlapBounds.get(pct) != null) {
-				
+				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ overlapBounds.get(pct).getA(),""+ overlapBounds.get(pct).getB(), ""+((overlapBounds.get(pct).getB() - overlapBounds.get(pct).getA())/2)) ));
 				request.put(pct.getName(), (overlapBounds.get(pct).getB() - overlapBounds.get(pct).getA())/2);
 			}else {
-				System.out.println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤");
+				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}
 			
 			
@@ -871,7 +857,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			double currentDistance = this.distanceForVolume(ctxt, pct);
 			totalDistanceAsVolume *= currentDistance;
-			// System.out.println(pct.getName() + " " + currentDistance);
+
 
 		}
 
@@ -886,7 +872,7 @@ public class Context extends AmoebaAgent {
 			if (currentDistance > maxDistance) {
 				maxDistance = currentDistance;
 			}
-			// System.out.println(pct.getName() + " " + currentDistance);
+
 
 		}
 
@@ -898,7 +884,7 @@ public class Context extends AmoebaAgent {
 
 		for (Percept pct : getAmas().getPercepts()) {
 			minDistance = Math.min(minDistance, this.distanceForMaxOrMin(ctxt, pct) / pct.getMinMaxDistance());
-			// System.out.println(pct.getName() + " " + currentDistance);
+
 		}
 		return minDistance;
 	}
@@ -1007,7 +993,7 @@ public class Context extends AmoebaAgent {
 		for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct.getName(), getRandomValueInRange(pct));
 		}
-		
+		getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request)));
 		getAmas().getHeadAgent().addSelfRequest(request, 10);
 	}
 	
@@ -1250,7 +1236,7 @@ public class Context extends AmoebaAgent {
 		double volumeLost = Double.MAX_VALUE;
 		double vol = 1.0;
 
-		////// System.out.println("PerceptWithLesserImpactOnVolumeNotIncludedIn ...");
+
 		for (Percept percept : containingRanges) {
 
 			if (!ranges.get(percept).isPerceptEnum()) {
@@ -1259,40 +1245,34 @@ public class Context extends AmoebaAgent {
 				if (!(otherRanges.getStart() <= ranges.get(percept).getStart()
 						&& ranges.get(percept).getEnd() <= otherRanges.getEnd())) {
 
-					////// System.out.println(percept.getName());
+
 
 					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
-						////// System.out.println("end simu : " +
-						////// ranges.get(percept).simulateNegativeAVTFeedbackEnd(percept.getValue()) +
-						////// " start : " + ranges.get(percept).getStart());
+
 						vol = ranges.get(percept).simulateNegativeAVTFeedbackEnd(percept.getValue())
 								- ranges.get(percept).getStart();
 					} else {
-						////// System.out.println("end : " + ranges.get(percept).getEnd() + " start simu
-						////// : " +
-						////// ranges.get(percept).simulateNegativeAVTFeedbackStart(percept.getValue()));
+
 						vol = ranges.get(percept).getEnd()
 								- ranges.get(percept).simulateNegativeAVTFeedbackStart(percept.getValue());
 					}
 
-					////// System.out.println("Vol1 : " + vol);
+	
 
 					for (Percept p2 : ranges.keySet()) {
 						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							////// System.out.println(p2.getName());
+
 							vol *= ranges.get(p2).getLenght();
-							////// System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + " "
-							////// + getName());
+
 						}
 					}
-					////// System.out.println("Vol2 : " + vol);
+
 
 					if (vol < volumeLost) {
 						volumeLost = vol;
 						p = percept;
 					}
-					////// System.out.println("Vol lost : " + volumeLost + "percept " +
-					////// p.getName());
+
 				}
 			}
 		}
@@ -1305,7 +1285,7 @@ public class Context extends AmoebaAgent {
 		double volumeLost = Double.MAX_VALUE;
 		double vol = 1.0;
 
-		//////// System.out.println("LESSER ...");
+
 		for (Percept percept : containingRanges) {
 
 			if (!ranges.get(percept).isPerceptEnum()) {
@@ -1314,36 +1294,35 @@ public class Context extends AmoebaAgent {
 				if (!(otherRanges.getStart() <= ranges.get(percept).getStart()
 						&& ranges.get(percept).getEnd() <= otherRanges.getEnd())) {
 
-					//////// System.out.println(percept.getName());
+
 
 					vol = Math.abs(Math.abs(otherRanges.getCenter() - ranges.get(percept).getCenter())
 							- otherRanges.getRadius() - ranges.get(percept).getRadius());
 //					if (ranges.get(percept).getNearestLimit(percept.getValue()) == false) {
-//						////////System.out.println("end simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMax(percept.getValue()) + " start : " + ranges.get(percept).getStart());
+
 //						vol = percept.getValue() - ranges.get(percept).getStart();
 //					} else {
-//						////////System.out.println("end : " + ranges.get(percept).getEnd() + " start simu : " + ranges.get(percept).simulateNegativeAVTFeedbackMin(percept.getValue()));
+
 //						vol = ranges.get(percept).getEnd() - percept.getValue();
 //					}
 
-					//////// System.out.println("Vol1 : " + vol);
+
 
 					for (Percept p2 : ranges.keySet()) {
 						if (!ranges.get(p2).isPerceptEnum() && p2 != percept) {
-							//////// System.out.println(p2.getName());
+
 							vol *= ranges.get(p2).getLenght();
-							//////// System.out.println(p2.getName() + " " + ranges.get(p2).getLenght() + "
-							//////// " + getName());
+
 						}
 					}
-					//////// System.out.println("Vol2 : " + vol);
+
 
 					if (vol < volumeLost) {
 						volumeLost = vol;
 						p = percept;
 					}
 
-					//////// System.out.println("Vol lost : " + volumeLost);
+	
 
 				}
 			}
@@ -1466,7 +1445,7 @@ public class Context extends AmoebaAgent {
 				}
 			}
 		}
-		//////// System.out.println("percept " + p.getName());
+
 		return p;
 	}
 
@@ -1647,8 +1626,7 @@ public class Context extends AmoebaAgent {
 		Double influence = 1.0;
 
 		for (Percept pct : situation.keySet()) {
-			////////// System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct,
-			////////// situation.get(pct)));
+
 			influence *= getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
 		}
 
@@ -1663,8 +1641,7 @@ public class Context extends AmoebaAgent {
 		Double influence = 1.0;
 
 		for (Percept pct : situation.keySet()) {
-			////////// System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct,
-			////////// situation.get(pct)));
+
 			influence *= getInfluenceByPerceptSituation(pct, situation.get(pct));
 		}
 
@@ -1676,8 +1653,7 @@ public class Context extends AmoebaAgent {
 		Double currentInfluence = 0.0;
 
 		for (Percept pct : situation.keySet()) {
-			////////// System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct,
-			////////// situation.get(pct)));
+
 			currentInfluence = getInfluenceByPerceptSituationWithConfidence(pct, situation.get(pct));
 			if (currentInfluence < worstInfluence) {
 				worstInfluence = currentInfluence;
@@ -1692,8 +1668,7 @@ public class Context extends AmoebaAgent {
 		Double currentInfluence = 0.0;
 
 		for (Percept pct : situation.keySet()) {
-			////////// System.out.println("INFLUTEST " + getInfluenceByPerceptSituation(pct,
-			////////// situation.get(pct)));
+
 			currentInfluence = getInfluenceByPerceptSituation(pct, situation.get(pct));
 			if (currentInfluence < worstInfluence) {
 				worstInfluence = currentInfluence;
@@ -1750,7 +1725,7 @@ public class Context extends AmoebaAgent {
 	 * Update experiments.
 	 */
 	private void updateExperiments() {
-		// ////////System.out.println("Update experiments");
+
 		ArrayList<Percept> percepts = getAmas().getPercepts();
 		maxActivationsRequired = percepts.size();
 		Experiment exp = new Experiment(this);
@@ -1790,11 +1765,11 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void growRanges() {
-		////////System.out.println("Grow " + this.getName() );
+
 		ArrayList<Percept> allPercepts = getAmas().getPercepts();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
-			////////System.out.println(pct.getName() + " " + contain);
+	
 			if (!contain) {
 				if(ranges.get(pct).getLenght()<(pct.getMappingErrorAllowed()*1.5)) {
 					ranges.get(pct).adapt(pct.getValue());

@@ -152,7 +152,7 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		else if(activeLearning) {
 			
-			System.out.println("ACTIVE LEARNING " + selfRequest);
+			
 			
 			activeLearning = false;
 			
@@ -320,9 +320,7 @@ public class F_N_Manager implements StudiedSystem{
 			xRequest = x;
 		}else {
 			xRequest = situation;
-		}
-		System.out.println(situation[0] + " " + situation[1]);
-		System.out.println(xRequest[0] + " " + xRequest[1]);	
+		}	
 		if(xRequest[0] > 0 && xRequest[1] > 0) {
 			return 1;
 		}else if(xRequest[0] < 0 && xRequest[1] < 0){
@@ -522,6 +520,18 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		out.put("oracle",result);
 		return out;
+	}
+	
+	public HashMap<String, Double> getIntput() {
+		HashMap<String, Double> in = new HashMap<String, Double>();
+
+		
+		for(int i = 0; i<dimension; i++) {
+			
+			in.put("px" + i,x[i]);
+			
+		}
+		return in;
 	}
 	
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {

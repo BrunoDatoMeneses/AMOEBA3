@@ -1,6 +1,7 @@
 package kernel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -192,7 +193,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		if (studiedSystem != null) {
+			
 			studiedSystem.playOneStep();
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList("ACTIVE LEARNING", ""+studiedSystem.getIntput())));
 			perceptions = studiedSystem.getOutput();
 			
 			

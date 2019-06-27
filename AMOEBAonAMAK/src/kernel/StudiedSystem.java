@@ -22,6 +22,7 @@ public interface StudiedSystem extends Serializable{
 	 * @return an {@link HashMap} containing a value for each {@link Percept} of an {@link AMOEBA} and a value for the oracle.
 	 */
 	public HashMap<String, Double> getOutput();
+	public HashMap<String, Double> getIntput();
 	
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange);
 	

@@ -31,7 +31,7 @@ public class F_N_Launcher implements Serializable {
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 3	;
 	public static final int normType = 2	;
-	public static final boolean randomExploration = true;
+	public static final boolean randomExploration = false;
 	public static final boolean limitedToSpaceZone = true;
 	public static final double mappingErrorAllowed = 0.03	;
 	public static final double explorationIncrement = 1.0	;

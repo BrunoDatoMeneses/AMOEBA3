@@ -247,4 +247,10 @@ public class MNIST_System implements StudiedSystem {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public HashMap<String, Double> getIntput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
