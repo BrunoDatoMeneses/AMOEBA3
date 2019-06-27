@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -894,6 +895,9 @@ public class Head extends AmoebaAgent {
 		executionTimes[9]=System.currentTimeMillis();
 		if (activatedContexts.size() == 0) {
 			
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList(
+					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
+			
 			executionTimes[8]=System.currentTimeMillis();		
 			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 			executionTimes[8]=System.currentTimeMillis()- executionTimes[8];
@@ -990,7 +994,7 @@ public class Head extends AmoebaAgent {
 	
 	private void NCSDetection_PotentialRequest() {
 		
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+		
 
 		
 		if (activatedNeighborsContexts.size() > 1) {
@@ -1000,17 +1004,23 @@ public class Head extends AmoebaAgent {
 
 				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
 
-					EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
 					
-					if(potentialRequest != null) {
-						endogenousRequests.add(potentialRequest);
-						getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST", ""+potentialRequest)));
+					if(!this.isDying() && !ctxt.isDying()) {
+						EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
+						
+						if(potentialRequest != null) {
+							addEndogenousRequest(potentialRequest);
+							getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST", ""+potentialRequest)));
+						}
 					}
+					
 
 				}
 				i++;
 			}
 		}
+		
+		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
 		
 	}
 
@@ -2342,10 +2352,37 @@ public class Head extends AmoebaAgent {
 		return endogenousRequests.size()>0;
 	}
 	
-	public void addSelfRequest(HashMap<String, Double> request, int priority){
-		endogenousRequests.add(new EndogenousRequest(request, priority));
+	public void addSelfRequest(HashMap<String, Double> request, int priority, Context ctxt){
+		addEndogenousRequest(new EndogenousRequest(request, priority,new ArrayList<Context>(Arrays.asList(ctxt))));
 	}
 	
+	public void addEndogenousRequest(EndogenousRequest request) {
+		
+		boolean existingRequestTest = false;
+		
+		if(request.getAskingContexts().size()>1) {
+			
+			Iterator<EndogenousRequest> itr = endogenousRequests.iterator();
+			while(!existingRequestTest && itr.hasNext()) {
+				
+				EndogenousRequest currentRequest = itr.next();
+				
+				if(currentRequest.getAskingContexts().size()>1) {
+						
+					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
+				}
+				
+			}
+			if(!existingRequestTest) {
+				endogenousRequests.add(request);
+			}
+		}else {
+			endogenousRequests.add(request);
+		}
+		
+		
+		
+	}
 	
 	public void updatePartiallyActivatedNeighbors() {
 		
@@ -2367,6 +2404,24 @@ public class Head extends AmoebaAgent {
 				pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
 			}
 		}
+		
+	}
+	
+	public boolean isVoid(HashMap<String, Double> request) {
+		boolean test;
+		
+		for(Context ctxt : activatedNeighborsContexts) {
+			
+			test = true;
+			for(Percept pct : getAmas().getPercepts()) {
+				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct.getName()));
+			}
+			if(test) {
+				return false;
+			}
+		}
+		return true;
+		
 		
 	}
 	

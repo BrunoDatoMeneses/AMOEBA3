@@ -558,6 +558,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 		AmoebaWindow.instance().point.toFront();
+		AmoebaWindow.instance().point.setInfo(getCursorInfo());
 	}
 	
 	/**
@@ -689,6 +690,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			this.validContexts.retainAll(validContexts);
 		}
 		validContextLock.writeLock().unlock();
+	}
+	
+	private String getCursorInfo() {
+		String message = "";
+		for(Percept pct : getPercepts()) {
+			message += pct.getName() + "\t" + pct.getValue() +"\t[ " + pct.getMin() +" ; " + pct.getMax() + " ]\n" ;
+		}
+		return message;
 	}
 	
 	
