@@ -195,7 +195,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (studiedSystem != null) {
 			
 			studiedSystem.playOneStep();
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("ACTIVE LEARNING", ""+studiedSystem.getIntput())));
+			
 			perceptions = studiedSystem.getOutput();
 			
 			

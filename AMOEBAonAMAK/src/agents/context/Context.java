@@ -63,7 +63,7 @@ public class Context extends AmoebaAgent {
 
 	private HashMap<Percept, Boolean> perceptValidities = new HashMap<>();
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<>();
-	
+	private ArrayList<EndogenousRequest> waitingRequests = new ArrayList<EndogenousRequest>();
 	
 
 	public Context(AMOEBA amoeba) {
@@ -841,21 +841,23 @@ public class Context extends AmoebaAgent {
 				return new EndogenousRequest(request.getRequest(), 5, new ArrayList<Context>(Arrays.asList(this,ctxt)));
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
-			
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
-			
-			EndogenousRequest request = boundsToEndogenousRequest(bounds);
-			if(request.getRequest() != null) {
-				
-				if(getAmas().getHeadAgent().isVoid(request.getRequest())) {
-					return new EndogenousRequest(request.getRequest(), 7, new ArrayList<Context>(Arrays.asList(this,ctxt)));
-				}		
-			}
+//		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
+//			
+//			getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
+//			
+//			EndogenousRequest request = boundsToEndogenousRequest(bounds);
+//			if(request.getRequest() != null) {
+//				
+//				if(getAmas().getHeadAgent().isVoid(request.getRequest())) {
+//					return new EndogenousRequest(request.getRequest(), 7, new ArrayList<Context>(Arrays.asList(this,ctxt)));
+//				}		
+//			}
+//		}
+		else {
+			return null;
 		}
-
-
-		return null;
+	
+		return null;	
 	}
 
 	public double distanceAsVolume(Context ctxt) {
@@ -2124,6 +2126,19 @@ public class Context extends AmoebaAgent {
 		return s;
 	}
 	
+	public ArrayList<String> toStringArrayPierre() {
+		ArrayList<String> array = new ArrayList<String>(); 
+		array.add(getName());
+		array.add(""+localModel.getCoef()[0] );
+		for(int i =1;i<localModel.getCoef().length;i++) {
+			array.add(""+localModel.getCoef()[i]);
+		}
+		array.add(""+ getLocalModel().getMinProposition(this));
+		array.add(""+ getLocalModel().getMaxProposition(this));
+
+		return array;
+	}
+	
 	public String toStringFull() {
 		String s = "";
 		s += "Context : " + getName() + "\n";
@@ -2263,6 +2278,8 @@ public class Context extends AmoebaAgent {
 		for (Percept percept : getAmas().getPercepts()) {
 			percept.deleteContextProjection(this);
 		}
+		
+		
 
 		super.destroy();
 	}
@@ -2329,4 +2346,14 @@ public class Context extends AmoebaAgent {
 		this.localModel = localModel;
 		this.localModel.context = this;
 	}
+	
+	
+	public void addWaitingRequest(EndogenousRequest request) {
+		waitingRequests.add(request);
+	}
+	
+	public void deleteWaitingRequest(EndogenousRequest request) {
+		waitingRequests.remove(request);
+	}
+	
 }

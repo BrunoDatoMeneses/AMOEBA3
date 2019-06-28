@@ -1021,6 +1021,11 @@ public class Head extends AmoebaAgent {
 		}
 		
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+//		for(EndogenousRequest endoRequest : endogenousRequests) {
+//			
+//			System.out.println(endoRequest);
+//			
+//		}
 		
 	}
 
@@ -2345,14 +2350,20 @@ public class Head extends AmoebaAgent {
 	
 	
 	public HashMap<String, Double> getSelfRequest(){
+		getEnvironment().trace(new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
 		return endogenousRequests.poll().getRequest();
+	}
+	
+	public void deleteRequest(Context ctxt) {
+		
 	}
 	
 	public boolean isSelfRequest(){
 		return endogenousRequests.size()>0;
 	}
 	
-	public void addSelfRequest(HashMap<String, Double> request, int priority, Context ctxt){
+	public void addSelfRequest(HashMap<String, Double> request, int priority, Context ctxt){		
+		
 		addEndogenousRequest(new EndogenousRequest(request, priority,new ArrayList<Context>(Arrays.asList(ctxt))));
 	}
 	
@@ -2374,6 +2385,9 @@ public class Head extends AmoebaAgent {
 				
 			}
 			if(!existingRequestTest) {
+				for(Context ctxt : request.getAskingContexts()) {
+					ctxt.addWaitingRequest(request);
+				}
 				endogenousRequests.add(request);
 			}
 		}else {

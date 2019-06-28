@@ -45,9 +45,9 @@ public class EndogenousRequest {
 	
 	public String toString() {
 		String m="";
-//		for(Context ctxt : askingContexts) {
-//			m+= ctxt.getName();
-//		}
+		for(Context ctxt : askingContexts) {
+			m+= ctxt.getName() + " ";
+		}
 		m+=priority + " ";
 		m+= request;
 		return m;
