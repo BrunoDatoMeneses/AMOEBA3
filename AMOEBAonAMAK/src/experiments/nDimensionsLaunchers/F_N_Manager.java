@@ -50,7 +50,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	/* Parameters */
 	private static final double gaussianCoef = 1000;
-	private static final double gaussianVariance = 10;
+	private static final double gaussianVariance = 20;
 	
 	
 	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace) {
@@ -263,25 +263,30 @@ public class F_N_Manager implements StudiedSystem{
 			xRequest = situation;
 		}
 		
-		int subzone = subzone2D(xRequest);
+		double[] center =  new double[2];
+		center[0]=0.0;
+		center[1]=0.0;
+		return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
 		
-		if(subzone == 1) {
-			/* Disques */
-			return modelN(xRequest);
-		}else if (subzone == 2) {
-			/* Gaussian model */
-			return gaussianModel(xRequest, subZoneCenter2D(2));
-			
-		}else if (subzone == 3) {
-			/* Square */
-			return square2DModel(xRequest, subZoneCenter2D(3));
-			
-		}else if (subzone == 4) {
-			/* Exp */
-			return gaussianMapping2D(xRequest);
-		}
-		
-		return model1();
+//		int subzone = subzone2D(xRequest);
+//		
+//		if(subzone == 1) {
+//			/* Disques */
+//			return modelN(xRequest);
+//		}else if (subzone == 2) {
+//			/* Gaussian model */
+//			return gaussianModel(xRequest, subZoneCenter2D(2));
+//			
+//		}else if (subzone == 3) {
+//			/* Square */
+//			return square2DModel(xRequest, subZoneCenter2D(3));
+//			
+//		}else if (subzone == 4) {
+//			/* Exp */
+//			return gaussianMapping2D(xRequest);
+//		}
+//		
+//		return model1();
 		
 		
 		/* Disc */
@@ -380,12 +385,12 @@ public class F_N_Manager implements StudiedSystem{
 		return gaussianCoef*result;
 	}
 	
-	private double gaussianModel(Double[] xRequest, double[] center) {
+	private double gaussianModel(Double[] xRequest, double[] center, double factor, double variance) {
 		double result = 1.0;
 		for(int i=0;i<dimension;i++) {
-			result *= Math.exp(-(Math.pow((xRequest[i] - center[i])/gaussianVariance, 2))/2);
+			result *= Math.exp(-(Math.pow((xRequest[i] - center[i])/variance, 2))/2);
 		}
-		return gaussianCoef*result;
+		return factor*result;
 	}
 	
 	private double modelN() {
