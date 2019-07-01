@@ -270,7 +270,7 @@ public class Head extends AmoebaAgent {
 		executionTimes[5]=System.currentTimeMillis()- executionTimes[5];
 
 		executionTimes[6]=System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		executionTimes[6]=System.currentTimeMillis()- executionTimes[6];
 
 
@@ -1146,7 +1146,8 @@ public class Head extends AmoebaAgent {
 				contextNotFinished = true;
 			}
 
-			else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
+			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), learningSpeed,
 						numberOfPointsForRegression);
 
@@ -1159,12 +1160,25 @@ public class Head extends AmoebaAgent {
 
 			if (!contextNotFinished) {
 				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+				
 			}
+			
+			activatedContext.criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
 
 		}
 
 		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
 		for (Context activatedContext : activatedContexts) {
+			
+			activatedContext.criticalities.updateMeans();
+			
+			if (activatedContext.criticalities.getCriticalityMean("distanceToRegression") != null) {
+				activatedContext.regressionPerformance.update(activatedContext.criticalities.getCriticalityMean("distanceToRegression"));
+				getEnvironment().trace(new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContext.getName(), ""+activatedContext.regressionPerformance.getPerformanceIndicator())));
+			}
+			
+			
 			activatedContext.analyzeResults4(this, closestContextToOracle);
 
 		}
@@ -2436,6 +2450,30 @@ public class Head extends AmoebaAgent {
 		}
 		return true;
 		
+		
+	}
+	
+	public double getAverageRegressionPerformanceIndicator() {
+		
+		
+		if(activatedNeighborsContexts.size()>1) {
+			double meanRegressionPerformanceIndicator = 0.0;
+			
+			for(Context ctxt : activatedNeighborsContexts) {
+				
+
+				if(ctxt.regressionPerformance != null) {
+					meanRegressionPerformanceIndicator += ctxt.regressionPerformance.performanceIndicator;
+				}
+				
+				
+			}
+			
+			return meanRegressionPerformanceIndicator/activatedNeighborsContexts.size();
+		}
+		else {
+			return 200;
+		}
 		
 	}
 	

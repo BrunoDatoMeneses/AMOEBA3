@@ -4,13 +4,13 @@ public class DynamicPerformance {
 
 	public int successesBeforeDiminution;
 	public int conflictsBeforeAugmentation;
-	public double performanceIndicator;
+	public Double performanceIndicator;
 	public int performanceCounter;
 
 	public double augmentationFactor;
 	public double diminutionFactor;
 
-	public double minPerformanceIndicator;
+	public Double minPerformanceIndicator;
 
 	public DynamicPerformance(int nbSuccessesBeforeDiminution, int nbConflictsBeforeAugmentation,
 			double performanceIndicatorValue, double augmentationFactorValue, double diminutionFactorValue,

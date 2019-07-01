@@ -50,7 +50,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	/* Parameters */
 	private static final double gaussianCoef = 1000;
-	private static final double gaussianVariance = 20;
+	private static final double gaussianVariance = 10;
 	
 	
 	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace) {
@@ -266,27 +266,27 @@ public class F_N_Manager implements StudiedSystem{
 		double[] center =  new double[2];
 		center[0]=0.0;
 		center[1]=0.0;
-		return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
+		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
 		
-//		int subzone = subzone2D(xRequest);
-//		
-//		if(subzone == 1) {
-//			/* Disques */
-//			return modelN(xRequest);
-//		}else if (subzone == 2) {
-//			/* Gaussian model */
-//			return gaussianModel(xRequest, subZoneCenter2D(2));
-//			
-//		}else if (subzone == 3) {
-//			/* Square */
-//			return square2DModel(xRequest, subZoneCenter2D(3));
-//			
-//		}else if (subzone == 4) {
-//			/* Exp */
-//			return gaussianMapping2D(xRequest);
-//		}
-//		
-//		return model1();
+		int subzone = subzone2D(xRequest);
+		
+		if(subzone == 1) {
+			/* Disques */
+			return modelN(xRequest);
+		}else if (subzone == 2) {
+			/* Gaussian model */
+			return gaussianModel(xRequest, subZoneCenter2D(2), gaussianCoef, gaussianVariance);
+			
+		}else if (subzone == 3) {
+			/* Square */
+			return square2DModel(xRequest, subZoneCenter2D(3));
+			
+		}else if (subzone == 4) {
+			/* Exp */
+			return gaussianMapping2D(xRequest);
+		}
+		
+		return model1();
 		
 		
 		/* Disc */

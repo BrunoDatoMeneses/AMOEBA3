@@ -15,6 +15,8 @@ import agents.context.localModel.LocalModelAverage;
 import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
+import agents.head.Criticalities;
+import agents.head.DynamicPerformance;
 import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.percept.Percept;
@@ -65,10 +67,16 @@ public class Context extends AmoebaAgent {
 	private HashMap<Percept, Boolean> perceptNeighborhoodValidities = new HashMap<>();
 	private ArrayList<EndogenousRequest> waitingRequests = new ArrayList<EndogenousRequest>();
 	
+	public DynamicPerformance regressionPerformance;
+	public Criticalities criticalities ;
+	
 
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
 		buildContext();
+		criticalities = new Criticalities(2);
+		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
+		regressionPerformance = new DynamicPerformance(2, 2, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
 		getAmas().getEnvironment().trace(new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 	}
 
@@ -77,6 +85,9 @@ public class Context extends AmoebaAgent {
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
 				.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
+		criticalities = new Criticalities(2);
+		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
+		regressionPerformance = new DynamicPerformance(2, 2, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
 		//TODO in amak, cannot kill a agent before its 1st cycle
 		//NCSDetection_Uselessness();
 
@@ -707,6 +718,9 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void analyzeResults4(Head head, Context closestContextToOracle) {
+		
+		
+		
 		if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
 		} else {
@@ -2160,6 +2174,11 @@ public class Context extends AmoebaAgent {
 		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
 		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
 		
+		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
+		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";
+				
+				
+		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
 
@@ -2354,6 +2373,10 @@ public class Context extends AmoebaAgent {
 	
 	public void deleteWaitingRequest(EndogenousRequest request) {
 		waitingRequests.remove(request);
+	}
+	
+	public double getDistanceToRegressionAllowed() {
+		return regressionPerformance.getPerformanceIndicator();
 	}
 	
 }
