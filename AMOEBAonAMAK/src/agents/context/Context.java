@@ -74,9 +74,9 @@ public class Context extends AmoebaAgent {
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
 		buildContext();
-		criticalities = new Criticalities(2);
+		criticalities = new Criticalities(3);
 		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
-		regressionPerformance = new DynamicPerformance(2, 2, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
+		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
 		getAmas().getEnvironment().trace(new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 	}
 
@@ -85,9 +85,9 @@ public class Context extends AmoebaAgent {
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
 				.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
-		criticalities = new Criticalities(2);
+		criticalities = new Criticalities(3);
 		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
-		regressionPerformance = new DynamicPerformance(2, 2, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
+		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
 		//TODO in amak, cannot kill a agent before its 1st cycle
 		//NCSDetection_Uselessness();
 
@@ -958,7 +958,10 @@ public class Context extends AmoebaAgent {
 				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
 				
-				if((currentDistanceToOraclePrediction<getAmas().getHeadAgent().getDistanceToRegressionAllowed()) && (otherContextDistanceToOraclePrediction<getAmas().getHeadAgent().getDistanceToRegressionAllowed())) {
+				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
+				double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+						
+				if((currentDistanceToOraclePrediction<averageDistanceToOraclePrediction) && (otherContextDistanceToOraclePrediction<averageDistanceToOraclePrediction)) {
 					
 					getEnvironment().trace(new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
 					

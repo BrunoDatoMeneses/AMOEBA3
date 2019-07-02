@@ -270,7 +270,7 @@ public class Head extends AmoebaAgent {
 		executionTimes[5]=System.currentTimeMillis()- executionTimes[5];
 
 		executionTimes[6]=System.currentTimeMillis();
-		//NCSDetection_Context_Overmapping();
+		NCSDetection_Context_Overmapping();
 		executionTimes[6]=System.currentTimeMillis()- executionTimes[6];
 
 
