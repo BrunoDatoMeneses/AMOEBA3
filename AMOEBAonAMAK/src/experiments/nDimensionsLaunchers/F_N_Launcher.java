@@ -11,10 +11,10 @@ import experiments.XmlConfigGenerator;
 import fr.irit.smac.amak.Configuration;
 import gui.AmoebaWindow;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
-import kernel.IBackupSystem;
-import kernel.SaveHelper;
 import kernel.StudiedSystem;
+import kernel.backup.BackupSystem;
+import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 
 
 // TODO: Auto-generated Javadoc
@@ -66,7 +66,7 @@ public class F_N_Launcher implements Serializable {
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
-		amoeba.saver = new SaveHelper(amoeba);
+		amoeba.saver = new SaveHelperImpl(amoeba);
 		amoeba.allowGraphicalScheduler(true);
 		amoeba.setRenderUpdate(true);		
 		amoeba.data.learningSpeed = learningSpeed;

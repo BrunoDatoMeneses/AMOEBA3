@@ -39,10 +39,12 @@ if __name__ == '__main__':
     time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
-    gateway.jvm.py4j.Main.Control.setComandLine(True)
+    #gateway.jvm.py4j.Main.Control.setComandLine(True)
 
-    amoeba = gateway.jvm.kernel.AMOEBA("/home/daavve/AMOEBA3/documentation/py4j_demo/bipedal_walker.xml", None)
-    set_field(amoeba.saver, "autoSave", False)
+    amoeba = gateway.jvm.kernel.AMOEBA()
+    backup_sys = gateway.jvm.kernel.backup.BackupSystem(amoeba)
+    file = gateway.jvm.java.io.File("lunar_lander.xml")
+    backup_sys.load(file)
 
     env = gym.make('LunarLander-v2')
     env.reset()
@@ -79,9 +81,6 @@ if __name__ == '__main__':
             env.step(action)
             env.step(action)
             env.step(action)
-            env.step(action)
-            env.step(action)
-            env.step(action)
             state2, reward, done, info = env.step(action)
 
             state_action_list.append((state, action))
@@ -102,12 +101,11 @@ if __name__ == '__main__':
         # Track rewards
         reward_list.append(tot_reward)
 
-        if (i + 1) % 10 == 0:
+        print_delta = 10
+        if (i + 1) % print_delta == 0:
             ave_reward = np.mean(reward_list)
             reward_list = []
-
-        if (i + 1) % 10 == 0:
-            print('Episode {} Average Reward: {} Epsilon: {}'.format(i + 1, ave_reward, epsilon))
+            print('Episode {}-{} Average Reward: {} Epsilon: {}'.format(i - print_delta + 1, i + 1, ave_reward, epsilon))
 
     env.close()
 

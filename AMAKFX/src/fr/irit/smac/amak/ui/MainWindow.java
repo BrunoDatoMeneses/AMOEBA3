@@ -149,14 +149,14 @@ public class MainWindow extends Application {
 	 *            The action to be executed when the window is closed
 	 */
 	public static void addOnCloseAction(Runnable onClose) {
-		instance().closeActions.add(onClose);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() { onClose.run(); }
+		});
 	}
 	
-	private List<Runnable> closeActions = new ArrayList<>();
 	@Override
 	public void stop() throws Exception {
 		super.stop();
-		closeActions.forEach(Runnable::run);
 		System.exit(0);
 	}
 

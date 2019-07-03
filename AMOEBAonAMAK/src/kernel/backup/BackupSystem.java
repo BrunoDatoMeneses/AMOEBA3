@@ -1,4 +1,4 @@
-package kernel;
+package kernel.backup;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,6 +29,8 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
+import kernel.AMOEBA;
+import kernel.AmoebaData;
 import utils.XMLSerialization;
 
 /**

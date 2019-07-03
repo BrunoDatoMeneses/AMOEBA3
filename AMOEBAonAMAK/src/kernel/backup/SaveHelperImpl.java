@@ -1,4 +1,4 @@
-package kernel;
+package kernel.backup;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,20 +9,23 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.MainWindow;
 import gui.AmoebaWindow;
 import gui.saveExplorer.SaveExplorer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
+import kernel.AMOEBA;
 import utils.DeleteDirectory;
 
 /**
- * An helper class that handle save, autosave, and load needs of an AMOEBA.
+ * The standard implementation of {@link ISaveHelper}
+ * @see SaveHelperDummy
  * @author Hugo
  *
  */
-public class SaveHelper {
+public class SaveHelperImpl implements ISaveHelper{
 	/**
 	 * Path to the saves' root directory. Default is 'saves'.
 	 */
@@ -36,12 +39,13 @@ public class SaveHelper {
 	public IBackupSystem backupSystem;
 	
 	/**
-	 * If false {@link SaveHelper#autosave()} will do nothing.
+	 * If false {@link SaveHelperImpl#autosave()} will do nothing.<br/>
+	 * Default at not( {@link Configuration#commandLineMode} ).
 	 */
 	public boolean autoSave = true;
 	
 	/**
-	 * Will the SaveHelper delete {@link SaveHelper#dir} when closing the MainWindow ?
+	 * Will the SaveHelper delete {@link SaveHelperImpl#dir} when closing the MainWindow ?
 	 */
 	public boolean deleteFolderOnClose = true;
 	
@@ -64,12 +68,13 @@ public class SaveHelper {
 
 	/**
 	 * Create a SaveHelper for an amoeba.<br/>
-	 * Saves are stored in {@link SaveHelper#savesRoot}, under a directory named after the amoeba and creation time of the SaveHelper.<br/>
-	 * Autosave for this SaveHelper can be deactivated with {@link SaveHelper#autoSave}.<br/>
-	 * By default, the save folder for this amoeba is deleted when the application is closed, this can be changed with {@link SaveHelper#deleteFolderOnClose}.
+	 * Saves are stored in {@link SaveHelperImpl#savesRoot}, under a directory named after the amoeba and creation time of the SaveHelper.<br/>
+	 * Autosave for this SaveHelper can be deactivated with {@link SaveHelperImpl#autoSave}.<br/>
+	 * By default, the save folder for this amoeba is deleted when the application is closed, this can be changed with {@link SaveHelperImpl#deleteFolderOnClose}.
 	 * @param amoeba
 	 */
-	public SaveHelper(AMOEBA amoeba) {
+	public SaveHelperImpl(AMOEBA amoeba) {
+		autoSave = !Configuration.commandLineMode;
 		this.amoeba = amoeba;
 		backupSystem = new BackupSystem(amoeba);
 		String dirName = amoeba.toString() + "_" + System.currentTimeMillis();
@@ -112,45 +117,30 @@ public class SaveHelper {
 		}
 	}
 
-	/**
-	 * Load a save pointed by path.
-	 * @param path path to the save.
-	 */
+	@Override
 	public void load(String path) {
 		File f = new File(path);
 		load(f);
 	}
 	
-	/**
-	 * Load a save from file.
-	 * @param path path to the save.
-	 */
+	@Override
 	public void load(File file) {
 		backupSystem.load(file);
 	}
 
-	/**
-	 * Create a save at path.
-	 * @param path path of the new save
-	 */
+	@Override
 	public void save(String path) {
 		File f = new File(path);
 		save(f);
 	}
 	
-	/**
-	 * Create a save in file.
-	 * @param path path of the new save
-	 */
+	@Override
 	public void save(File file) {
 		backupSystem.setLoadPresetContext(true);
 		backupSystem.save(file);
 	}
 
-	/**
-	 * Add a new save in {@link SaveHelper#dirManual}.
-	 * @param name
-	 */
+	@Override
 	public void newManualSave(String name) {
 		String c = (name == null || "".equals(name)) ? "" : ("_" + name);
 		c.replace('/', '-');
@@ -160,9 +150,7 @@ public class SaveHelper {
 		backupSystem.save(p.toFile());
 	}
 
-	/**
-	 * Add a new save in {@link SaveHelper#dirAuto}.
-	 */
+	@Override
 	public void autosave() {
 		if (autoSave) {
 			Path p = Paths.get(dirAuto.toString(), amoeba.getCycle() + "." + backupSystem.getExtension());
@@ -171,9 +159,7 @@ public class SaveHelper {
 		}
 	}
 
-	/**
-	 * List saves in {@link SaveHelper#dirAuto}.
-	 */
+	@Override
 	public List<Path> listAutoSaves() {
 		List<Path> l = new ArrayList<>();
 		try (DirectoryStream<Path> d = Files.newDirectoryStream(dirAuto)){
@@ -185,9 +171,7 @@ public class SaveHelper {
 		return l;
 	}
 
-	/**
-	 * List saves in {@link SaveHelper#dirManual}.
-	 */
+	@Override
 	public List<Path> listManualSaves() {
 		List<Path> l = new ArrayList<>();
 		try (DirectoryStream<Path> d = Files.newDirectoryStream(dirManual)){
@@ -232,5 +216,15 @@ public class SaveHelper {
 			}
 		};
 		MainWindow.addOptionsItem("Save", eventSave);
+	}
+
+	@Override
+	public void setAutoSave(boolean value) {
+		autoSave = value;
+	}
+
+	@Override
+	public boolean getAutoSave() {
+		return autoSave;
 	}
 }

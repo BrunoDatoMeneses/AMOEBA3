@@ -25,6 +25,10 @@ import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
+import kernel.backup.IBackupSystem;
+import kernel.backup.ISaveHelper;
+import kernel.backup.SaveHelperDummy;
+import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
 
 /**
@@ -36,7 +40,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Utility to save, autosave, and load amoebas.
 	 */
-	public SaveHelper saver;
+	public ISaveHelper saver = new SaveHelperDummy();
 	
 	/**
 	 * The system studied by the amoeba.
@@ -87,7 +91,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super(new World(), Scheduling.HIDDEN);
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
-		saver = new SaveHelper(this);
+		saver = new SaveHelperImpl(this);
 		saver.load(path);
 	}
 

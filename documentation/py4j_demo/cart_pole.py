@@ -2,36 +2,52 @@ import gym
 import subprocess
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 
 from py4j.java_gateway import JavaGateway, GatewayParameters, set_field
 
 
+def msg_obj(obs:list, act:list, oracle) -> dict:
+    msg = dict()
+    for i, o in enumerate(obs):
+        msg["p%d" % i] = float(o*1000.0)
+    for i, a in enumerate(act):
+        msg["a%d" % i] = float(a)
+    msg["oracle"] = float(oracle)
+    return msg
+
+
 def chose_next_action(amoeba, state):
-    proposition = [
-        amoeba.request({"p0": state[0]*100, "p1": state[1]*100, "p2": state[2]*100, "p3": state[3]*100, "a0": 1.0, "a1": 0.0, "oracle": 0.0}),
-        amoeba.request({"p0": state[0]*100, "p1": state[1]*100, "p2": state[2]*100, "p3": state[3]*100, "a0": 0.0, "a1": 1.0, "oracle": 0.0})
-    ]
+    proposition = []
+    for i in range(env.action_space.n):
+        act = [0.0]*env.action_space.n
+        act[i] = 1
+        proposition.append(amoeba.request(msg_obj(state, act, 0)))
+
     return np.argmax(proposition)
 
 
 def learn_amoeba(amoeba, state, action, reward):
-    a0 = 1.0 if action == 0 else 0.0
-    a1 = 1.0 if action == 1 else 0.0
-    #a2 = 1.0 if action == 2 else 0.0
-    amoeba.learn({"p0": state[0]*100, "p1": state[1]*100, "p2": state[2]*100, "p3": state[3]*100, "a0": a0, "a1": a1, "oracle": reward})
+    act = [0.0]*env.action_space.n
+    act[action] = 1
+    amoeba.learn(msg_obj(state, act, reward))
 
 
 if __name__ == '__main__':
-    # Make sure to run setup.sh at least once before running this script
 
+    plt.ion()
+
+    # Make sure to run setup.sh at least once before running this script
     subprocess.Popen(["java", "-jar", "amoeba.jar"])
     time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
     gateway.jvm.py4j.Main.Control.setComandLine(True)
 
-    amoeba = gateway.jvm.kernel.AMOEBA("/home/daavve/AMOEBA3/documentation/py4j_demo/cart_pole.xml", None)
-    set_field(amoeba.saver, "autoSave", False)
+    amoeba = gateway.jvm.kernel.AMOEBA()
+    backup_sys = gateway.jvm.kernel.backup.BackupSystem(amoeba)
+    file = gateway.jvm.java.io.File("cart_pole.xml")
+    backup_sys.load(file)
 
     env = gym.make('CartPole-v1')
     env.reset()
@@ -41,7 +57,7 @@ if __name__ == '__main__':
     ave_reward_list = []
 
     episodes = 1000
-    epsilon = 0.3
+    epsilon = 0
     min_eps = 0
     reduction = 0.01
     for i in range(episodes):
@@ -54,7 +70,7 @@ if __name__ == '__main__':
 
         while not done:
             # Render environment for last five episodes
-            env.render()
+            #env.render()
             #if i >= (episodes - 20):
             #    env.render()
 
@@ -85,12 +101,16 @@ if __name__ == '__main__':
         # Track rewards
         reward_list.append(tot_reward)
 
-        if (i + 1) % 10 == 0:
+        print_delta = 10
+        if (i + 1) % print_delta == 0:
             ave_reward = np.mean(reward_list)
+            ave_reward_list.append(ave_reward)
             reward_list = []
+            print(
+                'Episode {}-{} Average Reward: {} Epsilon: {}'.format(i - print_delta + 1, i + 1, ave_reward, epsilon))
+            plt.plot(ave_reward_list)
+            plt.pause(0.1)
 
-        if (i + 1) % 10 == 0:
-            print('Episode {} Average Reward: {} Epsilon: {}'.format(i + 1, ave_reward, epsilon))
 
     env.close()
 

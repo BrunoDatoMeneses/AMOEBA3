@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 rm amoeba.jar
 rm ./*.log

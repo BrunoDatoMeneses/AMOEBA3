@@ -24,7 +24,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import kernel.AMOEBA;
-import kernel.SaveHelper;
+import kernel.backup.SaveHelperImpl;
 
 /**
  * The main window for AMOEBA GUI.
@@ -172,7 +172,7 @@ public class AmoebaWindow extends MainWindow {
 	 * @param amoeba
 	 * @return
 	 * @see AMOEBA#saver
-	 * @see SaveHelper#newManualSave(String)
+	 * @see SaveHelperImpl#newManualSave(String)
 	 */
 	public Button newManualSaveButton(AMOEBA amoeba) {
 		Button button = new Button("Quick save");

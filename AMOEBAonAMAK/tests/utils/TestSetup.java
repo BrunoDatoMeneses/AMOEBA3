@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import experiments.F_XY_System;
 import fr.irit.smac.amak.Configuration;
 import kernel.AMOEBA;
-import kernel.SaveHelper;
 import kernel.StudiedSystem;
+import kernel.backup.SaveHelperImpl;
 
 public class TestSetup {
 	protected AMOEBA amoeba;
@@ -43,7 +43,7 @@ public class TestSetup {
 		Configuration.commandLineMode = true;
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		amoeba = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
-		amoeba.saver.autoSave = false;
+		amoeba.saver.setAutoSave(false);
 		for (int i = 0; i < train.length; i++) {
 			studiedSystem.playOneStep();
 			amoeba.learn(train[i]);
@@ -53,7 +53,7 @@ public class TestSetup {
 	@AfterAll
 	public static void clean() {
 		try {
-			DeleteDirectory.deleteDirectoryRecursion(Paths.get(SaveHelper.savesRoot));
+			DeleteDirectory.deleteDirectoryRecursion(Paths.get(SaveHelperImpl.savesRoot));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
