@@ -24,6 +24,7 @@ import gui.RenderStrategy;
 import kernel.AMOEBA;
 import ncs.NCS;
 import utils.Pair;
+import utils.TRACE_LEVEL;
 
 /**
  * The core agent of AMOEBA.
@@ -76,14 +77,14 @@ public class Context extends AmoebaAgent {
 		criticalities = new Criticalities(3);
 		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
 		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
-		getAmas().getEnvironment().trace(new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
+		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 	}
 
 	public Context(AMOEBA amoeba, Context bestNearestContext) {
 		super(amoeba);
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
-				.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(3);
 		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
 		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
@@ -96,7 +97,7 @@ public class Context extends AmoebaAgent {
 		super(amoeba);
 		buildContext(fatherContext, contextDimensions);
 		getAmas().getEnvironment()
-				.trace(new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
 	}
 
 	private void buildContextCommon() {
@@ -512,7 +513,7 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void solveNCS_IncompetentHead(Head head) {
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS INCOMPETENT HEAD")));
 
 		getEnvironment().raiseNCS(NCS.HEAD_INCOMPETENT);
@@ -526,7 +527,7 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void solveNCS_Concurrence(Head head) {
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CONCURENCE")));
 
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONCURRENCE);
@@ -542,7 +543,7 @@ public class Context extends AmoebaAgent {
 	 */
 	public void solveNCS_Uselessness() {
 		if (!isDying()) {
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
+			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 					"*********************************************************************************************************** SOLVE NCS USELESSNESS")));
 			getEnvironment().raiseNCS(NCS.CONTEXT_USELESSNESS);
 			this.destroy();
@@ -767,10 +768,10 @@ public class Context extends AmoebaAgent {
 		for(Percept pct : bounds.keySet()) {
 			
 			if(bounds.get(pct) != null) {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
 				request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
 			}else {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
+				getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}
 			
 			
@@ -795,7 +796,7 @@ public class Context extends AmoebaAgent {
 			currentDistance = this.distance(ctxt, pct);
 			
 			if(currentDistance<-(pct.getMappingErrorAllowed()*0.1)) {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
 				bounds.put(pct, this.overlapBounds(ctxt, pct));
@@ -805,7 +806,7 @@ public class Context extends AmoebaAgent {
 			
 
 			if (currentDistance > (pct.getMappingErrorAllowed()*0.1)) {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt)) );
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
 			}
@@ -818,7 +819,7 @@ public class Context extends AmoebaAgent {
 
 		if (overlapCounts == getAmas().getPercepts().size()) {
 			
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
@@ -827,7 +828,7 @@ public class Context extends AmoebaAgent {
 		}
 		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
 			
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
@@ -906,7 +907,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void solveNCS_BetterNeighbor(Context betterContext) {
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(),
 				"*********************************************************************************************************** SOLVE NCS BETTER NEIGHBOR")));
 		localModel = new LocalModelMillerRegression(this, betterContext.getLocalModel().getCoef(),
 				betterContext.getLocalModel().getFirstExperiments());
@@ -914,7 +915,7 @@ public class Context extends AmoebaAgent {
 
 	public void NCSDetection_OverMapping() {
 		
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(), 
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), 
 				"*********************************************************************************************************** SOLVE NCS OVERMAPPING")));
 		
 		
@@ -933,14 +934,14 @@ public class Context extends AmoebaAgent {
 						
 				if((currentDistanceToOraclePrediction<averageDistanceToOraclePrediction) && (otherContextDistanceToOraclePrediction<averageDistanceToOraclePrediction)) {
 					
-					getEnvironment().trace(new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
 					
 					
 					for(Percept pct : ranges.keySet()) {
 						
 						boolean fusionTest = true;
 						
-						getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
+						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
 						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowed()/2){		
 														
 							for(Percept otherPct : ranges.keySet()) {
@@ -949,7 +950,7 @@ public class Context extends AmoebaAgent {
 																		
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
-									getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + getEnvironment().getMappingErrorAllowed())));
+									getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + getEnvironment().getMappingErrorAllowed())));
 									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowed()/2) && (centerDifference< otherPct.getMappingErrorAllowed()/2);
 								}
 							}
@@ -969,7 +970,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	private void solveNCS_OverMapping(Context fusionContext) {
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS OVERMAPPING")));
 		getEnvironment().raiseNCS(NCS.CONTEXT_OVERMAPPING);
 
@@ -990,7 +991,7 @@ public class Context extends AmoebaAgent {
 		for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct, getRandomValueInRange(pct));
 		}
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addSelfRequest(request, 10,this);
 	}
 	
@@ -1126,7 +1127,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void solveNCS_BadPrediction(Head head) {
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList(this.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CONFLICT")));
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);
 
@@ -1341,7 +1342,7 @@ public class Context extends AmoebaAgent {
 						&& ranges.get(percept).getEnd() <= bestContextRanges.getEnd())) {
 
 					if (percept.contextOrder(this, bestContext)) {
-						getEnvironment().trace(new ArrayList<String>(
+						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 								Arrays.asList("ORDER :", percept.getName(), this.getName(), bestContext.getName())));
 						vol = Math.abs(
 								percept.getEndRangeProjection(this) - percept.getStartRangeProjection(bestContext));
@@ -1350,7 +1351,7 @@ public class Context extends AmoebaAgent {
 							perceptWithBiggerImpact = percept;
 						}
 					} else if (percept.contextOrder(bestContext, this)) {
-						getEnvironment().trace(new ArrayList<String>(
+						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 								Arrays.asList("ORDER :", percept.getName(), bestContext.getName(), this.getName())));
 						vol = Math.abs(
 								percept.getEndRangeProjection(bestContext) - percept.getStartRangeProjection(this));
@@ -1359,7 +1360,7 @@ public class Context extends AmoebaAgent {
 							perceptWithBiggerImpact = percept;
 						}
 					} else if (percept.contextIncludedIn(bestContext, this)) {
-						getEnvironment().trace(new ArrayList<String>(Arrays.asList("INCLUSION :", percept.getName(),
+						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("INCLUSION :", percept.getName(),
 								bestContext.getName(), this.getName())));
 						vol = Math.abs(percept.getEndRangeProjection(bestContext)
 								- percept.getStartRangeProjection(bestContext));
@@ -2265,7 +2266,7 @@ public class Context extends AmoebaAgent {
 
 	@Override
 	public void destroy() {
-		getEnvironment().trace(new ArrayList<String>(
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(
 				Arrays.asList("-----------------------------------------", this.getName(), "DIE")));
 		for (Context ctxt : getAmas().getContexts()) {
 			ctxt.removeContext(this);
@@ -2346,7 +2347,7 @@ public class Context extends AmoebaAgent {
 	
 	public void addWaitingRequest(EndogenousRequest request) {
 		waitingRequests.add(request);
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADDED WAITING REQUEST", this.getName(), ""+waitingRequests.size(), ""+request)));
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("ADDED WAITING REQUEST", this.getName(), ""+waitingRequests.size(), ""+request)));
 	}
 	
 	public void deleteWaitingRequest(EndogenousRequest request) {

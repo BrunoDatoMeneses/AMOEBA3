@@ -7,6 +7,7 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
 import utils.Pair;
+import utils.TRACE_LEVEL;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -355,7 +356,7 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	
 	public void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
-		context.getAmas().getEnvironment().trace(new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
 		if(firstExperiments.size()< (nParameters + 2)) {
 			firstExperiments.add(newExperiment); 
@@ -366,7 +367,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		}
 		
 		
-		context.getAmas().getEnvironment().trace(new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
 	}
 	
 	public void updateModel() {

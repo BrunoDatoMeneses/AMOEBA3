@@ -15,6 +15,7 @@ import agents.percept.Percept;
 import kernel.AMOEBA;
 import utils.Pair;
 import utils.Quadruplet;
+import utils.TRACE_LEVEL;
 import agents.context.CustomComparator;
 import agents.head.ContextPair;
 import agents.head.Criticalities;
@@ -238,7 +239,7 @@ public class Head extends AmoebaAgent {
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
 			bestContext.notifySelection();
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList(bestContext.getName(),
+			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(bestContext.getName(),
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
@@ -895,7 +896,7 @@ public class Head extends AmoebaAgent {
 		executionTimes[9]=System.currentTimeMillis();
 		if (activatedContexts.size() == 0) {
 			
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList(
+			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
 			
 			executionTimes[8]=System.currentTimeMillis();		
@@ -906,7 +907,7 @@ public class Head extends AmoebaAgent {
 			
 			Context context;
 			if (nearestGoodContext.getA() != null) {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
+				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
 						"************************************* NEAREST GOOD CONTEXT")));
 				context = createNewContext(nearestGoodContext.getA());
 			} else {
@@ -1020,7 +1021,7 @@ public class Head extends AmoebaAgent {
 			}
 		}
 		
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
 		for(EndogenousRequest endoRequest : endogenousRequests) {
 			
 			System.out.println(endoRequest);
@@ -1138,7 +1139,7 @@ public class Head extends AmoebaAgent {
 			distanceToRegression = currentDistanceToOraclePrediction;
 
 			contextNotFinished = false;
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), learningSpeed,
@@ -1175,7 +1176,7 @@ public class Head extends AmoebaAgent {
 			
 			if (activatedContext.criticalities.getCriticalityMean("distanceToRegression") != null) {
 				activatedContext.regressionPerformance.update(activatedContext.criticalities.getCriticalityMean("distanceToRegression"));
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContext.getName(), ""+activatedContext.regressionPerformance.getPerformanceIndicator())));
+				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContext.getName(), ""+activatedContext.regressionPerformance.getPerformanceIndicator())));
 			}
 			
 			
@@ -1206,14 +1207,14 @@ public class Head extends AmoebaAgent {
 					.abs(distanceToOracleForActivatedContext - closestAndFarestContextsToPredictionWithDistance.getD());
 
 			if (distanceToMin < distanceToMax) {
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE",
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE",
 						activatedContexts.get(0).getName(), "" + distanceToOracleForActivatedContext)));
 				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
 						learningSpeed, numberOfPointsForRegression);
 
 			}
 		} else {
-			getEnvironment().trace(new ArrayList<String>(
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 					Arrays.asList("MODEL DISTANCE", activatedContexts.get(0).getName(), "" + activatedContexts.get(0)
 							.getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment()))));
 			activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
@@ -1235,7 +1236,7 @@ public class Head extends AmoebaAgent {
 			if (contextNeighbor != activatedContexts.get(0)) {
 				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
 						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
 						"" + currentDistanceToOraclePrediction)));
 				if (currentDistanceToOraclePrediction > maxDistanceToOraclePredictionInNeighbors) {
 					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
@@ -1254,7 +1255,7 @@ public class Head extends AmoebaAgent {
 			if (contextNeighbor != activatedContexts.get(0)) {
 				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
 						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
 						"" + currentDistanceToOraclePrediction)));
 				if (currentDistanceToOraclePrediction < minDistanceToOraclePredictionInNeighbors) {
 					minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
@@ -1276,7 +1277,7 @@ public class Head extends AmoebaAgent {
 			if (contextNeighbor != activatedContexts.get(0)) {
 				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
 						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
 						"" + currentDistanceToOraclePrediction)));
 				if (currentDistanceToOraclePrediction > maxDistanceToOraclePredictionInNeighbors) {
 					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
@@ -1303,7 +1304,7 @@ public class Head extends AmoebaAgent {
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
 
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
 				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
@@ -1450,7 +1451,7 @@ public class Head extends AmoebaAgent {
 			double currentDistanceToOraclePrediction = c.getLocalModel()
 					.distance(c.getCurrentExperiment());
 			
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
 					"" + c.getLocalModel().distance(c.getCurrentExperiment()))));
 			
 			if (currentDistanceToOraclePrediction < averageDistanceToModels) {
@@ -2366,7 +2367,7 @@ public class Head extends AmoebaAgent {
 	
 	
 	public HashMap<Percept, Double> getSelfRequest(){
-		getEnvironment().trace(new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
 		EndogenousRequest futureRequest = endogenousRequests.poll();
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
@@ -2412,12 +2413,12 @@ public class Head extends AmoebaAgent {
 					ctxt.addWaitingRequest(request);
 				}
 				endogenousRequests.add(request);
-				getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
+				getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 			}
 		}else {
 			request.getAskingContexts().get(0).addWaitingRequest(request);
 			endogenousRequests.add(request);
-			getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
+			getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 		}
 		
 		
