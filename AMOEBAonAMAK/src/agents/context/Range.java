@@ -794,12 +794,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < percept.getMappingErrorAllowed()*0.1 && (end - start)>0) {
-			////// System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" +
-			////// mininimalRange + " ~~~ " + (end - start));
-		}
+		
 
-		return ((end - start) < (percept.getMappingErrorAllowed() / 2)) && !this.isPerceptEnum();
+		return ((end - start) < (percept.getMappingErrorAllowed()*0.1)) && !this.isPerceptEnum();
 	}
 
 	/**
