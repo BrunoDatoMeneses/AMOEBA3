@@ -25,8 +25,6 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.Range;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -259,12 +257,6 @@ public class BackupSystem implements IBackupSystem {
 		List<Double> coefs = new ArrayList<>();
 		LocalModel localModel;
 		switch (type) {
-		case AVERAGE:
-			localModel = new LocalModelAverage(context);
-			break;
-		case FIRST_EXPERIMENT:
-			localModel = new LocalModelFirstExp(context);
-			break;
 		case MILLER_REGRESSION:
 			localModel = new LocalModelMillerRegression(context);
 			for(Element e : localModelElement.getChild("Coefs").getChildren()) {

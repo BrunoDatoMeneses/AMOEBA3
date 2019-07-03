@@ -14,8 +14,6 @@ import java.util.stream.Stream;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -391,12 +389,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
 			return new LocalModelMillerRegression(context);
 		}
-		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp(context);
-		}
-		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage(context);
-		}
+
 		return null;
 	}
 

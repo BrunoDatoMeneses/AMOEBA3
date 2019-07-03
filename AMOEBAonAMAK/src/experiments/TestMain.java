@@ -55,13 +55,13 @@ public class TestMain {
 		hm6.put("p6", 50.0);
 		HashMap<String, Double> hm7 = new HashMap<String, Double>();
 		hm7.put("p7", 50.0);
-		endogenousRequest.add(new EndogenousRequest(hm1, 5));
-		endogenousRequest.add(new EndogenousRequest(hm2, 3));
-		endogenousRequest.add(new EndogenousRequest(hm3, 1));
-		endogenousRequest.add(new EndogenousRequest(hm4, 2));
-		endogenousRequest.add(new EndogenousRequest(hm5, 0));
-		endogenousRequest.add(new EndogenousRequest(hm6, 5));
-		endogenousRequest.add(new EndogenousRequest(hm7, 3));
+//		endogenousRequest.add(new EndogenousRequest(hm1, 5));
+//		endogenousRequest.add(new EndogenousRequest(hm2, 3));
+//		endogenousRequest.add(new EndogenousRequest(hm3, 1));
+//		endogenousRequest.add(new EndogenousRequest(hm4, 2));
+//		endogenousRequest.add(new EndogenousRequest(hm5, 0));
+//		endogenousRequest.add(new EndogenousRequest(hm6, 5));
+//		endogenousRequest.add(new EndogenousRequest(hm7, 3));
 		
 		System.out.println(endogenousRequest);
 		

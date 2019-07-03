@@ -11,14 +11,13 @@ import java.util.Map;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Criticalities;
 import agents.head.DynamicPerformance;
 import agents.head.EndogenousRequest;
 import agents.head.Head;
+import agents.head.REQUEST;
 import agents.percept.Percept;
 import gui.ContextRendererFX;
 import gui.RenderStrategy;
@@ -221,21 +220,7 @@ public class Context extends AmoebaAgent {
 			this.actionProposition = ((LocalModelMillerRegression) fatherContext.localModel)
 					.getProposition(fatherContext);
 
-		} else if (fatherContext.getLocalModel().getType() == TypeLocalModel.FIRST_EXPERIMENT) {
-
-			this.localModel = new LocalModelFirstExp(this);
-			// this.formulaLocalModel = ((LocalModelFirstExp)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelFirstExp) fatherContext.localModel).getProposition(fatherContext);
-
-		} else if (fatherContext.getLocalModel().getType() == TypeLocalModel.AVERAGE) {
-
-			this.localModel = new LocalModelAverage(this);
-			// this.formulaLocalModel = ((LocalModelAverage)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelAverage) fatherContext.localModel).getProposition(fatherContext);
-
-		}
+		}  
 
 		this.experiments = new ArrayList<Experiment>();
 		experiments.addAll(fatherContext.getExperiments());
@@ -304,23 +289,7 @@ public class Context extends AmoebaAgent {
 			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel)
 					.getProposition(bestNearestContext);
 
-		} else if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.FIRST_EXPERIMENT) {
-
-			this.localModel = new LocalModelFirstExp(this);
-			// this.formulaLocalModel = ((LocalModelFirstExp)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelFirstExp) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
-
-		} else if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.AVERAGE) {
-
-			this.localModel = new LocalModelAverage(this);
-			// this.formulaLocalModel = ((LocalModelAverage)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			this.actionProposition = ((LocalModelAverage) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
-
-		}
+		} 
 
 		this.experiments = new ArrayList<Experiment>();
 		experiments.addAll(bestNearestContext.getExperiments());
@@ -720,8 +689,9 @@ public class Context extends AmoebaAgent {
 	public void analyzeResults4(Head head, Context closestContextToOracle) {
 		
 		
-		
-		if (head.getCriticity(this) < head.getErrorAllowed()) {
+		if(getLocalModel().distance(this.getCurrentExperiment()) < regressionPerformance.performanceIndicator) {
+		//if(getLocalModel().distance(this.getCurrentExperiment()) < head.getAverageRegressionPerformanceIndicator()) {
+		//if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
 		} else {
 			this.solveNCS_BadPrediction(head);
@@ -791,14 +761,14 @@ public class Context extends AmoebaAgent {
 	
 	
 	
-	public EndogenousRequest boundsToEndogenousRequest(HashMap<Percept, Pair<Double, Double>> bounds) {
-		HashMap<String, Double> request = new HashMap<String, Double>();
+	public HashMap<Percept, Double> boundsToRequest(HashMap<Percept, Pair<Double, Double>> bounds) {
+		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
 		
 		for(Percept pct : bounds.keySet()) {
 			
 			if(bounds.get(pct) != null) {
 				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
-				request.put(pct.getName(), (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
+				request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
 			}else {
 				getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}
@@ -806,7 +776,7 @@ public class Context extends AmoebaAgent {
 			
 		}
 		
-		return new EndogenousRequest(request, null);
+		return request;
 	}
 	
 	public EndogenousRequest endogenousRequest(Context ctxt) {
@@ -850,23 +820,23 @@ public class Context extends AmoebaAgent {
 			
 			getEnvironment().trace(new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
-			EndogenousRequest request = boundsToEndogenousRequest(bounds);
-			if(request.getRequest() != null) {
-				return new EndogenousRequest(request.getRequest(), 5, new ArrayList<Context>(Arrays.asList(this,ctxt)));
+			HashMap<Percept, Double> request = boundsToRequest(bounds);
+			if(request != null) {
+				return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
 			}		
 		}
-//		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
-//			
-//			getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
-//			
-//			EndogenousRequest request = boundsToEndogenousRequest(bounds);
-//			if(request.getRequest() != null) {
-//				
-//				if(getAmas().getHeadAgent().isVoid(request.getRequest())) {
-//					return new EndogenousRequest(request.getRequest(), 7, new ArrayList<Context>(Arrays.asList(this,ctxt)));
-//				}		
-//			}
-//		}
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
+			
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
+			
+			HashMap<Percept, Double> request = boundsToRequest(bounds);
+			if(request != null) {
+				
+				if(getAmas().getHeadAgent().isVoid(request)) {
+					return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
+				}		
+			}
+		}
 		else {
 			return null;
 		}
@@ -1016,9 +986,9 @@ public class Context extends AmoebaAgent {
 	}
 	
 	public void solveNCS_ChildContext() {
-		HashMap<String, Double> request = new HashMap<String, Double>();
+		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
 		for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct.getName(), getRandomValueInRange(pct));
+			request.put(pct, getRandomValueInRange(pct));
 		}
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addSelfRequest(request, 10,this);
@@ -2175,12 +2145,16 @@ public class Context extends AmoebaAgent {
 		s += "\n";
 		
 		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
-		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n\n";
 		
+		s += "ASKED REQUEST " + waitingRequests.size() + "\n";
+		for(EndogenousRequest rqt : waitingRequests) {
+			s += rqt + "\n";
+		}
+		s += "\n";
+				
 		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
-		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";
-				
-				
+		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";	
 		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";
@@ -2372,6 +2346,7 @@ public class Context extends AmoebaAgent {
 	
 	public void addWaitingRequest(EndogenousRequest request) {
 		waitingRequests.add(request);
+		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADDED WAITING REQUEST", this.getName(), ""+waitingRequests.size(), ""+request)));
 	}
 	
 	public void deleteWaitingRequest(EndogenousRequest request) {

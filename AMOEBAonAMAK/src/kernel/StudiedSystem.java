@@ -39,6 +39,6 @@ public interface StudiedSystem extends Serializable{
 	public void setActiveLearning(boolean value);
 	
 	
-	public void setSelfRequest(HashMap<String, Double> request);
+	public void setSelfRequest(HashMap<Percept, Double> request);
 
 }

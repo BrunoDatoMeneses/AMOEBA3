@@ -1010,7 +1010,7 @@ public class Head extends AmoebaAgent {
 						
 						if(potentialRequest != null) {
 							addEndogenousRequest(potentialRequest);
-							getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST", ""+potentialRequest)));
+							
 						}
 					}
 					
@@ -1021,11 +1021,11 @@ public class Head extends AmoebaAgent {
 		}
 		
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
-//		for(EndogenousRequest endoRequest : endogenousRequests) {
-//			
-//			System.out.println(endoRequest);
-//			
-//		}
+		for(EndogenousRequest endoRequest : endogenousRequests) {
+			
+			System.out.println(endoRequest);
+			
+		}
 		
 	}
 
@@ -1443,6 +1443,8 @@ public class Head extends AmoebaAgent {
 		double d = Double.MAX_VALUE;
 		Context bestContextInNeighbors = null;
 		
+		Double averageDistanceToModels = getAverageRegressionPerformanceIndicator();
+		
 		for (Context c : contextNeighbors) {
 			
 			double currentDistanceToOraclePrediction = c.getLocalModel()
@@ -1451,7 +1453,7 @@ public class Head extends AmoebaAgent {
 			getEnvironment().trace(new ArrayList<String>(Arrays.asList("MODEL DISTANCE FOR FATHER CTXT", c.getName(),
 					"" + c.getLocalModel().distance(c.getCurrentExperiment()))));
 			
-			if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+			if (currentDistanceToOraclePrediction < averageDistanceToModels) {
 				if(currentDistanceToOraclePrediction < d) {
 					d = currentDistanceToOraclePrediction;
 					bestContextInNeighbors = c;
@@ -2363,9 +2365,13 @@ public class Head extends AmoebaAgent {
 	
 	
 	
-	public HashMap<String, Double> getSelfRequest(){
+	public HashMap<Percept, Double> getSelfRequest(){
 		getEnvironment().trace(new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
-		return endogenousRequests.poll().getRequest();
+		EndogenousRequest futureRequest = endogenousRequests.poll();
+		for(Context ctxt : futureRequest.getAskingContexts()) {
+			ctxt.deleteWaitingRequest(futureRequest);
+		}
+		return futureRequest.getRequest();
 	}
 	
 	public void deleteRequest(Context ctxt) {
@@ -2376,9 +2382,9 @@ public class Head extends AmoebaAgent {
 		return endogenousRequests.size()>0;
 	}
 	
-	public void addSelfRequest(HashMap<String, Double> request, int priority, Context ctxt){		
+	public void addSelfRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
 		
-		addEndogenousRequest(new EndogenousRequest(request, priority,new ArrayList<Context>(Arrays.asList(ctxt))));
+		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF));
 	}
 	
 	public void addEndogenousRequest(EndogenousRequest request) {
@@ -2392,9 +2398,12 @@ public class Head extends AmoebaAgent {
 				
 				EndogenousRequest currentRequest = itr.next();
 				
-				if(currentRequest.getAskingContexts().size()>1) {
+				if(currentRequest.getType() == REQUEST.OVERLAP) {
 						
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
+				}
+				if(currentRequest.getType() == REQUEST.VOID) {
+					existingRequestTest = existingRequestTest || currentRequest.requestInBounds(request.getRequest());
 				}
 				
 			}
@@ -2403,9 +2412,12 @@ public class Head extends AmoebaAgent {
 					ctxt.addWaitingRequest(request);
 				}
 				endogenousRequests.add(request);
+				getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 			}
 		}else {
+			request.getAskingContexts().get(0).addWaitingRequest(request);
 			endogenousRequests.add(request);
+			getEnvironment().trace(new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 		}
 		
 		
@@ -2435,14 +2447,14 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
-	public boolean isVoid(HashMap<String, Double> request) {
+	public boolean isVoid(HashMap<Percept, Double> request) {
 		boolean test;
 		
 		for(Context ctxt : activatedNeighborsContexts) {
 			
 			test = true;
 			for(Percept pct : getAmas().getPercepts()) {
-				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct.getName()));
+				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
 			}
 			if(test) {
 				return false;

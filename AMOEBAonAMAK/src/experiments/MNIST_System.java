@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import agents.context.localModel.TypeLocalModel;
+import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
@@ -243,7 +244,7 @@ public class MNIST_System implements StudiedSystem {
 	}
 
 	@Override
-	public void setSelfRequest(HashMap<String, Double> request) {
+	public void setSelfRequest(HashMap<Percept, Double> request) {
 		// TODO Auto-generated method stub
 		
 	}

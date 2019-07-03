@@ -3,6 +3,7 @@ package experiments;
 import java.util.HashMap;
 import java.util.Random;
 
+import agents.percept.Percept;
 import kernel.StudiedSystem;
 
 /**
@@ -76,7 +77,7 @@ public class F_XY_System implements StudiedSystem {
 	}
 
 	@Override
-	public void setSelfRequest(HashMap<String, Double> request) {
+	public void setSelfRequest(HashMap<Percept, Double> request) {
 		// TODO Auto-generated method stub
 		
 	}

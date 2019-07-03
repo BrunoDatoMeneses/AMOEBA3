@@ -3,6 +3,7 @@ package experiments;
 import java.util.HashMap;
 import java.util.Random;
 
+import agents.percept.Percept;
 import fr.irit.smac.amak.tools.Log;
 import kernel.StudiedSystem;
 
@@ -123,7 +124,7 @@ public class NDimCube implements StudiedSystem{
 	}
 
 	@Override
-	public void setSelfRequest(HashMap<String, Double> request) {
+	public void setSelfRequest(HashMap<Percept, Double> request) {
 		// TODO Auto-generated method stub
 		
 	}

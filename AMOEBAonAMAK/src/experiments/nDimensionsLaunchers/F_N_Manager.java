@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
+import agents.percept.Percept;
 import kernel.StudiedSystem;
 
 
@@ -155,6 +156,8 @@ public class F_N_Manager implements StudiedSystem{
 			
 			
 			activeLearning = false;
+			
+			
 			
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
@@ -648,8 +651,14 @@ public class F_N_Manager implements StudiedSystem{
 	}
 	
 	@Override
-	public void setSelfRequest(HashMap<String, Double> request){
-		selfRequest = request;
+	public void setSelfRequest(HashMap<Percept, Double> request){
+		HashMap<String,Double> newRequest = new HashMap<String,Double>();
+		
+		for(Percept pct : request.keySet()) {
+			newRequest.put(pct.getName(), request.get(pct));
+		}
+		
+		selfRequest = newRequest;
 	}
 
 
