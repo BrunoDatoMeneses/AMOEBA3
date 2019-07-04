@@ -81,7 +81,7 @@ public class World extends Environment {
 	
 	public void trace(TRACE_LEVEL lvl, ArrayList<String> infos) {
 		if (lvl.isGE(minLevel)) {
-			String message = "" +amoeba.getCycle();
+			String message = "[" +amoeba.getCycle() + "]";
 			for(String info : infos) {
 				message += " " + info;
 			}

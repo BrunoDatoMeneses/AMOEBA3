@@ -69,14 +69,22 @@ public class Context extends AmoebaAgent {
 	
 	public DynamicPerformance regressionPerformance;
 	public Criticalities criticalities ;
+	public double lastDistanceToModel = -1.0;
+	public double lastAverageRegressionPerformanceIndicator = -1.0;
 	
-
+	public double  augmentationFactorError = 0.5;
+	public double  diminutionFactorError = 0.66;
+	public double  minError = 1;
+	public int temporalWindowCriticalityMean = 5;
+	public int successesBeforeDiminution = 5;
+	public int errorsBeforeAugmentation = 5;
+	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
 		buildContext();
-		criticalities = new Criticalities(3);
-		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
-		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
+		criticalities = new Criticalities(5);
+		
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 	}
 
@@ -85,9 +93,9 @@ public class Context extends AmoebaAgent {
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
-		criticalities = new Criticalities(3);
-		//regressionPerformance = new DynamicPerformance(10, 10, 200, 0.5, 0.5, 1);
-		regressionPerformance = new DynamicPerformance(3, 3, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), 0.5, 0.5, 1);
+		criticalities = new Criticalities(5);
+		
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		//TODO in amak, cannot kill a agent before its 1st cycle
 		//NCSDetection_Uselessness();
 
@@ -687,13 +695,18 @@ public class Context extends AmoebaAgent {
 
 	}
 
-	public void analyzeResults4(Head head, Context closestContextToOracle) {
+	public void analyzeResults4(Head head) {
 		
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- ANALYSE RESULTS " + this.getName())));
 		
-		if(getLocalModel().distance(this.getCurrentExperiment()) < regressionPerformance.performanceIndicator) {
+		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
+		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
+		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator) {
 		//if(getLocalModel().distance(this.getCurrentExperiment()) < head.getAverageRegressionPerformanceIndicator()) {
 		//if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
 		} else {
 			this.solveNCS_BadPrediction(head);
 		}
@@ -795,7 +808,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-(pct.getMappingErrorAllowed()*0.1)) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin()) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -805,7 +818,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > (pct.getMappingErrorAllowed()*0.1)) {
+			if (currentDistance > pct.getMappingErrorAllowedMin()) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -823,7 +836,7 @@ public class Context extends AmoebaAgent {
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
-				return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
+				return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
 			}		
 		}
 		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
@@ -834,7 +847,7 @@ public class Context extends AmoebaAgent {
 			if(request != null) {
 				
 				if(getAmas().getHeadAgent().isVoid(request)) {
-					return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
+					return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
 				}		
 			}
 		}
@@ -915,8 +928,7 @@ public class Context extends AmoebaAgent {
 
 	public void NCSDetection_OverMapping() {
 		
-		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), 
-				"*********************************************************************************************************** SOLVE NCS OVERMAPPING")));
+		
 		
 		
 		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
@@ -930,7 +942,7 @@ public class Context extends AmoebaAgent {
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
 				
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
-				double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 						
 				if((currentDistanceToOraclePrediction<averageDistanceToOraclePrediction) && (otherContextDistanceToOraclePrediction<averageDistanceToOraclePrediction)) {
 					
@@ -942,7 +954,7 @@ public class Context extends AmoebaAgent {
 						boolean fusionTest = true;
 						
 						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
-						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowed()/2){		
+						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowedOverMapping()){		
 														
 							for(Percept otherPct : ranges.keySet()) {
 								
@@ -951,7 +963,7 @@ public class Context extends AmoebaAgent {
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
 									getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + getEnvironment().getMappingErrorAllowed())));
-									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowed()/2) && (centerDifference< otherPct.getMappingErrorAllowed()/2);
+									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowedOverMapping()) && (centerDifference< otherPct.getMappingErrorAllowedOverMapping());
 								}
 							}
 							
@@ -981,7 +993,9 @@ public class Context extends AmoebaAgent {
 		}
 		
 		this.setConfidence(Math.max(this.getConfidence(), fusionContext.getConfidence()));
-
+		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
+		
+		
 		fusionContext.destroy();
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
@@ -1769,7 +1783,7 @@ public class Context extends AmoebaAgent {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
 	
 			if (!contain) {
-				if(ranges.get(pct).getLenght()<(pct.getMappingErrorAllowed()*1.5)) {
+				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
 					ranges.get(pct).adapt(pct.getValue());
 				}
 				
@@ -1788,24 +1802,15 @@ public class Context extends AmoebaAgent {
 	public void shrinkRangesToJoinBorders(Context bestContext) {
 		Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
 				bestContext);
-		// if(perceptWithLesserImpact!=null) world.trace(new
-		// ArrayList<String>(Arrays.asList(this.getName(),perceptWithLesserImpact.getName(),
-		// "PERCEPT BIGGER IMPACT")));
+
 
 		if (perceptWithBiggerImpactOnOverlap == null) {
 			this.destroy();
 		} else {
-			// ranges.get(perceptWithBiggerImpactOnOverlap).matchBorderWithBestContext(bestContext);
-			// ranges.get(perceptWithBiggerImpactOnOverlap).adaptTowardsBorder(bestContext);
+
 
 			ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue());
 
-//			if(testIfOtherContextShouldFinalyShrink(bestContext, perceptWithLesserImpact)){
-//				bestContext.getRanges().get(perceptWithLesserImpact).adaptTowardsBorder(this);
-//			}
-//			else {
-//				ranges.get(perceptWithLesserImpact).adaptTowardsBorder(bestContext);
-//			}
 		}
 	}
 
@@ -2145,6 +2150,11 @@ public class Context extends AmoebaAgent {
 		// s += "\n";
 		s += "\n";
 		
+		s += "Last Distance to Regression " + lastDistanceToModel + "\n";
+		s += "Last Average Distance To Regression Allowed "  + lastAverageRegressionPerformanceIndicator +"\n";
+		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
+		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";
+		
 		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
 		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n\n";
 		
@@ -2154,8 +2164,7 @@ public class Context extends AmoebaAgent {
 		}
 		s += "\n";
 				
-		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
-		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";	
+			
 		
 		for (Percept v : ranges.keySet()) {
 			s += v.getName() + " : " + ranges.get(v).toString() + "\n";

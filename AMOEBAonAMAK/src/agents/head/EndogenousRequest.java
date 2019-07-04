@@ -52,7 +52,7 @@ public class EndogenousRequest {
 	}
 	
 	public String toString() {
-		String m="";
+		String m="ASK BY ";
 		for(Context ctxt : askingContexts) {
 			m+= ctxt.getName() + " ";
 		}
