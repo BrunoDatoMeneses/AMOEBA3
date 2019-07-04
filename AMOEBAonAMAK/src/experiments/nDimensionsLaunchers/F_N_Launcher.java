@@ -27,7 +27,7 @@ public class F_N_Launcher implements Serializable {
 	public static final double oracleNoiseRange = 0.0;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
-	public static final int dimension = 2	;
+	public static final int dimension = 3;
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 5	;
 	public static final int normType = 2	;
@@ -63,7 +63,7 @@ public class F_N_Launcher implements Serializable {
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/twoDimensionsLauncher.xml");
+		File file = new File("resources/threeDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
 		amoeba.saver = new SaveHelperImpl(amoeba);
@@ -73,9 +73,19 @@ public class F_N_Launcher implements Serializable {
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
-
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
+		
+		for(int i = 0; i < 500; i++) {
+			studiedSystem.playOneStep();
+			amoeba.learn(studiedSystem.getOutput());
+		}
+		
+		HashMap<String, Double> req = new HashMap<String, Double>();
+		req.put("px0", 10.0);
+		HashMap<String, Double> max = amoeba.maximise(req);
+		System.out.println(max);
+		max.put("px0", 10.0);
+		System.out.println(amoeba.request(max));
+		
 		
 		
 		/* AUTOMATIC */

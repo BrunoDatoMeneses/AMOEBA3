@@ -3,11 +3,22 @@ package kernel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.math3.optim.OptimizationData;
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.linear.LinearConstraint;
+import org.apache.commons.math3.optim.linear.LinearConstraintSet;
+import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
+import org.apache.commons.math3.optim.linear.LinearOptimizer;
+import org.apache.commons.math3.optim.linear.Relationship;
+import org.apache.commons.math3.optim.linear.SimplexSolver;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
@@ -30,6 +41,7 @@ import kernel.backup.ISaveHelper;
 import kernel.backup.SaveHelperDummy;
 import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
+import utils.Pair;
 
 /**
  * The AMOEBA amas
@@ -381,6 +393,85 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			head.changeOracleConnection();
 		studiedSystem = ss;
 		return getAction();
+	}
+	
+	public HashMap<String, Double> maximise(HashMap<String, Double> known){
+		//get partially activated context
+		ArrayList<Context> pca = new ArrayList<>();
+		for(Context c : getContexts()) {
+			boolean good = true;
+			for(String p : known.keySet()) {
+				if(!c.getRangeByPerceptName(p).contains2(known.get(p))) {
+					good = false;
+					break;
+				}
+			}
+			if(good) pca.add(c);
+		}
+		
+		ArrayList<Percept> percepts = getPercepts();
+		ArrayList<Percept> unknown = new ArrayList<>(percepts);
+		unknown.removeIf(p ->known.containsKey(p.getName()));
+		System.out.println("known : "+known.keySet());
+		System.out.println("unknow : "+unknown);
+		
+		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
+		for(Context c : pca) {
+			sol.add(maximiseContext(known, percepts, unknown, c));
+		}
+		HashMap<String, Double> max = new HashMap<>();
+		// set default value if no solution
+		for(Percept p : unknown) {
+			max.put(p.getName(), 0.0);
+		}
+		Double maxValue = Double.NEGATIVE_INFINITY;
+		//find best solution
+		for(Pair<HashMap<String, Double>, Double> s : sol) {
+			if(s.getB() > maxValue) {
+				maxValue = s.getB();
+				max = s.getA();
+			}
+		}
+		max.put("oracle", maxValue);
+		return max;
+	}
+
+	//TODO tests !
+	private Pair<HashMap<String, Double>, Double> maximiseContext(HashMap<String, Double> known,
+			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
+		HashMap<String, Double> res = new HashMap<>();
+		
+		Double[] coefs = c.getLocalModel().getCoef();
+		double[] vCoefs = new double[coefs.length-1];
+		for(int i = 1; i < coefs.length; i++) {
+			vCoefs[i-1] = coefs[i];
+		}
+		LinearObjectiveFunction fct = new LinearObjectiveFunction(vCoefs, coefs[0]);
+		ArrayList<LinearConstraint> constraints = new ArrayList<>();
+		//TODO : problem : we are not sure that the order of percepts is the same as coefs
+		int i = 0;
+		for(String p : known.keySet()) {
+			double[] cf = new double[percepts.size()];
+			cf[i++] = 1.0;
+			constraints.add(new LinearConstraint(cf, Relationship.EQ, known.get(p)));
+		}
+		int unknowStart = i;
+		for(Percept p : unknown) {
+			double[] cf = new double[percepts.size()];
+			cf[i++] = 1.0;
+			constraints.add(new LinearConstraint(cf, Relationship.GEQ, c.getRangeByPerceptName(p.getName()).getStart()));
+			constraints.add(new LinearConstraint(cf, Relationship.LEQ, c.getRangeByPerceptName(p.getName()).getEnd()));
+		}
+		SimplexSolver solver = new SimplexSolver();
+		LinearConstraintSet set = new LinearConstraintSet(constraints);
+		PointValuePair sol = solver.optimize(fct, set, GoalType.MAXIMIZE);
+		for(Percept p : unknown) {
+			//TODO check if the order match
+			res.put(p.getName(), sol.getFirst()[unknowStart++]);
+		}
+		
+		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, sol.getSecond());
+		return ret;
 	}
 
 	public LocalModel buildLocalModel(Context context) {
