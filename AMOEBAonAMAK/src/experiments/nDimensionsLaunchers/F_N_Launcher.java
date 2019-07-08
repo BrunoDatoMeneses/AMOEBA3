@@ -27,7 +27,7 @@ public class F_N_Launcher implements Serializable {
 	public static final double oracleNoiseRange = 0.0;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
-	public static final int dimension = 3;
+	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 5	;
 	public static final int normType = 2	;
@@ -63,7 +63,7 @@ public class F_N_Launcher implements Serializable {
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/threeDimensionsLauncher.xml");
+		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
 		amoeba.saver = new SaveHelperImpl(amoeba);

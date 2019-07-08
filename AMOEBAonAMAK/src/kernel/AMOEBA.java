@@ -182,9 +182,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
+			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
-		System.out.println("Nb agents : "+getAgents().size());
 		
 		if(isRenderUpdate()) {
 			incrementCycleWithoutRender();
@@ -445,7 +444,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
 		HashMap<String, Double> res = new HashMap<>();
 		for(Percept p : unknown) {
-			res.put(p.getName(), c.getRangeByPerceptName(p.getName()).getCenter());
+			res.put(p.getName(), c.getRangeByPercept(p).getCenter());
 		}
 		HashMap<String, Double> tmpReq = new HashMap<>(res);
 		HashMap<String, Double> old = perceptions;
@@ -478,8 +477,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Percept p : unknown) {
 			double[] cf = new double[percepts.size()];
 			cf[i++] = 1.0;
-			constraints.add(new LinearConstraint(cf, Relationship.GEQ, c.getRangeByPerceptName(p.getName()).getStart()));
-			constraints.add(new LinearConstraint(cf, Relationship.LEQ, c.getRangeByPerceptName(p.getName()).getEnd()));
+			constraints.add(new LinearConstraint(cf, Relationship.GEQ, c.getRangeByPercept(p).getStart()));
+			constraints.add(new LinearConstraint(cf, Relationship.LEQ, c.getRangeByPercept(p).getEnd()));
 		}
 		SimplexSolver solver = new SimplexSolver();
 		LinearConstraintSet set = new LinearConstraintSet(constraints);

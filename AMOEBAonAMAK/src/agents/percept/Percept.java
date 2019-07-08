@@ -1,16 +1,11 @@
 package agents.percept;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.apache.commons.math3.exception.OutOfRangeException;
-
 import agents.AmoebaAgent;
-import agents.context.CenterRangeComparator;
 import agents.context.Context;
-import agents.context.CustomComparator;
 import kernel.AMOEBA;
 
 /**
@@ -27,15 +22,6 @@ public class Percept extends AmoebaAgent {
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 	private HashSet<Context> neighborContextProjection = new HashSet<Context>();
-	
-	public HashMap<String, ArrayList<Context>> sortedRanges = new HashMap<String, ArrayList<Context>>();
-	public ArrayList<Context> sortedContextbyStartRanges = new ArrayList<Context>();
-	public ArrayList<Context> sortedContextbyEndRanges = new ArrayList<Context>();
-	public HashMap<String, CustomComparator> customRangeComparators = new HashMap<String, CustomComparator>();
-
-	private CustomComparator rangeStartComparator = new CustomComparator(this, "start");
-	private CustomComparator rangeEndComparator = new CustomComparator(this, "end");
-	private CenterRangeComparator centerComparator = new CenterRangeComparator(this);
 
 	private double min = Double.MAX_VALUE;
 	private double max = Double.MIN_VALUE;
@@ -51,12 +37,6 @@ public class Percept extends AmoebaAgent {
 	 */
 	public Percept(AMOEBA amoeba) {
 		super(amoeba);
-
-		sortedRanges.put("start", new ArrayList<Context>());
-		sortedRanges.put("end", new ArrayList<Context>());
-
-		customRangeComparators.put("start", new CustomComparator(this, "start"));
-		customRangeComparators.put("end", new CustomComparator(this, "end"));
 		
 		getAmas().getHeadAgent().addPercept(this);
 	}
@@ -296,192 +276,6 @@ public class Percept extends AmoebaAgent {
 	 */
 	public void setEnum(boolean isEnum) {
 		this.isEnum = isEnum;
-	}
-
-	/*
-	 * ENDO
-	 */
-
-	public HashMap<String, ArrayList<Context>> getSortedRanges() {
-		return sortedRanges;
-	}
-
-	public ArrayList<Context> getSortedRangesSubGroup(ArrayList<Context> subGroupOfContexts, String rangeString) {
-		ArrayList<Context> sortedRangesSubGroup = new ArrayList<Context>();
-
-		for (Context ctxt : sortedRanges.get(rangeString)) {
-			if (subGroupOfContexts.contains(ctxt)) {
-				sortedRangesSubGroup.add(ctxt);
-			}
-		}
-
-		return sortedRangesSubGroup;
-	}
-
-	/*
-	 * Sorted Ranges methods
-	 */
-
-	public void displaySortedRanges() {
-		//////// System.out.println("########### SORTED RANGES DISPLAY " +
-		//////// this.getName() +" ###########");
-		//////// System.out.println("########### START ###########");
-		for (Context cntxt : this.sortedRanges.get("start")) {
-			//////// System.out.println(cntxt.getRanges().get(this).getStart());
-		}
-
-		//////// System.out.println("########### END ###########");
-		for (Context cntxt : this.sortedRanges.get("end")) {
-			//////// System.out.println(cntxt.getRanges().get(this).getEnd());
-		}
-	}
-
-	public void displaySortedRangesTreeSet() {
-		//////// System.out.println("########### SORTED RANGES DISPLAY TREE " +
-		//////// this.getName() +" ###########");
-		//////// System.out.println(sortedContextbyStartRanges.size()+ " " +
-		//////// sortedContextbyEndRanges.size());
-		//////// System.out.println("########### START ###########");
-
-		for (Context ctxt : sortedContextbyStartRanges) {
-			//////// System.out.println(ctxt.getRanges().get(this).getStart());
-		}
-
-		//////// System.out.println("########### END ###########");
-		for (Context ctxt : sortedContextbyEndRanges) {
-			//////// System.out.println(ctxt.getRanges().get(this).getEnd());
-		}
-	}
-
-	public void sortOnStartRanges(ArrayList<Context> contextsSet) {
-
-		Collections.sort(contextsSet, rangeStartComparator);
-
-	}
-
-	public void sortOnCenterOfRanges(ArrayList<Context> contextsSet) {
-
-		Collections.sort(contextsSet, centerComparator);
-
-	}
-
-	public void sortOnEndRanges(ArrayList<Context> contextsSet) {
-
-		Collections.sort(contextsSet, rangeEndComparator);
-
-	}
-
-	public void updateSortedRanges(Context context, String range) {
-		int contextIndex = sortedRanges.get(range).indexOf(context);
-		boolean rightPlace = false;
-
-		Collections.sort(sortedContextbyEndRanges, rangeEndComparator);
-		Collections.sort(sortedContextbyStartRanges, rangeStartComparator);
-		Collections.sort(sortedRanges.get("end"), rangeEndComparator);
-		Collections.sort(sortedRanges.get("start"), rangeStartComparator);
-
-		/*
-		 * if(contextIndex<sortedRanges.get(range).size()-1) {
-		 * 
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) >
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
-		 * 
-		 * while(contextIndex<sortedRanges.get(range).size()-1 && !rightPlace){
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) >
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
-		 * swapListElements(sortedRanges.get(range), contextIndex); contextIndex +=1;
-		 * 
-		 * if(contextIndex<sortedRanges.get(range).size()-1) {
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) <
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex +1), range)) {
-		 * rightPlace = true; } } else { rightPlace = true; }
-		 * 
-		 * 
-		 * }
-		 * 
-		 * } }
-		 * 
-		 * 
-		 * }
-		 * 
-		 * if(contextIndex>0) {
-		 * 
-		 * rightPlace = false;
-		 * 
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) <
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
-		 * 
-		 * while(contextIndex> 0 && !rightPlace){
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) <
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
-		 * swapListElements(sortedRanges.get(range), contextIndex -1); contextIndex -=1;
-		 * 
-		 * if(contextIndex> 0) {
-		 * if(getRangeProjection(sortedRanges.get(range).get(contextIndex), range) >
-		 * getRangeProjection(sortedRanges.get(range).get(contextIndex -1), range)) {
-		 * rightPlace = true; } } else { rightPlace = true; }
-		 * 
-		 * 
-		 * }
-		 * 
-		 * } } }
-		 */
-
-	}
-
-	private void swapListElements(ArrayList<Context> list, int indexFirstElement) {
-		try {
-			list.add(indexFirstElement, list.get(indexFirstElement + 1));
-			////////// System.out.println(list);
-			list.remove(indexFirstElement + 2);
-		} catch (OutOfRangeException e) {
-			// TODO: handle exception
-		}
-	}
-
-	public void addContextSortedRanges(Context context) {
-
-		sortedRanges.get("start").add(context);
-		sortedRanges.get("end").add(context);
-
-		sortedContextbyStartRanges.add(context);
-		sortedContextbyEndRanges.add(context);
-
-		Collections.sort(sortedRanges.get("end"), rangeEndComparator);
-		Collections.sort(sortedRanges.get("start"), rangeStartComparator);
-		Collections.sort(sortedContextbyEndRanges, rangeEndComparator);
-		Collections.sort(sortedContextbyStartRanges, rangeStartComparator);
-
-		// displaySortedRanges();
-		// displaySortedRangesTreeSet();
-
-		////////// System.out.println("----------------------AUTO PRINT");
-		////////// System.out.println(sortedEndRanges.size()+ " " + sortedStartRanges);
-	}
-
-	private void insertContextInSortedRanges(Context context, String range) {
-
-		int i = 0;
-		boolean inserted = false;
-		while (i < sortedRanges.get(range).size() && !inserted) {
-			if (getRangeProjection(context, range) < getRangeProjection(sortedRanges.get(range).get(i), range)) {
-				sortedRanges.get(range).add(i, context);
-				inserted = true;
-			}
-			i += 1;
-		}
-		if (i == sortedRanges.get(range).size() && !inserted) {
-			sortedRanges.get(range).add(context);
-		}
-
-	}
-
-	public void deleteContextRanges(Context context) {
-		sortedRanges.get("start").remove(context);
-		sortedRanges.get("end").remove(context);
-
-		sortedContextbyStartRanges.remove(context);
-		sortedContextbyStartRanges.remove(context);
 	}
 
 	/*

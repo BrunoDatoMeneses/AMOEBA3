@@ -7,16 +7,12 @@ import java.util.HashMap;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
+import agents.context.CustomComparator;
 import agents.percept.Percept;
 import kernel.AMOEBA;
-import kernel.AmoebaData;
+import ncs.NCS;
 import utils.Pair;
 import utils.Quadruplet;
-import agents.context.CustomComparator;
-import agents.head.ContextPair;
-import agents.head.Criticalities;
-import agents.head.DynamicPerformance;
-import ncs.NCS;
 
 /**
  * The Class Head.
@@ -2199,14 +2195,6 @@ public class Head extends AmoebaAgent {
 			ctxt.computeContextNeighborsValidity();
 			
 		}
-		
-		for (Percept pct : getAmas().getPercepts()) {
-
-			if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
-				pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
-			}
-		}
-		
 	}
 	
 

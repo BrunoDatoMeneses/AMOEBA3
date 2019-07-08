@@ -123,7 +123,7 @@ if __name__ == '__main__':
     gateway.jvm.py4j.Main.Control.setComandLine(True)
     gateway.jvm.py4j.Main.Control.setLogLevel("INFORM")
 
-    env = gym.make('BipedalWalker-v2')
+    env = gym.make('CartPole-v0')
     env.reset()
     percepts = percepts_from_env(env)
     filename = gen_file(percepts_from_env(env))
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         done = False
         tot_reward, reward = 0, 0
         state = env.reset()
-        #env.render()
+        env.render()
 
         state_action_list = []
 
@@ -161,15 +161,16 @@ if __name__ == '__main__':
 
             state_action_list.append((state, action))
 
+            reward = 0
             # Get next state and reward
             for _ in range(step_per_action) :
-                j += 1
-                if j >= 200:
-                    done = True
-                    r = -100
-                else:
-                    state2, r, done, info = env.step(action)
-                    #env.render()
+                #j += 1
+                #if j >= 200:
+                #    done = True
+                #    r = -100
+                #else:
+                state2, r, done, info = env.step(action)
+                env.render()
                 reward += r
                 if done:
                     break
