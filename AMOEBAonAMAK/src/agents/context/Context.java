@@ -46,7 +46,6 @@ public class Context extends AmoebaAgent {
 	private Double actionProposition = null;
 
 	public HashMap<Percept, HashMap<String, Context>> nearestNeighbours;
-	public HashMap<Context, HashMap<Percept, Pair<Double, Integer>>> otherContextsDistancesByPercept;
 	public HashMap<Percept, HashMap<String, ArrayList<Context>>> sortedPossibleNeighbours = new HashMap<>();
 
 	private ArrayList<Percept> nonValidPercepts = new ArrayList<Percept>();
@@ -90,11 +89,6 @@ public class Context extends AmoebaAgent {
 
 		action = getAmas().getHeadAgent().getOracleValue();
 		maxActivationsRequired = var.size();
-
-		for (Context ctxt : getAmas().getContexts()) {
-
-			ctxt.addContext(this);
-		}
 	}
 
 	/**
@@ -144,7 +138,6 @@ public class Context extends AmoebaAgent {
 		}
 
 		nearestNeighbours = new HashMap<Percept, HashMap<String, Context>>();
-		otherContextsDistancesByPercept = new HashMap<Context, HashMap<Percept, Pair<Double, Integer>>>();
 
 		for (Percept p : ranges.keySet()) {
 			nearestNeighbours.put(p, new HashMap<String, Context>());
@@ -210,7 +203,6 @@ public class Context extends AmoebaAgent {
 		}
 
 		nearestNeighbours = new HashMap<Percept, HashMap<String, Context>>();
-		otherContextsDistancesByPercept = new HashMap<Context, HashMap<Percept, Pair<Double, Integer>>>();
 
 		for (Percept p : ranges.keySet()) {
 			nearestNeighbours.put(p, new HashMap<String, Context>());
@@ -280,7 +272,6 @@ public class Context extends AmoebaAgent {
 		}
 
 		nearestNeighbours = new HashMap<Percept, HashMap<String, Context>>();
-		otherContextsDistancesByPercept = new HashMap<Context, HashMap<Percept, Pair<Double, Integer>>>();
 
 		for (Percept p : ranges.keySet()) {
 			nearestNeighbours.put(p, new HashMap<String, Context>());
@@ -1636,38 +1627,6 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	public void addContext(Context ctxt) {
-		if (ctxt != this) {
-			otherContextsDistancesByPercept.put(ctxt, new HashMap<Percept, Pair<Double, Integer>>());
-		}
-		for (Percept pct : getAmas().getPercepts()) {
-			otherContextsDistancesByPercept.get(ctxt).put(pct, new Pair<>(null, getAmas().getCycle()));
-		}
-	}
-
-	public void addContextDistance(Context ctxt, Percept percept, double distance) {
-		if (ctxt != this) {
-
-			if (otherContextsDistancesByPercept.get(ctxt) == null) {
-				addContext(ctxt);
-			}
-			otherContextsDistancesByPercept.get(ctxt).put(percept, new Pair<>(distance, getAmas().getCycle()));
-		}
-	}
-
-	public void removeContext(Context ctxt) {
-		otherContextsDistancesByPercept.remove(ctxt);
-	}
-
-	public Integer getContextDistanceUpdateTick(Context ctxt, Percept pct) {
-		if (otherContextsDistancesByPercept.get(ctxt) != null) {
-			if (otherContextsDistancesByPercept.get(ctxt).get(pct) != null) {
-				return otherContextsDistancesByPercept.get(ctxt).get(pct).getB();
-			}
-		}
-		return null;
-	}
-
 	public double distance(Percept pct, double value) {
 		return this.ranges.get(pct).distance(value);
 	}
@@ -1954,9 +1913,6 @@ public class Context extends AmoebaAgent {
 	public void destroy() {
 		getEnvironment().trace(new ArrayList<String>(
 				Arrays.asList("-----------------------------------------", this.getName(), "DIE")));
-		for (Context ctxt : getAmas().getContexts()) {
-			ctxt.removeContext(this);
-		}
 
 		for (Percept percept : getAmas().getPercepts()) {
 			percept.deleteContextProjection(this);
