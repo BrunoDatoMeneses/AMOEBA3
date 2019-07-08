@@ -1,6 +1,9 @@
+import os
 import gym
+import gym_gazebo2
 import subprocess
 import time
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -38,7 +41,7 @@ def gen_file(percepts:list):
 </System>
 """
         xmlFile.write(end)
-    return filename
+        return os.path.realpath(xmlFile.name)
 
 
 def percepts_from_env(env) -> list:
@@ -68,29 +71,44 @@ def msg_obj(obs:list, act:list, oracle) -> dict:
 
 def chose_next_action(amoeba, state, env):
     if isinstance(env.action_space, gym.spaces.discrete.Discrete):
-        proposition = []
-        for i in range(env.action_space.n):
-            act = [0.0]*env.action_space.n
-            act[i] = 1.0
-            proposition.append(amoeba.request(msg_obj(state, act, 0)))
-        action = np.argmax(proposition)
+        # Special case for Discrete, work better than maximize
+        #proposition = []
+        #for i in range(env.action_space.n):
+        #    act = [i]
+        #    proposition.append(amoeba.request(msg_obj(state, act, 0)))
+        #return np.argmax(proposition)
+        # ----------------------------------------------------
+        n = 1
     else:
-        res = amoeba.maximise(msg_obj(state, []))
         n = env.action_space.shape[0]
-        action = [0.0]*n
-        for i in range(n):
-            action[i] = res["a%d" % i]/MULTIPLICATOR
 
-    return action
+    action = [0.0]*n
+    msg = msg_obj(state, [], 0)
+    msg.pop("oracle", None)
+    res = amoeba.maximize(msg)
+
+    if (res["oracle"] == -math.inf) or (res is None):
+        return random_action()
+
+    for i in range(n):
+        action[i] = res["a%d" % i]/MULTIPLICATOR
+
+    if isinstance(env.action_space, gym.spaces.discrete.Discrete) :
+        return int(round(action[0]))
+    else:
+        return action
 
 
 def learn_amoeba(amoeba, state, action, reward, env):
     if isinstance(env.action_space, gym.spaces.discrete.Discrete):
-        act = [0.0] * env.action_space.n
-        act[action] = 1.0
+        act = [action]
         amoeba.learn(msg_obj(state, act, reward))
     else:
         amoeba.learn(msg_obj(state, action, reward))
+
+
+def random_action():
+    return env.action_space.sample()
 
 
 if __name__ == '__main__':
@@ -98,13 +116,14 @@ if __name__ == '__main__':
     plt.ion()
 
     # Make sure to run setup.sh at least once before running this script
-    subprocess.Popen(["java", "-jar", "amoeba.jar"])
-    time.sleep(2)
+    #subprocess.Popen(["java", "-jar", "amoeba.jar"])
+    #time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
     gateway.jvm.py4j.Main.Control.setComandLine(True)
+    gateway.jvm.py4j.Main.Control.setLogLevel("INFORM")
 
-    env = gym.make('CartPole-v1')
+    env = gym.make('MARA-v0')
     env.reset()
     percepts = percepts_from_env(env)
     filename = gen_file(percepts_from_env(env))
@@ -119,38 +138,47 @@ if __name__ == '__main__':
     ave_reward_list = []
 
     episodes = 1000
-    epsilon = 0
-    min_eps = 0
+    epsilon = 0.5
+    min_eps = 0.02
     reduction = 0.01
+    step_per_action = 1
     for i in range(episodes):
         # Initialize parameters
         done = False
         tot_reward, reward = 0, 0
         state = env.reset()
+        #env.render()
 
         state_action_list = []
 
+        j = 0
         while not done:
-            # Render environment for last five episodes
-            #env.render()
-            #if i >= (episodes - 20):
-            #    env.render()
 
-            # Determine next action - epsilon greedy strategy
             if np.random.random() < 1 - epsilon:
                 action = chose_next_action(amoeba, state, env)
             else:
-                action = np.random.randint(0, env.action_space.n)
-
-            # Get next state and reward
-            state2, reward, done, info = env.step(action)
+                action = random_action()
 
             state_action_list.append((state, action))
 
-            state = state2
+            # Get next state and reward
+            for _ in range(step_per_action) :
+                j += 1
+                if j >= 200:
+                    done = True
+                    r = -100
+                else:
+                    state2, r, done, info = env.step(action)
+                    #env.render()
+                reward += r
+                if done:
+                    break
 
-            # Update variables
+            #learn_amoeba(amoeba, state, action, reward, env)
+
             tot_reward += reward
+
+            state = state2
 
         for state, action in state_action_list:
             learn_amoeba(amoeba, state, action, tot_reward, env)
@@ -174,7 +202,8 @@ if __name__ == '__main__':
             plt.plot(ave_reward_list)
             plt.pause(0.1)
 
-
+    plt.show()
+    plt.pause(100000)
     env.close()
 
 

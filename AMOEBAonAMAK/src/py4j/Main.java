@@ -1,6 +1,7 @@
 package py4j;
 
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.tools.Log;
 
 public class Main {
 
@@ -10,6 +11,10 @@ public class Main {
 	public static class Control{
 		public static void setComandLine(boolean value) {
 			Configuration.commandLineMode = value;
+		}
+		
+		public static void setLogLevel(String level) {
+			Log.defaultMinLevel = Log.Level.valueOf(level);
 		}
 	}
 	

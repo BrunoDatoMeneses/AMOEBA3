@@ -73,20 +73,8 @@ public class F_N_Launcher implements Serializable {
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
-		
-		for(int i = 0; i < 500; i++) {
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
-		}
-		
-		HashMap<String, Double> req = new HashMap<String, Double>();
-		req.put("px0", 10.0);
-		HashMap<String, Double> max = amoeba.maximise(req);
-		System.out.println(max);
-		max.put("px0", 10.0);
-		System.out.println(amoeba.request(max));
-		
-		
+		studiedSystem.playOneStep();
+		amoeba.learn(studiedSystem.getOutput());
 		
 		/* AUTOMATIC */
 //		long start = System.currentTimeMillis();

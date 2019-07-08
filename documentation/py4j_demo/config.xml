@@ -10,7 +10,32 @@
 		<Sensor Name="p1" Enum="false" />
 		<Sensor Name="p2" Enum="false" />
 		<Sensor Name="p3" Enum="false" />
-		<Sensor Name="a0" Enum="true" />
+		<Sensor Name="p4" Enum="false" />
+		<Sensor Name="p5" Enum="false" />
+		<Sensor Name="p6" Enum="false" />
+		<Sensor Name="p7" Enum="false" />
+		<Sensor Name="p8" Enum="false" />
+		<Sensor Name="p9" Enum="false" />
+		<Sensor Name="p10" Enum="false" />
+		<Sensor Name="p11" Enum="false" />
+		<Sensor Name="p12" Enum="false" />
+		<Sensor Name="p13" Enum="false" />
+		<Sensor Name="p14" Enum="false" />
+		<Sensor Name="p15" Enum="false" />
+		<Sensor Name="p16" Enum="false" />
+		<Sensor Name="p17" Enum="false" />
+		<Sensor Name="p18" Enum="false" />
+		<Sensor Name="p19" Enum="false" />
+		<Sensor Name="p20" Enum="false" />
+		<Sensor Name="p21" Enum="false" />
+		<Sensor Name="p22" Enum="false" />
+		<Sensor Name="p23" Enum="false" />
+		<Sensor Name="a0" Enum="false" />
+		<Sensor Name="a1" Enum="false" />
+		<Sensor Name="a2" Enum="false" />
+		<Sensor Name="a3" Enum="false" />
+		<Sensor Name="a4" Enum="false" />
+		<Sensor Name="a5" Enum="false" />
 
         <Controller Name="Controller">
             <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />

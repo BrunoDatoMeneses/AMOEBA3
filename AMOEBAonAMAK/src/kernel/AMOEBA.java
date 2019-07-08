@@ -184,6 +184,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (cycle % 1000 == 0) {
 			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
 		}
+		System.out.println("Nb agents : "+getAgents().size());
 		
 		if(isRenderUpdate()) {
 			incrementCycleWithoutRender();
@@ -395,7 +396,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return getAction();
 	}
 	
-	public HashMap<String, Double> maximise(HashMap<String, Double> known){
+	@Override
+	public HashMap<String, Double> maximize(HashMap<String, Double> known){
+		ArrayList<Percept> percepts = getPercepts();
+		ArrayList<Percept> unknown = new ArrayList<>(percepts);
+		unknown.removeIf(p ->known.containsKey(p.getName()));
+		//System.out.println("known : "+known.keySet());
+		//System.out.println("unknow : "+unknown);
+		if(unknown.isEmpty()) {
+			return null;
+		}
+		
 		//get partially activated context
 		ArrayList<Context> pca = new ArrayList<>();
 		for(Context c : getContexts()) {
@@ -408,12 +419,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			}
 			if(good) pca.add(c);
 		}
-		
-		ArrayList<Percept> percepts = getPercepts();
-		ArrayList<Percept> unknown = new ArrayList<>(percepts);
-		unknown.removeIf(p ->known.containsKey(p.getName()));
-		System.out.println("known : "+known.keySet());
-		System.out.println("unknow : "+unknown);
 		
 		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
 		for(Context c : pca) {
