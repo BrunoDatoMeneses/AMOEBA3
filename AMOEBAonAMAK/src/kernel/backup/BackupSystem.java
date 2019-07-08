@@ -149,15 +149,14 @@ public class BackupSystem implements IBackupSystem {
 			public int compare(Element o1, Element o2) {
 				if(o1.getName().equals(HEAD_NODE))
 					return -1;
-				else if(o1.getName().equals(HEAD_NODE))
+				else if(o1.getName().equals(PERCEPT_NODE))
 					return 1;
 				else
 					return 0;
 			}
 		});
-
+		
 		for (Element startingAgentElement : agentsElement) {
-
 			switch (startingAgentElement.getName()) {
 			case HEAD_NODE:
 				loadController(startingAgentElement);

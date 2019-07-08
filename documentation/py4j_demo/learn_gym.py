@@ -116,14 +116,14 @@ if __name__ == '__main__':
     plt.ion()
 
     # Make sure to run setup.sh at least once before running this script
-    #subprocess.Popen(["java", "-jar", "amoeba.jar"])
-    #time.sleep(2)
+    subprocess.Popen(["java", "-jar", "amoeba.jar"])
+    time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
     gateway.jvm.py4j.Main.Control.setComandLine(True)
     gateway.jvm.py4j.Main.Control.setLogLevel("INFORM")
 
-    env = gym.make('MARA-v0')
+    env = gym.make('BipedalWalker-v2')
     env.reset()
     percepts = percepts_from_env(env)
     filename = gen_file(percepts_from_env(env))

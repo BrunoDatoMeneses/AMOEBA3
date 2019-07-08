@@ -422,7 +422,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
 		for(Context c : pca) {
-			sol.add(maximiseContext(known, percepts, unknown, c));
+			sol.add(maximiseDummy(known, percepts, unknown, c));
 		}
 		HashMap<String, Double> max = new HashMap<>();
 		// set default value if no solution
@@ -439,6 +439,20 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		max.put("oracle", maxValue);
 		return max;
+	}
+	
+	private Pair<HashMap<String, Double>, Double> maximiseDummy(HashMap<String, Double> known,
+			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
+		HashMap<String, Double> res = new HashMap<>();
+		for(Percept p : unknown) {
+			res.put(p.getName(), c.getRangeByPerceptName(p.getName()).getCenter());
+		}
+		HashMap<String, Double> tmpReq = new HashMap<>(res);
+		HashMap<String, Double> old = perceptions;
+		perceptions = tmpReq;
+		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, c.getActionProposal());
+		perceptions = old;
+		return ret;
 	}
 
 	//TODO tests !
