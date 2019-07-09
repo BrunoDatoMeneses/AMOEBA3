@@ -1,5 +1,7 @@
 package experiments;
 
+import java.util.HashMap;
+
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
@@ -28,15 +30,45 @@ public class MinimalMain {
 		
 		long start = System.currentTimeMillis();
 		long end = System.currentTimeMillis();
-		for(int i = 0; i < 10000; i++) {
+		for(int i = 0; i < 1000; i++) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
-			if(i%100 == 0) {
+			if(i%100 == 99) {
 				end = System.currentTimeMillis();
 				System.out.println("Time for 100 learn: "+(end-start)/1000.0);
 				start = System.currentTimeMillis();
 			}
 		}
+		
+		start = System.currentTimeMillis();
+		end = System.currentTimeMillis();
+		for(int i = 0; i < 1000; i++) {
+			studiedSystem.playOneStep();
+			amoeba.request(studiedSystem.getOutput());
+			if(i%100 == 99) {
+				end = System.currentTimeMillis();
+				System.out.println("Time for 100 request: "+(end-start)/1000.0);
+				start = System.currentTimeMillis();
+			}
+		}
+		
+		start = System.currentTimeMillis();
+		end = System.currentTimeMillis();
+		for(int i = 0; i < 1000; i++) {
+			studiedSystem.playOneStep();
+			HashMap<String, Double> req = studiedSystem.getOutput();
+			req.remove("px1");
+			req.remove("px2");
+			req.remove("px3");
+			req.remove("oracle");
+			amoeba.maximize(req);
+			if(i%100 == 99) {
+				end = System.currentTimeMillis();
+				System.out.println("Time for 100 maximize: "+(end-start)/1000.0);
+				start = System.currentTimeMillis();
+			}
+		}
+		
 	}
 
 }

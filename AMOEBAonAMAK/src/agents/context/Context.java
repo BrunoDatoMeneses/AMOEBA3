@@ -1457,7 +1457,7 @@ public class Context extends AmoebaAgent {
 		double center = getCenterByPercept(pct);
 		double radius = getRadiusByPercept(pct);
 
-		return Math.exp(-Math.pow(situation - center, 2) / (2 * Math.pow(radius, 2)));
+		return Math.exp(-((situation - center)*(situation - center)) / (2 * (radius*radius)));
 	}
 
 	public double getInfluenceByPerceptSituationWithConfidence(Percept pct, double situation) {

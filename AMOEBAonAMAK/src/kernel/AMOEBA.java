@@ -3,19 +3,16 @@ package kernel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.math3.optim.OptimizationData;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.LinearConstraintSet;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
-import org.apache.commons.math3.optim.linear.LinearOptimizer;
 import org.apache.commons.math3.optim.linear.Relationship;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
@@ -407,7 +404,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		//get partially activated context
-		ArrayList<Context> pca = new ArrayList<>();
+		ArrayList<Context> pac = new ArrayList<>();
 		for(Context c : getContexts()) {
 			boolean good = true;
 			for(String p : known.keySet()) {
@@ -416,12 +413,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 					break;
 				}
 			}
-			if(good) pca.add(c);
+			if(good) pac.add(c);
 		}
 		
 		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
-		for(Context c : pca) {
-			sol.add(maximiseDummy(known, percepts, unknown, c));
+		for(Context c : pac) {
+			sol.add(maximiseContext(known, percepts, unknown, c));
 		}
 		HashMap<String, Double> max = new HashMap<>();
 		// set default value if no solution
