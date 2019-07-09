@@ -57,6 +57,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private int cycleWithoutRender = 0;
 
 	private ArrayList<Context> spatiallyAlteredContext = new ArrayList<>();
+	private ArrayList<Context> toKillContexts = new ArrayList<>();
+	
 	private ArrayList<Context> lastModifiedContext = new ArrayList<>();
 
 	private ArrayList<Context> alteredContexts = new ArrayList<>();
@@ -66,6 +68,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	private HashSet<Context> neighborContexts ;
 	private ReadWriteLock neighborContextsLock = new ReentrantReadWriteLock();
+	
+	private ArrayList<Percept> percepts;
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -95,6 +99,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	protected void onInitialConfiguration() {
 		super.onInitialConfiguration();
 		getEnvironment().setAmoeba(this);
+		
+
+		
 	}
 	
 	@Override
@@ -205,6 +212,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		neighborContexts = null;
 		environment.resetNbActivatedAgent();
 		spatiallyAlteredContext.clear();
+		toKillContexts.clear();
 		lastModifiedContext.clear();
 		alteredContexts.clear();
 		for(Context ctxt : getContexts()) {
@@ -492,13 +500,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public ArrayList<Percept> getPercepts() {
-		ArrayList<Percept> percepts = new ArrayList<>();
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if ((agent instanceof Percept)) {
-				percepts.add((Percept) agent);
+		
+		
+		if(percepts == null || percepts.size()==0) {
+			ArrayList<Percept> pcts = new ArrayList<Percept>();
+			for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+				if ((agent instanceof Percept)) {
+					pcts.add((Percept) agent);
+				}
 			}
+			percepts = pcts;
 		}
+			
+		
 		return percepts;
+		
+
 	}
 
 	/**
@@ -582,12 +599,21 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return head;
 	}
 	
-	public ArrayList<Context> getSpatiallyAlteredContext() {
+	public ArrayList<Context> getSpatiallyAlteredContextForUnityUI() {
 		return spatiallyAlteredContext;
 	}
 	
-	public void addSpatiallyAlteredContext(Context ctxt) {
-		spatiallyAlteredContext.add(ctxt);
+	public void addSpatiallyAlteredContextForUnityUI(Context ctxt) {
+		if(!ctxt.isFlat())
+			spatiallyAlteredContext.add(ctxt);
+	}
+	
+	public ArrayList<Context> getToKillContextsForUnityUI() {
+		return toKillContexts;
+	}
+	
+	public void addToKillContextForUnityUI(Context ctxt) {
+		toKillContexts.add(ctxt);
 	}
 	
 	public void addLastmodifiedContext(Context context) {
@@ -693,5 +719,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return message;
 	}
 	
+	public void setPercepts() {
+		percepts = new ArrayList<Percept>();
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Percept)) {
+				percepts.add((Percept) agent);
+			}
+		}
+	}
 	
 }
