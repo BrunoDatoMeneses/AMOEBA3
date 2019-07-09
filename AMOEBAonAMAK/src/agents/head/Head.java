@@ -218,7 +218,7 @@ public class Head extends AmoebaAgent {
 
 	private void playWithOracle() {
 
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		
@@ -250,6 +250,8 @@ public class Head extends AmoebaAgent {
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 1", "" + (bestContext != null))));
+		
 		executionTimes[0]=System.currentTimeMillis()- executionTimes[0];
 
 		executionTimes[1]=System.currentTimeMillis();
@@ -260,6 +262,7 @@ public class Head extends AmoebaAgent {
 		selfAnalysationOfContexts4();
 		executionTimes[2]=System.currentTimeMillis()- executionTimes[2];
 		
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
 
 		executionTimes[3]=System.currentTimeMillis();
 		NCSDetection_IncompetentHead(); /*
@@ -268,7 +271,8 @@ public class Head extends AmoebaAgent {
 		 */
 		executionTimes[3]=System.currentTimeMillis()- executionTimes[3];
 		
-
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 3", "" + (bestContext != null))));
+		
 		executionTimes[4]=System.currentTimeMillis();
 		NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
 		executionTimes[4]=System.currentTimeMillis()- executionTimes[4];
@@ -287,7 +291,7 @@ public class Head extends AmoebaAgent {
 		NCSDetection_ChildContext();
 		
 		//if(getAmas().getCycle()>1000)
-		NCSDetection_PotentialRequest();
+		//NCSDetection_PotentialRequest();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -970,11 +974,24 @@ public class Head extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION CONCURRENCE")));
 		
+		
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
+		
+		if(bestContext != null) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + (bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() ))));
+			
+		}
+		
+
 		/* If result is good, shrink redundant context (concurrence NCS) */
 		if (bestContext != null && bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
 		//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 
 				for (int i = 0; i<activatedContexts.size();i++) {
+					
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("activatedContexts.get(i) != bestContext", "" + ( activatedContexts.get(i) != bestContext))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("", "" + ( activatedContexts.get(i).getLocalModel().distance(activatedContexts.get(i).getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()))));
 
 					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && activatedContexts.get(i).getLocalModel().distance(activatedContexts.get(i).getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
 		
@@ -993,16 +1010,24 @@ public class Head extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION INCOMPETENT HEAD")));
 		
-		
-		if (activatedContexts.isEmpty()
-				|| (criticity > predictionPerformance.getPerformanceIndicator() && !oneOfProposedContextWasGood())) {
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 22", "" + (bestContext != null))));
+		if(activatedContexts.isEmpty()	|| ((bestContext.getLocalModel().distance(bestContext.getCurrentExperiment())) > bestContext.regressionPerformance.getPerformanceIndicator() && !oneOfProposedContextWasGood())) {
 
+			
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 23", "" + (bestContext != null))));
 			Context c = getNearestGoodContext(activatedNeighborsContexts);
 			// Context c = getSmallestGoodContext(activatedNeighborsContexts);
 
-			if (c != null)
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 24", "" + (bestContext != null))));
+			
+			if (c != null) {
 				c.solveNCS_IncompetentHead(this);
+			}
+				
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 25", "" + (bestContext != null))));
 			bestContext = c;
+			
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 26", "" + (bestContext != null))));
 
 			/* This allow to test for all contexts rather than the nearest */
 			/*
@@ -1199,22 +1224,24 @@ public class Head extends AmoebaAgent {
 
 		}
 
-		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
-		for (Context activatedContext : activatedContexts) {
+		
+		
+		for (int i = 0; i< activatedContexts.size() ; i++) {
 			
-			activatedContext.criticalities.updateMeans();
+			activatedContexts.get(i).criticalities.updateMeans();
 			
-			if (activatedContext.criticalities.getCriticalityMean("distanceToRegression") != null) {
-				activatedContext.regressionPerformance.update(activatedContext.criticalities.getCriticalityMean("distanceToRegression"));
-				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContext.getName(), ""+activatedContext.regressionPerformance.getPerformanceIndicator())));
+			if (activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression") != null) {
+				activatedContexts.get(i).regressionPerformance.update(activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression"));
+				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContexts.get(i).getName(), ""+activatedContexts.get(i).regressionPerformance.getPerformanceIndicator())));
 			}
 			
 			
-			activatedContext.analyzeResults4(this);
+			activatedContexts.get(i).analyzeResults4(this);
 
 		}
-		activatedContexts = activatedContextsCopyForUpdates;
+		
 
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NCS DECTECTION USELESSNESS IN SELF ANALISIS")));
 		for (Context ctxt : activatedNeighborsContexts) {
 
 			if (!activatedContexts.contains(ctxt)) {
@@ -2500,7 +2527,7 @@ public class Head extends AmoebaAgent {
 	
 	public Double getAverageRegressionPerformanceIndicator() {
 		
-		
+		int numberOfRegressions = 0;
 		if(activatedNeighborsContexts.size()>0) {
 			double meanRegressionPerformanceIndicator = 0.0;
 			
@@ -2509,12 +2536,13 @@ public class Head extends AmoebaAgent {
 
 				if(ctxt.regressionPerformance != null) {
 					meanRegressionPerformanceIndicator += ctxt.regressionPerformance.performanceIndicator;
+					numberOfRegressions+=1;
 				}
 				
 				
 			}
 			
-			return meanRegressionPerformanceIndicator/activatedNeighborsContexts.size();
+			return meanRegressionPerformanceIndicator/numberOfRegressions;
 		}
 		else{
 			return initRegressionPerformance;

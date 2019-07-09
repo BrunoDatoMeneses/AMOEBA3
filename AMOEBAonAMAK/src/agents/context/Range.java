@@ -797,6 +797,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public boolean isTooSmall() {
 		
+		if((end - start) < percept.getMappingErrorAllowedMin()) {
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "TOO SMALL DISTANCE", "" + (end - start))));
+		}
 
 		return ((end - start) < percept.getMappingErrorAllowedMin()) && !this.isPerceptEnum();
 	}
@@ -1498,8 +1501,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			
 
-			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContext().contains(this.context)) {
-				context.getAmas().addSpatiallyAlteredContext(this.context);
+			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
+				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
 			}
 		}
 
@@ -1563,8 +1566,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			
 
-			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContext().contains(this.context)) {
-				context.getAmas().addSpatiallyAlteredContext(this.context);
+			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
+				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
 			}
 		}
 

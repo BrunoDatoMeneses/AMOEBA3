@@ -86,6 +86,7 @@ public class Context extends AmoebaAgent {
 		
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
+		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
 	public Context(AMOEBA amoeba, Context bestNearestContext) {
@@ -96,6 +97,8 @@ public class Context extends AmoebaAgent {
 		criticalities = new Criticalities(5);
 		
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		getAmas().addSpatiallyAlteredContextForUnityUI(this);
+		
 		//TODO in amak, cannot kill a agent before its 1st cycle
 		//NCSDetection_Uselessness();
 
@@ -819,7 +822,7 @@ public class Context extends AmoebaAgent {
 			
 
 			if (currentDistance > pct.getMappingErrorAllowedMin()) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt)) );
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
 			}
@@ -2277,6 +2280,9 @@ public class Context extends AmoebaAgent {
 	public void destroy() {
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(
 				Arrays.asList("-----------------------------------------", this.getName(), "DIE")));
+		
+		getAmas().addToKillContextForUnityUI(this);
+		
 		for (Context ctxt : getAmas().getContexts()) {
 			ctxt.removeContext(this);
 		}
@@ -2365,6 +2371,81 @@ public class Context extends AmoebaAgent {
 	
 	public double getDistanceToRegressionAllowed() {
 		return regressionPerformance.getPerformanceIndicator();
+	}
+	
+	
+	
+	
+	/**
+	 * Compute the color of a {@link Context} based on the coefficients of its {@link LocalModel}
+	 * @param coefs
+	 * @return
+	 */
+	public String getColorForUnity() {
+		
+		Double[] coefs = localModel.getCoef();
+		
+		double upperBound = 255;
+		double dispersion = 100;
+		
+		
+		Double r = 0.0;
+		Double g = 0.0;
+		Double b = 0.0;
+
+		
+		
+		
+		if(coefs.length>=3) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[1]));
+			b =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[2]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
+				r = 255.0;
+				g = 0.0;
+				b = 0.0;
+			}
+		}else if(coefs.length==2) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[1]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
+				r = 255.0;
+				g = 0.0;
+			}
+		}else if(coefs.length==1) {
+			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs[0]));
+			
+			if(r.isNaN() || g.isNaN() || b.isNaN()) {
+				r = 255.0;
+			}
+		}else {
+			r = 0.0;
+			g = 255.0;
+			b = 0.0;
+		}
+		
+		
+		Double[] ret = new Double[3];
+		ret[0] = r / 255.0d;
+		ret[1] = g / 255.0d;
+		ret[2] = b / 255.0d;
+		
+		return ret[0] + "," + ret[1] + "," + ret[2] + ",100";
+	}
+	
+	public static double normalizePositiveValues(double upperBound, double dispersion, double value) {
+		return upperBound * 2 * (-0.5 + 1 / (1 + Math.exp(-value / dispersion)));
+	}
+	
+	public boolean isFlat() {
+		for(Percept pct:getAmas().getPercepts()) {
+			if(ranges.get(pct).getLenght()<0.00001) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

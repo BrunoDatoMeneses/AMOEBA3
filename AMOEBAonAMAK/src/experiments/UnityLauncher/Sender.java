@@ -36,7 +36,7 @@ public class Sender {
 			
 			
 		}
-		System.out.println(message);
+		//System.out.println(message);
 		server.sendMessage(message);
 	}
 	
@@ -48,7 +48,7 @@ public class Sender {
 			
 			
 		}
-		System.out.println(message);
+		//System.out.println(message);
 		server.sendMessage(message);
 	}
 	

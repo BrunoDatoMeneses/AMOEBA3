@@ -30,13 +30,13 @@ public class Main implements Runnable {
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 3	;
 	public static final int normType = 2	;
-	public static final boolean randomExploration = true;
+	public static final boolean randomExploration = false;
 	public static final boolean limitedToSpaceZone = true;
 	public static final double mappingErrorAllowed = 0.03;
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 	
-	public static final int nbCycle = 1000;
+	public static final int nbCycle = 10000;
 	
 	private SocketServer server;
 	
@@ -76,7 +76,7 @@ public class Main implements Runnable {
 		Configuration.commandLineMode = false;
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
-		Configuration.plotMilliSecondsUpdate = 10000;
+		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		AMOEBA amoeba = new AMOEBA();
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
@@ -84,6 +84,7 @@ public class Main implements Runnable {
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/threeDimensionsLauncherUnity.xml");
 		backupSystem.load(file);
+		
 		
 		amoeba.saver = new SaveHelper(amoeba);
 		amoeba.allowGraphicalScheduler(true);
@@ -129,7 +130,7 @@ public class Main implements Runnable {
 				while (!sender.acq("CTXTS", amoeba.getCycle())) {
 					try        
 					{
-					    Thread.sleep(100);
+					    Thread.sleep(10);
 					} 
 					catch(InterruptedException ex) 
 					{
@@ -145,7 +146,7 @@ public class Main implements Runnable {
 				while (!sender.acq("KILL", amoeba.getCycle())) {
 					try        
 					{
-					    Thread.sleep(100);
+					    Thread.sleep(10);
 					} 
 					catch(InterruptedException ex) 
 					{

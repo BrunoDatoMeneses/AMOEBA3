@@ -29,7 +29,7 @@ public class SocketServer {
 			// out.close();
 
 		} catch (IOException e) {
-			System.err.println("Déconnection ");
+			System.err.println("Dï¿½connection ");
 		}
 
 	}
@@ -53,7 +53,7 @@ public class SocketServer {
 		}
 		
 		counter ++;
-		System.out.println("MSG :\t" + message);
+		//System.out.println("MSG :\t" + message);
 		String delimsTags = "[ _~]+";
 		String[] tokens = message.split(delimsTags);
 		

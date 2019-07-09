@@ -441,7 +441,7 @@ private double[] subZoneCenter3D(int nb) {
 		
 		for(int nb = 0; nb<numberOfModels-1; nb++) {
 			
-			if(distance(xRequest,modelCenterZones[nb]) < spaceSize/2) {
+			if(distance(xRequest,modelCenterZones[nb]) < spaceSize*0.75) {
 				return modeli(nb, xRequest);
 			}
 			
