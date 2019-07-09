@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
+import agents.context.CustomComparator;
 import agents.percept.Percept;
 import kernel.AMOEBA;
-import kernel.AmoebaData;
-import utils.Pair;
-import utils.Quadruplet;
-import agents.context.CustomComparator;
-import agents.head.ContextPair;
-import agents.head.Criticalities;
-import agents.head.DynamicPerformance;
 import ncs.NCS;
+import utils.Pair;
+import utils.PickRandom;
+import utils.PrintOnce;
+import utils.Quadruplet;
 
 /**
  * The Class Head.
@@ -321,10 +320,17 @@ public class Head extends AmoebaAgent {
 				getAmas().data.prediction = nearestContext.getActionProposal();
 				bestContext = nearestContext;
 			} else {
-				//TODO amoeba should not look globally, but right now there's no other strategy
-				System.err.println("Play without oracle : no nearest context in neighbors, searching globally.");
-				nearestContext = this.getNearestContext(getAmas().getContexts());
-				getAmas().data.prediction = nearestContext.getActionProposal();
+				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy
+				// to limit performance impact, we limit our search on a random sample.
+				// a better way would be to increase neighborhood.
+				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
+				List<Context> searchList = PickRandom.pickNRandomElements(getAmas().getContexts(), 100);
+				nearestContext = this.getNearestContext(searchList);
+				if(nearestContext != null) {
+					getAmas().data.prediction = nearestContext.getActionProposal();
+				} else {
+					getAmas().data.prediction = 0.0;
+				}
 			}
 		}
 		if(bestContext != null) {
@@ -1276,14 +1282,15 @@ public class Head extends AmoebaAgent {
 	 * @param allContext the all context
 	 * @return the nearest context
 	 */
-	private Context getNearestContext(ArrayList<Context> contextNeighboors) {
+	private Context getNearestContext(List<Context> contextNeighboors) {
 		Context nearest = null;
 		double distanceToNearest = Double.MAX_VALUE;
 		for (Context c : contextNeighboors) {
 			if (c != newContext && !c.isDying()) {
-				if (nearest == null || getExternalDistanceToContext(c) < distanceToNearest) {
+				double externalDistanceToContext = getExternalDistanceToContext(c);
+				if (nearest == null || externalDistanceToContext < distanceToNearest) {
 					nearest = c;
-					distanceToNearest = getExternalDistanceToContext(c);
+					distanceToNearest = externalDistanceToContext;
 				}
 			}
 		}
@@ -2195,14 +2202,6 @@ public class Head extends AmoebaAgent {
 			ctxt.computeContextNeighborsValidity();
 			
 		}
-		
-		for (Percept pct : getAmas().getPercepts()) {
-
-			if (partiallyActivatedContextInNeighbors.get(pct).size() > 1) {
-				pct.sortOnCenterOfRanges(partiallyActivatedContextInNeighbors.get(pct));
-			}
-		}
-		
 	}
 	
 

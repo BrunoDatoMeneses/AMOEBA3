@@ -9,10 +9,10 @@ import java.util.function.DoubleBinaryOperator;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
 import kernel.IAMOEBA;
-import kernel.IBackupSystem;
 import kernel.StudiedSystem;
+import kernel.backup.BackupSystem;
+import kernel.backup.IBackupSystem;
 
 public class BenchmarkThreading {
 

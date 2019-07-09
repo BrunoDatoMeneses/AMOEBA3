@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 . ./catkin_ws/devel/setup.sh
 roslaunch amoeba_demo turtle_demo.launch &

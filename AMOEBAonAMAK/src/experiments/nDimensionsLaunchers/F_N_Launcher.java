@@ -11,10 +11,10 @@ import experiments.XmlConfigGenerator;
 import fr.irit.smac.amak.Configuration;
 import gui.AmoebaWindow;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
-import kernel.IBackupSystem;
-import kernel.SaveHelper;
 import kernel.StudiedSystem;
+import kernel.backup.BackupSystem;
+import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 
 
 // TODO: Auto-generated Javadoc
@@ -27,7 +27,7 @@ public class F_N_Launcher implements Serializable {
 	public static final double oracleNoiseRange = 0.0;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
-	public static final int dimension = 2	;
+	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 5	;
 	public static final int normType = 2	;
@@ -66,17 +66,15 @@ public class F_N_Launcher implements Serializable {
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
-		amoeba.saver = new SaveHelper(amoeba);
+		amoeba.saver = new SaveHelperImpl(amoeba);
 		amoeba.allowGraphicalScheduler(true);
 		amoeba.setRenderUpdate(true);		
 		amoeba.data.learningSpeed = learningSpeed;
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
-
 		studiedSystem.playOneStep();
 		amoeba.learn(studiedSystem.getOutput());
-		
 		
 		/* AUTOMATIC */
 //		long start = System.currentTimeMillis();

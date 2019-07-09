@@ -10,10 +10,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
-import kernel.IBackupSystem;
-import kernel.SaveHelper;
 import kernel.StudiedSystem;
+import kernel.backup.BackupSystem;
+import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 
 /**
  * A more advanced and complete main.
@@ -34,7 +34,7 @@ public class AdvancedMain {
 
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 8;
+		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
 
 		// Create an AMOEBA
@@ -59,7 +59,7 @@ public class AdvancedMain {
 		
 		// We add an optional saver, allowing us to autosave the amoeba at each cycle.
 		// The SaveHelper also add graphical tools to save and load AMOEBA's state.
-		amoeba.saver = new SaveHelper(amoeba);
+		amoeba.saver = new SaveHelperImpl(amoeba);
 		// Autosave slow execution, if you want fast training, set saver to null,
 		// or saver.autoSave = false.
 

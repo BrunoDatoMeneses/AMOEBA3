@@ -1460,7 +1460,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 		if (this.context != null) {
 			lastStartTickModification = this.context.getAmas().getCycle();
 			this.percept.updateContextProjectionStart(this.context);
-			this.percept.updateSortedRanges(this.context, "start");
 			context.getAmas().addLastmodifiedContext(context);
 
 			if (!this.inNeighborhood()) {
@@ -1520,7 +1519,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 		if (this.context != null) {
 			lastEndTickModification = context.getAmas().getCycle();
 			this.percept.updateContextProjectionEnd(this.context);
-			this.percept.updateSortedRanges(this.context, "end");
 			context.getAmas().addLastmodifiedContext(context);
 
 			if (!this.inNeighborhood()) {

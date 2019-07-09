@@ -9,6 +9,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.linear.LinearConstraint;
+import org.apache.commons.math3.optim.linear.LinearConstraintSet;
+import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
+import org.apache.commons.math3.optim.linear.Relationship;
+import org.apache.commons.math3.optim.linear.SimplexSolver;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
@@ -25,7 +33,13 @@ import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
+import kernel.backup.IBackupSystem;
+import kernel.backup.ISaveHelper;
+import kernel.backup.SaveHelperDummy;
+import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
+import utils.Pair;
+import utils.PrintOnce;
 
 /**
  * The AMOEBA amas
@@ -36,7 +50,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Utility to save, autosave, and load amoebas.
 	 */
-	public SaveHelper saver;
+	public ISaveHelper saver = new SaveHelperDummy();
 	
 	/**
 	 * The system studied by the amoeba.
@@ -87,13 +101,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super(new World(), Scheduling.HIDDEN);
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
-		saver = new SaveHelper(this);
+		saver = new SaveHelperImpl(this);
 		saver.load(path);
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
 		super.onInitialConfiguration();
+		if(Configuration.allowedSimultaneousAgentsExecution != 1) {
+			PrintOnce.print("Warning ! Multithreading is not currently sopported !\n"
+					+ "Please use Configuration.allowedSimultaneousAgentsExecution=1");
+		}
 		getEnvironment().setAmoeba(this);
 		data = new AmoebaData();
 	}
@@ -166,7 +184,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
+			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
 		
 		if(isRenderUpdate()) {
@@ -377,6 +395,103 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			head.changeOracleConnection();
 		studiedSystem = ss;
 		return getAction();
+	}
+	
+	@Override
+	public HashMap<String, Double> maximize(HashMap<String, Double> known){
+		ArrayList<Percept> percepts = getPercepts();
+		ArrayList<Percept> unknown = new ArrayList<>(percepts);
+		unknown.removeIf(p ->known.containsKey(p.getName()));
+		//System.out.println("known : "+known.keySet());
+		//System.out.println("unknow : "+unknown);
+		if(unknown.isEmpty()) {
+			return null;
+		}
+		
+		//get partially activated context
+		ArrayList<Context> pac = new ArrayList<>();
+		for(Context c : getContexts()) {
+			boolean good = true;
+			for(String p : known.keySet()) {
+				if(!c.getRangeByPerceptName(p).contains2(known.get(p))) {
+					good = false;
+					break;
+				}
+			}
+			if(good) pac.add(c);
+		}
+		
+		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
+		for(Context c : pac) {
+			sol.add(maximiseContext(known, percepts, unknown, c));
+		}
+		HashMap<String, Double> max = new HashMap<>();
+		// set default value if no solution
+		for(Percept p : unknown) {
+			max.put(p.getName(), 0.0);
+		}
+		Double maxValue = Double.NEGATIVE_INFINITY;
+		//find best solution
+		for(Pair<HashMap<String, Double>, Double> s : sol) {
+			if(s.getB() > maxValue) {
+				maxValue = s.getB();
+				max = s.getA();
+			}
+		}
+		max.put("oracle", maxValue);
+		return max;
+	}
+	
+	private Pair<HashMap<String, Double>, Double> maximiseDummy(HashMap<String, Double> known,
+			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
+		HashMap<String, Double> res = new HashMap<>();
+		for(Percept p : unknown) {
+			res.put(p.getName(), c.getRangeByPercept(p).getCenter());
+		}
+		HashMap<String, Double> tmpReq = new HashMap<>(res);
+		HashMap<String, Double> old = perceptions;
+		perceptions = tmpReq;
+		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, c.getActionProposal());
+		perceptions = old;
+		return ret;
+	}
+
+	//TODO tests !
+	private Pair<HashMap<String, Double>, Double> maximiseContext(HashMap<String, Double> known,
+			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
+		HashMap<String, Double> res = new HashMap<>();
+		
+		Double[] coefs = c.getLocalModel().getCoef();
+		double[] vCoefs = new double[coefs.length-1];
+		for(int i = 1; i < coefs.length; i++) {
+			vCoefs[i-1] = coefs[i];
+		}
+		LinearObjectiveFunction fct = new LinearObjectiveFunction(vCoefs, coefs[0]);
+		ArrayList<LinearConstraint> constraints = new ArrayList<>();
+		//TODO : problem : we are not sure that the order of percepts is the same as coefs
+		int i = 0;
+		for(String p : known.keySet()) {
+			double[] cf = new double[percepts.size()];
+			cf[i++] = 1.0;
+			constraints.add(new LinearConstraint(cf, Relationship.EQ, known.get(p)));
+		}
+		int unknowStart = i;
+		for(Percept p : unknown) {
+			double[] cf = new double[percepts.size()];
+			cf[i++] = 1.0;
+			constraints.add(new LinearConstraint(cf, Relationship.GEQ, c.getRangeByPercept(p).getStart()));
+			constraints.add(new LinearConstraint(cf, Relationship.LEQ, c.getRangeByPercept(p).getEnd()));
+		}
+		SimplexSolver solver = new SimplexSolver();
+		LinearConstraintSet set = new LinearConstraintSet(constraints);
+		PointValuePair sol = solver.optimize(fct, set, GoalType.MAXIMIZE);
+		for(Percept p : unknown) {
+			//TODO check if the order match
+			res.put(p.getName(), sol.getFirst()[unknowStart++]);
+		}
+		
+		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, sol.getSecond());
+		return ret;
 	}
 
 	public LocalModel buildLocalModel(Context context) {

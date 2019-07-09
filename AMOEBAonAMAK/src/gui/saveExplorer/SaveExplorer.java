@@ -26,12 +26,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import kernel.AMOEBA;
-import kernel.SaveHelper;
 import kernel.StudiedSystem;
+import kernel.backup.SaveHelperImpl;
 
 /**
  * Graphical element to browse and load (auto)saves for a specific amoeba. 
- * @see SaveHelper
+ * @see SaveHelperImpl
  * @see AMOEBA
  * @author Hugo
  *
@@ -47,7 +47,7 @@ public class SaveExplorer extends VBox {
 	 * create a SaveExplorer for an AMOEBA.
 	 * The amoeba MUST have a working {@link AMOEBA#saver}.
 	 * @param amoeba
-	 * @see SaveHelper
+	 * @see SaveHelperImpl
 	 */
 	public SaveExplorer(AMOEBA amoeba) {
 		this.amoeba = amoeba;
@@ -258,7 +258,6 @@ public class SaveExplorer extends VBox {
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		System.out.println("New AMOEBA launched.");
 		AMOEBA amoeba = new AMOEBA(args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
-		amoeba.saver.deleteFolderOnClose = false;
 		//amoeba.allowGraphicalScheduler(false);
 		for(Percept p : amoeba.getPercepts()) {
 			p.setValue(amoeba.getPerceptions(p.getName()));

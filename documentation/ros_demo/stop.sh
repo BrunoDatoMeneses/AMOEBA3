@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 for p in $(ps -A | grep ros | awk '{print $1;}')
 do
