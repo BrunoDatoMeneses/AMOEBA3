@@ -1924,8 +1924,9 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getCenterByPercept(Percept pct) {
-		return (this.getRangeByPercept(pct).getEnd()
-				+ this.getRangeByPercept(pct).getStart()) / 2;
+		Range rangeByPercept = this.getRangeByPercept(pct);
+		return (rangeByPercept.getEnd()
+				+ rangeByPercept.getStart()) / 2;
 	}
 
 	public double getConfidence() {
@@ -1937,8 +1938,9 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getRadiusByPercept(Percept pct) {
-		return (this.getRangeByPercept(pct).getEnd()
-				- this.getRangeByPercept(pct).getStart()) / 2;
+		Range rangeByPercept = this.getRangeByPercept(pct);
+		return (rangeByPercept.getEnd()
+				- rangeByPercept.getStart()) / 2;
 	}
 
 	public Range getRangeByPerceptName(String perceptName) {
