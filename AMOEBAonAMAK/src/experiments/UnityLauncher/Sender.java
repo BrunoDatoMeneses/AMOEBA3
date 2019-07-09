@@ -2,9 +2,11 @@ package experiments.UnityLauncher;
 
 import java.util.ArrayList;
 
-import mas.agents.context.Context;
-import mas.agents.percept.Percept;
-import mas.kernel.AMOEBA;
+import agents.context.Context;
+import agents.percept.Percept;
+import kernel.AMOEBA;
+
+
 
 public class Sender {
 
@@ -17,13 +19,13 @@ public class Sender {
 	}
 	
 	public void sendContexts(ArrayList<Context> contexts) {
-		ArrayList<Percept> percepts = amoeba.getScheduler().getPercepts();
+		ArrayList<Percept> percepts = amoeba.getPercepts();
 		String message = initializeMessage("CTXTS");
 		
 		for(Context ctxt : contexts) {
 			message += "~";
 			message += ctxt.getName() + "_";
-			message += ctxt.getColor();
+			message += ctxt.getColorForUnity();
 			
 			for(Percept pct : percepts) {
 				message += "_";
@@ -51,7 +53,7 @@ public class Sender {
 	}
 	
 	private String initializeMessage(String prefix) {
-		return prefix + "~" + amoeba.getScheduler().getTick();
+		return prefix + "~" + amoeba.getCycle();
 	}
 	
 	public boolean acq(String type, int cycle) {

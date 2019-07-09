@@ -78,6 +78,8 @@ public class ContextColor {
 		return ret;
 	}
 	
+	
+	
 	public static double normalizePositiveValues(double upperBound, double dispersion, double value) {
 		return upperBound * 2 * (-0.5 + 1 / (1 + Math.exp(-value / dispersion)));
 	}

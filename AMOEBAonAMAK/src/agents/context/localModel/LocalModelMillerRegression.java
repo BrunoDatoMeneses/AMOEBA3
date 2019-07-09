@@ -358,6 +358,7 @@ public class LocalModelMillerRegression extends LocalModel{
 	public void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
+		
 		if(firstExperiments.size()< (nParameters + 2)) {
 			firstExperiments.add(newExperiment); 
 			updateModel();
@@ -366,7 +367,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			updateModelWithExperimentAndWeight(newExperiment, weight, numberOfPointsForRegression);
 		}
 		
-		
+		context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
 	}
 	

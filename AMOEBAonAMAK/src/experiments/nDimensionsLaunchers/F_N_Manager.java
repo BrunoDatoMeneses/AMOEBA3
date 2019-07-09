@@ -278,11 +278,11 @@ public class F_N_Manager implements StudiedSystem{
 			return modelN(xRequest);
 		}else if (subzone == 2) {
 			/* Gaussian model */
-			return gaussianModel(xRequest, subZoneCenter2D(2), gaussianCoef, gaussianVariance);
+			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
 			
 		}else if (subzone == 3) {
 			/* Square */
-			return square2DModel(xRequest, subZoneCenter2D(3));
+			return square2DModel(xRequest, subZoneCenter3D(3));
 			
 		}else if (subzone == 4) {
 			/* Exp */
@@ -363,6 +363,34 @@ public class F_N_Manager implements StudiedSystem{
 		else if(nb == 4) {
 			center[0] = spaceSize;
 			center[1] = -spaceSize;
+		}
+		
+		return center;
+		
+	}
+	
+private double[] subZoneCenter3D(int nb) {
+		
+		double[] center =  new double[3];
+		
+		if(nb == 1) {
+			center[0] = spaceSize;
+			center[1] = spaceSize;
+			center[2] = 0.0;
+		}else if(nb == 2) {
+			center[0] = -spaceSize;
+			center[1] = -spaceSize;
+			center[2] = 0.0;
+		}
+		else if(nb == 3) {
+			center[0] = -spaceSize;
+			center[1] = spaceSize;
+			center[2] = 0.0;
+		}
+		else if(nb == 4) {
+			center[0] = spaceSize;
+			center[1] = -spaceSize;
+			center[2] = 0.0;
 		}
 		
 		return center;

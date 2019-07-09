@@ -1,112 +1,132 @@
 package experiments.UnityLauncher;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import mas.agents.context.Context;
-import mas.agents.localModel.TypeLocalModel;
-import mas.init.amoeba.AMOEBAFactory;
-import mas.kernel.AMOEBA;
+import agents.context.Context;
+import experiments.FILE;
+import experiments.nDimensionsLaunchers.F_N_Manager;
+import fr.irit.smac.amak.Configuration;
+import gui.AmoebaWindow;
+import kernel.AMOEBA;
+import kernel.BackupSystem;
+import kernel.IBackupSystem;
+import kernel.SaveHelper;
+import kernel.StudiedSystem;
 
 public class Main implements Runnable {
 
+	
+	
+	public static final double oracleNoiseRange = 0.0;
+	public static final double learningSpeed = 0.01;
+	public static final int regressionPoints = 100;
+	public static final int dimension = 3	;
+	public static final double spaceSize = 50.0	;
+	public static final int nbOfModels = 3	;
+	public static final int normType = 2	;
+	public static final boolean randomExploration = true;
+	public static final boolean limitedToSpaceZone = true;
+	public static final double mappingErrorAllowed = 0.03;
+	public static final double explorationIncrement = 1.0	;
+	public static final double explorationWidht = 0.5	;
+	
+	public static final int nbCycle = 1000;
+	
 	private SocketServer server;
 	
 	/* GUI or not */
 	public static final boolean viewer = false;
 	private String message = "";
-
-	
 	private Boolean shutDown;
 	
-
-
-	
 	public Main(ServerSocket ss, Socket s) {
+		
 		server = new SocketServer(ss, s);
-
-		
-		
 		shutDown = false;
 		
-
 	}
 	
 	public void run() {
 
-		/*Here we create AMOEBA.*/
-		AMOEBA amoeba = AMOEBAFactory.createAMOEBA(viewer,"threeDimensionsLauncher.xml");
+		AmoebaWindow.instance();
+		try {
+			launch();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		/* These method calls allow to setup AMOEBA*/
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		
-		/* Error parameter */
-		amoeba.setDataForErrorMargin(500, 0.5, 0.5, 1, 20, 20);
-		
-		/* Other parameters */
-		amoeba.setRememberState(false);
-		amoeba.setGenerateCSV(false);
 		
 
-		Manager f_XY_Manager = new Manager(50.0);
+		
+	}
+	
+	public void launch() throws IOException{
+		
+		
+		
+		
+		// Set AMAK configuration before creating an AMOEBA
+		Configuration.commandLineMode = false;
+		Configuration.allowedSimultaneousAgentsExecution = 1;
+		Configuration.waitForGUI = true;
+		Configuration.plotMilliSecondsUpdate = 10000;
+		
+		AMOEBA amoeba = new AMOEBA();
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
+		amoeba.setStudiedSystem(studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		File file = new File("resources/threeDimensionsLauncherUnity.xml");
+		backupSystem.load(file);
+		
+		amoeba.saver = new SaveHelper(amoeba);
+		amoeba.allowGraphicalScheduler(true);
+		amoeba.setRenderUpdate(true);		
+		amoeba.getHeadAgent().learningSpeed = learningSpeed;
+		amoeba.getHeadAgent().numberOfPointsForRegression = regressionPoints;
+		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+		
 		
 		Sender sender = new Sender(server, amoeba);
+
+		studiedSystem.playOneStep();
+		amoeba.learn(studiedSystem.getOutput());
 		
-		amoeba.setRunning(true);
+		
+		
+	
 
-		int i = 0;
-
-		while (shutDown != true)  {
+		for (int i = 0; i < nbCycle; ++i) {
 			
-			//System.out.println("Running :" + amoeba.isRunning());
-			try        
-			{
-			    Thread.sleep(amoeba.temporisation);
-			} 
-			catch(InterruptedException ex) 
-			{
-			    Thread.currentThread().interrupt();
+			
+			
+			
+			studiedSystem.playOneStep();
+			amoeba.learn(studiedSystem.getOutput());
+			if(amoeba.getHeadAgent().isActiveLearning()) {
+			
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+			 
 			}
 			
 			
-			if(amoeba.getScheduler().requestAsked()) {
-				amoeba.manual = true;
-				System.out.println("                                                                                                     MANUAL REQUEST");
-				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutputRequest(amoeba.getScheduler().getManualRequest())));
-				amoeba.manual = false;
-				
-			}else if(amoeba.isRunning()) {
-				
-				/*Random samples of the studied system */
-				f_XY_Manager.playOneStep(0);
-				
-				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
-				
-				i++;
-			}
-			else if(amoeba.getPlayOneStep()) {
-				
-				amoeba.setPlayOneStep(false);
-				/*Random samples of the studied system */
-				f_XY_Manager.playOneStep(0);
-				
-				/*This is a learning step of AMOEBA*/
-				amoeba.learn(new HashMap<String, Double>(f_XY_Manager.getOutput()));
-				
-				i++;
-				
-				
-			}
- 
-			ArrayList<Context> spatiallyAlteredContexts = amoeba.getScheduler().getSpatiallyAlteredContext();
-			ArrayList<Context> toKillContexts = amoeba.getScheduler().getToKillContext();
+			ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
+			ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
+			
 			if(spatiallyAlteredContexts.size()>0) {
+				
+				
+				
 				sender.sendContexts(spatiallyAlteredContexts);
-				while (!sender.acq("CTXTS", amoeba.getScheduler().getTick())) {
+				
+				while (!sender.acq("CTXTS", amoeba.getCycle())) {
 					try        
 					{
 					    Thread.sleep(100);
@@ -119,8 +139,10 @@ public class Main implements Runnable {
 			}
 			
 			if(toKillContexts.size()>0) {
+				
 				sender.sendContextsToKill(toKillContexts);
-				while (!sender.acq("KILL", amoeba.getScheduler().getTick())) {
+				
+				while (!sender.acq("KILL", amoeba.getCycle())) {
 					try        
 					{
 					    Thread.sleep(100);
@@ -131,14 +153,80 @@ public class Main implements Runnable {
 					}
 				}
 			}
-			
-					
-			
-			// CTXTS_1~1489196812_PCT_2-px_65.94282672146022_13.84702351908335-py_9.267954533508991_33.35921345566747
-
-			
 		}
-
+		
+		
+		
+		
+		
+		
+		
+		/* AUTOMATIC */
+//		long start = System.currentTimeMillis();
+//		for (int i = 0; i < nbCycle; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//		}
+//		long end = System.currentTimeMillis();
+//		System.out.println("Done in : " + (end - start) );
+		
+		
+//		/* XP PIERRE */
+//		
+//		String fileName = fileName(new ArrayList<String>(Arrays.asList("GaussiennePierre")));
+//		
+//		FILE Pierrefile = new FILE("Pierre",fileName);
+//		for (int i = 0; i < nbCycle; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.learn(studiedSystem.getOutput());
+//			if(amoeba.getHeadAgent().isActiveLearning()) {
+//				studiedSystem.setActiveLearning(true);
+//				studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+//				 
+//			}
+//		}
+//		
+//		for (int i = 0; i < 10; ++i) {
+//			studiedSystem.playOneStep();
+//			System.out.println(studiedSystem.getOutput());
+//			System.out.println(amoeba.request(studiedSystem.getOutput()));
+//			
+//			
+//		}
+//		
+//		Pierrefile.write(new ArrayList<String>(Arrays.asList("ID contexte","Coeff Cte","Coeff X0","Coeff X1","Min Value","Max Value")));
+//		
+//		for(Context ctxt : amoeba.getContexts()) {
+//			
+//			writeMessage(Pierrefile, ctxt.toStringArrayPierre());
+//
+//		}
+//		
+//		
+//		Pierrefile.close();
+		
+	
+	}
+	
+	public static String fileName(ArrayList<String> infos) {
+		String fileName = "";
+		
+		for(String info : infos) {
+			fileName += info + "_";
+		}
+		
+		return fileName;
+	}
+	
+	public static void writeMessage(FILE file, ArrayList<String> message) {
+		
+		file.initManualMessage();
+		
+		for(String m : message) {
+			file.addManualMessage(m);
+		}
+		
+		file.sendManualMessage();
 		
 	}
 
