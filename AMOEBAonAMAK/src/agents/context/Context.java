@@ -627,8 +627,9 @@ public class Context extends AmoebaAgent {
 		int overlapCounts = 0;
 		Percept voidPercept = null;
 		double voidDistance = 0.0;
-
-		for (Percept pct : getAmas().getPercepts()) {
+		
+		ArrayList<Percept> percepts = getAmas().getPercepts();
+		for (Percept pct : percepts) {
 			currentDistance = this.distance(ctxt, pct);
 			overlapCounts = (currentDistance < 0) ? overlapCounts + 1 : overlapCounts;
 
@@ -644,9 +645,9 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size()) {
+		if (overlapCounts == percepts.size()) {
 			return new Pair<Double, Percept>(-minDistance, null);
-		} else if (overlapCounts == (getAmas().getPercepts().size() - 1)) {
+		} else if (overlapCounts == (percepts.size() - 1)) {
 			return new Pair<Double, Percept>(voidDistance, voidPercept);
 		} else {
 			return new Pair<Double, Percept>(maxDistance, null);

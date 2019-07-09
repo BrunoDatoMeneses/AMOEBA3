@@ -34,7 +34,7 @@ public class AdvancedMain {
 
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 8;
+		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
 
 		// Create an AMOEBA

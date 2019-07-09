@@ -39,6 +39,7 @@ import kernel.backup.SaveHelperDummy;
 import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
 import utils.Pair;
+import utils.PrintOnce;
 
 /**
  * The AMOEBA amas
@@ -107,6 +108,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onInitialConfiguration() {
 		super.onInitialConfiguration();
+		if(Configuration.allowedSimultaneousAgentsExecution != 1) {
+			PrintOnce.print("Warning ! Multithreading is not currently sopported !\n"
+					+ "Please use Configuration.allowedSimultaneousAgentsExecution=1");
+		}
 		getEnvironment().setAmoeba(this);
 		data = new AmoebaData();
 	}

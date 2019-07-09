@@ -13,7 +13,7 @@ import kernel.backup.SaveHelperDummy;
  * @author Hugo
  *
  */
-public class MinimalMain {
+public class TestingMain {
 
 	public static void main(String[] args) throws InterruptedException {
 		Configuration.commandLineMode = true;
