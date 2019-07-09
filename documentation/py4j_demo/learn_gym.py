@@ -108,7 +108,13 @@ def learn_amoeba(amoeba, state, action, reward, env):
 
 
 def random_action():
+    #nb_random_action += 1
     return env.action_space.sample()
+
+
+def render():
+    if i > 0:
+        env.render()
 
 
 if __name__ == '__main__':
@@ -120,7 +126,7 @@ if __name__ == '__main__':
     time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
-    gateway.jvm.py4j.Main.Control.setComandLine(True)
+    #gateway.jvm.py4j.Main.Control.setComandLine(True)
     gateway.jvm.py4j.Main.Control.setLogLevel("INFORM")
 
     env = gym.make('CartPole-v0')
@@ -136,18 +142,19 @@ if __name__ == '__main__':
     # Initialize variables to track rewards
     reward_list = []
     ave_reward_list = []
+    nb_random_action = 0
 
     episodes = 1000
-    epsilon = 0.5
+    epsilon = 0.3
     min_eps = 0.02
     reduction = 0.01
-    step_per_action = 1
     for i in range(episodes):
         # Initialize parameters
         done = False
         tot_reward, reward = 0, 0
+        nb_random_action = 0
         state = env.reset()
-        env.render()
+        render()
 
         state_action_list = []
 
@@ -163,27 +170,24 @@ if __name__ == '__main__':
 
             reward = 0
             # Get next state and reward
-            for _ in range(step_per_action) :
-                #j += 1
-                #if j >= 200:
-                #    done = True
-                #    r = -100
-                #else:
-                state2, r, done, info = env.step(action)
-                env.render()
-                reward += r
-                if done:
-                    break
+            # j += 1
+            # if j >= 200:
+            #     done = True
+            #     r = -100
+            # else:
+            state2, r, done, info = env.step(action)
+            render()
+            reward += r
 
-            #learn_amoeba(amoeba, state, action, reward, env)
+            learn_amoeba(amoeba, state, action, reward, env)
 
             tot_reward += reward
 
             state = state2
 
-        for state, action in state_action_list:
-            learn_amoeba(amoeba, state, action, tot_reward, env)
-        print('Episode {}  Reward: {}'.format(i + 1, tot_reward))
+        # for state, action in state_action_list:
+        #     learn_amoeba(amoeba, state, action, tot_reward, env)
+        print('Episode {}  Reward: {}  Random actions: {}/{}  Info: {}'.format(i + 1, tot_reward, nb_random_action, i, info))
 
         # Decay epsilon
         if epsilon > min_eps:
