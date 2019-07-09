@@ -1,0 +1,142 @@
+package experiments.UnityLauncher;
+
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Random;
+import mas.kernel.StudiedSystem;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BadContextManager.
+ */
+public class Manager implements StudiedSystem, Serializable{
+
+	/** The x. */
+	double x = 0;
+	
+	/** The y. */
+	double y = 0;
+	
+	/** The z. */
+	double z = 0;
+	
+	/** The result. */
+	double result = 0;
+	
+	/** The first step. */
+	boolean firstStep = true;
+	
+	double spaceSize;
+	
+	/** The world. */
+	Random generator;
+	
+	
+	public Manager(double size) {
+		this.spaceSize= size;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see kernel.StudiedSystem#playOneStep(double)
+	 */
+	@Override
+	public void playOneStep(double action) {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+			
+		if (generator == null)	generator = new Random(29);
+			
+		
+		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
+		y = (generator.nextDouble()- 0.5) * spaceSize * 4;
+		z = (generator.nextDouble()- 0.5) * spaceSize * 4;
+	}
+
+	
+	public double model() {
+		
+		/* Disc */
+		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		
+		/* Square */
+		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y - z: 5*x - 8*y - z;
+		
+		/* Triange */
+		return (y > x) ? 2*x + y - z : 5*x - 8*y - z;
+		
+		/* Cube */
+		//return 5*x - 8*y - z;
+		
+		/* Split */
+		//return ( x <= 0 ) ? 2*x + y - z: 5*x - 8*y - z;
+		
+	}
+	
+public double model(double xV, double yV) {
+		
+		/* Disc */
+		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
+		
+		/* Square */
+		//return (y > -spaceSize && y < spaceSize && x < spaceSize && x > -spaceSize) ? 2*x + y - z: 5*x - 8*y - z;
+		
+		/* Triange */
+		//return (y > x) ? 2*x + y : 5*x - 8*y;
+		
+		/* Cube */
+		return 5*xV - 8*yV;
+		
+		
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see kernel.StudiedSystem#getOutput()
+	 */
+	@Override
+	public HashMap<String, Double> getOutput() {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		result = model();
+		
+		out.put("px",x);
+		out.put("py",y);
+		out.put("pz",z);
+		out.put("oracle",result);
+		return out;
+	}
+	
+	
+	public HashMap<String, Double> getOutputRequest(HashMap<String, Double> values) {
+		HashMap<String, Double> out = new HashMap<String, Double>();
+
+		double xValue = values.get("px");
+		double yValue = values.get("py");
+		double zValue = 0.0;
+		
+		result = model(xValue, yValue);
+		
+		out.put("px",xValue);
+		out.put("py",yValue);
+		out.put("pZ",zValue);
+		out.put("oracle",result);
+		return out;
+	}
+
+	/* (non-Javadoc)
+	 * @see kernel.StudiedSystem#switchControlMode()
+	 */
+	@Override
+	public void switchControlMode() {
+		
+	}
+	
+
+	public double getSpaceSize() {
+		return spaceSize;
+	}
+
+
+
+}
