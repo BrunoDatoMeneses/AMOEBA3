@@ -37,8 +37,7 @@ public class Percept extends AmoebaAgent {
 	 */
 	public Percept(AMOEBA amoeba) {
 		super(amoeba);
-		
-		getAmas().getHeadAgent().addPercept(this);
+		getAmas().addPercept(this);
 	}
 	
 	/**

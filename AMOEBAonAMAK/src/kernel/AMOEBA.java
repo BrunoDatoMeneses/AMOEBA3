@@ -839,4 +839,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 	}
 	
+	public void addPercept(Percept pct) {
+		percepts = null;
+		head.addPercept(pct);
+	}
+	
 }

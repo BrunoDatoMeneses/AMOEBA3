@@ -2449,10 +2449,6 @@ public class Head extends AmoebaAgent {
 		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
 		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
-		for (Percept pct : getAmas().getPercepts()) {
-			addPercept(pct);
-		}
-
 		// getAmas().data.mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());//
 		// Math.pow(world.getMappingErrorAllowed(),
 		// world.getScheduler().getPercepts().size());
