@@ -713,7 +713,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin()) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -723,7 +723,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin()) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>2000) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -2209,7 +2209,7 @@ public class Context extends AmoebaAgent {
 		ret[1] = g / 255.0d;
 		ret[2] = b / 255.0d;
 		
-		return ret[0] + "," + ret[1] + "," + ret[2] + ",100";
+		return ret[0] + "," + ret[1] + "," + ret[2] + ",200";
 	}
 	
 	public static double normalizePositiveValues(double upperBound, double dispersion, double value) {

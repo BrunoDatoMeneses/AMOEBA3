@@ -31,8 +31,8 @@ public class Main implements Runnable {
 	public static final boolean randomExploration = false;
 	public static final boolean limitedToSpaceZone = true;
 	public static final double mappingErrorAllowed = 0.03;
-	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 0.5	;
+	public static final double explorationIncrement = 2.0	;
+	public static final double explorationWidht = 0.3	;
 	
 	public static final int nbCycle = 10000;
 	

@@ -163,6 +163,7 @@ public class F_N_Manager implements StudiedSystem{
 				x[i] = selfRequest.get("px" + i);
 			}
 		}
+
 		else {
 			if (generator == null)	generator = new Random(29);
 			
