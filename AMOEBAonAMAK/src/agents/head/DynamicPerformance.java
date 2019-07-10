@@ -7,13 +7,13 @@ public class DynamicPerformance implements Serializable{
 	
 	public int successesBeforeDiminution;
 	public int conflictsBeforeAugmentation;
-	public double performanceIndicator;
+	public Double performanceIndicator;
 	public int performanceCounter;
 
 	public double augmentationFactor;
 	public double diminutionFactor;
 
-	public double minPerformanceIndicator;
+	public Double minPerformanceIndicator;
 
 	// Required for serialization by XML
 	public DynamicPerformance() {};

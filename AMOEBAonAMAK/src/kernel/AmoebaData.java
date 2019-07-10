@@ -65,30 +65,6 @@ public class AmoebaData implements Serializable {
 	public int currentCriticalityMapping = 0;
 	public int currentCriticalityConfidence = 0;
 
-	public long playExecutionTime;
-	public long endogenousExecutionTime;
-	public long contextSelfAnalisisExecutionTime;
-
-	public long incompetentHeadNCSExecutionTime;
-	public long concurrenceNCSExecutionTime;
-	public long create_New_ContextNCSExecutionTime;
-	public long overmappingNCSExecutionTime;
-	public long memoryCreationExecutionTime;
-
-	public long otherExecutionTime;
-
-	public long playExecutionTimeSum = 0;
-	public long endogenousExecutionTimeSum = 0;
-	public long contextSelfAnalisisExecutionTimeSum = 0;
-
-	public long incompetentHeadNCSExecutionTimeSum = 0;
-	public long concurrenceNCSExecutionTimeSum = 0;
-	public long create_New_ContextNCSExecutionTimeSum = 0;
-	public long overmappingNCSExecutionTimeSum = 0;
-	public long memoryCreationExecutionTimeSum = 0;
-
-	public long otherExecutionTimeSum = 0;
-
 	public double learningSpeed = 0.25;
 	public int numberOfPointsForRegression = 50;
 
@@ -97,4 +73,7 @@ public class AmoebaData implements Serializable {
 	public DynamicPerformance predictionPerformance;
 	public DynamicPerformance regressionPerformance;
 	public DynamicPerformance mappingPerformance;
+	
+	public double[] executionTimes = new  double[20];
+	public double[] executionTimesSums = new double[20];
 }

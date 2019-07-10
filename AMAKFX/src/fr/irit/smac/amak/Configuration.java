@@ -41,4 +41,10 @@ public class Configuration {
 	 * or else you may experience freeze on the GUI.
 	 */
 	public static boolean waitForGUI = true;
+	
+	
+	/**
+	 * By default AMAK will wait for 1 sec before updating the plots
+	 */
+	public static double plotMilliSecondsUpdate = 1000;
 }

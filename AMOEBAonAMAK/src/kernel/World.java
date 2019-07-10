@@ -74,11 +74,11 @@ public class World extends Environment {
 	}
 	
 	public void trace(ArrayList<String> infos) {
-//		String message = "" +amoeba.getCycle();
-//		for(String info : infos) {
-//			message += " " + info;
-//		}
-//		System.out.println(message);
+		String message = "" +amoeba.getCycle();
+		for(String info : infos) {
+			message += " " + info;
+		}
+		System.out.println(message);
 	}
 
 	public double getAVT_acceleration() {

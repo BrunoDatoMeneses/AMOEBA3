@@ -3,9 +3,12 @@ package experiments.nDimensionsLaunchers;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import agents.context.Context;
+import experiments.FILE;
 import experiments.F_XY_System;
 import experiments.XmlConfigGenerator;
 import fr.irit.smac.amak.Configuration;
@@ -29,13 +32,13 @@ public class F_N_Launcher implements Serializable {
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
-	public static final int nbOfModels = 5	;
+	public static final int nbOfModels = 3	;
 	public static final int normType = 2	;
 	public static final boolean randomExploration = true;
-	public static final boolean limitedToSpaceZone = false;
-	public static final double mappingErrorAllowed = 0.05	;
+	public static final boolean limitedToSpaceZone = true;
+	public static final double mappingErrorAllowed = 0.03;
 	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 1	;
+	public static final double explorationWidht = 0.5	;
 	
 	public static final int nbCycle = 1000;
 	
@@ -54,10 +57,13 @@ public class F_N_Launcher implements Serializable {
 	public static void launch() throws IOException{
 		
 		
+		
+		
 		// Set AMAK configuration before creating an AMOEBA
 		Configuration.commandLineMode = false;
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
+		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		AMOEBA amoeba = new AMOEBA();
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
@@ -86,10 +92,19 @@ public class F_N_Launcher implements Serializable {
 //		System.out.println("Done in : " + (end - start) );
 		
 		
-		/* XP PIERRE */
-//		for (int i = 0; i < 1000; ++i) {
+//		/* XP PIERRE */
+//		
+//		String fileName = fileName(new ArrayList<String>(Arrays.asList("GaussiennePierre")));
+//		
+//		FILE Pierrefile = new FILE("Pierre",fileName);
+//		for (int i = 0; i < nbCycle; ++i) {
 //			studiedSystem.playOneStep();
 //			amoeba.learn(studiedSystem.getOutput());
+//			if(amoeba.getHeadAgent().isActiveLearning()) {
+//				studiedSystem.setActiveLearning(true);
+//				studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+//				 
+//			}
 //		}
 //		
 //		for (int i = 0; i < 10; ++i) {
@@ -97,17 +112,42 @@ public class F_N_Launcher implements Serializable {
 //			System.out.println(studiedSystem.getOutput());
 //			System.out.println(amoeba.request(studiedSystem.getOutput()));
 //			
+//			
 //		}
 //		
+//		Pierrefile.write(new ArrayList<String>(Arrays.asList("ID contexte","Coeff Cte","Coeff X0","Coeff X1","Min Value","Max Value")));
+//		
 //		for(Context ctxt : amoeba.getContexts()) {
-//			System.out.println(ctxt.toStringPierre());
+//			
+//			writeMessage(Pierrefile, ctxt.toStringArrayPierre());
 //
 //		}
-		
-		
-		
-
+//		
+//		
+//		Pierrefile.close();
 		
 	
+	}
+	
+	public static String fileName(ArrayList<String> infos) {
+		String fileName = "";
+		
+		for(String info : infos) {
+			fileName += info + "_";
+		}
+		
+		return fileName;
+	}
+	
+	public static void writeMessage(FILE file, ArrayList<String> message) {
+		
+		file.initManualMessage();
+		
+		for(String m : message) {
+			file.addManualMessage(m);
+		}
+		
+		file.sendManualMessage();
+		
 	}
 }

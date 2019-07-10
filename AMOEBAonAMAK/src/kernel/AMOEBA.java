@@ -160,14 +160,17 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
 			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
 			
-			timeExecution.addData("HeadPlay", cycle, data.playExecutionTimeSum, notify);
-			timeExecution.addData("EndogenousPlay", cycle, data.endogenousExecutionTime, notify);
-			timeExecution.addData("ContextSelfAnalisis", cycle, data.contextSelfAnalisisExecutionTimeSum, notify);
-			timeExecution.addData("IncompetentNCS", cycle, data.incompetentHeadNCSExecutionTimeSum, notify);
-			timeExecution.addData("ConcurrenceNCS", cycle, data.concurrenceNCSExecutionTimeSum, notify);
-			timeExecution.addData("NewContextNCS", cycle, data.create_New_ContextNCSExecutionTimeSum, notify);
-			timeExecution.addData("OvermappingNCS", cycle, data.overmappingNCSExecutionTimeSum, notify);
-			timeExecution.addData("Other", cycle, data.otherExecutionTimeSum, notify);
+			timeExecution.addData("HeadPlay", cycle, data.executionTimesSums[0], notify);
+			timeExecution.addData("EndogenousPlay", cycle, data.executionTimesSums[1], notify);
+			timeExecution.addData("ContextSelfAnalisis", cycle, data.executionTimesSums[2], notify);
+			timeExecution.addData("IncompetentNCS", cycle, data.executionTimesSums[3], notify);
+			timeExecution.addData("ConcurrenceNCS", cycle, data.executionTimesSums[4], notify);
+			timeExecution.addData("NewContextNCS", cycle, data.executionTimesSums[5], notify);
+			timeExecution.addData("OvermappingNCS", cycle, data.executionTimesSums[6], notify);
+			timeExecution.addData("Other", cycle, data.executionTimesSums[7], notify);
+			timeExecution.addData("BestContextInNeighbors", cycle, data.executionTimesSums[8], notify);
+			timeExecution.addData("CreateContext", cycle, data.executionTimesSums[9], notify);
+			timeExecution.addData("UpdateStatitics", cycle, data.executionTimesSums[10], notify);
 			
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
@@ -204,7 +207,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		if (studiedSystem != null) {
+			
 			studiedSystem.playOneStep();
+			
 			perceptions = studiedSystem.getOutput();
 			
 			
@@ -241,7 +246,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		if(studiedSystem != null) {
 			if(head.isActiveLearning()) {
-				head.setActiveLearning(false);
 				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
 				 
@@ -662,6 +666,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 		AmoebaWindow.instance().point.toFront();
+		AmoebaWindow.instance().point.setInfo(getCursorInfo());
 	}
 	
 	/**
@@ -793,6 +798,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			this.validContexts.retainAll(validContexts);
 		}
 		validContextLock.writeLock().unlock();
+	}
+	
+	private String getCursorInfo() {
+		String message = "";
+		for(Percept pct : getPercepts()) {
+			message += pct.getName() + "\t" + pct.getValue() +"\t[ " + pct.getMin() +" ; " + pct.getMax() + " ]\n" ;
+		}
+		return message;
 	}
 	
 	

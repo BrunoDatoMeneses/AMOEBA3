@@ -66,5 +66,11 @@ public class Criticalities implements Cloneable{
 		
 		
 	}
+	
+	public HashMap<String, ArrayList<Double>> getLastValues() {
+		
+		return lastValues;
+		
+	}
 
 }
