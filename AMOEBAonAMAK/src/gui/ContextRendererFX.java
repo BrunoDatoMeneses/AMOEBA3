@@ -43,6 +43,11 @@ public class ContextRendererFX extends RenderStrategy {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
 		drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
 	}
+	
+	public String getColorForUnity() {
+		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
+		 return c[0].intValue() + "," + c[1].intValue() + "," + c[2].intValue() + ",100";
+	}
 
 	private void updatePosition() {
 		Percept p1 = context.getAmas().getDimensionSelector().d1();

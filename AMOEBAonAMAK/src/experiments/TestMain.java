@@ -7,6 +7,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import agents.head.EndogenousRequest;
+import fr.irit.smac.amak.tools.Log.Level;
  
 
 
@@ -23,14 +24,45 @@ public class TestMain {
 			return n*fact(n-1);
 		}
 	}
+	
+	public enum Level {
+		FATAL(60), ERROR(50), IMPORTANT(40), WARNING(30), INFORM(20), DEBUG(10);
+
+		private final int order;
+
+		Level(final int order) {
+			this.order = order;
+		}
+
+		public boolean isGE(final Level _other) {
+			return order >= _other.order;
+		}
+	}
+	
+	public static Level minLevel = Level.IMPORTANT;
+	
+	private static void trace(final Level _level, final String _message) {
+			if (_level.isGE(minLevel)) {
+				System.out.println(_message);
+			}
+	}
+	
+	
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		testPriorityQueue();
+		testLvlTrace();
 		
 
 		
+	}
+	
+	public static void testLvlTrace() {
+		trace(Level.DEBUG, "DEBUG");
+		trace(Level.WARNING, "WARNING");
+		trace(Level.ERROR, "ERROR");
+		trace(Level.FATAL, "FATAL");
 	}
 	
 	public static void testPriorityQueue() {
@@ -55,13 +87,13 @@ public class TestMain {
 		hm6.put("p6", 50.0);
 		HashMap<String, Double> hm7 = new HashMap<String, Double>();
 		hm7.put("p7", 50.0);
-		endogenousRequest.add(new EndogenousRequest(hm1, 5));
-		endogenousRequest.add(new EndogenousRequest(hm2, 3));
-		endogenousRequest.add(new EndogenousRequest(hm3, 1));
-		endogenousRequest.add(new EndogenousRequest(hm4, 2));
-		endogenousRequest.add(new EndogenousRequest(hm5, 0));
-		endogenousRequest.add(new EndogenousRequest(hm6, 5));
-		endogenousRequest.add(new EndogenousRequest(hm7, 3));
+//		endogenousRequest.add(new EndogenousRequest(hm1, 5));
+//		endogenousRequest.add(new EndogenousRequest(hm2, 3));
+//		endogenousRequest.add(new EndogenousRequest(hm3, 1));
+//		endogenousRequest.add(new EndogenousRequest(hm4, 2));
+//		endogenousRequest.add(new EndogenousRequest(hm5, 0));
+//		endogenousRequest.add(new EndogenousRequest(hm6, 5));
+//		endogenousRequest.add(new EndogenousRequest(hm7, 3));
 		
 		System.out.println(endogenousRequest);
 		

@@ -7,7 +7,9 @@ import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
 import agents.context.Context;
 import agents.percept.Percept;
+import experiments.TestMain.Level;
 import ncs.NCS;
+import utils.TRACE_LEVEL;
 
 /**
  * Store some data about the world
@@ -29,6 +31,10 @@ public class World extends Environment {
 	public double mappingErrorAllowed = 0.04;// TODO remove from here --> head agent
 	
 	public int regressionPoints = 0; // TODO remove from here
+	
+	
+	
+	public static TRACE_LEVEL minLevel = TRACE_LEVEL.ERROR;
 	
 	private AMOEBA amoeba;
 
@@ -73,12 +79,15 @@ public class World extends Environment {
 		}
 	}
 	
-	public void trace(ArrayList<String> infos) {
-		String message = "" +amoeba.getCycle();
-		for(String info : infos) {
-			message += " " + info;
+	public void trace(TRACE_LEVEL lvl, ArrayList<String> infos) {
+		if (lvl.isGE(minLevel)) {
+			String message = "[" +amoeba.getCycle() + "]";
+			for(String info : infos) {
+				message += " " + info;
+			}
+			System.out.println(message);
 		}
-		System.out.println(message);
+		
 	}
 
 	public double getAVT_acceleration() {

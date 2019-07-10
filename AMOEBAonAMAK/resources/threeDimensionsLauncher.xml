@@ -6,21 +6,16 @@
 		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
 	</Configuration>
 	
-	
 	<StartingAgents>
 	
-		<Sensor Name="px0" Enum="false" />
 		<Sensor Name="px1" Enum="false" />
 		<Sensor Name="px2" Enum="false" />
+		<Sensor Name="px3" Enum="false" />
 	
 	  	<Controller Name="Controller">
-              <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
+              <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />
               
         </Controller> 
-
-
-			
 	</StartingAgents>
-	
 	
 </System>

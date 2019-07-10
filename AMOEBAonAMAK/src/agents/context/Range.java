@@ -9,6 +9,7 @@ import agents.percept.Percept;
 import kernel.World;
 import ncs.NCS;
 import utils.Pair;
+import utils.TRACE_LEVEL;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -354,7 +355,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	private void adaptEnd(double oracleValue, double increment) {
-		world.trace(new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
+		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON END ADAPT", context.getName(), percept.getName(), "" + increment )));
 
 		classicEndAdapt(oracleValue, increment);
 		// adaptEndWithSplitting(oracleValue, increment);
@@ -402,7 +403,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	private void adaptEndWithSplitting(double oracleValue, double increment) {
-		world.trace(new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
+		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
 
 		ArrayList<Context> bordererContexts = new ArrayList<Context>();
 
@@ -410,7 +411,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			for (Context ctxt : context.getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
 
-				world.trace(new ArrayList<String>(
+				world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 						Arrays.asList(context.getName(), "" + this.distance(ctxt.getRanges().get(this.percept)),
 								"DISTANCE SPLIT", percept.getName(), ctxt.getName())));
 
@@ -432,7 +433,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 					}
 
 					if (bordererContextTest) {
-						world.trace(new ArrayList<String>(Arrays.asList(context.getName(), "END BORDER CONTEXT",
+						world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(), "END BORDER CONTEXT",
 								percept.getName(), ctxt.getName())));
 						bordererContexts.add(ctxt);
 					}
@@ -441,7 +442,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			}
 			if (bordererContexts.size() > 0) {
-				world.trace(new ArrayList<String>(Arrays.asList("END BORDER CONTEXT", percept.getName())));
+				world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("END BORDER CONTEXT", percept.getName())));
 				double minAlternativeIncrement = increment;
 				double alternativeIncrement;
 				for (Context ctxt : bordererContexts) {
@@ -525,7 +526,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	private void adaptStart(double oracleValue, double increment) {
-		world.trace(new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
+		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON END ADAPT", context.getName(), percept.getName(), "" + increment )));
+
 
 		classicStartAdapt(oracleValue, increment);
 		// adaptStartWithSplitting(oracleValue, increment);
@@ -597,7 +599,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	private void adaptStartWithSplitting(double oracleValue, double increment) {
-		world.trace(new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
+		world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
 		ArrayList<Context> bordererContexts = new ArrayList<Context>();
 
 		if (!(contains(oracleValue) == 0.0)) {
@@ -622,7 +624,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 					}
 
 					if (bordererContextTest) {
-						world.trace(new ArrayList<String>(
+						world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 								Arrays.asList("START BORDER CONTEXT", percept.getName(), ctxt.getName())));
 						bordererContexts.add(ctxt);
 					}
@@ -631,7 +633,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			}
 			if (bordererContexts.size() > 0) {
-				world.trace(new ArrayList<String>(Arrays.asList("START BORDER CONTEXT", percept.getName())));
+				world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("START BORDER CONTEXT", percept.getName())));
 				double minAlternativeIncrement = increment;
 				double alternativeIncrement;
 				for (Context ctxt : bordererContexts) {
@@ -794,12 +796,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @return boolean representing if the range is too small.
 	 */
 	public boolean isTooSmall() {
-		if((end - start) < percept.getMappingErrorAllowed()*0.1 && (end - start)>0) {
-			////// System.out.println("£££££££££££££££££££££££££££££ mininimalRange :" +
-			////// mininimalRange + " ~~~ " + (end - start));
+		
+		if((end - start) < percept.getMappingErrorAllowedMin()) {
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "TOO SMALL DISTANCE", "" + (end - start))));
 		}
 
-		return ((end - start) < (percept.getMappingErrorAllowed() / 2)) && !this.isPerceptEnum();
+		return ((end - start) < percept.getMappingErrorAllowedMin()) && !this.isPerceptEnum();
 	}
 
 	/**
@@ -944,9 +946,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	public void adaptOnOverlap(Range overlappingContextRanges, double border) {
 
-		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
+		world.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
 				"*********************************************************************************************************** ADAPT ON OVERLAP")));
-		world.trace(new ArrayList<String>(
+		world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 				Arrays.asList(this.context.getName(), overlappingContextRanges.getContext().getName())));
 		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
 
@@ -1003,10 +1005,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 				if (newContext) {
 
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(this.context.getName(), "" + context.getRanges().get(pct),
 									overlappingContext.getRanges().get(pct) + "", pct.getName(), "RANGES")));
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(this.context.getName(), "" + this.context.getRanges().get(pct).getLenght(),
 									this.context.getRanges().get(pct)
 											.overlapDistance(overlappingContext.getRanges().get(pct)) + "",
@@ -1033,7 +1035,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
 			for (Percept pct : context.getAmas().getPercepts()) {
-				world.trace(
+				world.trace(TRACE_LEVEL.DEBUG, 
 						new ArrayList<String>(Arrays.asList(pct.getName(), "" + newContextDimensions.get(pct).getA(),
 								"" + newContextDimensions.get(pct).getB(), "NEW DIM")));
 			}
@@ -1045,7 +1047,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 					System.out.println("TEST");
 					System.out.println(newContextDimensionsBis.get(pct).getA());
 					System.out.println(newContextDimensionsBis.get(pct).getB());
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(pct.getName(), "" + newContextDimensionsBis.get(pct).getA(),
 									"" + newContextDimensionsBis.get(pct).getB(), "NEW DIM")));
 				}
@@ -1058,9 +1060,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	public void setOnConcurentOverlap(Range overlappingContextRanges, double border) {
 
-		world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
+		world.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
 				"*********************************************************************************************************** SET ON OVERLAP")));
-		world.trace(new ArrayList<String>(
+		world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 				Arrays.asList(this.context.getName(), overlappingContextRanges.getContext().getName())));
 
 		double increment = Math.min(Math.abs(this.distance(overlappingContextRanges)), getIncrement());
@@ -1122,10 +1124,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 				if (newContext) {
 
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(this.context.getName(), "" + context.getRanges().get(pct),
 									overlappingContext.getRanges().get(pct) + "", pct.getName(), "RANGES")));
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(this.context.getName(), "" + this.context.getRanges().get(pct).getLenght(),
 									this.context.getRanges().get(pct)
 											.overlapDistance(overlappingContext.getRanges().get(pct)) + "",
@@ -1152,7 +1154,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			world.raiseNCS(NCS.CREATE_NEW_CONTEXT);
 			for (Percept pct : context.getAmas().getPercepts()) {
-				world.trace(
+				world.trace(TRACE_LEVEL.DEBUG, 
 						new ArrayList<String>(Arrays.asList(pct.getName(), "" + newContextDimensions.get(pct).getA(),
 								"" + newContextDimensions.get(pct).getB(), "NEW DIM")));
 			}
@@ -1166,7 +1168,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 					System.out.println(newContextDimensionsBis.get(pct).getA());
 					System.out.println(newContextDimensionsBis.get(pct).getB());
 
-					world.trace(new ArrayList<String>(
+					world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
 							Arrays.asList(pct.getName(), "" + newContextDimensionsBis.get(pct).getA(),
 									"" + newContextDimensionsBis.get(pct).getB(), "NEW DIM")));
 				}
@@ -1185,12 +1187,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 		ArrayList<Pair<Double, Double>> centersAndLengths = new ArrayList<Pair<Double, Double>>();
 
-		world.trace(new ArrayList<String>(
+		world.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(
 				Arrays.asList(this.context.getName(), overlappingRange.getContext().getName(), "SEEK NON OVERLAPING")));
 
 		if (this.getStart() < overlappingRange.getStart() && overlappingRange.getEnd() < this.getEnd()) {
 
-			world.trace(new ArrayList<String>(Arrays.asList("CONTAINED", this.percept.getName())));
+			world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("CONTAINED", this.percept.getName())));
 			double center1 = (this.getStart() + overlappingRange.getStart()) / 2;
 			double center2 = (overlappingRange.getEnd() + this.getEnd()) / 2;
 			double length1 = overlappingRange.getStart() - this.getStart();
@@ -1199,13 +1201,13 @@ public class Range implements Serializable, Comparable, Cloneable {
 			centersAndLengths.add(new Pair<Double, Double>(center2, length2));
 		} else if (this.getStart() < overlappingRange.getStart() && overlappingRange.getStart() < this.getEnd()) {
 
-			world.trace(new ArrayList<String>(Arrays.asList("START", this.percept.getName())));
+			world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("START", this.percept.getName())));
 			double center = (this.getStart() + overlappingRange.getStart()) / 2;
 			double length = overlappingRange.getStart() - this.getStart();
 			centersAndLengths.add(new Pair<Double, Double>(center, length));
 		} else if (this.getStart() < overlappingRange.getEnd() && overlappingRange.getEnd() < this.getEnd()) {
 
-			world.trace(new ArrayList<String>(Arrays.asList("END", this.percept.getName())));
+			world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("END", this.percept.getName())));
 			double center = (overlappingRange.getEnd() + this.getEnd()) / 2;
 			double length = this.getEnd() - overlappingRange.getEnd();
 			centersAndLengths.add(new Pair<Double, Double>(center, length));
@@ -1458,8 +1460,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 //		}
 		
 		this.start = newStartValue;
+		
+		
 
 		if (this.context != null) {
+			
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
+					Arrays.asList(this.context.getName(), this.percept.getName(), "SET START", "" + newStartValue)));
+			
 			lastStartTickModification = this.context.getAmas().getCycle();
 			this.percept.updateContextProjectionStart(this.context);
 			context.getAmas().addLastmodifiedContext(context);
@@ -1490,11 +1498,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			this.context.updateActivatedContextsCopyForUpdate();
 
-			world.trace(new ArrayList<String>(
-					Arrays.asList(this.context.getName(), this.percept.getName(), "SET START", "" + newStartValue)));
+			
 
-			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContext().contains(this.context)) {
-				context.getAmas().addSpatiallyAlteredContext(this.context);
+			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
+				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
 			}
 		}
 
@@ -1519,8 +1526,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 //		}
 		
 		this.end = newEndValue;
+		
 
 		if (this.context != null) {
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
+					Arrays.asList(this.context.getName(), this.percept.getName(), "SET END", "" + newEndValue)));
+			
 			lastEndTickModification = context.getAmas().getCycle();
 			this.percept.updateContextProjectionEnd(this.context);
 			context.getAmas().addLastmodifiedContext(context);
@@ -1551,11 +1562,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 			this.context.updateActivatedContextsCopyForUpdate();
 
-			world.trace(new ArrayList<String>(
-					Arrays.asList(this.context.getName(), this.percept.getName(), "SET END", "" + newEndValue)));
+			
 
-			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContext().contains(this.context)) {
-				context.getAmas().addSpatiallyAlteredContext(this.context);
+			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
+				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
 			}
 		}
 
