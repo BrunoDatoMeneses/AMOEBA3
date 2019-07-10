@@ -3,7 +3,7 @@
   <Configuration>
     <Learning creationOfNewContext="true" loadPresetContext="true" />
     <Data>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;java version="11.0.3" class="java.beans.XMLDecoder"&gt;
+&lt;java version="1.8.0_171" class="java.beans.XMLDecoder"&gt;
  &lt;object class="kernel.AmoebaData" id="AmoebaData0"&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
    &lt;string&gt;nPropositionsReceived&lt;/string&gt;
@@ -65,20 +65,14 @@
    &lt;string&gt;firstContext&lt;/string&gt;
    &lt;void method="set"&gt;
     &lt;object idref="AmoebaData0"/&gt;
-    &lt;void class="kernel.AmoebaData" id="Field0" method="getField"&gt;
-     &lt;string&gt;useOracle&lt;/string&gt;
-     &lt;void id="Boolean0" method="get"&gt;
-      &lt;object idref="AmoebaData0"/&gt;
-     &lt;/void&gt;
-    &lt;/void&gt;
-    &lt;object idref="Boolean0"/&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
    &lt;/void&gt;
   &lt;/void&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
    &lt;string&gt;contextFromPropositionWasSelected&lt;/string&gt;
    &lt;void method="set"&gt;
     &lt;object idref="AmoebaData0"/&gt;
-    &lt;object idref="Boolean0"/&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
    &lt;/void&gt;
   &lt;/void&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
@@ -151,27 +145,6 @@
    &lt;/void&gt;
   &lt;/void&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
-   &lt;string&gt;contextSelfAnalisisExecutionTimeSum&lt;/string&gt;
-   &lt;void method="set"&gt;
-    &lt;object idref="AmoebaData0"/&gt;
-    &lt;long&gt;13&lt;/long&gt;
-   &lt;/void&gt;
-  &lt;/void&gt;
-  &lt;void class="kernel.AmoebaData" method="getField"&gt;
-   &lt;string&gt;create_New_ContextNCSExecutionTimeSum&lt;/string&gt;
-   &lt;void method="set"&gt;
-    &lt;object idref="AmoebaData0"/&gt;
-    &lt;long&gt;34&lt;/long&gt;
-   &lt;/void&gt;
-  &lt;/void&gt;
-  &lt;void class="kernel.AmoebaData" method="getField"&gt;
-   &lt;string&gt;otherExecutionTimeSum&lt;/string&gt;
-   &lt;void method="set"&gt;
-    &lt;object idref="AmoebaData0"/&gt;
-    &lt;long&gt;1&lt;/long&gt;
-   &lt;/void&gt;
-  &lt;/void&gt;
-  &lt;void class="kernel.AmoebaData" method="getField"&gt;
    &lt;string&gt;learningSpeed&lt;/string&gt;
    &lt;void method="set"&gt;
     &lt;object idref="AmoebaData0"/&gt;
@@ -182,20 +155,14 @@
    &lt;string&gt;numberOfPointsForRegression&lt;/string&gt;
    &lt;void method="set"&gt;
     &lt;object idref="AmoebaData0"/&gt;
-    &lt;void class="kernel.AmoebaData" id="Field1" method="getField"&gt;
-     &lt;string&gt;numberOfCriticityValuesForAverage&lt;/string&gt;
-     &lt;void id="Integer0" method="get"&gt;
-      &lt;object idref="AmoebaData0"/&gt;
-     &lt;/void&gt;
-    &lt;/void&gt;
-    &lt;object idref="Integer0"/&gt;
+    &lt;int&gt;100&lt;/int&gt;
    &lt;/void&gt;
   &lt;/void&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
    &lt;string&gt;contextNotFinished&lt;/string&gt;
    &lt;void method="set"&gt;
     &lt;object idref="AmoebaData0"/&gt;
-    &lt;object idref="Boolean0"/&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
    &lt;/void&gt;
   &lt;/void&gt;
   &lt;void class="kernel.AmoebaData" method="getField"&gt;
@@ -264,14 +231,14 @@
       &lt;string&gt;successesBeforeDiminution&lt;/string&gt;
       &lt;void method="set"&gt;
        &lt;object idref="DynamicPerformance1"/&gt;
-       &lt;object idref="Integer0"/&gt;
+       &lt;int&gt;100&lt;/int&gt;
       &lt;/void&gt;
      &lt;/void&gt;
      &lt;void class="agents.head.DynamicPerformance" method="getField"&gt;
       &lt;string&gt;conflictsBeforeAugmentation&lt;/string&gt;
       &lt;void method="set"&gt;
        &lt;object idref="DynamicPerformance1"/&gt;
-       &lt;object idref="Integer0"/&gt;
+       &lt;int&gt;100&lt;/int&gt;
       &lt;/void&gt;
      &lt;/void&gt;
      &lt;void class="agents.head.DynamicPerformance" method="getField"&gt;
@@ -369,11 +336,11 @@
   <PresetContexts>
     <LastPerceptionsAndActionState oracle="0.016507301905780793" px1="-37.40972633944136" px0="-89.03028902104312" px2="66.62397977488465" />
     <!-- Nb contexts = 11 -->
-    <Context Name="1838997370" Confidence="4.0" ActionsProposal="0.09577194562472954" Activated="false">
+    <Context Name="1838997370" Confidence="4.0" ActionsProposal="0.09577194562472954">
       <Ranges>
+        <Range Sensor="px2" Start="85.30503251402415" End="85.30503251402415" />
         <Range Sensor="px1" Start="46.380645641867744" End="46.380645641867744" />
         <Range Sensor="px0" Start="46.247303558422146" End="46.247303558422146" />
-        <Range Sensor="px2" Start="85.30503251402415" End="85.30503251402415" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -421,11 +388,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="1346910014" Confidence="4.0" ActionsProposal="64.86494678314874" Activated="false">
+    <Context Name="1346910014" Confidence="4.0" ActionsProposal="206.94651829609595">
       <Ranges>
+        <Range Sensor="px2" Start="-37.09558977813698" End="-30.975558663528926" />
         <Range Sensor="px1" Start="-2.617317456246515" End="-0.16741930134080185" />
         <Range Sensor="px0" Start="-59.28062054090291" End="-54.004224335936655" />
-        <Range Sensor="px2" Start="-37.09558977813698" End="-30.975558663528926" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -473,11 +440,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="454500758" Confidence="4.0" ActionsProposal="23.80047097808879" Activated="false">
+    <Context Name="454500758" Confidence="4.0" ActionsProposal="31.314904365573863">
       <Ranges>
+        <Range Sensor="px2" Start="28.909035565691934" End="41.149097794908045" />
         <Range Sensor="px1" Start="-76.04600706976316" End="-69.92467443418161" />
         <Range Sensor="px0" Start="24.65206741321943" End="35.204859823151935" />
-        <Range Sensor="px2" Start="28.909035565691934" End="41.149097794908045" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -525,11 +492,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="223161699" Confidence="4.0" ActionsProposal="0.6613371664658384" Activated="false">
+    <Context Name="223161699" Confidence="4.0" ActionsProposal="0.3496747902552914">
       <Ranges>
+        <Range Sensor="px2" Start="-11.513133897917303" End="0.7269283312988124" />
         <Range Sensor="px1" Start="73.77334445063934" End="81.65857347802896" />
         <Range Sensor="px0" Start="83.24852617110032" End="90.75006020857418" />
-        <Range Sensor="px2" Start="-11.513133897917303" End="0.7269283312988124" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -577,11 +544,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="729992457" Confidence="4.0" ActionsProposal="41.92858390283845" Activated="false">
+    <Context Name="729992457" Confidence="4.0" ActionsProposal="48.95267755449822">
       <Ranges>
+        <Range Sensor="px2" Start="61.69151884433755" End="73.93158107355366" />
         <Range Sensor="px1" Start="6.815101504677624" End="22.585559559456836" />
         <Range Sensor="px0" Start="33.34556691685419" End="48.348634991801895" />
-        <Range Sensor="px2" Start="61.69151884433755" End="73.93158107355366" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -629,11 +596,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="9804879" Confidence="4.0" ActionsProposal="26.696461523093255" Activated="false">
+    <Context Name="9804879" Confidence="4.0" ActionsProposal="16.721079241094706">
       <Ranges>
+        <Range Sensor="px2" Start="-93.9310346287636" End="-84.96923127162421" />
         <Range Sensor="px1" Start="-20.22830524266429" End="-4.457847187885079" />
         <Range Sensor="px0" Start="1.7664204960351384" End="16.769488570982848" />
-        <Range Sensor="px2" Start="-93.9310346287636" End="-84.96923127162421" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -681,11 +648,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="724032275" Confidence="4.0" ActionsProposal="49.38199121704557" Activated="false">
+    <Context Name="724032275" Confidence="4.0" ActionsProposal="63.7139154317825">
       <Ranges>
+        <Range Sensor="px2" Start="66.64763149272741" End="84.57123820700619" />
         <Range Sensor="px1" Start="29.30698828984127" End="45.07744634462048" />
         <Range Sensor="px0" Start="-5.785795896560929" End="9.21727217838678" />
-        <Range Sensor="px2" Start="66.64763149272741" End="84.57123820700619" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -733,11 +700,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="135578647" Confidence="4.0" ActionsProposal="13.739266622818693" Activated="false">
+    <Context Name="135578647" Confidence="4.0" ActionsProposal="9.020814859779763">
       <Ranges>
+        <Range Sensor="px2" Start="-36.32125259507306" End="-18.397645880794286" />
         <Range Sensor="px1" Start="85.47681171334386" End="93.97801270192845" />
         <Range Sensor="px0" Start="-0.8519282382845592" End="14.15113983666315" />
-        <Range Sensor="px2" Start="-36.32125259507306" End="-18.397645880794286" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -785,11 +752,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="48621543" Confidence="4.0" ActionsProposal="0.056018104443792544" Activated="false">
+    <Context Name="48621543" Confidence="4.0" ActionsProposal="0.0819935776028891">
       <Ranges>
+        <Range Sensor="px2" Start="23.360754440698045" End="41.28436115497682" />
         <Range Sensor="px1" Start="77.39745711947435" End="93.97801270192845" />
         <Range Sensor="px0" Start="-92.5530226940015" End="-83.38786854887272" />
-        <Range Sensor="px2" Start="23.360754440698045" End="41.28436115497682" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -837,11 +804,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="1710089778" Confidence="4.0" ActionsProposal="0.929967106718202" Activated="false">
+    <Context Name="1710089778" Confidence="4.0" ActionsProposal="0.6492511380905877">
       <Ranges>
+        <Range Sensor="px2" Start="34.53998478742335" End="52.463591501702126" />
         <Range Sensor="px1" Start="52.39051465636333" End="69.3929166335325" />
         <Range Sensor="px0" Start="83.47071095819973" End="92.73511799252611" />
-        <Range Sensor="px2" Start="34.53998478742335" End="52.463591501702126" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
@@ -889,11 +856,11 @@
         </Experiments>
       </LocalModel>
     </Context>
-    <Context Name="121573526" Confidence="4.0" ActionsProposal="0.01511766387765709" Activated="true">
+    <Context Name="121573526" Confidence="4.0" ActionsProposal="0.5948709844574692">
       <Ranges>
+        <Range Sensor="px2" Start="56.652361133902815" End="74.57596784818159" />
         <Range Sensor="px1" Start="-41.43976576473927" End="-24.437363787570114" />
         <Range Sensor="px0" Start="-92.5530226940015" End="-81.89441318686536" />
-        <Range Sensor="px2" Start="56.652361133902815" End="74.57596784818159" />
       </Ranges>
       <LocalModel Type="MILLER_REGRESSION">
         <Coefs>
