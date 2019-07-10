@@ -713,7 +713,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>50) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -723,7 +723,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>2000) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>50) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));

@@ -271,6 +271,7 @@ public class F_N_Manager implements StudiedSystem{
 		center[0]=0.0;
 		center[1]=0.0;
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
+		//return squareSimpleModel(xRequest);
 		
 		int subzone = subzone2D(xRequest);
 		
@@ -407,6 +408,13 @@ private double[] subZoneCenter3D(int nb) {
 				xRequest[0] < (center[0]+spaceSize/2) &&
 				(center[1]-spaceSize/2)  < xRequest[1]  && 
 				xRequest[1] < (center[1]+spaceSize/2)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+	}
+	
+	private double squareSimpleModel(Double[] xRequest) {
+		return ((-spaceSize)  < xRequest[0]  && 
+				xRequest[0] < (spaceSize) &&
+				(-spaceSize)  < xRequest[1]  && 
+				xRequest[1] < (+spaceSize)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
 	}
 	
 	private double gaussianModel() {

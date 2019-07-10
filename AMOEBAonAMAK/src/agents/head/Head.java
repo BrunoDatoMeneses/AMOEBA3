@@ -144,9 +144,9 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void playWithOracle() {
-
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		if (activatedContexts.size() > 0) {
@@ -2394,7 +2394,8 @@ public class Head extends AmoebaAgent {
 			
 			test = true;
 			for(Percept pct : getAmas().getPercepts()) {
-				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
+//				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
+				test = test && ctxt.getRanges().get(pct).contains(request.get(pct), pct.getMappingErrorAllowedMin());
 			}
 			if(test) {
 				return false;
