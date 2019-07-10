@@ -444,7 +444,8 @@ public class BackupSystem implements IBackupSystem {
 		agentAttributes.add(new Attribute("Name", String.valueOf(context.getName())));
 		agentAttributes.add(new Attribute("Confidence", String.valueOf(context.getConfidence())));
 		agentAttributes.add(new Attribute("ActionsProposal", context.getActionProposal() + ""));
-		agentAttributes.add(new Attribute("Activated", (context.getAmas().getValidContexts().contains(context)) + ""));
+		if(context.getAmas().getValidContexts() != null)
+			agentAttributes.add(new Attribute("Activated", (context.getAmas().getValidContexts().contains(context)) + ""));
 
 		contextElement.setAttributes(agentAttributes);
 		presetContextsElement.addContent(contextElement);

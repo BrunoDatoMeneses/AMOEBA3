@@ -2,6 +2,7 @@ package kernel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import fr.irit.smac.amak.Configuration;
+import kernel.backup.BackupSystem;
 import kernel.backup.SaveHelperDummy;
 import utils.Round;
 

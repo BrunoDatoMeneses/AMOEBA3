@@ -611,22 +611,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public ArrayList<Percept> getPercepts() {
-		
-		
 		if(percepts == null || percepts.size()==0) {
-			ArrayList<Percept> pcts = new ArrayList<Percept>();
-			for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-				if ((agent instanceof Percept)) {
-					pcts.add((Percept) agent);
-				}
-			}
-			percepts = pcts;
-		}
-			
-		
+			setPercepts();
+		}	
 		return percepts;
-		
-
 	}
 
 	/**
@@ -834,7 +822,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		percepts = new ArrayList<Percept>();
 		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
 			if ((agent instanceof Percept)) {
-				percepts.add((Percept) agent);
+				Percept p = (Percept) agent;
+				if(!p.isDying()) {
+					percepts.add(p);
+				}
 			}
 		}
 	}

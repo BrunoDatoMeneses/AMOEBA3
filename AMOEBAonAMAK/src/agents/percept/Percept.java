@@ -439,4 +439,10 @@ public class Percept extends AmoebaAgent {
 	public String toString() {
 		return getName();
 	}
+	
+	@Override
+	public void destroy() {
+		super.destroy();
+		getAmas().setPercepts();
+	}
 }
