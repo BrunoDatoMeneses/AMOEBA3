@@ -2,6 +2,7 @@ package agents.context.localModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import agents.context.Context;
@@ -126,6 +127,35 @@ public class LocalModelMillerRegression extends LocalModel{
 			}
 			else {
 				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getStart();
+			}
+		}
+	
+		return result;
+	}
+	
+	public HashMap<String, Double> getMax(Context context){
+		ArrayList<Percept> percepts = context.getAmas().getPercepts();
+		
+		HashMap<String, Double> result = new HashMap<String, Double>();
+		result.put("oracle", coefs[0]);
+
+		if (coefs[0] == Double.NaN)
+			throw new ArithmeticException("First coeficient of model cannot be NaN");
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			if(coefs[i]>0) {
+				Percept p = percepts.get(i-1);
+				double value = coefs[i] * context.getRanges().get(p).getEnd();
+				result.put("oracle", value);
+				result.put(p.getName(), context.getRanges().get(p).getEnd());
+			}
+			else {
+				Percept p = percepts.get(i-1);
+				double value = coefs[i] * context.getRanges().get(p).getStart();
+				result.put("oracle", value);
+				result.put(p.getName(), context.getRanges().get(p).getStart());
 			}
 		}
 	

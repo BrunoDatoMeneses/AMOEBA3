@@ -1,6 +1,7 @@
 package agents.context.localModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import agents.context.Context;
 import agents.context.Experiment;
@@ -31,6 +32,7 @@ public abstract class LocalModel {
 	public abstract double getProposition(Context context);
 	public abstract double getProposition(Experiment experiment);
 	public abstract double getMaxProposition(Context context);
+	public abstract HashMap<String, Double> getMax(Context context);
 	public abstract double getMinProposition(Context context);
 	
 

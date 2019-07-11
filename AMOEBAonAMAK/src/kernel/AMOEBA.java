@@ -429,77 +429,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			if(good) pac.add(c);
 		}
 		
-		ArrayList<Pair<HashMap<String, Double>, Double>> sol = new ArrayList<>();
+		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
 		for(Context c : pac) {
-			sol.add(maximiseContext(known, percepts, unknown, c));
+			sol.add(c.getLocalModel().getMax(c));
 		}
 		HashMap<String, Double> max = new HashMap<>();
-		// set default value if no solution
-		for(Percept p : unknown) {
-			max.put(p.getName(), 0.0);
-		}
+
 		Double maxValue = Double.NEGATIVE_INFINITY;
+		max.put("oracle", maxValue);
 		//find best solution
-		for(Pair<HashMap<String, Double>, Double> s : sol) {
-			if(s.getB() > maxValue) {
-				maxValue = s.getB();
-				max = s.getA();
+		for(HashMap<String, Double> s : sol) {
+			if(s.get("oracle") > maxValue) {
+				maxValue = s.get("oracle");
+				max = s;
 			}
 		}
-		max.put("oracle", maxValue);
 		return max;
-	}
-	
-	private Pair<HashMap<String, Double>, Double> maximiseDummy(HashMap<String, Double> known,
-			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
-		HashMap<String, Double> res = new HashMap<>();
-		for(Percept p : unknown) {
-			res.put(p.getName(), c.getRangeByPercept(p).getCenter());
-		}
-		HashMap<String, Double> tmpReq = new HashMap<>(res);
-		HashMap<String, Double> old = perceptions;
-		perceptions = tmpReq;
-		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, c.getActionProposal());
-		perceptions = old;
-		return ret;
-	}
-
-	//TODO tests !
-	private Pair<HashMap<String, Double>, Double> maximiseContext(HashMap<String, Double> known,
-			ArrayList<Percept> percepts, ArrayList<Percept> unknown, Context c) {
-		HashMap<String, Double> res = new HashMap<>();
-		
-		Double[] coefs = c.getLocalModel().getCoef();
-		double[] vCoefs = new double[coefs.length-1];
-		for(int i = 1; i < coefs.length; i++) {
-			vCoefs[i-1] = coefs[i];
-		}
-		LinearObjectiveFunction fct = new LinearObjectiveFunction(vCoefs, coefs[0]);
-		ArrayList<LinearConstraint> constraints = new ArrayList<>();
-		//TODO : problem : we are not sure that the order of percepts is the same as coefs
-		int i = 0;
-		for(String p : known.keySet()) {
-			double[] cf = new double[percepts.size()];
-			cf[i++] = 1.0;
-			constraints.add(new LinearConstraint(cf, Relationship.EQ, known.get(p)));
-		}
-		int unknowStart = i;
-		for(Percept p : unknown) {
-			double[] cf = new double[percepts.size()];
-			cf[i++] = 1.0;
-			constraints.add(new LinearConstraint(cf, Relationship.GEQ, c.getRangeByPercept(p).getStart()));
-			constraints.add(new LinearConstraint(cf, Relationship.LEQ, c.getRangeByPercept(p).getEnd()));
-		}
-		SimplexSolver solver = new SimplexSolver();
-		LinearConstraintSet set = new LinearConstraintSet(constraints);
-		PointValuePair sol = solver.optimize(fct, set, GoalType.MAXIMIZE);
-		for(Percept p : unknown) {
-			//TODO check if the order match
-			res.put(p.getName(), sol.getFirst()[unknowStart++]);
-		}
-		
-		Pair<HashMap<String, Double>, Double> ret = new Pair<>(res, sol.getSecond());
-		return ret;
 	}
 
 	public LocalModel buildLocalModel(Context context) {

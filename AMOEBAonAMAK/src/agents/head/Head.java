@@ -17,7 +17,7 @@ import agents.percept.Percept;
 import kernel.AMOEBA;
 import ncs.NCS;
 import utils.Pair;
-import utils.PickRandom;
+import utils.RandomUtils;
 import utils.PrintOnce;
 import utils.Quadruplet;
 import utils.TRACE_LEVEL;
@@ -347,7 +347,7 @@ public class Head extends AmoebaAgent {
 				// to limit performance impact, we limit our search on a random sample.
 				// a better way would be to increase neighborhood.
 				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
-				List<Context> searchList = PickRandom.pickNRandomElements(getAmas().getContexts(), 100);
+				List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
 				nearestContext = this.getNearestContext(searchList);
 				if(nearestContext != null) {
 					getAmas().data.prediction = nearestContext.getActionProposal();
