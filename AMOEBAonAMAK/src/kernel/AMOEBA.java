@@ -431,7 +431,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
 		for(Context c : pac) {
-			sol.add(c.getLocalModel().getMax());
+			sol.add(c.getLocalModel().getMaxWithConstraint(known));
 		}
 		HashMap<String, Double> max = new HashMap<>();
 

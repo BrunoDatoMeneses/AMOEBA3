@@ -37,11 +37,11 @@ public interface LocalModel {
 	public double getMaxProposition();
 	
 	/**
-	 * Return the point (percept value) that produce the max proposition
+	 * Return the point (percept value) that produce the max proposition, considering some percepts are fixed.
 	 * @return a HashMap with percept names as key, and their corresponding value. The oracle is the max proposition
 	 * @see LocalModel#getMaxProposition(Context)  
 	 */
-	public HashMap<String, Double> getMax();
+	public HashMap<String, Double> getMaxWithConstraint(HashMap<String, Double> fixedPercepts);;
 	
 	/**
 	 * Gets the proposition with the lowest value possible

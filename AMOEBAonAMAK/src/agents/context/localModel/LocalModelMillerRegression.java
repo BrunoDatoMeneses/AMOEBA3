@@ -128,7 +128,8 @@ public class LocalModelMillerRegression implements LocalModel{
 		ArrayList<Percept> percepts = context.getAmas().getPercepts();			
 		double result = coefs[0];
 
-		if (coefs[0] == Double.NaN) System.exit(0);
+		if (coefs[0] == Double.NaN)
+			throw new ArithmeticException("First coeficient of model cannot be NaN");
 		
 		for (int i = 1 ; i < coefs.length ; i++) {
 			
@@ -145,7 +146,7 @@ public class LocalModelMillerRegression implements LocalModel{
 	}
 	
 	@Override
-	public HashMap<String, Double> getMax(){
+	public HashMap<String, Double> getMaxWithConstraint(HashMap<String, Double> fixedPercepts){
 		ArrayList<Percept> percepts = context.getAmas().getPercepts();
 		
 		HashMap<String, Double> result = new HashMap<String, Double>();
@@ -157,20 +158,23 @@ public class LocalModelMillerRegression implements LocalModel{
 		for (int i = 1 ; i < coefs.length ; i++) {
 			
 			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			if(coefs[i]>0) {
-				Percept p = percepts.get(i-1);
-				double value = coefs[i] * context.getRanges().get(p).getEnd();
-				result.put("oracle", value);
-				result.put(p.getName(), context.getRanges().get(p).getEnd());
+			double pos;
+			Percept p = percepts.get(i-1);
+			if(fixedPercepts.containsKey(p.getName())) {
+				pos = fixedPercepts.get(p.getName());
+			} else {
+				if(coefs[i]>0) {
+					pos = context.getRanges().get(p).getEnd();
+				}
+				else {
+					pos = context.getRanges().get(p).getStart();
+				}
 			}
-			else {
-				Percept p = percepts.get(i-1);
-				double value = coefs[i] * context.getRanges().get(p).getStart();
-				result.put("oracle", value);
-				result.put(p.getName(), context.getRanges().get(p).getStart());
-			}
+			double value = coefs[i] * pos;
+			result.put("oracle", result.get("oracle") + value);
+			result.put(p.getName(), pos);
 		}
-	
+		
 		return result;
 	}
 	
