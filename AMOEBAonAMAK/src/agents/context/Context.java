@@ -150,8 +150,7 @@ public class Context extends AmoebaAgent {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
 		// firstPoint.toString())));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 
@@ -212,7 +211,7 @@ public class Context extends AmoebaAgent {
 			Double[] coef = ((LocalModelMillerRegression) fatherContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) fatherContext.localModel)
-					.getProposition(fatherContext);
+					.getProposition();
 		}
 
 		getAmas().addAlteredContext(this);
@@ -274,13 +273,12 @@ public class Context extends AmoebaAgent {
 			Double[] coef = ((LocalModelMillerRegression) bestNearestContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
+					.getProposition();
 		}
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -543,7 +541,7 @@ public class Context extends AmoebaAgent {
 		((LocalModelMillerRegression) this.localModel).setCoef(coef);
 
 		this.actionProposition = ((LocalModelMillerRegression) betterContext.getLocalModel())
-				.getProposition(betterContext);
+				.getProposition();
 	}
 
 	public void analyzeResults3(Head head, Context closestContextToOracle) {
@@ -957,14 +955,6 @@ public class Context extends AmoebaAgent {
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
 
 		return exp;
-	}
-
-	private boolean tryNewExperiment2() {
-		if (localModel.distance(getCurrentExperiment()) < 10.0) {
-			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(), 0.5, 100);
-			return true;
-		}
-		return false;
 	}
 
 	public double sumOfRangesLengths() {
@@ -1910,8 +1900,8 @@ public class Context extends AmoebaAgent {
 		s += "Context : " + getName() + "\n";
 		s += "Model : ";
 		s += this.localModel.getCoefsFormula() + "\n";	
-		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
-		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
+		s += "Max Prediction " + getLocalModel().getMaxProposition() + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition() + "\n";
 		return s;
 	}
 	
@@ -1922,8 +1912,8 @@ public class Context extends AmoebaAgent {
 		for(int i =1;i<localModel.getCoef().length;i++) {
 			array.add(""+localModel.getCoef()[i]);
 		}
-		array.add(""+ getLocalModel().getMinProposition(this));
-		array.add(""+ getLocalModel().getMaxProposition(this));
+		array.add(""+ getLocalModel().getMinProposition());
+		array.add(""+ getLocalModel().getMaxProposition());
 
 		return array;
 	}
@@ -1951,8 +1941,8 @@ public class Context extends AmoebaAgent {
 		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
 		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";
 		
-		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
-		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n\n";
+		s += "Max Prediction " + getLocalModel().getMaxProposition() + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition() + "\n\n";
 		
 		s += "ASKED REQUEST " + waitingRequests.size() + "\n";
 		for(EndogenousRequest rqt : waitingRequests) {
@@ -2076,7 +2066,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getActionProposal() {
-		return localModel.getProposition(this);
+		return localModel.getProposition();
 	}
 
 	public double getCenterByPercept(Percept pct) {
@@ -2133,7 +2123,7 @@ public class Context extends AmoebaAgent {
 	 */
 	public void setLocalModel(LocalModel localModel) {
 		this.localModel = localModel;
-		this.localModel.context = this;
+		this.localModel.setContext(this);
 	}
 	
 	

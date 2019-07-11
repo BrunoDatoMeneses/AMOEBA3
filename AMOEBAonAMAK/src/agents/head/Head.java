@@ -1111,15 +1111,13 @@ public class Head extends AmoebaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
-						getAmas().data.numberOfPointsForRegression);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 				getAmas().data.contextNotFinished = true;
 			}
 
 			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
-						getAmas().data.numberOfPointsForRegression);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 			}
 
@@ -1181,7 +1179,7 @@ public class Head extends AmoebaAgent {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE",
 						activatedContexts.get(0).getName(), "" + distanceToOracleForActivatedContext)));
 				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-						getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
+						getAmas().data.learningSpeed);
 
 			}
 		} else {
@@ -1189,7 +1187,7 @@ public class Head extends AmoebaAgent {
 					Arrays.asList("MODEL DISTANCE", activatedContexts.get(0).getName(), "" + activatedContexts.get(0)
 							.getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment()))));
 			activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-					getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
+					getAmas().data.learningSpeed);
 		}
 
 		// world.trace(new ArrayList<String>(Arrays.asList("MODEL
@@ -1284,8 +1282,7 @@ public class Head extends AmoebaAgent {
 
 		}
 
-		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
+		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
 		for (Context activatedContext : activatedContexts) {
