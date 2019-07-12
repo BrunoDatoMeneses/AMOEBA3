@@ -444,37 +444,6 @@ public class Context extends AmoebaAgent {
 		return maxExpansions;
 	}
 
-	// ---------
-	// TODO these methods look very similar, maybe factorization is possible ?
-	public void updateRequestNeighborState() { // faire le update dans le head attention partial et full
-		if (nonValidNeightborPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addRequestNeighbor(this);
-		} else {
-			getAmas().getHeadAgent().removeRequestNeighbor(this);
-		}
-	}
-
-	public void updateActivatedContexts() { // faire le update dans le head attention partial et full
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addActivatedContext(this);
-		} else {
-			getAmas().getHeadAgent().removeActivatedContext(this);
-		}
-	}
-
-	public void updateActivatedContextsCopyForUpdate() { // faire le update dans le head attention partial et full
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addActivatedContextCopy(this);
-		} else {
-			getAmas().getHeadAgent().removeActivatedContextCopy(this);
-		}
-
-	}
-	// --------
-
 	public void clearNonValidPerceptNeighbors() {
 		nonValidNeightborPercepts.clear();
 	}
@@ -604,7 +573,7 @@ public class Context extends AmoebaAgent {
 		
 		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
 		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
-		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator) {
+		if(lastDistanceToModel <= lastAverageRegressionPerformanceIndicator) {
 		//if(getLocalModel().distance(this.getCurrentExperiment()) < head.getAverageRegressionPerformanceIndicator()) {
 		//if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
@@ -1811,56 +1780,6 @@ public class Context extends AmoebaAgent {
 			activations++;
 			getAmas().getHeadAgent().proposition(this);
 		}
-	}
-	
-	private void onActOld() {
-
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().proposition(this);
-
-//			for (Percept pct : getAmas().getPercepts()) {
-//				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
-//			}
-
-		} else if (nonValidPercepts.size() == 1) {
-			//getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
-		}
-
-		if (nonValidNeightborPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addRequestNeighbor(this);
-		} else if (nonValidNeightborPercepts.size() == 1) {
-			//getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
-		}
-
-		if ((nonValidNeightborPercepts.size() == 0) && (nonValidPercepts.size() == 1)) {
-
-			//getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
-
-		}
-
-		this.activations = 0;
-		//this.valid = false;
-
-		// Reset percepts validities
-		for (Percept percept : perceptValidities.keySet()) {
-			perceptValidities.put(percept, false);
-			perceptNeighborhoodValidities.put(percept, false);
-		}
-		
-	}
-	
-	public void computeContextNeighborsValidity() {
-
-		
-		if (nonValidNeightborPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidNeightborPercepts.get(0), this);
-		}
-
-
-
-		
 	}
 
 	/**

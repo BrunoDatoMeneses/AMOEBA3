@@ -16,6 +16,14 @@ import utils.Pair;
 import utils.RandomUtils;
 import utils.XmlConfigGenerator;
 
+/**
+ * Train an amoeba on a simple reinforcement task.
+ * The goal of the task is to get to the center. When the position of the agent cross 0, it gets a reward of 100.
+ * The agent can only moves in 2 directions, of a distance of 1. Moving give a reward of -1.
+ * If the agent moves outside of the allowed range, it gets a reward of -100. 
+ * @author Hugo
+ *
+ */
 public class SimpleReinforcement {
 	
 	private Random rand = new Random();
@@ -46,7 +54,7 @@ public class SimpleReinforcement {
 		for(int i = 0; i < 10000; i++) {
 			state.remove("oracle");
 			HashMap<String, Double> action = amoeba.maximize(state);
-			if(r.nextDouble() < 0.1 || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
+			if(r.nextDouble() < 0.2 || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
 				System.out.println("Random action");
 				action.put("a1", (r.nextBoolean() ? 10.0 : -10.0));
 			}
@@ -96,7 +104,7 @@ public class SimpleReinforcement {
 		HashMap<String, Double> ret = new HashMap<>();
 		ret.put("p1", x);
 		ret.put("oracle", reward);
-		pos.move(x, 0);
+		pos.move(x+0.5, 0.5);
 		return ret;
 	}
 	

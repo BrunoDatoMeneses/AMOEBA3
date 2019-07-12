@@ -680,15 +680,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 	
 	/**
-	 * Gets the altered contexts.
-	 *
-	 * @return the altered contexts
-	 */
-	public ArrayList<Context> getAlteredContexts() {
-		return alteredContexts;
-	}
-	
-	/**
 	 * Return the current set of valid contexts.
 	 *
 	 * Synchronized with a readLock.
@@ -777,7 +768,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	public void addPercept(Percept pct) {
 		percepts = null;
-		head.addPercept(pct);
 	}
 	
 }

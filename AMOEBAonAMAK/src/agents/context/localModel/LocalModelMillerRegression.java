@@ -132,13 +132,13 @@ public class LocalModelMillerRegression implements LocalModel{
 			throw new ArithmeticException("First coeficient of model cannot be NaN");
 		
 		for (int i = 1 ; i < coefs.length ; i++) {
-			
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			if(coefs[i]>0) {
-				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getEnd();
+			double coef = coefs[i];
+			if (Double.isNaN(coef)) coef = 0.0;
+			if(coef>0) {
+				result += coef * context.getRanges().get(percepts.get(i-1)).getEnd();
 			}
 			else {
-				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getStart();
+				result += coef * context.getRanges().get(percepts.get(i-1)).getStart();
 			}
 		}
 	
@@ -156,21 +156,21 @@ public class LocalModelMillerRegression implements LocalModel{
 			throw new ArithmeticException("First coeficient of model cannot be NaN");
 		
 		for (int i = 1 ; i < coefs.length ; i++) {
-			
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			double coef = coefs[i];
+			if (Double.isNaN(coef)) coef = 0.0;
 			double pos;
 			Percept p = percepts.get(i-1);
 			if(fixedPercepts.containsKey(p.getName())) {
 				pos = fixedPercepts.get(p.getName());
 			} else {
-				if(coefs[i]>0) {
+				if(coef>0) {
 					pos = context.getRanges().get(p).getEnd();
 				}
 				else {
 					pos = context.getRanges().get(p).getStart();
 				}
 			}
-			double value = coefs[i] * pos;
+			double value = coef * pos;
 			result.put("oracle", result.get("oracle") + value);
 			result.put(p.getName(), pos);
 		}
