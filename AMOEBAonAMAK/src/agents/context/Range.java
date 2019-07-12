@@ -1472,28 +1472,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 			this.percept.updateContextProjectionStart(this.context);
 			context.getAmas().addLastmodifiedContext(context);
 
-			if (!this.inNeighborhood()) {
-				// if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation()))
-				// {
-				if (!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.addNonValidNeighborPercept(this.percept);
-				}
-			} else {
-				if (this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.removeNonValidNeighborPercept(this.percept);
-				}
-			}
-
-			if (!this.contains2(percept.getValue())) {
-				if (!this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.addNonValidPercept(this.percept);
-				}
-			} else {
-				if (this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.removeNonValidPercept(this.percept);
-				}
-			}
-
 			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
 				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
 			}
@@ -1529,28 +1507,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 			lastEndTickModification = context.getAmas().getCycle();
 			this.percept.updateContextProjectionEnd(this.context);
 			context.getAmas().addLastmodifiedContext(context);
-
-			if (!this.inNeighborhood()) {
-				// if(!this.contains(percept.getValue(), percept.getRadiusContextForCreation()))
-				// {
-				if (!this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.addNonValidNeighborPercept(this.percept);
-				}
-			} else {
-				if (this.context.getNonValidNeighborPercepts().contains(this.percept)) {
-					this.context.removeNonValidNeighborPercept(this.percept);
-				}
-			}
-
-			if (!this.contains2(percept.getValue())) {
-				if (!this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.addNonValidPercept(this.percept);
-				}
-			} else {
-				if (this.context.getNonValidPercepts().contains(this.percept)) {
-					this.context.removeNonValidPercept(this.percept);
-				}
-			}
 
 			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
 				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
