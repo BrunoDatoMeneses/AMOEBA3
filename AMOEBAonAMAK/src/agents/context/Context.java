@@ -150,8 +150,7 @@ public class Context extends AmoebaAgent {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
 		// firstPoint.toString())));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 
@@ -212,7 +211,7 @@ public class Context extends AmoebaAgent {
 			Double[] coef = ((LocalModelMillerRegression) fatherContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) fatherContext.localModel)
-					.getProposition(fatherContext);
+					.getProposition();
 		}
 
 		getAmas().addAlteredContext(this);
@@ -274,13 +273,12 @@ public class Context extends AmoebaAgent {
 			Double[] coef = ((LocalModelMillerRegression) bestNearestContext.localModel).getCoef();
 			((LocalModelMillerRegression) this.localModel).setCoef(coef);
 			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel)
-					.getProposition(bestNearestContext);
+					.getProposition();
 		}
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -446,37 +444,6 @@ public class Context extends AmoebaAgent {
 		return maxExpansions;
 	}
 
-	// ---------
-	// TODO these methods look very similar, maybe factorization is possible ?
-	public void updateRequestNeighborState() { // faire le update dans le head attention partial et full
-		if (nonValidNeightborPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addRequestNeighbor(this);
-		} else {
-			getAmas().getHeadAgent().removeRequestNeighbor(this);
-		}
-	}
-
-	public void updateActivatedContexts() { // faire le update dans le head attention partial et full
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addActivatedContext(this);
-		} else {
-			getAmas().getHeadAgent().removeActivatedContext(this);
-		}
-	}
-
-	public void updateActivatedContextsCopyForUpdate() { // faire le update dans le head attention partial et full
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addActivatedContextCopy(this);
-		} else {
-			getAmas().getHeadAgent().removeActivatedContextCopy(this);
-		}
-
-	}
-	// --------
-
 	public void clearNonValidPerceptNeighbors() {
 		nonValidNeightborPercepts.clear();
 	}
@@ -543,7 +510,7 @@ public class Context extends AmoebaAgent {
 		((LocalModelMillerRegression) this.localModel).setCoef(coef);
 
 		this.actionProposition = ((LocalModelMillerRegression) betterContext.getLocalModel())
-				.getProposition(betterContext);
+				.getProposition();
 	}
 
 	public void analyzeResults3(Head head, Context closestContextToOracle) {
@@ -606,7 +573,7 @@ public class Context extends AmoebaAgent {
 		
 		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
 		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
-		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator) {
+		if(lastDistanceToModel <= lastAverageRegressionPerformanceIndicator) {
 		//if(getLocalModel().distance(this.getCurrentExperiment()) < head.getAverageRegressionPerformanceIndicator()) {
 		//if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
@@ -957,14 +924,6 @@ public class Context extends AmoebaAgent {
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
 
 		return exp;
-	}
-
-	private boolean tryNewExperiment2() {
-		if (localModel.distance(getCurrentExperiment()) < 10.0) {
-			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(), 0.5, 100);
-			return true;
-		}
-		return false;
 	}
 
 	public double sumOfRangesLengths() {
@@ -1822,56 +1781,6 @@ public class Context extends AmoebaAgent {
 			getAmas().getHeadAgent().proposition(this);
 		}
 	}
-	
-	private void onActOld() {
-
-		if (nonValidPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().proposition(this);
-
-//			for (Percept pct : getAmas().getPercepts()) {
-//				getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(pct, this);
-//			}
-
-		} else if (nonValidPercepts.size() == 1) {
-			//getAmas().getHeadAgent().addPartiallyActivatedContext(nonValidPercepts.get(0), this);
-		}
-
-		if (nonValidNeightborPercepts.size() == 0) {
-
-			getAmas().getHeadAgent().addRequestNeighbor(this);
-		} else if (nonValidNeightborPercepts.size() == 1) {
-			//getAmas().getHeadAgent().addPartialRequestNeighborContext(nonValidNeightborPercepts.get(0), this);
-		}
-
-		if ((nonValidNeightborPercepts.size() == 0) && (nonValidPercepts.size() == 1)) {
-
-			//getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidPercepts.get(0), this);
-
-		}
-
-		this.activations = 0;
-		//this.valid = false;
-
-		// Reset percepts validities
-		for (Percept percept : perceptValidities.keySet()) {
-			perceptValidities.put(percept, false);
-			perceptNeighborhoodValidities.put(percept, false);
-		}
-		
-	}
-	
-	public void computeContextNeighborsValidity() {
-
-		
-		if (nonValidNeightborPercepts.size() == 1) {
-			getAmas().getHeadAgent().addPartiallyActivatedContextInNeighbors(nonValidNeightborPercepts.get(0), this);
-		}
-
-
-
-		
-	}
 
 	/**
 	 * Sets the confidence.
@@ -1910,8 +1819,8 @@ public class Context extends AmoebaAgent {
 		s += "Context : " + getName() + "\n";
 		s += "Model : ";
 		s += this.localModel.getCoefsFormula() + "\n";	
-		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
-		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n";
+		s += "Max Prediction " + getLocalModel().getMaxProposition() + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition() + "\n";
 		return s;
 	}
 	
@@ -1922,8 +1831,8 @@ public class Context extends AmoebaAgent {
 		for(int i =1;i<localModel.getCoef().length;i++) {
 			array.add(""+localModel.getCoef()[i]);
 		}
-		array.add(""+ getLocalModel().getMinProposition(this));
-		array.add(""+ getLocalModel().getMaxProposition(this));
+		array.add(""+ getLocalModel().getMinProposition());
+		array.add(""+ getLocalModel().getMaxProposition());
 
 		return array;
 	}
@@ -1951,8 +1860,8 @@ public class Context extends AmoebaAgent {
 		s += "Mean Distance To Regression " + criticalities.getCriticalityMean("distanceToRegression") + "\n";
 		s += "Distance To Regression Allowed " + regressionPerformance.getPerformanceIndicator() +"\n\n";
 		
-		s += "Max Prediction " + getLocalModel().getMaxProposition(this) + "\n";
-		s += "Min Prediction " + getLocalModel().getMinProposition(this) + "\n\n";
+		s += "Max Prediction " + getLocalModel().getMaxProposition() + "\n";
+		s += "Min Prediction " + getLocalModel().getMinProposition() + "\n\n";
 		
 		s += "ASKED REQUEST " + waitingRequests.size() + "\n";
 		for(EndogenousRequest rqt : waitingRequests) {
@@ -2076,7 +1985,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getActionProposal() {
-		return localModel.getProposition(this);
+		return localModel.getProposition();
 	}
 
 	public double getCenterByPercept(Percept pct) {
@@ -2133,7 +2042,7 @@ public class Context extends AmoebaAgent {
 	 */
 	public void setLocalModel(LocalModel localModel) {
 		this.localModel = localModel;
-		this.localModel.context = this;
+		this.localModel.setContext(this);
 	}
 	
 	

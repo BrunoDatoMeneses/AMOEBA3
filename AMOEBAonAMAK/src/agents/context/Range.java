@@ -1484,8 +1484,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 				}
 			}
 
-			this.context.updateRequestNeighborState();
-
 			if (!this.contains2(percept.getValue())) {
 				if (!this.context.getNonValidPercepts().contains(this.percept)) {
 					this.context.addNonValidPercept(this.percept);
@@ -1495,10 +1493,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 					this.context.removeNonValidPercept(this.percept);
 				}
 			}
-
-			this.context.updateActivatedContextsCopyForUpdate();
-
-			
 
 			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
 				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);
@@ -1548,8 +1542,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 				}
 			}
 
-			this.context.updateRequestNeighborState();
-
 			if (!this.contains2(percept.getValue())) {
 				if (!this.context.getNonValidPercepts().contains(this.percept)) {
 					this.context.addNonValidPercept(this.percept);
@@ -1559,10 +1551,6 @@ public class Range implements Serializable, Comparable, Cloneable {
 					this.context.removeNonValidPercept(this.percept);
 				}
 			}
-
-			this.context.updateActivatedContextsCopyForUpdate();
-
-			
 
 			if (!this.context.isDying() && !context.getAmas().getSpatiallyAlteredContextForUnityUI().contains(this.context)) {
 				context.getAmas().addSpatiallyAlteredContextForUnityUI(this.context);

@@ -16,7 +16,7 @@ import kernel.backup.SaveHelperDummy;
 public class TestingMain {
 
 	public static void main(String[] args) throws InterruptedException {
-		Configuration.commandLineMode = true;
+		Configuration.commandLineMode = false;
 		Log.defaultMinLevel = Log.Level.INFORM;
 		// create a system to be studied
 		StudiedSystem studiedSystem = new NDimCube(50.0, 3);
@@ -30,7 +30,7 @@ public class TestingMain {
 		
 		long start = System.currentTimeMillis();
 		long end = System.currentTimeMillis();
-		for(int i = 0; i < 10000; i++) {
+		for(int i = 0; i < 1000; i++) {
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
 			if(i%100 == 99) {
