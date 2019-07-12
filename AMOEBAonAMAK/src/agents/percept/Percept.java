@@ -54,35 +54,6 @@ public class Percept extends AmoebaAgent {
 		ajustMinMax();
 		computeContextProjectionValidityOptimized();
 	}
-
-	public void computeContextProjectionValidity() {
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-
-			// if(!contextProjection.contains(this.value, getRadiusContextForCreation())) {
-
-			if (!contextProjection.inNeighborhood()) {
-				contextProjection.getContext().addNonValidNeighborPercept(this);
-				contextProjection.getContext().addNonValidPercept(this);
-			} else if (!contextProjection.contains(this.value)) {
-				contextProjection.getContext().addNonValidPercept(this);
-			}
-		}
-	}
-	
-	public void computeContextNeighborsValidity(ArrayList<Context> contextNeighbors) {
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-
-			if(contextNeighbors.contains(contextProjection.getContext())) {
-				if (!contextProjection.contains(this.value)) {
-					contextProjection.getContext().addNonValidNeighborPercept(this);
-				} 
-			}
-			
-			
-		}
-	}
 	
 	public void computeContextProjectionValidityOptimized() {
 
@@ -171,17 +142,6 @@ public class Percept extends AmoebaAgent {
 			min = value;
 		if (value > max)
 			max = value;
-		
-		
-
-		/*
-		 * In order to avoid big gap in min-max value in order to adapt with the system
-		 * dynamic It's also a warranty to avoid to flaw AVT with flawed value
-		 */
-		double dist = max - min;
-		// TODO ?
-		// min += 0.05*dist;
-		// max -= 0.05*dist;
 	}
 
 	/**

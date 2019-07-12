@@ -9,14 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.linear.LinearConstraint;
-import org.apache.commons.math3.optim.linear.LinearConstraintSet;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
-import org.apache.commons.math3.optim.linear.Relationship;
-import org.apache.commons.math3.optim.linear.SimplexSolver;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
@@ -38,7 +30,6 @@ import kernel.backup.ISaveHelper;
 import kernel.backup.SaveHelperDummy;
 import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
-import utils.Pair;
 import utils.PrintOnce;
 
 /**
@@ -227,10 +218,6 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		toKillContexts.clear();
 		lastModifiedContext.clear();
 		alteredContexts.clear();
-		for(Context ctxt : getContexts()) {
-			ctxt.clearNonValidPerceptNeighbors();
-			ctxt.clearNonValidPercepts();
-		}
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
