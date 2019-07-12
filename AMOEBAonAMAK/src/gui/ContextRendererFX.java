@@ -83,7 +83,7 @@ public class ContextRendererFX extends RenderStrategy {
 	 */
 	public DrawableRectangle getDrawable() {
 		if (!context.isDying() && drawable == null) {
-			drawable = new DrawableContext(0, 0, 10, 10, context);
+			drawable = new DrawableContext(0, 0, 0, 0, context);
 			AmoebaWindow.instance().mainVUI.add(drawable);
 		}
 		return drawable;

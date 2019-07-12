@@ -17,9 +17,8 @@ import agents.percept.Percept;
 import kernel.AMOEBA;
 import ncs.NCS;
 import utils.Pair;
-import utils.PickRandom;
 import utils.PrintOnce;
-import utils.Quadruplet;
+import utils.RandomUtils;
 import utils.TRACE_LEVEL;
 
 /**
@@ -32,7 +31,6 @@ public class Head extends AmoebaAgent {
 	private Context bestContext;
 	private Context lastUsedContext;
 	private Context newContext;
-	private String functionSelected;
 
 	HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
 
@@ -40,19 +38,7 @@ public class Head extends AmoebaAgent {
 	public Criticalities endogenousCriticalities;
 
 	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
-	private ArrayList<Context> activatedContextsCopyForUpdates = new ArrayList<Context>();
 	private ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
-
-	private HashMap<Percept, ArrayList<Context>> partiallyActivatedContextInNeighbors = new HashMap<Percept, ArrayList<Context>>();
-	private HashMap<Percept, ArrayList<Context>> partiallyActivatedContexts = new HashMap<Percept, ArrayList<Context>>();
-	private HashMap<Percept, ArrayList<Context>> partialNeighborContexts = new HashMap<Percept, ArrayList<Context>>();
-
-	private ArrayList<Context> contextsNeighborsByInfluence = new ArrayList<Context>();
-
-	private HashMap<Percept, ContextPair<Context, Context>> requestSurroundings = new HashMap<Percept, ContextPair<Context, Context>>();
-	private HashMap<Percept, ContextPair<Context, Context>> sharedIncompetenceContextPairs = new HashMap<Percept, ContextPair<Context, Context>>();
-
-	private ArrayList<Context> contextsInCompetition = new ArrayList<Context>();
 
 	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
@@ -81,29 +67,6 @@ public class Head extends AmoebaAgent {
 		for(int i =0 ; i< 20;i++) {
 			getAmas().data.executionTimesSums[i]=0.0;
 		}
-		
-
-		
-		
-
-	}
-	
-	
-
-	public void addPartiallyActivatedContext(Percept nonValidPercept, Context validContextExecptOnTheNonValidPercept) {
-		partiallyActivatedContexts.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
-
-	}
-
-	public void addPartiallyActivatedContextInNeighbors(Percept nonValidPercept,
-			Context validContextExecptOnTheNonValidPercept) {
-		partiallyActivatedContextInNeighbors.get(nonValidPercept).add(validContextExecptOnTheNonValidPercept);
-
-	}
-
-	public void addPartialRequestNeighborContext(Percept nonValidPercept, Context validContextNeighborExecptOnTheNonValidPercept) {
-		partialNeighborContexts.get(nonValidPercept).add(validContextNeighborExecptOnTheNonValidPercept);
-
 	}
 
 	/**
@@ -280,28 +243,6 @@ public class Head extends AmoebaAgent {
 
 	}
 
-	public double getSpatialGeneralizationScore() {
-		return getAmas().data.spatialGeneralizationScore;
-	}
-
-	private boolean nearestLocalNeighbor(Context ctxt1, Context ctxt2) {
-
-		boolean nearestLocalNeighborTest = false;
-
-		for (Percept pct : getAmas().getPercepts()) {
-
-			if (partiallyActivatedContextInNeighbors.get(pct).contains(ctxt1)
-					&& partiallyActivatedContextInNeighbors.get(pct).contains(ctxt2)) {
-				nearestLocalNeighborTest = nearestLocalNeighborTest
-						|| (Math.abs(partiallyActivatedContextInNeighbors.get(pct).indexOf(ctxt1)
-								- partiallyActivatedContextInNeighbors.get(pct).indexOf(ctxt2)) == 1);
-			}
-
-		}
-
-		return nearestLocalNeighborTest;
-	}
-
 	public double getMinMaxVolume() {
 		double minMaxVolume = 1;
 		for (Percept pct : getAmas().getPercepts()) {
@@ -336,7 +277,6 @@ public class Head extends AmoebaAgent {
 		} else {
 
 			getAmas().data.noBestContext = true;
-			ArrayList<Context> allContexts = getAmas().getContexts();
 			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 			if(nearestContext != null) {
 				getAmas().data.prediction = nearestContext.getActionProposal();
@@ -346,7 +286,7 @@ public class Head extends AmoebaAgent {
 				// to limit performance impact, we limit our search on a random sample.
 				// a better way would be to increase neighborhood.
 				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
-				List<Context> searchList = PickRandom.pickNRandomElements(getAmas().getContexts(), 100);
+				List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
 				nearestContext = this.getNearestContext(searchList);
 				if(nearestContext != null) {
 					getAmas().data.prediction = nearestContext.getActionProposal();
@@ -385,12 +325,6 @@ public class Head extends AmoebaAgent {
 
 		getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence = null;
 		getAmas().data.endogenousPredictionNContextsByInfluence = null;
-
-		for (Percept pcpt : getAmas().getPercepts()) {
-			requestSurroundings.get(pcpt).clear();
-			sharedIncompetenceContextPairs.get(pcpt).clear();
-		}
-		contextsInCompetition.clear();
 
 		if (uniqueActivatedContext()) {
 			getAmas().data.endogenousPredictionActivatedContextsOverlaps = activatedContexts.get(0).getActionProposal();
@@ -442,6 +376,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
 		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
+		ArrayList<Context> contextsNeighborsByInfluence = new ArrayList<>();
 		for (Context ctxt : getAmas().getContexts()) {
 
 			if (ctxt.getConfidence() > getAmas().data.maxConfidence) {
@@ -516,20 +451,16 @@ public class Head extends AmoebaAgent {
 		// Test if there are surrounding contexts
 		boolean testSurroudingContext = false;
 
-		for (Percept pct : getAmas().getPercepts()) {
-
-			computeNearestContextsByPercept(pct);
-
-		}
+		HashMap<Percept, ContextPair<Context, Context>> sharedIncompetenceContextPairs = getSharedIncompetenceContextPair();
 
 		// displayContexts();
 
 		for (Percept pcpt : getAmas().getPercepts()) {
 
-			requestSurroundings.get(pcpt).print(pcpt);
 			if (sharedIncompetenceContextPairs.get(pcpt) != null) {
 				if (sharedIncompetenceContextPairs.get(pcpt).containTwoContexts()) {
 					testSurroudingContext = true;
+					break;
 				}
 			}
 
@@ -538,43 +469,40 @@ public class Head extends AmoebaAgent {
 		return testSurroudingContext;
 	}
 
-	private void diplayListRanges(ArrayList<Context> list, Percept prct, String range) {
-
-		System.out.print(range + " ranges list" + "  ");
-		for (Context ctxt : list) {
-			System.out.print(ctxt.getRanges().get(prct).getRange(range) + "  ");
+	private HashMap<Percept, ContextPair<Context, Context>> getSharedIncompetenceContextPair() {
+		HashMap<Percept, ContextPair<Context, Context>> sharedIncompetenceContextPairs = new HashMap<>();
+		
+		for (Percept pct : getAmas().getPercepts()) {
+			ContextPair<Context, Context> nearestContexts = computeNearestContextsByPercept(pct);
+			if (nearestContexts.getL() != null && nearestContexts.getR() != null) {
+				sharedIncompetenceContextPairs.put(pct, nearestContexts);
+			}
 		}
-		System.out.println(" ");
-
+		
+		return sharedIncompetenceContextPairs;
 	}
 
-	private void computeNearestContextsByPercept(Percept pct) {
-		ContextPair<Context, Context> nearestContexts = new ContextPair(null, null);
+	private ContextPair<Context, Context> computeNearestContextsByPercept(Percept pct) {
+		ContextPair<Context, Context> nearestContexts = new ContextPair<>(null, null);
 		boolean startNeighbor = false;
 		boolean endNeighbor = false;
 
 		ArrayList<Context> activatedContextInOtherPercepts = getAllActivatedContextsExeptForOnePercept(pct);
-
 		if (activatedContextInOtherPercepts.size() > 0) {
-
-
 
 			CustomComparator rangeStartComparator = new CustomComparator(pct, "start");
 			Collections.sort(activatedContextInOtherPercepts, rangeStartComparator);
-			// diplayListRanges(activatedContextInOtherPercepts, pct, "start");
 
 			for (Context ctxt : activatedContextInOtherPercepts) {
 				if (ctxt.getRanges().get(pct).getRange("start") > pct.getValue() && !startNeighbor) {
 					nearestContexts.setR(ctxt);
 					startNeighbor = true;
 				}
-
 			}
 
 			CustomComparator rangeEndComparator = new CustomComparator(pct, "end");
 			Collections.sort(activatedContextInOtherPercepts, rangeEndComparator);
 			Collections.reverse(activatedContextInOtherPercepts);
-			// diplayListRanges(activatedContextInOtherPercepts, pct, "end");
 
 			for (Context ctxt : activatedContextInOtherPercepts) {
 				if (ctxt.getRanges().get(pct).getRange("end") < pct.getValue() && !endNeighbor) {
@@ -583,65 +511,26 @@ public class Head extends AmoebaAgent {
 				}
 			}
 
-			// nearestContexts.print(pct);
-			requestSurroundings.put(pct, nearestContexts);
+		}
+		return nearestContexts;
+	}
 
-			if (nearestContexts.getL() != null && nearestContexts.getR() != null) {
-				sharedIncompetenceContextPairs.put(pct, nearestContexts);
+	/**
+	 * Return a list of contexts that have been activated by all percepts except a particular one.
+	 * @param pct
+	 * @return
+	 */
+	private ArrayList<Context> getAllActivatedContextsExeptForOnePercept(Percept pct) {
+		ArrayList<Percept> percepts = new ArrayList<>(getAmas().getPercepts());
+		percepts.remove(pct);
+		ArrayList<Context> ret = new ArrayList<>(getAmas().getContexts());
+		ret.removeIf(c -> {
+			for(Percept p : percepts) {
+				if(!p.activateContext(c)) return true;
 			}
-		} else {
-
-		}
-
-	}
-
-	private ArrayList<Context> getAllActivatedContextsExeptForOnePercept(Percept onePercept) {
-
-		return partiallyActivatedContexts.get(onePercept);
-	}
-
-	private ArrayList<Context> getAllActivatedNeighborContextsExeptForOnePercept(Percept onePercept) {
-
-		return partialNeighborContexts.get(onePercept);
-	}
-
-	public void displayPartiallyActivatedContexts() {
-		//////// System.out.println("PARTIALLY ACTIVATED CONTEXTS");
-		for (Percept pct : partiallyActivatedContexts.keySet()) {
-			//// System.out.print(pct.getName() + " : ");
-			if (partiallyActivatedContexts.get(pct).size() > 0)
-				for (Context ctxt : partiallyActivatedContexts.get(pct)) {
-					//// System.out.print(ctxt.getName() + " ; ");
-				}
-			//////// System.out.println(" ");
-		}
-	}
-
-	public void displayContexts() {
-		//////// System.out.println("CONTEXTS");
-		for (Context ctxt : getAmas().getContexts()) {
-			//// System.out.print(ctxt.getName() + " ; ");
-		}
-		//////// System.out.println(" ");
-	}
-
-	private Percept getDifferentPercept(Percept p) {
-		for (Percept pct : partiallyActivatedContexts.keySet()) {
-			if (p != pct) {
-				return pct;
-			}
-		}
-		return null;
-	}
-
-	private boolean contextActivateInOtherPerceptsThan(Context ctxt, Percept p1, Percept p2) {
-		boolean test = true;
-		for (Percept prct : partiallyActivatedContexts.keySet()) {
-			if (prct != p1 && prct != p2) {
-				test = test & partiallyActivatedContexts.get(prct).contains(ctxt);
-			}
-		}
-		return test;
+			return false;
+		});
+		return ret;
 	}
 
 	private void NCS_EndogenousCompetition() {
@@ -746,6 +635,7 @@ public class Head extends AmoebaAgent {
 		double smallestDistanceBetweenContexts = Double.POSITIVE_INFINITY;
 		double currentDistance;
 
+		HashMap<Percept, ContextPair<Context, Context>> sharedIncompetenceContextPairs = getSharedIncompetenceContextPair();
 		for (Percept pct : sharedIncompetenceContextPairs.keySet()) {
 			if (sharedIncompetenceContextPairs.get(pct) != null) {
 				if (sharedIncompetenceContextPairs.get(pct).containTwoContexts()) {
@@ -824,11 +714,6 @@ public class Head extends AmoebaAgent {
 			return difference;
 		}
 
-	}
-
-	private void NCS_EndogenousIncompetence() {
-		// Extrapolation of contexts by creating twin contexts that will give the
-		// prediction
 	}
 
 	private void NCSDetection_Create_New_Context() {
@@ -977,27 +862,16 @@ public class Head extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
 		
-		
-
-		
 		if (activatedNeighborsContexts.size() > 1) {
-
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
-
 				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
-
-					
 					if(!this.isDying() && !ctxt.isDying()) {
 						EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
-						
 						if(potentialRequest != null) {
 							addEndogenousRequest(potentialRequest);
-							
 						}
 					}
-					
-
 				}
 				i++;
 			}
@@ -1005,91 +879,9 @@ public class Head extends AmoebaAgent {
 		
 		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
 		for(EndogenousRequest endoRequest : endogenousRequests) {
-			
 			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
-			
 		}
 		
-	}
-
-	private void selfAnalysationOfContexts2() {
-
-		if (activatedContexts.size() > 1) {
-			selfAnalysationOfContextOnSeveralActivatedContexts();
-
-		} else if (activatedContexts.size() == 1) {
-
-//			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment());
-//			//System.out.println(distanceToOracleForActivatedContext + " ******************************************************************DISTANCE TO MODEL : " );
-//			if(activatedNeighborsContexts.size()>1) {
-//				
-//				Context closestContextToOracle = null;
-//				double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
-//				double currentDistanceToOraclePrediction = 0.0; 
-//				for(Context contextNeighbor : activatedNeighborsContexts) {
-//					if(contextNeighbor != activatedContexts.get(0)) {
-//						currentDistanceToOraclePrediction = contextNeighbor.getLocalModel().distance(contextNeighbor.getCurrentExperiment());
-//						if(currentDistanceToOraclePrediction<minDistanceToOraclePredictionInNeighbors) {
-//							minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-//							closestContextToOracle = contextNeighbor;
-//						} 
-//					}
-//				}
-//				
-//				if(minDistanceToOraclePredictionInNeighbors>distanceToOracleForActivatedContext) {
-//					//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-//					activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-//					//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-//					
-//				}else {
-//					closestContextToOracle.solveNCS_IncompetentHead(this);
-//					//activatedContexts.get(0).setLocalModel(new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef(),closestContextToOracle.getLocalModel().getFirstExperiments()));
-//					//LocalModelAgent remplacementModel = new LocalModelMillerRegression(world, activatedContexts.get(0), closestContextToOracle.getLocalModel().getCoef().clone());
-//					//activatedContexts.get(0).setLocalModel(remplacementModel);
-//					
-//				}
-//
-//				
-//			}else {
-//				//System.out.println("OLD COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-//				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-//				//System.out.println("NEW COEFS " + activatedContexts.get(0).getLocalModel().coefsToString());
-//				
-//				
-//			}
-
-			selfAnalysationOfContextOnUniqueActivatedContext();
-
-		}
-
-		for (Context ctxt : activatedNeighborsContexts) {
-
-			if (!activatedContexts.contains(ctxt)) {
-				ctxt.NCSDetection_Uselessness();
-			}
-
-		}
-	}
-
-	private void selfAnalysationOfContexts3() {
-
-		if (activatedContexts.size() > 1) {
-
-			selfAnalysationOfContextOnSeveralActivatedContexts();
-
-		} else if (activatedContexts.size() == 1) {
-
-			selfAnalysationOfContextOnUniqueActivatedContext();
-
-		}
-
-		for (Context ctxt : activatedNeighborsContexts) {
-
-			if (!activatedContexts.contains(ctxt)) {
-				ctxt.NCSDetection_Uselessness();
-			}
-
-		}
 	}
 
 	private void selfAnalysationOfContexts4() {
@@ -1098,7 +890,6 @@ public class Head extends AmoebaAgent {
 				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
 		
 		double currentDistanceToOraclePrediction;
-		Context closestContextToOracle = null;
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
@@ -1110,21 +901,18 @@ public class Head extends AmoebaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
-						getAmas().data.numberOfPointsForRegression);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 				getAmas().data.contextNotFinished = true;
 			}
 
 			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed,
-						getAmas().data.numberOfPointsForRegression);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 			}
 
 			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
 				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-				closestContextToOracle = activatedContext;
 			}
 
 			if (!getAmas().data.contextNotFinished) {
@@ -1164,136 +952,6 @@ public class Head extends AmoebaAgent {
 		}
 	}
 
-	private void selfAnalysationOfContextOnUniqueActivatedContext() {
-
-		if (activatedNeighborsContexts.size() > 0) {
-			double distanceToOracleForActivatedContext = activatedContexts.get(0).getLocalModel()
-					.distance(activatedContexts.get(0).getCurrentExperiment());
-			Quadruplet<Context, Double, Context, Double> closestAndFarestContextsToPredictionWithDistance = closestAndFarestContextsToPrediction();
-
-			double distanceToMin = Math
-					.abs(distanceToOracleForActivatedContext - closestAndFarestContextsToPredictionWithDistance.getB());
-			double distanceToMax = Math
-					.abs(distanceToOracleForActivatedContext - closestAndFarestContextsToPredictionWithDistance.getD());
-
-			if (distanceToMin < distanceToMax) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE",
-						activatedContexts.get(0).getName(), "" + distanceToOracleForActivatedContext)));
-				activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-						getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
-
-			}
-		} else {
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
-					Arrays.asList("MODEL DISTANCE", activatedContexts.get(0).getName(), "" + activatedContexts.get(0)
-							.getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment()))));
-			activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),
-					getAmas().data.learningSpeed, getAmas().data.numberOfPointsForRegression);
-		}
-
-		// world.trace(new ArrayList<String>(Arrays.asList("MODEL
-		// DISTANCE",activatedContexts.get(0).getName(),
-		// ""+activatedContexts.get(0).getLocalModel().distance(activatedContexts.get(0).getCurrentExperiment()))));
-		// activatedContexts.get(0).getLocalModel().updateModel(activatedContexts.get(0).getCurrentExperiment(),learningSpeed,numberOfPointsForRegression);
-		activatedContexts.get(0).analyzeResults3(this, activatedContexts.get(0));
-	}
-
-	private Pair<Context, Double> maxModelDistanceToOraclePredictionInNeighbors() {
-		Context farestContextToOracle = null;
-		double maxDistanceToOraclePredictionInNeighbors = Double.NEGATIVE_INFINITY;
-		double currentDistanceToOraclePrediction = 0.0;
-		for (Context contextNeighbor : activatedNeighborsContexts) {
-			if (contextNeighbor != activatedContexts.get(0)) {
-				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
-						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
-						"" + currentDistanceToOraclePrediction)));
-				if (currentDistanceToOraclePrediction > maxDistanceToOraclePredictionInNeighbors) {
-					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-					farestContextToOracle = contextNeighbor;
-				}
-			}
-		}
-		return new Pair<Context, Double>(farestContextToOracle, maxDistanceToOraclePredictionInNeighbors);
-	}
-
-	private Pair<Context, Double> minModelDistanceToOraclePredictionInNeighbors() {
-		Context closestContextToOracle = null;
-		double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
-		double currentDistanceToOraclePrediction = 0.0;
-		for (Context contextNeighbor : activatedNeighborsContexts) {
-			if (contextNeighbor != activatedContexts.get(0)) {
-				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
-						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
-						"" + currentDistanceToOraclePrediction)));
-				if (currentDistanceToOraclePrediction < minDistanceToOraclePredictionInNeighbors) {
-					minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-					closestContextToOracle = contextNeighbor;
-				}
-			}
-		}
-		return new Pair<Context, Double>(closestContextToOracle, minDistanceToOraclePredictionInNeighbors);
-	}
-
-	private Quadruplet<Context, Double, Context, Double> closestAndFarestContextsToPrediction() {
-		Context farestContextToOracle = null;
-		double maxDistanceToOraclePredictionInNeighbors = Double.NEGATIVE_INFINITY;
-		Context closestContextToOracle = null;
-		double minDistanceToOraclePredictionInNeighbors = Double.POSITIVE_INFINITY;
-
-		double currentDistanceToOraclePrediction = 0.0;
-		for (Context contextNeighbor : activatedNeighborsContexts) {
-			if (contextNeighbor != activatedContexts.get(0)) {
-				currentDistanceToOraclePrediction = contextNeighbor.getLocalModel()
-						.distance(contextNeighbor.getCurrentExperiment());
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", contextNeighbor.getName(),
-						"" + currentDistanceToOraclePrediction)));
-				if (currentDistanceToOraclePrediction > maxDistanceToOraclePredictionInNeighbors) {
-					maxDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-					farestContextToOracle = contextNeighbor;
-				}
-				if (currentDistanceToOraclePrediction < minDistanceToOraclePredictionInNeighbors) {
-					minDistanceToOraclePredictionInNeighbors = currentDistanceToOraclePrediction;
-					closestContextToOracle = contextNeighbor;
-				}
-			}
-		}
-		return new Quadruplet<Context, Double, Context, Double>(closestContextToOracle,
-				minDistanceToOraclePredictionInNeighbors, farestContextToOracle,
-				maxDistanceToOraclePredictionInNeighbors);
-	}
-
-	private void selfAnalysationOfContextOnSeveralActivatedContexts() {
-
-		Context closestContextToOracle = null;
-		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
-		double currentDistanceToOraclePrediction = 0.0;
-
-		for (Context activatedContext : activatedContexts) {
-			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
-					.distance(activatedContext.getCurrentExperiment());
-
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
-					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
-			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
-				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-				closestContextToOracle = activatedContext;
-			}
-
-		}
-
-		closestContextToOracle.getLocalModel().updateModel(closestContextToOracle.getCurrentExperiment(), getAmas().data.learningSpeed,
-				getAmas().data.numberOfPointsForRegression);
-
-		activatedContextsCopyForUpdates = new ArrayList<Context>(activatedContexts);
-		for (Context activatedContext : activatedContexts) {
-			activatedContext.analyzeResults3(this, closestContextToOracle);
-
-		}
-		activatedContexts = activatedContextsCopyForUpdates;
-	}
-
 	private void setNearestContextAsBestContext() {
 		Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 
@@ -1304,25 +962,6 @@ public class Head extends AmoebaAgent {
 		}
 
 		bestContext = nearestContext;
-	}
-
-	private void setNearestGoodContextAsBestContext() {
-		Context nearestContext = this.getNearestGoodContext(activatedNeighborsContexts);
-
-		if (nearestContext != null) {
-			getAmas().data.prediction = nearestContext.getActionProposal();
-		} else {
-			getAmas().data.prediction = 0.0;
-		}
-
-		bestContext = nearestContext;
-	}
-
-	/**
-	 * Endogenous feedback.
-	 */
-	private void endogenousFeedback() {
-		// bestContext.growRanges(this);
 	}
 
 	/**
@@ -1364,28 +1003,6 @@ public class Head extends AmoebaAgent {
 
 	}
 
-	/**
-	 * Gets the distance to nearest good context.
-	 *
-	 * @param allContext the all context
-	 * @return the distance to nearest good context
-	 */
-	private Pair<Context, Double> getNearestGoodContextWithDistance(ArrayList<Context> contextNeighbors) {
-		double d = Double.MAX_VALUE;
-		Context nearestGoodContext = null;
-		for (Context c : contextNeighbors) {
-			if (Math.abs((c.getActionProposal() - getAmas().data.oracleValue)) <= getAmas().data.predictionPerformance.getPerformanceIndicator()
-					&& c != newContext && !c.isDying()) {
-				if (getExternalDistanceToContext(c) < d) {
-					d = getExternalDistanceToContext(c);
-					nearestGoodContext = c;
-				}
-			}
-		}
-		return new Pair<Context, Double>(nearestGoodContext, d);
-
-	}
-	
 	private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
 		double d = Double.MAX_VALUE;
 		Context bestContextInNeighbors = null;
@@ -1462,19 +1079,6 @@ public class Head extends AmoebaAgent {
 		}
 
 		return d;
-	}
-
-	private double getDistanceToContext(Context context) {
-		double totalDistance = 0.0;
-		for (Percept p : getAmas().getPercepts()) {
-			double distance = context.distance(p, p.getValue());
-			if (distance > 0) {
-				totalDistance += distance;
-			}
-
-		}
-
-		return totalDistance;
 	}
 
 	/**
@@ -1952,24 +1556,6 @@ public class Head extends AmoebaAgent {
 	}
 
 	/**
-	 * Gets the function selected.
-	 *
-	 * @return the function selected
-	 */
-	public String getFunctionSelected() {
-		return functionSelected;
-	}
-
-	/**
-	 * Sets the function selected.
-	 *
-	 * @param functionSelected the new function selected
-	 */
-	public void setFunctionSelected(String functionSelected) {
-		this.functionSelected = functionSelected;
-	}
-
-	/**
 	 * Gets the n propositions received.
 	 *
 	 * @return the n propositions received
@@ -2076,86 +1662,6 @@ public class Head extends AmoebaAgent {
 		this.getAmas().data.prediction = prediction;
 	}
 
-	public ArrayList<Context> getPartiallyActivatedContexts(Percept pct) {
-		return partiallyActivatedContexts.get(pct);
-	}
-
-	public ArrayList<Context> getPartiallyActivatedNeighborContexts(Percept pct) {
-		return partialNeighborContexts.get(pct);
-	}
-
-	public HashMap<Percept, ContextPair<Context, Context>> getRequestSurroundings() {
-		return requestSurroundings;
-	}
-
-	public boolean requestSurroundingContains(Context ctxt) {
-
-		for (Percept pct : requestSurroundings.keySet()) {
-
-			if (requestSurroundings.get(pct).contains(ctxt)) {
-				return true;
-			}
-		}
-		return false;
-
-	}
-
-	public ArrayList<Context> getContextsInCompetition() {
-		return contextsInCompetition;
-	}
-
-	public Head clone() throws CloneNotSupportedException {
-		return (Head) super.clone();
-	}
-
-	public void addRequestNeighbor(Context ctxt) {
-		if (!activatedNeighborsContexts.contains(ctxt)) {
-
-			activatedNeighborsContexts.add(ctxt);
-		}
-	}
-
-	public void addActivatedContext(Context ctxt) {
-		if (!activatedContexts.contains(ctxt)) {
-			activatedContexts.add(ctxt);
-
-
-			for (Context cxt : activatedContexts) {
-
-			}
-		}
-	}
-
-	public void addActivatedContextCopy(Context ctxt) {
-		if (!activatedContextsCopyForUpdates.contains(ctxt)) {
-			activatedContextsCopyForUpdates.add(ctxt);
-
-
-			for (Context cxt : activatedContextsCopyForUpdates) {
-
-			}
-		}
-	}
-
-	public void removeActivatedContext(Context ctxt) {
-		if (activatedContexts.contains(ctxt)) {
-			activatedContexts.remove(ctxt);
-		}
-	}
-
-	public void removeActivatedContextCopy(Context ctxt) {
-		if (activatedContextsCopyForUpdates.contains(ctxt)) {
-			activatedContextsCopyForUpdates.remove(ctxt);
-		}
-	}
-
-	public void removeRequestNeighbor(Context ctxt) {
-		if (activatedNeighborsContexts.contains(ctxt)) {
-
-			activatedNeighborsContexts.remove(ctxt);
-		}
-	}
-
 	public ArrayList<Context> getActivatedNeighborsContexts() {
 		return activatedNeighborsContexts;
 	}
@@ -2164,34 +1670,9 @@ public class Head extends AmoebaAgent {
 		activatedNeighborsContexts = neighbors;
 	}
 
-
-	public ArrayList<Context> getContextNeighborsByInfluence() {
-		return contextsNeighborsByInfluence;
-	}
-
-	public void displayActivatedNeighborsContexts() {
-		for (Context ctxt : activatedNeighborsContexts) {
-
-		}
-	}
-
-	public void clearActivatedNeighborsContexts() {
-		activatedNeighborsContexts.clear();
-	}
-
-	public void clearContextdNeighborsByInfluence() {
-		contextsNeighborsByInfluence.clear();
-	}
-
 	public void clearAllUseableContextLists() {
 		activatedContexts.clear();
 		activatedNeighborsContexts.clear();
-		contextsNeighborsByInfluence.clear();
-		for (Percept pct : getAmas().getPercepts()) {
-			partiallyActivatedContexts.get(pct).clear();
-			partiallyActivatedContextInNeighbors.get(pct).clear();
-			partialNeighborContexts.get(pct).clear();
-		}
 	}
 
 	public Double getMaxRadiusForContextCreation(Percept pct) {
@@ -2372,21 +1853,6 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
-	public void updatePartiallyActivatedNeighbors() {
-		
-		for(Percept pct: getAmas().getPercepts()) {
-			
-			pct.computeContextNeighborsValidity(activatedNeighborsContexts);
-			
-		}
-		
-		for(Context ctxt : activatedNeighborsContexts) {
-			
-			ctxt.computeContextNeighborsValidity();
-			
-		}
-	}
-	
 	public boolean isVoid(HashMap<Percept, Double> request) {
 		boolean test;
 		
@@ -2410,18 +1876,11 @@ public class Head extends AmoebaAgent {
 		int numberOfRegressions = 0;
 		if(activatedNeighborsContexts.size()>0) {
 			double meanRegressionPerformanceIndicator = 0.0;
-			
 			for(Context ctxt : activatedNeighborsContexts) {
-				
-
-				if(ctxt.regressionPerformance != null) {
 					meanRegressionPerformanceIndicator += ctxt.regressionPerformance.performanceIndicator;
 					numberOfRegressions+=1;
-				}
-				
-				
 			}
-			
+			assert numberOfRegressions != 0;
 			return meanRegressionPerformanceIndicator/numberOfRegressions;
 		}
 		else{
@@ -2429,16 +1888,8 @@ public class Head extends AmoebaAgent {
 		}
 		
 	}
-	
-	
-	
-
-	// -----------------
-	// AMOEBAonAMAK ---
-	// -----------------
 
 	public void proposition(Context c) {
-
 		activatedContexts.add(c);
 	}
 	
@@ -2448,19 +1899,8 @@ public class Head extends AmoebaAgent {
 		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
 		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
-		// getAmas().data.mappingPerformance.setPerformanceIndicator(world.getMappingErrorAllowed());//
-		// Math.pow(world.getMappingErrorAllowed(),
-		// world.getScheduler().getPercepts().size());
-
 		criticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverage);
 		endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);
 	}
-
-	public void addPercept(Percept pct) {
-		partiallyActivatedContextInNeighbors.put(pct, new ArrayList<Context>());
-		partiallyActivatedContexts.put(pct, new ArrayList<Context>());
-		partialNeighborContexts.put(pct, new ArrayList<Context>());
-		requestSurroundings.put(pct, new ContextPair<Context, Context>(null, null));
-		sharedIncompetenceContextPairs.put(pct, new ContextPair<Context, Context>(null, null));
-	}
+	
 }
