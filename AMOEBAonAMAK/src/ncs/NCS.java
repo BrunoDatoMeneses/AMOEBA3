@@ -5,7 +5,6 @@ import java.io.Serializable;
 import kernel.World;
 
 
-	// TODO: Auto-generated Javadoc
 /**
 	 * Non Cooperative Situation as defined in the AMAS theory.
 	 */

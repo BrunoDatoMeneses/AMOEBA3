@@ -282,9 +282,9 @@ public class Head extends AmoebaAgent {
 				getAmas().data.prediction = nearestContext.getActionProposal();
 				bestContext = nearestContext;
 			} else {
-				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy
-				// to limit performance impact, we limit our search on a random sample.
-				// a better way would be to increase neighborhood.
+				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
+				// To limit performance impact, we limit our search on a random sample.
+				// A better way would be to increase neighborhood.
 				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
 				List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
 				nearestContext = this.getNearestContext(searchList);

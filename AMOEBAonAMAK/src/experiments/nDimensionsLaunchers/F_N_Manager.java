@@ -8,7 +8,6 @@ import agents.percept.Percept;
 import kernel.StudiedSystem;
 
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class BadContextManager.
  */

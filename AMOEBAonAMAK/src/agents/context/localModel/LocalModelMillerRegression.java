@@ -11,7 +11,6 @@ import agents.percept.Percept;
 import utils.Pair;
 import utils.TRACE_LEVEL;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class LocalModelMillerRegression.
  */

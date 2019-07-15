@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import agents.context.Context;
 import agents.percept.Percept;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Experiment.
  */

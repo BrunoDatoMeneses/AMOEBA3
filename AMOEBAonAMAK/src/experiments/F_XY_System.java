@@ -59,32 +59,25 @@ public class F_XY_System implements StudiedSystem {
 
 	@Override
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
 			double noiseRange) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setActiveLearning(boolean value) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setSelfRequest(HashMap<Percept, Double> request) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public HashMap<String, Double> getIntput() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

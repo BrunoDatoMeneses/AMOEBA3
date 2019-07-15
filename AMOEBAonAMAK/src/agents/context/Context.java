@@ -82,10 +82,6 @@ public class Context extends AmoebaAgent {
 		
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
-		
-		//TODO in amak, cannot kill a agent before its 1st cycle
-		//NCSDetection_Uselessness();
-
 	}
 
 	public Context(AMOEBA amoeba, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
@@ -120,8 +116,7 @@ public class Context extends AmoebaAgent {
 			// true, v, world);
 			ranges.put(p, r);
 			ranges.get(p).setValue(p.getValue());
-			// TODO
-			// sendExpressMessage(null, MessageType.REGISTER, p);
+
 			firstPoint.addDimension(p, p.getValue());
 
 			p.addContextProjection(this);
@@ -154,8 +149,6 @@ public class Context extends AmoebaAgent {
 
 			ranges.put(pct, r);
 			ranges.get(pct).setValue(center);
-			// TODO
-			// sendExpressMessage(null, MessageType.REGISTER, pct);
 
 			pct.addContextProjection(this);
 		}
@@ -194,8 +187,7 @@ public class Context extends AmoebaAgent {
 
 			ranges.put(v, r);
 			ranges.get(v).setValue(v.getValue());
-			// TODO
-			// sendExpressMessage(null, MessageType.REGISTER, v);
+
 			firstPoint.addDimension(v, v.getValue());
 
 			v.addContextProjection(this);;

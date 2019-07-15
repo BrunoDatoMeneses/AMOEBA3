@@ -28,7 +28,6 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	
 	@Override
 	protected void onReady() {
-		// TODO Auto-generated method stub
 		super.onReady();
 		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s ready.", toString());
 	}
