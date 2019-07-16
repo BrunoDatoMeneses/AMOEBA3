@@ -4,13 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
-import agents.context.Context;
 import experiments.FILE;
-import experiments.F_XY_System;
-import experiments.XmlConfigGenerator;
 import fr.irit.smac.amak.Configuration;
 import gui.AmoebaWindow;
 import javafx.beans.value.ChangeListener;
@@ -108,6 +103,14 @@ public class F_N_Launcher implements Serializable {
 //			amoeba.learn(studiedSystem.getOutput());
 //		}
 //		long end = System.currentTimeMillis();
+//		System.out.println("Done in : " + (end - start) );
+//		
+//		start = System.currentTimeMillis();
+//		for (int i = 0; i < nbCycle; ++i) {
+//			studiedSystem.playOneStep();
+//			amoeba.request(studiedSystem.getOutput());
+//		}
+//		end = System.currentTimeMillis();
 //		System.out.println("Done in : " + (end - start) );
 		
 		

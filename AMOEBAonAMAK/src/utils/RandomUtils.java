@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PickRandom {
+public class RandomUtils {
 	
 	/**
 	 * Pick N random element from the list. if n is bigger than the list, return the list.
@@ -39,5 +39,20 @@ public class PickRandom {
 	 */
 	public static <E> List<E> pickNRandomElements(List<E> list, int n) {
 	    return pickNRandomElements(list, n, ThreadLocalRandom.current());
+	}
+	
+	/**
+	 * Generate a pseudorandom double values, conforming to the given origin (inclusive) and bound(exclusive).
+	 * @param rand
+	 * @param origin the origin (inclusive) of the random value
+	 * @param bound the bound (exclusive) of the random value
+	 * @return
+	 */
+	public static double nextDouble(Random rand, double origin, double bound) {
+		   double r = rand.nextDouble();
+		   r = r * (bound - origin) + origin;
+		   if (r >= bound) // correct for rounding
+		     r = Math.nextDown(bound);
+		   return r;
 	}
 }

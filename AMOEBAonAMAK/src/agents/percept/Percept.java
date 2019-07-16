@@ -53,37 +53,6 @@ public class Percept extends AmoebaAgent {
 		value = getAmas().getPerceptions(this.name);
 		ajustMinMax();
 		computeContextProjectionValidityOptimized();
-		//computeContextProjectionValidity();
-
-	}
-
-	public void computeContextProjectionValidity() {
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-
-			// if(!contextProjection.contains(this.value, getRadiusContextForCreation())) {
-
-			if (!contextProjection.inNeighborhood()) {
-				contextProjection.getContext().addNonValidNeighborPercept(this);
-				contextProjection.getContext().addNonValidPercept(this);
-			} else if (!contextProjection.contains(this.value)) {
-				contextProjection.getContext().addNonValidPercept(this);
-			}
-		}
-	}
-	
-	public void computeContextNeighborsValidity(ArrayList<Context> contextNeighbors) {
-
-		for (ContextProjection contextProjection : contextProjections.values()) {
-
-			if(contextNeighbors.contains(contextProjection.getContext())) {
-				if (!contextProjection.contains(this.value)) {
-					contextProjection.getContext().addNonValidNeighborPercept(this);
-				} 
-			}
-			
-			
-		}
 	}
 	
 	public void computeContextProjectionValidityOptimized() {
@@ -124,7 +93,7 @@ public class Percept extends AmoebaAgent {
 		}
 		
 		for (Context c : contexts) {
-			if (contextProjections.get(c).contains(this.value)) {
+			if (activateContext(c)) {
 				validContextProjection.add(c);
 			}
 		} 
@@ -137,13 +106,31 @@ public class Percept extends AmoebaAgent {
 		}
 		
 		for (Context c : neighborsContexts) {
-			if(contextProjections.get(c).inNeighborhood()) {
+			if(inNeighborhood(c)) {
 				neighborContextProjection.add(c);
 			}
 		} 
 		amas.updateNeighborContexts(neighborContextProjection);
 		
 		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
+	}
+	
+	/**
+	 * Return true if the context is activated by this percept.
+	 * @param context
+	 * @return
+	 */
+	public boolean activateContext(Context context) {
+		return contextProjections.get(context).contains(this.value);
+	}
+	
+	/**
+	 * Return true if the context is in the neighborhood of this percept.
+	 * @param context
+	 * @return
+	 */
+	public boolean inNeighborhood(Context context) {
+		return contextProjections.get(context).inNeighborhood();
 	}
 
 
@@ -155,17 +142,6 @@ public class Percept extends AmoebaAgent {
 			min = value;
 		if (value > max)
 			max = value;
-		
-		
-
-		/*
-		 * In order to avoid big gap in min-max value in order to adapt with the system
-		 * dynamic It's also a warranty to avoid to flaw AVT with flawed value
-		 */
-		double dist = max - min;
-		// TODO ?
-		// min += 0.05*dist;
-		// max -= 0.05*dist;
 	}
 
 	/**

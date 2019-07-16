@@ -2,6 +2,7 @@ package agents.context.localModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import agents.context.Context;
@@ -14,7 +15,9 @@ import utils.TRACE_LEVEL;
 /**
  * The Class LocalModelMillerRegression.
  */
-public class LocalModelMillerRegression extends LocalModel{
+public class LocalModelMillerRegression implements LocalModel{
+	
+	private Context context;
 	
 	/** The n parameters. */
 	private int nParameters;
@@ -34,7 +37,7 @@ public class LocalModelMillerRegression extends LocalModel{
 	 * @param world the world
 	 */
 	public LocalModelMillerRegression(Context associatedContext) {
-		super(associatedContext);
+		context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
@@ -42,12 +45,22 @@ public class LocalModelMillerRegression extends LocalModel{
 	}
 	
 	public LocalModelMillerRegression(Context associatedContext, Double[] coefsCopy, List<Experiment> fstExperiments) {
-		super(associatedContext);
+		context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
 		coefs = coefsCopy;
 		firstExperiments = new ArrayList<Experiment>(fstExperiments);
+	}
+	
+	@Override
+	public void setContext(Context context) {
+		this.context = context;
+	}
+	
+	@Override
+	public Context getContext() {
+		return context;
 	}
 	
 	/**
@@ -70,7 +83,8 @@ public class LocalModelMillerRegression extends LocalModel{
 		return coefs;
 	}
 
-	public double getProposition(Context context) {
+	@Override
+	public double getProposition() {
 			
 		ArrayList<Percept> percepts = context.getAmas().getPercepts();
 		
@@ -92,11 +106,8 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	
 	
-	public double getProposition(Context context, double[] situation) {
+	private double getProposition(Context context, double[] situation) {
 		
-		ArrayList<Percept> percepts = context.getAmas().getPercepts();
-		
-			
 		double result = coefs[0];
 
 		if (coefs[0] == Double.NaN) System.exit(0);
@@ -111,28 +122,64 @@ public class LocalModelMillerRegression extends LocalModel{
 		return result;
 	}
 	
-	public double getMaxProposition(Context context) {
+	@Override
+	public double getMaxProposition() {
 		
 		ArrayList<Percept> percepts = context.getAmas().getPercepts();			
 		double result = coefs[0];
 
-		if (coefs[0] == Double.NaN) System.exit(0);
+		if (coefs[0] == Double.NaN)
+			throw new ArithmeticException("First coeficient of model cannot be NaN");
 		
 		for (int i = 1 ; i < coefs.length ; i++) {
-			
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			if(coefs[i]>0) {
-				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getEnd();
+			double coef = coefs[i];
+			if (Double.isNaN(coef)) coef = 0.0;
+			if(coef>0) {
+				result += coef * context.getRanges().get(percepts.get(i-1)).getEnd();
 			}
 			else {
-				result += coefs[i] * context.getRanges().get(percepts.get(i-1)).getStart();
+				result += coef * context.getRanges().get(percepts.get(i-1)).getStart();
 			}
 		}
 	
 		return result;
 	}
 	
-	public double getMinProposition(Context context) {
+	@Override
+	public HashMap<String, Double> getMaxWithConstraint(HashMap<String, Double> fixedPercepts){
+		ArrayList<Percept> percepts = context.getAmas().getPercepts();
+		
+		HashMap<String, Double> result = new HashMap<String, Double>();
+		result.put("oracle", coefs[0]);
+
+		if (coefs[0] == Double.NaN)
+			throw new ArithmeticException("First coeficient of model cannot be NaN");
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			double coef = coefs[i];
+			if (Double.isNaN(coef)) coef = 0.0;
+			double pos;
+			Percept p = percepts.get(i-1);
+			if(fixedPercepts.containsKey(p.getName())) {
+				pos = fixedPercepts.get(p.getName());
+			} else {
+				if(coef>0) {
+					pos = context.getRanges().get(p).getEnd();
+				}
+				else {
+					pos = context.getRanges().get(p).getStart();
+				}
+			}
+			double value = coef * pos;
+			result.put("oracle", result.get("oracle") + value);
+			result.put(p.getName(), pos);
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public double getMinProposition() {
 		
 		ArrayList<Percept> percepts = context.getAmas().getPercepts();			
 		double result = coefs[0];
@@ -153,31 +200,6 @@ public class LocalModelMillerRegression extends LocalModel{
 		return result;
 	}
 	
-	public double getProposition(ArrayList<Experiment> experimentsList, Experiment experiment) {
-		
-
-		
-		if (experimentsList.size() == 1) {
-			return experimentsList.get(0).getOracleProposition();
-		}
-		else {
-			double result = coefs[0];
-
-			if (coefs[0] == Double.NaN) System.exit(0);
-			
-			for (int i = 1 ; i < coefs.length ; i++) {
-				
-				if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-				result += coefs[i] * experiment.getValuesAsArray()[i-1];
-
-			}
-		
-			return result;
-		}
-			
-		
-	}
-	
 	public double getProposition(Experiment experiment) {
 		
 		if (coefs[0] == Double.NaN) System.exit(0);
@@ -194,6 +216,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			
 	}
 	
+	@Override
 	public String getCoefsFormula() {
 		String result = "" +coefs[0];
 	//	//System.out.println("Result 0" + " : " + result);
@@ -209,47 +232,8 @@ public class LocalModelMillerRegression extends LocalModel{
 		return result;
 
 }
-	
 	@Override
-	public void updateModelWithExperiments(ArrayList<Experiment> experimentsList) {
-		
-		regression = new Regression(nParameters,true);
-	
-		for (Experiment exp : experimentsList) {
-			
-			regression.addObservation(exp.getValuesAsArray(), exp.getOracleProposition());
-			
-	
-		}
-		
-			
-		
-		while (regression.getN() < experimentsList.get(0).getValuesAsLinkedHashMap().size() + 2) { //TODO : to improve
-			
-			regression.addObservation(experimentsList.get(0).getValuesAsArray(), experimentsList.get(0).getOracleProposition());
-			
-			System.out.println("Observations " + regression.getN());
-			
-			System.out.println(experimentsList.get(0).getValuesAsLinkedHashMap().toString());
-			for (int i = 0 ; i < experimentsList.get(0).getValuesAsArray().length ; i++ ) {
-				System.out.print(experimentsList.get(0).getValuesAsArray()[i] + "   " );
-			}
-			System.out.println(experimentsList.get(0).getOracleProposition() + "   " );
-		}
-		
-
-		
-		double[] coef = regression.regress().getParameterEstimates();
-		coefs = new Double[coef.length];
-		for(int i = 0; i < coef.length; i++) {
-			coefs[i] = coef[i];
-		}
-		
-		
-	}
-	
-	
-	public void updateModel(Experiment newExperiment, double weight, int numberOfPointsForRegression) {
+	public void updateModel(Experiment newExperiment, double weight) {
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
 		if(firstExperiments.size()< (nParameters + 2)) {
@@ -257,7 +241,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			updateModel();
 			
 		}else {
-			updateModelWithExperimentAndWeight(newExperiment, weight, numberOfPointsForRegression);
+			updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.numberOfPointsForRegression);
 		}
 		
 		context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
@@ -460,12 +444,8 @@ public class LocalModelMillerRegression extends LocalModel{
 		
 		return new Pair<double[][], double[]>(artificalExperiments, artificalResults);
 	}
-
 	
-	
-
-	
-	
+	@Override
 	public double distance(Experiment experiment) {
 		
 		if (coefs[0] == Double.NaN) System.exit(0);
@@ -491,14 +471,17 @@ public class LocalModelMillerRegression extends LocalModel{
 			
 	}
 	
+	@Override
 	public ArrayList<Experiment> getFirstExperiments() {
 		return firstExperiments;
 	}
 	
+	@Override
 	public void setFirstExperiments( ArrayList<Experiment> frstExp) {
 		firstExperiments = frstExp;
 	}
 	
+	@Override
 	public String coefsToString() {
 		String coefsString = "";
 		if(coefs != null) {
@@ -509,6 +492,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		return coefsString;
 	}
 	
+	@Override
 	public boolean finishedFirstExperiments() {
 		return firstExperiments.size()>= (nParameters + 2);
 	}
