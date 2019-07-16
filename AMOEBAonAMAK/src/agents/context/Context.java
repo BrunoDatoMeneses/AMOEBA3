@@ -735,7 +735,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size()) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 500) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -744,14 +744,14 @@ public class Context extends AmoebaAgent {
 				return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 750) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
 				
-				if(getAmas().getHeadAgent().isVoid(request)) {
+				if(getAmas().getHeadAgent().isRealVoid(request)) {
 					return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
 				}		
 			}

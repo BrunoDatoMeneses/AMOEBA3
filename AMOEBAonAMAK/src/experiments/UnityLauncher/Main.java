@@ -77,7 +77,7 @@ public class Main implements Runnable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/threeDimensionsLauncherUnity.xml");

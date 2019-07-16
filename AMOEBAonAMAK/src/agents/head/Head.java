@@ -2387,16 +2387,21 @@ public class Head extends AmoebaAgent {
 		}
 	}
 	
-	public boolean isVoid(HashMap<Percept, Double> request) {
+	public boolean isRealVoid(HashMap<Percept, Double> request) {
 		boolean test;
 		
 		for(Context ctxt : activatedNeighborsContexts) {
+			
+			
 			
 			test = true;
 			for(Percept pct : getAmas().getPercepts()) {
 //				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
 				test = test && ctxt.getRanges().get(pct).contains(request.get(pct), pct.getMappingErrorAllowedMin());
 			}
+			
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("IS REAL VOID",ctxt.getName(), "-->", ""+!test)));
+			
 			if(test) {
 				return false;
 			}

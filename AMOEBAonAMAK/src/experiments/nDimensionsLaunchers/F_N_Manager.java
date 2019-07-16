@@ -42,6 +42,8 @@ public class F_N_Manager implements StudiedSystem{
 	HashMap<String,Double> selfRequest;
 	boolean activeLearning = false;
 	
+	double noiseRange;
+	
 	/** The world. */
 	Random generator;
 	
@@ -54,13 +56,14 @@ public class F_N_Manager implements StudiedSystem{
 	private static final double gaussianVariance = 10;
 	
 	
-	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace) {
+	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace, double noise) {
 		this.spaceSize= size;
 		dimension = dim;
 		numberOfModels = nbOfModels;
 		normType = nrmType;
 		x = new Double[dimension];
 		
+		noiseRange = noise;
 		spaceLimited = limiteToSpace;
 		
 		//gaussianCoef = Math.random()*2000;
@@ -277,7 +280,7 @@ public class F_N_Manager implements StudiedSystem{
 		
 		if(subzone == 1) {
 			/* Disques */
-			return modelN(xRequest);
+			return modelN(xRequest) ;
 		}else if (subzone == 2) {
 			/* Gaussian model */
 			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
