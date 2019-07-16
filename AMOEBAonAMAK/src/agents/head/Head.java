@@ -1835,7 +1835,7 @@ public class Head extends AmoebaAgent {
 				
 				EndogenousRequest currentRequest = itr.next();
 				
-				if(currentRequest.getType() == REQUEST.OVERLAP) {
+				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
 						
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}
