@@ -1895,7 +1895,7 @@ public class Head extends AmoebaAgent {
 					numberOfRegressions+=1;
 			}
 			assert numberOfRegressions != 0;
-			return meanRegressionPerformanceIndicator/numberOfRegressions;
+			return (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.initRegressionPerformance) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.initRegressionPerformance;
 		}
 		else{
 			return getAmas().data.initRegressionPerformance;
