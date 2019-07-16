@@ -23,8 +23,8 @@ public class Percept extends AmoebaAgent {
 	private HashSet<Context> validContextProjection = new HashSet<Context>();
 	private HashSet<Context> neighborContextProjection = new HashSet<Context>();
 
-	private double min = Double.MAX_VALUE;
-	private double max = Double.MIN_VALUE;
+	private double min = Double.POSITIVE_INFINITY;
+	private double max = Double.NEGATIVE_INFINITY;
 
 
 	private double value;

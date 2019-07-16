@@ -41,6 +41,8 @@ public class F_N_Manager implements StudiedSystem{
 	HashMap<String,Double> selfRequest;
 	boolean activeLearning = false;
 	
+	double noiseRange;
+	
 	/** The world. */
 	Random generator;
 	
@@ -53,13 +55,14 @@ public class F_N_Manager implements StudiedSystem{
 	private static final double gaussianVariance = 10;
 	
 	
-	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace) {
+	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace, double noise) {
 		this.spaceSize= size;
 		dimension = dim;
 		numberOfModels = nbOfModels;
 		normType = nrmType;
 		x = new Double[dimension];
 		
+		noiseRange = noise;
 		spaceLimited = limiteToSpace;
 		
 		//gaussianCoef = Math.random()*2000;
@@ -270,12 +273,13 @@ public class F_N_Manager implements StudiedSystem{
 		center[0]=0.0;
 		center[1]=0.0;
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
+		//return squareSimpleModel(xRequest);
 		
 		int subzone = subzone2D(xRequest);
 		
 		if(subzone == 1) {
 			/* Disques */
-			return modelN(xRequest);
+			return modelN(xRequest) ;
 		}else if (subzone == 2) {
 			/* Gaussian model */
 			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
@@ -406,6 +410,13 @@ private double[] subZoneCenter3D(int nb) {
 				xRequest[0] < (center[0]+spaceSize/2) &&
 				(center[1]-spaceSize/2)  < xRequest[1]  && 
 				xRequest[1] < (center[1]+spaceSize/2)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+	}
+	
+	private double squareSimpleModel(Double[] xRequest) {
+		return ((-spaceSize)  < xRequest[0]  && 
+				xRequest[0] < (spaceSize) &&
+				(-spaceSize)  < xRequest[1]  && 
+				xRequest[1] < (+spaceSize)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
 	}
 	
 	private double gaussianModel() {

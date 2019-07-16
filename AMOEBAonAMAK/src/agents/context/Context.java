@@ -108,7 +108,8 @@ public class Context extends AmoebaAgent {
 		for (Percept p : var) {
 			Range r;
 
-			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(p);
+			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(p);
+			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
 			r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 
@@ -122,7 +123,7 @@ public class Context extends AmoebaAgent {
 			p.addContextProjection(this);
 		}
 
-		expand();
+		//expand();
 
 		localModel = getAmas().buildLocalModel(this);
 		firstPoint.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
@@ -181,7 +182,9 @@ public class Context extends AmoebaAgent {
 		ArrayList<Percept> var = getAmas().getPercepts();
 		for (Percept v : var) {
 			Range r;
-			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(v);
+			
 
 			r = new Range(this, v.getValue() - radiuses.getA(), v.getValue() + radiuses.getB(), 0, true, true, v);
 
@@ -193,7 +196,7 @@ public class Context extends AmoebaAgent {
 			v.addContextProjection(this);;
 		}
 
-		expand();
+		//expand();
 
 		this.confidence = bestNearestContext.confidence;
 		if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.MILLER_REGRESSION) {
@@ -562,7 +565,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>500) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -572,7 +575,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>2000) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -584,7 +587,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size()) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 500) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -593,14 +596,14 @@ public class Context extends AmoebaAgent {
 				return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1) {
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 750) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
 				
-				if(getAmas().getHeadAgent().isVoid(request)) {
+				if(getAmas().getHeadAgent().isRealVoid(request)) {
 					return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
 				}		
 			}

@@ -107,9 +107,9 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void playWithOracle() {
-
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		if (activatedContexts.size() > 0) {
@@ -1693,6 +1693,14 @@ public class Head extends AmoebaAgent {
 
 	}
 
+	
+	public Pair<Double, Double> getRadiusesForContextCreation(Percept pct) {
+		return new Pair<Double, Double>(
+				pct.getRadiusContextForCreation(),
+				pct.getRadiusContextForCreation());
+	}
+	
+	
 	public Pair<Double, Double> getMaxRadiusesForContextCreation(Percept pct) {
 //		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
 //				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
@@ -1853,15 +1861,21 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
-	public boolean isVoid(HashMap<Percept, Double> request) {
+	public boolean isRealVoid(HashMap<Percept, Double> request) {
 		boolean test;
 		
 		for(Context ctxt : activatedNeighborsContexts) {
 			
+			
+			
 			test = true;
 			for(Percept pct : getAmas().getPercepts()) {
-				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
+//				test = test && ctxt.getRanges().get(pct).contains2(request.get(pct));
+				test = test && ctxt.getRanges().get(pct).contains(request.get(pct), pct.getMappingErrorAllowedMin());
 			}
+			
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("IS REAL VOID",ctxt.getName(), "-->", ""+!test)));
+			
 			if(test) {
 				return false;
 			}

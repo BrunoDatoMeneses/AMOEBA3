@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
 import gui.AmoebaWindow;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Slider;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
@@ -21,16 +24,17 @@ import kernel.backup.SaveHelperImpl;
 public class F_N_Launcher implements Serializable {
 
 
-	public static final double oracleNoiseRange = 0.0;
+	public static final double oracleNoiseRange = 0.5;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 3	;
 	public static final int normType = 2	;
-	public static final boolean randomExploration = true;
+	public static final boolean randomExploration = false;
 	public static final boolean limitedToSpaceZone = true;
-	public static final double mappingErrorAllowed = 0.03;
+	//public static final double mappingErrorAllowed = 0.07; // BIG SQUARE
+	public static double mappingErrorAllowed = 0.03; // MULTI
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 	
@@ -60,7 +64,7 @@ public class F_N_Launcher implements Serializable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		AMOEBA amoeba = new AMOEBA();
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone);
+		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/twoDimensionsLauncher.xml");
@@ -72,6 +76,21 @@ public class F_N_Launcher implements Serializable {
 		amoeba.data.learningSpeed = learningSpeed;
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+		
+		// Exemple for adding a tool in the toolbar
+		Slider slider = new Slider(0.01, 0.1, mappingErrorAllowed);
+		slider.setShowTickLabels(true);
+		slider.setShowTickMarks(true);
+		
+		slider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				System.out.println("new Value "+newValue);
+				mappingErrorAllowed = (double)newValue;
+				amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+			}
+		});
+		AmoebaWindow.addToolbar(slider);
 		
 		studiedSystem.playOneStep();
 		amoeba.learn(studiedSystem.getOutput());
