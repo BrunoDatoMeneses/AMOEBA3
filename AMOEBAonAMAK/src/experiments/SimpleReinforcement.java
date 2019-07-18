@@ -43,8 +43,8 @@ public class SimpleReinforcement {
 	private Drawable pos;
 
 	public static void main(String[] args) {
-		poc(true);
-		//exp1();
+		//poc(true);
+		exp1();
 		
 	}
 	
@@ -62,7 +62,7 @@ public class SimpleReinforcement {
 			return; // now compilator know config is initialized
 		}
 		
-		Configuration.commandLineMode = true;
+		//Configuration.commandLineMode = true;
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
@@ -75,7 +75,7 @@ public class SimpleReinforcement {
 		double explo = 0.8;
 		int nbGood = 0;
 		int nbBad = 0;
-		for(int i = 0; i < 1000; i++) {
+		for(int i = 0; i < 200; i++) {
 			Deque<HashMap<String, Double>> actions = new ArrayDeque<>();
 			//System.out.println("Explore "+i);
 			int nbStep = 0;
@@ -156,8 +156,10 @@ public class SimpleReinforcement {
 		System.out.println("Good: "+nbGood+" Bad: "+nbBad+" Good%: "+percentGood);
 		
 		// tests
+		int nbTest = 500;
+		double nbPositiveReward = 0.0;
 		double tot_reward = 0.0;
-		for(int i = 0; i < 500; i++) {
+		for(int i = 0; i < nbTest; i++) {
 			double reward = 0.0;
 			state = env.reset();
 			HashMap<String, Double> action = new HashMap<String, Double>();
@@ -187,10 +189,14 @@ public class SimpleReinforcement {
 				
 				state = state2;
 			}
-			
+			if(reward > 0) {
+				nbPositiveReward += 1.0;
+			}
 			tot_reward += reward;
 		}
-		System.out.println("Average reward : "+tot_reward/500.0);
+		System.out.println("Test average reward : "+tot_reward/nbTest+"  Positive reward %: "+(nbPositiveReward/nbTest));
+		//AmoebaWindow.instance().point.move(100, 100);
+		//AmoebaWindow.instance().mainVUI.updateCanvas();
 	}
 	
 	/**
@@ -390,12 +396,10 @@ public class SimpleReinforcement {
 		double oldX = x;
 		x = x + action;
 		if(x < -50.0 || x > 50.0) {
-			x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
 			reward = -100.0;
 		} else if(x == 0.0 || sign(oldX) != sign(x)) {
 			// win !
 			reward = 100.0;
-			x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
 		} else {
 			reward = -1.0;
 		}
@@ -408,7 +412,9 @@ public class SimpleReinforcement {
 	
 	public HashMap<String, Double> reset(){
 		x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
+		x = Math.round(x);
 		reward = 0.0;
+		//pos.move(x+0.5, 0.5);
 		
 		HashMap<String, Double> ret = new HashMap<>();
 		ret.put("p1", x);
