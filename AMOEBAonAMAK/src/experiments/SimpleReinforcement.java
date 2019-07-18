@@ -8,13 +8,10 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Random;
 
-import agents.context.localModel.TypeLocalModel;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import fr.irit.smac.amak.ui.drawables.DrawableOval;
 import gui.AmoebaWindow;
-import javafx.scene.paint.Color;
 import kernel.AMOEBA;
 import kernel.World;
 import kernel.backup.SaveHelperDummy;
@@ -32,7 +29,7 @@ import utils.XmlConfigGenerator;
  *
  */
 public class SimpleReinforcement {
-	public static final int N_EXPLORE_LINE = 60;
+	public static final int N_EXPLORE_LINE = 0;
 	public static final double MIN_EXPLO_RATE = 0.02;
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	private static int exploreLine;
@@ -93,8 +90,17 @@ public class SimpleReinforcement {
 				}
 				state.remove("oracle");
 				double lastAction = action.getOrDefault("a1", 0.0);
-				action = amoeba.maximize(state);
-				explore(r, explo, action, lastAction);
+				
+				action = new HashMap<String, Double>();
+				
+				if(exploreLine < N_EXPLORE_LINE && lastAction != 0.0) {
+					action.put("a1", lastAction);
+					exploreLine++;
+				} else {
+					action = amoeba.maximize(state);
+					explore(r, explo, action, lastAction);
+				}
+				
 				
 				state2 = env.step(action.get("a1"));
 				
@@ -104,7 +110,6 @@ public class SimpleReinforcement {
 				
 				action.put("p1", state.get("p1"));
 				action.put("oracle", state2.get("oracle"));
-				//System.out.println(action);
 				actions.push(action);
 				
 				state = state2;
@@ -354,20 +359,15 @@ public class SimpleReinforcement {
 	}
 
 	private static void explore(Random r, double explo, HashMap<String, Double> action, double lastAction) {
-		// if we were in the process of going in a straight line, continue
-		if(exploreLine < N_EXPLORE_LINE && lastAction != 0.0) {
-			action.put("a1", lastAction);
-			exploreLine++;
-		} else {
-			// else if we have to explore
-			if(r.nextDouble() < explo || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
-				// maybe next time go in a straight line
-				if(r.nextBoolean()) {
-					exploreLine = 0;
-				}
-				// chose a random action
-				action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
-			}
+		// maybe explore
+		if(r.nextDouble() < explo || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
+			// maybe next time go in a straight line
+			//if(r.nextBoolean()) {
+			//	exploreLine = 0;
+			//}
+			exploreLine = 0;
+			// chose a random action
+			action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
 		}
 	}
 	
