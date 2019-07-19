@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import fr.irit.smac.amak.Configuration;
@@ -130,7 +131,7 @@ public class SimpleReinforcement {
 			// learn
 			while(!learnSet.isEmpty()) {
 				HashMap<String, Double> a = learnSet.pop();
-				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
+				System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
 				amoeba.learn(a);
 			}
 			//System.exit(0);
@@ -163,7 +164,7 @@ public class SimpleReinforcement {
 			int nbStep = 0;
 			while(!done) {
 				nbStep++;
-				if(nbStep > 1000) {
+				if(nbStep > 200) {
 					done = true;
 				}
 				state.remove("oracle");
