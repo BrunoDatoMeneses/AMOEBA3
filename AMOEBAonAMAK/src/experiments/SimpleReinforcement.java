@@ -33,7 +33,7 @@ public class SimpleReinforcement {
 	public static final int N_EXPLORE_LINE = 100;
 	public static final double MIN_EXPLO_RATE = 0.02;
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
-	public static final double EXPLO_RATE_BASE = 2;
+	public static final double EXPLO_RATE_BASE = 1;
 	public static final String EXPLORATION_STRATEGY = "line"; // can be "random" or "line"
 	private static int exploreLine;
 	
@@ -44,11 +44,28 @@ public class SimpleReinforcement {
 
 	public static void main(String[] args) {
 		//poc(true);
+		Configuration.commandLineMode = true;
 		exp1();
+		/*ArrayList<ArrayList<Double>> results = new ArrayList<>();
+		for(int i = 0; i < 100; i++) {
+			results.add(exp1());
+			System.out.println(i);
+		}
+		
+		int nbEpisodes = results.get(0).size();
+		for(int i = 0; i < nbEpisodes; i++) {
+			double average = 0;
+			for(int j = 0; j < results.size(); j++) {
+				average += results.get(j).get(i);
+			}
+			average /= results.size();
+			System.out.println(""+i+"\t"+average);
+		}*/
+		
 		
 	}
 	
-	public static void exp1() {
+	public static ArrayList<Double> exp1() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		sensors.add(new Pair<String, Boolean>("a1", true));
@@ -59,7 +76,7 @@ public class SimpleReinforcement {
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
-			return; // now compilator know config is initialized
+			return null; // now compilator know config is initialized
 		}
 		
 		//Configuration.commandLineMode = true;
@@ -69,11 +86,14 @@ public class SimpleReinforcement {
 		amoeba.saver = new SaveHelperDummy();
 		SimpleReinforcement env = new SimpleReinforcement();
 		
+		ArrayList<Double> averageRewards = new ArrayList<Double>();
+		
 		Random r = new Random();
 		HashMap<String, Double> state = env.reset();
 		HashMap<String, Double> state2;
 		double explo = EXPLO_RATE_BASE;
-		for(int i = 0; i < 200; i++) {
+		int nbLearn = 200;
+		for(int i = 0; i < nbLearn; i++) {
 			Deque<HashMap<String, Double>> actions = new ArrayDeque<>();
 			//System.out.println("Explore "+i);
 			int nbStep = 0;
@@ -131,7 +151,7 @@ public class SimpleReinforcement {
 			// learn
 			while(!learnSet.isEmpty()) {
 				HashMap<String, Double> a = learnSet.pop();
-				System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
+				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
 				amoeba.learn(a);
 			}
 			//System.exit(0);
@@ -144,12 +164,25 @@ public class SimpleReinforcement {
 			}
 			
 			System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
+			double testAR = test(amoeba, env, r, 1000);
+			averageRewards.add(testAR);
 		}
 		
-		test(amoeba, env, r, 500);
+		//test(amoeba, env, r, 500);
+		explo = EXPLO_RATE_BASE;
+		for(int i = 0; i < averageRewards.size(); i++) {
+			System.out.println(""+i+"\t"+averageRewards.get(i)+"\t"+explo);
+			if(explo > MIN_EXPLO_RATE) {
+				explo -= EXPLO_RATE_DIMINUTION_FACTOR;
+				if(explo < MIN_EXPLO_RATE)
+					explo = MIN_EXPLO_RATE;
+			}
+		}
+		
+		return averageRewards;
 	}
 
-	private static void test(AMOEBA amoeba, SimpleReinforcement env, Random r, int nbTest) {
+	private static double test(AMOEBA amoeba, SimpleReinforcement env, Random r, int nbTest) {
 		HashMap<String, Double> state;
 		HashMap<String, Double> state2;
 		double nbPositiveReward = 0.0;
@@ -189,13 +222,16 @@ public class SimpleReinforcement {
 			}
 			tot_reward += reward;
 		}
-		System.out.println("Test average reward : "+tot_reward/nbTest+"  Positive reward %: "+(nbPositiveReward/nbTest));
+		double averageReward = tot_reward/nbTest;
+		System.out.println("Test average reward : "+averageReward+"  Positive reward %: "+(nbPositiveReward/nbTest));
 		
 		if(!Configuration.commandLineMode) {
 			AmoebaWindow.instance().point.hide();
 			AmoebaWindow.instance().rectangle.hide();
 			AmoebaWindow.instance().mainVUI.updateCanvas();
 		}
+		
+		return averageReward;
 	}
 	
 	/**
