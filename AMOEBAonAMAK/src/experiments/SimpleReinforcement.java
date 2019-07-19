@@ -29,9 +29,11 @@ import utils.XmlConfigGenerator;
  *
  */
 public class SimpleReinforcement {
-	public static final int N_EXPLORE_LINE = 0;
+	public static final int N_EXPLORE_LINE = 100;
 	public static final double MIN_EXPLO_RATE = 0.02;
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
+	public static final double EXPLO_RATE_BASE = 2;
+	public static final String EXPLORATION_STRATEGY = "line"; // can be "random" or "line"
 	private static int exploreLine;
 	
 	private Random rand = new Random();
@@ -69,9 +71,7 @@ public class SimpleReinforcement {
 		Random r = new Random();
 		HashMap<String, Double> state = env.reset();
 		HashMap<String, Double> state2;
-		double explo = 0.8;
-		int nbGood = 0;
-		int nbBad = 0;
+		double explo = EXPLO_RATE_BASE;
 		for(int i = 0; i < 200; i++) {
 			Deque<HashMap<String, Double>> actions = new ArrayDeque<>();
 			//System.out.println("Explore "+i);
@@ -115,53 +115,42 @@ public class SimpleReinforcement {
 				state = state2;
 			}
 			
-			if(!invalid) {
-				// build learning set 
-				HashMap<String, Double> step = actions.pop();
-				double reward = step.get("oracle");
-				Deque<HashMap<String, Double>> learnSet = new ArrayDeque<>();
-				learnSet.add(step);
-				while(!actions.isEmpty()) {
-					step = actions.pop();
-					reward += step.get("oracle");
-					step.put("oracle", reward);
-					learnSet.push(step);
-				}
-				
-				// learn
-				while(!learnSet.isEmpty()) {
-					HashMap<String, Double> a = learnSet.pop();
-					//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
-					amoeba.learn(a);
-				}
-				//System.exit(0);
-				
-				// update exploration rate
-				if(explo > MIN_EXPLO_RATE) {
-					explo -= EXPLO_RATE_DIMINUTION_FACTOR;
-					if(explo < MIN_EXPLO_RATE)
-						explo = MIN_EXPLO_RATE;
-				}
-				
-				String goobBad;
-				if(exploreLine < N_EXPLORE_LINE) {
-					nbBad++;
-					goobBad = "BAD  ";
-				} else {
-					nbGood++;
-					goobBad = "GOOD ";
-				}
-				System.out.println(goobBad+"Episode "+i+"  reward : "+reward+"  explo : "+explo);
-			} else {
-				nbBad++;
-				System.out.println("BAD  Episode "+i+" invalid.");
+			// build learning set 
+			HashMap<String, Double> step = actions.pop();
+			double reward = step.get("oracle");
+			Deque<HashMap<String, Double>> learnSet = new ArrayDeque<>();
+			learnSet.add(step);
+			while(!actions.isEmpty()) {
+				step = actions.pop();
+				reward += step.get("oracle");
+				step.put("oracle", reward);
+				learnSet.push(step);
 			}
+			
+			// learn
+			while(!learnSet.isEmpty()) {
+				HashMap<String, Double> a = learnSet.pop();
+				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
+				amoeba.learn(a);
+			}
+			//System.exit(0);
+			
+			// update exploration rate
+			if(explo > MIN_EXPLO_RATE) {
+				explo -= EXPLO_RATE_DIMINUTION_FACTOR;
+				if(explo < MIN_EXPLO_RATE)
+					explo = MIN_EXPLO_RATE;
+			}
+			
+			System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
 		}
-		double percentGood = ((double)nbGood)/(nbGood+nbBad);
-		System.out.println("Good: "+nbGood+" Bad: "+nbBad+" Good%: "+percentGood);
 		
-		// tests
-		int nbTest = 500;
+		test(amoeba, env, r, 500);
+	}
+
+	private static void test(AMOEBA amoeba, SimpleReinforcement env, Random r, int nbTest) {
+		HashMap<String, Double> state;
+		HashMap<String, Double> state2;
 		double nbPositiveReward = 0.0;
 		double tot_reward = 0.0;
 		for(int i = 0; i < nbTest; i++) {
@@ -200,8 +189,12 @@ public class SimpleReinforcement {
 			tot_reward += reward;
 		}
 		System.out.println("Test average reward : "+tot_reward/nbTest+"  Positive reward %: "+(nbPositiveReward/nbTest));
-		//AmoebaWindow.instance().point.move(100, 100);
-		//AmoebaWindow.instance().mainVUI.updateCanvas();
+		
+		if(!Configuration.commandLineMode) {
+			AmoebaWindow.instance().point.hide();
+			AmoebaWindow.instance().rectangle.hide();
+			AmoebaWindow.instance().mainVUI.updateCanvas();
+		}
 	}
 	
 	/**
@@ -358,16 +351,26 @@ public class SimpleReinforcement {
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 	}
 
+	/**
+	 * Possibly overwrite the action and explore instead. 
+	 * @param r A rng
+	 * @param explo Current exploration rate
+	 * @param action The current action
+	 * @param lastAction The action of the last simulation cycle
+	 */
 	private static void explore(Random r, double explo, HashMap<String, Double> action, double lastAction) {
-		// maybe explore
 		if(r.nextDouble() < explo || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
-			// maybe next time go in a straight line
-			//if(r.nextBoolean()) {
-			//	exploreLine = 0;
-			//}
-			exploreLine = 0;
-			// chose a random action
-			action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
+			switch (EXPLORATION_STRATEGY) {
+			case "line":
+				exploreLine = 0;
+				action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
+				break;
+			case "random":
+				action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
+				break;
+			default:
+				throw new IllegalArgumentException("Unkown exploration strategy : "+EXPLORATION_STRATEGY);
+			}
 		}
 	}
 	
