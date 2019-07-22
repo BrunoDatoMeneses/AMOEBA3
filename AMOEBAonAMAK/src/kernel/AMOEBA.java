@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
+import agents.context.localModel.LocalModelCoop;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -418,7 +419,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		
 		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
 		for(Context c : pac) {
-			sol.add(c.getLocalModel().getMaxWithConstraint(known));
+			sol.add(((LocalModelCoop)c.getLocalModel()).getMaxWithConstraintCoop(known));
 		}
 		HashMap<String, Double> max = new HashMap<>();
 
@@ -437,7 +438,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public LocalModel buildLocalModel(Context context) {
 		switch (localModel) {
 		case MILLER_REGRESSION:
-			return new LocalModelMillerRegression(context);
+			return new LocalModelCoop(new LocalModelMillerRegression(context));
 
 		default:
 			throw new IllegalArgumentException("Unknown model " + localModel + ".");

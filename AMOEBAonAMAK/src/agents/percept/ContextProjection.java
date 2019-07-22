@@ -111,9 +111,9 @@ public class ContextProjection implements Serializable {
 		return getRadius();
 	}
 
-	public boolean inNeighborhood() {
-		return this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept))
-				|| this.contains(percept.getValue(), this.getRadius() / 2);
+	public boolean inNeighborhood(double value) {
+		return this.contains(value, context.getEnvironment().getContextCreationNeighborhood(context, percept))
+				|| this.contains(value, this.getRadius() / 2);
 	}
 	
 	public double getStart() {

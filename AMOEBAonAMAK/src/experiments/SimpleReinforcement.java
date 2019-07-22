@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
+import agents.context.Context;
+import agents.context.localModel.LocalModelCoop;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -44,10 +46,10 @@ public class SimpleReinforcement {
 
 	public static void main(String[] args) {
 		//poc(true);
-		Configuration.commandLineMode = true;
-		exp1();
-		/*ArrayList<ArrayList<Double>> results = new ArrayList<>();
-		for(int i = 0; i < 100; i++) {
+		//Configuration.commandLineMode = true;
+		//exp1();
+		ArrayList<ArrayList<Double>> results = new ArrayList<>();
+		for(int i = 0; i < 1; i++) {
 			results.add(exp1());
 			System.out.println(i);
 		}
@@ -60,7 +62,7 @@ public class SimpleReinforcement {
 			}
 			average /= results.size();
 			System.out.println(""+i+"\t"+average);
-		}*/
+		}
 		
 		
 	}
@@ -79,7 +81,6 @@ public class SimpleReinforcement {
 			return null; // now compilator know config is initialized
 		}
 		
-		//Configuration.commandLineMode = true;
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
@@ -135,7 +136,7 @@ public class SimpleReinforcement {
 				
 				state = state2;
 			}
-			
+			/*
 			// build learning set 
 			HashMap<String, Double> step = actions.pop();
 			double reward = step.get("oracle");
@@ -147,10 +148,10 @@ public class SimpleReinforcement {
 				step.put("oracle", reward);
 				learnSet.push(step);
 			}
-			
+			*/
 			// learn
-			while(!learnSet.isEmpty()) {
-				HashMap<String, Double> a = learnSet.pop();
+			while(!actions.isEmpty()) {
+				HashMap<String, Double> a = actions.pop();
 				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
 				amoeba.learn(a);
 			}
@@ -163,10 +164,15 @@ public class SimpleReinforcement {
 					explo = MIN_EXPLO_RATE;
 			}
 			
-			System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
-			double testAR = test(amoeba, env, r, 1000);
+			//System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
+			double testAR = test(amoeba, env, r, 100);
 			averageRewards.add(testAR);
 		}
+		/*
+		ArrayList<Context> contexts = amoeba.getContexts();
+		System.out.println(contexts.get(0));
+		System.out.println(contexts.get(0).getLocalModel().getCoefsFormula());
+		System.out.println(((LocalModelCoop) contexts.get(0).getLocalModel()).getCoefsFormulaCoop());
 		
 		//test(amoeba, env, r, 500);
 		explo = EXPLO_RATE_BASE;
@@ -178,7 +184,7 @@ public class SimpleReinforcement {
 					explo = MIN_EXPLO_RATE;
 			}
 		}
-		
+		*/
 		return averageRewards;
 	}
 

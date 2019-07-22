@@ -25,4 +25,10 @@ public class Pair<A,B> {
     public void setB(B b) {
    	 this.b = b;
    }
+
+	@Override
+	public String toString() {
+		return "Pair [a=" + a + ", b=" + b + "]";
+	}
+	
 }
