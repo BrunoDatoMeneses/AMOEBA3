@@ -2,12 +2,9 @@ package experiments;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Scanner;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
@@ -30,6 +27,12 @@ import utils.XmlConfigGenerator;
  *
  */
 public class SimpleReinforcement {
+	/* Learn and Test */
+	public static final int MAX_STEP_PER_EPISODE = 200;
+	public static final int N_LEARN = 200;
+	public static final int N_TEST = 200;
+	
+	/* Exploration */
 	public static final int N_EXPLORE_LINE = 100;
 	public static final double MIN_EXPLO_RATE = 0.02;
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
@@ -41,12 +44,97 @@ public class SimpleReinforcement {
 	private double x = 0;
 	private double reward = 0;
 	private Drawable pos;
+	
+	/**
+	 * Wrapper for any kind of learning agent
+	 * @author Hugo
+	 *
+	 */
+	public interface LearningAgent {
+		public double choose(HashMap<String, Double> state);
+		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2, HashMap<String, Double> action, boolean done);
+	}
+	
+	/**
+	 * Wrapper for AMOEBA
+	 * @author Hugo
+	 *
+	 */
+	public static class Amoeba implements LearningAgent {
+		public AMOEBA amoeba;
+		private Random rand = new Random();
+		
+		public Amoeba() {
+			amoeba = setup();
+		}
+		
+		@Override
+		public double choose(HashMap<String, Double> state) {
+			double a = amoeba.maximize(state).getOrDefault("a1", 0.0);
+			if(a == 0.0) {
+				a = rand.nextBoolean() ? -1 : 1;
+			}
+			return a;
+		}
+
+		@Override
+		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2,
+				HashMap<String, Double> action, boolean done) {
+			amoeba.learn(action);
+		}
+		
+	}
+	
+	/**
+	 * An extremely crude and quick implementation of Q learning.
+	 * Not expected to perform well, but should be better than random.
+	 * @author Hugo
+	 *
+	 */
+	public static class QLearning implements LearningAgent {
+		public double[][] Q = new double[102][2];
+		public double lr = 0.8;
+		public double gamma = 0.9;
+		
+		@Override
+		public double choose(HashMap<String, Double> state) {
+			int p = state.get("p1").intValue()+50;
+			double a = Q[p][0] > Q[p][1] ? -1 : 1;
+			return a;
+		}
+
+		@Override
+		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2,
+				HashMap<String, Double> action, boolean done) {
+			int p = state.get("p1").intValue()+50;
+			int p2 = state2.get("p1").intValue()+50;
+			int a = action.get("a1").intValue() == -1 ? 0 : 1;
+			double reward = state2.get("oracle");
+			double max = Double.NEGATIVE_INFINITY;
+			if(!done) {
+				for(Double v : Q[p2]) {
+					max = Math.max(max, v);
+				}
+			} else {
+				max = reward;
+			}
+			double q = reward + gamma * max - Q[p][a];
+			Q[p][a] += lr * q;
+		}
+		
+	}
+	
 
 	public static void main(String[] args) {
 		//poc(true);
 		Configuration.commandLineMode = true;
-		//exp1();
-		ArrayList<ArrayList<Double>> results = new ArrayList<>();
+		System.out.println("----- AMOEBA -----");
+		learning(new Amoeba());
+		System.out.println("----- END AMOEBA -----");
+		System.out.println("\n\n----- QLEARNING -----");
+		learning(new QLearning());
+		System.out.println("----- END QLEARNING -----");
+		/*ArrayList<ArrayList<Double>> results = new ArrayList<>();
 		for(int i = 0; i < 1; i++) {
 			results.add(exp1());
 			System.out.println(i);
@@ -61,11 +149,15 @@ public class SimpleReinforcement {
 			average /= results.size();
 			System.out.println(""+i+"\t"+average);
 		}
-		
+		*/
 		System.exit(0);
 	}
 	
-	public static ArrayList<Double> exp1() {
+	/**
+	 * Setup an amoeba for the SimpleReinforcement problem
+	 * @return
+	 */
+	private static AMOEBA setup() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		sensors.add(new Pair<String, Boolean>("a1", true));
@@ -84,31 +176,35 @@ public class SimpleReinforcement {
 		World.minLevel = TRACE_LEVEL.ERROR;
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
+		return amoeba;
+	}
+	
+	/**
+	 * Teach a learning agent on the SimpleReinforcement problem
+	 * @param agent
+	 * @return
+	 */
+	public static ArrayList<Double> learning(LearningAgent agent){
 		SimpleReinforcement env = new SimpleReinforcement();
-		//System.out.println(test(amoeba, env, new Random(), 1000));
-		//Scanner scanner = new Scanner(System.in);
-		//scanner.nextLine();
 		ArrayList<Double> averageRewards = new ArrayList<Double>();
 		
 		Random r = new Random();
 		HashMap<String, Double> state = env.reset();
 		HashMap<String, Double> state2;
 		double explo = EXPLO_RATE_BASE;
-		int nbLearn = 200;
-		for(int i = 0; i < nbLearn; i++) {
-			Deque<HashMap<String, Double>> actions = new ArrayDeque<>();
-			//System.out.println("Explore "+i);
+		for(int i = 0; i < N_LEARN; i++) {
 			int nbStep = 0;
 			state = env.reset();
 			exploreLine = N_EXPLORE_LINE;
 			HashMap<String, Double> action = new HashMap<String, Double>();
+			double totReward = 0.0;
 			
 			// execute simulation cycles
 			boolean done = false;
 			boolean invalid = false;
 			while(!done && !invalid) {
 				nbStep++;
-				if(nbStep > 200) {
+				if(nbStep > MAX_STEP_PER_EPISODE) {
 					invalid = true;
 				}
 				state.remove("oracle");
@@ -120,46 +216,23 @@ public class SimpleReinforcement {
 					action.put("a1", lastAction);
 					exploreLine++;
 				} else {
-					action = amoeba.maximize(state);
+					action.put("a1", agent.choose(state));
 					explore(r, explo, action, lastAction);
 				}
 				
 				
 				state2 = env.step(action.get("a1"));
-				
 				if(state2.get("oracle") != -1.0) {
 					done = true;
 				}
-				
 				action.put("p1", state.get("p1"));
 				action.put("oracle", state2.get("oracle"));
-				amoeba.learn(action);
-				actions.push(action);
+				
+				agent.learn(state, state2, action, done);
+				totReward += action.get("oracle");
 				
 				state = state2;
 			}
-			/*
-			// build learning set 
-			HashMap<String, Double> step = actions.pop();
-			double reward = step.get("oracle");
-			Deque<HashMap<String, Double>> learnSet = new ArrayDeque<>();
-			learnSet.add(step);
-			while(!actions.isEmpty()) {
-				step = actions.pop();
-				reward += step.get("oracle");
-				step.put("oracle", reward);
-				learnSet.push(step);
-			}
-			*/
-			// learn
-			/*
-			while(!actions.isEmpty()) {
-				HashMap<String, Double> a = actions.pop();
-				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
-				amoeba.learn(a);
-			}
-			*/
-			//System.exit(0);
 			
 			// update exploration rate
 			if(explo > MIN_EXPLO_RATE) {
@@ -168,34 +241,15 @@ public class SimpleReinforcement {
 					explo = MIN_EXPLO_RATE;
 			}
 			
-			//System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
-			double testAR = test(amoeba, env, r, 200);
+			System.out.println("Episode "+i+"  reward : "+totReward+"  explo : "+explo);
+			double testAR = test(agent, env, r, N_TEST);
 			averageRewards.add(testAR);
-			
-			//Scanner scanner = new Scanner(System.in);
-			//scanner.nextLine();
 		}
-		/*
-		ArrayList<Context> contexts = amoeba.getContexts();
-		System.out.println(contexts.get(0));
-		System.out.println(contexts.get(0).getLocalModel().getCoefsFormula());
-		System.out.println(((LocalModelCoop) contexts.get(0).getLocalModel()).getCoefsFormulaCoop());
 		
-		//test(amoeba, env, r, 500);
-		explo = EXPLO_RATE_BASE;
-		for(int i = 0; i < averageRewards.size(); i++) {
-			System.out.println(""+i+"\t"+averageRewards.get(i)+"\t"+explo);
-			if(explo > MIN_EXPLO_RATE) {
-				explo -= EXPLO_RATE_DIMINUTION_FACTOR;
-				if(explo < MIN_EXPLO_RATE)
-					explo = MIN_EXPLO_RATE;
-			}
-		}
-		*/
 		return averageRewards;
 	}
 
-	private static double test(AMOEBA amoeba, SimpleReinforcement env, Random r, int nbTest) {
+	private static double test(LearningAgent agent, SimpleReinforcement env, Random r, int nbTest) {
 		HashMap<String, Double> state;
 		HashMap<String, Double> state2;
 		double nbPositiveReward = 0.0;
@@ -203,7 +257,6 @@ public class SimpleReinforcement {
 		for(int i = 0; i < nbTest; i++) {
 			double reward = 0.0;
 			state = env.reset();
-			HashMap<String, Double> action = new HashMap<String, Double>();
 			
 			// execute simulation cycles
 			boolean done = false;
@@ -214,13 +267,9 @@ public class SimpleReinforcement {
 					done = true;
 				}
 				state.remove("oracle");
-				action = amoeba.maximize(state);
-				// random action if no proposition from amoeba
-				if(action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
-					action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
-				}
+				double a = agent.choose(state);
 				
-				state2 = env.step(action.get("a1"));
+				state2 = env.step(a);
 				
 				if(state2.get("oracle") != -1.0) {
 					done = true;
@@ -254,23 +303,7 @@ public class SimpleReinforcement {
 	 * The main cause of negative reward is infinite loop (usually near the objective). In such case, the reward is -200
 	 */
 	public static void poc(boolean learnMalus) {
-		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
-		sensors.add(new Pair<String, Boolean>("p1", false));
-		sensors.add(new Pair<String, Boolean>("a1", true));
-		File config;
-		try {
-			config = File.createTempFile("config", "xml");
-			XmlConfigGenerator.makeXML(config, sensors);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-			return; // now compilator know config is initialized
-		}
-		
-		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		AMOEBA amoeba = setup();
 		SimpleReinforcement env = new SimpleReinforcement();
 		
 		// train
@@ -409,7 +442,7 @@ public class SimpleReinforcement {
 	 * @param lastAction The action of the last simulation cycle
 	 */
 	private static void explore(Random r, double explo, HashMap<String, Double> action, double lastAction) {
-		if(r.nextDouble() < explo || action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
+		if(r.nextDouble() < explo) {
 			switch (EXPLORATION_STRATEGY) {
 			case "line":
 				exploreLine = 0;
