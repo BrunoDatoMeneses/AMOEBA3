@@ -25,7 +25,6 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.Range;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
@@ -269,21 +268,15 @@ public class BackupSystem implements IBackupSystem {
 		// -- Load Model
 		String localModelName = localModelElement.getAttributeValue("Type");
 		TypeLocalModel type = TypeLocalModel.valueOf(localModelName);
-		LocalModel localModel;
-		switch (type) {
-		case MILLER_REGRESSION:
-			List<Double> coefs = new ArrayList<>();
-			for(Element e : localModelElement.getChild("Coefs").getChildren()) {
-				coefs.add(Double.valueOf(e.getAttributeValue("v")));
-			}
-			localModel = new LocalModelMillerRegression(context, coefs.toArray(new Double[coefs.size()]), experiments);
-			break;
-		default:
-			throw new IllegalArgumentException("Found unknown model " + localModelName + " in XML file. ");
+		LocalModel localModel = amoeba.buildLocalModel(context, type);
+		List<Double> coefs = new ArrayList<>();
+		for(Element e : localModelElement.getChild("Coefs").getChildren()) {
+			coefs.add(Double.valueOf(e.getAttributeValue("v")));
 		}
+		Double[] coefArray = coefs.toArray(new Double[coefs.size()]);
+		localModel.setFirstExperiments(experiments);
+		localModel.setCoef(coefArray);
 		context.setLocalModel(localModel);
-		
-		
 	}
 
 	private void loadRanges(Context context, Element elemRanges) {

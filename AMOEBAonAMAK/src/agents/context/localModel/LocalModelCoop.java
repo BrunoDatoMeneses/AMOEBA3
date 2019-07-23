@@ -162,7 +162,7 @@ public class LocalModelCoop implements LocalModel {
 		Set<Context> contexts = new HashSet<>(getContext().getAmas().getContexts());
 		
 		for(Percept p : percepts) {
-			contexts.removeIf(c -> !p.inNeighborhood(c, getContext().getRangeByPercept(p).getCenter()));
+			contexts.removeIf(c -> !(p.inNeighborhood(c, getContext().getRangeByPercept(p).getStart()) || p.inNeighborhood(c, getContext().getRangeByPercept(p).getEnd())));
 		}
 		return contexts;
 	}

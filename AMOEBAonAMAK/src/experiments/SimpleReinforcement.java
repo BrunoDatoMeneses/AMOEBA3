@@ -6,11 +6,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
+import java.util.Scanner;
 
-import agents.context.Context;
-import agents.context.localModel.LocalModelCoop;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -46,7 +44,7 @@ public class SimpleReinforcement {
 
 	public static void main(String[] args) {
 		//poc(true);
-		//Configuration.commandLineMode = true;
+		Configuration.commandLineMode = true;
 		//exp1();
 		ArrayList<ArrayList<Double>> results = new ArrayList<>();
 		for(int i = 0; i < 1; i++) {
@@ -64,7 +62,7 @@ public class SimpleReinforcement {
 			System.out.println(""+i+"\t"+average);
 		}
 		
-		
+		System.exit(0);
 	}
 	
 	public static ArrayList<Double> exp1() {
@@ -80,13 +78,16 @@ public class SimpleReinforcement {
 			System.exit(1);
 			return null; // now compilator know config is initialized
 		}
+		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		SimpleReinforcement env = new SimpleReinforcement();
-		
+		//System.out.println(test(amoeba, env, new Random(), 1000));
+		//Scanner scanner = new Scanner(System.in);
+		//scanner.nextLine();
 		ArrayList<Double> averageRewards = new ArrayList<Double>();
 		
 		Random r = new Random();
@@ -132,6 +133,7 @@ public class SimpleReinforcement {
 				
 				action.put("p1", state.get("p1"));
 				action.put("oracle", state2.get("oracle"));
+				amoeba.learn(action);
 				actions.push(action);
 				
 				state = state2;
@@ -150,11 +152,13 @@ public class SimpleReinforcement {
 			}
 			*/
 			// learn
+			/*
 			while(!actions.isEmpty()) {
 				HashMap<String, Double> a = actions.pop();
 				//System.out.println("("+a.get("p1")+"\t, "+a.get("a1")+"\t, "+a.get("oracle")+")");
 				amoeba.learn(a);
 			}
+			*/
 			//System.exit(0);
 			
 			// update exploration rate
@@ -165,8 +169,11 @@ public class SimpleReinforcement {
 			}
 			
 			//System.out.println("Episode "+i+"  reward : "+reward+"  explo : "+explo);
-			double testAR = test(amoeba, env, r, 100);
+			double testAR = test(amoeba, env, r, 200);
 			averageRewards.add(testAR);
+			
+			//Scanner scanner = new Scanner(System.in);
+			//scanner.nextLine();
 		}
 		/*
 		ArrayList<Context> contexts = amoeba.getContexts();
@@ -428,6 +435,8 @@ public class SimpleReinforcement {
 			//instance.mainVUI.add(pos);
 			instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
 			instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
+			instance.point.hide();
+			instance.rectangle.hide();
 		}
 		
 		

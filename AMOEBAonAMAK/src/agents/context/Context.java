@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
+import agents.context.localModel.LocalModelCoop;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Criticalities;
@@ -1401,7 +1402,14 @@ public class Context extends AmoebaAgent {
 
 		s += "Model : ";
 		s += this.localModel.getCoefsFormula() + "\n";
-
+		s += "Cooperative Spatial Model : ";
+		s += ((LocalModelCoop)this.localModel).getCoefsFormulaCoop() + "\n";
+		
+		s += "\n";
+		s += "Ranges :\n";
+		for(Percept p : getRanges().keySet()) {
+			s += p + " : " + getRangeByPercept(p)+"\n"; 
+		}
 		s += "\n";
 		
 		s += "Last Distance to Regression " + lastDistanceToModel + "\n";

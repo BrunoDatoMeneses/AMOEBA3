@@ -102,8 +102,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 		if (isPerceptEnum()) {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);
-			this.setStart(Math.round(p.getValue()));
-			this.setEnd(Math.round(p.getValue()));
+			this.setStart(Math.round(start));
+			this.setEnd(Math.round(end));
 		} else {
 			this.setStart_inclu(start_inclu);
 			this.setEnd_inclu(end_inclu);

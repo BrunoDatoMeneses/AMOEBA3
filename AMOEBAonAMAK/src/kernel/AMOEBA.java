@@ -435,14 +435,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return max;
 	}
 
-	public LocalModel buildLocalModel(Context context) {
-		switch (localModel) {
+	public LocalModel buildLocalModel(Context context, TypeLocalModel type) {
+		switch (type) {
 		case MILLER_REGRESSION:
 			return new LocalModelCoop(new LocalModelMillerRegression(context));
 
 		default:
 			throw new IllegalArgumentException("Unknown model " + localModel + ".");
 		}
+	}
+	
+	public LocalModel buildLocalModel(Context context) {
+		return buildLocalModel(context, localModel);
 	}
 
 	/**
