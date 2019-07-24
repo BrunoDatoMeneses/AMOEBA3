@@ -11,21 +11,24 @@ import agents.context.Experiment;
 import agents.percept.Percept;
 import utils.Pair;
 
-public class LocalModelCoop implements LocalModel {
+public class LocalModelCoopModifier extends LocalModel {
 	private LocalModel localModel;
+	private TypeLocalModel type;
 	
-	public LocalModelCoop(LocalModel localModel) {
+	public LocalModelCoopModifier(LocalModel localModel, TypeLocalModel type) {
 		this.localModel = localModel;
+		localModel.setModifier(this);
+		setType(type);
+	}
+	
+	@Override
+	public Context getContext() {
+		return localModel.getContext();
 	}
 	
 	@Override
 	public void setContext(Context context) {
 		localModel.setContext(context);
-	}
-
-	@Override
-	public Context getContext() {
-		return localModel.getContext();
 	}
 
 	@Override
@@ -45,10 +48,6 @@ public class LocalModelCoop implements LocalModel {
 
 	@Override
 	public HashMap<String, Double> getMaxWithConstraint(HashMap<String, Double> fixedPercepts) {
-		return localModel.getMaxWithConstraint(fixedPercepts);
-	}
-	
-	public HashMap<String, Double> getMaxWithConstraintCoop(HashMap<String, Double> fixedPercepts) {
 		ArrayList<Percept> percepts = getContext().getAmas().getPercepts();
 		
 		HashMap<String, Double> result = new HashMap<String, Double>();
@@ -87,28 +86,6 @@ public class LocalModelCoop implements LocalModel {
 	}
 
 	@Override
-	public String getCoefsFormula() {
-		return localModel.getCoefsFormula();
-	}
-	
-	public String getCoefsFormulaCoop() {
-		Double[] coefs = getCoefCoop();
-		String result = "" +coefs[0];
-	//	//System.out.println("Result 0" + " : " + result);
-		if (coefs[0] == Double.NaN) System.exit(0);
-		
-		for (int i = 1 ; i < coefs.length ; i++) {
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			
-			result += "\t" + coefs[i] + " (" + getContext().getAmas().getPercepts().get(i-1) +")";
-			
-		}
-		
-		return result;
-
-	}
-
-	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
 		localModel.updateModel(newExperiment, weight);
 	}
@@ -137,10 +114,27 @@ public class LocalModelCoop implements LocalModel {
 	public boolean finishedFirstExperiments() {
 		return localModel.finishedFirstExperiments();
 	}
-
+	
 	@Override
 	public Double[] getCoef() {
 		return localModel.getCoef();
+	}
+	
+	@Override
+	public String getCoefsFormula() {
+		Double[] coefs = getCoefCoop();
+		String result = "" +coefs[0];
+		if (coefs[0] == Double.NaN) System.exit(0);
+		
+		for (int i = 1 ; i < coefs.length ; i++) {
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			
+			result += "\t" + coefs[i] + " (" + getContext().getAmas().getPercepts().get(i-1) +")";
+			
+		}
+		result += "\nFrom " +localModel.getType()+" : "+localModel.getCoefsFormula(); 
+		
+		return result;
 	}
 	
 	public Double[] getCoefCoop() {
@@ -149,7 +143,11 @@ public class LocalModelCoop implements LocalModel {
 		int i = 0;
 		for(Percept p : getContext().getRanges().keySet()) {
 			for(Context c : neighbors) {
-				Double[] coef2 = c.getLocalModel().getCoef();
+				LocalModel model = c.getLocalModel();
+				while(model.hasModified()) {
+					model = model.getModified();
+				}
+				Double[] coef2 = model.getCoef();
 				coef[i] += coef2[i]/neighbors.size()*getCommonFrontierCoef(p, getContext(), c);
 			}
 			i++;
@@ -195,7 +193,12 @@ public class LocalModelCoop implements LocalModel {
 
 	@Override
 	public TypeLocalModel getType() {
-		return localModel.getType();
+		return type;
+	}
+
+	@Override
+	public void setType(TypeLocalModel type) {
+		this.type = type;
 	}
 
 }

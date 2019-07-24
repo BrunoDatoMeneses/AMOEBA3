@@ -14,9 +14,7 @@ import utils.TRACE_LEVEL;
 /**
  * The Class LocalModelMillerRegression.
  */
-public class LocalModelMillerRegression implements LocalModel{
-	
-	private Context context;
+public class LocalModelMillerRegression extends LocalModel{
 	
 	/** The n parameters. */
 	private int nParameters;
@@ -24,6 +22,7 @@ public class LocalModelMillerRegression implements LocalModel{
 	/** The regression. */
 	transient private Regression regression;
 
+	private Context context;
 	
 	/** The coef. */
 	private Double[] coefs;
@@ -36,7 +35,7 @@ public class LocalModelMillerRegression implements LocalModel{
 	 * @param world the world
 	 */
 	public LocalModelMillerRegression(Context associatedContext) {
-		context = associatedContext;
+		this.context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
@@ -44,7 +43,7 @@ public class LocalModelMillerRegression implements LocalModel{
 	}
 	
 	public LocalModelMillerRegression(Context associatedContext, Double[] coefsCopy, List<Experiment> fstExperiments) {
-		context = associatedContext;
+		this.context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
@@ -53,30 +52,20 @@ public class LocalModelMillerRegression implements LocalModel{
 	}
 	
 	@Override
+	public Context getContext() {
+		return context;
+	}
+	
+	@Override
 	public void setContext(Context context) {
 		this.context = context;
 	}
 	
 	@Override
-	public Context getContext() {
-		return context;
-	}
-	
-	/**
-	 * Sets the coef.
-	 *
-	 * @param coef the new coef
-	 */
-	@Override
 	public void setCoef(Double[] coef) {
 		this.coefs = coef.clone();
 	}
 	
-	/**
-	 * Gets the coef.
-	 *
-	 * @return the coef
-	 */
 	@Override
 	public Double[] getCoef() {
 		return coefs;
@@ -215,22 +204,6 @@ public class LocalModelMillerRegression implements LocalModel{
 			
 	}
 	
-	@Override
-	public String getCoefsFormula() {
-		String result = "" +coefs[0];
-	//	//System.out.println("Result 0" + " : " + result);
-		if (coefs[0] == Double.NaN) System.exit(0);
-		
-		for (int i = 1 ; i < coefs.length ; i++) {
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			
-			result += "\t" + coefs[i] + " (" + context.getAmas().getPercepts().get(i-1) +")";
-			
-		}
-		
-		return result;
-
-}
 	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
@@ -499,5 +472,9 @@ public class LocalModelMillerRegression implements LocalModel{
 	@Override
 	public TypeLocalModel getType() {
 		return TypeLocalModel.MILLER_REGRESSION;
+	}
+
+	@Override
+	public void setType(TypeLocalModel type) {
 	}
 }

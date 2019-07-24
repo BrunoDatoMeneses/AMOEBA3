@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelCoop;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Criticalities;
@@ -158,15 +157,13 @@ public class Context extends AmoebaAgent {
 		// expand();
 
 		this.confidence = fatherContext.confidence;
-		if (fatherContext.getLocalModel().getType() == TypeLocalModel.MILLER_REGRESSION) {
-
-			this.localModel = getAmas().buildLocalModel(this);
-			// this.formulaLocalModel = ((LocalModelMillerRegression)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			Double[] coef = fatherContext.localModel.getCoef();
-			this.localModel.setCoef(coef);
-			this.actionProposition = fatherContext.localModel.getProposition();
-		}
+	
+		this.localModel = getAmas().buildLocalModel(this);
+		// this.formulaLocalModel = ((LocalModelMillerRegression)
+		// bestNearestContext.localModel).getFormula(bestNearestContext);
+		Double[] coef = fatherContext.localModel.getCoef();
+		this.localModel.setCoef(coef);
+		this.actionProposition = fatherContext.localModel.getProposition();
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -199,15 +196,12 @@ public class Context extends AmoebaAgent {
 		//expand();
 
 		this.confidence = bestNearestContext.confidence;
-		if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.MILLER_REGRESSION) {
-
-			this.localModel = getAmas().buildLocalModel(this);
-			// this.formulaLocalModel = ((LocalModelMillerRegression)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			Double[] coef = bestNearestContext.localModel.getCoef();
-			this.localModel.setCoef(coef);
-			this.actionProposition = bestNearestContext.localModel.getProposition();
-		}
+		this.localModel = getAmas().buildLocalModel(this);
+		// this.formulaLocalModel = ((LocalModelMillerRegression)
+		// bestNearestContext.localModel).getFormula(bestNearestContext);
+		Double[] coef = bestNearestContext.localModel.getCoef();
+		this.localModel.setCoef(coef);
+		this.actionProposition = bestNearestContext.localModel.getProposition();
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
@@ -1400,10 +1394,8 @@ public class Context extends AmoebaAgent {
 		s += "creation tick : " + tickCreation +"\n";
 		s += "\n";
 
-		s += "Model : ";
+		s += "Model "+this.localModel.getType()+" :";
 		s += this.localModel.getCoefsFormula() + "\n";
-		s += "Cooperative Spatial Model : ";
-		s += ((LocalModelCoop)this.localModel).getCoefsFormulaCoop() + "\n";
 		
 		s += "\n";
 		s += "Ranges :\n";

@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Scanner;
 
+import agents.context.localModel.TypeLocalModel;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -30,14 +32,14 @@ public class SimpleReinforcement {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
 	public static final int N_LEARN = 200;
-	public static final int N_TEST = 200;
+	public static final int N_TEST = 10;
 	
 	/* Exploration */
-	public static final int N_EXPLORE_LINE = 100;
+	public static final int N_EXPLORE_LINE = 0;
 	public static final double MIN_EXPLO_RATE = 0.02;
-	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
+	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.0;
 	public static final double EXPLO_RATE_BASE = 1;
-	public static final String EXPLORATION_STRATEGY = "line"; // can be "random" or "line"
+	public static final String EXPLORATION_STRATEGY = "random"; // can be "random" or "line"
 	private static int exploreLine;
 	
 	private Random rand = new Random();
@@ -66,6 +68,8 @@ public class SimpleReinforcement {
 		
 		public Amoeba() {
 			amoeba = setup();
+			amoeba.setLocalModel(TypeLocalModel.COOP_MILLER_REGRESSION);
+			amoeba.getEnvironment().setMappingErrorAllowed(0.009);
 		}
 		
 		@Override
@@ -95,11 +99,17 @@ public class SimpleReinforcement {
 		public double[][] Q = new double[102][2];
 		public double lr = 0.8;
 		public double gamma = 0.9;
+		private Random rand = new Random();
 		
 		@Override
 		public double choose(HashMap<String, Double> state) {
 			int p = state.get("p1").intValue()+50;
-			double a = Q[p][0] > Q[p][1] ? -1 : 1;
+			double a;
+			if(Q[p][0] == Q[p][1]) {
+				a = rand.nextBoolean() ? -1 : 1;
+			} else {
+				a = Q[p][0] > Q[p][1] ? -1 : 1;
+			}
 			return a;
 		}
 
@@ -127,16 +137,17 @@ public class SimpleReinforcement {
 
 	public static void main(String[] args) {
 		//poc(true);
-		Configuration.commandLineMode = true;
+		//Configuration.commandLineMode = true;
 		System.out.println("----- AMOEBA -----");
 		learning(new Amoeba());
 		System.out.println("----- END AMOEBA -----");
-		System.out.println("\n\n----- QLEARNING -----");
+		/*System.out.println("\n\n----- QLEARNING -----");
 		learning(new QLearning());
-		System.out.println("----- END QLEARNING -----");
+		System.out.println("----- END QLEARNING -----");*/
 		/*ArrayList<ArrayList<Double>> results = new ArrayList<>();
-		for(int i = 0; i < 1; i++) {
-			results.add(exp1());
+		LearningAgent agent = new QLearning();
+		for(int i = 0; i < 100; i++) {
+			results.add(learning(agent));
 			System.out.println(i);
 		}
 		
@@ -150,7 +161,7 @@ public class SimpleReinforcement {
 			System.out.println(""+i+"\t"+average);
 		}
 		*/
-		System.exit(0);
+		//System.exit(0);
 	}
 	
 	/**
@@ -244,6 +255,9 @@ public class SimpleReinforcement {
 			System.out.println("Episode "+i+"  reward : "+totReward+"  explo : "+explo);
 			double testAR = test(agent, env, r, N_TEST);
 			averageRewards.add(testAR);
+			
+			//Scanner scan = new Scanner(System.in);
+			//scan.nextLine();
 		}
 		
 		return averageRewards;
@@ -286,12 +300,6 @@ public class SimpleReinforcement {
 		}
 		double averageReward = tot_reward/nbTest;
 		System.out.println("Test average reward : "+averageReward+"  Positive reward %: "+(nbPositiveReward/nbTest));
-		
-		if(!Configuration.commandLineMode) {
-			AmoebaWindow.instance().point.hide();
-			AmoebaWindow.instance().rectangle.hide();
-			AmoebaWindow.instance().mainVUI.updateCanvas();
-		}
 		
 		return averageReward;
 	}
@@ -469,7 +477,7 @@ public class SimpleReinforcement {
 			instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
 			instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
 			instance.point.hide();
-			instance.rectangle.hide();
+			//instance.rectangle.hide();
 		}
 		
 		
