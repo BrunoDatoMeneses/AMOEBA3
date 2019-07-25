@@ -89,6 +89,7 @@ public class Head extends AmoebaAgent {
 		setContextFromPropositionWasSelected(false);
 		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
 		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
+		setAverageRegressionPerformanceIndicator();
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -1887,6 +1888,12 @@ public class Head extends AmoebaAgent {
 	
 	public Double getAverageRegressionPerformanceIndicator() {
 		
+		return getAmas().data.averageRegressionPerformanceIndicator;
+		
+	}
+	
+	public void setAverageRegressionPerformanceIndicator() {
+		
 		int numberOfRegressions = 0;
 		if(activatedNeighborsContexts.size()>0) {
 			double meanRegressionPerformanceIndicator = 0.0;
@@ -1895,13 +1902,14 @@ public class Head extends AmoebaAgent {
 					numberOfRegressions+=1;
 			}
 			assert numberOfRegressions != 0;
-			return (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.initRegressionPerformance) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.initRegressionPerformance;
+			getAmas().data.averageRegressionPerformanceIndicator =  (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.initRegressionPerformance) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.initRegressionPerformance;
 		}
 		else{
-			return getAmas().data.initRegressionPerformance;
+			getAmas().data.averageRegressionPerformanceIndicator = getAmas().data.initRegressionPerformance;
 		}
 		
 	}
+	
 
 	public void proposition(Context c) {
 		activatedContexts.add(c);
