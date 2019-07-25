@@ -148,7 +148,7 @@ public class ContextMenuVUI extends ContextMenu {
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(amoeba.getPercepts().size() == 2) {
+				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
 					learnTwoDimension(amoeba, vui);
 				} else {
 					learnNDimebsion(amoeba, vui);
