@@ -1,6 +1,6 @@
 import os
 import gym
-import gym_gazebo2
+#import gym_gazebo2
 import subprocess
 import time
 import math
