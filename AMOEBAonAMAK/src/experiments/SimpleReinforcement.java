@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 import agents.context.localModel.TypeLocalModel;
 import fr.irit.smac.amak.Configuration;
@@ -28,24 +28,59 @@ import utils.XmlConfigGenerator;
  * @author Hugo
  *
  */
-public class SimpleReinforcement {
+public abstract class SimpleReinforcement {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
-	public static final int N_LEARN = 100;
+	public static final int N_LEARN = 400;
 	public static final int N_TEST = 100;
 	
 	/* Exploration */
-	public static final int N_EXPLORE_LINE = 60;
 	public static final double MIN_EXPLO_RATE = 0.02;
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
-	public static final String EXPLORATION_STRATEGY = "random"; // can be "random" or "line"
-	private static int exploreLine;
 	
-	private Random rand = new Random();
-	private double x = 0;
-	private double reward = 0;
-	private Drawable pos;
+	public static void main(String[] args) {
+		//poc(true);
+		Configuration.commandLineMode = true;
+		/*System.out.println("----- AMOEBA -----");
+		learning(new QLearning(), new OneDimensionEnv());
+		System.out.println("----- END AMOEBA -----");
+		System.out.println("\n\n----- QLEARNING -----");
+		learning(new QLearning());
+		System.out.println("----- END QLEARNING -----");*/
+		ArrayList<ArrayList<Double>> results = new ArrayList<>();
+		for(int i = 0; i < 100; i++) {
+			LearningAgent agent = new QLearning();
+			Environment env = new OneDimensionEnv();
+			results.add(learning(agent, env));
+			System.out.println(i);
+		}
+		
+		int nbEpisodes = results.get(0).size();
+		for(int i = 0; i < nbEpisodes; i++) {
+			double average = 0;
+			for(int j = 0; j < results.size(); j++) {
+				average += results.get(j).get(i);
+			}
+			average /= results.size();
+			System.out.println(""+i+"\t"+average);
+		}
+		
+		//System.exit(0);
+	}
+	
+	/**
+	 * An environment in which a LearningAgent reside
+	 * @author Hugo
+	 *
+	 */
+	public interface Environment {
+		public List<String> actionSpace();
+		public List<String> perceptionSpace();
+		public HashMap<String, Double> reset();
+		public HashMap<String, Double> step(HashMap<String, Double> action);
+		public HashMap<String, Double> randomAction();
+	}
 	
 	/**
 	 * Wrapper for any kind of learning agent
@@ -53,10 +88,16 @@ public class SimpleReinforcement {
 	 *
 	 */
 	public interface LearningAgent {
-		public double choose(HashMap<String, Double> state);
+		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env);
+		public HashMap<String, Double> explore(HashMap<String, Double> state, Environment env);
 		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2, HashMap<String, Double> action, boolean done);
 	}
 	
+	/**
+	 * Compatible only with OneDimensionEnv 
+	 * @author Hugo
+	 *
+	 */
 	public static class AmoebaQL implements LearningAgent {
 		public AMOEBA amoeba;
 		public double lr = 0.8;
@@ -70,12 +111,14 @@ public class SimpleReinforcement {
 		}
 		
 		@Override
-		public double choose(HashMap<String, Double> state) {
+		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
 			double a = amoeba.maximize(state).getOrDefault("a1", 0.0);
 			if(a == 0.0) {
 				a = rand.nextBoolean() ? -1 : 1;
 			}
-			return a;
+			HashMap<String, Double> action = new HashMap<String, Double>();
+			action.put("a1", a);
+			return action;
 		}
 
 		@Override
@@ -88,7 +131,7 @@ public class SimpleReinforcement {
 			double q;
 			if(!done) {
 				double expectedReward = amoeba.request(action);
-				double futureAction = this.choose(state2Copy);
+				double futureAction = this.choose(state2Copy, null).get("a1");
 				q = reward + gamma * futureAction - expectedReward;
 			} else {
 				q = reward;
@@ -97,6 +140,11 @@ public class SimpleReinforcement {
 			learn.put("oracle", lr * q);
 			
 			amoeba.learn(learn);
+		}
+
+		@Override
+		public HashMap<String, Double> explore(HashMap<String, Double> state, Environment env) {
+			return env.randomAction();
 		}
 	}
 	
@@ -107,7 +155,6 @@ public class SimpleReinforcement {
 	 */
 	public static class AmoebaCoop implements LearningAgent {
 		public AMOEBA amoeba;
-		private Random rand = new Random();
 		
 		public AmoebaCoop() {
 			amoeba = setup();
@@ -116,12 +163,12 @@ public class SimpleReinforcement {
 		}
 		
 		@Override
-		public double choose(HashMap<String, Double> state) {
-			double a = amoeba.maximize(state).getOrDefault("a1", 0.0);
-			if(a == 0.0) {
-				a = rand.nextBoolean() ? -1 : 1;
+		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
+			HashMap<String, Double> action = amoeba.maximize(state);
+			if(action.get("oracle") == Double.NEGATIVE_INFINITY) {
+				action = env.randomAction();
 			}
-			return a;
+			return action;
 		}
 
 		@Override
@@ -129,10 +176,16 @@ public class SimpleReinforcement {
 				HashMap<String, Double> action, boolean done) {
 			amoeba.learn(action);
 		}
+
+		@Override
+		public HashMap<String, Double> explore(HashMap<String, Double> state, Environment env) {
+			return env.randomAction();
+		}
 		
 	}
 	
 	/**
+	 * Compatible only with OneDimensionEnv.<br/>
 	 * An extremely crude and quick implementation of Q learning.
 	 * Not expected to perform well, but should be better than random.
 	 * @author Hugo
@@ -145,7 +198,7 @@ public class SimpleReinforcement {
 		private Random rand = new Random();
 		
 		@Override
-		public double choose(HashMap<String, Double> state) {
+		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
 			int p = state.get("p1").intValue()+50;
 			double a;
 			if(Q[p][0] == Q[p][1]) {
@@ -153,7 +206,9 @@ public class SimpleReinforcement {
 			} else {
 				a = Q[p][0] > Q[p][1] ? -1 : 1;
 			}
-			return a;
+			HashMap<String, Double> action = new HashMap<String, Double>();
+			action.put("a1", a);
+			return action;
 		}
 
 		@Override
@@ -174,37 +229,93 @@ public class SimpleReinforcement {
 			double q = reward + gamma * max - Q[p][a];
 			Q[p][a] += lr * q;
 		}
+
+		@Override
+		public HashMap<String, Double> explore(HashMap<String, Double> state, Environment env) {
+			return env.randomAction();
+		}
 		
 	}
 	
-
-	public static void main(String[] args) {
-		//poc(true);
-		//Configuration.commandLineMode = true;
-		System.out.println("----- AMOEBA -----");
-		learning(new AmoebaQL());
-		System.out.println("----- END AMOEBA -----");
-		/*System.out.println("\n\n----- QLEARNING -----");
-		learning(new QLearning());
-		System.out.println("----- END QLEARNING -----");*/
-		/*ArrayList<ArrayList<Double>> results = new ArrayList<>();
-		LearningAgent agent = new QLearning();
-		for(int i = 0; i < 100; i++) {
-			results.add(learning(agent));
-			System.out.println(i);
+	public static class OneDimensionEnv implements Environment {
+		private Random rand = new Random();
+		private double x = 0;
+		private double reward = 0;
+		private Drawable pos;
+		
+		public OneDimensionEnv() {
+			if(!Configuration.commandLineMode) {
+				AmoebaWindow instance = AmoebaWindow.instance();
+				//pos = new DrawableOval(0.5, 0.5, 1, 1);
+				//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
+				//instance.mainVUI.add(pos);
+				instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
+				instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
+				instance.point.hide();
+				//instance.rectangle.hide();
+			}
 		}
 		
-		int nbEpisodes = results.get(0).size();
-		for(int i = 0; i < nbEpisodes; i++) {
-			double average = 0;
-			for(int j = 0; j < results.size(); j++) {
-				average += results.get(j).get(i);
-			}
-			average /= results.size();
-			System.out.println(""+i+"\t"+average);
+		@Override
+		public HashMap<String, Double> reset(){
+			x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
+			x = Math.round(x);
+			reward = 0.0;
+			//pos.move(x+0.5, 0.5);
+			
+			HashMap<String, Double> ret = new HashMap<>();
+			ret.put("p1", x);
+			ret.put("oracle", reward);
+			return ret;
 		}
-		*/
-		//System.exit(0);
+		
+		@Override
+		public HashMap<String, Double> step(HashMap<String, Double> actionMap){
+			double action = actionMap.get("a1");
+			if(action == 0.0) action = rand.nextDouble();
+			if(action > 0.0) action = Math.ceil(action);
+			if(action < 0.0 ) action = Math.floor(action);
+			if(action > 1.0) action = 1.0;
+			if(action < -1.0) action = -1.0;
+			double oldX = x;
+			x = x + action;
+			if(x < -50.0 || x > 50.0) {
+				reward = -100.0;
+			} else if(x == 0.0 || sign(oldX) != sign(x)) {
+				// win !
+				reward = 100.0;
+			} else {
+				reward = -1.0;
+			}
+			HashMap<String, Double> ret = new HashMap<>();
+			ret.put("p1", x);
+			ret.put("oracle", reward);
+			//pos.move(x+0.5, 0.5);
+			return ret;
+		}
+
+		@Override
+		public List<String> actionSpace() {
+			ArrayList<String> l = new ArrayList<>();
+			l.add("a1 enum:true {-1, 1}");
+			return l;
+		}
+
+		@Override
+		public List<String> perceptionSpace() {
+			ArrayList<String> l = new ArrayList<>();
+			l.add("p1 enum:false [-50, 50]");
+			return l;
+		}
+
+		@Override
+		public HashMap<String, Double> randomAction() {
+			double a = rand.nextBoolean() ? -1 : 1;
+			HashMap<String, Double> action = new HashMap<String, Double>();
+			action.put("a1", a);
+			return action;
+			}
+		
 	}
 	
 	/**
@@ -238,9 +349,9 @@ public class SimpleReinforcement {
 	 * @param agent
 	 * @return
 	 */
-	public static ArrayList<Double> learning(LearningAgent agent){
-		SimpleReinforcement env = new SimpleReinforcement();
+	public static ArrayList<Double> learning(LearningAgent agent, Environment env){
 		ArrayList<Double> averageRewards = new ArrayList<Double>();
+		Random rand = new Random();
 		
 		Random r = new Random();
 		HashMap<String, Double> state = env.reset();
@@ -249,7 +360,6 @@ public class SimpleReinforcement {
 		for(int i = 0; i < N_LEARN; i++) {
 			int nbStep = 0;
 			state = env.reset();
-			exploreLine = N_EXPLORE_LINE;
 			HashMap<String, Double> action = new HashMap<String, Double>();
 			double totReward = 0.0;
 			
@@ -262,20 +372,17 @@ public class SimpleReinforcement {
 					invalid = true;
 				}
 				state.remove("oracle");
-				double lastAction = action.getOrDefault("a1", 0.0);
 				
 				action = new HashMap<String, Double>();
 				
-				if(exploreLine < N_EXPLORE_LINE && lastAction != 0.0) {
-					action.put("a1", lastAction);
-					exploreLine++;
+				if(rand.nextDouble() < explo) {
+					action = agent.explore(state, env);
 				} else {
-					action.put("a1", agent.choose(state));
-					explore(r, explo, action, lastAction);
+					action = agent.choose(state, env);
 				}
 				
 				
-				state2 = env.step(action.get("a1"));
+				state2 = env.step(action);
 				if(state2.get("oracle") != -1.0) {
 					done = true;
 				}
@@ -306,7 +413,7 @@ public class SimpleReinforcement {
 		return averageRewards;
 	}
 
-	private static double test(LearningAgent agent, SimpleReinforcement env, Random r, int nbTest) {
+	private static double test(LearningAgent agent, Environment env, Random r, int nbTest) {
 		HashMap<String, Double> state;
 		HashMap<String, Double> state2;
 		double nbPositiveReward = 0.0;
@@ -324,7 +431,7 @@ public class SimpleReinforcement {
 					done = true;
 				}
 				state.remove("oracle");
-				double a = agent.choose(state);
+				 HashMap<String, Double> a = agent.choose(state, env);
 				
 				state2 = env.step(a);
 				
@@ -355,7 +462,7 @@ public class SimpleReinforcement {
 	 */
 	public static void poc(boolean learnMalus) {
 		AMOEBA amoeba = setup();
-		SimpleReinforcement env = new SimpleReinforcement();
+		Environment env = new OneDimensionEnv();
 		
 		// train
 		for(double n = 0.0; n < 0.5; n+=0.1) {
@@ -397,42 +504,6 @@ public class SimpleReinforcement {
 				pos += 1.0;
 			}
 		}
-		// increase precision of model near objective
-		// right now it make things worst
-		/*
-		for(int n = 0; n < 5; n++) {
-			for(double pos = 2.0; pos > 0.02; pos -= 0.1) {
-				double reward = 100 - Math.abs(pos);
-				HashMap<String, Double> action = new HashMap<String, Double>();
-				
-				action.put("p1", pos);
-				action.put("a1", -1.0);
-				action.put("oracle", reward);
-				amoeba.learn(action);
-				
-				if(learnMalus) {
-					reward = -150 + Math.abs(pos);
-					action.put("p1", pos);
-					action.put("a1", 1.0);
-					action.put("oracle", reward);
-					amoeba.learn(action);
-				}
-				
-				action.put("p1", -pos);
-				action.put("a1", 1.0);
-				action.put("oracle", reward);
-				amoeba.learn(action);
-				
-				if(learnMalus) {
-					reward = -150 + Math.abs(pos);
-					action.put("p1", -pos);
-					action.put("a1", -1.0);
-					action.put("oracle", reward);
-					amoeba.learn(action);
-				}
-			}
-		}
-		*/
 		
 		// tests
 		Random r = new Random();
@@ -462,7 +533,7 @@ public class SimpleReinforcement {
 				}
 				//System.out.println("action "+action);
 				
-				state2 = env.step(action.get("a1"));
+				state2 = env.step(action);
 				
 				if(state2.get("oracle") != -1.0) {
 					done = true;
@@ -481,87 +552,9 @@ public class SimpleReinforcement {
 			//System.out.println("-----------------------------\nTot reward "+tot_reward+"\n-----------------------------");
 		}
 		System.out.println("Average reward : "+tot_reward/nbTest+"  Positive reward %: "+(nbPositiveReward/nbTest));
-		AmoebaWindow.instance().point.move(100, 100);
-		AmoebaWindow.instance().mainVUI.updateCanvas();
-	}
-
-	/**
-	 * Possibly overwrite the action and explore instead. 
-	 * @param r A rng
-	 * @param explo Current exploration rate
-	 * @param action The current action
-	 * @param lastAction The action of the last simulation cycle
-	 */
-	private static void explore(Random r, double explo, HashMap<String, Double> action, double lastAction) {
-		if(r.nextDouble() < explo) {
-			switch (EXPLORATION_STRATEGY) {
-			case "line":
-				exploreLine = 0;
-				action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
-				break;
-			case "random":
-				action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));
-				break;
-			default:
-				throw new IllegalArgumentException("Unkown exploration strategy : "+EXPLORATION_STRATEGY);
-			}
-		}
 	}
 	
-	/**
-	 * Must be called AFTER an AMOEBA with GUI
-	 */
-	public SimpleReinforcement() {
-		if(!Configuration.commandLineMode) {
-			AmoebaWindow instance = AmoebaWindow.instance();
-			//pos = new DrawableOval(0.5, 0.5, 1, 1);
-			//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
-			//instance.mainVUI.add(pos);
-			instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
-			instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
-			instance.point.hide();
-			//instance.rectangle.hide();
-		}
-		
-		
-	}
-	
-	public HashMap<String, Double> step(double action){
-		if(action == 0.0) action = rand.nextDouble();
-		if(action > 0.0) action = Math.ceil(action);
-		if(action < 0.0 ) action = Math.floor(action);
-		if(action > 1.0) action = 1.0;
-		if(action < -1.0) action = -1.0;
-		double oldX = x;
-		x = x + action;
-		if(x < -50.0 || x > 50.0) {
-			reward = -100.0;
-		} else if(x == 0.0 || sign(oldX) != sign(x)) {
-			// win !
-			reward = 100.0;
-		} else {
-			reward = -1.0;
-		}
-		HashMap<String, Double> ret = new HashMap<>();
-		ret.put("p1", x);
-		ret.put("oracle", reward);
-		//pos.move(x+0.5, 0.5);
-		return ret;
-	}
-	
-	public HashMap<String, Double> reset(){
-		x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
-		x = Math.round(x);
-		reward = 0.0;
-		//pos.move(x+0.5, 0.5);
-		
-		HashMap<String, Double> ret = new HashMap<>();
-		ret.put("p1", x);
-		ret.put("oracle", reward);
-		return ret;
-	}
-	
-	private int sign(double x) {
+	private static int sign(double x) {
 		return x < 0 ? -1 : 1;
 	}
 
