@@ -5,7 +5,7 @@ pip3 install requirements.txt
 ```
 Optional : check [openai gym](https://gym.openai.com/) documentation for a full install.
 
-Run the setup script [setup.sh](setup.sh) (linux only)
+Run the setup script [setup.sh](setup.sh) (linux only). It just clean some file, compile the correct AMOEBAonAMAK jar and copy it for ease of use. 
 
 You're good to go, check that py4j is correctly working with [basic_demo.py](basic_demo.py) :
 ```
