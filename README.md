@@ -1,10 +1,15 @@
 # AMAKFX and AMOEBAonAMAK 
 
-Tested with openjdk 11.
+Tested with OpenJDK 11, should work with Java 8.
 
-## Build Jar with dependencies
+Check [the documentation directory](documentation) for more detailed and in depth instruction and explanation.
+
+Check AMAKFX's [README](AMAKFX/README.md) for more detail on how to use it.
+
+# Quick start :
+## Maven build Jar with dependencies
 `mvn clean compile assembly:single`
-Note that the resulting jars are not platform independant. 
+Note that the resulting jars are not platform independent. 
 
 ## Use with Eclipse
 Clone this repo and import it as a Maven project.
@@ -16,5 +21,13 @@ AMOEBA-parent
   | AMAKFX
   | AMOEBAonAMAK
 ```
-For more detail on [AMOEBAonAMAK](AMOEBAonAMAK/README.md) or [AMAKFX](AMAKFX/README.md), check their respective README.
 
+Check AMAKFX's [README](AMAKFX/README.md) for more detail on how to use it.
+
+Check [the documentation directory](documentation) for more detailed and in depth instruction and explanation on AMOEBA.
+
+### Amoeba Quick start
+```Java
+StudiedSystem studiedSystem = new F_XY_System(50.0);
+AMOEBA amoeba = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
+```
