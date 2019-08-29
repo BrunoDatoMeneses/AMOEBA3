@@ -89,6 +89,7 @@ public class Head extends AmoebaAgent {
 		setContextFromPropositionWasSelected(false);
 		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
 		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
+		setAverageRegressionPerformanceIndicator();
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -174,11 +175,18 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 
-		getAmas().data.executionTimes[7]=System.currentTimeMillis();
 		
+		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 		NCSDetection_ChildContext();
+		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 		
+		getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		NCSDetection_PotentialRequest();
+		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
+		
+		
+		
+		getAmas().data.executionTimes[7]=System.currentTimeMillis();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -235,12 +243,13 @@ public class Head extends AmoebaAgent {
 
 		
 		getAmas().data.executionTimes[7]=System.currentTimeMillis()- getAmas().data.executionTimes[7];
-
 		
 		for(int i = 0 ; i<20;i++) {
 			getAmas().data.executionTimesSums[i] += getAmas().data.executionTimes[i];
 		}			
 
+		
+		
 	}
 
 	public double getMinMaxVolume() {
@@ -893,26 +902,28 @@ public class Head extends AmoebaAgent {
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
-			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
-					.distance(activatedContext.getCurrentExperiment());
-			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
+			currentDistanceToOraclePrediction = activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment());
+			
 
 			getAmas().data.contextNotFinished = false;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
+				
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 				getAmas().data.contextNotFinished = true;
+				
 			}
-
 			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+				
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 
 			}
 
 			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
 				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+				getAmas().data.distanceToRegression = minDistanceToOraclePrediction;
 			}
 
 			if (!getAmas().data.contextNotFinished) {
@@ -932,6 +943,7 @@ public class Head extends AmoebaAgent {
 			activatedContexts.get(i).criticalities.updateMeans();
 			
 			if (activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression") != null) {
+				
 				activatedContexts.get(i).regressionPerformance.update(activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression"));
 				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContexts.get(i).getName(), ""+activatedContexts.get(i).regressionPerformance.getPerformanceIndicator())));
 			}
@@ -1835,7 +1847,7 @@ public class Head extends AmoebaAgent {
 				
 				EndogenousRequest currentRequest = itr.next();
 				
-				if(currentRequest.getType() == REQUEST.OVERLAP) {
+				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
 						
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}
@@ -1887,6 +1899,12 @@ public class Head extends AmoebaAgent {
 	
 	public Double getAverageRegressionPerformanceIndicator() {
 		
+		return getAmas().data.averageRegressionPerformanceIndicator;
+		
+	}
+	
+	public void setAverageRegressionPerformanceIndicator() {
+		
 		int numberOfRegressions = 0;
 		if(activatedNeighborsContexts.size()>0) {
 			double meanRegressionPerformanceIndicator = 0.0;
@@ -1895,13 +1913,14 @@ public class Head extends AmoebaAgent {
 					numberOfRegressions+=1;
 			}
 			assert numberOfRegressions != 0;
-			return meanRegressionPerformanceIndicator/numberOfRegressions;
+			getAmas().data.averageRegressionPerformanceIndicator =  (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.initRegressionPerformance) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.initRegressionPerformance;
 		}
 		else{
-			return getAmas().data.initRegressionPerformance;
+			getAmas().data.averageRegressionPerformanceIndicator = getAmas().data.initRegressionPerformance;
 		}
 		
 	}
+	
 
 	public void proposition(Context c) {
 		activatedContexts.add(c);

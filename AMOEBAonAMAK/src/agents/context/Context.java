@@ -593,7 +593,24 @@ public class Context extends AmoebaAgent {
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
-				return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.OVERLAP);
+				
+				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
+				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
+				
+				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
+					
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
+				
+				if(distanceDifference<averageDistanceToOraclePrediction) {
+					return new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE);
+				}
+				else {
+					return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT);
+				}
+				
+				
+				
 			}		
 		}
 		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 750) {
@@ -700,10 +717,13 @@ public class Context extends AmoebaAgent {
 				
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
 				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-						
-				if((currentDistanceToOraclePrediction<averageDistanceToOraclePrediction) && (otherContextDistanceToOraclePrediction<averageDistanceToOraclePrediction)) {
+				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 					
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction))); 
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
+				
+				if(distanceDifference<averageDistanceToOraclePrediction) {
+					
+					 
 					
 					
 					for(Percept pct : ranges.keySet()) {

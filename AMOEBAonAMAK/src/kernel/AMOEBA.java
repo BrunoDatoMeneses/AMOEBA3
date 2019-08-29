@@ -165,6 +165,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			timeExecution.addData("BestContextInNeighbors", cycle, data.executionTimesSums[8], notify);
 			timeExecution.addData("CreateContext", cycle, data.executionTimesSums[9], notify);
 			timeExecution.addData("UpdateStatitics", cycle, data.executionTimesSums[10], notify);
+			timeExecution.addData("ChildContext", cycle, data.executionTimesSums[11], notify);
+			timeExecution.addData("PotentialRequest", cycle, data.executionTimesSums[12], notify);
 			
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
