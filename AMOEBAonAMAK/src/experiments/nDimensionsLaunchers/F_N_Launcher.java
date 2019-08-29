@@ -35,7 +35,7 @@ public class F_N_Launcher implements Serializable {
 	public static final boolean randomExploration = true;
 	public static final boolean limitedToSpaceZone = true;
 	//public static final double mappingErrorAllowed = 0.07; // BIG SQUARE
-	public static double mappingErrorAllowed = 0.04; // MULTI
+	public static double mappingErrorAllowed = 0.03; // MULTI
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 	
