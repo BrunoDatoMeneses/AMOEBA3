@@ -47,6 +47,7 @@ public class Context extends AmoebaAgent {
 	private double action;
 
 	private Double actionProposition = null;
+	public Double lastPrediction = null;
 
 	//private boolean valid;
 
@@ -1485,6 +1486,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getActionProposal() {
+		
+		
 		return localModel.getProposition();
 	}
 

@@ -40,9 +40,36 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	private void updateColor() {
+		setColorWithPrediction();
+	}
+	
+	private void setColorWithCoefs() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
 		drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
 	}
+	
+	private void setColorWithPrediction() {
+		
+		double r = 0.0;
+		double g = 0.0;
+		double b = 0.0;
+		
+		if(context.lastPrediction!=null) {
+			r = context.lastPrediction < -900 ? 1.0 : 0.0;
+			g = context.lastPrediction > 900 ? 1.0 : 0.0;
+		}else {
+			b = 1.0;
+		}
+		
+		
+		if(Math.abs(context.lastPrediction)>900) {
+			System.out.println("---------------------------------------------" +context.getName() + " " + context.lastPrediction + " r " + r + " g " + g);
+		}
+		
+		drawable.setColor(new Color(r, g, b, 90d / 255d));
+	}
+	
+	
 	
 	public String getColorForUnity() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());

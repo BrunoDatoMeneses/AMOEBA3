@@ -750,6 +750,7 @@ public class Head extends AmoebaAgent {
 			newContext = context;
 			newContextCreated = true;
 			
+			newContext.lastPrediction = newContext.getActionProposal();
 			
 		}
 		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
@@ -893,6 +894,7 @@ public class Head extends AmoebaAgent {
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
+			System.out.println(activatedContext.getName());
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
 			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
@@ -923,6 +925,7 @@ public class Head extends AmoebaAgent {
 			activatedContext.criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
 			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
 
+			activatedContext.lastPrediction = activatedContext.getActionProposal();
 		}
 
 		
