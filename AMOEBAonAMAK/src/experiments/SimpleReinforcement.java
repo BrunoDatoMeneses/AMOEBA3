@@ -110,7 +110,7 @@ public abstract class SimpleReinforcement {
 		public AmoebaQL() {
 			amoeba = setup();
 			amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-			amoeba.getEnvironment().setMappingErrorAllowed(0.04);
+			amoeba.getEnvironment().setMappingErrorAllowed(0.02);
 		}
 		
 		@Override
@@ -120,7 +120,7 @@ public abstract class SimpleReinforcement {
 				a = rand.nextBoolean() ? -1 : 1;
 			}
 			HashMap<String, Double> action = new HashMap<String, Double>();
-			action.put("a1", a);
+			action.put("a1", a/20);
 			return action;
 		}
 
@@ -139,7 +139,7 @@ public abstract class SimpleReinforcement {
 			double q;
 			if(!done) {
 				double expectedReward = amoeba.request(action);
-				double futureAction = this.choose(state2Copy, null).get("a1");
+				double futureAction = this.choose(state2Copy, null).get("a1")/20;
 				
 				q = reward + gamma * futureAction - expectedReward;
 			} else {
@@ -147,7 +147,9 @@ public abstract class SimpleReinforcement {
 			}
 			HashMap<String, Double> learn = new HashMap<>(action);
 			
-			learn.put("oracle", lr * q);
+			learn.put("a1", learn.get("a1")*20);
+			//learn.put("oracle", lr * q);
+			learn.put("oracle", reward);
 			
 			// learn : previous state, current action and current Q learning reward
 			
@@ -262,8 +264,8 @@ public abstract class SimpleReinforcement {
 				//pos = new DrawableOval(0.5, 0.5, 1, 1);
 				//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
 				//instance.mainVUI.add(pos);
-				instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
-				instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
+				//instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
+				//instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
 				instance.point.hide();
 				//instance.rectangle.hide();
 			}
@@ -271,7 +273,7 @@ public abstract class SimpleReinforcement {
 		
 		@Override
 		public HashMap<String, Double> reset(){
-			x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
+			x = RandomUtils.nextDouble(rand, -10.0, Math.nextUp(10.0));
 			x = Math.round(x);
 			reward = 0.0;
 			//pos.move(x+0.5, 0.5);
@@ -292,11 +294,11 @@ public abstract class SimpleReinforcement {
 			if(action < -1.0) action = -1.0;
 			double oldX = x;
 			x = x + action;
-			if(x < -50.0 || x > 50.0) {
-				reward = -100.0;
+			if(x < -10.0 || x > 10.0) {
+				reward = -1000.0;
 			} else if(x == 0.0 || sign(oldX) != sign(x)) {
 				// win !
-				reward = 100.0;
+				reward = 1000.0;
 			} else {
 				reward = -1.0;
 			}
@@ -317,7 +319,7 @@ public abstract class SimpleReinforcement {
 		@Override
 		public List<String> perceptionSpace() {
 			ArrayList<String> l = new ArrayList<>();
-			l.add("p1 enum:false [-50, 50]");
+			l.add("p1 enum:false [-10, 10]");
 			return l;
 		}
 
