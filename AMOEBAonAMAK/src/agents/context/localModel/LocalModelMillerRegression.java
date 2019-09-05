@@ -148,6 +148,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			if (Double.isNaN(coef)) coef = 0.0;
 			double pos;
 			Percept p = percepts.get(i-1);
+			
 			if(fixedPercepts.containsKey(p.getName())) {
 				pos = fixedPercepts.get(p.getName());
 			} else {
@@ -158,6 +159,7 @@ public class LocalModelMillerRegression extends LocalModel{
 					pos = context.getRanges().get(p).getStart();
 				}
 			}
+			
 			double value = coef * pos;
 			result.put("oracle", result.get("oracle") + value);
 			result.put(p.getName(), pos);

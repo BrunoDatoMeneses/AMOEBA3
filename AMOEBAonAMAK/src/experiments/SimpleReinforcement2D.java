@@ -28,7 +28,7 @@ import utils.XmlConfigGenerator;
  * @author Hugo
  *
  */
-public abstract class SimpleReinforcement {
+public abstract class SimpleReinforcement2D {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
 	public static final int N_LEARN = 400;
@@ -54,7 +54,7 @@ public abstract class SimpleReinforcement {
 			//LearningAgent agent = new QLearning();
 			LearningAgent agent = new AmoebaQL();
 			//LearningAgent agent = new AmoebaCoop();
-			Environment env = new OneDimensionEnv();
+			Environment env = new TwoDimensionEnv();
 			results.add(learning(agent, env));
 			System.out.println(i);
 		}
@@ -110,17 +110,25 @@ public abstract class SimpleReinforcement {
 		public AmoebaQL() {
 			amoeba = setup();
 			amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-			amoeba.getEnvironment().setMappingErrorAllowed(0.04);
+			amoeba.getEnvironment().setMappingErrorAllowed(0.1);
 		}
 		
 		@Override
 		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
-			double a = amoeba.maximize(state).getOrDefault("a1", 0.0);
-			if(a == 0.0) {
-				a = rand.nextBoolean() ? -1 : 1;
-			}
+			
+			HashMap<String, Double> bestActions =  amoeba.maximize(state);
+			double a1 = bestActions.getOrDefault("a1", 0.0);
+			double a2 = bestActions.getOrDefault("a2", 0.0);
+//			if(a1 == 0.0) {
+//				a1 = rand.nextBoolean() ? -1 : 1;
+//			}
+//			if(a2 == 0.0) {
+//				a2 = rand.nextBoolean() ? -1 : 1;
+//			}
+			
 			HashMap<String, Double> action = new HashMap<String, Double>();
-			action.put("a1", a);
+			action.put("a1", a1);
+			action.put("a2", a2);
 			return action;
 		}
 
@@ -130,7 +138,7 @@ public abstract class SimpleReinforcement {
 			
 			// state : previous position and associated reward
 			// state2 : new position with current reward
-			// action : previous state, current action and current reward
+			// action : previous state, current actions and current reward
 			
 			HashMap<String, Double> state2Copy = new HashMap<>(state2);
 			state2Copy.remove("oracle"); //reward
@@ -139,9 +147,12 @@ public abstract class SimpleReinforcement {
 			double q;
 			if(!done) {
 				double expectedReward = amoeba.request(action);
-				double futureAction = this.choose(state2Copy, null).get("a1");
+				HashMap<String, Double> futureState = this.choose(state2Copy, null);
+				futureState.putAll(state2);
+				double futureReward = amoeba.request(futureState);
+				//double futureAction = this.choose(state2Copy, null).get("a1");
 				
-				q = reward + gamma * futureAction - expectedReward;
+				q = reward + gamma * futureReward - expectedReward;
 			} else {
 				q = reward;
 			}
@@ -250,20 +261,21 @@ public abstract class SimpleReinforcement {
 		
 	}
 	
-	public static class OneDimensionEnv implements Environment {
+	public static class TwoDimensionEnv implements Environment {
 		private Random rand = new Random();
 		private double x = 0;
+		private double y = 0;
 		private double reward = 0;
 		private Drawable pos;
 		
-		public OneDimensionEnv() {
+		public TwoDimensionEnv() {
 			if(!Configuration.commandLineMode) {
 				AmoebaWindow instance = AmoebaWindow.instance();
 				//pos = new DrawableOval(0.5, 0.5, 1, 1);
 				//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
 				//instance.mainVUI.add(pos);
-				instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
-				instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
+				//instance.mainVUI.createAndAddRectangle(-50, -0.25, 100, 0.5);
+				//instance.mainVUI.createAndAddRectangle(-0.25, -1, 0.5, 2);
 				instance.point.hide();
 				//instance.rectangle.hide();
 			}
@@ -273,11 +285,14 @@ public abstract class SimpleReinforcement {
 		public HashMap<String, Double> reset(){
 			x = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
 			x = Math.round(x);
+			y = RandomUtils.nextDouble(rand, -50.0, Math.nextUp(50.0));
+			y = Math.round(x);
 			reward = 0.0;
 			//pos.move(x+0.5, 0.5);
 			
 			HashMap<String, Double> ret = new HashMap<>();
 			ret.put("p1", x);
+			ret.put("p2", y);
 			ret.put("oracle", reward);
 			return ret;
 		}
@@ -285,16 +300,27 @@ public abstract class SimpleReinforcement {
 		@Override
 		public HashMap<String, Double> step(HashMap<String, Double> actionMap){
 			double action = actionMap.get("a1");
-			if(action == 0.0) action = rand.nextDouble();
+			//if(action == 0.0) action = rand.nextDouble();
 			if(action > 0.0) action = Math.ceil(action);
 			if(action < 0.0 ) action = Math.floor(action);
 			if(action > 1.0) action = 1.0;
 			if(action < -1.0) action = -1.0;
 			double oldX = x;
-			x = x + action;
-			if(x < -50.0 || x > 50.0) {
+			x = x + action*10;
+			
+			double action2 = actionMap.get("a2");
+			//if(action2 == 0.0) action2 = rand.nextDouble();
+			if(action2 > 0.0) action2 = Math.ceil(action2);
+			if(action2 < 0.0 ) action2 = Math.floor(action2);
+			if(action2 > 1.0) action2 = 1.0;
+			if(action2 < -1.0) action2 = -1.0;
+			double oldY = y;
+			y = y + action2*10;
+			
+			//System.out.println("ACTIONS " + " a1 " +action + " " + " a2 " + action2);
+			if(x < -50.0 || x > 50.0 || y < -50.0 || y > 50.0) {
 				reward = -100.0;
-			} else if(x == 0.0 || sign(oldX) != sign(x)) {
+			} else if((x == 0.0 && y == 0.0) || (sign(oldX) != sign(x) && sign(oldY) != sign(y) )) {
 				// win !
 				reward = 100.0;
 			} else {
@@ -302,6 +328,7 @@ public abstract class SimpleReinforcement {
 			}
 			HashMap<String, Double> ret = new HashMap<>();
 			ret.put("p1", x);
+			ret.put("p2", y);
 			ret.put("oracle", reward);
 			//pos.move(x+0.5, 0.5);
 			return ret;
@@ -310,7 +337,8 @@ public abstract class SimpleReinforcement {
 		@Override
 		public List<String> actionSpace() {
 			ArrayList<String> l = new ArrayList<>();
-			l.add("a1 enum:true {-1, 1}");
+			l.add("a1 enum:true {-1, 0, 1}");
+			l.add("a2 enum:true {-1, 0, 1}");
 			return l;
 		}
 
@@ -318,14 +346,20 @@ public abstract class SimpleReinforcement {
 		public List<String> perceptionSpace() {
 			ArrayList<String> l = new ArrayList<>();
 			l.add("p1 enum:false [-50, 50]");
+			l.add("p2 enum:false [-50, 50]");
 			return l;
 		}
 
 		@Override
 		public HashMap<String, Double> randomAction() {
-			double a = rand.nextBoolean() ? -1 : 1;
+			double a1 = rand.nextInt(3) - 1;
+			double a2 = (a1 == 0.0) ? (rand.nextBoolean() ? -1 : 1) : (rand.nextInt(3) - 1);
+						
+//			double a1 =  rand.nextBoolean() ? -1 : 1;
+//			double a2 =  rand.nextBoolean() ? -1 : 1;
 			HashMap<String, Double> action = new HashMap<String, Double>();
-			action.put("a1", a);
+			action.put("a1", a1);
+			action.put("a2", a2);
 			return action;
 			}
 		
@@ -339,6 +373,8 @@ public abstract class SimpleReinforcement {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		sensors.add(new Pair<String, Boolean>("a1", true));
+		sensors.add(new Pair<String, Boolean>("p2", false));
+		sensors.add(new Pair<String, Boolean>("a2", true));
 		File config;
 		try {
 			config = File.createTempFile("config", "xml");
@@ -390,11 +426,12 @@ public abstract class SimpleReinforcement {
 				
 				action = new HashMap<String, Double>();
 				
-				if(rand.nextDouble() < explo) {
-					action = agent.explore(state, env);
-				} else {
-					action = agent.choose(state, env);
-				}
+				action = agent.explore(state, env);
+//				if(rand.nextDouble() < explo) {
+//					action = agent.explore(state, env);
+//				} else {
+//					action = agent.choose(state, env);
+//				}
 				
 				
 				state2 = env.step(action);  // new position with associated reward
@@ -403,6 +440,7 @@ public abstract class SimpleReinforcement {
 					done = true;
 				}
 				action.put("p1", state.get("p1")); //add previous state to action
+				action.put("p2", state.get("p2")); //add previous state to action
 				
 				action.put("oracle", state2.get("oracle")); //add current reward to action
 				
@@ -483,7 +521,7 @@ public abstract class SimpleReinforcement {
 	 */
 	public static void poc(boolean learnMalus) {
 		AMOEBA amoeba = setup();
-		Environment env = new OneDimensionEnv();
+		Environment env = new TwoDimensionEnv();
 		
 		// train
 		for(double n = 0.0; n < 0.5; n+=0.1) {

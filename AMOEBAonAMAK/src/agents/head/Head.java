@@ -178,7 +178,7 @@ public class Head extends AmoebaAgent {
 		
 		NCSDetection_ChildContext();
 		
-		NCSDetection_PotentialRequest();
+		//NCSDetection_PotentialRequest();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());

@@ -392,45 +392,46 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 	
 	@Override
-	public HashMap<String, Double> maximize(HashMap<String, Double> known){
+	public HashMap<String, Double> maximize(HashMap<String, Double> fixedPercepts){
 		ArrayList<Percept> percepts = getPercepts();
-		ArrayList<Percept> unknown = new ArrayList<>(percepts);
-		unknown.removeIf(p ->known.containsKey(p.getName()));
+		ArrayList<Percept> freePercepts = new ArrayList<>(percepts);
+		freePercepts.removeIf(p ->fixedPercepts.containsKey(p.getName()));
 		//System.out.println("known : "+known.keySet());
 		//System.out.println("unknow : "+unknown);
-		if(unknown.isEmpty()) {
+		if(freePercepts.isEmpty()) {
 			return null;
 		}
 		
 		//get partially activated context
-		ArrayList<Context> pac = new ArrayList<>();
-		for(Context c : getContexts()) {
+		ArrayList<Context> partiallyActivatedCtxts = new ArrayList<>();
+		for(Context ctxt : getContexts()) {
 			boolean good = true;
-			for(String p : known.keySet()) {
-				if(!c.getRangeByPerceptName(p).contains2(known.get(p))) {
+			for(String pctString : fixedPercepts.keySet()) {
+				
+				if(!ctxt.getRangeByPerceptName(pctString).contains2(fixedPercepts.get(pctString))) {
 					good = false;
 					break;
 				}
 			}
-			if(good) pac.add(c);
+			if(good) partiallyActivatedCtxts.add(ctxt);
 		}
 		
-		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
-		for(Context c : pac) {
-			sol.add(c.getLocalModel().getMaxWithConstraint(known));
+		ArrayList<HashMap<String, Double>> posibleSolutions = new ArrayList<>();
+		for(Context ctxt : partiallyActivatedCtxts) {
+			posibleSolutions.add(ctxt.getLocalModel().getMaxWithConstraint(fixedPercepts));
 		}
-		HashMap<String, Double> max = new HashMap<>();
+		HashMap<String, Double> maxSolution = new HashMap<>();
 
 		Double maxValue = Double.NEGATIVE_INFINITY;
-		max.put("oracle", maxValue);
+		maxSolution.put("oracle", maxValue);
 		//find best solution
-		for(HashMap<String, Double> s : sol) {
+		for(HashMap<String, Double> s : posibleSolutions) {
 			if(s.get("oracle") > maxValue) {
 				maxValue = s.get("oracle");
-				max = s;
+				maxSolution = s;
 			}
 		}
-		return max;
+		return maxSolution;
 	}
 
 	public LocalModel buildLocalModel(Context context, TypeLocalModel type) {
