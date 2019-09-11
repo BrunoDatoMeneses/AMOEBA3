@@ -55,16 +55,15 @@ public class ContextRendererFX extends RenderStrategy {
 		double b = 0.0;
 		
 		if(context.lastPrediction!=null) {
-			r = context.lastPrediction < -900 ? 1.0 : 0.0;
-			g = context.lastPrediction > 900 ? 1.0 : 0.0;
+			r = context.lastPrediction < 0 ? Math.abs(context.lastPrediction)/1000 : 0.0;
+			g = context.lastPrediction > 0 ? context.lastPrediction/1000 : 0.0;
+			r = r > 1.0 ? 1.0 : r;
+			g = g > 1.0 ? 1.0 : g;
 		}else {
 			b = 1.0;
 		}
 		
 		
-		if(Math.abs(context.lastPrediction)>900) {
-			System.out.println("---------------------------------------------" +context.getName() + " " + context.lastPrediction + " r " + r + " g " + g);
-		}
 		
 		drawable.setColor(new Color(r, g, b, 90d / 255d));
 	}

@@ -31,7 +31,7 @@ import utils.XmlConfigGenerator;
 public abstract class SimpleReinforcement2D {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
-	public static final int N_LEARN = 400;//400
+	public static final int N_LEARN = 100;//400
 	public static final int N_TEST = 100;
 	
 	/* Exploration */

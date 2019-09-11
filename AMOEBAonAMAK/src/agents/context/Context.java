@@ -774,6 +774,17 @@ public class Context extends AmoebaAgent {
 
 		return exp;
 	}
+	
+	public Experiment getArtificialExperiment() {
+		ArrayList<Percept> percepts = getAmas().getPercepts();
+		Experiment exp = new Experiment(this);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, this.getRanges().get(pct).getCenter());
+		}
+		
+
+		return exp;
+	}
 
 	public double sumOfRangesLengths() {
 		double sum = 0;
@@ -1397,6 +1408,7 @@ public class Context extends AmoebaAgent {
 
 		s += "Model "+this.localModel.getType()+" :";
 		s += this.localModel.getCoefsFormula() + "\n";
+		s += "Last Predicition " + lastPrediction  +"\n";
 		
 		s += "\n";
 		s += "Ranges :\n";

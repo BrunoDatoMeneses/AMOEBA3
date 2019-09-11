@@ -31,7 +31,7 @@ import utils.XmlConfigGenerator;
 public abstract class SimpleReinforcement {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
-	public static final int N_LEARN = 400;
+	public static final int N_LEARN = 100;
 	public static final int N_TEST = 100;
 	
 	/* Exploration */
@@ -50,7 +50,7 @@ public abstract class SimpleReinforcement {
 		learning(new QLearning());
 		System.out.println("----- END QLEARNING -----");*/
 		ArrayList<ArrayList<Double>> results = new ArrayList<>();
-		for(int i = 0; i < 100; i++) {
+		for(int i = 0; i < 1; i++) {
 			//LearningAgent agent = new QLearning();
 			LearningAgent agent = new AmoebaQL();
 			//LearningAgent agent = new AmoebaCoop();
@@ -69,7 +69,7 @@ public abstract class SimpleReinforcement {
 			System.out.println(""+i+"\t"+average);
 		}
 		
-		System.exit(0);
+		//System.exit(0);
 	}
 	
 	/**
@@ -138,10 +138,15 @@ public abstract class SimpleReinforcement {
 			double reward = state2.get("oracle");
 			double q;
 			if(!done) {
-				double expectedReward = amoeba.request(action);
-				double futureAction = this.choose(state2Copy, null).get("a1")/20;
 				
-				q = reward + gamma * futureAction - expectedReward;
+				
+				double expectedReward = amoeba.request(action);
+				HashMap<String, Double> futureState = this.choose(state2Copy, null);
+				futureState.putAll(state2);
+				double futureReward = amoeba.request(futureState);
+				//double futureAction = this.choose(state2Copy, null).get("a1")/20;
+				
+				q = reward + gamma * futureReward - expectedReward;
 			} else {
 				q = reward;
 			}
@@ -392,11 +397,12 @@ public abstract class SimpleReinforcement {
 				
 				action = new HashMap<String, Double>();
 				
-				if(rand.nextDouble() < explo) {
-					action = agent.explore(state, env);
-				} else {
-					action = agent.choose(state, env);
-				}
+				action = agent.explore(state, env);
+//				if(rand.nextDouble() < explo) {
+//					action = agent.explore(state, env);
+//				} else {
+//					action = agent.choose(state, env);
+//				}
 				
 				
 				state2 = env.step(action);  // new position with associated reward

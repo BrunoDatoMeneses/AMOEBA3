@@ -13,6 +13,7 @@ import java.util.Queue;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.CustomComparator;
+import agents.context.Experiment;
 import agents.percept.Percept;
 import kernel.AMOEBA;
 import ncs.NCS;
@@ -179,6 +180,8 @@ public class Head extends AmoebaAgent {
 		NCSDetection_ChildContext();
 		
 		//NCSDetection_PotentialRequest();
+		
+		//predictionPropagation();
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -694,6 +697,38 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
+	private void predictionPropagation() {
+		
+		
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- PREDICTION PROPAGATION")));
+		
+		
+		if(bestContext != null) {
+			for(Context ctxt : activatedNeighborsContexts) {
+				
+				if(ctxt != bestContext) {
+					
+					if(Math.abs(ctxt.lastPrediction - bestContext.lastPrediction)>10) {
+						
+						Experiment propagationExperiment = bestContext.getCurrentExperiment();
+						propagationExperiment.setOracleProposition(bestContext.lastPrediction);
+						
+						ctxt.getLocalModel().updateModel(propagationExperiment, 0.5);
+						ctxt.lastPrediction = ctxt.getActionProposal();
+					}
+					
+				}
+				
+			}
+		}
+		
+		
+		
+		
+		
+	}
+	
 	
 
 	private Double compareClosestContextPairModels(ContextPair<Context, Context> closestContexts) {
@@ -894,7 +929,7 @@ public class Head extends AmoebaAgent {
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
-			System.out.println(activatedContext.getName());
+			//System.out.println(activatedContext.getName());
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
 			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
