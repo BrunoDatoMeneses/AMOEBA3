@@ -48,6 +48,7 @@ public class Context extends AmoebaAgent {
 
 	private Double actionProposition = null;
 	public Double lastPrediction = null;
+	public Double smoothedPrediction = null;
 
 	//private boolean valid;
 
@@ -1409,6 +1410,7 @@ public class Context extends AmoebaAgent {
 		s += "Model "+this.localModel.getType()+" :";
 		s += this.localModel.getCoefsFormula() + "\n";
 		s += "Last Predicition " + lastPrediction  +"\n";
+		s += "Smoothed Predicition " + smoothedPrediction  +"\n";
 		
 		s += "\n";
 		s += "Ranges :\n";

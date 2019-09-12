@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import agents.context.localModel.TypeLocalModel;
+import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -275,7 +276,7 @@ public abstract class SimpleReinforcement2DSpatialRewardAndAction {
 			x = RandomUtils.nextDouble(rand, -size, Math.nextUp(size));
 			x = Math.round(x);
 			y = RandomUtils.nextDouble(rand, -size, Math.nextUp(size));
-			y = Math.round(x);
+			y = Math.round(y);
 			reward = 0.0;
 			//pos.move(x+0.5, 0.5);
 			
@@ -377,6 +378,12 @@ public abstract class SimpleReinforcement2DSpatialRewardAndAction {
 		World.minLevel = TRACE_LEVEL.ERROR;
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
+		
+		for(Percept pct : amoeba.getPercepts()) {
+			pct.setMax(10);
+			pct.setMin(-10);
+		}
+		
 		return amoeba;
 	}
 	

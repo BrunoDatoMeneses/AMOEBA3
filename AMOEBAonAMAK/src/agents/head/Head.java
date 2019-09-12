@@ -108,6 +108,35 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void playWithOracle() {
+		
+		Double meanNeighborsLastPredictions = null;
+		
+		if(activatedNeighborsContexts.size()>0) {
+			int nb=0;
+			meanNeighborsLastPredictions = 0.0;
+			for (Context ctxt : activatedNeighborsContexts) {
+
+				if(ctxt.lastPrediction != null) {
+					meanNeighborsLastPredictions += ctxt.lastPrediction;
+					nb++;
+				}
+			}
+			if(nb>0) {
+				meanNeighborsLastPredictions /= nb;	
+			}
+			else {
+				meanNeighborsLastPredictions = null;
+			}
+			
+		}
+		if(meanNeighborsLastPredictions != null) {
+			getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
+		}
+		
+		
+		
+		
+		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -148,7 +177,8 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
-		selfAnalysationOfContexts4();
+		//selfAnalysationOfContexts4();
+		selfAnalysationOfContextsReinforcement();
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
@@ -171,7 +201,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
 
 		getAmas().data.executionTimes[6]=System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 
@@ -786,6 +816,7 @@ public class Head extends AmoebaAgent {
 			newContextCreated = true;
 			
 			newContext.lastPrediction = newContext.getActionProposal();
+			newContext.smoothedPrediction = newContext.lastPrediction;
 			
 		}
 		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
@@ -919,9 +950,98 @@ public class Head extends AmoebaAgent {
 		}
 		
 	}
+	
+	
+	private void selfAnalysationOfContextsReinforcement() {
+
+		
+		
+		
+		
+		
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
+		
+		double currentDistanceToOraclePrediction;
+		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
+
+		if(getAmas().data.oracleValue > 0) {
+			System.out.println("CYCLE " + getAmas().getCycle() + " ORACLE " + getAmas().data.oracleValue + "     -------- HEAD 136");
+		}
+		
+		for (Context activatedContext : activatedContexts) {
+			if(getAmas().data.oracleValue > 0) {
+				System.out.println(activatedContext.getName());
+			}
+			
+			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
+					.distance(activatedContext.getCurrentExperiment());
+			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
+
+			getAmas().data.contextNotFinished = false;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
+					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
+			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
+				getAmas().data.contextNotFinished = true;
+			}
+
+			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
+			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
+				
+				
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
+
+			}
+
+			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
+				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+			}
+
+			if (!getAmas().data.contextNotFinished) {
+				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+				
+			}
+			
+			activatedContext.criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
+
+			activatedContext.lastPrediction = activatedContext.getActionProposal();
+			
+		}
+
+		
+		
+		for (int i = 0; i< activatedContexts.size() ; i++) {
+			
+			activatedContexts.get(i).criticalities.updateMeans();
+			
+			if (activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression") != null) {
+				activatedContexts.get(i).regressionPerformance.update(activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression"));
+				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContexts.get(i).getName(), ""+activatedContexts.get(i).regressionPerformance.getPerformanceIndicator())));
+			}
+			
+			
+			activatedContexts.get(i).analyzeResults4(this);
+
+		}
+		
+
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NCS DECTECTION USELESSNESS IN SELF ANALISIS")));
+		for (Context ctxt : activatedNeighborsContexts) {
+
+			if (!activatedContexts.contains(ctxt)) {
+				ctxt.NCSDetection_Uselessness();
+			}
+
+		}
+	}
 
 	private void selfAnalysationOfContexts4() {
 
+		
+		
+		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
 		
@@ -961,6 +1081,7 @@ public class Head extends AmoebaAgent {
 			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
 
 			activatedContext.lastPrediction = activatedContext.getActionProposal();
+			
 		}
 
 		
