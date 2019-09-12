@@ -103,23 +103,23 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		public AMOEBA amoebaSpatialReward;
+		//public AMOEBA amoebaSpatialReward;
+		public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaQL() {
-			amoebaSpatialReward = setup();
-			amoebaSpatialReward.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-			amoebaSpatialReward.getEnvironment().setMappingErrorAllowed(0.025);
+			//amoebaSpatialReward = setupSpatialReward();
+			amoebaControlModel = setupControlModel();
 		}
 		
 		@Override
 		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
 			
-			HashMap<String, Double> bestActions =  amoebaSpatialReward.maximize(state);
-			double a1 = bestActions.getOrDefault("a1", 0.0);
-			double a2 = bestActions.getOrDefault("a2", 0.0);
+//			HashMap<String, Double> bestActions =  amoebaSpatialReward.maximize(state);
+//			double a1 = bestActions.getOrDefault("a1", 0.0);
+//			double a2 = bestActions.getOrDefault("a2", 0.0);
 //			if(a1 == 0.0) {
 //				a1 = rand.nextBoolean() ? -1 : 1;
 //			}
@@ -127,27 +127,34 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 //				a2 = rand.nextBoolean() ? -1 : 1;
 //			}
 			
-			HashMap<String, Double> action = new HashMap<String, Double>();
-			action.put("a1", a1);
-			action.put("a2", a2);
-			return action;
+//			HashMap<String, Double> action = new HashMap<String, Double>();
+//			action.put("a1", a1);
+//			action.put("a2", a2);
+//			return action;
+			return null;
 		}
 
 		@Override
-		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2,
+		public void learn(HashMap<String, Double> state, HashMap<String, Double> positionAndReward,
 				HashMap<String, Double> action, boolean done) {
 			
 			// state : previous position and associated reward
 			// state2 : new position with current reward
 			// action : previous state, current actions and current reward
 			
-			HashMap<String, Double> state2Copy = new HashMap<>(state2);
-			state2Copy.remove("oracle"); //reward
+			HashMap<String, Double> previousStateCurrentStateAction = new HashMap<>();
+			previousStateCurrentStateAction.put("pCurrent", action.get("p1"));
+			previousStateCurrentStateAction.put("pGoal", positionAndReward.get("p1"));
+			previousStateCurrentStateAction.put("oracle", action.get("a1"));
 			
-			double reward = state2.get("oracle");
-			state2.put("p2",0.0);
-			System.out.println(state2);
-			amoebaSpatialReward.learn(state2);
+
+			
+			positionAndReward.put("p2",0.0);
+			System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
+			System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
+			
+			//amoebaSpatialReward.learn(positionAndReward);
+			amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
 
@@ -327,11 +334,10 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 
 		@Override
 		public HashMap<String, Double> randomAction() {
-			double a1 = rand.nextInt(3) - 1;
-			double a2 = (a1 == 0.0) ? (rand.nextBoolean() ? -1 : 1) : (rand.nextInt(3) - 1);
+			double a1 = rand.nextBoolean() ? -1 : 1;
+			
 						
-//			double a1 =  rand.nextBoolean() ? -1 : 1;
-//			double a2 =  rand.nextBoolean() ? -1 : 1;
+
 			HashMap<String, Double> action = new HashMap<String, Double>();
 			action.put("a1", a1);
 			return action;
@@ -363,11 +369,72 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
+	
+
+		
+		return amoeba;
+	}
+	
+	
+	
+	private static AMOEBA setupSpatialReward() {
+		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
+		sensors.add(new Pair<String, Boolean>("p1", false));
+		sensors.add(new Pair<String, Boolean>("p2", false));
+		File config;
+		try {
+			config = File.createTempFile("configSpatialReward", "xml");
+			XmlConfigGenerator.makeXML(config, sensors);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+			return null; // now compilator know config is initialized
+		}
+		//File config = new File("resources/simpleReinManualTrained.xml");
+		
+		Log.defaultMinLevel = Log.Level.INFORM;
+		World.minLevel = TRACE_LEVEL.ERROR;
+		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		amoeba.saver = new SaveHelperDummy();
+		
 		
 		for(Percept pct : amoeba.getPercepts()) {
 			pct.setMax(10);
 			pct.setMin(-10);
 		}
+		
+		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		
+		return amoeba;
+	}
+	
+
+	private static AMOEBA setupControlModel() {
+		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
+		sensors.add(new Pair<String, Boolean>("pCurrent", false));
+		sensors.add(new Pair<String, Boolean>("pGoal", false));
+		File config;
+		try {
+			config = File.createTempFile("configControlModel", "xml");
+			XmlConfigGenerator.makeXML(config, sensors);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+			return null; // now compilator know config is initialized
+		}
+		//File config = new File("resources/simpleReinManualTrained.xml");
+		
+		Log.defaultMinLevel = Log.Level.INFORM;
+		World.minLevel = TRACE_LEVEL.ERROR;
+		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		amoeba.saver = new SaveHelperDummy();
+		
+		
+		
+		
+		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
 		
 		return amoeba;
 	}

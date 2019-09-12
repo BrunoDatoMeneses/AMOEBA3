@@ -130,7 +130,7 @@ public class Head extends AmoebaAgent {
 			
 		}
 		if(meanNeighborsLastPredictions != null) {
-			getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
+			//getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
 		}
 		
 		
@@ -177,8 +177,8 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
-		//selfAnalysationOfContexts4();
-		selfAnalysationOfContextsReinforcement();
+		selfAnalysationOfContexts4();
+		//selfAnalysationOfContextsReinforcement();
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
