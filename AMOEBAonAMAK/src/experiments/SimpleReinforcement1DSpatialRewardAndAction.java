@@ -103,14 +103,14 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		//public AMOEBA amoebaSpatialReward;
+		public AMOEBA amoebaSpatialReward;
 		public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaQL() {
-			//amoebaSpatialReward = setupSpatialReward();
+			amoebaSpatialReward = setupSpatialReward();
 			amoebaControlModel = setupControlModel();
 		}
 		
@@ -153,7 +153,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 			System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
 			System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
-			//amoebaSpatialReward.learn(positionAndReward);
+			amoebaSpatialReward.learn(positionAndReward);
 			amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
