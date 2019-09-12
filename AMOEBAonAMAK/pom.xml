@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>AMOEBA</groupId>
+		<artifactId>AMOEBA-parent</artifactId>
+		<version>1.0</version>
+	</parent>
+	<artifactId>AMOEBAonAMAK</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<skip.assembly>false</skip.assembly>
+		<main.class>experiments.Benchmark</main.class>
+	</properties>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>tests</testSourceDirectory>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.brown.cs.burlap</groupId>
+			<artifactId>java_rosbridge</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>AMOEBA</groupId>
+			<artifactId>AMAKFX</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.5</version>
+		</dependency>
+
+		<!-- Python integration -->
+		<dependency>
+			<groupId>net.sf.py4j</groupId>
+			<artifactId>py4j</artifactId>
+			<version>0.10.8.1</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
