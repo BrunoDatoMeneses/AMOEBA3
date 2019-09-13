@@ -181,7 +181,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
+			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
 		
 		if(isRenderUpdate()) {
@@ -218,6 +218,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		toKillContexts.clear();
 		lastModifiedContext.clear();
 		alteredContexts.clear();
+		data.higherNeighborLastPredictionPercepts=null;
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -393,7 +394,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 	
 	
-	public double reinfocementRequest(HashMap<String, Double> perceptionsActionState) {
+	public HashMap<String, Double> reinforcementRequest(HashMap<String, Double> perceptionsActionState) {
 		boolean usingOracle = isUseOracle();
 		if (usingOracle)
 			head.changeOracleConnection();
@@ -404,7 +405,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (usingOracle)
 			head.changeOracleConnection();
 		studiedSystem = ss;
-		return getAction();
+		return getHigherNeighborLastPredictionPercepts();
 	}
 	
 	@Override
@@ -550,8 +551,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	
 	
-	public double getHigherNeighborPrediction() {
-		return head.getAction();
+	public HashMap<String, Double> getHigherNeighborLastPredictionPercepts() {
+		return head.getHigherNeighborLastPredictionPercepts();
 	}
 
 	public ArrayList<Context> getContexts() {

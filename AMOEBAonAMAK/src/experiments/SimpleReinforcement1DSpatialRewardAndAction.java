@@ -32,7 +32,7 @@ import utils.XmlConfigGenerator;
 public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	/* Learn and Test */
 	public static final int MAX_STEP_PER_EPISODE = 200;
-	public static final int N_LEARN = 400;//400
+	public static final int N_LEARN = 1000;//400
 	public static final int N_TEST = 100;
 	
 	/* Exploration */
@@ -104,32 +104,37 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 */
 	public static class AmoebaQL implements LearningAgent {
 		public AMOEBA amoebaSpatialReward;
-		public AMOEBA amoebaControlModel;
+		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaQL() {
 			amoebaSpatialReward = setupSpatialReward();
-			amoebaControlModel = setupControlModel();
+			//amoebaControlModel = setupControlModel();
 		}
 		
 		@Override
 		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
 			
-//			HashMap<String, Double> bestActions =  amoebaSpatialReward.maximize(state);
-//			double a1 = bestActions.getOrDefault("a1", 0.0);
-//			double a2 = bestActions.getOrDefault("a2", 0.0);
-//			if(a1 == 0.0) {
-//				a1 = rand.nextBoolean() ? -1 : 1;
-//			}
-//			if(a2 == 0.0) {
-//				a2 = rand.nextBoolean() ? -1 : 1;
-//			}
-			
+//			HashMap<String, Double> stateWithVizuAdded = new HashMap<String, Double>(state);
+//			stateWithVizuAdded.put("p2", 0.0);
+//			stateWithVizuAdded.put("oracle", 0.0);
+//			HashMap<String, Double> bestFuturePosition =  amoebaSpatialReward.reinforcementRequest(stateWithVizuAdded);
+//			
 //			HashMap<String, Double> action = new HashMap<String, Double>();
-//			action.put("a1", a1);
-//			action.put("a2", a2);
+//			if(bestFuturePosition!=null) {
+//				HashMap<String, Double> requestForControlModel = new HashMap<String, Double>();
+//				requestForControlModel.put("pCurrent", state.get("p1"));
+//				requestForControlModel.put("pGoal", bestFuturePosition.get("p1"));
+//				
+//				double bestAction = amoebaControlModel.request(requestForControlModel);
+//				
+//				
+//				action.put("a1", bestAction);
+//			}
+//			action = env.randomAction();
+//			
 //			return action;
 			return null;
 		}
@@ -149,12 +154,11 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 			
 
 			
-			positionAndReward.put("p2",0.0);
-			System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
-			System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
+			//System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
+			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
 			amoebaSpatialReward.learn(positionAndReward);
-			amoebaControlModel.learn(previousStateCurrentStateAction);
+			//amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
 
@@ -352,7 +356,6 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	private static AMOEBA setup() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
-		sensors.add(new Pair<String, Boolean>("p2", false));
 		File config;
 		try {
 			config = File.createTempFile("config", "xml");
@@ -380,7 +383,6 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	private static AMOEBA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
-		sensors.add(new Pair<String, Boolean>("p2", false));
 		File config;
 		try {
 			config = File.createTempFile("configSpatialReward", "xml");
@@ -398,13 +400,15 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		amoeba.saver = new SaveHelperDummy();
 		
 		
-		for(Percept pct : amoeba.getPercepts()) {
-			pct.setMax(10);
-			pct.setMin(-10);
-		}
+//		for(Percept pct : amoeba.getPercepts()) {
+//			pct.setMax(10);
+//			pct.setMin(-10);
+//		}
 		
 		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
 		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		amoeba.setReinforcement(true);
+		
 		
 		return amoeba;
 	}

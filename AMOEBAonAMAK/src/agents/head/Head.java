@@ -111,14 +111,19 @@ public class Head extends AmoebaAgent {
 		
 		
 		if(getAmas().isReinforcement()) {
+			
+			int nb=0;
 			Double meanNeighborsLastPredictions = null;
 			
+			ArrayList<Context> usedNeighbors = new ArrayList<Context>();
+			
 			if(activatedNeighborsContexts.size()>0) {
-				int nb=0;
+				
 				meanNeighborsLastPredictions = 0.0;
 				for (Context ctxt : activatedNeighborsContexts) {
 
 					if(ctxt.lastPrediction != null) {
+						usedNeighbors.add(ctxt);
 						meanNeighborsLastPredictions += ctxt.lastPrediction;
 						nb++;
 					}
@@ -133,7 +138,23 @@ public class Head extends AmoebaAgent {
 			}
 			if(meanNeighborsLastPredictions != null) {
 				getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
+				
+				if(getAmas().data.oracleValue>0) {
+					
+					System.out.println("#################################################################");
+					System.out.println("PCT " + getAmas().getPerceptionsAndActionState());
+					System.out.println(getAmas().data.oracleValue);
+					for(Context ctxt : usedNeighbors) {
+						System.out.println(ctxt.getName() + " " + ctxt.lastPrediction);
+					}
+					System.out.println(usedNeighbors.size() + " " + nb);
+					
+					
+				}
 			}
+			
+			
+			
 		}
 		
 		
@@ -182,11 +203,9 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
-		if(getAmas().isReinforcement()) {
-			selfAnalysationOfContextsReinforcement();
-		}else {
-			selfAnalysationOfContexts4();
-		}
+
+		selfAnalysationOfContexts4();
+
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
@@ -233,12 +252,24 @@ public class Head extends AmoebaAgent {
 		}
 		globalConfidence = globalConfidence / getAmas().getContexts().size();
 
+		
 		if (activatedNeighborsContexts.size() > 1) {
 
-
+			
+			double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
+			Context bestNeighbor = null;
 
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
+				
+				
+				if(ctxt.lastPrediction> bestNeighborLastPrediction) {
+					bestNeighborLastPrediction = ctxt.lastPrediction;
+					bestNeighbor = ctxt;
+				}
+				
+				
+				
 
 				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
 
@@ -259,8 +290,17 @@ public class Head extends AmoebaAgent {
 
 				}
 				i++;
+				
+				
+				
 
 			}
+			
+			getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
+			for(Percept pct : getAmas().getPercepts()) {
+				getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
+			}
+			
 
 		}
 		
@@ -973,14 +1013,10 @@ public class Head extends AmoebaAgent {
 		double currentDistanceToOraclePrediction;
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
-		if(getAmas().data.oracleValue > 0) {
-			System.out.println("CYCLE " + getAmas().getCycle() + " ORACLE " + getAmas().data.oracleValue + "     -------- HEAD 136");
-		}
+		
 		
 		for (Context activatedContext : activatedContexts) {
-			if(getAmas().data.oracleValue > 0) {
-				System.out.println(activatedContext.getName());
-			}
+			
 			
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
@@ -1057,7 +1093,11 @@ public class Head extends AmoebaAgent {
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
-			//System.out.println(activatedContext.getName());
+			
+			
+			
+			
+			
 			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
 					.distance(activatedContext.getCurrentExperiment());
 			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
@@ -1068,12 +1108,25 @@ public class Head extends AmoebaAgent {
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 				getAmas().data.contextNotFinished = true;
+				
+				if(getAmas().data.oracleValue>0) {
+					
+					System.out.println(activatedContext.getName());
+					
+					
+				}
 			}
 
 			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 
+				if(getAmas().data.oracleValue>0) {
+					
+					System.out.println(activatedContext.getName());
+					
+					
+				}
 			}
 
 			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
@@ -1474,6 +1527,12 @@ public class Head extends AmoebaAgent {
 		this.getAmas().data.criticity = criticity;
 	}
 
+	
+	public HashMap<String, Double> getHigherNeighborLastPredictionPercepts() {
+		return getAmas().data.higherNeighborLastPredictionPercepts;
+	}
+
+	
 	/**
 	 * Gets the action.
 	 *

@@ -384,6 +384,8 @@ public abstract class SimpleReinforcement2DSpatialRewardAndAction {
 			pct.setMin(-10);
 		}
 		
+		amoeba.setReinforcement(true);
+		
 		return amoeba;
 	}
 	
