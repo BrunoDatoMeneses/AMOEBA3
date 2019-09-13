@@ -55,6 +55,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate;
+	private boolean reinforcementMode = false;
 	
 	private int cycleWithoutRender = 0;
 
@@ -391,6 +392,21 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return getAction();
 	}
 	
+	
+	public double reinfocementRequest(HashMap<String, Double> perceptionsActionState) {
+		boolean usingOracle = isUseOracle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
+		setPerceptionsAndActionState(perceptionsActionState);
+		cycle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		studiedSystem = ss;
+		return getAction();
+	}
+	
 	@Override
 	public HashMap<String, Double> maximize(HashMap<String, Double> fixedPercepts){
 		ArrayList<Percept> percepts = getPercepts();
@@ -491,6 +507,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setLocalModel(TypeLocalModel localModel) {
 		this.localModel = localModel;
 	}
+	
+	public void setReinforcement(boolean value) {
+		reinforcementMode = value;
+	}
+	
+	public boolean isReinforcement() {
+		return reinforcementMode;
+	}
 
 	/**
 	 * Activate or deactivate rendering of agents at runtime.
@@ -521,6 +545,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public double getAction() {
+		return head.getAction();
+	}
+	
+	
+	
+	public double getHigherNeighborPrediction() {
 		return head.getAction();
 	}
 

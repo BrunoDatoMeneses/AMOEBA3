@@ -109,29 +109,34 @@ public class Head extends AmoebaAgent {
 
 	private void playWithOracle() {
 		
-		Double meanNeighborsLastPredictions = null;
 		
-		if(activatedNeighborsContexts.size()>0) {
-			int nb=0;
-			meanNeighborsLastPredictions = 0.0;
-			for (Context ctxt : activatedNeighborsContexts) {
-
-				if(ctxt.lastPrediction != null) {
-					meanNeighborsLastPredictions += ctxt.lastPrediction;
-					nb++;
-				}
-			}
-			if(nb>0) {
-				meanNeighborsLastPredictions /= nb;	
-			}
-			else {
-				meanNeighborsLastPredictions = null;
-			}
+		if(getAmas().isReinforcement()) {
+			Double meanNeighborsLastPredictions = null;
 			
+			if(activatedNeighborsContexts.size()>0) {
+				int nb=0;
+				meanNeighborsLastPredictions = 0.0;
+				for (Context ctxt : activatedNeighborsContexts) {
+
+					if(ctxt.lastPrediction != null) {
+						meanNeighborsLastPredictions += ctxt.lastPrediction;
+						nb++;
+					}
+				}
+				if(nb>0) {
+					meanNeighborsLastPredictions /= nb;	
+				}
+				else {
+					meanNeighborsLastPredictions = null;
+				}
+				
+			}
+			if(meanNeighborsLastPredictions != null) {
+				getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
+			}
 		}
-		if(meanNeighborsLastPredictions != null) {
-			//getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
-		}
+		
+		
 		
 		
 		
@@ -177,8 +182,11 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
-		selfAnalysationOfContexts4();
-		//selfAnalysationOfContextsReinforcement();
+		if(getAmas().isReinforcement()) {
+			selfAnalysationOfContextsReinforcement();
+		}else {
+			selfAnalysationOfContexts4();
+		}
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
