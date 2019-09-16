@@ -54,7 +54,7 @@ public class AsyncTest {
 		}
 
 		@Override
-		protected void onInitialization() {
+		public void onInitialization() {
 			setAsynchronous();
 		}
 

@@ -1,6 +1,7 @@
 package testutils;
 
-import org.junit.Before;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.CommunicatingAgent;
@@ -18,7 +19,7 @@ public class ObjectsForAgentTesting {
 	public TestEnv env;
 
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		Configuration.commandLineMode = true;
 		

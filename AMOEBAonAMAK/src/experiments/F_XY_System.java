@@ -3,6 +3,7 @@ package experiments;
 import java.util.HashMap;
 import java.util.Random;
 
+import agents.percept.Percept;
 import kernel.StudiedSystem;
 
 /**
@@ -45,14 +46,38 @@ public class F_XY_System implements StudiedSystem {
 
 		result = getResult(x, y);
 
-		out.put("px", x);
-		out.put("py", y);
-		out.put("oracle", result);
+		out.put("px0", x);
+		out.put("px1", y);
+		out.put("oracle", 0.0);
 		return out;
 	}
 
 	@Override
 	public double requestOracle(HashMap<String, Double> request) {
 		return getResult(request.get("px"), request.get("py"));
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
+			double noiseRange) {
+		return null;
+	}
+
+	@Override
+	public void setActiveLearning(boolean value) {
+	}
+
+	@Override
+	public void setSelfRequest(HashMap<Percept, Double> request) {
+	}
+
+	@Override
+	public HashMap<String, Double> getIntput() {
+		return null;
 	}
 }

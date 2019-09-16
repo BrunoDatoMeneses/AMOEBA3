@@ -18,14 +18,7 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
+		<testSourceDirectory>tests</testSourceDirectory>
 	</build>
 
 	<dependencies>
@@ -35,7 +28,12 @@
 			<version>11</version>
 		</dependency>
 
-		<!-- AMAK -->
+		<dependency>
+			<groupId>edu.brown.cs.burlap</groupId>
+			<artifactId>java_rosbridge</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>AMOEBA</groupId>
 			<artifactId>AMAKFX</artifactId>
@@ -53,6 +51,14 @@
 			<artifactId>commons-math3</artifactId>
 			<version>3.5</version>
 		</dependency>
+
+		<!-- Python integration -->
+		<dependency>
+			<groupId>net.sf.py4j</groupId>
+			<artifactId>py4j</artifactId>
+			<version>0.10.8.1</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

@@ -3,6 +3,7 @@ package experiments;
 import java.util.HashMap;
 import java.util.Random;
 
+import agents.percept.Percept;
 import fr.irit.smac.amak.tools.Log;
 import kernel.StudiedSystem;
 
@@ -101,5 +102,29 @@ public class NDimCube implements StudiedSystem{
 		else {
 			return getModelResult(2);
 		}
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> getOutputWithAmoebaRequest(HashMap<String, Double> amoebaRequest,
+			double noiseRange) {
+		return null;
+	}
+
+	@Override
+	public void setActiveLearning(boolean value) {	
+	}
+
+	@Override
+	public void setSelfRequest(HashMap<Percept, Double> request) {
+	}
+
+	@Override
+	public HashMap<String, Double> getIntput() {
+		return null;
 	}
 }

@@ -33,11 +33,6 @@ public class DraggableTab extends Tab {
 	
 	private void setupDragAction() {
 		
-		// create new data format if it does not exist
-		if(DataFormat.lookupMimeType("DraggableTab") == null) {
-			new DataFormat("DraggableTab");
-		}
-		
 		// move text to label graphic:
 		// that way we have something that we can drag
         if (this.getText() != null && ! this.getText().isEmpty()) {
@@ -132,6 +127,12 @@ public class DraggableTab extends Tab {
             ClipboardContent content = new ClipboardContent();
             // dragboard must have some content, but we need it to be a Tab, which isn't supported (Tab is not Serializable)
             // So we just put arbitrary content in the dragbaord, and store our tab in a global variable
+            
+            // create new data format if it does not exist
+    		if(DataFormat.lookupMimeType("DraggableTab") == null) {
+    			new DataFormat("DraggableTab");
+    		}
+    		
             content.put(DataFormat.lookupMimeType("DraggableTab"), "This string is not meant to be used");
             dragboard.setContent(content);
             dragboard.setDragView(graphic.snapshot(null, null));

@@ -45,7 +45,6 @@ public class Main {
 			try {
 				Thread.currentThread().wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

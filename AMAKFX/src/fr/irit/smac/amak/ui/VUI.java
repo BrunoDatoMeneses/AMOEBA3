@@ -197,7 +197,7 @@ public class VUI {
 			toolbar.getItems().add(resetButton);
 
 			canvas = new Pane();
-			canvas.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
+			canvas.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 			// clip the canvas (avoid drawing outside of it)
 			Rectangle clip = new Rectangle(0, 0, 0, 0);
 			clip.widthProperty().bind(canvas.widthProperty());
@@ -331,7 +331,7 @@ public class VUI {
 	 * @return the Y on screen distance
 	 */
 	public double worldToScreenY(double y) {
-		return (y + getWorldOffsetY()) * getZoomFactor();
+		return (-y + getWorldOffsetY()) * getZoomFactor();
 	}
 
 	/**
@@ -355,7 +355,7 @@ public class VUI {
 	 * @return the Y in the world distance
 	 */
 	public double screenToWorldY(double y) {
-		return y / getZoomFactor() - getWorldOffsetY();
+		return -y / getZoomFactor() + getWorldOffsetY();
 	}
 
 	/**
