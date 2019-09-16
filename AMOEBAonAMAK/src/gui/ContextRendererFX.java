@@ -17,7 +17,7 @@ public class ContextRendererFX extends RenderStrategy {
 
 	private Context context;
 
-	private DrawableRectangle drawable;
+	private DrawableContext drawable;
 
 	public ContextRendererFX(Object o) {
 		this((Context) o);
@@ -40,8 +40,13 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	private void updateColor() {
-		double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoefs());
+		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
 		drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+	}
+	
+	public String getColorForUnity() {
+		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
+		 return c[0].intValue() + "," + c[1].intValue() + "," + c[2].intValue() + ",100";
 	}
 
 	private void updatePosition() {
@@ -78,7 +83,7 @@ public class ContextRendererFX extends RenderStrategy {
 	 */
 	public DrawableRectangle getDrawable() {
 		if (!context.isDying() && drawable == null) {
-			drawable = new DrawableRectangle(0, 0, 10, 10);
+			drawable = new DrawableContext(0, 0, 0, 0, context);
 			AmoebaWindow.instance().mainVUI.add(drawable);
 		}
 		return drawable;

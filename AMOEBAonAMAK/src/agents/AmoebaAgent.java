@@ -21,14 +21,13 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	 * Instantiate a new agent attached to an amoeba
 	 * @param the amoeba
 	 */
-	public AmoebaAgent(AMOEBA amas) {
-		super(amas);
+	public AmoebaAgent(AMOEBA amas, Object... params) {
+		super(amas, params);
 		this.dying = false;
 	}
 	
 	@Override
 	protected void onReady() {
-		// TODO Auto-generated method stub
 		super.onReady();
 		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s ready.", toString());
 	}

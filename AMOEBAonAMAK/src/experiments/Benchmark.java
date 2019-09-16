@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;
-import kernel.BackupSystem;
 import kernel.StudiedSystem;
+import kernel.backup.BackupSystem;
 
 public class Benchmark {
 

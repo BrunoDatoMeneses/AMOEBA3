@@ -1,13 +1,28 @@
-# This is the README from the old version of AMAK, some part may be outdated ! #
+# This is a fork of AMAK, now using JavaFX instead of Swing #
 [The original repo](https://bitbucket.org/perlesa/amak/overview)
 
-This repository contains a framework made to facilitate the development of multi-agent system. 
 
-Examples are available in the package fr.irit.smac.amak.examples.
 
-# [Click here to download the latest standalone version](https://bitbucket.org/perlesa/amak/raw/master/Release/AmakFramework-standalone.jar?at=master) #
+## AMAKFX changes (2019-07-25) :
+These changes were made for a particular project, without much care for backward compatibility. But the overall philosophy should be the same.
 
-# Recent changes #
+### Possible breaking changes :
++ Anything related with the GUI in Swing.
++ Support for asynchronous agent has been dropped, you may still use then, but no promise are made for the visualization.
+
+### Changes :
++ Build system is now maven.
++ Use JavaFX instead of Swing. JavaFX run on a different thread than the simulation, when updating the GUI from the simulation thread you must be extra careful for :
+  + Running JavaFX code on the JavaFX thread, by only using AMAKFX methods, or by learning how to use JavaFX's RunLater (see AMAKFX's [RunLaterHelper](src/fr/irit/smac/amak/tools/RunLaterHelper.java))
+  + Not overload JavaFX call queue with draw call, leading to unpredictable result. For that purpose a new option has been added to Configuration : waitForGui, default at true. Each simulation cycle, AMAK will wait for JavaFX call queue to be empty. But queue overload can still happen inside a cycle. Symptoms are : long freeze, part of GUI not updating, or becoming white.
++ The VUI has been overhauled, it now provide extra features :
+  + Drawable can detect events, and dispatch these events to linked drawables.
+  + VUI Explorer, a sided bar that show a list of visible Drawable in its VUI. Features : hovering an element in the VUI Explorer highlight it in the VUI. Search for element in the VUI Explorer with regex. Click an element to display additional info (when available).
++ Plotting is now done with JFreeChart, AMAKFX provide an helper class : AmakPlot.
++ Tabs can be drag-n-dropped to rearrange them. Dropping a tab outside the tab bar will open it in a new window (despite the mouse cursor showing it's impossible)
++ Changes on how logging work, the a Log object now accept multiple action. Added the Loggable interface,with default methods, allowing a class to easily log to a file.
+
+# Old AMAK README #
 
 ## 1.5.3 (11/28/2018) ##
 ### New features: none

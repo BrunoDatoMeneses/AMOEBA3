@@ -1,59 +1,110 @@
 package agents.context.localModel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import agents.context.Context;
-import agents.percept.Percept;
+import agents.context.Experiment;
 
 /**
- * The abstract class of all agents in charge of the generation of the output
- * from Context Agent. For the sake of simplicity, it's not scheduled as agent
- * like other of the system.
+ * A LocalModel is used by a Context to store information and generate prediction.
  */
-public abstract class LocalModel {
+public interface LocalModel {
 
 	/**
-	 * Instantiates a new local model agent.
+	 * Sets the context that use the LocalModel
+	 * @param context
 	 */
-	public LocalModel() {
-	}
-
+	public void setContext(Context context);
+	
 	/**
-	 * Update model.
-	 *
-	 * @param context the context
+	 * gets the context that use the LocalModel
+	 * @return
 	 */
-	public abstract void updateModel(Context context);
-
+	public Context getContext();
+	
 	/**
 	 * Gets the proposition.
 	 *
-	 * @param context the context
 	 * @return the proposition
 	 */
-	public abstract double getProposition(Context context);
+	public double getProposition();
+	
+	/**
+	 * Gets the proposition with the highest value possible
+	 * @return
+	 */
+	public double getMaxProposition();
+	
+	/**
+	 * Return the point (percept value) that produce the max proposition, considering some percepts are fixed.
+	 * @return a HashMap with percept names as key, and their corresponding value. The oracle is the max proposition
+	 * @see LocalModel#getMaxProposition(Context)  
+	 */
+	public HashMap<String, Double> getMaxWithConstraint(HashMap<String, Double> fixedPercepts);;
+	
+	/**
+	 * Gets the proposition with the lowest value possible
+	 * @return
+	 */
+	public double getMinProposition();
 
 	/**
-	 * Version of getProposition for 2D display.
-	 *
-	 * @param context the context
-	 * @param p1      the p 1
-	 * @param p2      the p 2
-	 * @param v1      the v 1
-	 * @param v2      the v 2
-	 * @return the proposition
+	 * Gets the formula of the model
+	 * @return
 	 */
-	public abstract double getProposition(Context context, Percept p1, Percept p2, double v1, double v2);
+	public String getCoefsFormula();
+	
+	/**
+	 * Update the model with a new experiment.
+	 * @param newExperiment
+	 * @param weight the weight of the new experiment in the compute of the model
+	 */
+	public void updateModel(Experiment newExperiment, double weight);
+	
+	public String coefsToString();
+	
+	/**
+	 * The distance between an experiment and the model.
+	 * @param experiment
+	 * @return
+	 */
+	public double distance(Experiment experiment);
+	
+	/**
+	 * Gets the experiments used to properly initialize the model.
+	 * @return
+	 */
+	public ArrayList<Experiment> getFirstExperiments();
+	
+	/**
+	 * Sets the experiments used to properly initialize the model.
+	 * This may not trigger an update of the model.
+	 * @param frstExp
+	 */
+	public void setFirstExperiments( ArrayList<Experiment> frstExp);
+	
+	/**
+	 * Tells if the model has enough experiments to produce a good prediction.
+	 * For example, a regression need a number of experiments equals or superior to the number of dimension.
+	 * @return
+	 */
+	public boolean finishedFirstExperiments();
+	
+	/**
+	 * Gets coefficients of the model
+	 * @return
+	 */
+	public Double[] getCoef();
+	
+	/**
+	 * Sets coefficients of the model
+	 * @return
+	 */
+	public void setCoef(Double[] coef);
 
 	/**
-	 * Gets the formula.
-	 *
-	 * @param context the context
-	 * @return the formula
+	 * Gets the {@link TypeLocalModel} corresponding to this LocalModel
 	 */
-	public abstract String getFormula(Context context);
-
-	public abstract String getCoefsFormula();
-
-	public abstract double[] getCoefs();
-
-	public abstract TypeLocalModel getType();
+	public TypeLocalModel getType();
 }

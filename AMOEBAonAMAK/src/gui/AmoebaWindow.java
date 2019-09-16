@@ -13,14 +13,18 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
+import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import kernel.AMOEBA;
-import kernel.SaveHelper;
+import kernel.backup.SaveHelperImpl;
 
 /**
  * The main window for AMOEBA GUI.
@@ -37,6 +41,7 @@ public class AmoebaWindow extends MainWindow {
 	public VUI mainVUI;
 	
 	public Drawable point;
+	public Drawable rectangle;
 	public ToggleButton toggleRender;
 	public SchedulerToolbar schedulerToolbar;
 	public DimensionSelector dimensionSelector;
@@ -59,11 +64,19 @@ public class AmoebaWindow extends MainWindow {
 		// plots
 		point = mainVUI.createAndAddPoint(0, 0);
 		point.setName("Cursor");
+		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
+		rectangle.setName("Neighborhood");
+		rectangle.setColor(new Color(1, 1, 1, 0));
+		
 		plots.put("This loop NCS", new AmakPlot("This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot("All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("Number of agents", new AmakPlot("Number of agents", ChartType.LINE, "Cycle", "Number of agents"));
 		plots.put("Errors", new AmakPlot("Errors", ChartType.LINE, "Cycle", "Coefficients"));
-
+		plots.put("Distances to models", new AmakPlot("Distances to models", ChartType.LINE, "Cycle", "Distances"));
+		plots.put("Global Mapping Criticality", new AmakPlot("Global Mapping Criticality", ChartType.LINE, "Cycle", "Criticalities"));
+		plots.put("Time Execution", new AmakPlot("Time Execution", ChartType.LINE, "Cycle", "Times"));
+		plots.put("Criticalities", new AmakPlot("Criticalities", ChartType.LINE, "Cycle", "Criticalities"));
+		
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {
@@ -90,6 +103,17 @@ public class AmoebaWindow extends MainWindow {
 		
 		// manual save button
 		AmoebaWindow.addToolbar(newManualSaveButton(amoeba));
+		
+		Slider slider = new Slider(0, 0.1, 0.1);
+		slider.setShowTickLabels(true);
+		slider.setShowTickMarks(true);
+		slider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				amoeba.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+			}
+		});
+		AmoebaWindow.addToolbar(slider);
 	}
 	
 	/**
@@ -148,7 +172,7 @@ public class AmoebaWindow extends MainWindow {
 	 * @param amoeba
 	 * @return
 	 * @see AMOEBA#saver
-	 * @see SaveHelper#newManualSave(String)
+	 * @see SaveHelperImpl#newManualSave(String)
 	 */
 	public Button newManualSaveButton(AMOEBA amoeba) {
 		Button button = new Button("Quick save");

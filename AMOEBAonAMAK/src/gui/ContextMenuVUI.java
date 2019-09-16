@@ -25,7 +25,10 @@ import kernel.AMOEBA;
  *
  */
 public class ContextMenuVUI extends ContextMenu {
-	
+	/**
+	 * If true will skip window asking for input in 2D problems
+	 */
+	public static boolean quick2DRequest = false;
 	private double reqHereX;
 	private double reqHereY;
 	
@@ -58,7 +61,7 @@ public class ContextMenuVUI extends ContextMenu {
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(amoeba.getPercepts().size() == 2) {
+				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
 					reqTwoDimension(amoeba, vui);
 				} else {
 					reqNDimension(amoeba, vui);

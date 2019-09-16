@@ -22,7 +22,7 @@ public class DrawableRectangle extends Drawable {
 	@Override
 	public void _onDraw() {
 		rectangle.setX(left());
-		rectangle.setY(top());
+		rectangle.setY(bottom());
 		rectangle.setWidth(getRenderedWidth());
 		rectangle.setHeight(getRenderedHeight());
 		if (strokeMode)

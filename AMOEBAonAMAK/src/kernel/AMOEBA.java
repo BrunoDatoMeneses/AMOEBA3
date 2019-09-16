@@ -1,11 +1,9 @@
 package kernel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -14,8 +12,6 @@ import java.util.stream.Stream;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelAverage;
-import agents.context.localModel.LocalModelFirstExp;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -29,7 +25,12 @@ import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
+import kernel.backup.IBackupSystem;
+import kernel.backup.ISaveHelper;
+import kernel.backup.SaveHelperDummy;
+import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
+import utils.PrintOnce;
 
 /**
  * The AMOEBA amas
@@ -40,7 +41,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	/**
 	 * Utility to save, autosave, and load amoebas.
 	 */
-	public SaveHelper saver;
+	public ISaveHelper saver = new SaveHelperDummy();
 	
 	/**
 	 * The system studied by the amoeba.
@@ -52,14 +53,27 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private HashMap<String, Double> perceptions = new HashMap<String, Double>();
 	private boolean useOracle = true;
 
-	private HashSet<Context> validContexts;
-	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
-
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate;
 	
 	private int cycleWithoutRender = 0;
+
+	private ArrayList<Context> spatiallyAlteredContext = new ArrayList<>();
+	private ArrayList<Context> toKillContexts = new ArrayList<>();
+	
+	private ArrayList<Context> lastModifiedContext = new ArrayList<>();
+
+	private ArrayList<Context> alteredContexts = new ArrayList<>();
+	
+	private HashSet<Context> validContexts;
+	private ReadWriteLock validContextLock = new ReentrantReadWriteLock();
+	
+	private HashSet<Context> neighborContexts ;
+	private ReadWriteLock neighborContextsLock = new ReentrantReadWriteLock();
+	
+	public AmoebaData data;
+	private ArrayList<Percept> percepts;
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -81,16 +95,19 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super(new World(), Scheduling.HIDDEN);
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
-		saver = new SaveHelper(this);
+		saver = new SaveHelperImpl(this);
 		saver.load(path);
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
-	}
-
-	@Override
-	protected void onInitialAgentsCreation() {
+		super.onInitialConfiguration();
+		if(Configuration.allowedSimultaneousAgentsExecution != 1) {
+			PrintOnce.print("Warning ! Multithreading is not currently sopported !\n"
+					+ "Please use Configuration.allowedSimultaneousAgentsExecution=1");
+		}
+		getEnvironment().setAmoeba(this);
+		data = new AmoebaData();
 	}
 	
 	@Override
@@ -108,6 +125,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			AmakPlot allNCS = window.getPlot("All time NCS");
 			AmakPlot nbAgent = window.getPlot("Number of agents");
 			AmakPlot errors = window.getPlot("Errors");
+			AmakPlot distancesToModels = window.getPlot("Distances to models");
+			AmakPlot gloabalMappingCriticality = window.getPlot("Global Mapping Criticality");
+			AmakPlot timeExecution = window.getPlot("Time Execution");
+			AmakPlot criticalities = window.getPlot("Criticalities");
+			
+			
 			boolean notify = isRenderUpdate();
 			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -120,16 +143,34 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			nbAgent.addData("Contexts", cycle, getContexts().size(), notify);
 			nbAgent.addData("Activated", cycle, environment.getNbActivatedAgent(), notify);
 
-			errors.addData("Mean criticity", cycle, head.getAveragePredictionCriticity(), notify);
+			errors.addData("Criticality", cycle, head.getNormalizedCriticicality(), notify);
+			errors.addData("Mean criticality", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
-			errors.addData("Inexact allowed", cycle, head.getInexactAllowed(), notify);
-			Vector<Double> sortedErrors = new Vector<>(head.getxLastCriticityValues());
-			Collections.sort(sortedErrors);
-
-			// @note (Labbeti) Test added to avoid crash when head has just been created.
-			if (!sortedErrors.isEmpty()) {
-				errors.addData("Median criticity", cycle, sortedErrors.get(sortedErrors.size() / 2), notify);
-			}
+			
+			distancesToModels.addData("Distance to model", cycle, head.getDistanceToRegression(), notify);
+			distancesToModels.addData("Average distance to model", cycle, head.criticalities.getCriticalityMean("distanceToRegression"), notify);
+			distancesToModels.addData("Allowed distance to model", cycle, head.getDistanceToRegressionAllowed(), notify);
+			
+			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
+			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
+			
+			timeExecution.addData("HeadPlay", cycle, data.executionTimesSums[0], notify);
+			timeExecution.addData("EndogenousPlay", cycle, data.executionTimesSums[1], notify);
+			timeExecution.addData("ContextSelfAnalisis", cycle, data.executionTimesSums[2], notify);
+			timeExecution.addData("IncompetentNCS", cycle, data.executionTimesSums[3], notify);
+			timeExecution.addData("ConcurrenceNCS", cycle, data.executionTimesSums[4], notify);
+			timeExecution.addData("NewContextNCS", cycle, data.executionTimesSums[5], notify);
+			timeExecution.addData("OvermappingNCS", cycle, data.executionTimesSums[6], notify);
+			timeExecution.addData("Other", cycle, data.executionTimesSums[7], notify);
+			timeExecution.addData("BestContextInNeighbors", cycle, data.executionTimesSums[8], notify);
+			timeExecution.addData("CreateContext", cycle, data.executionTimesSums[9], notify);
+			timeExecution.addData("UpdateStatitics", cycle, data.executionTimesSums[10], notify);
+			timeExecution.addData("ChildContext", cycle, data.executionTimesSums[11], notify);
+			timeExecution.addData("PotentialRequest", cycle, data.executionTimesSums[12], notify);
+			
+			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
+			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
+			criticalities.addData("Confidence", cycle, data.evolutionCriticalityConfidence, notify);
 		}
 		
 		if (isRenderUpdate()) {
@@ -142,7 +183,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle);
+			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
 		
 		if(isRenderUpdate()) {
@@ -162,13 +203,23 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		if (studiedSystem != null) {
+			
 			studiedSystem.playOneStep();
+			
 			perceptions = studiedSystem.getOutput();
+			
+			
 		}
+		
 		environment.preCycleActions();
 		head.clearAllUseableContextLists();
 		validContexts = null;
+		neighborContexts = null;
 		environment.resetNbActivatedAgent();
+		spatiallyAlteredContext.clear();
+		toKillContexts.clear();
+		lastModifiedContext.clear();
+		alteredContexts.clear();
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -185,6 +236,15 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onSystemCycleEnd() {
+		
+		if(studiedSystem != null) {
+			if(head.isActiveLearning()) {
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(head.getSelfRequest());
+				 
+			}
+		}
+		
 		super.onSystemCycleEnd();
 		if(saver != null)
 			saver.autosave();
@@ -205,7 +265,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		// run percepts
 		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
-		Collections.sort(synchronousPercepts, new AgentOrderComparator());
+		//Collections.sort(synchronousPercepts, new AgentOrderComparator());
 
 		for (Percept agent : synchronousPercepts) {
 			executor.execute(agent);
@@ -239,9 +299,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			}
 			contextStream = vcontexts.stream(); // or only valid ones
 		}
+		
+		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
+		
+		
 		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		Collections.sort(synchronousContexts, new AgentOrderComparator());
+		//Collections.sort(synchronousContexts, new AgentOrderComparator());
 
 		for (Context agent : synchronousContexts) {
 			executor.execute(agent);
@@ -261,7 +325,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		List<Head> heads = new ArrayList<>();
 		heads.add(head);
 		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		Collections.sort(synchronousHeads, new AgentOrderComparator());
+		//Collections.sort(synchronousHeads, new AgentOrderComparator());
 
 		for (Head agent : synchronousHeads) {
 			executor.execute(agent);
@@ -305,12 +369,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	@Override
-	public void learn(HashMap<String, Double> perceptionsActionState) {
+	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState) {
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		studiedSystem = ss;
+		
+		return null;
 	}
 
 	@Override
@@ -327,18 +393,57 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		studiedSystem = ss;
 		return getAction();
 	}
+	
+	@Override
+	public HashMap<String, Double> maximize(HashMap<String, Double> known){
+		ArrayList<Percept> percepts = getPercepts();
+		ArrayList<Percept> unknown = new ArrayList<>(percepts);
+		unknown.removeIf(p ->known.containsKey(p.getName()));
+		//System.out.println("known : "+known.keySet());
+		//System.out.println("unknow : "+unknown);
+		if(unknown.isEmpty()) {
+			return null;
+		}
+		
+		//get partially activated context
+		ArrayList<Context> pac = new ArrayList<>();
+		for(Context c : getContexts()) {
+			boolean good = true;
+			for(String p : known.keySet()) {
+				if(!c.getRangeByPerceptName(p).contains2(known.get(p))) {
+					good = false;
+					break;
+				}
+			}
+			if(good) pac.add(c);
+		}
+		
+		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
+		for(Context c : pac) {
+			sol.add(c.getLocalModel().getMaxWithConstraint(known));
+		}
+		HashMap<String, Double> max = new HashMap<>();
+
+		Double maxValue = Double.NEGATIVE_INFINITY;
+		max.put("oracle", maxValue);
+		//find best solution
+		for(HashMap<String, Double> s : sol) {
+			if(s.get("oracle") > maxValue) {
+				maxValue = s.get("oracle");
+				max = s;
+			}
+		}
+		return max;
+	}
 
 	public LocalModel buildLocalModel(Context context) {
-		if (localModel == TypeLocalModel.MILLER_REGRESSION) {
-			return new LocalModelMillerRegression(context.getRanges().size());
+		switch (localModel) {
+		case MILLER_REGRESSION:
+			return new LocalModelMillerRegression(context);
+
+		default:
+			throw new IllegalArgumentException("Unknown model " + localModel + ".");
 		}
-		if (localModel == TypeLocalModel.FIRST_EXPERIMENT) {
-			return new LocalModelFirstExp();
-		}
-		if (localModel == TypeLocalModel.AVERAGE) {
-			return new LocalModelAverage();
-		}
-		return null;
 	}
 
 	/**
@@ -440,50 +545,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	public ArrayList<Percept> getPercepts() {
-		ArrayList<Percept> percepts = new ArrayList<>();
-		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
-			if ((agent instanceof Percept)) {
-				percepts.add((Percept) agent);
-			}
-		}
+		if(percepts == null || percepts.size()==0) {
+			setPercepts();
+		}	
 		return percepts;
-	}
-
-	/**
-	 * Update the set of valid context. The update is done with an intersect of the
-	 * previous and new set.
-	 *
-	 * Synchronized with a writeLock.
-	 * @param validContexts new validContexts set.
-	 */
-	@SuppressWarnings("unchecked")
-	public void updateValidContexts(HashSet<Context> validContexts) {
-		validContextLock.writeLock().lock();
-		if (this.validContexts == null) {
-			this.validContexts = (HashSet<Context>) validContexts.clone();
-		} else {
-			this.validContexts.retainAll(validContexts);
-		}
-		validContextLock.writeLock().unlock();
-	}
-
-	/**
-	 * Return the current set of valid contexts.
-	 *
-	 * Synchronized with a readLock.
-	 *
-	 * @return
-	 */
-	public HashSet<Context> getValidContexts() {
-		HashSet<Context> ret;
-		validContextLock.readLock().lock();
-		if (validContexts == null) {
-			ret = null;
-		} else {
-			ret = new HashSet<>(validContexts);
-		}
-		validContextLock.readLock().unlock();
-		return ret;
 	}
 
 	/**
@@ -531,8 +596,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			a.onUpdateRender();
 		}
 		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
+		AmoebaWindow.instance().rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
+		AmoebaWindow.instance().rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()));
+		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
 		AmoebaWindow.instance().mainVUI.updateCanvas();
 		AmoebaWindow.instance().point.toFront();
+		AmoebaWindow.instance().point.setInfo(getCursorInfo());
 	}
 	
 	/**
@@ -558,4 +627,136 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setStudiedSystem(StudiedSystem studiedSystem) {
 		this.studiedSystem = studiedSystem;
 	}
+	
+	public Head getHeadAgent() {
+		return head;
+	}
+	
+	public ArrayList<Context> getSpatiallyAlteredContextForUnityUI() {
+		return spatiallyAlteredContext;
+	}
+	
+	public void addSpatiallyAlteredContextForUnityUI(Context ctxt) {
+		if(!ctxt.isFlat())
+			spatiallyAlteredContext.add(ctxt);
+	}
+	
+	public ArrayList<Context> getToKillContextsForUnityUI() {
+		return toKillContexts;
+	}
+	
+	public void addToKillContextForUnityUI(Context ctxt) {
+		toKillContexts.add(ctxt);
+	}
+	
+	public void addLastmodifiedContext(Context context) {
+		if(!lastModifiedContext.contains(context)) {
+			lastModifiedContext.add(context);
+		}
+	}
+	
+	public ArrayList<Context> getLastModifiedContexts(){
+		return lastModifiedContext;
+	}
+	
+	/**
+	 * Adds the altered context.
+	 *
+	 * @param context the context
+	 */
+	public void addAlteredContext(Context context) {
+		alteredContexts.add(context);
+	}
+	
+	/**
+	 * Return the current set of valid contexts.
+	 *
+	 * Synchronized with a readLock.
+	 *
+	 * @return
+	 */
+	public HashSet<Context> getValidContexts() {
+		HashSet<Context> ret;
+		validContextLock.readLock().lock();
+		if (validContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(validContexts);
+		}
+		validContextLock.readLock().unlock();
+		return ret;
+	}
+	
+	/**
+	 * Update the set of valid context. The update is done with an intersect of the
+	 * previous and new set.
+	 *
+	 * Synchronized with a writeLock.
+	 * @param validContexts new validContexts set.
+	 */
+	@SuppressWarnings("unchecked")
+	public void updateNeighborContexts(HashSet<Context> neighborContexts) {
+		neighborContextsLock.writeLock().lock();
+		if (this.neighborContexts == null) {
+			this.neighborContexts = (HashSet<Context>) neighborContexts.clone();
+		} else {
+			this.neighborContexts.retainAll(neighborContexts);
+		}
+		neighborContextsLock.writeLock().unlock();
+	}
+	
+	public HashSet<Context> getNeighborContexts() {
+		HashSet<Context> ret;
+		neighborContextsLock.readLock().lock();
+		if (neighborContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(neighborContexts);
+		}
+		neighborContextsLock.readLock().unlock();
+		return ret;
+	}
+	
+	/**
+	 * Update the set of valid context. The update is done with an intersect of the
+	 * previous and new set.
+	 *
+	 * Synchronized with a writeLock.
+	 * @param validContexts new validContexts set.
+	 */
+	@SuppressWarnings("unchecked")
+	public void updateValidContexts(HashSet<Context> validContexts) {
+		validContextLock.writeLock().lock();
+		if (this.validContexts == null) {
+			this.validContexts = (HashSet<Context>) validContexts.clone();
+		} else {
+			this.validContexts.retainAll(validContexts);
+		}
+		validContextLock.writeLock().unlock();
+	}
+	
+	private String getCursorInfo() {
+		String message = "";
+		for(Percept pct : getPercepts()) {
+			message += pct.getName() + "\t" + pct.getValue() +"\t[ " + pct.getMin() +" ; " + pct.getMax() + " ]\n" ;
+		}
+		return message;
+	}
+	
+	public void setPercepts() {
+		percepts = new ArrayList<Percept>();
+		for (Agent<? extends Amas<World>, World> agent : getAgents()) {
+			if ((agent instanceof Percept)) {
+				Percept p = (Percept) agent;
+				if(!p.isDying()) {
+					percepts.add(p);
+				}
+			}
+		}
+	}
+	
+	public void addPercept(Percept pct) {
+		percepts = null;
+	}
+	
 }

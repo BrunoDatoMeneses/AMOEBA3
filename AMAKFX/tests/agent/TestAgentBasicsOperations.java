@@ -1,10 +1,10 @@
 package agent;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.CommunicatingAgent;
@@ -16,7 +16,7 @@ public class TestAgentBasicsOperations extends ObjectsForAgentTesting {
 	private Agent<TestAMAS, TestEnv> agent;
 
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		super.setup();
 		
