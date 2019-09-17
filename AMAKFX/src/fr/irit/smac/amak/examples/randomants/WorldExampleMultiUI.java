@@ -2,10 +2,11 @@ package fr.irit.smac.amak.examples.randomants;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
+import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 
-public class WorldExample extends Environment {
-	public WorldExample(Object...params) {
-		super(Scheduling.DEFAULT, params);
+public class WorldExampleMultiUI extends Environment {
+	public WorldExampleMultiUI(AmasMultiUIWindow window, Object...params) {
+		super(window, Scheduling.DEFAULT, params);
 	}
 
 	private int width;

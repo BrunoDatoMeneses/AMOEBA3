@@ -145,6 +145,17 @@ public class VUI {
 			MainWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
 		return get("Default");
 	}
+	
+	public static VUI get(AmasMultiUIWindow window) {
+		if(!instances.containsKey("Default")) {
+			System.out.println(window + "            ------------- VUI 151");
+			System.out.println(get("Default"));
+			System.out.println(get("Default").getPanel());
+			window.addTabbedPanel("Default VUI", get("Default").getPanel());
+		}
+			
+		return get("Default");
+	}
 
 	/**
 	 * Create or get a VUI.<br/>

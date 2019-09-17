@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
@@ -26,6 +27,9 @@ import fr.irit.smac.amak.ui.VUI;
  *            The environment of the MAS
  */
 public class Amas<E extends Environment> implements Schedulable {
+	
+	public AmasMultiUIWindow amasMultiUIWindow;
+	
 	/**
 	 * List of agents present in the system
 	 */
@@ -142,6 +146,36 @@ public class Amas<E extends Environment> implements Schedulable {
 				MainWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
 			}
 		}
+		this.scheduler.lock();
+		this.params = params;
+		this.environment = environment;
+		this.onInitialConfiguration();
+		executionPolicy = Configuration.executionPolicy;
+		this.onInitialAgentsCreation();
+
+		addPendingAgents();
+		this.onReady();
+		if (!Configuration.commandLineMode)
+			this.onRenderingInitialization();
+		this.scheduler.unlock();
+	}
+	
+	public Amas(AmasMultiUIWindow window, E environment, Scheduling scheduling, Object... params) {
+		
+		amasMultiUIWindow = window;
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
+		if (scheduling == Scheduling.DEFAULT) {
+			//MainWindow.instance();
+			this.scheduler = Scheduler.getDefaultScheduler(window);
+			this.scheduler.add(this);
+		} else {
+			this.scheduler = new Scheduler(this);
+			if (scheduling == Scheduling.UI && !Configuration.commandLineMode) {
+				//MainWindow.instance();
+				amasMultiUIWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
+			}
+		}
+		
 		this.scheduler.lock();
 		this.params = params;
 		this.environment = environment;
@@ -371,7 +405,12 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * {@link Amas#onRenderingInitialization}
 	 */
 	protected void onUpdateRender() {
-		VUI.get().updateCanvas();
+		if(Configuration.multiUI) {
+			VUI.get(amasMultiUIWindow).updateCanvas();
+		}else {
+			VUI.get().updateCanvas();
+		}
+		
 	}
 
 	/**
