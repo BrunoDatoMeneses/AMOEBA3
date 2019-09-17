@@ -140,9 +140,9 @@ public class VUI {
 	 * 
 	 * @return the default VUI
 	 */
-	public static VUI get(AmasWindow amasWindow) {
+	public static VUI get() {
 		if(!instances.containsKey("Default"))
-			amasWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
+			MainWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
 		return get("Default");
 	}
 

@@ -95,7 +95,7 @@ public class TestAgentTwoPhaseScheduling {
 
 	public class TestAMAS extends Amas<TestEnv> {
 		public TestAMAS(TestEnv environment) {
-			super(null, environment, Scheduling.HIDDEN);
+			super(environment, Scheduling.HIDDEN);
 		}
 
 		@Override

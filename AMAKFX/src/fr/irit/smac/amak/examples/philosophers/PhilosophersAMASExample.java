@@ -12,40 +12,35 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 public class PhilosophersAMASExample extends Amas<TableExample> {
-	
-	public MainWindow mainWindow;
-	
 	private Label comp;
 	private PhilosopherExample[] ps;
 	
 	public AmakPlot plot;
 
-	public PhilosophersAMASExample(MainWindow window, TableExample env) {
-		super(window, env, Scheduling.DEFAULT);
-		
-		mainWindow = window;
+	public PhilosophersAMASExample(TableExample env) {
+		super(env, Scheduling.DEFAULT);
 	}
 	
 	@Override
 	protected void onRenderingInitialization() {
 		super.onRenderingInitialization();
-		plot = new AmakPlot(mainWindow, "Eaten pasten", ChartType.BAR, "Philosophers", "Number of eaten pastas");
+		plot = new AmakPlot("Eaten pasten", ChartType.BAR, "Philosophers", "Number of eaten pastas");
 	}
 
 	@Override
 	protected void onInitialConfiguration() {
 		Configuration.executionPolicy = ExecutionPolicy.TWO_PHASES;
 		comp = new Label("Cycle");
-		mainWindow.addToolbar(comp);
+		MainWindow.addToolbar(comp);
 
-		VUI.get(mainWindow).createAndAddRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10).setShowInExplorer(false);
-		VUI.get(mainWindow).createAndAddString(45, 25, "Hungry").setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddRectangle(20, 20, 20, 20).setColor(Color.RED).setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddString(45, 25, "Hungry").setFixed().setLayer(10).setShowInExplorer(false);
 
-		VUI.get(mainWindow).createAndAddRectangle(20, 45, 20, 20).setColor(Color.BLUE).setFixed().setLayer(10).setShowInExplorer(false);
-		VUI.get(mainWindow).createAndAddString(45, 50, "Eating").setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddRectangle(20, 45, 20, 20).setColor(Color.BLUE).setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddString(45, 50, "Eating").setFixed().setLayer(10).setShowInExplorer(false);
 
-		VUI.get(mainWindow).createAndAddRectangle(20, 70, 20, 20).setColor(Color.GREEN).setFixed().setLayer(10).setShowInExplorer(false);
-		VUI.get(mainWindow).createAndAddString(45, 75, "Thinking").setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddRectangle(20, 70, 20, 20).setColor(Color.GREEN).setFixed().setLayer(10).setShowInExplorer(false);
+		VUI.get().createAndAddString(45, 75, "Thinking").setFixed().setLayer(10).setShowInExplorer(false);
 	}
 
 	@Override

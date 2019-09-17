@@ -84,7 +84,7 @@ public abstract class CommunicatingAgent<A extends Amas<E>, E extends Environmen
 	 *            The strategy of messaging reader.
 	 */
 	public CommunicatingAgent(A amas, IMessagingReader msgReader, Object... params) {
-		super(null,amas, params);
+		super(amas, params);
 		// build the address...
 		final String randomUUID = getRawID(params);
 		IAmakAddress address = messagingService.getOrCreateAmakAddress(randomUUID);

@@ -23,8 +23,6 @@ import javafx.util.Duration;
  */
 public class AmakPlot {
 	
-	MainWindow mainWindow = null;
-	
 	public enum ChartType {LINE, BAR;}
 	
 	/* STATIC */
@@ -35,13 +33,8 @@ public class AmakPlot {
 	 */
 	public static boolean useSamplingRenderer = false;
 	
-	public void add(MainWindow window, AmakPlot chart) {
-		if(mainWindow == null) {
-			mainWindow = window;
-		}
-		mainWindow.addTabbedPanel(chart.name, new ChartViewer(chart.chart));
-		
-		
+	public static void add(AmakPlot chart) {
+		MainWindow.addTabbedPanel(chart.name, new ChartViewer(chart.chart));
 	}
 	/* ----- */
 	
@@ -62,8 +55,7 @@ public class AmakPlot {
 	 * @param yAxisLabel label for the y (vertical) axis
 	 * @param autoAdd automatically make an {@link AmakPlot#add(AmakPlot)} call ?
 	 */
-	public AmakPlot(MainWindow window, String name, ChartType chartType, String xAxisLabel, String yAxisLabel, boolean autoAdd) {
-		this.mainWindow = window;
+	public AmakPlot(String name, ChartType chartType, String xAxisLabel, String yAxisLabel, boolean autoAdd) {
 		this.name = name;
 		seriesCollection = new XYSeriesCollection();
 		switch (chartType) {
@@ -87,10 +79,8 @@ public class AmakPlot {
 		chart.setAntiAlias(false);
 		chart.getPlot().setBackgroundPaint(Color.WHITE);
 		if(autoAdd) {
-			add(mainWindow, this);
+			add(this);
 		}
-		
-		
 	}
 	
 	/**
@@ -100,9 +90,8 @@ public class AmakPlot {
 	 * @param xAxisLabel label for the x (horizontal) axis 
 	 * @param yAxisLabel label for the y (vertical) axis
 	 */
-	public AmakPlot(MainWindow window, String name, ChartType chartType, String xAxisLabel, String yAxisLabel) {
-		this(window, name, chartType, xAxisLabel, yAxisLabel, true);
-		mainWindow = window;
+	public AmakPlot(String name, ChartType chartType, String xAxisLabel, String yAxisLabel) {
+		this(name, chartType, xAxisLabel, yAxisLabel, true);
 	}
 	
 	
@@ -113,12 +102,11 @@ public class AmakPlot {
 	 * @param chart the {@link JFreeChart} using a {@link XYSeriesCollection} for dataset.
 	 * @param autoAdd automatically make an {@link AmakPlot#add(AmakPlot)} call ?
 	 */
-	public AmakPlot(MainWindow window, String name, JFreeChart chart, boolean autoAdd) {
-		mainWindow = window;
+	public AmakPlot(String name, JFreeChart chart, boolean autoAdd) {
 		this.name = name;
 		this.seriesCollection = (XYSeriesCollection) chart.getXYPlot().getDataset();
 		this.chart = chart;
-		add(mainWindow, this);
+		add(this);
 	}
 	
 	/**
@@ -127,10 +115,8 @@ public class AmakPlot {
 	 * @param name the name of the chart, used as the tab name.
 	 * @param chart the {@link JFreeChart} using a {@link XYSeriesCollection} for dataset.
 	 */
-	public AmakPlot(MainWindow window, String name, JFreeChart chart) {
-		this(window, name, chart, true);
-		mainWindow = window;
-		
+	public AmakPlot(String name, JFreeChart chart) {
+		this(name, chart, true);
 	}
 	
 	public String getName() {

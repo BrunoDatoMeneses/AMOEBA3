@@ -1,8 +1,6 @@
 package fr.irit.smac.amak.examples.randomants;
 
 import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.ui.AmasWindow;
-import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableImage;
 
@@ -34,8 +32,8 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 	 * @param startY
 	 *            Initial Y coordinate
 	 */
-	public AntExample(AmasWindow amasWindow, AntHillExample amas, double startX, double startY) {
-		super(amasWindow, amas, startX, startY);
+	public AntExample(AntHillExample amas, double startX, double startY) {
+		super(amas, startX, startY);
 	}
 	@Override
 	public void onInitialization() {
@@ -45,7 +43,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get(amasWindow).createAndAddImage(dx, dy, "file:resources/ant.png");
+		image = VUI.get().createAndAddImage(dx, dy, "file:resources/ant.png");
 		image.setName("Ant "+getId());
 	}
 
@@ -73,7 +71,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 		}
 
 		if (amas.getEnvironment().getRandom().nextDouble() < 0.001) {
-			new AntExample(amasWindow, getAmas(), dx, dy);
+			new AntExample(getAmas(), dx, dy);
 		}
 	}
 

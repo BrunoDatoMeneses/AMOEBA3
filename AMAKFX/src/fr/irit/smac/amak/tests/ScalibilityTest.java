@@ -53,7 +53,7 @@ public class ScalibilityTest {
 	public class MyAMAS extends Amas<MyEnvironment> {
 
 		public MyAMAS(MyEnvironment environment, Scheduling scheduling, Object... params) {
-			super(null, environment, scheduling, params);
+			super(environment, scheduling, params);
 		}
 
 		@Override
@@ -72,7 +72,7 @@ public class ScalibilityTest {
 	public class MyAgent extends Agent<MyAMAS, MyEnvironment> {
 
 		public MyAgent(MyAMAS amas, Object... params) {
-			super(null, amas, params);
+			super(amas, params);
 		}
 
 		@Override
@@ -91,7 +91,7 @@ public class ScalibilityTest {
 	public class MyEnvironment extends Environment {
 
 		public MyEnvironment(Object...params) {
-			super(null, Scheduling.DEFAULT, params);
+			super(Scheduling.DEFAULT, params);
 		}
 
 	}

@@ -2,7 +2,6 @@ package fr.irit.smac.amak;
 
 import java.util.Random;
 
-import fr.irit.smac.amak.ui.AmasWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 
@@ -14,8 +13,6 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
  */
 public abstract class Environment implements Schedulable {
 
-	public AmasWindow amasWindow;
-	
 	/**
 	 * Unique index to give unique id to each environment
 	 */
@@ -47,16 +44,14 @@ public abstract class Environment implements Schedulable {
 	 * @param params
 	 *            The parameters to initialize the environment
 	 */
-	public Environment(AmasWindow window, Scheduling _scheduling, Object... params) {
-		amasWindow = window;
+	public Environment(Scheduling _scheduling, Object... params) {
 		if (_scheduling == Scheduling.DEFAULT) {
-			this.scheduler = new Scheduler(amasWindow);
-			this.scheduler = this.scheduler.getDefaultScheduler(amasWindow);
+			this.scheduler = Scheduler.getDefaultScheduler();
 			this.scheduler.add(this);
 		} else {
-			this.scheduler = new Scheduler(amasWindow,this);
+			this.scheduler = new Scheduler(this);
 			if (_scheduling == Scheduling.UI && !Configuration.commandLineMode)
-				amasWindow.addToolbar(new SchedulerToolbar("Environment #" + id, getScheduler()));
+				MainWindow.addToolbar(new SchedulerToolbar("Environment #" + id, getScheduler()));
 		}
 		this.scheduler.lock();
 		this.params = params;

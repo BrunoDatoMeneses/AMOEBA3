@@ -39,13 +39,13 @@ public class ObjectsForAgentTesting {
 
 	public class TestEnv extends Environment {
 		public TestEnv() {
-			super(null, Scheduling.HIDDEN);
+			super(Scheduling.HIDDEN);
 		}
 	}
 
 	public class TestAMAS extends Amas<TestEnv> {
 		public TestAMAS(TestEnv environment) {
-			super(null, environment, Scheduling.HIDDEN);
+			super(environment, Scheduling.HIDDEN);
 		}
 	}
 }
