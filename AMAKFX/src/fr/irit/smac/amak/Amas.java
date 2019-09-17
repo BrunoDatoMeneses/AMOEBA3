@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import fr.irit.smac.amak.ui.AmasWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
@@ -26,6 +27,9 @@ import fr.irit.smac.amak.ui.VUI;
  *            The environment of the MAS
  */
 public class Amas<E extends Environment> implements Schedulable {
+	
+	public AmasWindow amasWindow;
+	
 	/**
 	 * List of agents present in the system
 	 */
@@ -129,17 +133,20 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * @param params
 	 *            The params to initialize the amas
 	 */
-	public Amas(E environment, Scheduling scheduling, Object... params) {
+	public Amas(AmasWindow window, E environment, Scheduling scheduling, Object... params) {
+		amasWindow = window;
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
 		if (scheduling == Scheduling.DEFAULT) {
-			MainWindow.instance();
-			this.scheduler = Scheduler.getDefaultScheduler();
+//			System.out.println("Amas");
+//			mainWindow.instance();
+			this.scheduler = new Scheduler(amasWindow);
+			this.scheduler = this.scheduler.getDefaultScheduler(amasWindow);
 			this.scheduler.add(this);
 		} else {
-			this.scheduler = new Scheduler(this);
+			this.scheduler = new Scheduler(amasWindow, this);
 			if (scheduling == Scheduling.UI && !Configuration.commandLineMode) {
-				MainWindow.instance();
-				MainWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
+				//amasWindow.instance();
+				amasWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
 			}
 		}
 		this.scheduler.lock();
@@ -371,7 +378,7 @@ public class Amas<E extends Environment> implements Schedulable {
 	 * {@link Amas#onRenderingInitialization}
 	 */
 	protected void onUpdateRender() {
-		VUI.get().updateCanvas();
+		VUI.get(amasWindow).updateCanvas();
 	}
 
 	/**

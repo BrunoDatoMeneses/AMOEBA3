@@ -22,7 +22,7 @@ public class Order {
 	public class MyAMAS extends Amas<MyEnv> {
 
 		public MyAMAS() {
-			super(new MyEnv(), Scheduling.DEFAULT);
+			super(null,new MyEnv(), Scheduling.DEFAULT);
 		}
 		@Override
 		public boolean stopCondition() {
@@ -45,7 +45,7 @@ public class Order {
 	public class MyEnv extends Environment {
 
 		public MyEnv() {
-			super(Scheduling.DEFAULT);
+			super(null, Scheduling.DEFAULT);
 		}
 		@Override
 		public void onCycle() {

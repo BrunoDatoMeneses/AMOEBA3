@@ -5,23 +5,55 @@ import fr.irit.smac.amak.ui.MainWindow;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
-public class AntsLaunchExample {
+public class AntsLaunchExampleMultiUI {
 
+
+	
+	
+	
 	public static void main(String[] args) {
 		
-		AmasWindow amasWindowAntHillExample = new AmasWindow();
+		
+		MainWindow mainWindow = new MainWindow();
+		mainWindow.instance();
+		
+		AmasWindow mainWindowAntHillExample = new AmasWindow();
 		
 		
-		WorldExample env = new WorldExample(amasWindowAntHillExample);
+
+		//MainWindow mainWindowAntHillExample2 = new MainWindow();
+		
+		
+		WorldExample env = new WorldExample(mainWindowAntHillExample);
 		
 		
 		
-		new AntHillExample(amasWindowAntHillExample, env);
+		new AntHillExample(mainWindowAntHillExample, env);
 		
 		Pane panel = new Pane();
 		panel.getChildren().add(new Label("AntHill simulation\n"
 				+ "Ants move randomly.\n"
 				+ "This demo is here to show AMAK rendering capacities.\n"));
-		amasWindowAntHillExample.setLeftPanel(panel);
+		mainWindowAntHillExample.setLeftPanel(panel);
+		
+		
+		
+		
 	}
+	
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

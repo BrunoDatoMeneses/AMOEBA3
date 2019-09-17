@@ -27,7 +27,7 @@ public class Test {
 	private class Agent1 extends Agent<MyAMAS, MyEnvironment> {
 
 		public Agent1(MyAMAS amas) {
-			super(amas);
+			super(null, amas);
 		}
 
 		@Override
@@ -44,7 +44,7 @@ public class Test {
 	private class Agent2 extends Agent<MyAMAS, MyEnvironment> {
 
 		public Agent2(MyAMAS amas) {
-			super(amas);
+			super(null, amas);
 		}
 
 		@Override
@@ -61,7 +61,7 @@ public class Test {
 	private class MyAMAS extends Amas<MyEnvironment> {
 
 		public MyAMAS(MyEnvironment environment) {
-			super(environment, Scheduling.HIDDEN);
+			super(null, environment, Scheduling.HIDDEN);
 		}
 		@Override
 		protected void onSystemCycleBegin() {
@@ -73,7 +73,7 @@ public class Test {
 	private class MyEnvironment extends Environment {
 
 		public MyEnvironment(Object...params) {
-			super(Scheduling.DEFAULT, params);
+			super(null,Scheduling.DEFAULT, params);
 			// TODO Auto-generated constructor stub
 		}
 

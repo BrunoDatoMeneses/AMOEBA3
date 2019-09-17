@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 
 import fr.irit.smac.amak.Amas.ExecutionPolicy;
 import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.ui.AmasWindow;
+import fr.irit.smac.amak.ui.MainWindow;
 
 /**
  * This class must be overridden by all agents
@@ -20,6 +22,10 @@ import fr.irit.smac.amak.tools.Log;
  *            The kind of Environment the agent AND the Amas refer to
  */
 public abstract class Agent<A extends Amas<E>, E extends Environment> implements Runnable {
+	
+	public AmasWindow amasWindow;
+	
+	
 	/**
 	 * Neighborhood of the agent (must refer to the same couple amas, environment
 	 */
@@ -103,7 +109,8 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 	 * @param params
 	 *            The params to initialize the agent
 	 */
-	public Agent(A amas, Object... params) {
+	public Agent(AmasWindow window, A amas, Object... params) {
+		this.amasWindow = window;
 		this.id = uniqueIndex++;
 		this.params = params;
 		this.amas = amas;

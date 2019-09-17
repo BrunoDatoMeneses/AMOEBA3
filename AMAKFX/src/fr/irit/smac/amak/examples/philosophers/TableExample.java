@@ -5,7 +5,7 @@ import fr.irit.smac.amak.Scheduling;
 
 public class TableExample extends Environment {
 	public TableExample(Object...params) {
-		super(Scheduling.HIDDEN, params);
+		super(null, Scheduling.HIDDEN, params);
 	}
 
 	private ForkExample[] forks;

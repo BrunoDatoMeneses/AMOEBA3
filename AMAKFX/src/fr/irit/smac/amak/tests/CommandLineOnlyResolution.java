@@ -19,7 +19,7 @@ public class CommandLineOnlyResolution {
 	public class MyAMAS extends Amas<MyEnv> {
 
 		public MyAMAS() {
-			super(new MyEnv(), Scheduling.DEFAULT);
+			super(null,new MyEnv(), Scheduling.DEFAULT);
 		}
 		@Override
 		public boolean stopCondition() {
@@ -33,7 +33,7 @@ public class CommandLineOnlyResolution {
 	public class MyEnv extends Environment {
 
 		public MyEnv() {
-			super(Scheduling.DEFAULT);
+			super(null, Scheduling.DEFAULT);
 		}
 	}
 

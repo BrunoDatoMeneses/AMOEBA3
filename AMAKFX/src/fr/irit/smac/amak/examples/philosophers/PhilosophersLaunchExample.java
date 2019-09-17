@@ -4,7 +4,7 @@ public class PhilosophersLaunchExample {
 
 	public static void main(String[] args) {
 		TableExample env = new TableExample();
-		new PhilosophersAMASExample(env);
+		new PhilosophersAMASExample(null, env);
 		
 	}
 }

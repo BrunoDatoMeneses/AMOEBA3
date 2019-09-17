@@ -92,7 +92,7 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	 *            the right fork
 	 */
 	public PhilosopherExample(int id, PhilosophersAMASExample amas, ForkExample left, ForkExample right) {
-		super(amas, id, left, right);
+		super(null, amas, id, left, right);
 	}
 
 	@Override
@@ -106,10 +106,10 @@ public class PhilosopherExample extends Agent<PhilosophersAMASExample, TableExam
 	protected void onRenderingInitialization() {
 		double x = 100 * Math.cos(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
 		double y = 100 * Math.sin(2 * Math.PI * id / this.amas.getEnvironment().getForks().length);
-		drawableRectangle = VUI.get().createAndAddRectangle(x, y, 20, 20);
+		drawableRectangle = VUI.get(mainWindow).createAndAddRectangle(x, y, 20, 20);
 		drawableRectangle.setName("Philosopher "+getId());
-		drawableLeftFork = VUI.get().createAndAddRectangle(x - 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
-		drawableRightFork = VUI.get().createAndAddRectangle(x + 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
+		drawableLeftFork = VUI.get(mainWindow).createAndAddRectangle(x - 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
+		drawableRightFork = VUI.get(mainWindow).createAndAddRectangle(x + 10, y, 5, 20).setColor(Color.BLACK).setStrokeOnly().hide().setShowInExplorer(false);
 
 	}
 

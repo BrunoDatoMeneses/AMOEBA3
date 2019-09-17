@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+import fr.irit.smac.amak.ui.AmasWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 
@@ -21,6 +22,9 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
  *
  */
 public class Scheduler implements Runnable, Serializable {
+	
+	public AmasWindow amasWindow;
+	
 	/**
 	 * Unique ID meant to handle serialization correctly
 	 */
@@ -94,8 +98,10 @@ public class Scheduler implements Runnable, Serializable {
 	 * @param _schedulables
 	 *            the corresponding schedulables
 	 */
-	public Scheduler(Schedulable... _schedulables) {
-
+	public Scheduler(AmasWindow window, Schedulable... _schedulables) {
+		amasWindow = window;
+		
+		
 		for (Schedulable schedulable : _schedulables) {
 			this.add(schedulable);
 		}
@@ -107,13 +113,15 @@ public class Scheduler implements Runnable, Serializable {
 	 * 
 	 * @return The default scheduler
 	 */
-	public static Scheduler getDefaultScheduler() {
+	public Scheduler getDefaultScheduler(AmasWindow window) {
+		amasWindow = window;
 		if (defaultScheduler == null) {
-			defaultScheduler = new Scheduler();
+			defaultScheduler = new Scheduler(amasWindow);
 			if (!Configuration.commandLineMode) {
-				MainWindow.instance();
+//				System.out.println("getDefaultScheduler");
+//				mainWindow.instance();
 				SchedulerToolbar st = new SchedulerToolbar("Default", defaultScheduler);
-				MainWindow.addToolbar(st);
+				amasWindow.addToolbar(st);
 			}
 		}
 		return defaultScheduler;
