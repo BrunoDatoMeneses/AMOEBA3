@@ -40,7 +40,7 @@ import javafx.scene.text.TextAlignment;
  * @author of original version (the Swing one) perles
  *
  */
-public class VUI {
+public class VUIMulti {
 	/**
 	 * The toolbar of the VUI.
 	 */
@@ -64,7 +64,7 @@ public class VUI {
 	/**
 	 * A static map to facilitate access to different instances of VUI
 	 */
-	private static Map<String, VUI> instances = new HashMap<>();
+	//private static Map<String, VUIMulti> instances = new HashMap<>();
 
 	/**
 	 * The horizontal offset of the drawing zone. Used to allow the user to move the
@@ -140,13 +140,15 @@ public class VUI {
 	 * 
 	 * @return the default VUI
 	 */
-	public static VUI get() {
-		if(!instances.containsKey("Default"))
-			MainWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
+
+	
+	public static VUIMulti getDefault() {		
 		return get("Default");
 	}
 	
-	
+	public void addTabbedDefaultPanel(AmasMultiUIWindow window) {
+			window.addTabbedPanel("Default VUI", getPanel());
+	}
 
 	/**
 	 * Create or get a VUI.<br/>
@@ -156,18 +158,19 @@ public class VUI {
 	 *            The unique id of the VUI
 	 * @return The VUI with id "id"
 	 */
-	public static VUI get(String id) {
+	public static VUIMulti get(String id) {
 		instanceLock.lock();
-		if (!instances.containsKey(id)) {
-			VUI value = new VUI(id);
-			instances.put(id, value);
-			instanceLock.unlock();
-			return value;
-		}
+		VUIMulti value = new VUIMulti(id);
 		instanceLock.unlock();
-		return instances.get(id);
+		return value;
 	}
 
+	
+	
+	public VUIMulti() {
+		
+	}
+	
 	/**
 	 * Constructor of the VUI. This one is private as it can only be created through
 	 * static method.
@@ -175,7 +178,8 @@ public class VUI {
 	 * @param title
 	 *            The title used for the vui
 	 */
-	private VUI(String title) {
+	private VUIMulti(String title) {
+		
 		Semaphore done = new Semaphore(0);
 		RunLaterHelper.runLater(() -> {
 			panel = new BorderPane();
@@ -272,6 +276,7 @@ public class VUI {
 			toolbar.getItems().add(veButton);
 			
 			done.release();
+			
 		});
 		try {
 			done.acquire();
@@ -367,7 +372,8 @@ public class VUI {
 	 *            the new drawable
 	 */
 	public void add(Drawable d) {
-		d.setVUI(this);
+		
+		d.setVUIMulti(this);
 		RunLaterHelper.runLater(()-> canvas.getChildren().add(d.getNode()));
 		drawablesLock.lock();
 		drawables.add(d);

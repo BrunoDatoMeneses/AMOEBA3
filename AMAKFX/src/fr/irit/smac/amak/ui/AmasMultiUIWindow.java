@@ -74,7 +74,7 @@ public class AmasMultiUIWindow extends Stage{
 	 *             if the MainWindow has already been instantiated. This constructor
 	 *             should be used by the Application of JavaFX only.
 	 */
-	public AmasMultiUIWindow() {
+	public AmasMultiUIWindow(String title) {
 		synchronized (startEnded) {
 			VBox root = new VBox();
 			
@@ -89,7 +89,7 @@ public class AmasMultiUIWindow extends Stage{
 			VBox.setVgrow(organizationPane, Priority.ALWAYS);
 			
 			// Creation of scene
-			this.setTitle("AMAS");
+			this.setTitle(title);
 			Scene scene = new Scene(root, 450, 300);
 			//stage = primaryStage;
 			this.setScene(scene);

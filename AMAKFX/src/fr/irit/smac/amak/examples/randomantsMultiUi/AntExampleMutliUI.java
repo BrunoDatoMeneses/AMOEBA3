@@ -1,4 +1,4 @@
-package fr.irit.smac.amak.examples.randomants;
+package fr.irit.smac.amak.examples.randomantsMultiUi;
 
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
@@ -37,7 +37,6 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 	 */
 	public AntExampleMutliUI(AmasMultiUIWindow window, AntHillExampleMultiUI amas, double startX, double startY) {
 		super(window, amas, startX, startY);
-		System.out.println(amasMultiUIWindow + "            ------------- AntExampleMutliUI 42");
 	}
 	@Override
 	public void onInitialization() {
@@ -47,8 +46,7 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 
 	@Override
 	protected void onRenderingInitialization() {
-		System.out.println(amasMultiUIWindow + "            ------------- AntExampleMutliUI 52");
-		image = VUI.get(amasMultiUIWindow).createAndAddImage(dx, dy, "file:resources/ant.png");
+		image =  getAmas().getVUIMulti().createAndAddImage(dx, dy, "file:resources/ant.png");
 		image.setName("Ant "+getId());
 	}
 
@@ -76,7 +74,7 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 		}
 
 		if (amas.getEnvironment().getRandom().nextDouble() < 0.001) {
-			new AntExampleMutliUI(amasMultiUIWindow, getAmas(), dx, dy);
+			new AntExampleMutliUI(getAmas().amasMultiUIWindow, getAmas(), dx, dy);
 		}
 	}
 

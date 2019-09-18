@@ -1,4 +1,4 @@
-package fr.irit.smac.amak.examples.randomants;
+package fr.irit.smac.amak.examples.randomantsMultiUi;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;

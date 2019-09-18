@@ -22,7 +22,6 @@ import fr.irit.smac.amak.ui.AmasMultiUIWindow;
  */
 public abstract class Agent<A extends Amas<E>, E extends Environment> implements Runnable {
 	
-	public AmasMultiUIWindow amasMultiUIWindow;
 	
 	/**
 	 * Neighborhood of the agent (must refer to the same couple amas, environment
@@ -124,7 +123,6 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 	}
 	
 	public Agent(AmasMultiUIWindow window, A amas, Object... params) {
-		amasMultiUIWindow = window;
 		
 		this.id = uniqueIndex++;
 		this.params = params;

@@ -17,6 +17,7 @@ import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.VUIMulti;
 
 /**
  * This class must be overridden by multi-agent systems
@@ -29,6 +30,7 @@ import fr.irit.smac.amak.ui.VUI;
 public class Amas<E extends Environment> implements Schedulable {
 	
 	public AmasMultiUIWindow amasMultiUIWindow;
+	public VUIMulti vuiMulti;
 	
 	/**
 	 * List of agents present in the system
@@ -160,9 +162,12 @@ public class Amas<E extends Environment> implements Schedulable {
 		this.scheduler.unlock();
 	}
 	
-	public Amas(AmasMultiUIWindow window, E environment, Scheduling scheduling, Object... params) {
+	public Amas(AmasMultiUIWindow window, VUIMulti vui, E environment, Scheduling scheduling, Object... params) {
 		
 		amasMultiUIWindow = window;
+		vuiMulti = vui;
+		vuiMulti.addTabbedDefaultPanel(amasMultiUIWindow);
+		
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
 		if (scheduling == Scheduling.DEFAULT) {
 			//MainWindow.instance();
@@ -406,11 +411,18 @@ public class Amas<E extends Environment> implements Schedulable {
 	 */
 	protected void onUpdateRender() {
 		if(Configuration.multiUI) {
-			VUI.get(amasMultiUIWindow).updateCanvas();
+			vuiMulti.updateCanvas();
 		}else {
 			VUI.get().updateCanvas();
 		}
 		
+	}
+	
+	
+
+	
+	public VUIMulti getVUIMulti() {
+		return vuiMulti;
 	}
 
 	/**
