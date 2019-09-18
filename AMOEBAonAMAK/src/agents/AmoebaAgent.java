@@ -39,7 +39,8 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	@Override
 	protected void onRenderingInitialization() {
 		if(renderStrategy != null) {
-			renderStrategy.initialize();
+			renderStrategy.initialize(getAmas().getVUIMulti());
+			
 		}
 	}
 	
@@ -96,7 +97,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	public void setRenderStrategy(RenderStrategy renderStrategy) {
 		if(this.renderStrategy != null) this.renderStrategy.delete();
 		this.renderStrategy = renderStrategy;
-		if(this.renderStrategy != null) this.renderStrategy.initialize();
+		if(this.renderStrategy != null) this.renderStrategy.initialize(getAmas().getVUIMulti());
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import java.util.List;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.MainWindow;
+import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
 import gui.saveExplorer.SaveExplorer;
 import javafx.event.ActionEvent;
@@ -33,6 +34,9 @@ public class SaveHelperImpl implements ISaveHelper{
 	public static final String autosaveDirName = "autosave";
 	public static final String manualsaveDirName = "manual";
 
+	
+	public AmoebaMultiUIWindow amoebaMultiUIWindow;
+	
 	/**
 	 * The backup system used by the SaveHelper.
 	 */
@@ -74,6 +78,51 @@ public class SaveHelperImpl implements ISaveHelper{
 	 * @param amoeba
 	 */
 	public SaveHelperImpl(AMOEBA amoeba) {
+		autoSave = !Configuration.commandLineMode;
+		this.amoeba = amoeba;
+		backupSystem = new BackupSystem(amoeba);
+		String dirName = amoeba.toString() + "_" + System.currentTimeMillis();
+		dir = Paths.get(savesRoot, dirName);
+		if (autoSave) {
+			dirAuto = Paths.get(dir.toString(), autosaveDirName);
+			try {
+				Files.createDirectories(dirAuto);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("Cannot create auto save directory. Auto saving is disabled.");
+				dirAuto = null;
+				autoSave = false;
+			}
+		}
+		dirManual = Paths.get(dir.toString(), manualsaveDirName);
+		try {
+			Files.createDirectories(dirManual);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Cannot create manual save directory.");
+			dirManual = null;
+		}
+
+		// add graphical element if relevant
+		if (AmoebaWindow.isInstance()) {
+			SaveExplorer se = new SaveExplorer(amoeba);
+			AmoebaWindow.addTabbedPanel("Save Explorer", se);
+			AmoebaWindow.addOnCloseAction(()-> {
+				if(deleteFolderOnClose) {
+					try {
+						DeleteDirectory.deleteDirectoryRecursion(dir);
+					} catch (IOException e) {
+						e.printStackTrace();
+						System.err.println("Failed to delete saves files on close.");
+					}
+				}
+			});
+			setupGraphicalTool();
+		}
+	}
+	
+	public SaveHelperImpl(AMOEBA amoeba, AmoebaMultiUIWindow window) {
+		amoebaMultiUIWindow = window;
 		autoSave = !Configuration.commandLineMode;
 		this.amoeba = amoeba;
 		backupSystem = new BackupSystem(amoeba);
@@ -187,7 +236,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	 * Add save/load options in the main window.
 	 */
 	private void setupGraphicalTool() {
-		MainWindow mw = AmoebaWindow.instance();
+		AmoebaMultiUIWindow mw = amoebaMultiUIWindow;
 		// TODO remove if they exist items Save and Load in menu Option.
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML", "*.xml"),
@@ -198,7 +247,7 @@ public class SaveHelperImpl implements ISaveHelper{
 			@Override
 			public void handle(ActionEvent event) {
 				amoeba.getScheduler().stop();
-				File file = fileChooser.showOpenDialog(mw.stage);
+				File file = fileChooser.showOpenDialog(mw);
 				if (file != null)
 					backupSystem.load(file);
 			}
@@ -210,7 +259,7 @@ public class SaveHelperImpl implements ISaveHelper{
 			@Override
 			public void handle(ActionEvent event) {
 				amoeba.getScheduler().stop();
-				File file = fileChooser.showSaveDialog(mw.stage);
+				File file = fileChooser.showSaveDialog(mw);
 				if (file != null)
 					backupSystem.save(file);
 			}

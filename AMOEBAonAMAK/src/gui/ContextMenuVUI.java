@@ -6,6 +6,7 @@ import java.util.Optional;
 import agents.percept.Percept;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.VUIMulti;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -38,7 +39,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba the amoeba where {@link AMOEBA#request(HashMap)} and {@link AMOEBA#learn(HashMap)} will be executed.
 	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUI}
 	 */
-	public ContextMenuVUI(AMOEBA amoeba, VUI vui) {
+	public ContextMenuVUI(AMOEBA amoeba, VUIMulti vui) {
 		// "request here" menu item
 		setupRequestHereMenuItem(amoeba, vui);
 		
@@ -56,7 +57,7 @@ public class ContextMenuVUI extends ContextMenu {
 		});	
 	}
 
-	private void setupRequestHereMenuItem(AMOEBA amoeba, VUI vui) {
+	private void setupRequestHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
 		MenuItem reqHere = new MenuItem("Request Here");
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -78,7 +79,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqTwoDimension(AMOEBA amoeba, VUI vui) {
+	private void reqTwoDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -95,7 +96,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqNDimension(AMOEBA amoeba, VUI vui) {
+	private void reqNDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
@@ -143,7 +144,7 @@ public class ContextMenuVUI extends ContextMenu {
 		});
 	}
 	
-	private void setupLearnHereMenuItem(AMOEBA amoeba, VUI vui) {
+	private void setupLearnHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
 		MenuItem learnHere = new MenuItem("Learn Here");
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -165,7 +166,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnTwoDimension(AMOEBA amoeba, VUI vui) {
+	private void learnTwoDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -181,7 +182,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnNDimebsion(AMOEBA amoeba, VUI vui) {
+	private void learnNDimebsion(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
