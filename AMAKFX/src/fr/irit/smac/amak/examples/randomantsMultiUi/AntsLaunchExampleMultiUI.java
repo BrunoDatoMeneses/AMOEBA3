@@ -35,8 +35,6 @@ public class AntsLaunchExampleMultiUI extends Application{
 		
 
 		AntHillExampleMultiUI amas1 = new AntHillExampleMultiUI(window, VUIMulti.getDefault(), env);
-		
-		
 		AntHillExampleMultiUI amas2 = new AntHillExampleMultiUI(window2, VUIMulti.getDefault(), env2);
 
 	}

@@ -315,6 +315,7 @@ public abstract class Agent<A extends Amas<E>, E extends Environment> implements
 	 */
 	@Override
 	public void run() {
+		
 		ExecutionPolicy executionPolicy = amas.getExecutionPolicy();
 		if (executionPolicy == ExecutionPolicy.TWO_PHASES) {
 

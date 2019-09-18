@@ -55,6 +55,7 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 	 */
 	@Override
 	protected void onDecideAndAct() {
+
 		double random = amas.getEnvironment().getRandom().nextGaussian();
 		angle += random * 0.1;
 		dx += Math.cos(angle);

@@ -169,14 +169,15 @@ public class Amas<E extends Environment> implements Schedulable {
 		vuiMulti.addTabbedDefaultPanel(amasMultiUIWindow);
 		
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
+		
+		//this.scheduler = environment.getScheduler();
 		if (scheduling == Scheduling.DEFAULT) {
-			//MainWindow.instance();
-			this.scheduler = Scheduler.getDefaultScheduler(window);
+
+			this.scheduler = Scheduler.getDefaultMultiUIScheduler(window);
 			this.scheduler.add(this);
 		} else {
 			this.scheduler = new Scheduler(this);
 			if (scheduling == Scheduling.UI && !Configuration.commandLineMode) {
-				//MainWindow.instance();
 				amasMultiUIWindow.addToolbar(new SchedulerToolbar("Amas #" + id, getScheduler()));
 			}
 		}

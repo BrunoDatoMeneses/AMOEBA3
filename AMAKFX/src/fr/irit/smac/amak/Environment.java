@@ -67,22 +67,22 @@ public abstract class Environment implements Schedulable {
 	
 	public Environment(AmasMultiUIWindow window, Scheduling _scheduling, Object... params) {
 		amasMultiUIWindow = window;
-		if (_scheduling == Scheduling.DEFAULT) {
-			this.scheduler = Scheduler.getDefaultScheduler(window);
-			this.scheduler.add(this);
-		} else {
-		this.scheduler = new Scheduler(this);
-		if (_scheduling == Scheduling.UI && !Configuration.commandLineMode)
-			amasMultiUIWindow.addToolbar(new SchedulerToolbar("Environment #" + id, getScheduler()));
-		}
-
-		this.scheduler.lock();
+//		if (_scheduling == Scheduling.DEFAULT) {
+//			this.scheduler = Scheduler.getDefaultMultiUIScheduler(window);
+//			this.scheduler.add(this);
+//		} else {
+//		this.scheduler = new Scheduler(this);
+//		if (_scheduling == Scheduling.UI && !Configuration.commandLineMode)
+//			amasMultiUIWindow.addToolbar(new SchedulerToolbar("Environment #" + id, getScheduler()));
+//		}
+//
+//		this.scheduler.lock();
 		this.params = params;
 		onInitialization();
 		onInitialEntitiesCreation();
 		if (!Configuration.commandLineMode)
 			onRenderingInitialization();
-		this.scheduler.unlock();
+//		this.scheduler.unlock();
 	}
 
 	/**
@@ -165,4 +165,6 @@ public abstract class Environment implements Schedulable {
 	@Override
 	public void onSchedulingStops() {
 	}
+	
+
 }

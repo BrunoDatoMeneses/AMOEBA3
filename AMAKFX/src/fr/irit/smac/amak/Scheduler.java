@@ -60,6 +60,8 @@ public class Scheduler implements Runnable, Serializable {
 	 * The default scheduler
 	 */
 	private static Scheduler defaultScheduler;
+	
+
 	/**
 	 * The schedulables that must be added
 	 */
@@ -120,16 +122,17 @@ public class Scheduler implements Runnable, Serializable {
 		return defaultScheduler;
 	}
 	
-	public static Scheduler getDefaultScheduler(AmasMultiUIWindow window) {
-		if (defaultScheduler == null) {
-			defaultScheduler = new Scheduler();
+	
+	
+	
+	
+	public static Scheduler getDefaultMultiUIScheduler(AmasMultiUIWindow window) {
+		Scheduler multiUIScheduler = new Scheduler();
 			if (!Configuration.commandLineMode) {
-				//MainWindow.instance();
-				SchedulerToolbar st = new SchedulerToolbar("Default", defaultScheduler);
+				SchedulerToolbar st = new SchedulerToolbar("Default", multiUIScheduler);
 				window.addToolbar(st);
 			}
-		}
-		return defaultScheduler;
+		return multiUIScheduler;
 	}
 
 	/**
