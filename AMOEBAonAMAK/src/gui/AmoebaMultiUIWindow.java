@@ -58,7 +58,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		
 
 		mainVUI.setDefaultView(200, 0, 0);
-		addTabbedPanel("2D VUI", mainVUI.getPanel());
+		//addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
 		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());

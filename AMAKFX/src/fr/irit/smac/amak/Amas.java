@@ -166,7 +166,8 @@ public class Amas<E extends Environment> implements Schedulable {
 		
 		amasMultiUIWindow = window;
 		vuiMulti = vui;
-		vuiMulti.addTabbedDefaultPanel(amasMultiUIWindow);
+		amasMultiUIWindow.addTabbedPanel(vuiMulti.title, vuiMulti.getPanel());
+		//vuiMulti.addTabbedDefaultPanel(amasMultiUIWindow);
 		
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Configuration.allowedSimultaneousAgentsExecution);
 		

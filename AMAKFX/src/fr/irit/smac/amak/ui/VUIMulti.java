@@ -41,6 +41,9 @@ import javafx.scene.text.TextAlignment;
  *
  */
 public class VUIMulti {
+	
+	public String title;
+	
 	/**
 	 * The toolbar of the VUI.
 	 */
@@ -178,8 +181,9 @@ public class VUIMulti {
 	 * @param title
 	 *            The title used for the vui
 	 */
-	private VUIMulti(String title) {
+	private VUIMulti(String titleValue) {
 		
+		this.title = titleValue;
 		Semaphore done = new Semaphore(0);
 		RunLaterHelper.runLater(() -> {
 			panel = new BorderPane();
