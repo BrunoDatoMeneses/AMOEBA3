@@ -133,46 +133,9 @@ public class VUIMulti {
 	 */
 	private double worldCenterY = defaultWorldCenterY;
 
-	/**
-	 * Used to be sure that only one thread at the same time create a VUI
-	 */
-	private static ReentrantLock instanceLock = new ReentrantLock();
-
-	/**
-	 * Get the default VUI
-	 * 
-	 * @return the default VUI
-	 */
-
-	
-	public static VUIMulti getDefault() {		
-		return get("Default");
-	}
-	
-	public void addTabbedDefaultPanel(AmasMultiUIWindow window) {
-			window.addTabbedPanel("Default VUI", getPanel());
-	}
-
-	/**
-	 * Create or get a VUI.<br/>
-	 * You have add its panel to the MainWindow yourself.
-	 * 
-	 * @param id
-	 *            The unique id of the VUI
-	 * @return The VUI with id "id"
-	 */
-	public static VUIMulti get(String id) {
-		instanceLock.lock();
-		VUIMulti value = new VUIMulti(id);
-		instanceLock.unlock();
-		return value;
-	}
-
 	
 	
-	public VUIMulti() {
-		
-	}
+
 	
 	/**
 	 * Constructor of the VUI. This one is private as it can only be created through
@@ -181,113 +144,105 @@ public class VUIMulti {
 	 * @param title
 	 *            The title used for the vui
 	 */
-	private VUIMulti(String titleValue) {
+	public VUIMulti(String titleValue) {
 		
 		this.title = titleValue;
-		Semaphore done = new Semaphore(0);
-		RunLaterHelper.runLater(() -> {
-			panel = new BorderPane();
+		panel = new BorderPane();
 
-			toolbar = new ToolBar();
-			statusLabel = new Label("status");
-			statusLabel.setTextAlignment(TextAlignment.LEFT);
-			toolbar.getItems().add(statusLabel);
-			panel.setBottom(toolbar);
+		toolbar = new ToolBar();
+		statusLabel = new Label("status");
+		statusLabel.setTextAlignment(TextAlignment.LEFT);
+		toolbar.getItems().add(statusLabel);
+		panel.setBottom(toolbar);
 
-			Button resetButton = new Button("Reset");
-			resetButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					zoom = defaultZoom;
-					worldCenterX = defaultWorldCenterX;
-					worldCenterY = defaultWorldCenterY;
-					updateCanvas();
-				}
-			});
-			toolbar.getItems().add(resetButton);
+		Button resetButton = new Button("Reset");
+		resetButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				zoom = defaultZoom;
+				worldCenterX = defaultWorldCenterX;
+				worldCenterY = defaultWorldCenterY;
+				updateCanvas();
+			}
+		});
+		toolbar.getItems().add(resetButton);
 
-			canvas = new Pane();
-			canvas.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-			// clip the canvas (avoid drawing outside of it)
-			Rectangle clip = new Rectangle(0, 0, 0, 0);
-			clip.widthProperty().bind(canvas.widthProperty());
-			clip.heightProperty().bind(canvas.heightProperty());
-			canvas.setClip(clip);
-			
-			canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
+		canvas = new Pane();
+		canvas.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+		// clip the canvas (avoid drawing outside of it)
+		Rectangle clip = new Rectangle(0, 0, 0, 0);
+		clip.widthProperty().bind(canvas.widthProperty());
+		clip.heightProperty().bind(canvas.heightProperty());
+		canvas.setClip(clip);
+		
+		canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				lastDragX = event.getX();
+				lastDragY = event.getY();
+			}
+		});
+		canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				lastDragX = null;
+				lastDragY = null;
+			}
+		});
+		canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				try {
+					double transX = screenToWorldDistance(event.getX() - lastDragX);
+					double transY = screenToWorldDistance(event.getY() - lastDragY);
+					worldCenterX += transX;
+					worldCenterY += transY;
+					worldOffsetX += transX;
+					worldOffsetY += transY;
 					lastDragX = event.getX();
 					lastDragY = event.getY();
-				}
-			});
-			canvas.setOnMouseExited(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					lastDragX = null;
-					lastDragY = null;
-				}
-			});
-			canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					try {
-						double transX = screenToWorldDistance(event.getX() - lastDragX);
-						double transY = screenToWorldDistance(event.getY() - lastDragY);
-						worldCenterX += transX;
-						worldCenterY += transY;
-						worldOffsetX += transX;
-						worldOffsetY += transY;
-						lastDragX = event.getX();
-						lastDragY = event.getY();
-						updateCanvas();
-					} catch (Exception ez) {
-						// Catch exception occurring when mouse is out of the canvas
-					}
-				}
-			});
-
-			canvas.setOnScroll(new EventHandler<ScrollEvent>() {
-				@Override
-				public void handle(ScrollEvent event) {
-					double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-					double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
-					zoom += event.getDeltaY() / event.getMultiplierY() * 10;
-					if (zoom < 10)
-						zoom = 10;
-
-					double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
-					double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
-					worldCenterX -= wdx2 - wdx;
-					worldCenterY -= wdy2 - wdy;
 					updateCanvas();
+				} catch (Exception ez) {
+					// Catch exception occurring when mouse is out of the canvas
 				}
-			});
-
-			panel.setCenter(canvas);
-			
-			//add VuiExplorer
-			vuiExplorer = new VuiExplorer(this);
-			panel.setLeft(vuiExplorer);
-			Button veButton = new Button("VUI explorer");
-			veButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					panel.setLeft(vuiExplorer);
-				}
-			});
-			veButton.setTooltip(new Tooltip("Show the VUI explorer if it was hidden."));
-			toolbar.getItems().add(veButton);
-			
-			done.release();
-			
+			}
 		});
-		try {
-			done.acquire();
-		} catch (InterruptedException e) {
-			System.err.println("Failed to make sure that the VUI is correctly initialized.");
-			e.printStackTrace();
-		}
+
+		canvas.setOnScroll(new EventHandler<ScrollEvent>() {
+			@Override
+			public void handle(ScrollEvent event) {
+				double wdx = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				zoom += event.getDeltaY() / event.getMultiplierY() * 10;
+				if (zoom < 10)
+					zoom = 10;
+
+				double wdx2 = screenToWorldDistance(canvas.getWidth() / 2 - event.getX());
+				double wdy2 = screenToWorldDistance(canvas.getHeight() / 2 - event.getY());
+				worldCenterX -= wdx2 - wdx;
+				worldCenterY -= wdy2 - wdy;
+				updateCanvas();
+			}
+		});
+
+		panel.setCenter(canvas);
+		
+		//add VuiExplorer
+		vuiExplorer = new VuiExplorer(this);
+		panel.setLeft(vuiExplorer);
+		Button veButton = new Button("VUI explorer");
+		veButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				panel.setLeft(vuiExplorer);
+			}
+		});
+		veButton.setTooltip(new Tooltip("Show the VUI explorer if it was hidden."));
+		toolbar.getItems().add(veButton);
+			
+
+			
+		
 	}
 
 	/**
