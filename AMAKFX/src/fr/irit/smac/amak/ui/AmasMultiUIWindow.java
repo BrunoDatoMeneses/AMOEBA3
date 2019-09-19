@@ -65,7 +65,6 @@ public class AmasMultiUIWindow extends Stage{
 	public TabPane tabbedPanel;
 
 	
-	protected static Object startEnded = new Object();
 
 	/**
 	 * Create the frame.
@@ -75,55 +74,57 @@ public class AmasMultiUIWindow extends Stage{
 	 *             should be used by the Application of JavaFX only.
 	 */
 	public AmasMultiUIWindow(String title) {
-		synchronized (startEnded) {
-			VBox root = new VBox();
+
 			
-			// Creation of the menu bar (Top)
-			menuBar = new MenuBar();
-			root.getChildren().add(menuBar);
 			
-			// Border organization
-			organizationPane = new BorderPane();
-			organizationPane.setMinSize(200, 200); //that way we avoid 0 size, which can cause problems
-			root.getChildren().add(organizationPane);
-			VBox.setVgrow(organizationPane, Priority.ALWAYS);
+		VBox root = new VBox();
+		
+		// Creation of the menu bar (Top)
+		menuBar = new MenuBar();
+		root.getChildren().add(menuBar);
+		
+		// Border organization
+		organizationPane = new BorderPane();
+		organizationPane.setMinSize(200, 200); //that way we avoid 0 size, which can cause problems
+		root.getChildren().add(organizationPane);
+		VBox.setVgrow(organizationPane, Priority.ALWAYS);
+		
+		// Creation of scene
+		this.setTitle(title);
+		Scene scene = new Scene(root, 450, 300);
+		//stage = primaryStage;
+		this.setScene(scene);
+		this.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				Platform.exit();
+			}
+		});
+
+		// Creation of the toolbar (Bottom)
+		toolbarPanel = new ToolBar();
+		organizationPane.setBottom(toolbarPanel);
+
+		// Creation of the right part of the split pane (Center Right)
+		tabbedPanel = new TabPane();
+		organizationPane.setCenter(tabbedPanel);
+
+		// Creation of the close menu item
+		MenuItem menuItem = new MenuItem("Close");
+		menuItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				System.exit(0);
+			}
+		});
+		addToMenu("Options", menuItem);
+
+		menuBar.getMenus().add(new Menu("AMAKFX v" + Information.VERSION));
+
+		this.show();
 			
-			// Creation of scene
-			this.setTitle(title);
-			Scene scene = new Scene(root, 450, 300);
-			//stage = primaryStage;
-			this.setScene(scene);
-			this.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent event) {
-					Platform.exit();
-				}
-			});
-	
-			// Creation of the toolbar (Bottom)
-			toolbarPanel = new ToolBar();
-			organizationPane.setBottom(toolbarPanel);
-	
-			// Creation of the right part of the split pane (Center Right)
-			tabbedPanel = new TabPane();
-			organizationPane.setCenter(tabbedPanel);
-	
-			// Creation of the close menu item
-			MenuItem menuItem = new MenuItem("Close");
-			menuItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					System.exit(0);
-				}
-			});
-			addToMenu("Options", menuItem);
-	
-			menuBar.getMenus().add(new Menu("AMAKFX v" + Information.VERSION));
-	
-			this.show();
-			
-			startEnded.notify();
-		}
+
+
 	}
 
 //	@Override
@@ -231,7 +232,8 @@ public class AmasMultiUIWindow extends Stage{
 	 */
 	public void addTabbedPanel(String title, Node panel) {
 		Tab t = new DraggableTab(title, panel);
-		RunLaterHelper.runLater(() -> tabbedPanel.getTabs().add(t));
+		tabbedPanel.getTabs().add(t);
+		//RunLaterHelper.runLater(() -> tabbedPanel.getTabs().add(t));
 	}
 	
 	/**

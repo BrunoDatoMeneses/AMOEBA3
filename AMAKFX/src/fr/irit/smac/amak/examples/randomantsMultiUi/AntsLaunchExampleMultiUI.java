@@ -5,7 +5,13 @@ import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import fr.irit.smac.amak.ui.VUIMulti;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -24,6 +30,7 @@ public class AntsLaunchExampleMultiUI extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		
 		Configuration.multiUI=true;
+		Configuration.commandLineMode =false;
 		
 		
 		AmasMultiUIWindow window = new AmasMultiUIWindow("Random Ants Multi UI 1");
@@ -34,11 +41,31 @@ public class AntsLaunchExampleMultiUI extends Application{
 		//WorldExampleMultiUI env2 = new WorldExampleMultiUI(window2);
 		
 
-		AntHillExampleMultiUI ants = new AntHillExampleMultiUI(window, VUIMulti.get("Ants VUI 1"), env);
+		AntHillExampleMultiUI ants = new AntHillExampleMultiUI(window, new VUIMulti("Ants VUI 1"), env);
 		//new AntHillExampleMultiUI(window2, VUIMulti.get("Ants VUI 2"), env2);
 		
-		for(int i=0;i<1000;i++)
-			ants.cycle();
+		Button btn = new Button();
+        btn.setText("GO");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	for(int i=0;i<10000;i++) {
+        			System.out.println(i);
+        			ants.cycle();
+        		}
+            }
+        });
+        
+        window.addToolbar(btn);
+		
+		
+        for(int i=0;i<10000;i++) {
+			System.out.println(i);
+			ants.getScheduler().step();
+		}
+		
+		
+			
 	}
 	
 	@Override
