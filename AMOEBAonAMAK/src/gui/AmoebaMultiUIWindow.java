@@ -102,7 +102,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
 		
 		// contextMenu "Request Here" on VUI
-		new ContextMenuVUI(amoeba, mainVUI); //the ContextMenu add itself to the VUI
+		new ContextMenuVUIMulti(amoeba, mainVUI); //the ContextMenu add itself to the VUI
 		
 		// manual save button
 		addToolbar(newManualSaveButton(amoeba));
