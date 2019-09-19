@@ -146,6 +146,8 @@ public class VUIMulti {
 	 */
 	public VUIMulti(String titleValue) {
 		
+		RunLaterHelper.runLater(() -> {
+		
 		this.title = titleValue;
 		panel = new BorderPane();
 
@@ -241,7 +243,7 @@ public class VUIMulti {
 		toolbar.getItems().add(veButton);
 			
 
-			
+		});	
 		
 	}
 

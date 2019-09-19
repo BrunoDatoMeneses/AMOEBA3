@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.examples.randomantsMultiUi;
 
 import fr.irit.smac.amak.Agent;
+import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableImage;
@@ -46,8 +47,10 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 
 	@Override
 	protected void onRenderingInitialization() {
+		RunLaterHelper.runLater(() -> {
 		image =  getAmas().getVUIMulti().createAndAddImage(dx, dy, "file:resources/ant.png");
 		image.setName("Ant "+getId());
+		});
 	}
 
 	/**
@@ -81,6 +84,7 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 
 	@Override
 	public void onUpdateRender() {
+		RunLaterHelper.runLater(() -> {
 		image.move(dx, dy);
 		image.setAngle(angle);
 		image.setInfo("Ant "+getId()+"\nPosition "+dx+" "+dy+"\nAngle "+angle);
@@ -88,5 +92,11 @@ public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExample
 			image.setFilename("file:Resources/ant_dead.png");
 			image.setInfo("Ant "+getId()+"\nPosition "+dx+" "+dy+"\nAngle "+angle+"\nDead");
 		}
+		
+		
+		});
 	}
 }
+
+
+

@@ -75,7 +75,7 @@ public class AmasMultiUIWindow extends Stage{
 	 */
 	public AmasMultiUIWindow(String title) {
 
-			
+		RunLaterHelper.runLater(() -> {	
 			
 		VBox root = new VBox();
 		
@@ -123,7 +123,7 @@ public class AmasMultiUIWindow extends Stage{
 
 		this.show();
 			
-
+		});	
 
 	}
 
@@ -232,8 +232,7 @@ public class AmasMultiUIWindow extends Stage{
 	 */
 	public void addTabbedPanel(String title, Node panel) {
 		Tab t = new DraggableTab(title, panel);
-		tabbedPanel.getTabs().add(t);
-		//RunLaterHelper.runLater(() -> tabbedPanel.getTabs().add(t));
+		RunLaterHelper.runLater(() -> tabbedPanel.getTabs().add(t));
 	}
 	
 	/**

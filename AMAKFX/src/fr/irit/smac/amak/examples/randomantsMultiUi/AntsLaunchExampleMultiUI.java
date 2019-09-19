@@ -44,26 +44,13 @@ public class AntsLaunchExampleMultiUI extends Application{
 		AntHillExampleMultiUI ants = new AntHillExampleMultiUI(window, new VUIMulti("Ants VUI 1"), env);
 		//new AntHillExampleMultiUI(window2, VUIMulti.get("Ants VUI 2"), env2);
 		
-		Button btn = new Button();
-        btn.setText("GO");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	for(int i=0;i<10000;i++) {
-        			System.out.println(i);
-        			ants.cycle();
-        		}
-            }
-        });
-        
-        window.addToolbar(btn);
+		
 		
 		
         for(int i=0;i<10000;i++) {
 			System.out.println(i);
-			ants.getScheduler().step();
+			ants.cycle();
 		}
-		
 		
 			
 	}

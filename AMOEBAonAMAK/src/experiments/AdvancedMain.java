@@ -55,7 +55,7 @@ public class AdvancedMain extends Application{
 		Configuration.multiUI = true;
 
 		
-		VUIMulti amoebaVUI = VUIMulti.get("2D");
+		VUIMulti amoebaVUI = new VUIMulti("2D");
 		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
 		
 		// Create an AMOEBA
@@ -93,8 +93,9 @@ public class AdvancedMain extends Application{
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 1000;
+		int nbCycle = 100;
 		for (int i = 0; i < nbCycle; ++i) {
+			System.out.println(i);
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
 		}
@@ -139,6 +140,12 @@ public class AdvancedMain extends Application{
 		amoebaUI.addToolbar(slider);
 
 		System.out.println("End main");
+	}
+	
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.exit(0);
 	}
 
 	
