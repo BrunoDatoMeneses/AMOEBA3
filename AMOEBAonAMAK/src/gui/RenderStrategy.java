@@ -18,7 +18,8 @@ public abstract class RenderStrategy {
 	/**
 	 * Called when the rendered object need to be initialized
 	 */
-	abstract public void initialize();
+	//abstract public void initialize();
+	abstract public void initialize(VUIMulti vui);
 	
 	/**
 	 * Called to render the object.

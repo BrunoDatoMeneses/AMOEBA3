@@ -2,6 +2,7 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
+import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
@@ -64,8 +65,8 @@ public class ContextRendererFX extends RenderStrategy {
 	 * window.
 	 */
 	@Override
-	public void initialize() {
-		getDrawable().setName(context.toString()); // create the drawable if it does not exist
+	public void initialize(VUIMulti vui) {
+		getDrawable(vui).setName(context.toString()); // create the drawable if it does not exist
 
 	}
 
@@ -81,10 +82,10 @@ public class ContextRendererFX extends RenderStrategy {
 	 * 
 	 * @return
 	 */
-	public DrawableRectangle getDrawable() {
+	public DrawableRectangle getDrawable(VUIMulti vui) {
 		if (!context.isDying() && drawable == null) {
 			drawable = new DrawableContext(0, 0, 0, 0, context);
-			AmoebaWindow.instance().mainVUI.add(drawable);
+			vui.add(drawable);
 		}
 		return drawable;
 	}
