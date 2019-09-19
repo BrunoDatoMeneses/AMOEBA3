@@ -27,15 +27,23 @@ public class AntsLaunchExampleMultiUI extends Application{
 		
 		
 		AmasMultiUIWindow window = new AmasMultiUIWindow("Random Ants Multi UI 1");
-		AmasMultiUIWindow window2 = new AmasMultiUIWindow("Random Ants Multi UI 2");
+		//AmasMultiUIWindow window2 = new AmasMultiUIWindow("Random Ants Multi UI 2");
 		
 		
 		WorldExampleMultiUI env = new WorldExampleMultiUI(window);
-		WorldExampleMultiUI env2 = new WorldExampleMultiUI(window2);
+		//WorldExampleMultiUI env2 = new WorldExampleMultiUI(window2);
 		
 
-		AntHillExampleMultiUI amas1 = new AntHillExampleMultiUI(window, VUIMulti.getDefault(), env);
-		AntHillExampleMultiUI amas2 = new AntHillExampleMultiUI(window2, VUIMulti.getDefault(), env2);
-
+		AntHillExampleMultiUI ants = new AntHillExampleMultiUI(window, VUIMulti.get("Ants VUI 1"), env);
+		//new AntHillExampleMultiUI(window2, VUIMulti.get("Ants VUI 2"), env2);
+		
+		for(int i=0;i<1000;i++)
+			ants.cycle();
+	}
+	
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.exit(0);
 	}
 }
