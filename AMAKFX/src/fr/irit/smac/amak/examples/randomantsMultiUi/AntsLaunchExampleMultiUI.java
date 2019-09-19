@@ -44,11 +44,11 @@ public class AntsLaunchExampleMultiUI extends Application{
 		AntHillExampleMultiUI ants = new AntHillExampleMultiUI(window, new VUIMulti("Ants VUI 1"), env);
 		//new AntHillExampleMultiUI(window2, VUIMulti.get("Ants VUI 2"), env2);
 		
-		
+		System.out.println(Configuration.waitForGUI);
 		
 		
         for(int i=0;i<10000;i++) {
-			System.out.println(i);
+			
 			ants.cycle();
 		}
 		

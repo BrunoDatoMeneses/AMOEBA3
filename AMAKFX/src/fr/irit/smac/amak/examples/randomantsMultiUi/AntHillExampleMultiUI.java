@@ -18,10 +18,8 @@ public class AntHillExampleMultiUI extends Amas<WorldExampleMultiUI> {
 
 	@Override
 	protected void onRenderingInitialization() {
-		RunLaterHelper.runLater(() -> {
-			vuiMulti.createAndAddImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10).setShowInExplorer(false);
-			antsCountLabel = (DrawableString) vuiMulti.createAndAddString(45, 25, "Ants count").setFixed().setLayer(10).setShowInExplorer(false);
-		});
+		vuiMulti.createAndAddImage(20, 20, "file:Resources/ant.png").setFixed().setLayer(10).setShowInExplorer(false);
+		antsCountLabel = (DrawableString) vuiMulti.createAndAddString(45, 25, "Ants count").setFixed().setLayer(10).setShowInExplorer(false);
 	}
 
 	@Override
