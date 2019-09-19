@@ -76,7 +76,7 @@ public class Main implements Runnable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
-		AMOEBA amoeba = new AMOEBA();
+		AMOEBA amoeba = new AMOEBA(null,null);
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);

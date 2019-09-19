@@ -30,7 +30,7 @@ public class Main {
 			}
 		}
 		
-		AMOEBA amoeba = new AMOEBA(config, null);
+		AMOEBA amoeba = new AMOEBA(null,null,config, null);
 		amoeba.allowGraphicalScheduler(false);
 
 		RosBridge bridge = new RosBridge();

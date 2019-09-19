@@ -39,7 +39,7 @@ public class Main {
 		}
 		
 		System.out.println("Creating the amoeba");
-		AMOEBA amoeba = new AMOEBA(configFile, ss);
+		AMOEBA amoeba = new AMOEBA(null,null,configFile, ss);
 		
 		synchronized (Thread.currentThread()){
 			try {

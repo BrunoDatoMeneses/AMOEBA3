@@ -49,7 +49,7 @@ public class SimpleReinforcement {
 		}
 		
 		Configuration.commandLineMode = true;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(null,null,config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		SimpleReinforcement env = new SimpleReinforcement();
 		

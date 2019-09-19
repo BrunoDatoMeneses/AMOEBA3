@@ -67,7 +67,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
-		VUIMulti amoebaVUI = VUIMulti.get("2D");
+		VUIMulti amoebaVUI = new VUIMulti("2D");
 		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
 		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
