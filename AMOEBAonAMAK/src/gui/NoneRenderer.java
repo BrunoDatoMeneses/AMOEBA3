@@ -14,7 +14,7 @@ public class NoneRenderer extends RenderStrategy {
 	}
 
 	@Override
-	public void initialize(VUIMulti vui) {
+	public void initialize() {
 	}
 
 	@Override

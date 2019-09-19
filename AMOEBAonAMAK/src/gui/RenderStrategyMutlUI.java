@@ -7,18 +7,19 @@ import fr.irit.smac.amak.ui.VUIMulti;
  * See {@link ContextRendererFX} for example on how to extends this class.
  * @author Hugo
  */
-public abstract class RenderStrategy {
+public abstract class RenderStrategyMutlUI {
 	
 	/**
 	 * @param o the object to be rendered
 	 */
-	public RenderStrategy(Object o) {
+	public RenderStrategyMutlUI(Object o) {
 	}
 	
 	/**
 	 * Called when the rendered object need to be initialized
 	 */
-	abstract public void initialize();
+	//abstract public void initialize();
+	abstract public void initialize(VUIMulti vui);
 	
 	/**
 	 * Called to render the object.

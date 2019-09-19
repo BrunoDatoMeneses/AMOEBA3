@@ -23,6 +23,8 @@ import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
+import fr.irit.smac.amak.ui.VUIMulti;
+import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
 import kernel.backup.IBackupSystem;
@@ -36,8 +38,11 @@ import utils.PrintOnce;
  * The AMOEBA amas
  *
  */
-public class AMOEBA extends Amas<World> implements IAMOEBA {
+public class AMOEBAMultiUI extends Amas<World> implements IAMOEBA {
 	// -- Attributes
+	
+	
+	public VUIMulti vuiMulti;
 	/**
 	 * Utility to save, autosave, and load amoebas.
 	 */
@@ -47,6 +52,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * The system studied by the amoeba.
 	 */
 	public StudiedSystem studiedSystem;
+	
+	public AmoebaMultiUIWindow multiUIWindow;
 	
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
@@ -77,13 +84,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	/**
 	 * Instantiates a new, empty, amoeba.
-	 * For ease of use, consider using {@link AMOEBA#AMOEBA(String, StudiedSystem)}.
+	 * For ease of use, consider using {@link AMOEBAMultiUI#AMOEBAMultiUI(String, StudiedSystem)}.
 	 *
 	 * @param studiedSystem
 	 *            the studied system
 	 */
-	public AMOEBA() {
-		super(new World(), Scheduling.HIDDEN);
+	public AMOEBAMultiUI(AmoebaMultiUIWindow window, VUIMulti vui) {
+		super(window, vui, new World(), Scheduling.HIDDEN);
+		vuiMulti = vui;
 	}
 	
 	/**
@@ -91,8 +99,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * 
 	 * @param path path to the config file.
 	 */
-	public AMOEBA(String path, StudiedSystem studiedSystem) {
-		super(new World(), Scheduling.HIDDEN);
+	public AMOEBAMultiUI(AmoebaMultiUIWindow window, VUIMulti vui, String path, StudiedSystem studiedSystem) {
+		super(window, vui, new World(), Scheduling.HIDDEN);
+		vuiMulti = vui;
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
 		saver = new SaveHelperImpl(this);
@@ -112,23 +121,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onRenderingInitialization() {
-		AmoebaWindow.instance().initialize(this);
+		((AmoebaMultiUIWindow) amasMultiUIWindow).initialize(this);
 	}
 
 	@Override
 	protected void onUpdateRender() {
 		// Update statistics
-		if(AmoebaWindow.isInstance()) {
-			AmoebaWindow window = AmoebaWindow.instance();
+		if(amasMultiUIWindow!=null) {
 
-			AmakPlot loopNCS = window.getPlot("This loop NCS");
-			AmakPlot allNCS = window.getPlot("All time NCS");
-			AmakPlot nbAgent = window.getPlot("Number of agents");
-			AmakPlot errors = window.getPlot("Errors");
-			AmakPlot distancesToModels = window.getPlot("Distances to models");
-			AmakPlot gloabalMappingCriticality = window.getPlot("Global Mapping Criticality");
-			AmakPlot timeExecution = window.getPlot("Time Execution");
-			AmakPlot criticalities = window.getPlot("Criticalities");
+			AmakPlot loopNCS = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("This loop NCS");
+			AmakPlot allNCS = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("All time NCS");
+			AmakPlot nbAgent = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Number of agents");
+			AmakPlot errors = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Errors");
+			AmakPlot distancesToModels = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Distances to models");
+			AmakPlot gloabalMappingCriticality = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Global Mapping Criticality");
+			AmakPlot timeExecution = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Time Execution");
+			AmakPlot criticalities = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Criticalities");
 			
 			
 			boolean notify = isRenderUpdate();
@@ -174,7 +182,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		if (isRenderUpdate()) {
-			AmoebaWindow.instance().mainVUI.updateCanvas();
+			((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
 			updateAgentsVisualisation();
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
@@ -454,7 +462,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
-			AmoebaWindow.instance().schedulerToolbar.setDisable(!allow);
+			((AmoebaMultiUIWindow)amasMultiUIWindow).schedulerToolbar.setDisable(!allow);
 		}
 	}
 
@@ -476,7 +484,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
 		if(!Configuration.commandLineMode) {
-			AmoebaWindow.instance().dimensionSelector.update(getPercepts());
+			((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.update(getPercepts());
 			updateAgentsVisualisation();
 		}
 	}
@@ -504,7 +512,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
-			AmoebaWindow.instance().toggleRender.setSelected(renderUpdate);
+			((AmoebaMultiUIWindow)amasMultiUIWindow).toggleRender.setSelected(renderUpdate);
 			if(renderUpdate == true)
 				nextCycleRunAllAgents();
 		}
@@ -595,13 +603,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
 		}
-		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
-		AmoebaWindow.instance().rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
-		AmoebaWindow.instance().rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()));
-		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
-		AmoebaWindow.instance().mainVUI.updateCanvas();
-		AmoebaWindow.instance().point.toFront();
-		AmoebaWindow.instance().point.setInfo(getCursorInfo());
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue(), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue());
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.toFront();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.setInfo(getCursorInfo());
 	}
 	
 	/**
@@ -609,7 +617,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public DimensionSelector getDimensionSelector() {
-		return AmoebaWindow.instance().dimensionSelector;
+		return ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector;
 	}
 	
 	/**
