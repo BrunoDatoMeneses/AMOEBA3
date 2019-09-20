@@ -1,4 +1,4 @@
-package experiments;
+package experiments.benchmark;
 
 import java.io.File;
 import java.util.ArrayList;
