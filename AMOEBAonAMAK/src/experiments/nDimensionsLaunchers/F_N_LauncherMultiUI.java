@@ -15,6 +15,7 @@ import fr.irit.smac.amak.ui.VUIMulti;
 import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
@@ -24,6 +25,7 @@ import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
+import utils.TRACE_LEVEL;
 
 
 /**
@@ -48,7 +50,15 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 	
 	public static final int nbCycle = 1000;
 	
-
+	AMOEBA amoeba;
+	StudiedSystem studiedSystem;
+	VUIMulti amoebaVUI;
+	AmoebaMultiUIWindow amoebaUI;
+	
+	AMOEBA amoeba2;
+	StudiedSystem studiedSystem2;
+	VUIMulti amoebaVUI2;
+	AmoebaMultiUIWindow amoebaUI2;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -67,21 +77,9 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
-		VUIMulti amoebaVUI = new VUIMulti("2D");
-		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
-		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-		amoeba.setStudiedSystem(studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/twoDimensionsLauncher.xml");
-		backupSystem.load(file);
+		amoebaVUI = new VUIMulti("2D");
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
 		
-		amoeba.saver = new SaveHelperImpl(amoeba);
-		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(true);		
-		amoeba.data.learningSpeed = learningSpeed;
-		amoeba.data.numberOfPointsForRegression = regressionPoints;
-		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
 		// Exemple for adding a tool in the toolbar
 		Slider slider = new Slider(0.01, 0.1, mappingErrorAllowed);
@@ -98,24 +96,31 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		});
 		amoebaUI.addToolbar(slider);
 		
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
-		studiedSystem.playOneStep();
-		amoeba.learn(studiedSystem.getOutput());
+		
+		amoebaVUI2 = new VUIMulti("2D");
+		amoebaUI2 = new AmoebaMultiUIWindow("ELLSA", amoebaVUI2);
 		
 		
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < 100; ++i) {
-			System.out.println(i);
-			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
-		}
-		long end = System.currentTimeMillis();
-		System.out.println("Done in : " + (end - start) );
+		// Exemple for adding a tool in the toolbar
+		Slider slider2 = new Slider(0.01, 0.1, mappingErrorAllowed);
+		slider2.setShowTickLabels(true);
+		slider2.setShowTickMarks(true);
+		
+		slider2.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				System.out.println("new Value "+newValue);
+				mappingErrorAllowed = (double)newValue;
+				amoeba2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+			}
+		});
+		amoebaUI2.addToolbar(slider2);
+		
+		
+		
+		startTask(100, 1000);
+		startTask2(500, 100);
+
 
 		
 //		VUIMulti amoebaVUI2 = VUIMulti.get("2D");
@@ -170,6 +175,190 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 
 		
 	}
+	
+	public void startTask(long wait, int cycles) 
+    {
+        // Create a Runnable
+        Runnable task = new Runnable()
+        {
+            public void run()
+            {
+                runTask(wait, cycles);
+            }
+        };
+ 
+        // Run the task in a background thread
+        Thread backgroundThread = new Thread(task);
+        // Terminate the running thread if the application exits
+        backgroundThread.setDaemon(true);
+        // Start the thread
+        backgroundThread.start();
+        
+     
+    }
+	
+	public void startTask2(long wait, int cycles) 
+    {
+        // Create a Runnable
+        Runnable task = new Runnable()
+        {
+            public void run()
+            {
+                runTask2(wait, cycles);
+            }
+        };
+ 
+        // Run the task in a background thread
+        Thread backgroundThread = new Thread(task);
+        // Terminate the running thread if the application exits
+        backgroundThread.setDaemon(true);
+        // Start the thread
+        backgroundThread.start();
+        
+     
+    }
+	
+	public void runTask(long wait, int cycles) 
+    {
+		
+		try
+        {
+             
+            // Update the Label on the JavaFx Application Thread        
+            Platform.runLater(new Runnable() 
+            {
+                @Override
+                public void run() 
+                {
+                	amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+            		studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
+            		amoeba.setStudiedSystem(studiedSystem);
+            		IBackupSystem backupSystem = new BackupSystem(amoeba);
+            		File file = new File("resources/twoDimensionsLauncher.xml");
+            		backupSystem.load(file);
+            		
+            		amoeba.saver = new SaveHelperImpl(amoeba);
+            		amoeba.allowGraphicalScheduler(true);
+            		amoeba.setRenderUpdate(true);		
+            		amoeba.data.learningSpeed = learningSpeed;
+            		amoeba.data.numberOfPointsForRegression = regressionPoints;
+            		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+            		
+                }
+            });
+     
+            Thread.sleep(wait);
+        }
+        catch (InterruptedException e) 
+        {
+            e.printStackTrace();
+        }
+		
+		
+		
+        for(int i = 0; i < cycles; i++) 
+        {
+            try
+            {
+                // Get the Status
+                final String status = "Processing " + i + " of " + cycles;
+                 
+                // Update the Label on the JavaFx Application Thread        
+                Platform.runLater(new Runnable() 
+                {
+                    @Override
+                    public void run() 
+                    {
+                    	studiedSystem.playOneStep();
+                    	amoeba.learn(studiedSystem.getOutput());
+                    	if(amoeba.getHeadAgent().isActiveLearning()) {
+                    		studiedSystem.setActiveLearning(true);
+                    		studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+    						 
+    					}
+                    	System.out.println(status);
+                    }
+                });
+         
+                Thread.sleep(wait);
+            }
+            catch (InterruptedException e) 
+            {
+                e.printStackTrace();
+            }
+        }
+    }   
+	
+	public void runTask2(long wait, int cycles) 
+    {
+		
+		try
+        {
+             
+            // Update the Label on the JavaFx Application Thread        
+            Platform.runLater(new Runnable() 
+            {
+                @Override
+                public void run() 
+                {
+                	amoeba2 = new AMOEBA(amoebaUI2,  amoebaVUI2);
+            		studiedSystem2 = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
+            		amoeba2.setStudiedSystem(studiedSystem2);
+            		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);
+            		File file2 = new File("resources/twoDimensionsLauncher.xml");
+            		backupSystem2.load(file2);
+            		
+            		amoeba2.saver = new SaveHelperImpl(amoeba2);
+            		amoeba2.allowGraphicalScheduler(true);
+            		amoeba2.setRenderUpdate(true);		
+            		amoeba2.data.learningSpeed = learningSpeed;
+            		amoeba2.data.numberOfPointsForRegression = regressionPoints;
+            		amoeba2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+            		
+                }
+            });
+     
+            Thread.sleep(wait);
+        }
+        catch (InterruptedException e) 
+        {
+            e.printStackTrace();
+        }
+		
+		
+		
+        for(int i = 0; i < cycles; i++) 
+        {
+            try
+            {
+                // Get the Status
+                final String status = "Processing " + i + " of " + cycles;
+                 
+                // Update the Label on the JavaFx Application Thread        
+                Platform.runLater(new Runnable() 
+                {
+                    @Override
+                    public void run() 
+                    {
+                    	studiedSystem2.playOneStep();
+                    	amoeba2.learn(studiedSystem2.getOutput());
+                    	if(amoeba2.getHeadAgent().isActiveLearning()) {
+                    		studiedSystem2.setActiveLearning(true);
+                    		studiedSystem2.setSelfRequest(amoeba2.getHeadAgent().getSelfRequest());
+    						 
+    					}
+                    	System.out.println(status);
+                    }
+                });
+         
+                Thread.sleep(wait);
+            }
+            catch (InterruptedException e) 
+            {
+                e.printStackTrace();
+            }
+        }
+    }   
 	
 	@Override
 	public void stop() throws Exception {
