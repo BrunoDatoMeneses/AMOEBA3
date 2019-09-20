@@ -29,8 +29,8 @@ import kernel.AMOEBA;
 import kernel.backup.SaveHelperImpl;
 
 /**
- * The main window for AMOEBA GUI.
- * @author Hugo
+ * The multi window for AMOEBA GUI.
+ * @author Bruno
  *
  */
 public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
