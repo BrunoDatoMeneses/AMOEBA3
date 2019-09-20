@@ -257,7 +257,7 @@ public class SaveExplorer extends VBox {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		System.out.println("New AMOEBA launched.");
-		AMOEBA amoeba = new AMOEBA(args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
+		AMOEBA amoeba = new AMOEBA(null,null,args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
 		//amoeba.allowGraphicalScheduler(false);
 		for(Percept p : amoeba.getPercepts()) {
 			p.setValue(amoeba.getPerceptions(p.getName()));
