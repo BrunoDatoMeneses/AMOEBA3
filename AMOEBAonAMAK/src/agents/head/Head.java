@@ -171,7 +171,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
 
 		getAmas().data.executionTimes[6]=System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
+		//NCSDetection_Context_Overmapping();
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 

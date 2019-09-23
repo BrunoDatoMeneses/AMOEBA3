@@ -110,6 +110,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
 		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI);
 		
+		
 		amoebaControlModelVUI = new VUIMulti("2D");
 		amoebaControlModelUI = new AmoebaMultiUIWindow("CONTROL MODEL", amoebaControlModelVUI);
 		
@@ -141,27 +142,31 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	public void runTask(long wait, int cycles) 
     {
 		
-		try
-        {
-             
-            // Update the Label on the JavaFx Application Thread        
-            Platform.runLater(new Runnable() 
-            {
-                @Override
-                public void run() 
-                {
-                	agent = new AmoebaRewardAndControl();
-                	env = new OneDimensionEnv(10);
-                }
-            });
-     
-            Thread.sleep(wait);
-        }
-        catch (InterruptedException e) 
-        {
-            e.printStackTrace();
-        }
+//		try
+//        {
+//             
+//            // Update the Label on the JavaFx Application Thread        
+//            Platform.runLater(new Runnable() 
+//            {
+//                @Override
+//                public void run() 
+//                {
+//                	agent = new AmoebaRewardAndControl();
+//                	env = new OneDimensionEnv(10);
+//                }
+//            });
+//     
+//            Thread.sleep(wait);
+//        }
+//        catch (InterruptedException e) 
+//        {
+//            e.printStackTrace();
+//        }
 		
+		
+		
+		agent = new AmoebaRewardAndControl();
+    	env = new OneDimensionEnv(10);
 		
 		state = env.reset(); // BUG LAAAAAAAAAAAAAAAA
 		double explo = EXPLO_RATE_BASE;
@@ -311,15 +316,13 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	}
 	
 	public class AmoebaRewardAndControl implements LearningAgent {
-		public AMOEBA amoebaSpatialReward;
-		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaRewardAndControl() {
 			amoebaSpatialReward = setupSpatialReward();
-			//amoebaControlModel = setupControlModel();
+			amoebaControlModel = setupControlModel();
 		}
 		
 		@Override
@@ -366,7 +369,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
 			amoebaSpatialReward.learn(positionAndReward);
-			//amoebaControlModel.learn(previousStateCurrentStateAction);
+			amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
 
@@ -497,7 +500,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	}
 	
 
-	private static AMOEBA setupControlModel() {
+	private AMOEBA setupControlModel() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("pCurrent", false));
 		sensors.add(new Pair<String, Boolean>("pGoal", false));
@@ -514,7 +517,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(amoebaControlModelUI, amoebaControlModelVUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
