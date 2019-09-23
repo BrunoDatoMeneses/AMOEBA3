@@ -16,7 +16,7 @@ Depending on your problem, determine what AMOEBA should learn, and from what. Bu
 A config file is a xml file used to initialize your amoeba. Most importantly it contain the list of percepts.
 
 You can use `utils/genFiles.py` to generate your xml file based on a list of percept. `python genFiles.py MySystem false px py` will create `MySystem.xml` (and `MySystem.msg`, but ignore it if you don't use [AMOEBA and ROS](rosbridge.md)) containing something looking like the following example :
-
+(if you don't want to use python, a java class doing the same job is available at `utils.XmlConfigGenerator`)
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <System>
@@ -144,6 +144,6 @@ public static void main(String[] args) {
     }
 }
 ```
-We can ask amoeba how well it performed on the last prediction with `amoeba.getHeads().get(0).getCriticity()`.
+We can ask amoeba how well it performed on the last prediction with `amoeba.getHeadAgent().getCriticity()`.
 
 For more example on how to use amoeba, check `AdvancedMain.java`, `MinimalMain.java`, and `Main.java` in the `experiments` package.

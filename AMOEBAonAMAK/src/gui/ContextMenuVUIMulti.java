@@ -25,7 +25,7 @@ import kernel.AMOEBA;
  * @author Hugo
  *
  */
-public class ContextMenuVUI extends ContextMenu {
+public class ContextMenuVUIMulti extends ContextMenu {
 	/**
 	 * If true will skip window asking for input in 2D problems
 	 */
@@ -37,9 +37,9 @@ public class ContextMenuVUI extends ContextMenu {
 	 * Create a {@link ContextMenu} suited for our needs, composed of 2 items : "Request Here" and "Learn here".<br/>
 	 * Set itself as the vui canvas {@link ContextMenu}. 
 	 * @param amoeba the amoeba where {@link AMOEBA#request(HashMap)} and {@link AMOEBA#learn(HashMap)} will be executed.
-	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUI}
+	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUIMulti}
 	 */
-	public ContextMenuVUI(AMOEBA amoeba, VUI vui) {
+	public ContextMenuVUIMulti(AMOEBA amoeba, VUIMulti vui) {
 		// "request here" menu item
 		setupRequestHereMenuItem(amoeba, vui);
 		
@@ -52,12 +52,12 @@ public class ContextMenuVUI extends ContextMenu {
 			public void handle(ContextMenuEvent event) {
 				reqHereX = event.getX();
 				reqHereY = event.getY();
-				ContextMenuVUI.this.show(vui.getCanvas(), event.getScreenX(), event.getScreenY());
+				ContextMenuVUIMulti.this.show(vui.getCanvas(), event.getScreenX(), event.getScreenY());
 			}
 		});	
 	}
 
-	private void setupRequestHereMenuItem(AMOEBA amoeba, VUI vui) {
+	private void setupRequestHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
 		MenuItem reqHere = new MenuItem("Request Here");
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -79,7 +79,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqTwoDimension(AMOEBA amoeba, VUI vui) {
+	private void reqTwoDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -96,7 +96,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqNDimension(AMOEBA amoeba, VUI vui) {
+	private void reqNDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
@@ -144,12 +144,12 @@ public class ContextMenuVUI extends ContextMenu {
 		});
 	}
 	
-	private void setupLearnHereMenuItem(AMOEBA amoeba, VUI vui) {
+	private void setupLearnHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
 		MenuItem learnHere = new MenuItem("Learn Here");
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
+				if(amoeba.getPercepts().size() == 2) {
 					learnTwoDimension(amoeba, vui);
 				} else {
 					learnNDimebsion(amoeba, vui);
@@ -166,7 +166,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnTwoDimension(AMOEBA amoeba, VUI vui) {
+	private void learnTwoDimension(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -182,7 +182,7 @@ public class ContextMenuVUI extends ContextMenu {
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnNDimebsion(AMOEBA amoeba, VUI vui) {
+	private void learnNDimebsion(AMOEBA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		

@@ -1,10 +1,13 @@
-package fr.irit.smac.amak.examples.randomants;
+package fr.irit.smac.amak.examples.randomantsMultiUi;
 
 import fr.irit.smac.amak.Agent;
+import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.drawables.DrawableImage;
 
-public class AntExample extends Agent<AntHillExample, WorldExample> {
+public class AntExampleMutliUI extends Agent<AntHillExampleMultiUI, WorldExampleMultiUI> {
+	
+	
 	
 	private boolean dead = false; 
 	
@@ -32,8 +35,8 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 	 * @param startY
 	 *            Initial Y coordinate
 	 */
-	public AntExample(AntHillExample amas, double startX, double startY) {
-		super(amas, startX, startY);
+	public AntExampleMutliUI(AmasMultiUIWindow window, AntHillExampleMultiUI amas, double startX, double startY) {
+		super(window, amas, startX, startY);
 	}
 	@Override
 	public void onInitialization() {
@@ -43,7 +46,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 
 	@Override
 	protected void onRenderingInitialization() {
-		image = VUI.get().createAndAddImage(dx, dy, "file:resources/ant.png");
+		image =  getAmas().getVUIMulti().createAndAddImage(dx, dy, "file:resources/ant.png");
 		image.setName("Ant "+getId());
 	}
 
@@ -52,6 +55,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 	 */
 	@Override
 	protected void onDecideAndAct() {
+
 		double random = amas.getEnvironment().getRandom().nextGaussian();
 		angle += random * 0.1;
 		dx += Math.cos(angle);
@@ -71,7 +75,7 @@ public class AntExample extends Agent<AntHillExample, WorldExample> {
 		}
 
 		if (amas.getEnvironment().getRandom().nextDouble() < 0.001) {
-			new AntExample(getAmas(), dx, dy);
+			new AntExampleMutliUI(getAmas().amasMultiUIWindow, getAmas(), dx, dy);
 		}
 	}
 

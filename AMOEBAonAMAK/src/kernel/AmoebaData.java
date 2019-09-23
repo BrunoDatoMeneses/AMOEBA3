@@ -79,4 +79,6 @@ public class AmoebaData implements Serializable {
 	public double[] executionTimesSums = new double[20];
 	
 	public double initRegressionPerformance = 1.0;
+	
+	public double averageRegressionPerformanceIndicator;
 }

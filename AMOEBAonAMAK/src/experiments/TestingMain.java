@@ -22,7 +22,7 @@ public class TestingMain {
 		StudiedSystem studiedSystem = new NDimCube(50.0, 3);
 		// create the amoeba
 		// Make sure the path to the config file is correct.
-		AMOEBA amoeba = new AMOEBA("resources/threeDimensionsLauncher.xml", studiedSystem);
+		AMOEBA amoeba = new AMOEBA(null,null,"resources/threeDimensionsLauncher.xml", studiedSystem);
 		amoeba.saver = new SaveHelperDummy();
 		// a window should have appeared, allowing you to control and visualize the amoeba.
 		

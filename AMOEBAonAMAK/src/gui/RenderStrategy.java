@@ -1,5 +1,7 @@
 package gui;
 
+import fr.irit.smac.amak.ui.VUIMulti;
+
 /**
  * Strategy on how to render an object.
  * See {@link ContextRendererFX} for example on how to extends this class.
@@ -16,7 +18,8 @@ public abstract class RenderStrategy {
 	/**
 	 * Called when the rendered object need to be initialized
 	 */
-	abstract public void initialize();
+	//abstract public void initialize();
+	abstract public void initialize(VUIMulti vui);
 	
 	/**
 	 * Called to render the object.

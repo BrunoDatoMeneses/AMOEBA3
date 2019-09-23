@@ -1,5 +1,7 @@
 package gui;
 
+import fr.irit.smac.amak.ui.VUIMulti;
+
 /**
  * A render strategy that does nothing.
  * @author Hugo
@@ -12,7 +14,7 @@ public class NoneRenderer extends RenderStrategy {
 	}
 
 	@Override
-	public void initialize() {
+	public void initialize(VUIMulti vui) {
 	}
 
 	@Override

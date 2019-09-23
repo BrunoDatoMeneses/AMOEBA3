@@ -116,7 +116,7 @@ public class BenchmarkThreading {
 		// setup cache --- (very important to reduce impact of the 1st measure)
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		StudiedSystem learnSystem = new NDimCube(50.0, 100);
-		AMOEBA amoeba = new AMOEBA();
+		AMOEBA amoeba = new AMOEBA(null,null);
 		amoeba.setStudiedSystem(learnSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		backupSystem.load(file);
@@ -127,7 +127,7 @@ public class BenchmarkThreading {
 		for(int thd = 1; thd <= 8; thd *= 2) {
 			Configuration.allowedSimultaneousAgentsExecution = thd;
 			learnSystem = new NDimCube(50.0, 100);
-			amoeba = new AMOEBA();
+			amoeba = new AMOEBA(null,null);
 			backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
 			List<List<Double>> bench = benchmark(amoeba, learnSystem, learnSystem, 0, 10000, 1000, null);
