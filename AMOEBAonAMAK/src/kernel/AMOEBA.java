@@ -104,7 +104,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		vuiMulti = vui;
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
-		saver = new SaveHelperImpl(this);
+		saver = new SaveHelperImpl(this, window);
 		saver.load(path);
 	}
 

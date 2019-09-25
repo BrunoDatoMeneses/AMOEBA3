@@ -14,7 +14,7 @@ public interface StudiedSystem extends Serializable{
 	/**
 	 * Tell the StudiedSystem to advance its simulation of one step
 	 */
-	public void playOneStep();
+	public HashMap<String, Double> playOneStep();
 
 	/**
 	 * Gets the output for the current step.
@@ -40,5 +40,12 @@ public interface StudiedSystem extends Serializable{
 	
 	
 	public void setSelfRequest(HashMap<Percept, Double> request);
+
+
+	public HashMap<String, Double> playOneStepWithControlModel();
+	
+	public void setControlModels(HashMap<String, AMOEBA> controlModels);
+	
+	public void setControl(boolean value);
 
 }

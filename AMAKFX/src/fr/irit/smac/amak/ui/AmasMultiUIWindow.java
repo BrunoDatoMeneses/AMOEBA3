@@ -138,7 +138,7 @@ public class AmasMultiUIWindow extends Stage{
 	 * @param onClose
 	 *            The action to be executed when the window is closed
 	 */
-	public static void addOnCloseAction(Runnable onClose) {
+	public void addOnCloseAction(Runnable onClose) {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    public void run() { onClose.run(); }
 		});

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
+import kernel.AMOEBA;
 import kernel.StudiedSystem;
 
 /**
@@ -31,13 +32,15 @@ public class F_XY_System implements StudiedSystem {
 	}
 	
 	@Override
-	public void playOneStep() {
+	public HashMap<String, Double> playOneStep() {
 		if (generator == null) {
 			generator = new Random(29);
 		}
 
 		x = (generator.nextDouble() - 0.5) * spaceSize * 4;
 		y = (generator.nextDouble() - 0.5) * spaceSize * 4;
+		
+		return null;
 	}
 
 	@Override
@@ -79,5 +82,23 @@ public class F_XY_System implements StudiedSystem {
 	@Override
 	public HashMap<String, Double> getIntput() {
 		return null;
+	}
+
+	@Override
+	public HashMap<String, Double> playOneStepWithControlModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setControl(boolean value) {
+		// TODO Auto-generated method stub
+		
 	}
 }

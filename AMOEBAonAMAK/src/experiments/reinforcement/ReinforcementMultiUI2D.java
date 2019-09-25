@@ -42,7 +42,7 @@ import utils.XmlConfigGenerator;
 /**
  * The Class BadContextLauncherEasy.
  */
-public class ReinforcementMultiUI extends Application implements Serializable {
+public class ReinforcementMultiUI2D extends Application implements Serializable {
 
 
 	public static final double oracleNoiseRange = 0.5;
@@ -75,9 +75,13 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	VUIMulti amoebaSpatialRewardVUI;
 	AmoebaMultiUIWindow amoebaSpatialRewardUI;
 	
-	AMOEBA amoebaControlModel;
-	VUIMulti amoebaControlModelVUI;
-	AmoebaMultiUIWindow amoebaControlModelUI;
+	AMOEBA amoebaActionModel1;
+	VUIMulti amoebaActionModel1VUI;
+	AmoebaMultiUIWindow amoebaActionModel1UI;
+	
+	AMOEBA amoebaActionModel2;
+	VUIMulti amoebaActionModel2VUI;
+	AmoebaMultiUIWindow amoebaActionModel2UI;
 	
 	LearningAgent agent;
 	Environment env;
@@ -110,9 +114,11 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
 		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI);
 		
+		amoebaActionModel1VUI = new VUIMulti("2D");
+		amoebaActionModel1UI = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModel1VUI);
 		
-		amoebaControlModelVUI = new VUIMulti("2D");
-		amoebaControlModelUI = new AmoebaMultiUIWindow("CONTROL MODEL", amoebaControlModelVUI);
+		amoebaActionModel2VUI = new VUIMulti("2D");
+		amoebaActionModel2UI = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModel2VUI);
 		
 		startTask(100, 0);		
 	}
@@ -141,34 +147,12 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	
 	public void runTask(long wait, int cycles) 
     {
-		
-//		try
-//        {
-//             
-//            // Update the Label on the JavaFx Application Thread        
-//            Platform.runLater(new Runnable() 
-//            {
-//                @Override
-//                public void run() 
-//                {
-//                	agent = new AmoebaRewardAndControl();
-//                	env = new OneDimensionEnv(10);
-//                }
-//            });
-//     
-//            Thread.sleep(wait);
-//        }
-//        catch (InterruptedException e) 
-//        {
-//            e.printStackTrace();
-//        }
-		
-		
+				
 		
 		agent = new AmoebaRewardAndControl();
-    	env = new OneDimensionEnv(10);
+    	env = new TwoDimensionEnv(10);
 		
-		state = env.reset(); // BUG LAAAAAAAAAAAAAAAA
+		state = env.reset(); 
 		double explo = EXPLO_RATE_BASE;
 		for(int i = 0; i < N_LEARN; i++) {
 			nbStep = 0;
@@ -214,6 +198,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		        					done = true;
 		        				}
 		        				action.put("p1", state.get("p1")); //add previous state to action
+		        				action.put("p2", state.get("p2")); //add previous state to action
 		        				
 		        				action.put("oracle", state2.get("oracle")); //add current reward to action
 		        				
@@ -222,6 +207,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		        				// action : previous state, current action and current reward
 		        				
 		        				agent.learn(state, state2, action, done);
+		        				
 		        				totReward += action.get("oracle");
 		        				
 		        				state = state2;
@@ -322,7 +308,8 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		
 		public AmoebaRewardAndControl() {
 			amoebaSpatialReward = setupSpatialReward();
-			amoebaControlModel = setupControlModel();
+			//amoebaActionModel1 = setupControlModel("1", amoebaActionModel1UI, amoebaActionModel1VUI);
+			//amoebaActionModel2 = setupControlModel("2", amoebaActionModel2UI, amoebaActionModel2VUI);
 		}
 		
 		@Override
@@ -358,10 +345,17 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 			// state2 : new position with current reward
 			// action : previous state, current actions and current reward
 			
-			HashMap<String, Double> previousStateCurrentStateAction = new HashMap<>();
-			previousStateCurrentStateAction.put("pCurrent", action.get("p1"));
-			previousStateCurrentStateAction.put("pGoal", positionAndReward.get("p1"));
-			previousStateCurrentStateAction.put("oracle", action.get("a1"));
+			HashMap<String, Double> previousStateCurrentStateAction1 = new HashMap<>();
+			previousStateCurrentStateAction1.put("p1Current", action.get("p1"));
+			previousStateCurrentStateAction1.put("p2Current", action.get("p2"));
+			previousStateCurrentStateAction1.put("p1Goal", positionAndReward.get("p1"));
+			previousStateCurrentStateAction1.put("oracle", action.get("a1"));
+			
+			HashMap<String, Double> previousStateCurrentStateAction2 = new HashMap<>();
+			previousStateCurrentStateAction2.put("p1Current", action.get("p1"));
+			previousStateCurrentStateAction2.put("p2Current", action.get("p2"));
+			previousStateCurrentStateAction2.put("p2Goal", positionAndReward.get("p2"));
+			previousStateCurrentStateAction2.put("oracle", action.get("a2"));
 			
 
 			
@@ -369,7 +363,8 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
 			amoebaSpatialReward.learn(positionAndReward);
-			amoebaControlModel.learn(previousStateCurrentStateAction);
+			//amoebaActionModel1.learn(previousStateCurrentStateAction1);
+			//amoebaActionModel2.learn(previousStateCurrentStateAction2);
 			
 		}
 
@@ -383,14 +378,15 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	
 	
 	
-	public static class OneDimensionEnv implements Environment {
+	public static class TwoDimensionEnv implements Environment {
 		private Random rand = new Random();
 		private double x = 0;
+		private double y = 0;
 		private double reward = 0;
 		private double size;
 		private Drawable pos;
 		
-		public OneDimensionEnv(double envSize) {
+		public TwoDimensionEnv(double envSize) {
 			
 			size = envSize;
 			
@@ -401,11 +397,14 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		public HashMap<String, Double> reset(){
 			x = RandomUtils.nextDouble(rand, -size, Math.nextUp(size));
 			x = Math.round(x);
+			y = RandomUtils.nextDouble(rand, -size, Math.nextUp(size));
+			y = Math.round(y);
 			reward = 0.0;
 			//pos.move(x+0.5, 0.5);
 			
 			HashMap<String, Double> ret = new HashMap<>();
 			ret.put("p1", x);
+			ret.put("p2", y);
 			ret.put("oracle", reward);
 			return ret;
 		}
@@ -421,11 +420,19 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 			double oldX = x;
 			x = x + action;
 			
+			double action2 = actionMap.get("a2");
+			//if(action2 == 0.0) action2 = rand.nextDouble();
+			if(action2 > 0.0) action2 = Math.ceil(action2);
+			if(action2 < 0.0 ) action2 = Math.floor(action2);
+			if(action2 > 1.0) action2 = 1.0;
+			if(action2 < -1.0) action2 = -1.0;
+			double oldY = y;
+			y = y + action2;
 			
 			//System.out.println("ACTIONS " + " a1 " +action + " " + " a2 " + action2);
-			if(x < -size || x > size) {
+			if(x < -size || x > size || y < -size || y > size) {
 				reward = -1000.0;
-			} else if((x == 0.0) || (sign(oldX) != sign(x) )) {
+			} else if((x == 0.0 && y == 0.0) || (sign(oldX) != sign(x) && sign(oldY) != sign(y) )) {
 				// win !
 				reward = 1000.0;
 			} else {
@@ -433,6 +440,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 			}
 			HashMap<String, Double> ret = new HashMap<>();
 			ret.put("p1", x);
+			ret.put("p2", y);
 			ret.put("oracle", reward);
 			//pos.move(x+0.5, 0.5);
 			return ret;
@@ -442,6 +450,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		public List<String> actionSpace() {
 			ArrayList<String> l = new ArrayList<>();
 			l.add("a1 enum:true {-1, 0, 1}");
+			l.add("a2 enum:true {-1, 0, 1}");
 			return l;
 		}
 
@@ -449,17 +458,20 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		public List<String> perceptionSpace() {
 			ArrayList<String> l = new ArrayList<>();
 			l.add("p1 enum:false [-"+size+", "+size+"]");
+			l.add("p2 enum:false [-"+size+", "+size+"]");
 			return l;
 		}
 
 		@Override
 		public HashMap<String, Double> randomAction() {
-			double a1 = rand.nextBoolean() ? -1 : 1;
-			
+			double a1 = rand.nextInt(3) - 1;
+			double a2 = (a1 == 0.0) ? (rand.nextBoolean() ? -1 : 1) : (rand.nextInt(3) - 1);
 						
-
+//			double a1 =  rand.nextBoolean() ? -1 : 1;
+//			double a2 =  rand.nextBoolean() ? -1 : 1;
 			HashMap<String, Double> action = new HashMap<String, Double>();
 			action.put("a1", a1);
+			action.put("a2", a2);
 			return action;
 			}
 		
@@ -472,6 +484,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	private AMOEBA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
+		sensors.add(new Pair<String, Boolean>("p2", false));
 		File config;
 		try {
 			config = File.createTempFile("configSpatialReward", "xml");
@@ -484,7 +497,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
+		World.minLevel = TRACE_LEVEL.DEBUG;
 		AMOEBA amoeba = new AMOEBA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
@@ -500,10 +513,11 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	}
 	
 
-	private AMOEBA setupControlModel() {
+	private AMOEBA setupControlModel(String action, AmoebaMultiUIWindow window, VUIMulti VUI) {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
-		sensors.add(new Pair<String, Boolean>("pCurrent", false));
-		sensors.add(new Pair<String, Boolean>("pGoal", false));
+		sensors.add(new Pair<String, Boolean>("p1Current", false));
+		sensors.add(new Pair<String, Boolean>("p2Current", false));
+		sensors.add(new Pair<String, Boolean>("p"+action+"Goal", false));
 		File config;
 		try {
 			config = File.createTempFile("configControlModel", "xml");
@@ -517,7 +531,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(amoebaControlModelUI, amoebaControlModelVUI, config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(window, VUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -534,84 +548,6 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		return x < 0 ? -1 : 1;
 	}
 	
-	/**
-	 * Teach a learning agent on the SimpleReinforcement problem
-	 * @param agent
-	 * @return
-	 */
-	public static ArrayList<Double> learning(LearningAgent agent, Environment env){
-		ArrayList<Double> averageRewards = new ArrayList<Double>();
-		Random rand = new Random();
-		
-		Random r = new Random();
-		HashMap<String, Double> state = env.reset();
-		HashMap<String, Double> state2;
-		double explo = EXPLO_RATE_BASE;
-		for(int i = 0; i < N_LEARN; i++) {
-			int nbStep = 0;
-			state = env.reset();
-			HashMap<String, Double> action = new HashMap<String, Double>();
-			double totReward = 0.0;
-			
-			// execute simulation cycles
-			boolean done = false;
-			boolean invalid = false;
-			
-			
-			while(!done && !invalid) {
-				nbStep++;
-				if(nbStep > MAX_STEP_PER_EPISODE) {
-					invalid = true;
-				}
-				state.remove("oracle");
-				
-				action = new HashMap<String, Double>();
-				
-				action = agent.explore(state, env);
-//				if(rand.nextDouble() < explo) {
-//					action = agent.explore(state, env);
-//				} else {
-//					action = agent.choose(state, env);
-//				}
-				
-				
-				state2 = env.step(action);  // new position with associated reward
-				
-				if(state2.get("oracle") != -1.0) { //if goal or end of world
-					done = true;
-				}
-				action.put("p1", state.get("p1")); //add previous state to action
-				
-				action.put("oracle", state2.get("oracle")); //add current reward to action
-				
-				// state : previous position and associated reward
-				// state2 : new position with current reward
-				// action : previous state, current action and current reward
-				
-				agent.learn(state, state2, action, done);
-				totReward += action.get("oracle");
-				
-				state = state2;
-			}
-			
-			System.out.println("-----------------------------------------------------------------------");
-			
-			// update exploration rate
-			if(explo > MIN_EXPLO_RATE) {
-				explo -= EXPLO_RATE_DIMINUTION_FACTOR;
-				if(explo < MIN_EXPLO_RATE)
-					explo = MIN_EXPLO_RATE;
-			}
-			
-			System.out.println("Episode "+i+"  reward : "+totReward+"  explo : "+explo);
-			//double testAR = test(agent, env, r, N_TEST);
-			//averageRewards.add(testAR);
-			
-			//Scanner scan = new Scanner(System.in);
-			//scan.nextLine();
-		}
-		
-		return averageRewards;
-	}
+	
 	
 }

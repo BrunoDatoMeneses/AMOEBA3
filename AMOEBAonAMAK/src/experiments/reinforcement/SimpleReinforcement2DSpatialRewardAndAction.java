@@ -376,7 +376,7 @@ public abstract class SimpleReinforcement2DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		for(Percept pct : amoeba.getPercepts()) {

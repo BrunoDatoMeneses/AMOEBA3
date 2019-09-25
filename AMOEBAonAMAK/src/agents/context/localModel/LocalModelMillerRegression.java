@@ -28,6 +28,8 @@ public class LocalModelMillerRegression extends LocalModel{
 	private Double[] coefs;
 	
 	private ArrayList<Experiment> firstExperiments;
+	
+	public boolean isReinforcement = false;
 
 	/**
 	 * Instantiates a new local model miller regression.
@@ -40,6 +42,8 @@ public class LocalModelMillerRegression extends LocalModel{
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
 		firstExperiments = new ArrayList<Experiment>();
+		
+		isReinforcement = associatedContext.getAmas().isReinforcement();
 	}
 	
 	public LocalModelMillerRegression(Context associatedContext, Double[] coefsCopy, List<Experiment> fstExperiments) {
@@ -210,7 +214,10 @@ public class LocalModelMillerRegression extends LocalModel{
 	public void updateModel(Experiment newExperiment, double weight) {
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
-		if(firstExperiments.size()< (nParameters + 2)) {
+		if(isReinforcement) {
+			updateModelReinforcement(newExperiment, weight);
+		}
+		else if(firstExperiments.size()< (nParameters + 2)) {
 			firstExperiments.add(newExperiment); 
 			updateModel();
 			
@@ -222,9 +229,54 @@ public class LocalModelMillerRegression extends LocalModel{
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
 	}
 	
+	
+	
+	
+	
+	
+	
+	public void updateModelReinforcement(Experiment newExperiment, double weight) {
+		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"REINFORCEMENT")));
+		
+		
+		double weightedNewProposition;
+		
+		if(coefs != null) {
+			weightedNewProposition = (newExperiment.getOracleProposition() * weight) + ((1-weight) * this.getProposition());
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),weight+ " " + newExperiment.getOracleProposition(),(1-weight)+  " " + this.getProposition())));
+		}
+		else {
+			weightedNewProposition = newExperiment.getOracleProposition();
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(), "NEW CTXT " + newExperiment.getOracleProposition())));
+		}
+		
+		
+		regression = new Regression(nParameters,true);
+		
+		int i = 0;
+		while (regression.getN() < nParameters + 2) { 
+			
+			//context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition()+"" )));
+			regression.addObservation(newExperiment.getValuesAsArray(), weightedNewProposition);
+			i++;
+		}
+		
+
+		double[] coef = regression.regress().getParameterEstimates();
+		coefs = new Double[coef.length];
+		for(int j = 0; j < coef.length; j++) {
+			coefs[j] = coef[j];
+		}
+		
+	}
+	
+	
+	
+	
 	public void updateModel() {
 		
-		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"FIRST EXPERIMENTS")));
 		regression = new Regression(nParameters,true);
 		
 		for (Experiment exp : firstExperiments) {
@@ -236,6 +288,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		int i = 0;
 		while (regression.getN() < nParameters + 2) { 
 			
+			//context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition()+"" )));
 			regression.addObservation(firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition());
 			i++;
 		}
@@ -252,6 +305,8 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPoints) {
 		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"EXPERIMENTS WITH WEIGHT")));
+		
 		regression = new Regression(nParameters,true);
 
 		
@@ -263,10 +318,12 @@ public class LocalModelMillerRegression extends LocalModel{
 		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		//Pair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"ARTIFICIAL" )));
 
 		int numberOfArtificialPoints = artificialSituations.getB().length;
 		for (int i =0;i<numberOfArtificialPoints;i++) {
 			
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+artificialSituations.getA()[i].toString(), artificialSituations.getB()[i]+"" )));
 			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);	
 		}
 		
@@ -278,9 +335,11 @@ public class LocalModelMillerRegression extends LocalModel{
 		else {
 			numberOfXPPoints = (int)(numberOfPointsForRegression*weight);
 		}
-
+		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"XP")));
 		for (int i =0;i<numberOfXPPoints;i++) {
 			
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+newExperiment.getValuesAsArray(), newExperiment.getOracleProposition()+"" )));
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
 			

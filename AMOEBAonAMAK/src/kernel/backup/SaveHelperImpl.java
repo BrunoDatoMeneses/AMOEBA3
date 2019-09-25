@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.MainWindow;
 import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
@@ -149,21 +150,19 @@ public class SaveHelperImpl implements ISaveHelper{
 		}
 
 		// add graphical element if relevant
-		if (AmoebaWindow.isInstance()) {
-			SaveExplorer se = new SaveExplorer(amoeba);
-			AmoebaWindow.addTabbedPanel("Save Explorer", se);
-			AmoebaWindow.addOnCloseAction(()-> {
-				if(deleteFolderOnClose) {
-					try {
-						DeleteDirectory.deleteDirectoryRecursion(dir);
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.err.println("Failed to delete saves files on close.");
-					}
+		SaveExplorer se = new SaveExplorer(amoeba);
+		window.addTabbedPanel("Save Explorer", se);
+		window.addOnCloseAction(()-> {
+			if(deleteFolderOnClose) {
+				try {
+					DeleteDirectory.deleteDirectoryRecursion(dir);
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.err.println("Failed to delete saves files on close.");
 				}
-			});
-			setupGraphicalTool();
-		}
+			}
+		});
+		setupGraphicalTool(window);
 	}
 
 	@Override
@@ -265,6 +264,38 @@ public class SaveHelperImpl implements ISaveHelper{
 			}
 		};
 		MainWindow.addOptionsItem("Save", eventSave);
+	}
+	
+	private void setupGraphicalTool(AmoebaMultiUIWindow window) {
+		AmoebaMultiUIWindow mw = amoebaMultiUIWindow;
+		// TODO remove if they exist items Save and Load in menu Option.
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML", "*.xml"),
+				new FileChooser.ExtensionFilter("All", "*.*"));
+
+		// Creation of the load menu item
+		EventHandler<ActionEvent> eventLoad = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.getScheduler().stop();
+				File file = fileChooser.showOpenDialog(mw);
+				if (file != null)
+					backupSystem.load(file);
+			}
+		};
+		window.addOptionsItem("Load", eventLoad);
+
+		// Creation of the save menu item
+		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.getScheduler().stop();
+				File file = fileChooser.showSaveDialog(mw);
+				if (file != null)
+					backupSystem.save(file);
+			}
+		};
+		window.addOptionsItem("Save", eventSave);
 	}
 
 	@Override

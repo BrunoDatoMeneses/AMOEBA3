@@ -369,7 +369,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 	
@@ -396,7 +396,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -431,7 +431,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(config.getAbsolutePath(), null);
+		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		

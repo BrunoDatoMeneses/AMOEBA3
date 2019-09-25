@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
+import kernel.AMOEBA;
 import kernel.StudiedSystem;
 
 
@@ -145,7 +146,7 @@ public class F_N_Manager implements StudiedSystem{
 	 * @see kernel.StudiedSystem#playOneStep(double)
 	 */
 	@Override
-	public void playOneStep() {
+	public HashMap<String, Double> playOneStep() {
 		
 
 		if(!randomExploration) {
@@ -174,7 +175,7 @@ public class F_N_Manager implements StudiedSystem{
 			}
 		}
 		
-		
+		return null;
 	}
 	
 	
@@ -698,6 +699,27 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		
 		selfRequest = newRequest;
+	}
+
+
+	@Override
+	public HashMap<String, Double> playOneStepWithControlModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setControl(boolean value) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

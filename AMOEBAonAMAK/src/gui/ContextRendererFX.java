@@ -68,7 +68,8 @@ public class ContextRendererFX extends RenderStrategy {
 			g = 0.0;
 			b = 1.0;
 		}
-		if(context.lastPrediction > 10000) {
+		if(Math.abs(context.lastPrediction) > 10000) {
+			
 			r = 1.0;
 			g = 1.0;
 			b = 0.0;

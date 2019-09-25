@@ -2,6 +2,7 @@ package experiments;
 
 import java.util.HashMap;
 
+import experiments.benchmark.NDimCube;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import kernel.AMOEBA;

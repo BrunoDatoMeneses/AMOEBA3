@@ -138,20 +138,23 @@ public class Head extends AmoebaAgent {
 				
 			}
 			if(meanNeighborsLastPredictions != null) {
+//				System.out.println("####################### NEIGHBORS #############################");
+//				System.out.println("ORACLE BEFORE" + getAmas().data.oracleValue);
+				
 				getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
 				
-				if(getAmas().data.oracleValue>0) {
+				
 					
-					System.out.println("#################################################################");
-					System.out.println("PCT " + getAmas().getPerceptionsAndActionState());
-					System.out.println(getAmas().data.oracleValue);
-					for(Context ctxt : usedNeighbors) {
-						System.out.println(ctxt.getName() + " " + ctxt.lastPrediction);
-					}
-					System.out.println(usedNeighbors.size() + " " + nb);
+				
+//				System.out.println("PCT " + getAmas().getPerceptionsAndActionState());
+//				System.out.println("ORACLE AFTER " +getAmas().data.oracleValue);
+//				for(Context ctxt : usedNeighbors) {
+//					System.out.println(ctxt.getName() + " " + ctxt.lastPrediction);
+//				}
+//				System.out.println(usedNeighbors.size() + " " + nb);
 					
 					
-				}
+
 			}
 			
 			
@@ -239,7 +242,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 		
 		getAmas().data.executionTimes[12]=System.currentTimeMillis();
-		NCSDetection_PotentialRequest();
+		//NCSDetection_PotentialRequest();
 		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 		
 		
@@ -268,11 +271,17 @@ public class Head extends AmoebaAgent {
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
 				
+//				if(getAmas().isReinforcement()) {
+//					System.out.println("####################### NEIGHBORS #############################");
+//					System.out.println(ctxt.getName()  + " " + ctxt.lastPrediction);
+//					if(ctxt.lastPrediction> bestNeighborLastPrediction) {
+//						
+//						
+//						bestNeighborLastPrediction = ctxt.lastPrediction;
+//						bestNeighbor = ctxt;
+//					}
+//				}
 				
-				if(ctxt.lastPrediction> bestNeighborLastPrediction) {
-					bestNeighborLastPrediction = ctxt.lastPrediction;
-					bestNeighbor = ctxt;
-				}
 				
 				
 				
@@ -302,10 +311,15 @@ public class Head extends AmoebaAgent {
 
 			}
 			
-			getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
-			for(Percept pct : getAmas().getPercepts()) {
-				getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
-			}
+//			if(getAmas().isReinforcement()) {
+//				System.out.println(bestNeighbor.getName() );
+//				getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
+//				for(Percept pct : getAmas().getPercepts()) {
+//					getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
+//				}
+//				System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
+//			}
+			
 			
 
 		}
@@ -398,7 +412,42 @@ public class Head extends AmoebaAgent {
 		
 		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
 
-		endogenousPlay();
+		if(getAmas().isReinforcement()) {
+			if (activatedNeighborsContexts.size() > 1) {
+
+				double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
+				Context bestNeighbor = null;
+
+				int i = 1;
+				System.out.println("####################### NEIGHBORS ############################# " +  activatedNeighborsContexts.size());
+				for (Context ctxt : activatedNeighborsContexts) {
+					
+		
+					
+					System.out.println(ctxt.getName()  + " " + ctxt.lastPrediction);
+					if(ctxt.lastPrediction> bestNeighborLastPrediction) {
+						
+						
+						bestNeighborLastPrediction = ctxt.lastPrediction;
+						bestNeighbor = ctxt;
+					}
+
+
+				}
+				
+		
+				System.out.println(bestNeighbor.getName() );
+				getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
+				for(Percept pct : getAmas().getPercepts()) {
+					getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
+				}
+				System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
+
+			}
+		}
+		
+		
+		//endogenousPlay();
 	}
 
 	private void endogenousPlay() {
@@ -782,37 +831,13 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
-	private void predictionPropagation() {
-		
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- PREDICTION PROPAGATION")));
-		
-		
-		if(bestContext != null) {
-			for(Context ctxt : activatedNeighborsContexts) {
-				
-				if(ctxt != bestContext) {
-					
-					if(Math.abs(ctxt.lastPrediction - bestContext.lastPrediction)>10) {
-						
-						Experiment propagationExperiment = bestContext.getCurrentExperiment();
-						propagationExperiment.setOracleProposition(bestContext.lastPrediction);
-						
-						ctxt.getLocalModel().updateModel(propagationExperiment, 0.5);
-						ctxt.lastPrediction = ctxt.getActionProposal();
-					}
-					
-				}
-				
-			}
-		}
+	
 		
 		
 		
 		
 		
-	}
+	
 	
 	
 
@@ -871,7 +896,29 @@ public class Head extends AmoebaAgent {
 			newContextCreated = true;
 			
 			newContext.lastPrediction = newContext.getActionProposal();
-			newContext.smoothedPrediction = newContext.lastPrediction;
+			
+			double maxCoef = 0.0;
+			for(Double coef : newContext.getLocalModel().getCoef()) {
+				if(Math.abs(coef)> maxCoef) {
+					maxCoef = Math.abs(coef);
+				}
+			}
+			
+			
+			if(newContext.lastPrediction>0 || maxCoef>10000) {
+//				System.out.println("##################################################################################################################");
+//				System.out.println(getAverageRegressionPerformanceIndicator());
+//				System.out.println(newContext.getName());
+//				System.out.println(newContext.getLocalModel().coefsToString());
+//				System.out.println(newContext.lastPrediction);
+//				System.out.println(getOracleValue());
+				
+				
+				
+				//System.exit(0);
+			}
+			
+
 			
 		}
 		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
@@ -1007,86 +1054,7 @@ public class Head extends AmoebaAgent {
 	}
 	
 	
-	private void selfAnalysationOfContextsReinforcement() {
-
-		
-		
-		
-		
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
-		
-		double currentDistanceToOraclePrediction;
-		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
-
-		
-		
-		for (Context activatedContext : activatedContexts) {
-			
-			
-			currentDistanceToOraclePrediction = activatedContext.getLocalModel()
-					.distance(activatedContext.getCurrentExperiment());
-			getAmas().data.distanceToRegression = currentDistanceToOraclePrediction;
-
-			getAmas().data.contextNotFinished = false;
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
-					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
-			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
-				getAmas().data.contextNotFinished = true;
-			}
-
-			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
-			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
-				
-				
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
-
-			}
-
-			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
-				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-			}
-
-			if (!getAmas().data.contextNotFinished) {
-				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
-				
-			}
-			
-			activatedContext.criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
-			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
-
-			activatedContext.lastPrediction = activatedContext.getActionProposal();
-			
-		}
-
-		
-		
-		for (int i = 0; i< activatedContexts.size() ; i++) {
-			
-			activatedContexts.get(i).criticalities.updateMeans();
-			
-			if (activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression") != null) {
-				activatedContexts.get(i).regressionPerformance.update(activatedContexts.get(i).criticalities.getCriticalityMean("distanceToRegression"));
-				getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("UPDATE REGRESSION PERFORMANCE", activatedContexts.get(i).getName(), ""+activatedContexts.get(i).regressionPerformance.getPerformanceIndicator())));
-			}
-			
-			
-			activatedContexts.get(i).analyzeResults4(this);
-
-		}
-		
-
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NCS DECTECTION USELESSNESS IN SELF ANALISIS")));
-		for (Context ctxt : activatedNeighborsContexts) {
-
-			if (!activatedContexts.contains(ctxt)) {
-				ctxt.NCSDetection_Uselessness();
-			}
-
-		}
-	}
+	
 
 	private void selfAnalysationOfContexts4() {
 
@@ -1139,6 +1107,26 @@ public class Head extends AmoebaAgent {
 			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
 
 			activatedContext.lastPrediction = activatedContext.getActionProposal();
+			
+			double maxCoef = 0.0;
+			for(Double coef : activatedContext.getLocalModel().getCoef()) {
+				if(Math.abs(coef)> maxCoef) {
+					maxCoef = Math.abs(coef);
+				}
+			}
+			
+			if(activatedContext.lastPrediction>0 || maxCoef>10000) {
+//				System.out.println("##################################################################################################################");
+//				System.out.println(getAverageRegressionPerformanceIndicator());
+//				System.out.println(activatedContext.getName());
+//				System.out.println(activatedContext.getLocalModel().coefsToString());
+//				System.out.println(activatedContext.lastPrediction);
+//				System.out.println(getOracleValue());
+				
+				
+				
+				//System.exit(0);
+			}
 			
 		}
 
