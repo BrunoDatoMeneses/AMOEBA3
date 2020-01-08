@@ -41,7 +41,8 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	private void updateColor() {
-		setColorWithPrediction();
+		//setColorWithPrediction();
+		setColorWithCoefs();
 	}
 	
 	private void setColorWithCoefs() {

@@ -82,6 +82,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
+		
 		// Exemple for adding a tool in the toolbar
 		Slider slider = new Slider(0.01, 0.1, mappingErrorAllowed);
 		slider.setShowTickLabels(true);

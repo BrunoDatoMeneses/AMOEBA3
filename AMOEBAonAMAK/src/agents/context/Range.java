@@ -129,6 +129,48 @@ public class Range implements Serializable, Comparable, Cloneable {
 		startIncrement = 0.25 * world.getMappingErrorAllowed() * percept.getMinMaxDistance();
 		endIncrement = startIncrement;
 	}
+	
+	public Range(Context context, double start, double end, double extendedrangeatcreation, boolean start_inclu,
+			boolean end_inclu, Percept p, double startIncr, double endIncr) {
+		super();
+
+		world = context.getAmas().getEnvironment();
+
+		AVT_deceleration = world.getAVT_deceleration();
+		AVT_acceleration = world.getAVT_acceleration();
+		AVT_minRatio = world.getAVT_percentAtStart();
+
+		this.percept = p;
+		if (isPerceptEnum()) {
+			this.setStart_inclu(start_inclu);
+			this.setEnd_inclu(end_inclu);
+			this.setStart(Math.round(start));
+			this.setEnd(Math.round(end));
+		} else {
+			this.setStart_inclu(start_inclu);
+			this.setEnd_inclu(end_inclu);
+			this.setStart(start - Math.abs(extendedrangeatcreation * start));
+			this.setEnd(end + Math.abs(extendedrangeatcreation * end));
+		}
+		this.context = context;
+		id = maxid;
+		maxid++;
+
+		/* Initialization of AVT : a better way to do that should be developped */
+//		this.AVT_deltaStart = (end - start) * AVT_minRatio + 0.0001;
+//		this.AVT_deltaEnd = (end - start) * AVT_minRatio + 0.0001;
+		this.AVT_deltaStart = getLenght() * 0.2 + 0.0001;
+		this.AVT_deltaEnd = getLenght() * 0.2 + 0.0001;
+		////// System.out.println(world.getScheduler().getTick() + "\t" +
+		////// context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" +
+		////// "START" + "\t" + AVT_deltaStart);
+		////// System.out.println(world.getScheduler().getTick() + "\t" +
+		////// context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" +
+		////// "END" + "\t" + AVT_deltaEnd);
+
+		startIncrement =startIncr;
+		endIncrement = endIncr;
+	}
 
 	/**
 	 * Extends the range to the specified target value.
@@ -389,7 +431,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 			lastEndDirection = -1; // shrinking direction
 
 			if (endCriticality == 1) { // negative feedback -> increment decreases
-				endIncrement /= 2;
+				endIncrement /= 3;
 			} else if (endCriticality == 0) { // positive feedback -> increment increases
 				endIncrement = Math.min(percept.getRadiusContextForCreation(), endIncrement * 2);
 				// endIncrement *=2;
@@ -574,7 +616,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 			lastStartDirection = -1;
 
 			if (startCriticality == 1) {
-				startIncrement /= 2;
+				startIncrement /= 3;
 			} else if (startCriticality == 0) {
 				startIncrement = Math.min(percept.getRadiusContextForCreation(), startIncrement * 2);
 				// startIncrement *=2;
@@ -1635,6 +1677,14 @@ public class Range implements Serializable, Comparable, Cloneable {
 	public boolean inNeighborhood() {
 		return this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept))
 				|| this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept));
+	}
+	
+	public double getStartIncrement() {
+		return startIncrement;
+	}
+	
+	public double getEndIncrement() {
+		return endIncrement;
 	}
 
 }

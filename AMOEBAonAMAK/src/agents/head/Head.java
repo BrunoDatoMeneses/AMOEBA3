@@ -16,6 +16,7 @@ import agents.context.CustomComparator;
 import agents.context.Experiment;
 import agents.percept.Percept;
 import kernel.AMOEBA;
+import kernel.AmoebaData;
 import ncs.NCS;
 import utils.Pair;
 import utils.PrintOnce;
@@ -77,6 +78,11 @@ public class Head extends AmoebaAgent {
 	@Override
 	public void onAct() {
 		
+		getAmas().data.meanNeighborhoodVolume = null;
+		getAmas().data.meanNeighborhoodRaduises = null; 
+		getAmas().data.meanNeighborhoodEndIncrements = null; 
+		getAmas().data.meanNeighborhoodStartIncrements = null; 
+		
 		getAmas().data.currentCriticalityPrediction = 0;
 		getAmas().data.currentCriticalityMapping = 0;
 		getAmas().data.currentCriticalityConfidence = 0;
@@ -115,6 +121,16 @@ public class Head extends AmoebaAgent {
 			
 			int nb=0;
 			Double meanNeighborsLastPredictions = null;
+			double neighborhoodVolumesSum = 0;
+			HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
+			HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
+			HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
+			for (Percept pct : getAmas().getPercepts()) {
+				neighborhoodRangesSums.put(pct, 0.0);
+				neighborhoodStartIncrementSums.put(pct, 0.0);
+				neighborhoodEndIncrementSums.put(pct, 0.0);
+			}
+			
 			
 			ArrayList<Context> usedNeighbors = new ArrayList<Context>();
 			
@@ -122,6 +138,13 @@ public class Head extends AmoebaAgent {
 				
 				meanNeighborsLastPredictions = 0.0;
 				for (Context ctxt : activatedNeighborsContexts) {
+					
+					neighborhoodVolumesSum += ctxt.getVolume();
+					for (Percept pct : ctxt.getRanges().keySet()) {
+						neighborhoodRangesSums.put(pct, neighborhoodRangesSums.get(pct) + ctxt.getRanges().get(pct).getRadius());
+						neighborhoodStartIncrementSums.put(pct, neighborhoodStartIncrementSums.get(pct) + ctxt.getRanges().get(pct).getStartIncrement());
+						neighborhoodEndIncrementSums.put(pct, neighborhoodEndIncrementSums.get(pct) + ctxt.getRanges().get(pct).getEndIncrement());
+					}
 
 					if(ctxt.lastPrediction != null) {
 						usedNeighbors.add(ctxt);
@@ -135,8 +158,28 @@ public class Head extends AmoebaAgent {
 				else {
 					meanNeighborsLastPredictions = null;
 				}
+				getAmas().data.meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
+				
+				getAmas().data.meanNeighborhoodRaduises = new HashMap<Percept, Double>();
+				for (Percept pct : getAmas().getPercepts()) {
+					getAmas().data.meanNeighborhoodRaduises.put(pct, neighborhoodRangesSums.get(pct)/activatedNeighborsContexts.size());
+					getAmas().data.meanNeighborhoodStartIncrements.put(pct, neighborhoodStartIncrementSums.get(pct)/activatedNeighborsContexts.size());
+					getAmas().data.meanNeighborhoodEndIncrements.put(pct, neighborhoodEndIncrementSums.get(pct)/activatedNeighborsContexts.size());
+				}
+				
 				
 			}
+			
+			
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", getAmas().data.meanNeighborhoodVolume.toString())));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", getAmas().data.meanNeighborhoodRaduises.toString())));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", getAmas().data.meanNeighborhoodStartIncrements.toString())));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", getAmas().data.meanNeighborhoodEndIncrements.toString())));
+			
 			if(meanNeighborsLastPredictions != null) {
 //				System.out.println("####################### NEIGHBORS #############################");
 //				System.out.println("ORACLE BEFORE" + getAmas().data.oracleValue);
@@ -156,6 +199,62 @@ public class Head extends AmoebaAgent {
 					
 
 			}
+			
+			
+			
+		}else {
+			double neighborhoodVolumesSum = 0;
+			HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
+			HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
+			HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
+			for (Percept pct : getAmas().getPercepts()) {
+				neighborhoodRangesSums.put(pct, 0.0);
+				neighborhoodStartIncrementSums.put(pct, 0.0);
+				neighborhoodEndIncrementSums.put(pct, 0.0);
+			}
+			
+			
+			
+			if(activatedNeighborsContexts.size()>0) {
+				
+		
+				for (Context ctxt : activatedNeighborsContexts) {
+					
+					neighborhoodVolumesSum += ctxt.getVolume();
+					for (Percept pct : ctxt.getRanges().keySet()) {
+						neighborhoodRangesSums.put(pct, neighborhoodRangesSums.get(pct) + ctxt.getRanges().get(pct).getRadius());
+						neighborhoodStartIncrementSums.put(pct, neighborhoodStartIncrementSums.get(pct) + ctxt.getRanges().get(pct).getStartIncrement());
+						neighborhoodEndIncrementSums.put(pct, neighborhoodEndIncrementSums.get(pct) + ctxt.getRanges().get(pct).getEndIncrement());
+					}
+
+					
+				}
+				
+				getAmas().data.meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
+				
+				getAmas().data.meanNeighborhoodRaduises = new HashMap<Percept, Double>();
+				getAmas().data.meanNeighborhoodStartIncrements = new HashMap<Percept, Double>();
+				getAmas().data.meanNeighborhoodEndIncrements = new HashMap<Percept, Double>();
+				for (Percept pct : getAmas().getPercepts()) {
+					getAmas().data.meanNeighborhoodRaduises.put(pct, neighborhoodRangesSums.get(pct)/activatedNeighborsContexts.size());
+					getAmas().data.meanNeighborhoodStartIncrements.put(pct, neighborhoodStartIncrementSums.get(pct)/activatedNeighborsContexts.size());
+					getAmas().data.meanNeighborhoodEndIncrements.put(pct, neighborhoodEndIncrementSums.get(pct)/activatedNeighborsContexts.size());
+				}
+				
+				
+				
+				
+				
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", getAmas().data.meanNeighborhoodVolume.toString())));
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", getAmas().data.meanNeighborhoodRaduises.toString())));
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", getAmas().data.meanNeighborhoodStartIncrements.toString())));
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", getAmas().data.meanNeighborhoodEndIncrements.toString())));
+			}
+			
 			
 			
 			

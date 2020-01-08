@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import agents.head.DynamicPerformance;
+import agents.percept.Percept;
 /**
  * A Plain Old Java Object for storing parameters for the Head. Keep it as simple as possible for ease of serialization.<br/>
  * Make sure that all member are : public, serializable, and with a default constructor (taking no parameters).
@@ -81,4 +82,9 @@ public class AmoebaData implements Serializable {
 	public double initRegressionPerformance = 1.0;
 	
 	public double averageRegressionPerformanceIndicator;
+	
+	public Double meanNeighborhoodVolume;
+	public HashMap<Percept, Double> meanNeighborhoodRaduises;
+	public HashMap<Percept, Double> meanNeighborhoodStartIncrements;
+	public HashMap<Percept, Double> meanNeighborhoodEndIncrements;
 }
