@@ -1,8 +1,10 @@
 package kernel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import agents.context.Context;
 import agents.head.DynamicPerformance;
 import agents.percept.Percept;
 /**
@@ -83,8 +85,5 @@ public class AmoebaData implements Serializable {
 	
 	public double averageRegressionPerformanceIndicator;
 	
-	public Double meanNeighborhoodVolume;
-	public HashMap<Percept, Double> meanNeighborhoodRaduises;
-	public HashMap<Percept, Double> meanNeighborhoodStartIncrements;
-	public HashMap<Percept, Double> meanNeighborhoodEndIncrements;
+	
 }

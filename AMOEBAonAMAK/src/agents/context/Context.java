@@ -114,14 +114,14 @@ public class Context extends AmoebaAgent {
 			//TODO use neihbors sizes to define radiuses for creation !!!!!!!!!!!
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
-			if(getAmas().data.meanNeighborhoodRaduises != null) {
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().data.meanNeighborhoodRaduises.get(p).toString())));
-				r = new Range(this, p.getValue() - getAmas().data.meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().data.meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().data.meanNeighborhoodStartIncrements.get(p), getAmas().data.meanNeighborhoodEndIncrements.get(p));
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+				r = new Range(this, p.getValue() - getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().getHeadAgent().meanNeighborhoodStartIncrements.get(p), getAmas().getHeadAgent().meanNeighborhoodEndIncrements.get(p));
 			}else {
 				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
 			}
 			
 
@@ -196,14 +196,14 @@ public class Context extends AmoebaAgent {
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
-			if(getAmas().data.meanNeighborhoodRaduises != null) {
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().data.meanNeighborhoodRaduises.get(p).toString())));
-				r = new Range(this, p.getValue() - getAmas().data.meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().data.meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().data.meanNeighborhoodStartIncrements.get(p), getAmas().data.meanNeighborhoodEndIncrements.get(p));
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+				r = new Range(this, p.getValue() - getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().getHeadAgent().meanNeighborhoodStartIncrements.get(p), getAmas().getHeadAgent().meanNeighborhoodEndIncrements.get(p));
 			}else {
 				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
 			}
 
 			ranges.put(p, r);
