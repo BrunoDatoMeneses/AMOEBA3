@@ -128,6 +128,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 		startIncrement = 0.25 * world.getMappingErrorAllowed() * percept.getMinMaxDistance();
 		endIncrement = startIncrement;
+		world
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(), p.getName(), "Init start increment " + startIncrement)));
+		world
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(), p.getName(), "Init end increment " + endIncrement)));
 	}
 	
 	public Range(Context context, double start, double end, double extendedrangeatcreation, boolean start_inclu,

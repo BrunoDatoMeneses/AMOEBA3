@@ -278,23 +278,24 @@ public class F_N_Manager implements StudiedSystem{
 		
 		int subzone = subzone2D(xRequest);
 		
-		if(subzone == 1) {
-			/* Disques */
-			return modelN(xRequest) ;
-		}else if (subzone == 2) {
-			/* Gaussian model */
-			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
-			
-		}else if (subzone == 3) {
-			/* Square */
-			return square2DModel(xRequest, subZoneCenter3D(3));
-			
-		}else if (subzone == 4) {
-			/* Exp */
-			return gaussianMapping2D(xRequest);
-		}
-		
-		return model1();
+		/* Multi */
+//		if(subzone == 1) {
+//			/* Disques */
+//			return modelN(xRequest) ;
+//		}else if (subzone == 2) {
+//			/* Gaussian model */
+//			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
+//			
+//		}else if (subzone == 3) {
+//			/* Square */
+//			return square2DModel(xRequest, subZoneCenter3D(3));
+//			
+//		}else if (subzone == 4) {
+//			/* Exp */
+//			return gaussianMapping2D(xRequest);
+//		}
+//		
+//		return model1();
 		
 		
 		/* Disc */
@@ -305,7 +306,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return model1();
 		
 		/* Triangle */
-		//return (y > x) ? 2*x + y : 5*x - 8*y;
+		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Split */
 		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;

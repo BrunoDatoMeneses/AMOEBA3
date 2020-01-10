@@ -65,6 +65,8 @@ public class Context extends AmoebaAgent {
 	public static final int successesBeforeDiminution = 5;
 	public static final int errorsBeforeAugmentation = 5;
 	
+	public boolean fusionned = false;
+	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
 		buildContext();
@@ -788,6 +790,7 @@ public class Context extends AmoebaAgent {
 		
 		
 		fusionContext.destroy();
+		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
@@ -1210,12 +1213,12 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void growRanges() {
-
+		
 		ArrayList<Percept> allPercepts = getAmas().getPercepts();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
-	
-			if (!contain) {
+			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), "CONTAINED", ""+contain)));
+			if (!contain && !fusionned) {
 				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
 					ranges.get(pct).adapt(pct.getValue());
 				}
@@ -1443,7 +1446,8 @@ public class Context extends AmoebaAgent {
 	public String toStringFull() {
 		String s = "";
 		s += "Context : " + getName() + "\n";
-		s += "creation tick : " + tickCreation +"\n";
+		s += "Creation tick : " + tickCreation +"\n";
+		s += "Confidence : " + confidence + "\n";
 		s += "\n";
 
 		s += "Model "+this.localModel.getType()+" :";
@@ -1455,6 +1459,9 @@ public class Context extends AmoebaAgent {
 		s += "Ranges :\n";
 		for(Percept p : getRanges().keySet()) {
 			s += p + " : " + getRangeByPercept(p)+"\n"; 
+			s += p + " : " + getRangeByPercept(p).getStartIncrement()+"\n"; 
+			s += p + " : " + getRangeByPercept(p).getEndIncrement()+"\n"; 
+			
 		}
 		s += "\n";
 		
@@ -1479,7 +1486,7 @@ public class Context extends AmoebaAgent {
 			s += "Action proposed : " + this.getActionProposal() + "\n";
 		}
 
-		s += "Confidence : " + confidence + "\n";
+		
 
 		s += "\n";
 

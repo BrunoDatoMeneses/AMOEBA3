@@ -396,11 +396,11 @@ public class Percept extends AmoebaAgent {
 	}
 	
 	public double getMappingErrorAllowedOverMapping() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 0.5;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 1.0;
 	}
 	
 	public double getMappingErrorAllowedMax() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 1.5;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 2.0;
 	}
 
 	// -----------------------
