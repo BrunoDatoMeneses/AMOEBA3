@@ -34,7 +34,7 @@ public class World extends Environment {
 	
 	
 	
-	public static TRACE_LEVEL minLevel = TRACE_LEVEL.INFORM;
+	public static TRACE_LEVEL minLevel = TRACE_LEVEL.DEBUG;
 	
 	private AMOEBA amoeba;
 

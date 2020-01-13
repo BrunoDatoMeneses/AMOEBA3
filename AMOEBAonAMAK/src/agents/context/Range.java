@@ -217,12 +217,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 * @param oracleValue the oracle value
 	 * @param p           the p
 	 */
-	public void adapt(Double oracleValue, double increment) {
+	public void adapt(Double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		if (!isPerceptEnum()) {
 
 			double minIncrement = Math.min(increment, getIncrement());
 
-			staticAdapt(oracleValue, minIncrement);
+			staticAdapt(oracleValue, minIncrement, isOverlap, bestContext);
 
 			// adaptUsingAVT(c, oracleValue);
 			// adaptWithoutAVT(c, oracleValue);
@@ -235,10 +235,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 	}
 
-	public void adapt(Double oracleValue) {
+	public void adapt(Double oracleValue, boolean isOverlap, Context bestContext) {
 		if (!isPerceptEnum()) {
 
-			staticAdapt(oracleValue, getIncrement());
+			staticAdapt(oracleValue, getIncrement(), isOverlap, bestContext);
 
 			// adaptUsingAVT(c, oracleValue);
 			// adaptWithoutAVT(c, oracleValue);
@@ -250,6 +250,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 //			}
 		}
 	}
+	
+	
 
 	/**
 	 * Adapt without AVT.
@@ -310,11 +312,11 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	}
 
-	private void staticAdapt(double oracleValue, double increment) {
+	private void staticAdapt(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		if (Math.abs(end - oracleValue) < Math.abs(oracleValue - start)) {
-			adaptEnd(oracleValue, increment);
+			adaptEnd(oracleValue, increment, isOverlap, bestContext);
 		} else {
-			adaptStart(oracleValue, increment);
+			adaptStart(oracleValue, increment, isOverlap, bestContext);
 		}
 	}
 
@@ -399,15 +401,15 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	}
 
-	private void adaptEnd(double oracleValue, double increment) {
+	private void adaptEnd(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON END ADAPT", context.getName(), percept.getName(), "" + increment )));
 
-		classicEndAdapt(oracleValue, increment);
+		classicEndAdapt(oracleValue, increment, isOverlap, bestContext);
 		// adaptEndWithSplitting(oracleValue, increment);
 
 	}
 
-	private void classicEndAdapt(double oracleValue, double increment) {
+	private void classicEndAdapt(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		if (!(contains(oracleValue) == 0.0)) { // value not contained --> end range will grow (growing direction = 1)
 
 			if (lastEndDirection == -1) { // opposite direction -> negative feedback
@@ -424,7 +426,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 				// endIncrement *=2;
 			}
 
+			
 			this.setEnd(end + endIncrement);
+			
+			
 		} else { // value contained --> end range will shrink (shrinking direction = -1)
 
 			if (lastEndDirection == 1) { // opposite direction -> negative feedback
@@ -441,7 +446,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 				// endIncrement *=2;
 			}
 
-			this.setEnd(end - endIncrement);
+			if(isOverlap) {
+				this.setEnd(bestContext.getRanges().get(this.percept).getStart());
+			}else {
+				this.setEnd(end - endIncrement);
+			}
+			
 
 		}
 
@@ -570,16 +580,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	}
 
-	private void adaptStart(double oracleValue, double increment) {
+	private void adaptStart(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON END ADAPT", context.getName(), percept.getName(), "" + increment )));
 
 
-		classicStartAdapt(oracleValue, increment);
+		classicStartAdapt(oracleValue, increment, isOverlap, bestContext);
 		// adaptStartWithSplitting(oracleValue, increment);
 
 	}
 
-	private void classicStartAdapt(double oracleValue, double increment) {
+	private void classicStartAdapt(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
 		if (!(contains(oracleValue) == 0.0)) {
 
 			if (lastStartDirection == -1) {
@@ -635,7 +645,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 //					startIncrement 
 //					);
 
-			this.setStart(start + startIncrement);
+			
+			if(isOverlap) {
+				this.setStart(bestContext.getRanges().get(this.percept).getEnd());
+			}else {
+				this.setStart(start + startIncrement);
+			}
 		}
 
 		// this.setStart(start + getIncrementDependingOnNeighboorDistances("start"));
@@ -1022,16 +1037,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 		if (overlapDistance(overlappingContextRanges) > nonOverlapDistance(overlappingContextRanges)) {
 
 			if (Math.abs(end - border) > Math.abs(border - start)) {
-				adaptEnd(border, increment);
+				adaptEnd(border, increment, false, null);
 			} else {
-				adaptStart(border, increment);
+				adaptStart(border, increment, false, null);
 			}
 
 		} else {
 			if (Math.abs(end - border) < Math.abs(border - start)) {
-				adaptEnd(border, increment);
+				adaptEnd(border, increment, false, null);
 			} else {
-				adaptStart(border, increment);
+				adaptStart(border, increment, false, null);
 			}
 		}
 

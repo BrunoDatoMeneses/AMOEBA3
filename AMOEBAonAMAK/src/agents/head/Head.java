@@ -47,6 +47,10 @@ public class Head extends AmoebaAgent {
 	public HashMap<Percept, Double> meanNeighborhoodStartIncrements;
 	public HashMap<Percept, Double> meanNeighborhoodEndIncrements;
 	
+	public Double minMeanNeighborhoodRaduises = null;
+	public Double minMeanNeighborhoodStartIncrements = null;
+	public Double minMeanNeighborhoodEndIncrements = null;
+	
 
 	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
@@ -90,6 +94,10 @@ public class Head extends AmoebaAgent {
 		meanNeighborhoodEndIncrements = null; 
 		meanNeighborhoodStartIncrements = null; 
 		
+		minMeanNeighborhoodRaduises = Double.POSITIVE_INFINITY;
+		minMeanNeighborhoodStartIncrements = Double.POSITIVE_INFINITY;
+		minMeanNeighborhoodEndIncrements = Double.POSITIVE_INFINITY;
+		
 		getAmas().data.currentCriticalityPrediction = 0;
 		getAmas().data.currentCriticalityMapping = 0;
 		getAmas().data.currentCriticalityConfidence = 0;
@@ -108,6 +116,97 @@ public class Head extends AmoebaAgent {
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
 		bestContext = null;
+		
+		/* Neighbors */
+
+				
+		double neighborhoodVolumesSum = 0;
+		HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
+		HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
+		HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
+		for (Percept pct : getAmas().getPercepts()) {
+			neighborhoodRangesSums.put(pct, 0.0);
+			neighborhoodStartIncrementSums.put(pct, 0.0);
+			neighborhoodEndIncrementSums.put(pct, 0.0);
+		}
+		
+		
+		
+		if(activatedNeighborsContexts.size()>0) {
+			
+			System.out.println(activatedNeighborsContexts);
+			
+			for (Context ctxt : activatedNeighborsContexts) {
+				
+				neighborhoodVolumesSum += ctxt.getVolume();
+				
+				for (Percept pct : ctxt.getRanges().keySet()) {
+					Double oldRadiusSum = neighborhoodRangesSums.get(pct);
+					Double oldStartIncrSum = neighborhoodStartIncrementSums.get(pct);
+					Double oldEndIncrSum = neighborhoodEndIncrementSums.get(pct);
+					neighborhoodRangesSums.put(pct, oldRadiusSum + ctxt.getRanges().get(pct).getRadius());
+					neighborhoodStartIncrementSums.put(pct, oldStartIncrSum + ctxt.getRanges().get(pct).getStartIncrement());
+					neighborhoodEndIncrementSums.put(pct, oldEndIncrSum + ctxt.getRanges().get(pct).getEndIncrement());
+				}
+
+				
+			}
+	
+		meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
+		
+		meanNeighborhoodRaduises = new HashMap<Percept, Double>();
+		meanNeighborhoodStartIncrements = new HashMap<Percept, Double>();
+		meanNeighborhoodEndIncrements = new HashMap<Percept, Double>();
+		
+		
+		for (Percept pct : getAmas().getPercepts()) {
+			
+			
+			double meanRadius = neighborhoodRangesSums.get(pct)/activatedNeighborsContexts.size();
+			double meanStartIncrement = neighborhoodStartIncrementSums.get(pct)/activatedNeighborsContexts.size();
+			double meanEndIncrement = neighborhoodEndIncrementSums.get(pct)/activatedNeighborsContexts.size();
+			meanNeighborhoodRaduises.put(pct, meanRadius);
+			meanNeighborhoodStartIncrements.put(pct, meanStartIncrement);
+			meanNeighborhoodEndIncrements.put(pct, meanEndIncrement);
+			
+			if(meanRadius < minMeanNeighborhoodRaduises) {
+				minMeanNeighborhoodRaduises = meanRadius;
+			}
+			if(meanStartIncrement < minMeanNeighborhoodStartIncrements) {
+				minMeanNeighborhoodStartIncrements = meanStartIncrement;
+			}
+			if(meanEndIncrement < minMeanNeighborhoodEndIncrements) {
+				minMeanNeighborhoodEndIncrements = meanEndIncrement;
+			}
+			
+			
+		}
+			
+		
+			
+			
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "size", ""+activatedNeighborsContexts.size())));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", ""+meanNeighborhoodVolume)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", ""+meanNeighborhoodRaduises)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", ""+meanNeighborhoodStartIncrements)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", ""+meanNeighborhoodEndIncrements)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodRaduises", ""+minMeanNeighborhoodRaduises)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodStartIncrements", ""+minMeanNeighborhoodStartIncrements)));
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodEndIncrements", ""+minMeanNeighborhoodEndIncrements)));
+		}
+			
+			
+			
+			
+
 
 		if (getAmas().data.useOracle) {
 			playWithOracle();
@@ -128,30 +227,19 @@ public class Head extends AmoebaAgent {
 			
 			int nb=0;
 			Double meanNeighborsLastPredictions = null;
-			double neighborhoodVolumesSum = 0;
-			HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
-			HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
-			HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
-			for (Percept pct : getAmas().getPercepts()) {
-				neighborhoodRangesSums.put(pct, 0.0);
-				neighborhoodStartIncrementSums.put(pct, 0.0);
-				neighborhoodEndIncrementSums.put(pct, 0.0);
-			}
+			
+			
+			
 			
 			
 			ArrayList<Context> usedNeighbors = new ArrayList<Context>();
 			
-			if(activatedNeighborsContexts.size()>0) { ////////////// TODO no good version
+			if(activatedNeighborsContexts.size()>0) { 
 				
 				meanNeighborsLastPredictions = 0.0;
 				for (Context ctxt : activatedNeighborsContexts) {
 					
-					neighborhoodVolumesSum += ctxt.getVolume();
-					for (Percept pct : ctxt.getRanges().keySet()) {
-						neighborhoodRangesSums.put(pct, neighborhoodRangesSums.get(pct) + ctxt.getRanges().get(pct).getRadius());
-						neighborhoodStartIncrementSums.put(pct, neighborhoodStartIncrementSums.get(pct) + ctxt.getRanges().get(pct).getStartIncrement());
-						neighborhoodEndIncrementSums.put(pct, neighborhoodEndIncrementSums.get(pct) + ctxt.getRanges().get(pct).getEndIncrement());
-					}
+					
 
 					if(ctxt.lastPrediction != null) {
 						usedNeighbors.add(ctxt);
@@ -165,27 +253,16 @@ public class Head extends AmoebaAgent {
 				else {
 					meanNeighborsLastPredictions = null;
 				}
-				meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
 				
-				meanNeighborhoodRaduises = new HashMap<Percept, Double>();
-				for (Percept pct : getAmas().getPercepts()) {
-					meanNeighborhoodRaduises.put(pct, neighborhoodRangesSums.get(pct)/activatedNeighborsContexts.size());
-					meanNeighborhoodStartIncrements.put(pct, neighborhoodStartIncrementSums.get(pct)/activatedNeighborsContexts.size());
-					meanNeighborhoodEndIncrements.put(pct, neighborhoodEndIncrementSums.get(pct)/activatedNeighborsContexts.size());
-				}
+				
+				
+				
 				
 				
 			}
 			
 			
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", meanNeighborhoodVolume.toString())));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", meanNeighborhoodRaduises.toString())));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", meanNeighborhoodStartIncrements.toString())));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", meanNeighborhoodEndIncrements.toString())));
+			
 			
 			if(meanNeighborsLastPredictions != null) {
 //				System.out.println("####################### NEIGHBORS #############################");
@@ -210,78 +287,7 @@ public class Head extends AmoebaAgent {
 			
 			
 		}
-		else {
-			
-			
-			double neighborhoodVolumesSum = 0;
-			HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
-			HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
-			HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
-			for (Percept pct : getAmas().getPercepts()) {
-				neighborhoodRangesSums.put(pct, 0.0);
-				neighborhoodStartIncrementSums.put(pct, 0.0);
-				neighborhoodEndIncrementSums.put(pct, 0.0);
-			}
-			
-			
-			
-			if(activatedNeighborsContexts.size()>0) {
-				
-				System.out.println(activatedNeighborsContexts);
-				
-				for (Context ctxt : activatedNeighborsContexts) {
-					
-					neighborhoodVolumesSum += ctxt.getVolume();
-					
-					for (Percept pct : ctxt.getRanges().keySet()) {
-						Double oldRadiusSum = neighborhoodRangesSums.get(pct);
-						Double oldStartIncrSum = neighborhoodStartIncrementSums.get(pct);
-						Double oldEndIncrSum = neighborhoodEndIncrementSums.get(pct);
-						neighborhoodRangesSums.put(pct, oldRadiusSum + ctxt.getRanges().get(pct).getRadius());
-						neighborhoodStartIncrementSums.put(pct, oldStartIncrSum + ctxt.getRanges().get(pct).getStartIncrement());
-						neighborhoodEndIncrementSums.put(pct, oldEndIncrSum + ctxt.getRanges().get(pct).getEndIncrement());
-					}
-
-					
-				}
 		
-			meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
-			
-			meanNeighborhoodRaduises = new HashMap<Percept, Double>();
-			meanNeighborhoodStartIncrements = new HashMap<Percept, Double>();
-			meanNeighborhoodEndIncrements = new HashMap<Percept, Double>();
-			
-			
-			for (Percept pct : getAmas().getPercepts()) {
-				
-				
-				
-				meanNeighborhoodRaduises.put(pct, neighborhoodRangesSums.get(pct)/activatedNeighborsContexts.size());
-				meanNeighborhoodStartIncrements.put(pct, neighborhoodStartIncrementSums.get(pct)/activatedNeighborsContexts.size());
-				meanNeighborhoodEndIncrements.put(pct, neighborhoodEndIncrementSums.get(pct)/activatedNeighborsContexts.size());
-				
-				
-			}
-				
-			
-				
-				
-				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "size", ""+activatedNeighborsContexts.size())));
-				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", ""+meanNeighborhoodVolume)));
-				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", ""+meanNeighborhoodRaduises)));
-				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", ""+meanNeighborhoodStartIncrements)));
-				getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", ""+meanNeighborhoodEndIncrements)));
-			}
-			
-			
-			
-			
-		}
 		
 		
 		
@@ -295,9 +301,9 @@ public class Head extends AmoebaAgent {
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		if (activatedContexts.size() > 0) {
-			//selectBestContext(); // using highest confidence
-			selectBestContextWithDistanceToModel(); // using closest distance
-			// selectBestContextWithDistanceToModel();
+			//selectBestContextWithConfidenceAndVolume(); // using highest confidence and volume
+			selectBestContextWithDistanceToModelAndVolume(); // using closest distance and volume
+			
 		} else {
 			bestContext = lastUsedContext;
 		}
@@ -494,7 +500,7 @@ public class Head extends AmoebaAgent {
 
 		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
 
-		selectBestContext();
+		selectBestContextWithConfidenceAndVolume();
 		if (bestContext != null) {
 			getAmas().data.noBestContext = false;
 			getAmas().data.prediction = bestContext.getActionProposal();
@@ -1536,7 +1542,7 @@ public class Head extends AmoebaAgent {
 	/**
 	 * Select best context.
 	 */
-	private void selectBestContext() {
+	private void selectBestContextWithConfidenceAndVolume() {
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {
 			Context bc;
 	
@@ -1544,9 +1550,10 @@ public class Head extends AmoebaAgent {
 			double currentConfidence = bc.getConfidence();
 
 			for (Context context : activatedContexts) {
-				if (context.getConfidence() > currentConfidence) {
+				double confidenceWithVolume = context.getConfidence()*context.getVolume();
+				if (confidenceWithVolume > currentConfidence) {
 					bc = context;
-					currentConfidence = bc.getConfidence();
+					currentConfidence = confidenceWithVolume;
 				}
 			}
 			bestContext = bc;
@@ -1557,20 +1564,20 @@ public class Head extends AmoebaAgent {
 	
 	
 
-	private void selectBestContextWithDistanceToModel() {
+	private void selectBestContextWithDistanceToModelAndVolume() {
 
 		Context bc;
 
 		bc = activatedContexts.get(0);
 		double distanceToModel = bc.getLocalModel().distance(bc.getCurrentExperiment());
-		double currentDistanceToModel;
+		double currentDistanceToModelWithVolume;
 
 		for (Context context : activatedContexts) {
 
-			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
-			if (currentDistanceToModel < distanceToModel) {
+			currentDistanceToModelWithVolume = context.getLocalModel().distance(context.getCurrentExperiment())/context.getVolume();
+			if (currentDistanceToModelWithVolume < distanceToModel) {
 				bc = context;
-				distanceToModel = currentDistanceToModel;
+				distanceToModel = currentDistanceToModelWithVolume;
 			}
 		}
 		bestContext = bc;

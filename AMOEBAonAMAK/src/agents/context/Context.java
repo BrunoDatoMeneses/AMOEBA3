@@ -119,7 +119,7 @@ public class Context extends AmoebaAgent {
 			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 				getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
-				r = new Range(this, p.getValue() - getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().getHeadAgent().meanNeighborhoodStartIncrements.get(p), getAmas().getHeadAgent().meanNeighborhoodEndIncrements.get(p));
+				r = new Range(this, p.getValue() - getAmas().getHeadAgent().minMeanNeighborhoodRaduises, p.getValue() + getAmas().getHeadAgent().minMeanNeighborhoodRaduises, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
 			}else {
 				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 				getAmas().getEnvironment()
@@ -201,7 +201,7 @@ public class Context extends AmoebaAgent {
 			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 				getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
-				r = new Range(this, p.getValue() - getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), p.getValue() + getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p), 0, true, true, p, getAmas().getHeadAgent().meanNeighborhoodStartIncrements.get(p), getAmas().getHeadAgent().meanNeighborhoodEndIncrements.get(p));
+				r = new Range(this, p.getValue() - getAmas().getHeadAgent().minMeanNeighborhoodRaduises, p.getValue() + getAmas().getHeadAgent().minMeanNeighborhoodRaduises, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
 			}else {
 				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 				getAmas().getEnvironment()
@@ -785,7 +785,7 @@ public class Context extends AmoebaAgent {
 			this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
 		}
 		
-		this.setConfidence(Math.max(this.getConfidence(), fusionContext.getConfidence()));
+		this.setConfidence(2*Math.max(this.getConfidence(), fusionContext.getConfidence()));
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
@@ -889,7 +889,7 @@ public class Context extends AmoebaAgent {
 //			ranges.get(p).adapt(p.getValue()); 
 //		}
 
-		ranges.get(p).adapt(p.getValue());
+		ranges.get(p).adapt(p.getValue(), false, null);
 
 //		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
 //			if(testIfOtherContextShouldFinalyShrink(perceptForAdapatationAndOverlapingContext.getB(), perceptForAdapatationAndOverlapingContext.getA())){
@@ -1220,7 +1220,7 @@ public class Context extends AmoebaAgent {
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), "CONTAINED", ""+contain)));
 			if (!contain && !fusionned) {
 				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
-					ranges.get(pct).adapt(pct.getValue());
+					ranges.get(pct).adapt(pct.getValue(), false, null);
 				}
 				
 				//ranges.get(pct).extend(pct.getValue(), pct);
@@ -1245,7 +1245,7 @@ public class Context extends AmoebaAgent {
 		} else {
 
 
-			ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue());
+			ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue(), true, bestContext);
 
 		}
 	}
