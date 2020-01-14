@@ -47,7 +47,12 @@ public class ContextRendererFX extends RenderStrategy {
 	
 	private void setColorWithCoefs() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
-		drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+		if(context.isInNeighborhood) {
+			drawable.setColor(new Color(c[0], c[1], c[2], 255d / 255d));
+		}else {
+			drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+		}
+		
 	}
 	
 	private void setColorWithPrediction() {

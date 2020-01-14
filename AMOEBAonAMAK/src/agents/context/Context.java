@@ -66,6 +66,7 @@ public class Context extends AmoebaAgent {
 	public static final int errorsBeforeAugmentation = 5;
 	
 	public boolean fusionned = false;
+	public boolean isInNeighborhood = false;
 	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
@@ -218,7 +219,7 @@ public class Context extends AmoebaAgent {
 
 		//expand();
 
-		this.confidence = bestNearestContext.confidence;
+		//this.confidence = bestNearestContext.confidence;
 		this.localModel = getAmas().buildLocalModel(this);
 		// this.formulaLocalModel = ((LocalModelMillerRegression)
 		// bestNearestContext.localModel).getFormula(bestNearestContext);
@@ -932,6 +933,34 @@ public class Context extends AmoebaAgent {
 			}
 		}
 	}
+	
+	
+	private Percept getPerceptWithLesserImpactOnContext(ArrayList<Percept> percepts) {
+		
+		Percept perceptForAdapation = null;
+		double minDistanceToFrontier = Double.MAX_VALUE;
+		double distanceToFrontier;
+		
+		for (Percept pct : percepts) {
+			if (!ranges.get(pct).isPerceptEnum()) {
+
+				distanceToFrontier = Math.min(ranges.get(pct).startDistance(pct.getValue()),
+						ranges.get(pct).endDistance(pct.getValue()));
+				
+				for(Percept otherPct : percepts) {
+					if(otherPct != pct) {
+						distanceToFrontier*= this.getRanges().get(otherPct).getLenght();
+					}
+				}
+
+				if (distanceToFrontier < minDistanceToFrontier) {
+					minDistanceToFrontier = distanceToFrontier;
+					perceptForAdapation = pct;
+				}
+			}
+		}
+		return perceptForAdapation;
+	}
 
 	private Percept getPerceptWithBiggerImpactOnOverlap(ArrayList<Percept> percepts, Context bestContext) {
 		Percept perceptWithBiggerImpact = null;
@@ -989,7 +1018,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(ArrayList<Percept> percepts) {
-		Percept perceptForAdapation = null;
+		Percept perceptForBigerImpactOnOverlap = null;
+		Percept perceptWithLesserImpactOnContext = null;
 		Context overlapingContext = null;
 		double minDistanceToFrontier = Double.MAX_VALUE;
 		double distanceToFrontier;
@@ -1005,29 +1035,34 @@ public class Context extends AmoebaAgent {
 					} else {
 						overlappingVolume = this.getOverlappingVolume(ctxt);
 						if (overlappingVolume > maxOverlappingVolume) {
-							perceptForAdapation = getPerceptWithBiggerImpactOnOverlap(percepts, ctxt);
+							
 							overlapingContext = ctxt;
 						}
 					}
 				}
 			}
-		}
-		if (perceptForAdapation == null) {
-			for (Percept pct : percepts) {
-				if (!ranges.get(pct).isPerceptEnum()) {
-
-					distanceToFrontier = Math.min(ranges.get(pct).startDistance(pct.getValue()),
-							ranges.get(pct).endDistance(pct.getValue()));
-
-					if (distanceToFrontier < minDistanceToFrontier) {
-						minDistanceToFrontier = distanceToFrontier;
-						perceptForAdapation = pct;
-					}
-				}
+			
+			if(overlapingContext != null) {
+				perceptForBigerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(percepts, overlapingContext);
+				
 			}
+			
 		}
+		
+		perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(percepts);
+		if(perceptForBigerImpactOnOverlap != null) {
+			
+			if(perceptForBigerImpactOnOverlap == perceptWithLesserImpactOnContext) {
+				return new Pair<Percept, Context>(perceptForBigerImpactOnOverlap, overlapingContext);
+			}
+			
+		}
+		
+		return new Pair<Percept, Context>(perceptWithLesserImpactOnContext, overlapingContext);
+		
+		
 
-		return new Pair<Percept, Context>(perceptForAdapation, overlapingContext);
+		
 	}
 
 	public boolean containedBy(Context ctxt) {
@@ -1238,14 +1273,21 @@ public class Context extends AmoebaAgent {
 	public void shrinkRangesToJoinBorders(Context bestContext) {
 		Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
 				bestContext);
+		
+		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(getAmas().getPercepts());
 
 
 		if (perceptWithBiggerImpactOnOverlap == null) {
 			this.destroy();
 		} else {
 
+				if(perceptWithBiggerImpactOnOverlap == perceptWithLesserImpactOnContext) {
+					ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue(), true, bestContext);
+				}else {
+					ranges.get(perceptWithLesserImpactOnContext).adapt(perceptWithLesserImpactOnContext.getValue(), true, bestContext);
+				}
 
-			ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue(), true, bestContext);
+			
 
 		}
 	}

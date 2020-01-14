@@ -75,7 +75,8 @@ public class F_N_Launcher  extends Application implements Serializable {
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
-		amoeba.saver = new SaveHelperImpl(amoeba);
+		amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+		
 		amoeba.allowGraphicalScheduler(true);
 		amoeba.setRenderUpdate(true);		
 		amoeba.data.learningSpeed = learningSpeed;

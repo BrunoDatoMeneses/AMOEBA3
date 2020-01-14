@@ -138,6 +138,7 @@ public class Head extends AmoebaAgent {
 			
 			for (Context ctxt : activatedNeighborsContexts) {
 				
+				ctxt.isInNeighborhood = true;
 				neighborhoodVolumesSum += ctxt.getVolume();
 				
 				for (Percept pct : ctxt.getRanges().keySet()) {
@@ -1575,6 +1576,7 @@ public class Head extends AmoebaAgent {
 		for (Context context : activatedContexts) {
 
 			currentDistanceToModelWithVolume = context.getLocalModel().distance(context.getCurrentExperiment())/context.getVolume();
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("DISTANCE / VOLUME ", context.getName(), ""+currentDistanceToModelWithVolume)));
 			if (currentDistanceToModelWithVolume < distanceToModel) {
 				bc = context;
 				distanceToModel = currentDistanceToModelWithVolume;
@@ -2013,6 +2015,9 @@ public class Head extends AmoebaAgent {
 
 	public void clearAllUseableContextLists() {
 		activatedContexts.clear();
+		for (Context ctxt : activatedNeighborsContexts) {
+			ctxt.isInNeighborhood = false;
+		}
 		activatedNeighborsContexts.clear();
 	}
 
