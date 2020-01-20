@@ -302,7 +302,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
 		
 		/* Square */
-		//return (x1 > -spaceSize && x1 < spaceSize && x0 < spaceSize && x0 > -spaceSize) ? model1(x0,x1) : model2(x0,x1) ;
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
 		//return model1();
 		
 		/* Triangle */

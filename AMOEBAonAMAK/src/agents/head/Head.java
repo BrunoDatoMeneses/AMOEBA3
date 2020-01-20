@@ -51,6 +51,10 @@ public class Head extends AmoebaAgent {
 	public Double minMeanNeighborhoodStartIncrements = null;
 	public Double minMeanNeighborhoodEndIncrements = null;
 	
+	public Double minNeighborhoodRadius = null;
+	public Double minNeighborhoodStartIncrement = null;
+	public Double minNeighborhoodEndIncrement = null;
+	
 
 	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
@@ -98,6 +102,10 @@ public class Head extends AmoebaAgent {
 		minMeanNeighborhoodStartIncrements = Double.POSITIVE_INFINITY;
 		minMeanNeighborhoodEndIncrements = Double.POSITIVE_INFINITY;
 		
+		minNeighborhoodRadius = Double.POSITIVE_INFINITY;
+		minNeighborhoodStartIncrement = Double.POSITIVE_INFINITY;
+		minNeighborhoodEndIncrement = Double.POSITIVE_INFINITY;
+		
 		getAmas().data.currentCriticalityPrediction = 0;
 		getAmas().data.currentCriticalityMapping = 0;
 		getAmas().data.currentCriticalityConfidence = 0;
@@ -124,6 +132,9 @@ public class Head extends AmoebaAgent {
 		HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
 		HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
 		HashMap<Percept,Double> neighborhoodEndIncrementSums = new HashMap<Percept,Double>();
+		
+		
+		
 		for (Percept pct : getAmas().getPercepts()) {
 			neighborhoodRangesSums.put(pct, 0.0);
 			neighborhoodStartIncrementSums.put(pct, 0.0);
@@ -145,6 +156,22 @@ public class Head extends AmoebaAgent {
 					Double oldRadiusSum = neighborhoodRangesSums.get(pct);
 					Double oldStartIncrSum = neighborhoodStartIncrementSums.get(pct);
 					Double oldEndIncrSum = neighborhoodEndIncrementSums.get(pct);
+					
+					if( ctxt.getRanges().get(pct).getRadius() < minNeighborhoodRadius) {
+						minNeighborhoodRadius = ctxt.getRanges().get(pct).getRadius();
+					}
+					
+					if( ctxt.getRanges().get(pct).getStartIncrement() < minNeighborhoodStartIncrement) {
+						minNeighborhoodStartIncrement = ctxt.getRanges().get(pct).getStartIncrement();
+					}
+					
+					if( ctxt.getRanges().get(pct).getEndIncrement() < minNeighborhoodEndIncrement) {
+						minNeighborhoodEndIncrement = ctxt.getRanges().get(pct).getEndIncrement();
+					}
+					
+					
+					
+					
 					neighborhoodRangesSums.put(pct, oldRadiusSum + ctxt.getRanges().get(pct).getRadius());
 					neighborhoodStartIncrementSums.put(pct, oldStartIncrSum + ctxt.getRanges().get(pct).getStartIncrement());
 					neighborhoodEndIncrementSums.put(pct, oldEndIncrSum + ctxt.getRanges().get(pct).getEndIncrement());
