@@ -46,7 +46,10 @@ public class AmoebaData implements Serializable {
 	public boolean newContextWasCreated = false;
 	public boolean contextFromPropositionWasSelected = false;
 	
+	public boolean isActiveLearning;
+	
 	public boolean activeLearning = false;
+	public boolean selfLearning = false;
 	
 	public HashMap<String, Double> selfRequest;
 

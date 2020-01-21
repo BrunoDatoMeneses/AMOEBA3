@@ -41,6 +41,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	HashMap<String,Double> selfRequest;
 	boolean activeLearning = false;
+	boolean selfLearning = false;
 	
 	double noiseRange;
 	
@@ -152,6 +153,11 @@ public class F_N_Manager implements StudiedSystem{
 		if(!randomExploration) {
 			
 			nonRandomExplorationStep();
+			
+		}
+		else if(selfLearning) {
+			
+			selfLearning = false;
 			
 		}
 		else if(activeLearning) {
@@ -689,6 +695,11 @@ private double[] subZoneCenter3D(int nb) {
 	@Override
 	public void setActiveLearning(boolean value) {
 		activeLearning = value;
+	}
+	
+	@Override
+	public void setSelfLearning(boolean value) {
+		selfLearning = value;
 	}
 	
 	@Override

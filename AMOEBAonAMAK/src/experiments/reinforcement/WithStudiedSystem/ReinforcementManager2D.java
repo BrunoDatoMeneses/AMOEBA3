@@ -512,6 +512,17 @@ public class ReinforcementManager2D implements StudiedSystem{
 		
 	}
 
+
+
+
+
+
+	@Override
+	public void setSelfLearning(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 

@@ -55,6 +55,7 @@ public class Head extends AmoebaAgent {
 	public Double minNeighborhoodStartIncrement = null;
 	public Double minNeighborhoodEndIncrement = null;
 	
+	public EndogenousRequest lastEndogenousRequest = null;
 
 	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
@@ -404,6 +405,11 @@ public class Head extends AmoebaAgent {
 		
 		
 		getAmas().data.executionTimes[7]=System.currentTimeMillis();
+		
+		
+		if(isSelfRequest()) {
+			getAmas().data.activeLearning = true;
+		}
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -972,16 +978,20 @@ public class Head extends AmoebaAgent {
 	
 	private void NCSDetection_ChildContext() {
 		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
-		
-		if(bestContext!=null) {
-			if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
-				bestContext.solveNCS_ChildContext();
-				
-				
+		if(getAmas().data.isActiveLearning) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
+			
+			if(bestContext!=null) {
+				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+					bestContext.solveNCS_ChildContext();
+					
+					
+				}
 			}
 		}
+		
+		
 		
 		
 		
@@ -1184,28 +1194,33 @@ public class Head extends AmoebaAgent {
 	
 	private void NCSDetection_PotentialRequest() {
 		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
-		
-		if (activatedNeighborsContexts.size() > 1) {
-			int i = 1;
-			for (Context ctxt : activatedNeighborsContexts) {
-				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
-					if(!this.isDying() && !ctxt.isDying()) {
-						EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
-						if(potentialRequest != null) {
-							addEndogenousRequest(potentialRequest);
+		if(getAmas().data.isActiveLearning) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
+			
+			if (activatedNeighborsContexts.size() > 1) {
+				int i = 1;
+				for (Context ctxt : activatedNeighborsContexts) {
+					for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
+						if(!this.isDying() && !ctxt.isDying()) {
+							EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
+							if(potentialRequest != null) {
+								getAmas().data.activeLearning = true;
+								addEndogenousRequest(potentialRequest);
+							}
 						}
 					}
+					i++;
 				}
-				i++;
+			}
+			
+			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+			for(EndogenousRequest endoRequest : endogenousRequests) {
+				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
 			}
 		}
 		
-		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
-		for(EndogenousRequest endoRequest : endogenousRequests) {
-			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
-		}
+		
 		
 	}
 	
@@ -1496,6 +1511,7 @@ public class Head extends AmoebaAgent {
 			getAmas().data.firstContext = true;
 		}
 
+		resetLastEndogenousRequest();
 		return context;
 	}
 
@@ -2170,7 +2186,11 @@ public class Head extends AmoebaAgent {
 	
 	
 	public boolean isActiveLearning() {
-		return isSelfRequest();
+		return isSelfRequest() && getAmas().data.activeLearning;
+	}
+	
+	public boolean isSelfLearning() {
+		return isSelfRequest() && getAmas().data.selfLearning;
 	}
 	
 	
@@ -2178,10 +2198,20 @@ public class Head extends AmoebaAgent {
 	public HashMap<Percept, Double> getSelfRequest(){
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
 		EndogenousRequest futureRequest = endogenousRequests.poll();
+		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
 		}
+		
 		return futureRequest.getRequest();
+	}
+	
+	public EndogenousRequest getLastEndogenousRequest() {
+		return lastEndogenousRequest;
+	}
+	
+	public void resetLastEndogenousRequest() {
+		lastEndogenousRequest = null;
 	}
 	
 	public void deleteRequest(Context ctxt) {
@@ -2194,6 +2224,7 @@ public class Head extends AmoebaAgent {
 	
 	public void addSelfRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
 		
+		getAmas().data.activeLearning = true;
 		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF));
 	}
 	

@@ -148,4 +148,10 @@ public class NDimCube implements StudiedSystem{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setSelfLearning(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
 }

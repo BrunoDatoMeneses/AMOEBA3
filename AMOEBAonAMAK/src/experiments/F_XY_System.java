@@ -101,4 +101,10 @@ public class F_XY_System implements StudiedSystem {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setSelfLearning(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
 }

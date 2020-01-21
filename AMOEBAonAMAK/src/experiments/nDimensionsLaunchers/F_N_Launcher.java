@@ -41,7 +41,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 	public static double mappingErrorAllowed = 0.03; // MULTI
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
-	
+	public static final boolean setActiveLearning = true	;
 	public static final int nbCycle = 1000;
 	
 
@@ -81,6 +81,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 		amoeba.setRenderUpdate(true);		
 		amoeba.data.learningSpeed = learningSpeed;
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
+		amoeba.data.isActiveLearning = setActiveLearning;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
 		
