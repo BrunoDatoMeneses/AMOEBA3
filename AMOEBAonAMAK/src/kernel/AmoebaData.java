@@ -32,8 +32,8 @@ public class AmoebaData implements Serializable {
 	public Double endogenousPredictionNContexts = 0.0;
 	public Double endogenousPredictionNContextsByInfluence = 0.0;
 
-	public double oracleValue;
-	public double oldOracleValue;
+	public Double oracleValue;
+	public Double oldOracleValue;
 	public double criticity = 0.0;
 	public double distanceToRegression;
 	public double oldCriticity;
@@ -47,6 +47,7 @@ public class AmoebaData implements Serializable {
 	public boolean contextFromPropositionWasSelected = false;
 	
 	public boolean isActiveLearning;
+	public boolean isSelfLearning;
 	
 	public boolean activeLearning = false;
 	public boolean selfLearning = false;

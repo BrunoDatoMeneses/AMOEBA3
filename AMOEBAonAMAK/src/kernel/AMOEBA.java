@@ -217,6 +217,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			perceptions = studiedSystem.getOutput();
 			
 			
+			if(perceptions.get("oracle")==null) {
+				data.useOracle = false;
+			}else {
+				data.useOracle = true;
+			}
+			
 		}
 		
 		environment.preCycleActions();
@@ -247,15 +253,15 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	protected void onSystemCycleEnd() {
 		
 		if(studiedSystem != null) {
-			if(head.isActiveLearning()) {
-				data.activeLearning = false;
-				studiedSystem.setActiveLearning(true);
+			if(data.selfLearning) {
+				data.selfLearning = false;
+				studiedSystem.setSelfLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
 				 
 			}
-			else if(head.isSelfLearning()) {
-				data.selfLearning = false;
-				studiedSystem.setSelfLearning(true);
+			else if(data.activeLearning) {
+				data.activeLearning = false;
+				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
 			}
 		}

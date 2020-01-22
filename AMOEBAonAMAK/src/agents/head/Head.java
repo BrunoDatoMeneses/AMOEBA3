@@ -243,6 +243,15 @@ public class Head extends AmoebaAgent {
 			playWithoutOracle();
 		}
 
+		
+		if(isSelfRequest()) {
+			if(getAmas().data.isSelfLearning) {
+				getAmas().data.selfLearning = true;
+			}else if(getAmas().data.isActiveLearning) {
+				getAmas().data.selfLearning = true;
+			}
+		}
+		
 		updateStatisticalInformations(); /// regarder dans le détail, possible que ce pas trop utile
 
 		newContext = null;
@@ -326,7 +335,7 @@ public class Head extends AmoebaAgent {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		if (activatedContexts.size() > 0) {
@@ -407,9 +416,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[7]=System.currentTimeMillis();
 		
 		
-		if(isSelfRequest()) {
-			getAmas().data.activeLearning = true;
-		}
+		
 		
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
@@ -531,6 +538,9 @@ public class Head extends AmoebaAgent {
 	 * Play without oracle.
 	 */
 	private void playWithoutOracle() {
+		
+		getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- PLAY WITHOUT ORACLE")));
 
 		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
 
@@ -572,7 +582,7 @@ public class Head extends AmoebaAgent {
 			logger().debug("HEAD without oracle", "no Best context selected ");
 		}
 		
-		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
+		//getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
 
 		if(getAmas().isReinforcement()) {
 			if (activatedNeighborsContexts.size() > 1) {
@@ -1205,7 +1215,8 @@ public class Head extends AmoebaAgent {
 						if(!this.isDying() && !ctxt.isDying()) {
 							EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
 							if(potentialRequest != null) {
-								getAmas().data.activeLearning = true;
+								
+								
 								addEndogenousRequest(potentialRequest);
 							}
 						}
@@ -1214,10 +1225,7 @@ public class Head extends AmoebaAgent {
 				}
 			}
 			
-			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
-			for(EndogenousRequest endoRequest : endogenousRequests) {
-				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
-			}
+			
 		}
 		
 		
@@ -1520,47 +1528,49 @@ public class Head extends AmoebaAgent {
 	 */
 	private void updateStatisticalInformations() {
 
-		
-		if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
-			getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
+		if(getAmas().data.oracleValue != null) {
+			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
+				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
+			}
+			
+
+			getAmas().data.normalizedCriticality = getAmas().data.criticity/getAmas().data.maxPrediction;
+			criticalities.addCriticality("predictionCriticality", getAmas().data.normalizedCriticality);
+			
+			criticalities.updateMeans();
+
+			if (severalActivatedContexts()) {
+
+				endogenousCriticalities.addCriticality("predictionCriticality", getAmas().data.criticity);
+				endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapspredictionCriticality",
+						Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlaps));
+				endogenousCriticalities.addCriticality(
+						"endogenousPredictionActivatedContextsOverlapsWorstDimInfluencepredictionCriticality",
+						Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
+				endogenousCriticalities.addCriticality(
+						"endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidencepredictionCriticality",
+						Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
+				endogenousCriticalities.addCriticality(
+						"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidencepredictionCriticality",
+						Math.abs(getAmas().data.oracleValue
+								- getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
+				endogenousCriticalities.addCriticality(
+						"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumepredictionCriticality",
+						Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
+				endogenousCriticalities.addCriticality(
+						"endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality",
+						Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence));
+
+				endogenousCriticalities.updateMeans();
+
+			}
+
+			getAmas().data.predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
+			if (criticalities.getCriticalityMean("distanceToRegression") != null) {
+				getAmas().data.regressionPerformance.update(criticalities.getCriticalityMean("distanceToRegression"));
+			}
 		}
 		
-
-		getAmas().data.normalizedCriticality = getAmas().data.criticity/getAmas().data.maxPrediction;
-		criticalities.addCriticality("predictionCriticality", getAmas().data.normalizedCriticality);
-		
-		criticalities.updateMeans();
-
-		if (severalActivatedContexts()) {
-
-			endogenousCriticalities.addCriticality("predictionCriticality", getAmas().data.criticity);
-			endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapspredictionCriticality",
-					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlaps));
-			endogenousCriticalities.addCriticality(
-					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluencepredictionCriticality",
-					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence));
-			endogenousCriticalities.addCriticality(
-					"endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidencepredictionCriticality",
-					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence));
-			endogenousCriticalities.addCriticality(
-					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidencepredictionCriticality",
-					Math.abs(getAmas().data.oracleValue
-							- getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithoutConfidence));
-			endogenousCriticalities.addCriticality(
-					"endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolumepredictionCriticality",
-					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluenceWithVolume));
-			endogenousCriticalities.addCriticality(
-					"endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality",
-					Math.abs(getAmas().data.oracleValue - getAmas().data.endogenousPredictionActivatedContextsSharedIncompetence));
-
-			endogenousCriticalities.updateMeans();
-
-		}
-
-		getAmas().data.predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
-		if (criticalities.getCriticalityMean("distanceToRegression") != null) {
-			getAmas().data.regressionPerformance.update(criticalities.getCriticalityMean("distanceToRegression"));
-		}
 
 		// getAmas().data.mappingPerformance.update(?);
 	}
@@ -2219,6 +2229,10 @@ public class Head extends AmoebaAgent {
 	}
 	
 	public boolean isSelfRequest(){
+		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
+		for(EndogenousRequest endoRequest : endogenousRequests) {
+			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
+		}
 		return endogenousRequests.size()>0;
 	}
 	

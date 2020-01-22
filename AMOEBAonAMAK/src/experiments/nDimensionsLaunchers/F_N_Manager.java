@@ -155,11 +155,6 @@ public class F_N_Manager implements StudiedSystem{
 			nonRandomExplorationStep();
 			
 		}
-		else if(selfLearning) {
-			
-			selfLearning = false;
-			
-		}
 		else if(activeLearning) {
 			
 			
@@ -573,7 +568,15 @@ private double[] subZoneCenter3D(int nb) {
 			out.put("px" + i,x[i]);
 			
 		}
-		out.put("oracle",result);
+		if(selfLearning) {
+			selfLearning = false;
+			out.put("oracle",null);
+		}else {
+			out.put("oracle",result);
+		}
+		//out.put("oracle",result);
+		System.out.println(out);
+		
 		return out;
 	}
 	
