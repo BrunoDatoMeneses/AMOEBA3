@@ -245,10 +245,10 @@ public class Head extends AmoebaAgent {
 
 		
 		if(isSelfRequest()) {
-			if(getAmas().data.isSelfLearning) {
+			if(getAmas().data.isSelfLearning && endogenousRequests.element().getType() !=  REQUEST.SELF) {
 				getAmas().data.selfLearning = true;
 			}else if(getAmas().data.isActiveLearning) {
-				getAmas().data.selfLearning = true;
+				getAmas().data.activeLearning = true;
 			}
 		}
 		

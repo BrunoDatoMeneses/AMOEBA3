@@ -630,7 +630,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>500) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>250) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -640,7 +640,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>500) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -652,7 +652,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 500) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 250) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -678,11 +678,14 @@ public class Context extends AmoebaAgent {
 				
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 750) {
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 500) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
+			updateBoundsWithNeighborhood(bounds);
+			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
+			
 			if(request != null) {
 				
 				if(getAmas().getHeadAgent().isRealVoid(request)) {
@@ -696,6 +699,30 @@ public class Context extends AmoebaAgent {
 	
 		return null;	
 	}
+	
+	private void updateBoundsWithNeighborhood(HashMap<Percept, Pair<Double, Double>> voidBounds) {
+
+		
+		
+		for (HashMap.Entry<Percept,  Pair<Double, Double>> entry : voidBounds.entrySet()) {
+			
+			double neighborhoodRadius = entry.getKey().getRadiusContextForCreation()*2;
+			
+			if(entry.getValue().getA()<entry.getKey().getValue()-neighborhoodRadius) {
+				entry.getValue().setA(entry.getKey().getValue()-neighborhoodRadius);
+			}
+			if(entry.getKey().getValue()+neighborhoodRadius < entry.getValue().getB()) {
+				entry.getValue().setB(entry.getKey().getValue()+neighborhoodRadius);
+			}
+			
+		    
+		    
+		}
+		
+
+		
+	}
+	
 
 	public double distanceAsVolume(Context ctxt) {
 		double totalDistanceAsVolume = 1.0;
