@@ -63,6 +63,12 @@ public class Head extends AmoebaAgent {
 			   }
 			});
 	
+	Queue<EndogenousRequest> endogenousChildRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
+			      return r2.getPriority().compareTo(r1.getPriority());
+			   }
+			});
+	
 	static double lembda = 0.99;
 	// -----------------------------
 	
@@ -244,10 +250,14 @@ public class Head extends AmoebaAgent {
 		}
 
 		
-		if(isSelfRequest()) {
-			if(getAmas().data.isSelfLearning && endogenousRequests.element().getType() !=  REQUEST.SELF) {
+		if(isSelfRequest() ) {
+			if(getAmas().data.isSelfLearning) {
 				getAmas().data.selfLearning = true;
 			}else if(getAmas().data.isActiveLearning) {
+				getAmas().data.activeLearning = true;
+			}
+		}else if(isSelfChildRequest()) {
+			if(getAmas().data.isActiveLearning) {
 				getAmas().data.activeLearning = true;
 			}
 		}
@@ -1217,7 +1227,7 @@ public class Head extends AmoebaAgent {
 							if(potentialRequest != null) {
 								
 								
-								addEndogenousRequest(potentialRequest);
+								addEndogenousRequest(potentialRequest, endogenousRequests);
 							}
 						}
 					}
@@ -2206,8 +2216,25 @@ public class Head extends AmoebaAgent {
 	
 	
 	public HashMap<Percept, Double> getSelfRequest(){
-		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+endogenousRequests.element())));
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE SELF LEARNING", ""+endogenousRequests.element())));
 		EndogenousRequest futureRequest = endogenousRequests.poll();
+		lastEndogenousRequest = futureRequest;
+		for(Context ctxt : futureRequest.getAskingContexts()) {
+			ctxt.deleteWaitingRequest(futureRequest);
+		}
+		
+		return futureRequest.getRequest();
+	}
+	
+	public HashMap<Percept, Double> getActiveRequest(){
+		EndogenousRequest futureRequest = null;
+		if(endogenousChildRequests.size()>0) {
+			futureRequest = endogenousChildRequests.poll();
+		}else if(endogenousRequests.size()>0) {
+			futureRequest = endogenousRequests.poll();
+		}
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+futureRequest)));
+		
 		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
@@ -2228,6 +2255,14 @@ public class Head extends AmoebaAgent {
 		
 	}
 	
+	public boolean isSelfChildRequest(){
+		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO CHILD REQUESTS", ""+endogenousChildRequests.size())));
+		for(EndogenousRequest endoRequest : endogenousChildRequests) {
+			getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + endoRequest)));
+		}
+		return endogenousChildRequests.size()>0;
+	}
+	
 	public boolean isSelfRequest(){
 		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
 		for(EndogenousRequest endoRequest : endogenousRequests) {
@@ -2236,19 +2271,19 @@ public class Head extends AmoebaAgent {
 		return endogenousRequests.size()>0;
 	}
 	
-	public void addSelfRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
+	public void addChildRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
 		
 		getAmas().data.activeLearning = true;
-		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF));
+		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF), endogenousChildRequests);
 	}
 	
-	public void addEndogenousRequest(EndogenousRequest request) {
+	public void addEndogenousRequest(EndogenousRequest request, Queue<EndogenousRequest> endogenousRequestsList) {
 		
 		boolean existingRequestTest = false;
 		
 		if(request.getAskingContexts().size()>1) {
 			
-			Iterator<EndogenousRequest> itr = endogenousRequests.iterator();
+			Iterator<EndogenousRequest> itr = endogenousRequestsList.iterator();
 			while(!existingRequestTest && itr.hasNext()) {
 				
 				EndogenousRequest currentRequest = itr.next();
@@ -2266,12 +2301,12 @@ public class Head extends AmoebaAgent {
 				for(Context ctxt : request.getAskingContexts()) {
 					ctxt.addWaitingRequest(request);
 				}
-				endogenousRequests.add(request);
+				endogenousRequestsList.add(request);
 				getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 			}
 		}else {
 			request.getAskingContexts().get(0).addWaitingRequest(request);
-			endogenousRequests.add(request);
+			endogenousRequestsList.add(request);
 			getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("NEW ADDED ENDO REQUEST", ""+request)));
 		}
 		

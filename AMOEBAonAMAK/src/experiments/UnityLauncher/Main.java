@@ -111,7 +111,7 @@ public class Main implements Runnable {
 			if(amoeba.getHeadAgent().isActiveLearning()) {
 			
 				studiedSystem.setActiveLearning(true);
-				studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+				studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest()); //TODO self active ...
 			 
 			}
 			

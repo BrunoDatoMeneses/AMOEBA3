@@ -262,7 +262,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			else if(data.activeLearning) {
 				data.activeLearning = false;
 				studiedSystem.setActiveLearning(true);
-				studiedSystem.setSelfRequest(head.getSelfRequest());
+				studiedSystem.setSelfRequest(head.getActiveRequest());
 			}
 		}
 		

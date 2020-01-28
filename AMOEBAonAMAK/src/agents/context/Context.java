@@ -876,7 +876,7 @@ public class Context extends AmoebaAgent {
 			request.put(pct, getRandomValueInRange(pct));
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
-		getAmas().getHeadAgent().addSelfRequest(request, 10,this);
+		getAmas().getHeadAgent().addChildRequest(request, 10,this);
 		
 	}
 	

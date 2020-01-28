@@ -33,7 +33,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 	public static final int regressionPoints = 100;
 	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
-	public static final int nbOfModels = 3	;
+	public static final int nbOfModels = 2	;
 	public static final int normType = 2	;
 	public static final boolean randomExploration = true;
 	public static final boolean limitedToSpaceZone = true;

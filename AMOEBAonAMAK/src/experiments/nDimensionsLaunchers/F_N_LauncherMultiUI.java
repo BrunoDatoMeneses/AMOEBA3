@@ -273,7 +273,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                     	amoeba.learn(studiedSystem.getOutput());
                     	if(amoeba.getHeadAgent().isActiveLearning()) {
                     		studiedSystem.setActiveLearning(true);
-                    		studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
+                    		studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	System.out.println(status);
@@ -344,7 +344,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                     	amoeba2.learn(studiedSystem2.getOutput());
                     	if(amoeba2.getHeadAgent().isActiveLearning()) {
                     		studiedSystem2.setActiveLearning(true);
-                    		studiedSystem2.setSelfRequest(amoeba2.getHeadAgent().getSelfRequest());
+                    		studiedSystem2.setSelfRequest(amoeba2.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	System.out.println(status);

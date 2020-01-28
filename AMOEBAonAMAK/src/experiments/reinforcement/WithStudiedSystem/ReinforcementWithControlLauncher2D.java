@@ -219,7 +219,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
                     	amoebaSpatialReward.learn(studiedSystem.getOutput());
                     	if(amoebaSpatialReward.getHeadAgent().isActiveLearning()) {
                     		studiedSystem.setActiveLearning(true);
-                    		studiedSystem.setSelfRequest(amoebaSpatialReward.getHeadAgent().getSelfRequest());
+                    		studiedSystem.setSelfRequest(amoebaSpatialReward.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	//System.out.println(status);
