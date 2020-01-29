@@ -155,13 +155,13 @@ public class F_N_Manager implements StudiedSystem{
 			nonRandomExplorationStep();
 			
 		}
+		else if(selfLearning) {
+					
+			for(int i = 0 ; i < dimension ; i++) {
+				x[i] = selfRequest.get("px" + i);
+			}
+		}
 		else if(activeLearning) {
-			
-			
-			
-			activeLearning = false;
-			
-			
 			
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
@@ -175,6 +175,8 @@ public class F_N_Manager implements StudiedSystem{
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
 		}
+		
+		System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
 		
 		return null;
 	}
@@ -280,6 +282,37 @@ public class F_N_Manager implements StudiedSystem{
 		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
+		//return multiModel(xRequest, subzone);
+		
+		
+		/* Disc */
+		//return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		/* Square */
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[0] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+		
+		/* Triangle */
+		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		/* Split */
+		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		
+		
+		/* Cercle */
+//		double rho = Math.sqrt(x1*x1 + x0*x0);
+//		double start = 50.0;
+//		double width = 25.0;
+//		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
+		
+		
+		
+		
+		
+	}
+
+
+	private double multiModel(Double[] xRequest, int subzone) {
 		if(subzone == 1) {
 			/* Disques */
 			return modelN(xRequest) ;
@@ -297,33 +330,6 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		
 		return model1();
-		
-		
-		/* Disc */
-		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
-		
-		/* Square */
-		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
-		//return model1();
-		
-		/* Triangle */
-		//return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
-		
-		/* Split */
-		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
-		
-		
-		
-		/* Cercle */
-//		double rho = Math.sqrt(x1*x1 + x0*x0);
-//		double start = 50.0;
-//		double width = 25.0;
-//		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
-		
-		
-		
-		
-		
 	}
 	
 	
@@ -574,8 +580,11 @@ private double[] subZoneCenter3D(int nb) {
 		}else {
 			out.put("oracle",result);
 		}
+		if(activeLearning) {
+			activeLearning=false;
+		}
 		//out.put("oracle",result);
-		System.out.println(out);
+		System.out.println("[GET OUTPUT] " +out);
 		
 		return out;
 	}
@@ -708,6 +717,8 @@ private double[] subZoneCenter3D(int nb) {
 	@Override
 	public void setSelfRequest(HashMap<Percept, Double> request){
 		HashMap<String,Double> newRequest = new HashMap<String,Double>();
+		
+		System.out.println("[SET SELF REQUEST] " +request);
 		
 		for(Percept pct : request.keySet()) {
 			newRequest.put(pct.getName(), request.get(pct));

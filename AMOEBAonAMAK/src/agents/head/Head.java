@@ -152,7 +152,10 @@ public class Head extends AmoebaAgent {
 		
 		if(activatedNeighborsContexts.size()>0) {
 			
-			System.out.println(activatedNeighborsContexts);
+			getAmas().getEnvironment()
+			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", ""+activatedNeighborsContexts)));
+			
+			
 			
 			for (Context ctxt : activatedNeighborsContexts) {
 				

@@ -1508,18 +1508,18 @@ public class Range implements Serializable, Comparable, Cloneable {
 			////// " + (Math.abs(newStartValue-this.start)));
 		}
 
-//		if ((Double) newStartValue != null) {
-//			if (newStartValue < percept.getMin()) {
-//				this.start = percept.getMin();
-//
-//			} else {
-//				this.start = newStartValue;
-//			}
-//		} else {
-//			this.start = newStartValue;
-//		}
+		if ((Double) newStartValue != null) {
+			if (newStartValue < percept.getMin()) {
+				this.start = percept.getMin();
+
+			} else {
+				this.start = newStartValue;
+			}
+		} else {
+			this.start = newStartValue;
+		}
 		
-		this.start = newStartValue;
+		//this.start = newStartValue;
 		
 		
 
@@ -1547,17 +1547,17 @@ public class Range implements Serializable, Comparable, Cloneable {
 			////// System.out.println(context.getName() + " " + percept.getName() + " END "
 			////// + (Math.abs(newEndValue-this.end)));
 		}
-//		if ((Double) newEndValue != null) {
-//			if (newEndValue > percept.getMax()) {
-//				this.end = percept.getMax();
-//			} else {
-//				this.end = newEndValue;
-//			}
-//		} else {
-//			this.end = newEndValue;
-//		}
+		if ((Double) newEndValue != null) {
+			if (newEndValue > percept.getMax()) {
+				this.end = percept.getMax();
+			} else {
+				this.end = newEndValue;
+			}
+		} else {
+			this.end = newEndValue;
+		}
 		
-		this.end = newEndValue;
+		//this.end = newEndValue;
 		
 
 		if (this.context != null) {

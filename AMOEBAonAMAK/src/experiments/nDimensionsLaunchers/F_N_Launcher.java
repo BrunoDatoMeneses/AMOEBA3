@@ -42,7 +42,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 	public static final boolean setActiveLearning = true	;
-	public static final boolean setSelfLearning = false	;
+	public static final boolean setSelfLearning = true	;
 	public static final int nbCycle = 1000;
 	
 
