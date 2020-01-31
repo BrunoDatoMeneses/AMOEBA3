@@ -523,6 +523,39 @@ public class ReinforcementManager2D implements StudiedSystem{
 		
 	}
 
+
+
+
+
+
+	@Override
+	public Double getActiveRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+
+	@Override
+	public Double getSelfRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+
+	@Override
+	public Double getRandomRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 
 

@@ -107,4 +107,22 @@ public class F_XY_System implements StudiedSystem {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public Double getActiveRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Double getSelfRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Double getRandomRequestCounts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

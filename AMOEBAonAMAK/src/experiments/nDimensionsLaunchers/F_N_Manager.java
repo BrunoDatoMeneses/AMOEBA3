@@ -51,7 +51,31 @@ public class F_N_Manager implements StudiedSystem{
 	double explorationIncrement;
 	double explorationMaxVariation;
 	
+	private Double activeRequestCounts = 0.0;
+	private Double selfRequestCounts = 0.0;
+	private Double randomRequestCounts = 0.0;
 	
+	public Double getActiveRequestCounts() {
+		return activeRequestCounts;
+	}
+
+
+
+
+	public Double getSelfRequestCounts() {
+		return selfRequestCounts;
+	}
+
+
+
+
+	public Double getRandomRequestCounts() {
+		return randomRequestCounts;
+	}
+
+
+
+
 	/* Parameters */
 	private static final double gaussianCoef = 1000;
 	private static final double gaussianVariance = 10;
@@ -97,6 +121,28 @@ public class F_N_Manager implements StudiedSystem{
 		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
 		
 		
+		//printModels(nbOfModels);
+		
+		
+		
+		randomExploration= rndExploration;
+		
+		explorationVector = new double[dimension];	
+		for(int i = 0 ; i < dimension ; i++) {
+			explorationVector[i] = Math.random() - 0.5;
+		}
+		double vectorNorm = normeP(explorationVector, 2);
+		for(int i = 0 ; i < dimension ; i++) {
+			explorationVector[i] /= vectorNorm;
+		}
+		
+		
+		explorationIncrement = explIncrement;
+		explorationMaxVariation = explnVariation;
+	}
+
+
+	private void printModels(int nbOfModels) {
 		System.out.println("ZONE 1 DISKS");
 		for(int nb = 0; nb<nbOfModels; nb++) {
 			System.out.print(modelCoefs[nb][dimension] + "\t");
@@ -123,23 +169,6 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		System.out.println("");
 		System.out.println("");
-		
-		
-		
-		randomExploration= rndExploration;
-		
-		explorationVector = new double[dimension];	
-		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] = Math.random() - 0.5;
-		}
-		double vectorNorm = normeP(explorationVector, 2);
-		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] /= vectorNorm;
-		}
-		
-		
-		explorationIncrement = explIncrement;
-		explorationMaxVariation = explnVariation;
 	}
 	
 	
@@ -160,12 +189,14 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
+			selfRequestCounts++;
 		}
 		else if(activeLearning) {
 			
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
+			activeRequestCounts ++;
 		}
 
 		else {
@@ -174,9 +205,10 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
+			randomRequestCounts++;
 		}
 		
-		System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
+		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
 		
 		return null;
 	}
@@ -286,13 +318,13 @@ public class F_N_Manager implements StudiedSystem{
 		
 		
 		/* Disc */
-		//return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Square */
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[0] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
-		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		//return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Split */
 		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
@@ -584,7 +616,7 @@ private double[] subZoneCenter3D(int nb) {
 			activeLearning=false;
 		}
 		//out.put("oracle",result);
-		System.out.println("[GET OUTPUT] " +out);
+		//System.out.println("[GET OUTPUT] " +out);
 		
 		return out;
 	}
@@ -718,7 +750,7 @@ private double[] subZoneCenter3D(int nb) {
 	public void setSelfRequest(HashMap<Percept, Double> request){
 		HashMap<String,Double> newRequest = new HashMap<String,Double>();
 		
-		System.out.println("[SET SELF REQUEST] " +request);
+		//System.out.println("[SET SELF REQUEST] " +request);
 		
 		for(Percept pct : request.keySet()) {
 			newRequest.put(pct.getName(), request.get(pct));

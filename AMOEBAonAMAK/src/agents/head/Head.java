@@ -348,7 +348,7 @@ public class Head extends AmoebaAgent {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITH ORACLE")));
 		
 		if (activatedContexts.size() > 0) {
@@ -464,6 +464,7 @@ public class Head extends AmoebaAgent {
 //					}
 //				}
 				
+
 				
 				
 				
@@ -552,7 +553,7 @@ public class Head extends AmoebaAgent {
 	 */
 	private void playWithoutOracle() {
 		
-		getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+		getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- PLAY WITHOUT ORACLE")));
 
 		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
@@ -1279,7 +1280,7 @@ public class Head extends AmoebaAgent {
 
 				if(getAmas().data.oracleValue>0) {
 					
-					System.out.println(activatedContext.getName());
+					//System.out.println(activatedContext.getName()); REINFORCEMENT ?
 					
 					
 				}

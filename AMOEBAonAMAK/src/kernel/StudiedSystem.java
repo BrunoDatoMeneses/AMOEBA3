@@ -10,6 +10,8 @@ import agents.percept.Percept;
  * 
  */
 public interface StudiedSystem extends Serializable{
+	
+	
 
 	/**
 	 * Tell the StudiedSystem to advance its simulation of one step
@@ -47,5 +49,20 @@ public interface StudiedSystem extends Serializable{
 	public void setControlModels(HashMap<String, AMOEBA> controlModels);
 	
 	public void setControl(boolean value);
+	
+	public Double getActiveRequestCounts() ;
+	
+
+
+
+
+	public Double getSelfRequestCounts() ;
+
+
+
+
+	public Double getRandomRequestCounts() ;
+	
+	
 
 }

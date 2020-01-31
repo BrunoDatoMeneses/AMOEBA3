@@ -23,6 +23,10 @@ import ncs.NCS;
 import utils.Pair;
 import utils.TRACE_LEVEL;
 
+
+
+
+
 /**
  * The core agent of AMOEBA.
  * 
@@ -67,6 +71,9 @@ public class Context extends AmoebaAgent {
 	
 	public boolean fusionned = false;
 	public boolean isInNeighborhood = false;
+	
+	static final int VOID_CYCLE_START = 0;
+	static final int OVERLAP_CYCLE_START = 0;
 	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
@@ -232,7 +239,7 @@ public class Context extends AmoebaAgent {
 					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
 						double startRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getA();
 						double endRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getB();
-						System.out.println(startRange + "  " + endRange);
+						//System.out.println(startRange + "  " + endRange);
 						getAmas().getEnvironment()
 						.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
 						r = new Range(this, startRange, endRange, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
@@ -630,7 +637,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>250) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>OVERLAP_CYCLE_START) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -640,7 +647,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>500) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -652,7 +659,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 250) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -678,7 +685,7 @@ public class Context extends AmoebaAgent {
 				
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 500) {
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > VOID_CYCLE_START) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
