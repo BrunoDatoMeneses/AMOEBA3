@@ -75,12 +75,12 @@ public class F_N_Launcher  extends Application implements Serializable {
 		Configuration.waitForGUI = false;
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
-		HashMap<String, ArrayList<Double>> data = new HashMap<String, ArrayList<Double>>();
+		HashMap<String, ArrayList<Double>> data = new HashMap<>();
 		
 		List<String> dataStrings = Arrays.asList("mappingScore", "randomRequests", "activeRequests","nbAgents");
 		
 		for (String dataName : dataStrings){
-			data.put(dataName, new ArrayList<Double>());
+			data.put(dataName, new ArrayList<>());
 		}
 		
 		for (int i = 0; i < nbTest; ++i) {
@@ -97,8 +97,8 @@ public class F_N_Launcher  extends Application implements Serializable {
 		for (String dataName : dataStrings){
 			OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
 			Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-			System.out.println("[" + dataName +" AVERAGE] " + averageScore.getAsDouble());
-			System.out.println("[" + dataName +" DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
+			System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
+
 		}
 		
 		
