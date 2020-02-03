@@ -39,7 +39,7 @@ public class TestSetup {
 
 	@BeforeEach
 	public void setup() {
-		Configuration.allowedSimultaneousAgentsExecution = 1;
+		/*Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.commandLineMode = true;
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		amoeba = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
@@ -47,7 +47,7 @@ public class TestSetup {
 		for (int i = 0; i < train.length; i++) {
 			studiedSystem.playOneStep();
 			amoeba.learn(train[i]);
-		}
+		}*/
 	}
 	
 	@AfterAll

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	
+	<StartingAgents>
+		<Sensor Name="px1" Enum="false"></Sensor>
+		<Sensor Name="px2" Enum="false"></Sensor>
+		<Sensor Name="px3" Enum="false"></Sensor>
+		<Sensor Name="px4" Enum="false"></Sensor>
+		<Sensor Name="px5" Enum="false"></Sensor>
+		<Sensor Name="px6" Enum="false"></Sensor>
+		<Sensor Name="px7" Enum="false"></Sensor>
+		<Sensor Name="px8" Enum="false"></Sensor>
+		<Sensor Name="px9" Enum="false"></Sensor>
+		<Sensor Name="px10" Enum="false"></Sensor>
+		<Sensor Name="px11" Enum="false"></Sensor>
+		<Sensor Name="px12" Enum="false"></Sensor>
+		<Sensor Name="px13" Enum="false"></Sensor>
+		<Sensor Name="px14" Enum="false"></Sensor>
+		<Sensor Name="px15" Enum="false"></Sensor>
+		<Sensor Name="px16" Enum="false"></Sensor>
+		<Sensor Name="px17" Enum="false"></Sensor>
+		<Sensor Name="px18" Enum="false"></Sensor>
+		<Sensor Name="px19" Enum="false"></Sensor>
+		<Sensor Name="px20" Enum="false"></Sensor>
+		<Sensor Name="px21" Enum="false"></Sensor>
+		<Sensor Name="px22" Enum="false"></Sensor>
+		<Sensor Name="px23" Enum="false"></Sensor>
+		<Sensor Name="px24" Enum="false"></Sensor>
+		<Sensor Name="px25" Enum="false"></Sensor>
+		<Sensor Name="px26" Enum="false"></Sensor>
+		<Sensor Name="px27" Enum="false"></Sensor>
+		<Sensor Name="px28" Enum="false"></Sensor>
+		<Sensor Name="px29" Enum="false"></Sensor>
+		<Sensor Name="px30" Enum="false"></Sensor>
+		<Sensor Name="px31" Enum="false"></Sensor>
+		<Sensor Name="px32" Enum="false"></Sensor>
+		<Sensor Name="px33" Enum="false"></Sensor>
+		<Sensor Name="px34" Enum="false"></Sensor>
+		<Sensor Name="px35" Enum="false"></Sensor>
+		<Sensor Name="px36" Enum="false"></Sensor>
+		<Sensor Name="px37" Enum="false"></Sensor>
+		<Sensor Name="px38" Enum="false"></Sensor>
+		<Sensor Name="px39" Enum="false"></Sensor>
+		<Sensor Name="px40" Enum="false"></Sensor>
+		<Sensor Name="px41" Enum="false"></Sensor>
+		<Sensor Name="px42" Enum="false"></Sensor>
+		<Sensor Name="px43" Enum="false"></Sensor>
+		<Sensor Name="px44" Enum="false"></Sensor>
+		<Sensor Name="px45" Enum="false"></Sensor>
+		<Sensor Name="px46" Enum="false"></Sensor>
+		<Sensor Name="px47" Enum="false"></Sensor>
+		<Sensor Name="px48" Enum="false"></Sensor>
+		<Sensor Name="px49" Enum="false"></Sensor>
+		<Sensor Name="px50" Enum="false"></Sensor>
+		<Sensor Name="px51" Enum="false"></Sensor>
+		<Sensor Name="px52" Enum="false"></Sensor>
+		<Sensor Name="px53" Enum="false"></Sensor>
+		<Sensor Name="px54" Enum="false"></Sensor>
+		<Sensor Name="px55" Enum="false"></Sensor>
+		<Sensor Name="px56" Enum="false"></Sensor>
+		<Sensor Name="px57" Enum="false"></Sensor>
+		<Sensor Name="px58" Enum="false"></Sensor>
+		<Sensor Name="px59" Enum="false"></Sensor>
+		<Sensor Name="px60" Enum="false"></Sensor>
+		<Sensor Name="px61" Enum="false"></Sensor>
+		<Sensor Name="px62" Enum="false"></Sensor>
+		<Sensor Name="px63" Enum="false"></Sensor>
+		<Sensor Name="px64" Enum="false"></Sensor>
+		<Sensor Name="px65" Enum="false"></Sensor>
+		<Sensor Name="px66" Enum="false"></Sensor>
+		<Sensor Name="px67" Enum="false"></Sensor>
+		<Sensor Name="px68" Enum="false"></Sensor>
+		<Sensor Name="px69" Enum="false"></Sensor>
+		<Sensor Name="px70" Enum="false"></Sensor>
+		<Sensor Name="px71" Enum="false"></Sensor>
+		<Sensor Name="px72" Enum="false"></Sensor>
+		<Sensor Name="px73" Enum="false"></Sensor>
+		<Sensor Name="px74" Enum="false"></Sensor>
+		<Sensor Name="px75" Enum="false"></Sensor>
+		<Sensor Name="px76" Enum="false"></Sensor>
+		<Sensor Name="px77" Enum="false"></Sensor>
+		<Sensor Name="px78" Enum="false"></Sensor>
+		<Sensor Name="px79" Enum="false"></Sensor>
+		<Sensor Name="px80" Enum="false"></Sensor>
+		<Sensor Name="px81" Enum="false"></Sensor>
+		<Sensor Name="px82" Enum="false"></Sensor>
+		<Sensor Name="px83" Enum="false"></Sensor>
+		<Sensor Name="px84" Enum="false"></Sensor>
+		<Sensor Name="px85" Enum="false"></Sensor>
+		<Sensor Name="px86" Enum="false"></Sensor>
+		<Sensor Name="px87" Enum="false"></Sensor>
+		<Sensor Name="px88" Enum="false"></Sensor>
+		<Sensor Name="px89" Enum="false"></Sensor>
+		<Sensor Name="px90" Enum="false"></Sensor>
+		<Sensor Name="px91" Enum="false"></Sensor>
+		<Sensor Name="px92" Enum="false"></Sensor>
+		<Sensor Name="px93" Enum="false"></Sensor>
+		<Sensor Name="px94" Enum="false"></Sensor>
+		<Sensor Name="px95" Enum="false"></Sensor>
+		<Sensor Name="px96" Enum="false"></Sensor>
+		<Sensor Name="px97" Enum="false"></Sensor>
+		<Sensor Name="px98" Enum="false"></Sensor>
+		<Sensor Name="px99" Enum="false"></Sensor>
+		<Sensor Name="px100" Enum="false"></Sensor>
+
+	  	<Controller Name="Controller" Oracle="test">
+              <ErrorMargin ErrorAllowed="2000.0" AugmentationFactorError="5.0" DiminutionFactorError="0.4" MinErrorAllowed="0.1" NConflictBeforeAugmentation="40" NSuccessBeforeDiminution="80" />
+              
+        </Controller> 
+
+
+			
+	</StartingAgents>
+	
+	
+</System>

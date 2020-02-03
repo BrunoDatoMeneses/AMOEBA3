@@ -25,10 +25,10 @@ public class TestMaximize {
 	
 	@BeforeEach
 	public void setup() {
-		Configuration.allowedSimultaneousAgentsExecution = 1;
+		/*Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.commandLineMode = true;
 		amoeba = new AMOEBA("tests/kernel/simple_with_context.xml", null);
-		amoeba.saver = new SaveHelperDummy();
+		amoeba.saver = new SaveHelperDummy();*/
 	}
 	
 	@Test

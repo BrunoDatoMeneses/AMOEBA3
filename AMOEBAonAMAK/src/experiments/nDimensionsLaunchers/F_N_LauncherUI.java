@@ -86,9 +86,9 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.isSelfLearning = setSelfLearning;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		
-		for (int i = 0; i < nbCycle; ++i) {
-			amoeba.cycle();
-		}
+		//for (int i = 0; i < nbCycle; ++i) {
+		//	amoeba.cycle();
+		//}
 		
 		
 		// Exemple for adding a tool in the toolbar
