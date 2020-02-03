@@ -32,7 +32,7 @@ import utils.TRACE_LEVEL;
 /**
  * The Class BadContextLauncherEasy.
  */
-public class F_N_Launcher  extends Application implements Serializable {
+public class F_N_Launcher implements Serializable {
 
 
 	public static final double oracleNoiseRange = 0.5;
@@ -51,21 +51,21 @@ public class F_N_Launcher  extends Application implements Serializable {
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-	public static final int nbTest = 10;
+	public static final int nbTest = 100;
 	
 
 	
-	public static void main(String[] args) throws IOException {
-		
-		
-		Application.launch(args);
+	public static void main(String[] args) throws Exception {
+
+
+		start();
 
 
 	}
 	
 
-	@Override
-	public void start(Stage arg0) throws Exception {
+
+	public static void start() throws Exception {
 
 
 		// Set AMAK configuration before creating an AMOEBA
@@ -106,7 +106,7 @@ public class F_N_Launcher  extends Application implements Serializable {
 	}
 
 
-	private void ellsaTest(HashMap<String, ArrayList<Double>> data) {
+	private static void ellsaTest(HashMap<String, ArrayList<Double>> data) {
 		AMOEBA amoeba = new AMOEBA(null,  null);
 		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
