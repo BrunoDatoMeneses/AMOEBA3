@@ -51,7 +51,7 @@ public class F_N_Launcher implements Serializable {
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-	public static final int nbTest = 100;
+	public static final int nbTest = 10;
 	
 
 	

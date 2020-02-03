@@ -711,15 +711,15 @@ public class Context extends AmoebaAgent {
 
 		
 		
-		for (HashMap.Entry<Percept,  Pair<Double, Double>> entry : voidBounds.entrySet()) {
+		for (HashMap.Entry<Percept,  Pair<Double, Double>> voidBound : voidBounds.entrySet()) {
 			
-			double neighborhoodRadius = entry.getKey().getRadiusContextForCreation()*2;
+			double neighborhoodRadius = voidBound.getKey().getRadiusContextForCreation()*2;
 			
-			if(entry.getValue().getA()<entry.getKey().getValue()-neighborhoodRadius) {
-				entry.getValue().setA(entry.getKey().getValue()-neighborhoodRadius);
+			if(voidBound.getValue().getA()<voidBound.getKey().getValue()-neighborhoodRadius) {
+				voidBound.getValue().setA(voidBound.getKey().getValue()-neighborhoodRadius);
 			}
-			if(entry.getKey().getValue()+neighborhoodRadius < entry.getValue().getB()) {
-				entry.getValue().setB(entry.getKey().getValue()+neighborhoodRadius);
+			if(voidBound.getKey().getValue()+neighborhoodRadius < voidBound.getValue().getB()) {
+				voidBound.getValue().setB(voidBound.getKey().getValue()+neighborhoodRadius);
 			}
 			
 		    
@@ -728,6 +728,57 @@ public class Context extends AmoebaAgent {
 		
 
 		
+	}
+
+
+	private ArrayList<VOID> getVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds) {
+
+		ArrayList<VOID> voidsTorReturn = new ArrayList<VOID>();
+		ArrayList<FILLED> filleds = new ArrayList<FILLED>();
+
+		for (Percept pct : zoneBounds.keySet() ) {
+
+			ArrayList<VOID> voids = new ArrayList<VOID>();
+			FILLED filled;
+
+
+
+			for (Percept otherPCt : zoneBounds.keySet()) {
+				if (pct != otherPCt):
+
+			}
+
+		}
+
+
+
+	}
+
+	public HashMap<String,Pair<Double,Double>> get1DVoidsAndFilled(Percept pct, HashMap<Percept, Pair<Double, Double>> zoneBounds){
+		HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = new HashMap<>();
+		voidsAndFilleds.put("1D_Voids", new ArrayList<>());
+		voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
+
+		if (this.getRanges().get(pct).getStart() < zoneBounds.get(pct).getA() && zoneBounds.get(pct).getB() < this.getRanges().get(pct).getEnd()) {
+			voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),zoneBounds.get(pct).getB()));
+		} else {
+			if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() && this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB()) {
+				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getStart()));
+				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(this.getRanges().get(pct).getStart(),this.getRanges().get(pct).getEnd()));
+				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
+
+			}
+			else if (this.getRanges().get(pct).getStart() < zoneBounds.get(pct).getA() && zoneBounds.get(pct).getA() < this.getRanges().get(pct).getEnd() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB()){
+				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
+				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
+			}
+			else if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB() && ){
+				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
+				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
+			}
+		}
+
+		return voidsAndFilleds;
 	}
 	
 

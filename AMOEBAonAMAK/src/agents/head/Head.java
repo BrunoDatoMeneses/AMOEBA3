@@ -1086,7 +1086,8 @@ public class Head extends AmoebaAgent {
 			newContextCreated = true;
 			
 			newContext.lastPrediction = newContext.getActionProposal();
-			
+			activatedNeighborsContexts.add(newContext);
+			activatedContexts.add(newContext);
 			double maxCoef = 0.0;
 			for(Double coef : newContext.getLocalModel().getCoef()) {
 				if(Math.abs(coef)> maxCoef) {
