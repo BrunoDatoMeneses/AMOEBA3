@@ -14,9 +14,7 @@ import utils.TRACE_LEVEL;
 /**
  * The Class LocalModelMillerRegression.
  */
-public class LocalModelMillerRegression implements LocalModel{
-	
-	private Context context;
+public class LocalModelMillerRegression extends LocalModel{
 	
 	/** The n parameters. */
 	private int nParameters;
@@ -24,11 +22,14 @@ public class LocalModelMillerRegression implements LocalModel{
 	/** The regression. */
 	transient private Regression regression;
 
+	private Context context;
 	
 	/** The coef. */
 	private Double[] coefs;
 	
 	private ArrayList<Experiment> firstExperiments;
+	
+	public boolean isReinforcement = false;
 
 	/**
 	 * Instantiates a new local model miller regression.
@@ -36,15 +37,17 @@ public class LocalModelMillerRegression implements LocalModel{
 	 * @param world the world
 	 */
 	public LocalModelMillerRegression(Context associatedContext) {
-		context = associatedContext;
+		this.context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
 		firstExperiments = new ArrayList<Experiment>();
+		
+		isReinforcement = associatedContext.getAmas().isReinforcement();
 	}
 	
 	public LocalModelMillerRegression(Context associatedContext, Double[] coefsCopy, List<Experiment> fstExperiments) {
-		context = associatedContext;
+		this.context = associatedContext;
 		ArrayList<Percept> var = associatedContext.getAmas().getPercepts();
 		this.nParameters = var.size();
 		regression = new Regression(nParameters,true);
@@ -53,30 +56,20 @@ public class LocalModelMillerRegression implements LocalModel{
 	}
 	
 	@Override
+	public Context getContext() {
+		return context;
+	}
+	
+	@Override
 	public void setContext(Context context) {
 		this.context = context;
 	}
 	
 	@Override
-	public Context getContext() {
-		return context;
-	}
-	
-	/**
-	 * Sets the coef.
-	 *
-	 * @param coef the new coef
-	 */
-	@Override
 	public void setCoef(Double[] coef) {
 		this.coefs = coef.clone();
 	}
 	
-	/**
-	 * Gets the coef.
-	 *
-	 * @return the coef
-	 */
 	@Override
 	public Double[] getCoef() {
 		return coefs;
@@ -159,6 +152,7 @@ public class LocalModelMillerRegression implements LocalModel{
 			if (Double.isNaN(coef)) coef = 0.0;
 			double pos;
 			Percept p = percepts.get(i-1);
+			
 			if(fixedPercepts.containsKey(p.getName())) {
 				pos = fixedPercepts.get(p.getName());
 			} else {
@@ -169,6 +163,7 @@ public class LocalModelMillerRegression implements LocalModel{
 					pos = context.getRanges().get(p).getStart();
 				}
 			}
+			
 			double value = coef * pos;
 			result.put("oracle", result.get("oracle") + value);
 			result.put(p.getName(), pos);
@@ -216,26 +211,13 @@ public class LocalModelMillerRegression implements LocalModel{
 	}
 	
 	@Override
-	public String getCoefsFormula() {
-		String result = "" +coefs[0];
-	//	//System.out.println("Result 0" + " : " + result);
-		if (coefs[0] == Double.NaN) System.exit(0);
-		
-		for (int i = 1 ; i < coefs.length ; i++) {
-			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
-			
-			result += "\t" + coefs[i] + " (" + context.getAmas().getPercepts().get(i-1) +")";
-			
-		}
-		
-		return result;
-
-}
-	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
-		if(firstExperiments.size()< (nParameters + 2)) {
+		if(isReinforcement) {
+			updateModelReinforcement(newExperiment, weight);
+		}
+		else if(firstExperiments.size()< (nParameters + 2)) {
 			firstExperiments.add(newExperiment); 
 			updateModel();
 			
@@ -247,9 +229,54 @@ public class LocalModelMillerRegression implements LocalModel{
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
 	}
 	
+	
+	
+	
+	
+	
+	
+	public void updateModelReinforcement(Experiment newExperiment, double weight) {
+		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"REINFORCEMENT")));
+		
+		
+		double weightedNewProposition;
+		
+		if(coefs != null) {
+			weightedNewProposition = (newExperiment.getOracleProposition() * weight) + ((1-weight) * this.getProposition());
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),weight+ " " + newExperiment.getOracleProposition(),(1-weight)+  " " + this.getProposition())));
+		}
+		else {
+			weightedNewProposition = newExperiment.getOracleProposition();
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(), "NEW CTXT " + newExperiment.getOracleProposition())));
+		}
+		
+		
+		regression = new Regression(nParameters,true);
+		
+		int i = 0;
+		while (regression.getN() < nParameters + 2) { 
+			
+			//context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition()+"" )));
+			regression.addObservation(newExperiment.getValuesAsArray(), weightedNewProposition);
+			i++;
+		}
+		
+
+		double[] coef = regression.regress().getParameterEstimates();
+		coefs = new Double[coef.length];
+		for(int j = 0; j < coef.length; j++) {
+			coefs[j] = coef[j];
+		}
+		
+	}
+	
+	
+	
+	
 	public void updateModel() {
 		
-		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"FIRST EXPERIMENTS")));
 		regression = new Regression(nParameters,true);
 		
 		for (Experiment exp : firstExperiments) {
@@ -261,6 +288,7 @@ public class LocalModelMillerRegression implements LocalModel{
 		int i = 0;
 		while (regression.getN() < nParameters + 2) { 
 			
+			//context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition()+"" )));
 			regression.addObservation(firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition());
 			i++;
 		}
@@ -277,6 +305,8 @@ public class LocalModelMillerRegression implements LocalModel{
 	
 	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPoints) {
 		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"EXPERIMENTS WITH WEIGHT")));
+		
 		regression = new Regression(nParameters,true);
 
 		
@@ -288,10 +318,12 @@ public class LocalModelMillerRegression implements LocalModel{
 		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		//Pair<double[][], double[]> artificialSituations = getEquallyDistributedArtificialExperiments((int)(numberOfPointsForRegression - (numberOfPointsForRegression*weight)));
 		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"ARTIFICIAL" )));
 
 		int numberOfArtificialPoints = artificialSituations.getB().length;
 		for (int i =0;i<numberOfArtificialPoints;i++) {
 			
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+artificialSituations.getA()[i].toString(), artificialSituations.getB()[i]+"" )));
 			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);	
 		}
 		
@@ -303,9 +335,11 @@ public class LocalModelMillerRegression implements LocalModel{
 		else {
 			numberOfXPPoints = (int)(numberOfPointsForRegression*weight);
 		}
-
+		
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"XP")));
 		for (int i =0;i<numberOfXPPoints;i++) {
 			
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+newExperiment.getValuesAsArray(), newExperiment.getOracleProposition()+"" )));
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
 			
@@ -499,5 +533,9 @@ public class LocalModelMillerRegression implements LocalModel{
 	@Override
 	public TypeLocalModel getType() {
 		return TypeLocalModel.MILLER_REGRESSION;
+	}
+
+	@Override
+	public void setType(TypeLocalModel type) {
 	}
 }

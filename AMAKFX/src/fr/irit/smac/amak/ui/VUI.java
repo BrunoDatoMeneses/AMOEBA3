@@ -145,6 +145,8 @@ public class VUI {
 			MainWindow.addTabbedPanel("Default VUI", get("Default").getPanel());
 		return get("Default");
 	}
+	
+	
 
 	/**
 	 * Create or get a VUI.<br/>

@@ -5,10 +5,14 @@ import java.io.IOException;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
+import fr.irit.smac.amak.ui.VUIMulti;
+import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
+import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
+import javafx.stage.Stage;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
@@ -20,15 +24,27 @@ import kernel.backup.SaveHelperImpl;
  * @author Hugo
  *
  */
-public class AdvancedMain {
-
+public class AdvancedMain extends Application{
+	
+	
 	public static void main(String[] args) throws IOException {
-		// Instantiating the MainWindow before usage.
+		
+		// Application.launch(args) launches JavaFX process 
 		// It also allows you to change some of its behavior before creating an AMOEBA.
 		// If you use Configuration.commandLineMode = True , then you should skip it. 
-		AmoebaWindow.instance();
-		example();
+		Application.launch(args);
+
+
 	}
+	
+	@Override
+	public void start(Stage primaryStage) throws Exception, IOException {
+
+		example();
+		
+	}
+
+	
 
 	private static void example() throws IOException {
 
@@ -36,9 +52,14 @@ public class AdvancedMain {
 		Configuration.commandLineMode = false;
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
+		Configuration.multiUI = true;
 
+		
+		VUIMulti amoebaVUI = new VUIMulti("2D");
+		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		
 		// Create an AMOEBA
-		AMOEBA amoeba = new AMOEBA();
+		AMOEBA amoeba = new AMOEBA(amoebaUI, amoebaVUI);
 		// Create a studied system and add it to the amoeba.
 		// Adding a studied system to an amoeba allow you to control the learning speed (the simulation : how many cycles per second)
 		// with amoeba's scheduler, graphically or programmatically.
@@ -72,8 +93,9 @@ public class AdvancedMain {
 		amoeba.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
-		int nbCycle = 1000;
+		int nbCycle = 100;
 		for (int i = 0; i < nbCycle; ++i) {
+			System.out.println(i);
 			studiedSystem.playOneStep();
 			amoeba.learn(studiedSystem.getOutput());
 		}
@@ -115,8 +137,16 @@ public class AdvancedMain {
 				System.out.println("new Value "+newValue);
 			}
 		});
-		AmoebaWindow.addToolbar(slider);
+		amoebaUI.addToolbar(slider);
 
 		System.out.println("End main");
 	}
+	
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.exit(0);
+	}
+
+	
 }

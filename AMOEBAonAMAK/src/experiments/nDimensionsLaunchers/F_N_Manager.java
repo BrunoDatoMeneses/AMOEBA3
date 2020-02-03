@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
+import kernel.AMOEBA;
 import kernel.StudiedSystem;
 
 
@@ -40,6 +41,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	HashMap<String,Double> selfRequest;
 	boolean activeLearning = false;
+	boolean selfLearning = false;
 	
 	double noiseRange;
 	
@@ -49,7 +51,31 @@ public class F_N_Manager implements StudiedSystem{
 	double explorationIncrement;
 	double explorationMaxVariation;
 	
+	private Double activeRequestCounts = 0.0;
+	private Double selfRequestCounts = 0.0;
+	private Double randomRequestCounts = 0.0;
 	
+	public Double getActiveRequestCounts() {
+		return activeRequestCounts;
+	}
+
+
+
+
+	public Double getSelfRequestCounts() {
+		return selfRequestCounts;
+	}
+
+
+
+
+	public Double getRandomRequestCounts() {
+		return randomRequestCounts;
+	}
+
+
+
+
 	/* Parameters */
 	private static final double gaussianCoef = 1000;
 	private static final double gaussianVariance = 10;
@@ -95,6 +121,28 @@ public class F_N_Manager implements StudiedSystem{
 		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
 		
 		
+		//printModels(nbOfModels);
+		
+		
+		
+		randomExploration= rndExploration;
+		
+		explorationVector = new double[dimension];	
+		for(int i = 0 ; i < dimension ; i++) {
+			explorationVector[i] = Math.random() - 0.5;
+		}
+		double vectorNorm = normeP(explorationVector, 2);
+		for(int i = 0 ; i < dimension ; i++) {
+			explorationVector[i] /= vectorNorm;
+		}
+		
+		
+		explorationIncrement = explIncrement;
+		explorationMaxVariation = explnVariation;
+	}
+
+
+	private void printModels(int nbOfModels) {
 		System.out.println("ZONE 1 DISKS");
 		for(int nb = 0; nb<nbOfModels; nb++) {
 			System.out.print(modelCoefs[nb][dimension] + "\t");
@@ -121,23 +169,6 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		System.out.println("");
 		System.out.println("");
-		
-		
-		
-		randomExploration= rndExploration;
-		
-		explorationVector = new double[dimension];	
-		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] = Math.random() - 0.5;
-		}
-		double vectorNorm = normeP(explorationVector, 2);
-		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] /= vectorNorm;
-		}
-		
-		
-		explorationIncrement = explIncrement;
-		explorationMaxVariation = explnVariation;
 	}
 	
 	
@@ -145,7 +176,7 @@ public class F_N_Manager implements StudiedSystem{
 	 * @see kernel.StudiedSystem#playOneStep(double)
 	 */
 	@Override
-	public void playOneStep() {
+	public HashMap<String, Double> playOneStep() {
 		
 
 		if(!randomExploration) {
@@ -153,17 +184,19 @@ public class F_N_Manager implements StudiedSystem{
 			nonRandomExplorationStep();
 			
 		}
+		else if(selfLearning) {
+					
+			for(int i = 0 ; i < dimension ; i++) {
+				x[i] = selfRequest.get("px" + i);
+			}
+			selfRequestCounts++;
+		}
 		else if(activeLearning) {
-			
-			
-			
-			activeLearning = false;
-			
-			
 			
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
+			activeRequestCounts ++;
 		}
 
 		else {
@@ -172,9 +205,12 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
+			randomRequestCounts++;
 		}
 		
+		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
 		
+		return null;
 	}
 	
 	
@@ -277,6 +313,38 @@ public class F_N_Manager implements StudiedSystem{
 		
 		int subzone = subzone2D(xRequest);
 		
+		/* Multi */
+		//return multiModel(xRequest, subzone);
+		
+		
+		/* Disc */
+		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		/* Square */
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[0] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+		
+		/* Triangle */
+		//return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		/* Split */
+		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		
+		
+		
+		/* Cercle */
+//		double rho = Math.sqrt(x1*x1 + x0*x0);
+//		double start = 50.0;
+//		double width = 25.0;
+//		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
+		
+		
+		
+		
+		
+	}
+
+
+	private double multiModel(Double[] xRequest, int subzone) {
 		if(subzone == 1) {
 			/* Disques */
 			return modelN(xRequest) ;
@@ -294,33 +362,6 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		
 		return model1();
-		
-		
-		/* Disc */
-		//return (y*y + x*x < spaceSize*spaceSize ) ? 2*x + y : 5*x - 8*y;
-		
-		/* Square */
-		//return (x1 > -spaceSize && x1 < spaceSize && x0 < spaceSize && x0 > -spaceSize) ? model1(x0,x1) : model2(x0,x1) ;
-		//return model1();
-		
-		/* Triangle */
-		//return (y > x) ? 2*x + y : 5*x - 8*y;
-		
-		/* Split */
-		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
-		
-		
-		
-		/* Cercle */
-//		double rho = Math.sqrt(x1*x1 + x0*x0);
-//		double start = 50.0;
-//		double width = 25.0;
-//		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
-		
-		
-		
-		
-		
 	}
 	
 	
@@ -565,7 +606,18 @@ private double[] subZoneCenter3D(int nb) {
 			out.put("px" + i,x[i]);
 			
 		}
-		out.put("oracle",result);
+		if(selfLearning) {
+			selfLearning = false;
+			out.put("oracle",null);
+		}else {
+			out.put("oracle",result);
+		}
+		if(activeLearning) {
+			activeLearning=false;
+		}
+		//out.put("oracle",result);
+		//System.out.println("[GET OUTPUT] " +out);
+		
 		return out;
 	}
 	
@@ -690,14 +742,42 @@ private double[] subZoneCenter3D(int nb) {
 	}
 	
 	@Override
+	public void setSelfLearning(boolean value) {
+		selfLearning = value;
+	}
+	
+	@Override
 	public void setSelfRequest(HashMap<Percept, Double> request){
 		HashMap<String,Double> newRequest = new HashMap<String,Double>();
+		
+		//System.out.println("[SET SELF REQUEST] " +request);
 		
 		for(Percept pct : request.keySet()) {
 			newRequest.put(pct.getName(), request.get(pct));
 		}
 		
 		selfRequest = newRequest;
+	}
+
+
+	@Override
+	public HashMap<String, Double> playOneStepWithControlModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setControl(boolean value) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

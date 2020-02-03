@@ -1,9 +1,12 @@
 package kernel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import agents.context.Context;
 import agents.head.DynamicPerformance;
+import agents.percept.Percept;
 /**
  * A Plain Old Java Object for storing parameters for the Head. Keep it as simple as possible for ease of serialization.<br/>
  * Make sure that all member are : public, serializable, and with a default constructor (taking no parameters).
@@ -19,6 +22,7 @@ public class AmoebaData implements Serializable {
 	public int numberOfCriticityValuesForAverageforVizualisation = 300;
 
 	public Double prediction;
+	public HashMap<String, Double> higherNeighborLastPredictionPercepts = null;
 	public Double endogenousPredictionActivatedContextsOverlaps = 0.0;
 	public Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = 0.0;
 	public Double endogenousPredictionActivatedContextsOverlapsInfluenceWithoutConfidence = 0.0;
@@ -28,8 +32,8 @@ public class AmoebaData implements Serializable {
 	public Double endogenousPredictionNContexts = 0.0;
 	public Double endogenousPredictionNContextsByInfluence = 0.0;
 
-	public double oracleValue;
-	public double oldOracleValue;
+	public Double oracleValue;
+	public Double oldOracleValue;
 	public double criticity = 0.0;
 	public double distanceToRegression;
 	public double oldCriticity;
@@ -42,7 +46,11 @@ public class AmoebaData implements Serializable {
 	public boolean newContextWasCreated = false;
 	public boolean contextFromPropositionWasSelected = false;
 	
+	public boolean isActiveLearning;
+	public boolean isSelfLearning;
+	
 	public boolean activeLearning = false;
+	public boolean selfLearning = false;
 	
 	public HashMap<String, Double> selfRequest;
 
@@ -80,4 +88,6 @@ public class AmoebaData implements Serializable {
 	public double initRegressionPerformance = 1.0;
 	
 	public double averageRegressionPerformanceIndicator;
+	
+	
 }

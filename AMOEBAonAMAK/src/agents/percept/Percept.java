@@ -3,6 +3,7 @@ package agents.percept;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.function.Function;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
@@ -20,8 +21,6 @@ public class Percept extends AmoebaAgent {
 	protected ArrayList<Context> activatedContext = new ArrayList<>();
 
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
-	private HashSet<Context> validContextProjection = new HashSet<Context>();
-	private HashSet<Context> neighborContextProjection = new HashSet<Context>();
 
 	private double min = Double.POSITIVE_INFINITY;
 	private double max = Double.NEGATIVE_INFINITY;
@@ -81,38 +80,25 @@ public class Percept extends AmoebaAgent {
 		 * 
 		 */
 		
-		validContextProjection = new HashSet<Context>();
-		neighborContextProjection = new HashSet<Context>();
-		
 		// To avoid unnecessary tests, we only compute validity on context
 		// validated by percepts that have finished before us
-		HashSet<Context> contexts = amas.getValidContexts();
-		if(contexts == null) {
+		HashSet<Context> activatedContexts = amas.getValidContexts();
+		if(activatedContexts == null) {
 			// If we are one of the first percept to run, we compute validity on all contexts
-			contexts = new HashSet<>(amas.getContexts());
+			activatedContexts = new HashSet<>(amas.getContexts());
 		}
-		
-		for (Context c : contexts) {
-			if (activateContext(c)) {
-				validContextProjection.add(c);
-			}
-		} 
-		amas.updateValidContexts(validContextProjection);
+		activatedContexts.removeIf(c -> !activateContext(c));
+		amas.updateValidContexts(activatedContexts);
 		
 		HashSet<Context> neighborsContexts = amas.getNeighborContexts();
 		if(neighborsContexts == null) {
 			// If we are one of the first percept to run, we compute validity on all contexts
 			neighborsContexts = new HashSet<>(amas.getContexts());
 		}
+		neighborsContexts.removeIf(c -> !inNeighborhood(c));
+		amas.updateNeighborContexts(neighborsContexts);
 		
-		for (Context c : neighborsContexts) {
-			if(inNeighborhood(c)) {
-				neighborContextProjection.add(c);
-			}
-		} 
-		amas.updateNeighborContexts(neighborContextProjection);
-		
-		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), validContextProjection.toString());
+		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), activatedContexts.toString());
 	}
 	
 	/**
@@ -125,12 +111,22 @@ public class Percept extends AmoebaAgent {
 	}
 	
 	/**
-	 * Return true if the context is in the neighborhood of this percept.
+	 * Return true if the context is in the neighborhood of this percept's current value.
 	 * @param context
 	 * @return
 	 */
 	public boolean inNeighborhood(Context context) {
-		return contextProjections.get(context).inNeighborhood();
+		return contextProjections.get(context).inNeighborhood(this.value);
+	}
+	
+	/**
+	 * Return true if the context is in the neighborhood of this percept's at a value.
+	 * @param context
+	 * @param value
+	 * @return
+	 */
+	public boolean inNeighborhood(Context context, double value) {
+		return contextProjections.get(context).inNeighborhood(value);
 	}
 
 
@@ -396,7 +392,7 @@ public class Percept extends AmoebaAgent {
 	}
 	
 	public double getMappingErrorAllowedMin() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 0.4;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 0.25;
 	}
 	
 	public double getMappingErrorAllowedOverMapping() {
@@ -404,7 +400,7 @@ public class Percept extends AmoebaAgent {
 	}
 	
 	public double getMappingErrorAllowedMax() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 1.5;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 2.0;
 	}
 
 	// -----------------------

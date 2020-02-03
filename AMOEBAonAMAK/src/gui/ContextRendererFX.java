@@ -2,6 +2,7 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
+import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
@@ -40,9 +41,51 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	private void updateColor() {
-		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
-		drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+		//setColorWithPrediction();
+		setColorWithCoefs();
 	}
+	
+	private void setColorWithCoefs() {
+		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
+		if(context.isInNeighborhood) {
+			drawable.setColor(new Color(c[0], c[1], c[2], 255d / 255d));
+		}else {
+			drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+		}
+		
+	}
+	
+	private void setColorWithPrediction() {
+		
+		double r = 0.0;
+		double g = 0.0;
+		double b = 0.0;
+		
+		if(context.lastPrediction!=null) {
+			r = context.lastPrediction < 0 ? Math.abs(context.lastPrediction)/2 : 0.0;
+			g = context.lastPrediction > 0 ? context.lastPrediction/2	 : 0.0;
+			r = r > 1.0 ? 1.0 : r;
+			g = g > 1.0 ? 1.0 : g;
+		}else {
+			b = 1.0;
+		}
+		if(context.lastPrediction == -1.0) {
+			r = 1.0;
+			g = 0.0;
+			b = 1.0;
+		}
+		if(Math.abs(context.lastPrediction) > 10000) {
+			
+			r = 1.0;
+			g = 1.0;
+			b = 0.0;
+		}
+		
+		
+		drawable.setColor(new Color(r, g, b, 200d / 255d));
+	}
+	
+	
 	
 	public String getColorForUnity() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
@@ -64,8 +107,8 @@ public class ContextRendererFX extends RenderStrategy {
 	 * window.
 	 */
 	@Override
-	public void initialize() {
-		getDrawable().setName(context.toString()); // create the drawable if it does not exist
+	public void initialize(VUIMulti vui) {
+		getDrawable(vui).setName(context.toString()); // create the drawable if it does not exist
 
 	}
 
@@ -81,10 +124,10 @@ public class ContextRendererFX extends RenderStrategy {
 	 * 
 	 * @return
 	 */
-	public DrawableRectangle getDrawable() {
+	public DrawableRectangle getDrawable(VUIMulti vui) {
 		if (!context.isDying() && drawable == null) {
 			drawable = new DrawableContext(0, 0, 0, 0, context);
-			AmoebaWindow.instance().mainVUI.add(drawable);
+			vui.add(drawable);
 		}
 		return drawable;
 	}

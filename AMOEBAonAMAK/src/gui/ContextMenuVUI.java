@@ -6,6 +6,7 @@ import java.util.Optional;
 import agents.percept.Percept;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.VUI;
+import fr.irit.smac.amak.ui.VUIMulti;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -148,7 +149,7 @@ public class ContextMenuVUI extends ContextMenu {
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(amoeba.getPercepts().size() == 2) {
+				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
 					learnTwoDimension(amoeba, vui);
 				} else {
 					learnNDimebsion(amoeba, vui);

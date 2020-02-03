@@ -97,6 +97,10 @@ public class EndogenousRequest {
 		return requestType;
 	}
 	
+	public HashMap<Percept, Pair<Double, Double>> getBounds(){
+		return bounds;
+	}
+	
 	
 	
 }

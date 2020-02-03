@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.localModel.LocalModel;
-import agents.context.localModel.LocalModelMillerRegression;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
@@ -23,6 +22,8 @@ import fr.irit.smac.amak.Scheduling;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
+import fr.irit.smac.amak.ui.VUIMulti;
+import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
 import kernel.backup.IBackupSystem;
@@ -38,6 +39,9 @@ import utils.PrintOnce;
  */
 public class AMOEBA extends Amas<World> implements IAMOEBA {
 	// -- Attributes
+	
+	
+	public VUIMulti vuiMulti;
 	/**
 	 * Utility to save, autosave, and load amoebas.
 	 */
@@ -48,6 +52,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public StudiedSystem studiedSystem;
 	
+	public AmoebaMultiUIWindow multiUIWindow;
+	
 	private Head head;
 	private TypeLocalModel localModel = TypeLocalModel.MILLER_REGRESSION;
 	private HashMap<String, Double> perceptions = new HashMap<String, Double>();
@@ -56,6 +62,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	private boolean runAll = false;
 	private boolean creationOfNewContext = true;
 	private boolean renderUpdate;
+	private boolean reinforcementMode = false;
 	
 	private int cycleWithoutRender = 0;
 
@@ -82,8 +89,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @param studiedSystem
 	 *            the studied system
 	 */
-	public AMOEBA() {
-		super(new World(), Scheduling.HIDDEN);
+	public AMOEBA(AmoebaMultiUIWindow window, VUIMulti vui) {
+		super(window, vui, new World(), Scheduling.HIDDEN);
+		vuiMulti = vui;
 	}
 	
 	/**
@@ -91,11 +99,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * 
 	 * @param path path to the config file.
 	 */
-	public AMOEBA(String path, StudiedSystem studiedSystem) {
-		super(new World(), Scheduling.HIDDEN);
+	public AMOEBA(AmoebaMultiUIWindow window, VUIMulti vui, String path, StudiedSystem studiedSystem) {
+		super(window, vui, new World(), Scheduling.HIDDEN);
+		vuiMulti = vui;
 		this.studiedSystem = studiedSystem;
 		setRenderUpdate(true);
-		saver = new SaveHelperImpl(this);
+		saver = new SaveHelperImpl(this, window);
 		saver.load(path);
 	}
 
@@ -112,23 +121,22 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	@Override
 	protected void onRenderingInitialization() {
-		AmoebaWindow.instance().initialize(this);
+		((AmoebaMultiUIWindow) amasMultiUIWindow).initialize(this);
 	}
 
 	@Override
 	protected void onUpdateRender() {
 		// Update statistics
-		if(AmoebaWindow.isInstance()) {
-			AmoebaWindow window = AmoebaWindow.instance();
+		if(amasMultiUIWindow!=null) {
 
-			AmakPlot loopNCS = window.getPlot("This loop NCS");
-			AmakPlot allNCS = window.getPlot("All time NCS");
-			AmakPlot nbAgent = window.getPlot("Number of agents");
-			AmakPlot errors = window.getPlot("Errors");
-			AmakPlot distancesToModels = window.getPlot("Distances to models");
-			AmakPlot gloabalMappingCriticality = window.getPlot("Global Mapping Criticality");
-			AmakPlot timeExecution = window.getPlot("Time Execution");
-			AmakPlot criticalities = window.getPlot("Criticalities");
+			AmakPlot loopNCS = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("This loop NCS");
+			AmakPlot allNCS = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("All time NCS");
+			AmakPlot nbAgent = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Number of agents");
+			AmakPlot errors = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Errors");
+			AmakPlot distancesToModels = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Distances to models");
+			AmakPlot gloabalMappingCriticality = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Global Mapping Criticality");
+			AmakPlot timeExecution = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Time Execution");
+			AmakPlot criticalities = ((AmoebaMultiUIWindow)amasMultiUIWindow).getPlot("Criticalities");
 			
 			
 			boolean notify = isRenderUpdate();
@@ -174,7 +182,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		
 		if (isRenderUpdate()) {
-			AmoebaWindow.instance().mainVUI.updateCanvas();
+			((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
 			updateAgentsVisualisation();
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
@@ -183,7 +191,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	protected void onSystemCycleBegin() {
 		if (cycle % 1000 == 0) {
-			Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
+			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
 		
 		if(isRenderUpdate()) {
@@ -209,6 +217,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			perceptions = studiedSystem.getOutput();
 			
 			
+			if(perceptions.get("oracle")==null) {
+				data.useOracle = false;
+			}else {
+				data.useOracle = true;
+			}
+			
 		}
 		
 		environment.preCycleActions();
@@ -220,6 +234,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		toKillContexts.clear();
 		lastModifiedContext.clear();
 		alteredContexts.clear();
+		data.higherNeighborLastPredictionPercepts=null;
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -238,10 +253,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	protected void onSystemCycleEnd() {
 		
 		if(studiedSystem != null) {
-			if(head.isActiveLearning()) {
-				studiedSystem.setActiveLearning(true);
+			if(data.selfLearning) {
+				data.selfLearning = false;
+				studiedSystem.setSelfLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
 				 
+			}
+			else if(data.activeLearning) {
+				data.activeLearning = false;
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(head.getActiveRequest());
 			}
 		}
 		
@@ -394,56 +415,70 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return getAction();
 	}
 	
+	
+	public HashMap<String, Double> reinforcementRequest(HashMap<String, Double> perceptionsActionState) {
+		boolean usingOracle = isUseOracle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
+		setPerceptionsAndActionState(perceptionsActionState);
+		cycle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		studiedSystem = ss;
+		return getHigherNeighborLastPredictionPercepts();
+	}
+	
 	@Override
-	public HashMap<String, Double> maximize(HashMap<String, Double> known){
+	public HashMap<String, Double> maximize(HashMap<String, Double> fixedPercepts){
 		ArrayList<Percept> percepts = getPercepts();
-		ArrayList<Percept> unknown = new ArrayList<>(percepts);
-		unknown.removeIf(p ->known.containsKey(p.getName()));
+		ArrayList<Percept> freePercepts = new ArrayList<>(percepts);
+		freePercepts.removeIf(p ->fixedPercepts.containsKey(p.getName()));
 		//System.out.println("known : "+known.keySet());
 		//System.out.println("unknow : "+unknown);
-		if(unknown.isEmpty()) {
+		if(freePercepts.isEmpty()) {
 			return null;
 		}
 		
 		//get partially activated context
-		ArrayList<Context> pac = new ArrayList<>();
-		for(Context c : getContexts()) {
+		ArrayList<Context> partiallyActivatedCtxts = new ArrayList<>();
+		for(Context ctxt : getContexts()) {
 			boolean good = true;
-			for(String p : known.keySet()) {
-				if(!c.getRangeByPerceptName(p).contains2(known.get(p))) {
+			for(String pctString : fixedPercepts.keySet()) {
+				
+				if(!ctxt.getRangeByPerceptName(pctString).contains2(fixedPercepts.get(pctString))) {
 					good = false;
 					break;
 				}
 			}
-			if(good) pac.add(c);
+			if(good) partiallyActivatedCtxts.add(ctxt);
 		}
 		
-		ArrayList<HashMap<String, Double>> sol = new ArrayList<>();
-		for(Context c : pac) {
-			sol.add(c.getLocalModel().getMaxWithConstraint(known));
+		ArrayList<HashMap<String, Double>> posibleSolutions = new ArrayList<>();
+		for(Context ctxt : partiallyActivatedCtxts) {
+			posibleSolutions.add(ctxt.getLocalModel().getMaxWithConstraint(fixedPercepts));
 		}
-		HashMap<String, Double> max = new HashMap<>();
+		HashMap<String, Double> maxSolution = new HashMap<>();
 
 		Double maxValue = Double.NEGATIVE_INFINITY;
-		max.put("oracle", maxValue);
+		maxSolution.put("oracle", maxValue);
 		//find best solution
-		for(HashMap<String, Double> s : sol) {
+		for(HashMap<String, Double> s : posibleSolutions) {
 			if(s.get("oracle") > maxValue) {
 				maxValue = s.get("oracle");
-				max = s;
+				maxSolution = s;
 			}
 		}
-		return max;
+		return maxSolution;
 	}
 
+	public LocalModel buildLocalModel(Context context, TypeLocalModel type) {
+		return type.factory.buildLocalModel(context);
+	}
+	
 	public LocalModel buildLocalModel(Context context) {
-		switch (localModel) {
-		case MILLER_REGRESSION:
-			return new LocalModelMillerRegression(context);
-
-		default:
-			throw new IllegalArgumentException("Unknown model " + localModel + ".");
-		}
+		return buildLocalModel(context, localModel);
 	}
 
 	/**
@@ -454,7 +489,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public void allowGraphicalScheduler(boolean allow) {
 		if (!Configuration.commandLineMode) {
-			AmoebaWindow.instance().schedulerToolbar.setDisable(!allow);
+			((AmoebaMultiUIWindow)amasMultiUIWindow).schedulerToolbar.setDisable(!allow);
 		}
 	}
 
@@ -476,7 +511,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		super.addPendingAgents();
 		nextCycleRunAllAgents();
 		if(!Configuration.commandLineMode) {
-			AmoebaWindow.instance().dimensionSelector.update(getPercepts());
+			((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.update(getPercepts());
 			updateAgentsVisualisation();
 		}
 	}
@@ -495,6 +530,14 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setLocalModel(TypeLocalModel localModel) {
 		this.localModel = localModel;
 	}
+	
+	public void setReinforcement(boolean value) {
+		reinforcementMode = value;
+	}
+	
+	public boolean isReinforcement() {
+		return reinforcementMode;
+	}
 
 	/**
 	 * Activate or deactivate rendering of agents at runtime.
@@ -504,7 +547,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public void setRenderUpdate(boolean renderUpdate) {
 		if (!Configuration.commandLineMode) {
 			this.renderUpdate = renderUpdate;
-			AmoebaWindow.instance().toggleRender.setSelected(renderUpdate);
+			((AmoebaMultiUIWindow)amasMultiUIWindow).toggleRender.setSelected(renderUpdate);
 			if(renderUpdate == true)
 				nextCycleRunAllAgents();
 		}
@@ -526,6 +569,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	public double getAction() {
 		return head.getAction();
+	}
+	
+	
+	
+	public HashMap<String, Double> getHigherNeighborLastPredictionPercepts() {
+		return head.getHigherNeighborLastPredictionPercepts();
 	}
 
 	public ArrayList<Context> getContexts() {
@@ -595,13 +644,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
 		}
-		AmoebaWindow.instance().point.move(AmoebaWindow.instance().dimensionSelector.d1().getValue(), AmoebaWindow.instance().dimensionSelector.d2().getValue());
-		AmoebaWindow.instance().rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
-		AmoebaWindow.instance().rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()));
-		AmoebaWindow.instance().rectangle.move(AmoebaWindow.instance().dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d1()), AmoebaWindow.instance().dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, AmoebaWindow.instance().dimensionSelector.d2()));
-		AmoebaWindow.instance().mainVUI.updateCanvas();
-		AmoebaWindow.instance().point.toFront();
-		AmoebaWindow.instance().point.setInfo(getCursorInfo());
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue(), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue());
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.toFront();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.setInfo(getCursorInfo());
 	}
 	
 	/**
@@ -609,7 +658,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 * @return
 	 */
 	public DimensionSelector getDimensionSelector() {
-		return AmoebaWindow.instance().dimensionSelector;
+		return ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector;
 	}
 	
 	/**

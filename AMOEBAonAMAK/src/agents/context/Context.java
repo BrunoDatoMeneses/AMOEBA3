@@ -23,6 +23,10 @@ import ncs.NCS;
 import utils.Pair;
 import utils.TRACE_LEVEL;
 
+
+
+
+
 /**
  * The core agent of AMOEBA.
  * 
@@ -47,6 +51,8 @@ public class Context extends AmoebaAgent {
 	private double action;
 
 	private Double actionProposition = null;
+	public Double lastPrediction = null;
+	//public Double smoothedPrediction = null;
 
 	//private boolean valid;
 
@@ -62,6 +68,12 @@ public class Context extends AmoebaAgent {
 	public static final double  minError = 1;
 	public static final int successesBeforeDiminution = 5;
 	public static final int errorsBeforeAugmentation = 5;
+	
+	public boolean fusionned = false;
+	public boolean isInNeighborhood = false;
+	
+	static final int VOID_CYCLE_START = 0;
+	static final int OVERLAP_CYCLE_START = 0;
 	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
@@ -106,12 +118,47 @@ public class Context extends AmoebaAgent {
 		Experiment firstPoint = new Experiment(this);
 		ArrayList<Percept> var = getAmas().getPercepts();
 		for (Percept p : var) {
-			Range r;
+			Range r = null;
 
 			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(p);
+			//TODO use neihbors sizes to define radiuses for creation !!!!!!!!!!!
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
-			r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
+			
+					
+			
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && getAmas().data.isActiveLearning) {
+				
+				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
+					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
+						double startRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getA();
+						double endRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getB();
+						
+						getAmas().getEnvironment()
+						.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+						r = new Range(this, startRange, endRange, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
+					
+					}
+				}
+				if(r==null) {
+					double radiusCreation = getAmas().getHeadAgent().minNeighborhoodRadius;
+					//double radiusCreation = getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p);
+					//double radiusCreation = getAmas().getHeadAgent().minMeanNeighborhoodRaduises;
+					getAmas().getEnvironment()
+					.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+					r = new Range(this, p.getValue() - radiusCreation, p.getValue() + radiusCreation, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
+				
+				}
+				
+			
+			
+			}
+			if(r==null){
+				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
+			}
+			
 
 			// r = new Range(this, v.getValue() - radius, v.getValue() + radius, 0, true,
 			// true, v, world);
@@ -157,16 +204,13 @@ public class Context extends AmoebaAgent {
 		// expand();
 
 		this.confidence = fatherContext.confidence;
-		if (fatherContext.getLocalModel().getType() == TypeLocalModel.MILLER_REGRESSION) {
-
-			this.localModel = new LocalModelMillerRegression(this);
-			// this.formulaLocalModel = ((LocalModelMillerRegression)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			Double[] coef = ((LocalModelMillerRegression) fatherContext.localModel).getCoef();
-			((LocalModelMillerRegression) this.localModel).setCoef(coef);
-			this.actionProposition = ((LocalModelMillerRegression) fatherContext.localModel)
-					.getProposition();
-		}
+	
+		this.localModel = getAmas().buildLocalModel(this);
+		// this.formulaLocalModel = ((LocalModelMillerRegression)
+		// bestNearestContext.localModel).getFormula(bestNearestContext);
+		Double[] coef = fatherContext.localModel.getCoef();
+		this.localModel.setCoef(coef);
+		this.actionProposition = fatherContext.localModel.getProposition();
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -180,35 +224,63 @@ public class Context extends AmoebaAgent {
 
 		Experiment firstPoint = new Experiment(this);
 		ArrayList<Percept> var = getAmas().getPercepts();
-		for (Percept v : var) {
-			Range r;
+		for (Percept p : var) {
+			Range r = null;
 			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
-			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(v);
+			//TODO use neihbors sizes to define radiuses for creation !!!!!!!!!!!
+			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
-			r = new Range(this, v.getValue() - radiuses.getA(), v.getValue() + radiuses.getB(), 0, true, true, v);
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && getAmas().data.isActiveLearning) {
+				
+				
+				
+				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
+					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
+						double startRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getA();
+						double endRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getB();
+						//System.out.println(startRange + "  " + endRange);
+						getAmas().getEnvironment()
+						.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+						r = new Range(this, startRange, endRange, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
+					
+					}
+				}
+				if(r==null) {
+					double radiusCreation = getAmas().getHeadAgent().minNeighborhoodRadius;
+					//double radiusCreation = getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p);
+					//double radiusCreation = getAmas().getHeadAgent().minMeanNeighborhoodRaduises;
+					getAmas().getEnvironment()
+					.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+					r = new Range(this, p.getValue() - radiusCreation, p.getValue() + radiusCreation, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
+				
+				}
+				
+			}
+			if(r==null) {
+				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
+				getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
+			}
 
-			ranges.put(v, r);
-			ranges.get(v).setValue(v.getValue());
 
-			firstPoint.addDimension(v, v.getValue());
+			ranges.put(p, r);
+			ranges.get(p).setValue(p.getValue());
 
-			v.addContextProjection(this);;
+			firstPoint.addDimension(p, p.getValue());
+
+			p.addContextProjection(this);;
 		}
 
 		//expand();
 
-		this.confidence = bestNearestContext.confidence;
-		if (bestNearestContext.getLocalModel().getType() == TypeLocalModel.MILLER_REGRESSION) {
-
-			this.localModel = new LocalModelMillerRegression(this);
-			// this.formulaLocalModel = ((LocalModelMillerRegression)
-			// bestNearestContext.localModel).getFormula(bestNearestContext);
-			Double[] coef = ((LocalModelMillerRegression) bestNearestContext.localModel).getCoef();
-			((LocalModelMillerRegression) this.localModel).setCoef(coef);
-			this.actionProposition = ((LocalModelMillerRegression) bestNearestContext.localModel)
-					.getProposition();
-		}
+		//this.confidence = bestNearestContext.confidence;
+		this.localModel = getAmas().buildLocalModel(this);
+		// this.formulaLocalModel = ((LocalModelMillerRegression)
+		// bestNearestContext.localModel).getFormula(bestNearestContext);
+		Double[] coef = bestNearestContext.localModel.getCoef();
+		this.localModel.setCoef(coef);
+		this.actionProposition = bestNearestContext.localModel.getProposition();
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
@@ -565,7 +637,7 @@ public class Context extends AmoebaAgent {
 		for (Percept pct : getAmas().getPercepts()) {
 			currentDistance = this.distance(ctxt, pct);
 			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>500) {
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>OVERLAP_CYCLE_START) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
 				overlapCounts+=1;
 				overlapDistances.put(pct, Math.abs(currentDistance));
@@ -575,7 +647,7 @@ public class Context extends AmoebaAgent {
 			}
 			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>1000) {
+			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
 				voidDistances.put(pct, currentDistance);
 				bounds.put(pct, this.voidBounds(ctxt, pct));
@@ -587,7 +659,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > 500) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -613,11 +685,14 @@ public class Context extends AmoebaAgent {
 				
 			}		
 		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > 750) {
+		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > VOID_CYCLE_START) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
+			updateBoundsWithNeighborhood(bounds);
+			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
+			
 			if(request != null) {
 				
 				if(getAmas().getHeadAgent().isRealVoid(request)) {
@@ -631,6 +706,30 @@ public class Context extends AmoebaAgent {
 	
 		return null;	
 	}
+	
+	private void updateBoundsWithNeighborhood(HashMap<Percept, Pair<Double, Double>> voidBounds) {
+
+		
+		
+		for (HashMap.Entry<Percept,  Pair<Double, Double>> entry : voidBounds.entrySet()) {
+			
+			double neighborhoodRadius = entry.getKey().getRadiusContextForCreation()*2;
+			
+			if(entry.getValue().getA()<entry.getKey().getValue()-neighborhoodRadius) {
+				entry.getValue().setA(entry.getKey().getValue()-neighborhoodRadius);
+			}
+			if(entry.getKey().getValue()+neighborhoodRadius < entry.getValue().getB()) {
+				entry.getValue().setB(entry.getKey().getValue()+neighborhoodRadius);
+			}
+			
+		    
+		    
+		}
+		
+
+		
+	}
+	
 
 	public double distanceAsVolume(Context ctxt) {
 		double totalDistanceAsVolume = 1.0;
@@ -769,11 +868,12 @@ public class Context extends AmoebaAgent {
 			this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
 		}
 		
-		this.setConfidence(Math.max(this.getConfidence(), fusionContext.getConfidence()));
+		this.setConfidence(2*Math.max(this.getConfidence(), fusionContext.getConfidence()));
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
 		fusionContext.destroy();
+		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
@@ -783,7 +883,8 @@ public class Context extends AmoebaAgent {
 			request.put(pct, getRandomValueInRange(pct));
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
-		getAmas().getHeadAgent().addSelfRequest(request, 10,this);
+		getAmas().getHeadAgent().addChildRequest(request, 10,this);
+		
 	}
 	
 	private Double getRandomValueInRange(Percept pct) {
@@ -797,6 +898,17 @@ public class Context extends AmoebaAgent {
 			exp.addDimension(pct, pct.getValue());
 		}
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
+
+		return exp;
+	}
+	
+	public Experiment getArtificialExperiment() {
+		ArrayList<Percept> percepts = getAmas().getPercepts();
+		Experiment exp = new Experiment(this);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, this.getRanges().get(pct).getCenter());
+		}
+		
 
 		return exp;
 	}
@@ -861,7 +973,7 @@ public class Context extends AmoebaAgent {
 //			ranges.get(p).adapt(p.getValue()); 
 //		}
 
-		ranges.get(p).adapt(p.getValue());
+		ranges.get(p).adapt(p.getValue(), false, null);
 
 //		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
 //			if(testIfOtherContextShouldFinalyShrink(perceptForAdapatationAndOverlapingContext.getB(), perceptForAdapatationAndOverlapingContext.getA())){
@@ -903,6 +1015,34 @@ public class Context extends AmoebaAgent {
 				ranges.get(p).endogenousAdaptStartUsingAVT();
 			}
 		}
+	}
+	
+	
+	private Percept getPerceptWithLesserImpactOnContext(ArrayList<Percept> percepts) {
+		
+		Percept perceptForAdapation = null;
+		double minDistanceToFrontier = Double.MAX_VALUE;
+		double distanceToFrontier;
+		
+		for (Percept pct : percepts) {
+			if (!ranges.get(pct).isPerceptEnum()) {
+
+				distanceToFrontier = Math.min(ranges.get(pct).startDistance(pct.getValue()),
+						ranges.get(pct).endDistance(pct.getValue()));
+				
+				for(Percept otherPct : percepts) {
+					if(otherPct != pct) {
+						distanceToFrontier*= this.getRanges().get(otherPct).getLenght();
+					}
+				}
+
+				if (distanceToFrontier < minDistanceToFrontier) {
+					minDistanceToFrontier = distanceToFrontier;
+					perceptForAdapation = pct;
+				}
+			}
+		}
+		return perceptForAdapation;
 	}
 
 	private Percept getPerceptWithBiggerImpactOnOverlap(ArrayList<Percept> percepts, Context bestContext) {
@@ -961,7 +1101,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(ArrayList<Percept> percepts) {
-		Percept perceptForAdapation = null;
+		Percept perceptForBigerImpactOnOverlap = null;
+		Percept perceptWithLesserImpactOnContext = null;
 		Context overlapingContext = null;
 		double minDistanceToFrontier = Double.MAX_VALUE;
 		double distanceToFrontier;
@@ -977,29 +1118,34 @@ public class Context extends AmoebaAgent {
 					} else {
 						overlappingVolume = this.getOverlappingVolume(ctxt);
 						if (overlappingVolume > maxOverlappingVolume) {
-							perceptForAdapation = getPerceptWithBiggerImpactOnOverlap(percepts, ctxt);
+							
 							overlapingContext = ctxt;
 						}
 					}
 				}
 			}
-		}
-		if (perceptForAdapation == null) {
-			for (Percept pct : percepts) {
-				if (!ranges.get(pct).isPerceptEnum()) {
-
-					distanceToFrontier = Math.min(ranges.get(pct).startDistance(pct.getValue()),
-							ranges.get(pct).endDistance(pct.getValue()));
-
-					if (distanceToFrontier < minDistanceToFrontier) {
-						minDistanceToFrontier = distanceToFrontier;
-						perceptForAdapation = pct;
-					}
-				}
+			
+			if(overlapingContext != null) {
+				perceptForBigerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(percepts, overlapingContext);
+				
 			}
+			
 		}
+		
+		perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(percepts);
+		if(perceptForBigerImpactOnOverlap != null) {
+			
+			if(perceptForBigerImpactOnOverlap == perceptWithLesserImpactOnContext) {
+				return new Pair<Percept, Context>(perceptForBigerImpactOnOverlap, overlapingContext);
+			}
+			
+		}
+		
+		return new Pair<Percept, Context>(perceptWithLesserImpactOnContext, overlapingContext);
+		
+		
 
-		return new Pair<Percept, Context>(perceptForAdapation, overlapingContext);
+		
 	}
 
 	public boolean containedBy(Context ctxt) {
@@ -1185,14 +1331,14 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void growRanges() {
-
+		
 		ArrayList<Percept> allPercepts = getAmas().getPercepts();
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
-	
-			if (!contain) {
+			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), "CONTAINED", ""+contain)));
+			if (!contain && !fusionned) {
 				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
-					ranges.get(pct).adapt(pct.getValue());
+					ranges.get(pct).adapt(pct.getValue(), false, null);
 				}
 				
 				//ranges.get(pct).extend(pct.getValue(), pct);
@@ -1210,14 +1356,21 @@ public class Context extends AmoebaAgent {
 	public void shrinkRangesToJoinBorders(Context bestContext) {
 		Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
 				bestContext);
+		
+		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(getAmas().getPercepts());
 
 
 		if (perceptWithBiggerImpactOnOverlap == null) {
 			this.destroy();
 		} else {
 
+				if(perceptWithBiggerImpactOnOverlap == perceptWithLesserImpactOnContext) {
+					ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue(), true, bestContext);
+				}else {
+					ranges.get(perceptWithLesserImpactOnContext).adapt(perceptWithLesserImpactOnContext.getValue(), true, bestContext);
+				}
 
-			ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue());
+			
 
 		}
 	}
@@ -1418,12 +1571,23 @@ public class Context extends AmoebaAgent {
 	public String toStringFull() {
 		String s = "";
 		s += "Context : " + getName() + "\n";
-		s += "creation tick : " + tickCreation +"\n";
+		s += "Creation tick : " + tickCreation +"\n";
+		s += "Confidence : " + confidence + "\n";
 		s += "\n";
 
-		s += "Model : ";
+		s += "Model "+this.localModel.getType()+" :";
 		s += this.localModel.getCoefsFormula() + "\n";
-
+		s += "Last Predicition " + lastPrediction  +"\n";
+		//s += "Smoothed Predicition " + smoothedPrediction  +"\n";
+		
+		s += "\n";
+		s += "Ranges :\n";
+		for(Percept p : getRanges().keySet()) {
+			s += p + " : " + getRangeByPercept(p)+"\n"; 
+			s += p + " : " + getRangeByPercept(p).getStartIncrement()+"\n"; 
+			s += p + " : " + getRangeByPercept(p).getEndIncrement()+"\n"; 
+			
+		}
 		s += "\n";
 		
 		s += "Last Distance to Regression " + lastDistanceToModel + "\n";
@@ -1447,7 +1611,7 @@ public class Context extends AmoebaAgent {
 			s += "Action proposed : " + this.getActionProposal() + "\n";
 		}
 
-		s += "Confidence : " + confidence + "\n";
+		
 
 		s += "\n";
 
@@ -1507,6 +1671,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	public double getActionProposal() {
+		
+		
 		return localModel.getProposition();
 	}
 
