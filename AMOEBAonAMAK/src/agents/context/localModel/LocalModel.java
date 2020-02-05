@@ -181,4 +181,6 @@ public abstract class LocalModel {
 	public LocalModel getModified() {
 		return modified;
 	}
+
+	public abstract double getModelDifference(LocalModel otherModel);
 }

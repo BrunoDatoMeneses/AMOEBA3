@@ -201,4 +201,9 @@ public class LocalModelCoopModifier extends LocalModel {
 		this.type = type;
 	}
 
+	@Override
+	public double getModelDifference(LocalModel otherModel) {
+		return 0;
+	}
+
 }

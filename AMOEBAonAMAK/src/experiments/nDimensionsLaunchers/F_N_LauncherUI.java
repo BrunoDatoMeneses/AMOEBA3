@@ -17,9 +17,11 @@ import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
+import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
+import utils.TRACE_LEVEL;
 
 
 /**
@@ -38,15 +40,21 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 	public static final boolean randomExploration = true;
 	public static final boolean limitedToSpaceZone = true;
 	//public static final double mappingErrorAllowed = 0.07; // BIG SQUARE
-	public static double mappingErrorAllowed = 0.05; // MULTI
+	public static double mappingErrorAllowed = 0.02; // MULTI
 	public static final double explorationIncrement = 1.0	;
 	public static final double explorationWidht = 0.5	;
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-	
 
-	
+	public static final boolean setConflictDetection = true ;
+	public static final boolean setConcurrenceDetection = true ;
+	public static final boolean setVoidDetection = true ;
+
+	public static final boolean setConflictResolution = true ;
+	public static final boolean setConcurrenceResolution = true ;
+
+
 	public static void main(String[] args) throws IOException {
 		
 		
@@ -79,12 +87,18 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 		
 		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(true);		
+		amoeba.setRenderUpdate(false);
 		amoeba.data.learningSpeed = learningSpeed;
 		amoeba.data.numberOfPointsForRegression = regressionPoints;
 		amoeba.data.isActiveLearning = setActiveLearning;
 		amoeba.data.isSelfLearning = setSelfLearning;
+		amoeba.data.isConflictDetection = setConflictDetection;
+		amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
+		amoeba.data.isVoidDetection = setVoidDetection;
+		amoeba.data.isConflictResolution = setConflictResolution;
+		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+		World.minLevel = TRACE_LEVEL.ERROR;
 		
 		//for (int i = 0; i < nbCycle; ++i) {
 		//	amoeba.cycle();

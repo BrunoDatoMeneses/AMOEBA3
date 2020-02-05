@@ -88,6 +88,11 @@ public class AmoebaData implements Serializable {
 	public double initRegressionPerformance = 1.0;
 	
 	public double averageRegressionPerformanceIndicator;
-	
-	
+
+	public boolean isConflictResolution = false;
+	public boolean isConcurrenceResolution = false;
+
+	public boolean isVoidDetection = false;
+	public boolean isConflictDetection = false;
+	public boolean isConcurrenceDetection = false;
 }

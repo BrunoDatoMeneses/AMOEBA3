@@ -209,6 +209,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		return result;
 			
 	}
+
 	
 	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
@@ -537,5 +538,16 @@ public class LocalModelMillerRegression extends LocalModel{
 
 	@Override
 	public void setType(TypeLocalModel type) {
+	}
+
+	@Override
+	public double getModelDifference(LocalModel otherModel) {
+		double difference = 0;
+
+		for(int i=0;i<coefs.length;i++){
+			difference += Math.abs(coefs[i] - otherModel.getCoef()[i]);
+		}
+
+		return difference;
 	}
 }

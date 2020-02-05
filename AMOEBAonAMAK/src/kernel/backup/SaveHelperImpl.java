@@ -199,6 +199,16 @@ public class SaveHelperImpl implements ISaveHelper{
 	}
 
 	@Override
+	public void newManualSave(String name, String path) {
+		String c = (name == null || "".equals(name)) ? "" : ("_" + name);
+		c.replace('/', '-');
+		c.replace('\\', '-');
+		Path p = Paths.get(path, amoeba.getCycle() + c + "." + backupSystem.getExtension());
+		backupSystem.setLoadPresetContext(true);
+		backupSystem.save(p.toFile());
+	}
+
+	@Override
 	public void autosave() {
 		if (autoSave) {
 			Path p = Paths.get(dirAuto.toString(), amoeba.getCycle() + "." + backupSystem.getExtension());

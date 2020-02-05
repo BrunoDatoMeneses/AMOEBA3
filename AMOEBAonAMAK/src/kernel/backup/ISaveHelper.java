@@ -43,6 +43,8 @@ public interface ISaveHelper {
 	 */
 	public void newManualSave(String name);
 
+	public void newManualSave(String name, String path);
+
 	/**
 	 * Add a new save in {@link SaveHelperImpl#dirAuto}.
 	 */

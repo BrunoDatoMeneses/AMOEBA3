@@ -46,7 +46,8 @@ public class Head extends AmoebaAgent {
 	public HashMap<Percept, Double> meanNeighborhoodRaduises;
 	public HashMap<Percept, Double> meanNeighborhoodStartIncrements;
 	public HashMap<Percept, Double> meanNeighborhoodEndIncrements;
-	
+
+	public HashMap<Percept, Double> minNeighborhoodRaduises;
 	public Double minMeanNeighborhoodRaduises = null;
 	public Double minMeanNeighborhoodStartIncrements = null;
 	public Double minMeanNeighborhoodEndIncrements = null;
@@ -101,7 +102,8 @@ public class Head extends AmoebaAgent {
 		
 		
 		meanNeighborhoodVolume = null;
-		meanNeighborhoodRaduises = null; 
+		meanNeighborhoodRaduises = null;
+		minNeighborhoodRaduises = null;
 		meanNeighborhoodEndIncrements = null; 
 		meanNeighborhoodStartIncrements = null; 
 		
@@ -154,13 +156,15 @@ public class Head extends AmoebaAgent {
 			
 			getAmas().getEnvironment()
 			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", ""+activatedNeighborsContexts)));
-			
-			
+
+
 			
 			for (Context ctxt : activatedNeighborsContexts) {
 				
 				ctxt.isInNeighborhood = true;
 				neighborhoodVolumesSum += ctxt.getVolume();
+
+
 				
 				for (Percept pct : ctxt.getRanges().keySet()) {
 					Double oldRadiusSum = neighborhoodRangesSums.get(pct);
@@ -195,6 +199,7 @@ public class Head extends AmoebaAgent {
 		meanNeighborhoodRaduises = new HashMap<Percept, Double>();
 		meanNeighborhoodStartIncrements = new HashMap<Percept, Double>();
 		meanNeighborhoodEndIncrements = new HashMap<Percept, Double>();
+		minNeighborhoodRaduises = new HashMap<>();
 		
 		
 		for (Percept pct : getAmas().getPercepts()) {
@@ -386,24 +391,21 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
-
 		selfAnalysationOfContexts4();
-
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
 
 		getAmas().data.executionTimes[3]=System.currentTimeMillis();
-		NCSDetection_IncompetentHead(); /*
-		 * If there isn't any proposition or only bad propositions, the head is
-		 * incompetent. It needs help from a context.
-		 */
+		NCSDetection_IncompetentHead();
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
 		
 
 		getAmas().data.executionTimes[4]=System.currentTimeMillis();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 3", "" + (bestContext != null))));
-		NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
+		if(getAmas().data.isConcurrenceResolution){
+			NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
+		}
 		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
 
 		getAmas().data.executionTimes[5]=System.currentTimeMillis();
@@ -528,6 +530,25 @@ public class Head extends AmoebaAgent {
 		
 	}
 
+	public HashMap<String, Double> getMappingScores(){
+
+		Pair<Double,Double> volumeOfOverlaps = getVolumeOfAllOverlaps();
+		double minMaxVolume = getMinMaxVolume();
+		double volumeOfAllContexts = getVolumeOfAllContexts()  - volumeOfOverlaps.getA() - volumeOfOverlaps.getB();
+		double voidVolume = minMaxVolume - volumeOfAllContexts;
+		double allVolumes = voidVolume + volumeOfAllContexts ;
+
+		System.out.println("\nMINMAX VOL \t" + minMaxVolume + " \tNORM \t1.0"  );
+		System.out.println("CTXT VOL \t" + volumeOfAllContexts + " \tNORM \t"  + volumeOfAllContexts/minMaxVolume);
+		System.out.println("CONF VOL \t" + volumeOfOverlaps.getA() + " \tNORM \t"  + volumeOfOverlaps.getA()/minMaxVolume);
+		System.out.println("CONC VOL \t" + volumeOfOverlaps.getB() + " \tNORM \t"  + volumeOfOverlaps.getB()/minMaxVolume);
+		System.out.println("VOIDS VOL \t" + voidVolume + " \tNORM \t"  + voidVolume/minMaxVolume);
+		System.out.println("TEST VOL \t" + allVolumes +  " \tNORM \t"  + allVolumes/minMaxVolume);
+
+
+		return null;
+	}
+
 	public double getMinMaxVolume() {
 		double minMaxVolume = 1;
 		for (Percept pct : getAmas().getPercepts()) {
@@ -542,6 +563,32 @@ public class Head extends AmoebaAgent {
 			allContextsVolume += ctxt.getVolume();
 		}
 		return allContextsVolume;
+	}
+
+	public Pair<Double, Double> getVolumeOfAllOverlaps() {
+		double allConflictsVolume = 0;
+		double allConcurrencesVolume = 0;
+		int i = 1;
+		for (Context ctxt : getAmas().getContexts()) {
+			for (Context otherCtxt : getAmas().getContexts().subList(i, getAmas().getContexts().size())) {
+				if(otherCtxt != ctxt){
+
+
+
+					if(ctxt.getLocalModel().getModelDifference(otherCtxt.getLocalModel())<0.1){
+						allConcurrencesVolume += ctxt.getOverlappingVolume(otherCtxt);
+					}
+					else{
+						allConflictsVolume += ctxt.getOverlappingVolume(otherCtxt);
+					}
+
+				}
+			}
+			i++;
+
+		}
+
+		return new Pair<Double,Double>(allConflictsVolume, allConcurrencesVolume);
 	}
 
 	public double getSpatialCriticality() {

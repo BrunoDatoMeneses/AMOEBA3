@@ -659,7 +659,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START ) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
 			
@@ -674,10 +674,10 @@ public class Context extends AmoebaAgent {
 					
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
 				
-				if(distanceDifference<averageDistanceToOraclePrediction) {
+				if(distanceDifference<=averageDistanceToOraclePrediction && getAmas().data.isConcurrenceDetection) {
 					return new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE);
 				}
-				else {
+				else if(distanceDifference > averageDistanceToOraclePrediction &&  getAmas().data.isConflictDetection){
 					return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT);
 				}
 				
@@ -695,7 +695,7 @@ public class Context extends AmoebaAgent {
 			
 			if(request != null) {
 				
-				if(getAmas().getHeadAgent().isRealVoid(request)) {
+				if(getAmas().getHeadAgent().isRealVoid(request) && getAmas().data.isVoidDetection) {
 					return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
 				}		
 			}
@@ -706,7 +706,8 @@ public class Context extends AmoebaAgent {
 	
 		return null;	
 	}
-	
+
+	//TODO
 	private void updateBoundsWithNeighborhood(HashMap<Percept, Pair<Double, Double>> voidBounds) {
 
 		
@@ -730,7 +731,7 @@ public class Context extends AmoebaAgent {
 		
 	}
 
-
+	//TODO
 	private ArrayList<VOID> getVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds) {
 
 		ArrayList<VOID> voidsTorReturn = new ArrayList<VOID>();
@@ -744,17 +745,20 @@ public class Context extends AmoebaAgent {
 
 
 			for (Percept otherPCt : zoneBounds.keySet()) {
-				if (pct != otherPCt):
+				if (pct != otherPCt){
+
+				}
 
 			}
 
 		}
 
 
-
+		return voidsTorReturn;
 	}
 
-	public HashMap<String,Pair<Double,Double>> get1DVoidsAndFilled(Percept pct, HashMap<Percept, Pair<Double, Double>> zoneBounds){
+	//TODO
+	public HashMap<String,ArrayList<Pair<Double,Double>>> get1DVoidsAndFilled(Percept pct, HashMap<Percept, Pair<Double, Double>> zoneBounds){
 		HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = new HashMap<>();
 		voidsAndFilleds.put("1D_Voids", new ArrayList<>());
 		voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
@@ -772,10 +776,10 @@ public class Context extends AmoebaAgent {
 				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
 				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
 			}
-			else if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB() && ){
+			/*else if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB() && ){
 				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
 				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
-			}
+			}*/
 		}
 
 		return voidsAndFilleds;
@@ -1004,56 +1008,25 @@ public class Context extends AmoebaAgent {
 
 		Pair<Percept, Context> perceptForAdapatationAndOverlapingContext = getPerceptForAdaptationWithOverlapingContext(
 				percepts);
+
 		Percept p = perceptForAdapatationAndOverlapingContext.getA();
+		Context overlapingContext = perceptForAdapatationAndOverlapingContext.getB();
 
-//		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
-//			world.trace(new ArrayList<String>(Arrays.asList(this.getName(),p.getName(),perceptForAdapatationAndOverlapingContext.getB().getName(), "*********************************************************************************************************** CONFLICT OVERLAP")));
-//			Range overlapingRange = perceptForAdapatationAndOverlapingContext.getB().getRanges().get(p);
-//			
-//			
-//			if (Math.abs(overlapingRange.getStart() - this.getRanges().get(p).getEnd()) >= Math.abs(overlapingRange.getEnd() - this.getRanges().get(p).getStart())) {
-//						
-//				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getEnd());
-//			} else {
-//				this.getRanges().get(p).adaptOnOverlap(overlapingRange, overlapingRange.getStart());
-//			}
-//			
-//			//ranges.get(p).adapt(p.getValue(), Math.abs(this.distance(overlapingContext, p))); 
-//			
-//		}else {
-//			ranges.get(p).adapt(p.getValue()); 
-//		}
+		if(getAmas().data.isConflictResolution){
+			if(overlapingContext != null){
+				ranges.get(p).adapt(p.getValue(), true, overlapingContext);
+			}else{
+				ranges.get(p).adapt(p.getValue(), false, null);
+			}
+		}else{
+			ranges.get(p).adapt(p.getValue(), false, null);
+		}
 
-		ranges.get(p).adapt(p.getValue(), false, null);
 
-//		if(perceptForAdapatationAndOverlapingContext.getB()!=null) {
-//			if(testIfOtherContextShouldFinalyShrink(perceptForAdapatationAndOverlapingContext.getB(), perceptForAdapatationAndOverlapingContext.getA())){
-//				perceptForAdapatationAndOverlapingContext.getB().getRanges().get(p).adapt(p.getValue());
-//			}
-//		}
 
-//		if (head.isContextFromPropositionWasSelected() && head.getCriticity() <= head.getErrorAllowed()){
-//			
-//			//System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//			
-//				p = this.getPerceptWithLesserImpactOnVolumeNotIncludedIn2(percepts, head.getBestContext());
-//
-//			if (p == null) {
-//				this.die();
-//			}else {	
-//				ranges.get(p).adaptTowardsBorder(head.getBestContext());
-//			}
-//		} else {
-//			p = this.getPerceptWithLesserImpactOnVolume2(percepts);
-//			ranges.get(p).adapt(p.getValue()); 
-//		}
 
-//		for (Percept v : ranges.keySet()) {
-//			if (ranges.get(v).isTooSmall()){
-//				solveNCS_Uselessness();
-//				break;
-//			}
-//		}
+
+
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 

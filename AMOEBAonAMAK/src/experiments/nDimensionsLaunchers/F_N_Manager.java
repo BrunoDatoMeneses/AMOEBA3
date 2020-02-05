@@ -314,17 +314,20 @@ public class F_N_Manager implements StudiedSystem{
 		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
-		//return multiModel(xRequest, subzone);
+		return multiModel(xRequest, subzone);
 		
 		
 		/* Disc */
-		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+//		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Square */
-		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[0] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+
+		/* Square artcile JFSMA 2020*/
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
-		//return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+//		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Split */
 		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
@@ -582,6 +585,22 @@ private double[] subZoneCenter3D(int nb) {
 		result += x1*modelCoefs1[1];
 		result += modelCoefs1[dimension];
 		return result;		
+	}
+
+	public double model1JFSMA2020(double x0, double x1) {
+		double result = 0.0;
+		result += x0*0;
+		result += x1*150;
+		result += 0;
+		return result;
+	}
+
+	public double model2JFSMA2020(double x0, double x1) {
+		double result = 0.0;
+		result += x0*150;
+		result += x1*0;
+		result += 0;
+		return result;
 	}
 	
 	public double model2(double x0, double x1) {

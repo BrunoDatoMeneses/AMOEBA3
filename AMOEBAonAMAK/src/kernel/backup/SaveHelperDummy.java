@@ -35,6 +35,11 @@ public class SaveHelperDummy implements ISaveHelper {
 	}
 
 	@Override
+	public void newManualSave(String name, String path) {
+
+	}
+
+	@Override
 	public void autosave() {
 	}
 
