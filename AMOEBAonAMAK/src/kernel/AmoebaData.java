@@ -95,4 +95,5 @@ public class AmoebaData implements Serializable {
 	public boolean isVoidDetection = false;
 	public boolean isConflictDetection = false;
 	public boolean isConcurrenceDetection = false;
+	public boolean isVoidDetection2 = false;
 }

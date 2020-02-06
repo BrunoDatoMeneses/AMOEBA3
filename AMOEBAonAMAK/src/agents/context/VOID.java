@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class VOID {
 
-    HashMap<Percept, Pair<Double, Double>> bounds;
+    public HashMap<Percept, Pair<Double, Double>> bounds;
 
 
     public VOID( HashMap<Percept, Pair<Double, Double>> zoneBounds){

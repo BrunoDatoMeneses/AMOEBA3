@@ -1,19 +1,12 @@
 package agents.head;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.CustomComparator;
 import agents.context.Experiment;
+import agents.context.VOID;
 import agents.percept.Percept;
 import kernel.AMOEBA;
 import kernel.AmoebaData;
@@ -57,6 +50,9 @@ public class Head extends AmoebaAgent {
 	public Double minNeighborhoodEndIncrement = null;
 	
 	public EndogenousRequest lastEndogenousRequest = null;
+
+	static final int NEIGH_VOID_CYCLE_START = 0;
+
 
 	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
@@ -423,7 +419,10 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 		
 		getAmas().data.executionTimes[12]=System.currentTimeMillis();
-		NCSDetection_PotentialRequest();
+		if(getAmas().getCycle()>0){
+			NCSDetection_PotentialRequest();
+		}
+
 		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 		
 		
@@ -1286,6 +1285,42 @@ public class Head extends AmoebaAgent {
 					i++;
 				}
 			}
+
+
+			if(getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.isVoidDetection2){
+				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
+				for(Percept pct : getAmas().getPercepts()){
+					neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
+				}
+				ArrayList<VOID> detectedVoids = getVoidsFromContextsAndZone(neighborhoodBounds, activatedNeighborsContexts);
+
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DETECTED VOIDS", ""+detectedVoids.size())));
+
+				for(VOID detectedVoid : detectedVoids){
+
+					HashMap<Percept, Double> request = new HashMap<>();
+					boolean isInMinMax = true;
+					boolean isNotTooSmall = true;
+					for(Percept pct : getAmas().getPercepts()){
+						double value = (detectedVoid.bounds.get(pct).getB() + detectedVoid.bounds.get(pct).getA())/2;
+						double range = detectedVoid.bounds.get(pct).getB() - detectedVoid.bounds.get(pct).getA();
+						request.put(pct, value);
+						isInMinMax = isInMinMax && pct.isInMinMax(value);
+						isNotTooSmall = isNotTooSmall && !pct.isTooSmall(range);
+
+						if(pct.isTooBig(range)){
+							detectedVoid.bounds.get(pct).setA(value - pct.getRadiusContextForCreation());
+							detectedVoid.bounds.get(pct).setB(value + pct.getRadiusContextForCreation());
+						}
+					}
+					if(isInMinMax && isNotTooSmall){
+						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
+						addEndogenousRequest(potentialRequest, endogenousRequests);
+					}
+
+				}
+			}
+
 			
 			
 		}
@@ -2269,7 +2304,7 @@ public class Head extends AmoebaAgent {
 	
 	public HashMap<Percept, Double> getSelfRequest(){
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE SELF LEARNING", ""+endogenousRequests.element())));
-		EndogenousRequest futureRequest = endogenousRequests.poll();
+		EndogenousRequest futureRequest = pollRequest(endogenousRequests);
 		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
@@ -2283,7 +2318,8 @@ public class Head extends AmoebaAgent {
 		if(endogenousChildRequests.size()>0) {
 			futureRequest = endogenousChildRequests.poll();
 		}else if(endogenousRequests.size()>0) {
-			futureRequest = endogenousRequests.poll();
+
+			futureRequest = pollRequest(endogenousRequests);
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+futureRequest)));
 		
@@ -2293,6 +2329,20 @@ public class Head extends AmoebaAgent {
 		}
 		
 		return futureRequest.getRequest();
+	}
+
+	private EndogenousRequest pollRequest(Queue<EndogenousRequest> endogenousRequests){
+
+		if(endogenousRequests.element().getType() == REQUEST.VOID){
+			ArrayList<EndogenousRequest> endogenousRequestList = new ArrayList<>(endogenousRequests);
+			Random rdn = new Random();
+			int i = rdn.nextInt(endogenousRequestList.size());
+			endogenousRequests.remove(endogenousRequestList.get(i));
+			return endogenousRequestList.get(i);
+		}else{
+			return endogenousRequests.poll();
+		}
+
 	}
 	
 	public EndogenousRequest getLastEndogenousRequest() {
@@ -2333,7 +2383,7 @@ public class Head extends AmoebaAgent {
 		
 		boolean existingRequestTest = false;
 		
-		if(request.getAskingContexts().size()>1) {
+		if(request.getAskingContexts().size()>1 || request.getType() == REQUEST.VOID) {
 			
 			Iterator<EndogenousRequest> itr = endogenousRequestsList.iterator();
 			while(!existingRequestTest && itr.hasNext()) {
@@ -2427,6 +2477,26 @@ public class Head extends AmoebaAgent {
 
 		criticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverage);
 		endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);
+	}
+
+	public ArrayList<VOID> getVoidsFromContextsAndZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Context> contexts) {
+		ArrayList<VOID> currentVoids = new ArrayList<>();
+		currentVoids.add(new VOID(zoneBounds));
+
+		for(Context testedCtxt : contexts){
+
+			ArrayList<VOID> newVoids = new ArrayList<>();
+			for(VOID currentVoid : currentVoids){
+
+				ArrayList<Percept> computedPerceptsInit = new ArrayList<>();
+				ArrayList<VOID> voidsToAdd = testedCtxt.getVoidsFromZone(currentVoid.bounds, computedPerceptsInit);
+				newVoids.addAll(voidsToAdd);
+
+			}
+			currentVoids = newVoids;
+
+		}
+		return currentVoids;
 	}
 	
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import agents.percept.Percept;
+import kernel.AMOEBA;
 import kernel.World;
 import ncs.NCS;
 import utils.Pair;
@@ -132,6 +133,50 @@ public class Range implements Serializable, Comparable, Cloneable {
 		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(), p.getName(), "Init start increment " + startIncrement)));
 		world
 		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(), p.getName(), "Init end increment " + endIncrement)));
+	}
+
+	// FOR TEST ONLY
+	public Range(AMOEBA amoeba, double start, double end, double extendedrangeatcreation, boolean start_inclu,
+				 boolean end_inclu, Percept p) {
+		super();
+
+		world = amoeba.getEnvironment();
+
+		AVT_deceleration = world.getAVT_deceleration();
+		AVT_acceleration = world.getAVT_acceleration();
+		AVT_minRatio = world.getAVT_percentAtStart();
+
+		this.percept = p;
+		if (isPerceptEnum()) {
+			this.setStart_inclu(start_inclu);
+			this.setEnd_inclu(end_inclu);
+			this.setStart(Math.round(start));
+			this.setEnd(Math.round(end));
+		} else {
+			this.setStart_inclu(start_inclu);
+			this.setEnd_inclu(end_inclu);
+			this.setStart(start - Math.abs(extendedrangeatcreation * start));
+			this.setEnd(end + Math.abs(extendedrangeatcreation * end));
+		}
+		//this.context = context;
+		id = maxid;
+		maxid++;
+
+		/* Initialization of AVT : a better way to do that should be developped */
+//		this.AVT_deltaStart = (end - start) * AVT_minRatio + 0.0001;
+//		this.AVT_deltaEnd = (end - start) * AVT_minRatio + 0.0001;
+		this.AVT_deltaStart = getLenght() * 0.2 + 0.0001;
+		this.AVT_deltaEnd = getLenght() * 0.2 + 0.0001;
+		////// System.out.println(world.getScheduler().getTick() + "\t" +
+		////// context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" +
+		////// "START" + "\t" + AVT_deltaStart);
+		////// System.out.println(world.getScheduler().getTick() + "\t" +
+		////// context.getName() + "\t" + percept.getName()+ "\t" + "Creation" + "\t" +
+		////// "END" + "\t" + AVT_deltaEnd);
+
+		startIncrement = 0.25 * world.getMappingErrorAllowed() * percept.getMinMaxDistance();
+		endIncrement = startIncrement;
+
 	}
 	
 	public Range(Context context, double start, double end, double extendedrangeatcreation, boolean start_inclu,

@@ -44,9 +44,13 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
 
+
+	public static final boolean setVoidDetection = false ;
+
 	public static final boolean setConflictDetection = true ;
 	public static final boolean setConcurrenceDetection = true ;
-	public static final boolean setVoidDetection = true ;
+
+	public static final boolean setVoidDetection2 = true ;
 
 	public static final boolean setConflictResolution = true ;
 	public static final boolean setConcurrenceResolution = true ;
@@ -94,6 +98,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		amoeba.data.isVoidDetection = setVoidDetection;
 		amoeba.data.isConflictResolution = setConflictResolution;
 		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
+		amoeba.data.isVoidDetection2 = setVoidDetection2;
 
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		World.minLevel = TRACE_LEVEL.ERROR;

@@ -403,6 +403,14 @@ public class Percept extends AmoebaAgent {
 		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 2.0;
 	}
 
+	public boolean isTooSmall(double range){
+		return range < getMappingErrorAllowedMin();
+	}
+
+	public boolean isTooBig(double range){
+		return range > getRadiusContextForCreation();
+	}
+
 	// -----------------------
 	// AMOEBAonAMAK code ----
 	// -----------------------
@@ -416,5 +424,9 @@ public class Percept extends AmoebaAgent {
 	public void destroy() {
 		super.destroy();
 		getAmas().setPercepts();
+	}
+
+	public boolean isInMinMax(double value){
+		return min<value && value < max;
 	}
 }

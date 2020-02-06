@@ -74,12 +74,24 @@ public class Context extends AmoebaAgent {
 	
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
+
 	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
 		buildContext();
 		criticalities = new Criticalities(5);
 		
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
+		getAmas().addSpatiallyAlteredContextForUnityUI(this);
+	}
+
+	// FOR TEST ONLY
+	public Context(AMOEBA amoeba, HashMap<Percept, Range> manualRanges) {
+		super(amoeba);
+		buildContext(manualRanges);
+		criticalities = new Criticalities(5);
+
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
@@ -153,7 +165,8 @@ public class Context extends AmoebaAgent {
 			
 			
 			}
-			if(r==null){
+
+			if(r==null ){
 				r = new Range(this, p.getValue() - radiuses.getA(), p.getValue() + radiuses.getB(), 0, true, true, p);
 				getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName(), radiuses.getA().toString())));
@@ -182,6 +195,42 @@ public class Context extends AmoebaAgent {
 		this.setName(String.valueOf(this.hashCode()));
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
+	}
+
+	// FOR TEST ONLY
+	private void buildContext(HashMap<Percept, Range> manualRanges) {
+
+		//buildContextCommon();
+
+		Experiment firstPoint = new Experiment(this);
+		ArrayList<Percept> var = getAmas().getPercepts();
+		for (Percept p : var) {
+			Range r = new Range(this, manualRanges.get(p).getStart(), manualRanges.get(p).getEnd(), 0, true, true, p);
+				getAmas().getEnvironment()
+						.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by init", this.getName(), p.getName())));
+
+
+			ranges.put(p, r);
+			ranges.get(p).setValue((manualRanges.get(p).getEnd() +  manualRanges.get(p).getStart())/2);
+
+			firstPoint.addDimension(p, ranges.get(p).getValue());
+
+			p.addContextProjection(this);
+
+		}
+
+
+
+
+		/*localModel = getAmas().buildLocalModel(this);
+		firstPoint.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
+
+
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);*/
+		getAmas().addAlteredContext(this);
+		this.setName(String.valueOf(this.hashCode()));
+
+
 	}
 
 	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
@@ -692,6 +741,7 @@ public class Context extends AmoebaAgent {
 			updateBoundsWithNeighborhood(bounds);
 			
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
+
 			
 			if(request != null) {
 				
@@ -707,7 +757,7 @@ public class Context extends AmoebaAgent {
 		return null;	
 	}
 
-	//TODO
+
 	private void updateBoundsWithNeighborhood(HashMap<Percept, Pair<Double, Double>> voidBounds) {
 
 		
@@ -731,56 +781,123 @@ public class Context extends AmoebaAgent {
 		
 	}
 
-	//TODO
-	private ArrayList<VOID> getVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds) {
-
-		ArrayList<VOID> voidsTorReturn = new ArrayList<VOID>();
-		ArrayList<FILLED> filleds = new ArrayList<FILLED>();
-
-		for (Percept pct : zoneBounds.keySet() ) {
-
-			ArrayList<VOID> voids = new ArrayList<VOID>();
-			FILLED filled;
 
 
 
-			for (Percept otherPCt : zoneBounds.keySet()) {
-				if (pct != otherPCt){
 
+	public ArrayList<VOID> getVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Percept> computedPercepts) {
+
+		ArrayList<VOID> voidsToReturn = new ArrayList<>();
+
+		if(computedPercepts.size() == getAmas().getPercepts().size()){
+			return voidsToReturn;
+		}else{
+			Percept pct = selectOnePerceptNotComputed(computedPercepts);
+			HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = get1DVoidsAndFilled(pct, zoneBounds);
+
+			for(Pair<Double,Double> void1D : voidsAndFilleds.get("1D_Voids")){
+
+				HashMap<Percept, Pair<Double, Double>> voidToAdd = new HashMap<>();
+				voidToAdd.put(pct, void1D);
+
+				for(Percept otherPercept : getAllOtherPercepts(pct)){
+					voidToAdd.put(otherPercept, zoneBounds.get(otherPercept));
 				}
+
+				voidsToReturn.add(new VOID(voidToAdd));
 
 			}
 
+
+
+			if(voidsAndFilleds.keySet().contains("1D_Filleds")){
+				HashMap<Percept, Pair<Double, Double>> filledZoneToTest = new HashMap<>();
+				filledZoneToTest.put(pct, voidsAndFilleds.get("1D_Filleds").get(0));
+				for(Percept otherPercept : getAllOtherPercepts(pct)){
+					filledZoneToTest.put(otherPercept, zoneBounds.get(otherPercept));
+				}
+
+				ArrayList<Percept> newComputedPercepts = new ArrayList<>(computedPercepts);
+				newComputedPercepts.add(pct);
+
+				voidsToReturn.addAll(getVoidsFromZone(filledZoneToTest, newComputedPercepts));
+			}
+
+
+
+			return voidsToReturn;
 		}
 
 
-		return voidsTorReturn;
+
+
 	}
+
+
+	private Percept selectOnePerceptNotComputed(ArrayList<Percept> computedPercepts) {
+		if(computedPercepts.size()==0){
+			return getAmas().getPercepts().get(0);
+		}else{
+			for(Percept pct : getAmas().getPercepts()){
+				if(!computedPercepts.contains(pct)){
+					return pct;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private ArrayList<Percept> getAllOtherPercepts(Percept pct) {
+		ArrayList<Percept> percepts = new ArrayList<>();
+
+		for(Percept otherPct : getAmas().getPercepts()){
+			if(otherPct != pct){
+				percepts.add(otherPct);
+			}
+		}
+
+		return percepts;
+	}
+
+
 
 	//TODO
 	public HashMap<String,ArrayList<Pair<Double,Double>>> get1DVoidsAndFilled(Percept pct, HashMap<Percept, Pair<Double, Double>> zoneBounds){
 		HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = new HashMap<>();
 		voidsAndFilleds.put("1D_Voids", new ArrayList<>());
-		voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
 
-		if (this.getRanges().get(pct).getStart() < zoneBounds.get(pct).getA() && zoneBounds.get(pct).getB() < this.getRanges().get(pct).getEnd()) {
-			voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),zoneBounds.get(pct).getB()));
-		} else {
-			if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() && this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB()) {
-				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getStart()));
-				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(this.getRanges().get(pct).getStart(),this.getRanges().get(pct).getEnd()));
-				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
 
-			}
-			else if (this.getRanges().get(pct).getStart() < zoneBounds.get(pct).getA() && zoneBounds.get(pct).getA() < this.getRanges().get(pct).getEnd() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB()){
-				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
-				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
-			}
-			/*else if (zoneBounds.get(pct).getA() < this.getRanges().get(pct).getStart() &&  this.getRanges().get(pct).getEnd() < zoneBounds.get(pct).getB() && ){
-				voidsAndFilleds.get("1D_Filleds").add(new Pair<Double,Double>(zoneBounds.get(pct).getA(),this.getRanges().get(pct).getEnd()));
-				voidsAndFilleds.get("1D_Voids").add(new Pair<Double,Double>(this.getRanges().get(pct).getEnd(),zoneBounds.get(pct).getB()));
-			}*/
+		double zoneStart = zoneBounds.get(pct).getA();
+		double zoneEnd = zoneBounds.get(pct).getB();
+		double ctxtStart = this.getRanges().get(pct).getStart();
+		double ctxtEnd = this.getRanges().get(pct).getEnd();
+
+
+		if (ctxtStart <= zoneStart && zoneEnd <= ctxtEnd) {
+			voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
+			voidsAndFilleds.get("1D_Filleds").add(new Pair<>(zoneStart, zoneEnd));
+
+		} else if (zoneStart < ctxtStart && ctxtEnd < zoneEnd) {
+			voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
+			voidsAndFilleds.get("1D_Voids").add(new Pair<>(zoneStart, ctxtStart));
+			voidsAndFilleds.get("1D_Filleds").add(new Pair<>(ctxtStart, ctxtEnd));
+			voidsAndFilleds.get("1D_Voids").add(new Pair<>(ctxtEnd, zoneEnd));
+
+		} else if (ctxtStart <= zoneStart && zoneStart < ctxtEnd &&  ctxtEnd < zoneEnd){
+			voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
+			voidsAndFilleds.get("1D_Filleds").add(new Pair<>(zoneStart, ctxtEnd));
+			voidsAndFilleds.get("1D_Voids").add(new Pair<>(ctxtEnd, zoneEnd));
+
+		} else if (zoneStart < ctxtStart && ctxtStart < zoneEnd && zoneEnd <= ctxtEnd){
+			voidsAndFilleds.put("1D_Filleds", new ArrayList<>());
+			voidsAndFilleds.get("1D_Voids").add(new Pair<>(zoneStart, ctxtStart));
+			voidsAndFilleds.get("1D_Filleds").add(new Pair<>(ctxtStart, zoneEnd));
+
+		}else{
+			voidsAndFilleds.get("1D_Voids").add(new Pair<>(zoneStart, zoneEnd));
 		}
+
 
 		return voidsAndFilleds;
 	}
