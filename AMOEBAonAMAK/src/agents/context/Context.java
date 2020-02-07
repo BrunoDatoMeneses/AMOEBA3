@@ -21,6 +21,7 @@ import gui.RenderStrategy;
 import kernel.AMOEBA;
 import ncs.NCS;
 import utils.Pair;
+import utils.RAND_NUM;
 import utils.TRACE_LEVEL;
 
 
@@ -75,6 +76,7 @@ public class Context extends AmoebaAgent {
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
 
+	int lastFrontierRequestTick = 0;
 	
 	public Context(AMOEBA amoeba) {
 		super(amoeba);
@@ -222,8 +224,8 @@ public class Context extends AmoebaAgent {
 
 
 
-		/*localModel = getAmas().buildLocalModel(this);
-		firstPoint.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
+		localModel = getAmas().buildLocalModel(this);
+		/*firstPoint.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
 
 
 		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);*/
@@ -674,13 +676,24 @@ public class Context extends AmoebaAgent {
 		return request;
 	}
 	
-	public EndogenousRequest endogenousRequest(Context ctxt) {
+	public ArrayList<EndogenousRequest> endogenousRequest(Context ctxt) {
 		
 		HashMap<Percept, Double> voidDistances = new HashMap<Percept, Double>();
 		HashMap<Percept, Double> overlapDistances = new HashMap<Percept, Double>();
 		HashMap<Percept, Pair<Double, Double>> bounds = new HashMap<Percept, Pair<Double, Double>>();
+
+		ArrayList<EndogenousRequest> potentialRequests = new ArrayList<>();
 		
 		double currentDistance = 0.0;
+		boolean differentModel = false;
+
+		double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
+		double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
+
+		Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+		Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
+
+		if(distanceDifference>averageDistanceToOraclePrediction) differentModel=true;
 
 		int overlapCounts = 0;
 		for (Percept pct : getAmas().getPercepts()) {
@@ -702,7 +715,54 @@ public class Context extends AmoebaAgent {
 				bounds.put(pct, this.voidBounds(ctxt, pct));
 			}
 
+			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("FRONTIER TEST",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance , "ErrorAllowedMin", ""+pct.getMappingErrorAllowedMin(), "differentModel", ""+differentModel)) );
+			if ( -pct.getMappingErrorAllowedMin()<currentDistance && currentDistance< pct.getMappingErrorAllowedMin() && differentModel){
+				HashMap<Percept, Pair<Double, Double>> frontierBounds = new HashMap<>();
 
+				double leftBound ;
+				double rightBound ;
+				if(this.getRanges().get(pct).getCenter() < ctxt.getRanges().get(pct).getCenter() ){
+					leftBound = this.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
+					rightBound = ctxt.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
+				}
+				else{
+					leftBound = ctxt.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
+					rightBound = this.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
+				}
+				frontierBounds.put(pct, new Pair<>(leftBound, rightBound));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("FIRST BOUNDS", pct.getName(), ""+frontierBounds.get(pct))) );
+				for(Percept otherPercept : getAmas().getPercepts()){
+					if(otherPercept!=pct){
+						double frontierOverlapDistance = this.distance(ctxt, otherPercept);
+						if(frontierOverlapDistance < - otherPercept.getMappingErrorAllowedMin()){
+							frontierBounds.put(otherPercept, this.overlapBounds(ctxt, otherPercept));
+							getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OTHERS BOUNDS", otherPercept.getName(), ""+frontierBounds.get(otherPercept))) );
+						}
+
+
+					}
+				}
+
+				if (frontierBounds.size()==getAmas().getPercepts().size()){
+
+					HashMap<Percept, Double> frontierRequestLeft = boundsToRequest(frontierBounds);
+					HashMap<Percept, Double> frontierRequestRight = boundsToRequest(frontierBounds);
+
+					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
+					frontierRequestLeft.put(pct, frontierBounds.get(pct).getA()+ (pct.getMappingErrorAllowedMin()/2));
+					frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
+					if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(5)){
+
+						potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
+						potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
+					}
+
+				}
+
+
+
+			}
 
 			
 
@@ -715,19 +775,15 @@ public class Context extends AmoebaAgent {
 			HashMap<Percept, Double> request = boundsToRequest(bounds);
 			if(request != null) {
 				
-				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
-				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
-				
-				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
+
 					
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
 				
 				if(distanceDifference<=averageDistanceToOraclePrediction && getAmas().data.isConcurrenceDetection) {
-					return new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE);
+					potentialRequests.add( new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE));
 				}
 				else if(distanceDifference > averageDistanceToOraclePrediction &&  getAmas().data.isConflictDetection){
-					return new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT);
+					potentialRequests.add( new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT));
 				}
 				
 				
@@ -746,15 +802,13 @@ public class Context extends AmoebaAgent {
 			if(request != null) {
 				
 				if(getAmas().getHeadAgent().isRealVoid(request) && getAmas().data.isVoidDetection) {
-					return new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID);
+					potentialRequests.add( new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID));
 				}		
 			}
 		}
-		else {
-			return null;
-		}
-	
-		return null;	
+
+
+		return potentialRequests;
 	}
 
 
@@ -795,13 +849,18 @@ public class Context extends AmoebaAgent {
 			Percept pct = selectOnePerceptNotComputed(computedPercepts);
 			HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = get1DVoidsAndFilled(pct, zoneBounds);
 
+
 			for(Pair<Double,Double> void1D : voidsAndFilleds.get("1D_Voids")){
 
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>( Arrays.asList("NEW VOID")));
 				HashMap<Percept, Pair<Double, Double>> voidToAdd = new HashMap<>();
 				voidToAdd.put(pct, void1D);
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(pct.getName(),""+void1D)));
+
 
 				for(Percept otherPercept : getAllOtherPercepts(pct)){
 					voidToAdd.put(otherPercept, zoneBounds.get(otherPercept));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(otherPercept.getName(),""+zoneBounds.get(otherPercept))));
 				}
 
 				voidsToReturn.add(new VOID(voidToAdd));
@@ -1962,5 +2021,7 @@ public class Context extends AmoebaAgent {
 		}
 		return false;
 	}
+
+
 	
 }

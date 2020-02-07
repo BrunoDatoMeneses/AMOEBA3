@@ -58,7 +58,14 @@ public class EndogenousRequest {
 		}
 		m+=priority + " ";
 		m+= request + " ";
-		m+= requestType;
+		m+= requestType + " ";
+
+		if(bounds != null){
+			for(Percept pct : bounds.keySet()){
+				m+= pct.getName() + " " + bounds.get(pct) + " ";
+			}
+		}
+
 		return m;
 	} 
 	

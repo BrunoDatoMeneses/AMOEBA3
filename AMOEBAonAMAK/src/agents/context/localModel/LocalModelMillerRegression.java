@@ -44,6 +44,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		firstExperiments = new ArrayList<Experiment>();
 		
 		isReinforcement = associatedContext.getAmas().isReinforcement();
+		initCoefs();
 	}
 	
 	public LocalModelMillerRegression(Context associatedContext, Double[] coefsCopy, List<Experiment> fstExperiments) {
@@ -53,8 +54,16 @@ public class LocalModelMillerRegression extends LocalModel{
 		regression = new Regression(nParameters,true);
 		coefs = coefsCopy;
 		firstExperiments = new ArrayList<Experiment>(fstExperiments);
+		initCoefs();
 	}
-	
+
+	private void initCoefs() {
+		coefs = new Double[context.getAmas().getPercepts().size()+1];
+		for(int j = 0; j < coefs.length; j++) {
+			coefs[j] = 0.0;
+		}
+	}
+
 	@Override
 	public Context getContext() {
 		return context;

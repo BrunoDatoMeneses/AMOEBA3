@@ -28,7 +28,7 @@ public class Pair<A,B> {
 
 	@Override
 	public String toString() {
-		return "Pair [a=" + a + ", b=" + b + "]";
+		return "[" + a + "," + b + "]";
 	}
 	
 }

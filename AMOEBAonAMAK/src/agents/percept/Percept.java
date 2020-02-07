@@ -408,7 +408,7 @@ public class Percept extends AmoebaAgent {
 	}
 
 	public boolean isTooBig(double range){
-		return range > getRadiusContextForCreation();
+		return range > getRadiusContextForCreation()*2;
 	}
 
 	// -----------------------

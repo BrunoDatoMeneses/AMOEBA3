@@ -1,9 +1,6 @@
 package kernel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -32,6 +29,7 @@ import kernel.backup.SaveHelperDummy;
 import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
 import utils.PrintOnce;
+import utils.TRACE_LEVEL;
 
 /**
  * The AMOEBA amas
@@ -189,7 +187,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 
 	@Override
-	protected void onSystemCycleBegin() {
+	public void onSystemCycleBegin() {
+		cycle++;
 		if (cycle % 1000 == 0) {
 			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
@@ -250,7 +249,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 	
 	@Override
-	protected void onSystemCycleEnd() {
+	public void onSystemCycleEnd() {
 		
 		if(studiedSystem != null) {
 			if(data.selfLearning) {
@@ -271,6 +270,29 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			saver.autosave();
 	}
 
+	public void onSystemCycleEndWithoutSave() {
+
+
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("studiedSystem",""+(studiedSystem!=null),"activeLearning",""+data.activeLearning,"selfLearning",""+data.selfLearning)));
+		if(studiedSystem != null) {
+			if(data.selfLearning) {
+				data.selfLearning = false;
+				studiedSystem.setSelfLearning(true);
+				studiedSystem.setSelfRequest(head.getSelfRequest());
+
+			}
+			else if(data.activeLearning) {
+				data.activeLearning = false;
+				studiedSystem.setActiveLearning(true);
+				studiedSystem.setSelfRequest(head.getActiveRequest());
+			}
+		}
+
+		super.onSystemCycleEnd();
+		//if(saver != null)
+		//	saver.autosave();
+	}
+
 	/**
 	 * Define what is done during a cycle, most importantly it launch agents.
 	 *
@@ -279,10 +301,28 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	 */
 	@Override
 	public void cycle() {
-		cycle++;
+
 
 		onSystemCycleBegin();
 
+		runAgents();
+
+		computePendingAgents();
+
+		onSystemCycleEnd();
+
+		renderUI();
+
+
+	}
+
+	public void computePendingAgents() {
+		removePendingAgents();
+
+		addPendingAgents();
+	}
+
+	private void runAgents() {
 		// run percepts
 		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
 				.collect(Collectors.toList());
@@ -320,10 +360,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			}
 			contextStream = vcontexts.stream(); // or only valid ones
 		}
-		
+
 		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
-		
-		
+
+
 		// run contexts
 		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
 		//Collections.sort(synchronousContexts, new AgentOrderComparator());
@@ -361,16 +401,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
 
-		removePendingAgents();
-
-		addPendingAgents();
-
-		onSystemCycleEnd();
+	public void renderUI() {
 
 		if (!Configuration.commandLineMode) {
 			onUpdateRender();
-			
+
 			if(Configuration.waitForGUI) {
 				// we put an action in JavaFX rendering queue
 				RunLaterHelper.runLater(() -> {
@@ -386,6 +423,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				// now the queue should be clear
 			}
 		}
+
 
 	}
 

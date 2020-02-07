@@ -20,6 +20,7 @@ public class ContextColor {
 	 */
 	public static Double[] colorFromCoefs(Double[] coefs) {
 		ArrayList<Double> c = new ArrayList<Double>();
+
 		for(double v : coefs)
 			c.add(v);
 		return colorFromCoefs(c);

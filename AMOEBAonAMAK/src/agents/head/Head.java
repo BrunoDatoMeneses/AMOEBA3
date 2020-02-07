@@ -54,13 +54,13 @@ public class Head extends AmoebaAgent {
 	static final int NEIGH_VOID_CYCLE_START = 0;
 
 
-	Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+	public Queue<EndogenousRequest> endogenousRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
 			      return r2.getPriority().compareTo(r1.getPriority());
 			   }
 			});
-	
-	Queue<EndogenousRequest> endogenousChildRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+
+	public Queue<EndogenousRequest> endogenousChildRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		   public int compare(EndogenousRequest r1, EndogenousRequest r2) {
 			      return r2.getPriority().compareTo(r1.getPriority());
 			   }
@@ -253,7 +253,16 @@ public class Head extends AmoebaAgent {
 			playWithoutOracle();
 		}
 
-		
+
+		testIfrequest();
+
+		updateStatisticalInformations(); /// regarder dans le détail, possible que ce pas trop utile
+
+		newContext = null;
+
+	}
+
+	public void testIfrequest() {
 		if(isSelfRequest() ) {
 			if(getAmas().data.isSelfLearning) {
 				getAmas().data.selfLearning = true;
@@ -265,11 +274,6 @@ public class Head extends AmoebaAgent {
 				getAmas().data.activeLearning = true;
 			}
 		}
-		
-		updateStatisticalInformations(); /// regarder dans le détail, possible que ce pas trop utile
-
-		newContext = null;
-
 	}
 
 	private void playWithOracle() {
@@ -393,7 +397,12 @@ public class Head extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
 
 		getAmas().data.executionTimes[3]=System.currentTimeMillis();
-		NCSDetection_IncompetentHead();
+		if(lastEndogenousRequest==null){
+			NCSDetection_IncompetentHead();
+		}
+		else if(lastEndogenousRequest.getType()!=REQUEST.VOID){
+			NCSDetection_IncompetentHead();
+		}
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
 		
 
@@ -1263,7 +1272,7 @@ public class Head extends AmoebaAgent {
 		}
 	}
 	
-	private void NCSDetection_PotentialRequest() {
+	public void NCSDetection_PotentialRequest() {
 		
 		if(getAmas().data.isActiveLearning) {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -1274,11 +1283,13 @@ public class Head extends AmoebaAgent {
 				for (Context ctxt : activatedNeighborsContexts) {
 					for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
 						if(!this.isDying() && !ctxt.isDying()) {
-							EndogenousRequest potentialRequest = ctxt.endogenousRequest(otherCtxt);
-							if(potentialRequest != null) {
+							ArrayList<EndogenousRequest> potentialRequests = ctxt.endogenousRequest(otherCtxt);
+							if(potentialRequests.size()>0) {
 								
-								
-								addEndogenousRequest(potentialRequest, endogenousRequests);
+								for(EndogenousRequest potentialRequest : potentialRequests){
+									addEndogenousRequest(potentialRequest, endogenousRequests);
+								}
+
 							}
 						}
 					}
@@ -1298,6 +1309,7 @@ public class Head extends AmoebaAgent {
 
 				for(VOID detectedVoid : detectedVoids){
 
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("VOID", ""+detectedVoid)));
 					HashMap<Percept, Double> request = new HashMap<>();
 					boolean isInMinMax = true;
 					boolean isNotTooSmall = true;
@@ -1308,10 +1320,10 @@ public class Head extends AmoebaAgent {
 						isInMinMax = isInMinMax && pct.isInMinMax(value);
 						isNotTooSmall = isNotTooSmall && !pct.isTooSmall(range);
 
-						if(pct.isTooBig(range)){
+						/*if(pct.isTooBig(range)){
 							detectedVoid.bounds.get(pct).setA(value - pct.getRadiusContextForCreation());
 							detectedVoid.bounds.get(pct).setB(value + pct.getRadiusContextForCreation());
-						}
+						}*/
 					}
 					if(isInMinMax && isNotTooSmall){
 						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
@@ -2329,6 +2341,10 @@ public class Head extends AmoebaAgent {
 		}
 		
 		return futureRequest.getRequest();
+	}
+
+	public boolean requestIsEmpty(){
+		return endogenousRequests.size()==0 && endogenousChildRequests.size() == 0;
 	}
 
 	private EndogenousRequest pollRequest(Queue<EndogenousRequest> endogenousRequests){

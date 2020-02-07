@@ -50,6 +50,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 	public static final boolean setConflictDetection = true ;
 	public static final boolean setConcurrenceDetection = true ;
 	public static final boolean setVoidDetection = false ;
+	public static final boolean setVoidDetection2 = true ;
 
 	public static final boolean setConflictResolution = true ;
 	public static final boolean setConcurrenceResolution = true ;
@@ -95,6 +96,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.isConflictDetection = setConflictDetection;
 		amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
 		amoeba.data.isVoidDetection = setVoidDetection;
+		amoeba.data.isVoidDetection2 = setVoidDetection2;
 		amoeba.data.isConflictResolution = setConflictResolution;
 		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);

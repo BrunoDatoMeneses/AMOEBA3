@@ -13,6 +13,7 @@ public class VOID {
     public VOID( HashMap<Percept, Pair<Double, Double>> zoneBounds){
 
         bounds = zoneBounds;
+
     }
 
 

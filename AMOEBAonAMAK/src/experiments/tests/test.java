@@ -8,16 +8,10 @@ public class test {
 
     public static void main(String[] args) {
 
-        Queue<String> testQueue = new ArrayDeque<>();
-
-        testQueue.add("1");
-        testQueue.add("2");
-        testQueue.add("3");
-
-        System.out.println(testQueue);
-        testQueue.poll();
-        System.out.println(testQueue);
-        System.out.println(testQueue.size());
+        int Min = 0;
+        int Max = 1000;
+        for(int i=0;i<20;i++)
+            System.out.println(Min + (int)(Math.random() * ((Max - Min) + 1)));
 
 
     }

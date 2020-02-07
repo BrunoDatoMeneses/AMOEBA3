@@ -7,6 +7,7 @@ public enum REQUEST implements Serializable {
 	OVERLAP,
 	CONFLICT,
 	CONCURRENCE,
+	FRONTIER,
 	VOID,
 	SELF
 	
