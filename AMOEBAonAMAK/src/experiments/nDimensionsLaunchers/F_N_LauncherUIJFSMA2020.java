@@ -43,17 +43,18 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-
-
 	public static final boolean setVoidDetection = false ;
 
+
 	public static final boolean setConflictDetection = true ;
+	public static final boolean setConflictResolution = true ;
+
 	public static final boolean setConcurrenceDetection = true ;
+	public static final boolean setConcurrenceResolution = true ;
 
 	public static final boolean setVoidDetection2 = true ;
 
-	public static final boolean setConflictResolution = true ;
-	public static final boolean setConcurrenceResolution = true ;
+	public static final boolean setFrontierRequest = true ;
 
 	AMOEBA amoeba;
 	StudiedSystem studiedSystem;
@@ -99,6 +100,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		amoeba.data.isConflictResolution = setConflictResolution;
 		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
 		amoeba.data.isVoidDetection2 = setVoidDetection2;
+		amoeba.data.isFrontierRequest = setFrontierRequest;
 
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		World.minLevel = TRACE_LEVEL.ERROR;
@@ -128,6 +130,8 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		amoeba2.saver = new SaveHelperImpl(amoeba2, amoebaUI);
 		amoeba2.saver.load("saves/1000_TestManualSave.xml");
 		amoeba2.setRenderUpdate(true);
+
+		amoebaUI.rectangle.delete();
 	}
 
 	

@@ -283,11 +283,7 @@ public class Head extends AmoebaAgent {
 			
 			int nb=0;
 			Double meanNeighborsLastPredictions = null;
-			
-			
-			
-			
-			
+
 			ArrayList<Context> usedNeighbors = new ArrayList<Context>();
 			
 			if(activatedNeighborsContexts.size()>0) { 
@@ -309,39 +305,10 @@ public class Head extends AmoebaAgent {
 				else {
 					meanNeighborsLastPredictions = null;
 				}
-				
-				
-				
-				
-				
-				
 			}
-			
-			
-			
-			
 			if(meanNeighborsLastPredictions != null) {
-//				System.out.println("####################### NEIGHBORS #############################");
-//				System.out.println("ORACLE BEFORE" + getAmas().data.oracleValue);
-				
 				getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
-				
-				
-					
-				
-//				System.out.println("PCT " + getAmas().getPerceptionsAndActionState());
-//				System.out.println("ORACLE AFTER " +getAmas().data.oracleValue);
-//				for(Context ctxt : usedNeighbors) {
-//					System.out.println(ctxt.getName() + " " + ctxt.lastPrediction);
-//				}
-//				System.out.println(usedNeighbors.size() + " " + nb);
-					
-					
-
 			}
-			
-			
-			
 		}
 		
 		
@@ -384,7 +351,6 @@ public class Head extends AmoebaAgent {
 		}
 
 		getAmas().data.executionTimes[0]=System.currentTimeMillis()- getAmas().data.executionTimes[0];
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 1", "" + (bestContext != null))));
 
 		getAmas().data.executionTimes[1]=System.currentTimeMillis();
 		// endogenousPlay();
@@ -393,54 +359,25 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[2]=System.currentTimeMillis();
 		selfAnalysationOfContexts4();
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 2", "" + (bestContext != null))));
-
-		getAmas().data.executionTimes[3]=System.currentTimeMillis();
-		if(lastEndogenousRequest==null){
-			NCSDetection_IncompetentHead();
-		}
-		else if(lastEndogenousRequest.getType()!=REQUEST.VOID){
-			NCSDetection_IncompetentHead();
-		}
-		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
-		
-
-		getAmas().data.executionTimes[4]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null 3", "" + (bestContext != null))));
-		if(getAmas().data.isConcurrenceResolution){
-			NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
-		}
-		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
-
-		getAmas().data.executionTimes[5]=System.currentTimeMillis();
-		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
-		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
-
-		getAmas().data.executionTimes[6]=System.currentTimeMillis();
-		NCSDetection_Context_Overmapping();
-		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 
-		
-		getAmas().data.executionTimes[11]=System.currentTimeMillis();
-		NCSDetection_ChildContext();
-		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
-		
-		getAmas().data.executionTimes[12]=System.currentTimeMillis();
-		if(getAmas().getCycle()>0){
-			NCSDetection_PotentialRequest();
-		}
+		allNCSDetections();
 
-		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
+
+		updatePerformanceIndicators();
+
+		for(int i = 0 ; i<20;i++) {
+			getAmas().data.executionTimesSums[i] += getAmas().data.executionTimes[i];
+		}			
+
 		
 		
-		
+	}
+
+	private void updatePerformanceIndicators() {
 		getAmas().data.executionTimes[7]=System.currentTimeMillis();
-		
-		
-		
-		
+
+
 		criticalities.addCriticality("spatialCriticality",
 				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
 
@@ -453,31 +390,29 @@ public class Head extends AmoebaAgent {
 		}
 		globalConfidence = globalConfidence / getAmas().getContexts().size();
 
-		
+
 		if (activatedNeighborsContexts.size() > 1) {
 
-			
+
 			double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
 			Context bestNeighbor = null;
 
 			int i = 1;
 			for (Context ctxt : activatedNeighborsContexts) {
-				
+
 //				if(getAmas().isReinforcement()) {
 //					System.out.println("####################### NEIGHBORS #############################");
 //					System.out.println(ctxt.getName()  + " " + ctxt.lastPrediction);
 //					if(ctxt.lastPrediction> bestNeighborLastPrediction) {
-//						
-//						
+//
+//
 //						bestNeighborLastPrediction = ctxt.lastPrediction;
 //						bestNeighbor = ctxt;
 //					}
 //				}
-				
 
-				
-				
-				
+
+
 
 				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
 
@@ -498,12 +433,12 @@ public class Head extends AmoebaAgent {
 
 				}
 				i++;
-				
-				
-				
+
+
+
 
 			}
-			
+
 //			if(getAmas().isReinforcement()) {
 //				System.out.println(bestNeighbor.getName() );
 //				getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
@@ -512,11 +447,11 @@ public class Head extends AmoebaAgent {
 //				}
 //				System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
 //			}
-			
-			
+
+
 
 		}
-		
+
 		getAmas().data.mappingPerformance.setPerformanceIndicator(getEnvironment().getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(),
 		// world.getScheduler().getPercepts().size());
 
@@ -527,15 +462,47 @@ public class Head extends AmoebaAgent {
 		getAmas().data.evolutionCriticalityConfidence = (lembda * getAmas().data.evolutionCriticalityConfidence)
 				+ ((1 - lembda) * getAmas().data.currentCriticalityConfidence);
 
-		
-		getAmas().data.executionTimes[7]=System.currentTimeMillis()- getAmas().data.executionTimes[7];
-		
-		for(int i = 0 ; i<20;i++) {
-			getAmas().data.executionTimesSums[i] += getAmas().data.executionTimes[i];
-		}			
 
-		
-		
+		getAmas().data.executionTimes[7]=System.currentTimeMillis()- getAmas().data.executionTimes[7];
+	}
+
+	private void allNCSDetections() {
+		getAmas().data.executionTimes[3]=System.currentTimeMillis();
+		if(lastEndogenousRequest==null){
+			NCSDetection_IncompetentHead();
+		}
+		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
+			NCSDetection_IncompetentHead();
+		}
+		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
+
+
+		getAmas().data.executionTimes[4]=System.currentTimeMillis();
+
+		if(getAmas().data.isConcurrenceResolution){
+			NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
+		}
+		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
+
+		getAmas().data.executionTimes[5]=System.currentTimeMillis();
+		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
+		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
+
+		getAmas().data.executionTimes[6]=System.currentTimeMillis();
+		NCSDetection_Context_Overmapping();
+		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
+
+
+		getAmas().data.executionTimes[11]=System.currentTimeMillis();
+		NCSDetection_ChildContext();
+		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
+
+		getAmas().data.executionTimes[12]=System.currentTimeMillis();
+		if(getAmas().getCycle()>0){
+			NCSDetection_PotentialRequest();
+		}
+
+		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 	}
 
 	public HashMap<String, Double> getMappingScores(){
@@ -1346,9 +1313,7 @@ public class Head extends AmoebaAgent {
 
 	private void selfAnalysationOfContexts4() {
 
-		
-		
-		
+
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
 		
@@ -1362,6 +1327,7 @@ public class Head extends AmoebaAgent {
 			getAmas().data.contextNotFinished = false;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
 					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
+
 			if (!activatedContext.getLocalModel().finishedFirstExperiments()) {
 				
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
@@ -1373,17 +1339,12 @@ public class Head extends AmoebaAgent {
 				
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
 
-				if(getAmas().data.oracleValue>0) {
-					
-					//System.out.println(activatedContext.getName()); REINFORCEMENT ?
-					
-					
-				}
+
 			}
 
 			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
 				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-				getAmas().data.distanceToRegression = minDistanceToOraclePrediction;
+				getAmas().data.lastMinDistanceToRegression = minDistanceToOraclePrediction;
 			}
 
 			if (!getAmas().data.contextNotFinished) {
@@ -1402,19 +1363,7 @@ public class Head extends AmoebaAgent {
 					maxCoef = Math.abs(coef);
 				}
 			}
-			
-			if(activatedContext.lastPrediction>0 || maxCoef>10000) {
-//				System.out.println("##################################################################################################################");
-//				System.out.println(getAverageRegressionPerformanceIndicator());
-//				System.out.println(activatedContext.getName());
-//				System.out.println(activatedContext.getLocalModel().coefsToString());
-//				System.out.println(activatedContext.lastPrediction);
-//				System.out.println(getOracleValue());
-				
-				
-				
-				//System.exit(0);
-			}
+
 			
 		}
 
@@ -1434,8 +1383,12 @@ public class Head extends AmoebaAgent {
 			activatedContexts.get(i).analyzeResults4(this);
 
 		}
-		
 
+
+		NCSDetection_Uselessness();
+	}
+
+	private void NCSDetection_Uselessness() {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NCS DECTECTION USELESSNESS IN SELF ANALISIS")));
 		for (Context ctxt : activatedNeighborsContexts) {
 
@@ -2295,8 +2248,8 @@ public class Head extends AmoebaAgent {
 		return getAmas().data.mappingPerformance.getPerformanceIndicator();
 	}
 
-	public double getDistanceToRegression() {
-		return getAmas().data.distanceToRegression;
+	public double getLastMinDistanceToRegression() {
+		return getAmas().data.lastMinDistanceToRegression;
 	}
 
 	public double getDistanceToRegressionAllowed() {

@@ -752,7 +752,7 @@ public class Context extends AmoebaAgent {
 					frontierRequestLeft.put(pct, frontierBounds.get(pct).getA()+ (pct.getMappingErrorAllowedMin()/2));
 					frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
 					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
-					if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(5)){
+					if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(5) && getAmas().data.isFrontierRequest){
 
 						potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
 						potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));

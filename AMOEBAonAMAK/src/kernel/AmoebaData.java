@@ -35,7 +35,7 @@ public class AmoebaData implements Serializable {
 	public Double oracleValue;
 	public Double oldOracleValue;
 	public double criticity = 0.0;
-	public double distanceToRegression;
+	public double lastMinDistanceToRegression;
 	public double oldCriticity;
 
 	public double spatialGeneralizationScore = 0;
@@ -96,4 +96,5 @@ public class AmoebaData implements Serializable {
 	public boolean isConflictDetection = false;
 	public boolean isConcurrenceDetection = false;
 	public boolean isVoidDetection2 = false;
+	public boolean isFrontierRequest = false;
 }

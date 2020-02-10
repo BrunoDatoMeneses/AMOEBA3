@@ -153,7 +153,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			errors.addData("Mean criticality", cycle, head.getAveragePredictionCriticity(), notify);
 			errors.addData("Error allowed", cycle, head.getErrorAllowed(), notify);
 			
-			distancesToModels.addData("Distance to model", cycle, head.getDistanceToRegression(), notify);
+			distancesToModels.addData("Distance to model", cycle, head.getLastMinDistanceToRegression(), notify);
 			distancesToModels.addData("Average distance to model", cycle, head.criticalities.getCriticalityMean("distanceToRegression"), notify);
 			distancesToModels.addData("Allowed distance to model", cycle, head.getDistanceToRegressionAllowed(), notify);
 			
