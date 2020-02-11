@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import agents.context.Context;
 import agents.head.DynamicPerformance;
+import agents.head.REQUEST;
 import agents.percept.Percept;
 /**
  * A Plain Old Java Object for storing parameters for the Head. Keep it as simple as possible for ease of serialization.<br/>
@@ -97,4 +98,6 @@ public class AmoebaData implements Serializable {
 	public boolean isConcurrenceDetection = false;
 	public boolean isVoidDetection2 = false;
 	public boolean isFrontierRequest = false;
+
+	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
 }

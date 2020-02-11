@@ -11,6 +11,7 @@ import agents.context.Context;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
+import agents.head.REQUEST;
 import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
@@ -115,6 +116,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 		getEnvironment().setAmoeba(this);
 		data = new AmoebaData();
+		for(REQUEST rqt : REQUEST.values()){
+			data.requestCounts.put(rqt, 0);
+		}
+
 	}
 	
 	@Override

@@ -52,9 +52,21 @@ public class F_N_Launcher implements Serializable {
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
 	public static final int nbTest = 10;
-	
 
-	
+	public static final boolean setVoidDetection = false ;
+
+
+	public static final boolean setConflictDetection = true ;
+	public static final boolean setConflictResolution = true ;
+
+	public static final boolean setConcurrenceDetection = true ;
+	public static final boolean setConcurrenceResolution = true ;
+
+	public static final boolean setVoidDetection2 = true ;
+
+	public static final boolean setFrontierRequest = true ;
+
+
 	public static void main(String[] args) throws Exception {
 
 
@@ -122,6 +134,13 @@ public class F_N_Launcher implements Serializable {
 		amoeba.data.isActiveLearning = setActiveLearning;
 		amoeba.data.isSelfLearning = setSelfLearning;
 		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+		amoeba.data.isConflictDetection = setConflictDetection;
+		amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
+		amoeba.data.isVoidDetection = setVoidDetection;
+		amoeba.data.isConflictResolution = setConflictResolution;
+		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
+		amoeba.data.isVoidDetection2 = setVoidDetection2;
+		amoeba.data.isFrontierRequest = setFrontierRequest;
 		
 		amoeba.setRenderUpdate(false);
 		

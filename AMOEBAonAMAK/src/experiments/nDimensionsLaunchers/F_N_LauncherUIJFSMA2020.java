@@ -114,6 +114,11 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		}
 
 		amoeba.getHeadAgent().getMappingScores();
+		System.out.println("RDM REQUESTS " + studiedSystem.getRandomRequestCounts());
+		System.out.println("ACT REQUESTS " + studiedSystem.getActiveRequestCounts());
+		System.out.println("CTXT NB " + amoeba.getContexts().size());
+		System.out.println("REQUEST TYPES");
+		System.out.println(amoeba.data.requestCounts);
 
 		amoeba.saver.newManualSave("TestManualSave", "saves/");
 

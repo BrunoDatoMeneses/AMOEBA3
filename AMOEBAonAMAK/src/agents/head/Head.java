@@ -521,7 +521,14 @@ public class Head extends AmoebaAgent {
 		System.out.println("TEST VOL \t" + allVolumes +  " \tNORM \t"  + allVolumes/minMaxVolume);
 
 
-		return null;
+
+		HashMap<String, Double> scores = new HashMap<>();
+		scores.put("CTXT",volumeOfAllContexts/minMaxVolume);
+		scores.put("CONF",volumeOfOverlaps.getA()/minMaxVolume);
+		scores.put("CONC",volumeOfOverlaps.getB()/minMaxVolume);
+		scores.put("VOIDS",voidVolume/minMaxVolume);
+
+		return scores;
 	}
 
 	public double getMinMaxVolume() {
@@ -2292,7 +2299,8 @@ public class Head extends AmoebaAgent {
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
 		}
-		
+
+		getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
 		return futureRequest.getRequest();
 	}
 
