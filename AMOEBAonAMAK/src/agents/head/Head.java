@@ -505,7 +505,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 	}
 
-	public HashMap<String, Double> getMappingScores(){
+	public HashMap<String, Double> getMappingScoresAndPrint(){
 
 		Pair<Double,Double> volumeOfOverlaps = getVolumeOfAllOverlaps();
 		double minMaxVolume = getMinMaxVolume();
@@ -519,6 +519,27 @@ public class Head extends AmoebaAgent {
 		System.out.println("CONC VOL \t" + volumeOfOverlaps.getB() + " \tNORM \t"  + volumeOfOverlaps.getB()/minMaxVolume);
 		System.out.println("VOIDS VOL \t" + voidVolume + " \tNORM \t"  + voidVolume/minMaxVolume);
 		System.out.println("TEST VOL \t" + allVolumes +  " \tNORM \t"  + allVolumes/minMaxVolume);
+
+
+
+		HashMap<String, Double> scores = new HashMap<>();
+		scores.put("CTXT",volumeOfAllContexts/minMaxVolume);
+		scores.put("CONF",volumeOfOverlaps.getA()/minMaxVolume);
+		scores.put("CONC",volumeOfOverlaps.getB()/minMaxVolume);
+		scores.put("VOIDS",voidVolume/minMaxVolume);
+
+		return scores;
+	}
+
+	public HashMap<String, Double> getMappingScores(){
+
+		Pair<Double,Double> volumeOfOverlaps = getVolumeOfAllOverlaps();
+		double minMaxVolume = getMinMaxVolume();
+		double volumeOfAllContexts = getVolumeOfAllContexts()  - volumeOfOverlaps.getA() - volumeOfOverlaps.getB();
+		double voidVolume = minMaxVolume - volumeOfAllContexts;
+		double allVolumes = voidVolume + volumeOfAllContexts ;
+
+
 
 
 

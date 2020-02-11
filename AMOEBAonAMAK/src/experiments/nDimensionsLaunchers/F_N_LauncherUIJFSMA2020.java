@@ -113,7 +113,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		}
 
-		amoeba.getHeadAgent().getMappingScores();
+		amoeba.getHeadAgent().getMappingScoresAndPrint();
 		System.out.println("RDM REQUESTS " + studiedSystem.getRandomRequestCounts());
 		System.out.println("ACT REQUESTS " + studiedSystem.getActiveRequestCounts());
 		System.out.println("CTXT NB " + amoeba.getContexts().size());
@@ -133,7 +133,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		backupSystem2.load(file2);
 
 		amoeba2.saver = new SaveHelperImpl(amoeba2, amoebaUI);
-		amoeba2.saver.load("saves/1000_TestManualSave.xml");
+		amoeba2.saver.load("saves/"+nbCycle +"_TestManualSave.xml");
 		amoeba2.setRenderUpdate(true);
 
 		amoebaUI.rectangle.delete();

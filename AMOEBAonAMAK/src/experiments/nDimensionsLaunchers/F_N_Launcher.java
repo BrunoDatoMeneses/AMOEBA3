@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import agents.head.REQUEST;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
@@ -89,15 +90,17 @@ public class F_N_Launcher implements Serializable {
 		
 		HashMap<String, ArrayList<Double>> data = new HashMap<>();
 		
-		List<String> dataStrings = Arrays.asList("mappingScore", "randomRequests", "activeRequests","nbAgents");
-		
+		List<String> dataStrings = Arrays.asList("mappingScore", "randomRequests", "activeRequests","nbAgents", "conflictVol", "concurrenceVol", "voidVol", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "selfRequests");
+
+
+
 		for (String dataName : dataStrings){
 			data.put(dataName, new ArrayList<>());
 		}
 		
 		for (int i = 0; i < nbTest; ++i) {
 			System.out.print(i + " ");
-			ellsaTest( data);
+			ellsaTest(data);
 		}
 		System.out.println("");
 		
@@ -153,12 +156,23 @@ public class F_N_Launcher implements Serializable {
 		for (int i = 0; i < nbCycle; ++i) {
 			amoeba.cycle();
 		}
-		
-		
-		data.get("mappingScore").add(amoeba.getHeadAgent().criticalities.getCriticality("spatialCriticality"));
+
+		HashMap<String, Double> mappingScores = amoeba.getHeadAgent().getMappingScores();
+		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
+
+		data.get("mappingScore").add(mappingScores.get("CTXT"));
+		data.get("conflictVol").add(mappingScores.get("CONF"));
+		data.get("concurrenceVol").add(mappingScores.get("CONC"));
+		data.get("voidVol").add(mappingScores.get("VOIDS"));
 		data.get("randomRequests").add(studiedSystem.getRandomRequestCounts());
 		data.get("activeRequests").add(studiedSystem.getActiveRequestCounts());
+		data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
+		data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
+		data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));
+		data.get("voidRequests").add((double)requestCounts.get(REQUEST.VOID));
+		data.get("selfRequests").add((double)requestCounts.get(REQUEST.SELF));
 		data.get("nbAgents").add((double)amoeba.getContexts().size());
+
 	}
 
 	
