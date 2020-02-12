@@ -1,6 +1,7 @@
 package experiments.tests;
 
 import agents.context.Context;
+import agents.context.Experiment;
 import agents.context.Range;
 import agents.context.VOID;
 import agents.percept.Percept;
@@ -125,11 +126,14 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
             p.setMax(15*tailleCtxt);
         }
 
+
+
         amoeba.onSystemCycleBegin();
 
         Context ctxt1 = new Context(amoeba,manualRanges1);
         Context ctxt2 = new Context(amoeba,manualRanges2);
         Context ctxt3 = new Context(amoeba,manualRanges3);
+
 
         ArrayList<Context> contexts = new ArrayList<>();
         contexts.add(ctxt1);
@@ -152,6 +156,16 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
     }
 
+    private Experiment getExperiment(AMOEBA amoeba, Context ctxt1) {
+        ArrayList<Percept> percepts = amoeba.getPercepts();
+        Experiment exp = new Experiment(ctxt1);
+        for (Percept pct : percepts) {
+            exp.addDimension(pct, pct.getValue());
+        }
+        exp.setOracleProposition(0.0);
+
+        return exp;
+    }
 
 
 }

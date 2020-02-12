@@ -90,7 +90,7 @@ public class F_N_Launcher implements Serializable {
 		
 		HashMap<String, ArrayList<Double>> data = new HashMap<>();
 		
-		List<String> dataStrings = Arrays.asList("mappingScore", "randomRequests", "activeRequests","nbAgents", "conflictVol", "concurrenceVol", "voidVol", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "selfRequests");
+		List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "randomRequests", "activeRequests","nbAgents", "conflictVol", "concurrenceVol", "voidVol", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "selfRequests");
 
 
 
@@ -112,7 +112,12 @@ public class F_N_Launcher implements Serializable {
 		for (String dataName : dataStrings){
 			OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
 			Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-			System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
+			if(averageScore.getAsDouble()<1){
+				System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
+			}else{
+				System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
+			}
+
 
 		}
 		
@@ -161,6 +166,7 @@ public class F_N_Launcher implements Serializable {
 		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
 
 		data.get("mappingScore").add(mappingScores.get("CTXT"));
+		data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));
 		data.get("conflictVol").add(mappingScores.get("CONF"));
 		data.get("concurrenceVol").add(mappingScores.get("CONC"));
 		data.get("voidVol").add(mappingScores.get("VOIDS"));

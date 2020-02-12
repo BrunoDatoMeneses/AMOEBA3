@@ -33,7 +33,7 @@ public class AmoebaData implements Serializable {
 	public Double endogenousPredictionNContexts = 0.0;
 	public Double endogenousPredictionNContextsByInfluence = 0.0;
 
-	public Double oracleValue;
+	public Double oracleValue = 0.0; //TODO à changer !!!!!!!!!!
 	public Double oldOracleValue;
 	public double criticity = 0.0;
 	public double lastMinDistanceToRegression;
