@@ -799,6 +799,30 @@ private double[] subZoneCenter3D(int nb) {
 		
 	}
 
+	@Override
+	public double getErrorOnRequest(AMOEBA amoeba){
+
+		if (generator == null)	generator = new Random(29);
+		for(int i = 0 ; i < dimension ; i++) {
+			x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+		}
+		HashMap<String, Double> out = new HashMap<String, Double>();
+		double oracleValue = model(null);
+		for(int i = 0; i<dimension; i++) {
+
+			out.put("px" + i,x[i]);
+
+		}
+		out.put("oracle",null);
+
+		double prediction = amoeba.request(out);
+		double error = Math.abs(oracleValue-prediction)/Math.abs(oracleValue);
+		//System.out.println(oracleValue + " " + prediction + " " + error);
+
+		return error;
+
+	}
+
 
 
 }

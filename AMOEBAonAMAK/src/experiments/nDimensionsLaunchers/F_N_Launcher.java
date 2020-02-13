@@ -4,11 +4,9 @@ package experiments.nDimensionsLaunchers;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 
 import agents.head.REQUEST;
 import experiments.FILE;
@@ -52,16 +50,16 @@ public class F_N_Launcher implements Serializable {
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-	public static final int nbTest = 10;
+	public static final int nbTest = 50;
 
 	public static final boolean setVoidDetection = false ;
 
 
 	public static final boolean setConflictDetection = true ;
-	public static final boolean setConflictResolution = true ;
+	public static final boolean setConflictResolution = setConflictDetection ;
 
 	public static final boolean setConcurrenceDetection = true ;
-	public static final boolean setConcurrenceResolution = true ;
+	public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
 
 	public static final boolean setVoidDetection2 = true ;
 
@@ -90,7 +88,7 @@ public class F_N_Launcher implements Serializable {
 		
 		HashMap<String, ArrayList<Double>> data = new HashMap<>();
 		
-		List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "randomRequests", "activeRequests","nbAgents", "conflictVol", "concurrenceVol", "voidVol", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "selfRequests");
+		List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "randomRequests", "activeRequests","nbAgents", "conflictVol", "concurrenceVol", "voidVol", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "selfRequests", "prediction");
 
 
 
@@ -120,7 +118,40 @@ public class F_N_Launcher implements Serializable {
 
 
 		}
-		
+
+
+
+		//Create the formatter for round the values of scores
+		Locale currentLocale = Locale.getDefault();
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(currentLocale);
+		otherSymbols.setDecimalSeparator('.');
+		DecimalFormat df = new DecimalFormat("##.##", otherSymbols);
+		System.out.println("ROUNDED");
+
+		for (String dataName : dataStrings){
+			OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
+			Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+			if(averageScore.getAsDouble()<1){
+				System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
+			}
+
+
+		}
+
+		for (String dataName : dataStrings){
+			OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
+			Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+			if(averageScore.getAsDouble()>=1){
+				System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
+			}
+
+
+		}
+
+		OptionalDouble averageScore = data.get("prediction").stream().mapToDouble(a->a).average();
+		Double deviationScore = data.get("prediction").stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+		System.out.println("[PREDICTION AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get("prediction").size()));
+		System.out.println("[PREDICTION AVERAGE] " + df.format(100*averageScore.getAsDouble()) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())));
 		
 		
 	}
@@ -162,6 +193,12 @@ public class F_N_Launcher implements Serializable {
 			amoeba.cycle();
 		}
 
+		double errorsMean = 0;
+		for (int i = 0; i < nbCycle/4; ++i) {
+			errorsMean += studiedSystem.getErrorOnRequest(amoeba);
+		}
+		errorsMean = errorsMean/(nbCycle/4);
+
 		HashMap<String, Double> mappingScores = amoeba.getHeadAgent().getMappingScores();
 		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
 
@@ -178,6 +215,9 @@ public class F_N_Launcher implements Serializable {
 		data.get("voidRequests").add((double)requestCounts.get(REQUEST.VOID));
 		data.get("selfRequests").add((double)requestCounts.get(REQUEST.SELF));
 		data.get("nbAgents").add((double)amoeba.getContexts().size());
+		data.get("prediction").add(errorsMean);
+
+
 
 	}
 

@@ -556,7 +556,10 @@ public class ReinforcementManager2D implements StudiedSystem{
 		return null;
 	}
 
-	
+	@Override
+	public double getErrorOnRequest(AMOEBA amoeba) {
+		return 0;
+	}
 
 
 }

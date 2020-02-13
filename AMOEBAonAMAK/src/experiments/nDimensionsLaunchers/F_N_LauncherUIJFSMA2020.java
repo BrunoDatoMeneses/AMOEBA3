@@ -27,10 +27,13 @@ import java.util.ArrayList;
 public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable {
 
 
+
+	public static final String configFile = "twoDimensionsLauncher.xml";
+	public static final int dimension = 2;
+	public static final int nbCycle = 1000;
 	public static final double oracleNoiseRange = 0.5;
 	public static final double learningSpeed = 0.01;
 	public static final int regressionPoints = 100;
-	public static final int dimension = 2;
 	public static final double spaceSize = 50.0	;
 	public static final int nbOfModels = 2	;
 	public static final int normType = 2	;
@@ -42,7 +45,6 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 	public static final double explorationWidht = 0.5	;
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
-	public static final int nbCycle = 1000;
 	public static final boolean setVoidDetection = false ;
 
 
@@ -83,7 +85,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/twoDimensionsLauncher.xml");
+		File file = new File("resources/"+configFile);
 		backupSystem.load(file);
 
 		amoeba.saver = new SaveHelperImpl(amoeba);
@@ -120,6 +122,14 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		System.out.println("REQUEST TYPES");
 		System.out.println(amoeba.data.requestCounts);
 
+		/*double errorsMean = 0;
+		for (int i = 0; i < nbCycle/4; ++i) {
+			errorsMean += studiedSystem.getErrorOnRequest(amoeba);
+		}
+		errorsMean = errorsMean/(nbCycle/4);
+		System.out.println("PREDICTION MEAN ERROR " + errorsMean);*/
+
+		//amoeba.saver.newManualSave( dimension + "_" + nbCycle +"_TestManualSave", "saves/");
 		amoeba.saver.newManualSave("TestManualSave", "saves/");
 
 		Configuration.commandLineMode = false;
@@ -129,14 +139,18 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		StudiedSystem studiedSystem2 = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba2.setStudiedSystem(studiedSystem2);
 		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);
-		File file2 = new File("resources/twoDimensionsLauncher.xml");
+		File file2 = new File("resources/"+configFile);
 		backupSystem2.load(file2);
 
 		amoeba2.saver = new SaveHelperImpl(amoeba2, amoebaUI);
+
 		amoeba2.saver.load("saves/"+nbCycle +"_TestManualSave.xml");
+		//amoeba2.saver.load("saves/"+amoeba.getCycle()+ "_" +dimension + "_" + nbCycle +"_TestManualSave.xml");
 		amoeba2.setRenderUpdate(true);
 
 		amoebaUI.rectangle.delete();
+
+
 	}
 
 	

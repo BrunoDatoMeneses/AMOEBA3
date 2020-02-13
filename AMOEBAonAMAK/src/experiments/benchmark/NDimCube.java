@@ -172,4 +172,9 @@ public class NDimCube implements StudiedSystem{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public double getErrorOnRequest(AMOEBA amoeba) {
+		return 0;
+	}
 }

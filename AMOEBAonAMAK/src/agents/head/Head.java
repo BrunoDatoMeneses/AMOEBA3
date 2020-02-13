@@ -628,6 +628,7 @@ public class Head extends AmoebaAgent {
 				nearestContext = this.getNearestContext(searchList);
 				if(nearestContext != null) {
 					getAmas().data.prediction = nearestContext.getActionProposal();
+					bestContext = nearestContext;
 				} else {
 					getAmas().data.prediction = 0.0;
 				}

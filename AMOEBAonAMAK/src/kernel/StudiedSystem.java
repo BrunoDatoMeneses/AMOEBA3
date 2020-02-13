@@ -62,6 +62,7 @@ public interface StudiedSystem extends Serializable{
 
 
 	public Double getRandomRequestCounts() ;
+	public double getErrorOnRequest(AMOEBA amoeba);
 	
 	
 

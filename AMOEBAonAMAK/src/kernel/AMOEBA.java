@@ -652,6 +652,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		return this.perceptions.get(key);
 	}
 
+	public HashMap<String, Double> getPerceptions() {
+		return this.perceptions;
+	}
+
 	@Override
 	public boolean isCreationOfNewContext() {
 		return creationOfNewContext;
