@@ -50,7 +50,7 @@ public class F_N_Launcher implements Serializable {
 	public static final boolean setActiveLearning = true	;
 	public static final boolean setSelfLearning = false	;
 	public static final int nbCycle = 1000;
-	public static final int nbTest = 50;
+	public static final int nbTest = 10;
 
 	public static final boolean setVoidDetection = false ;
 
@@ -95,12 +95,17 @@ public class F_N_Launcher implements Serializable {
 		for (String dataName : dataStrings){
 			data.put(dataName, new ArrayList<>());
 		}
-		
+
+		double start = System.currentTimeMillis();
 		for (int i = 0; i < nbTest; ++i) {
 			System.out.print(i + " ");
 			ellsaTest(data);
 		}
 		System.out.println("");
+		double total = (System.currentTimeMillis()- start)/1000;
+		double mean = total/ nbTest;
+		System.out.println("[TIME MEAN] " + mean + " s");
+		System.out.println("[TIME TOTAL] " + total + " s");
 		
 		
 		

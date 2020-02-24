@@ -130,15 +130,15 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
         amoeba.onSystemCycleBegin();
 
-        Context ctxt1 = new Context(amoeba,manualRanges1);
+        //Context ctxt1 = new Context(amoeba,manualRanges1);
         Context ctxt2 = new Context(amoeba,manualRanges2);
-        Context ctxt3 = new Context(amoeba,manualRanges3);
+        //Context ctxt3 = new Context(amoeba,manualRanges3);
 
 
         ArrayList<Context> contexts = new ArrayList<>();
-        contexts.add(ctxt1);
+        //contexts.add(ctxt1);
         contexts.add(ctxt2);
-        contexts.add(ctxt3);
+        //contexts.add(ctxt3);
 
 
         amoeba.getHeadAgent().activatedNeighborsContexts = contexts;

@@ -626,7 +626,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	private void adaptStart(double oracleValue, double increment, boolean isOverlap, Context bestContext) {
-		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON END ADAPT", context.getName(), percept.getName(), "" + increment )));
+		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("INCREMENT ON START ADAPT", context.getName(), percept.getName(), "" + increment )));
 
 
 		classicStartAdapt(oracleValue, increment, isOverlap, bestContext);
@@ -1548,18 +1548,16 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	public void setStart(double newStartValue) {
 
-		if (context != null && percept != null) {
-			////// System.out.println(context.getName() + " " + percept.getName() + " START
-			////// " + (Math.abs(newStartValue-this.start)));
+
+		if(((Double) this.start) != null && this.context!= null && this.percept!= null){
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
+					Arrays.asList(this.context.getName(), this.percept.getName(), "OLD START", "" + this.start)));
 		}
 
-		if ((Double) newStartValue != null) {
-			if (newStartValue < percept.getMin()) {
-				this.start = percept.getMin();
 
-			} else {
-				this.start = newStartValue;
-			}
+		if (newStartValue < percept.getMin()) {
+			this.start = percept.getMin();
+
 		} else {
 			this.start = newStartValue;
 		}
@@ -1588,19 +1586,18 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	public void setEnd(double newEndValue) {
 
-		if (context != null && percept != null) {
-			////// System.out.println(context.getName() + " " + percept.getName() + " END "
-			////// + (Math.abs(newEndValue-this.end)));
+		if(((Double) this.end) != null && this.context!= null && this.percept!= null){
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
+					Arrays.asList(this.context.getName(), this.percept.getName(), "OLD END", "" + this.end)));
 		}
-		if ((Double) newEndValue != null) {
-			if (newEndValue > percept.getMax()) {
-				this.end = percept.getMax();
-			} else {
-				this.end = newEndValue;
-			}
+
+
+		if (newEndValue > percept.getMax()) {
+			this.end = percept.getMax();
 		} else {
 			this.end = newEndValue;
 		}
+
 		
 		//this.end = newEndValue;
 		

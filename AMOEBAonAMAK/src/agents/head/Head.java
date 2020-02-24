@@ -158,6 +158,8 @@ public class Head extends AmoebaAgent {
 			for (Context ctxt : activatedNeighborsContexts) {
 				
 				ctxt.isInNeighborhood = true;
+				ctxt.restructured = false;
+				ctxt.conflictResolved = false;
 				neighborhoodVolumesSum += ctxt.getVolume();
 
 

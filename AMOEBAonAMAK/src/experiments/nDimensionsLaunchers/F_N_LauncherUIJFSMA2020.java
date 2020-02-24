@@ -56,7 +56,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 	public static final boolean setVoidDetection2 = true ;
 
-	public static final boolean setFrontierRequest = false ;
+	public static final boolean setFrontierRequest = true ;
 
 	AMOEBA amoeba;
 	StudiedSystem studiedSystem;

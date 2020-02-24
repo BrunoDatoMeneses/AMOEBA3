@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
@@ -69,8 +70,10 @@ public class Context extends AmoebaAgent {
 	public static final double  minError = 1;
 	public static final int successesBeforeDiminution = 5;
 	public static final int errorsBeforeAugmentation = 5;
-	
+
+	public boolean conflictResolved = false;
 	public boolean fusionned = false;
+	public boolean restructured = false;
 	public boolean isInNeighborhood = false;
 	
 	static final int VOID_CYCLE_START = 0;
@@ -857,14 +860,31 @@ public class Context extends AmoebaAgent {
 				voidToAdd.put(pct, void1D);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(pct.getName(),""+void1D)));
 
+				ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd = new ArrayList<>();
 
 				for(Percept otherPercept : getAllOtherPercepts(pct)){
-					voidToAdd.put(otherPercept, zoneBounds.get(otherPercept));
+
+					Pair<Double, Double> perceptZoneBounds = zoneBounds.get(otherPercept);
+					double perceptZoneBoundsLength =  perceptZoneBounds.getB() -  perceptZoneBounds.getA(); //TODO smaller voids ?
+
+					addOtherPerceptZoneBounds(voidToAdd, additionnalVoidsToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
+
+					if(additionnalVoidsToAdd.size()>0){
+
+						for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : new ArrayList<>(additionnalVoidsToAdd)){
+							addOtherPerceptZoneBounds(additionnalVoid, additionnalVoidsToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
+						}
+					}
+
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(otherPercept.getName(),""+zoneBounds.get(otherPercept))));
 				}
 
 				voidsToReturn.add(new VOID(voidToAdd));
-
+				if(additionnalVoidsToAdd.size()>0){
+					for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : additionnalVoidsToAdd){
+						voidsToReturn.add(new VOID(additionnalVoid));
+					}
+				}
 			}
 
 
@@ -890,6 +910,29 @@ public class Context extends AmoebaAgent {
 
 
 
+	}
+
+	private void addOtherPerceptZoneBounds(HashMap<Percept, Pair<Double, Double>> voidToAdd, ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd, Percept otherPercept, Pair<Double, Double> perceptZoneBounds, double perceptZoneBoundsLength) {
+		/*if(perceptZoneBoundsLength> otherPercept.getRadiusContextForCreation()*2){
+			HashMap<Percept, Pair<Double, Double>> aditionnalVoidToAdd = new HashMap<>();
+
+			for (Map.Entry<Percept, Pair<Double, Double>> entry : voidToAdd.entrySet()) {
+				aditionnalVoidToAdd.put(entry.getKey(), entry.getValue());
+			}
+			double middleBound = (perceptZoneBounds.getA() + perceptZoneBounds.getB())  / 2 ;
+			Pair<Double, Double> perceptZoneBounds1 = new Pair<>(perceptZoneBounds.getA(), middleBound);
+			Pair<Double, Double> perceptZoneBounds2 = new Pair<>(middleBound, perceptZoneBounds.getB());
+
+			aditionnalVoidToAdd.put(otherPercept, perceptZoneBounds1);
+			voidToAdd.put(otherPercept, perceptZoneBounds2);
+
+			additionnalVoidsToAdd.add(aditionnalVoidToAdd);
+		}else{
+			voidToAdd.put(otherPercept, perceptZoneBounds);
+		}*/
+		//TODO ??
+
+		voidToAdd.put(otherPercept, perceptZoneBounds);
 	}
 
 
@@ -1044,14 +1087,17 @@ public class Context extends AmoebaAgent {
 	
 				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
+				double modelDifference = this.getLocalModel().getModelDifference(ctxt.getLocalModel());
 				
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
 				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 					
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + modelDifference)));
 				
-				if(distanceDifference<averageDistanceToOraclePrediction) {
+				//if(distanceDifference<averageDistanceToOraclePrediction) {
+				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
+				if(modelDifference<getAmas().data.initRegressionPerformance) {
 					
 					 
 					
@@ -1059,6 +1105,10 @@ public class Context extends AmoebaAgent {
 					for(Percept pct : ranges.keySet()) {
 						
 						boolean fusionTest = true;
+						int sameRanges = 0;
+						int sameBorders = 0;
+						Percept sameBorderPercept = null;
+						String range = "";
 						
 						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
 						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowedOverMapping()){		
@@ -1069,13 +1119,37 @@ public class Context extends AmoebaAgent {
 																		
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
+
+									double startDifference = Math.abs(ranges.get(otherPct).getStart() - ctxt.getRanges().get(otherPct).getStart());
+									double endDifference = Math.abs(ranges.get(otherPct).getEnd() - ctxt.getRanges().get(otherPct).getEnd());
+
 									getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + getEnvironment().getMappingErrorAllowed())));
 									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowedOverMapping()) && (centerDifference< otherPct.getMappingErrorAllowedOverMapping());
+
+									sameRanges += (startDifference < otherPct.getMappingErrorAllowedOverMapping()) && (endDifference< otherPct.getMappingErrorAllowedOverMapping()) ? 1 : 0;
+
+									if((startDifference < otherPct.getMappingErrorAllowedOverMapping()) && !(endDifference< otherPct.getMappingErrorAllowedOverMapping())  ||
+											!(startDifference < otherPct.getMappingErrorAllowedOverMapping()) && (endDifference< otherPct.getMappingErrorAllowedOverMapping())){
+										sameBorders +=1;
+										sameBorderPercept = otherPct;
+
+										if(startDifference < otherPct.getMappingErrorAllowedOverMapping()){
+											range = "Start";
+										}
+										if(endDifference < otherPct.getMappingErrorAllowedOverMapping()){
+											range = "End";
+										}
+									}
+
+
 								}
 							}
 							
 							if(fusionTest) {
-								solveNCS_OverMapping(ctxt);
+								solveNCS_OverMapping(ctxt, pct);
+							}
+							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.conflictResolved && !ctxt.conflictResolved){
+								solveNCS_Restructure(ctxt, sameBorderPercept, range, pct);
 							}
 							
 						}
@@ -1088,24 +1162,76 @@ public class Context extends AmoebaAgent {
 		
 	}
 
-	private void solveNCS_OverMapping(Context fusionContext) {
+	private void solveNCS_OverMapping(Context fusionContext, Percept frontierPercept) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
-				"*********************************************************************************************************** SOLVE NCS OVERMAPPING")));
+				"*********************************************************************************************************** SOLVE NCS OVERMAPPING", this.getName(), fusionContext.getName())));
 		getEnvironment().raiseNCS(NCS.CONTEXT_OVERMAPPING);
 
-		
+
 		for(Percept pct : getAmas().getPercepts()) {
+
 			this.getRanges().get(pct).setEnd(Math.max(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
 			this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
+
+			/*if(pct ==  frontierPercept){
+				this.getRanges().get(pct).setEnd(Math.max(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
+				this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
+			}else{
+				this.getRanges().get(pct).setEnd(Math.min(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
+				this.getRanges().get(pct).setStart(Math.max(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
+			}*/
+
 		}
 		
-		this.setConfidence(2*Math.max(this.getConfidence(), fusionContext.getConfidence()));
+		this.setConfidence(2*Math.max(this.getConfidence(), fusionContext.getConfidence())); // TODO too much ?
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
 		fusionContext.destroy();
 		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+	}
+
+	private void solveNCS_Restructure(Context otherContext, Percept sameBorderPercept, String range, Percept frontierPercept) {
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
+				"*********************************************************************************************************** SOLVE NCS RESTRUCTURE", this.getName(), otherContext.getName())));
+		getEnvironment().raiseNCS(NCS.CONTEXT_RESTRUCTURE);
+
+		if(this.getRanges().get(sameBorderPercept).getLenght() > otherContext.getRanges().get(sameBorderPercept).getLenght()){
+			if(range == "Start"){
+				this.getRanges().get(sameBorderPercept).setStart(otherContext.getRanges().get(sameBorderPercept).getEnd());
+			}
+			if(range == "End"){
+				this.getRanges().get(sameBorderPercept).setEnd(otherContext.getRanges().get(sameBorderPercept).getStart());
+			}
+
+			if(this.getRanges().get(frontierPercept).getCenter() < otherContext.getRanges().get(frontierPercept).getCenter()){
+				otherContext.getRanges().get(frontierPercept).setStart(this.getRanges().get(frontierPercept).getStart());
+			}else{
+				otherContext.getRanges().get(frontierPercept).setEnd(this.getRanges().get(frontierPercept).getEnd());
+			}
+		}else{
+			if(range == "Start"){
+				otherContext.getRanges().get(sameBorderPercept).setStart(this.getRanges().get(sameBorderPercept).getEnd());
+			}
+			if(range == "End"){
+				otherContext.getRanges().get(sameBorderPercept).setEnd(this.getRanges().get(sameBorderPercept).getStart());
+			}
+
+			if(this.getRanges().get(frontierPercept).getCenter() < otherContext.getRanges().get(frontierPercept).getCenter()){
+				this.getRanges().get(frontierPercept).setEnd(otherContext.getRanges().get(frontierPercept).getEnd());
+			}else{
+				this.getRanges().get(frontierPercept).setStart(otherContext.getRanges().get(frontierPercept).getStart());
+			}
+		}
+
+
+
+
+
+		restructured =  true;
+		otherContext.restructured = true;
+		//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 	
 	public void solveNCS_ChildContext() {
@@ -1198,6 +1324,7 @@ public class Context extends AmoebaAgent {
 			ranges.get(p).adapt(p.getValue(), false, null);
 		}
 
+		conflictResolved = true;
 
 
 
