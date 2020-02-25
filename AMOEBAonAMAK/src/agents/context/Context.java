@@ -71,7 +71,7 @@ public class Context extends AmoebaAgent {
 	public static final int successesBeforeDiminution = 5;
 	public static final int errorsBeforeAugmentation = 5;
 
-	public boolean conflictResolved = false;
+	public boolean modified = false;
 	public boolean fusionned = false;
 	public boolean restructured = false;
 	public boolean isInNeighborhood = false;
@@ -501,14 +501,16 @@ public class Context extends AmoebaAgent {
 	 *
 	 * @param head the head
 	 */
-	public void solveNCS_Concurrence(Head head) {
+	public void solveNCS_Concurrence(Context bestContext) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CONCURENCE")));
 
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONCURRENCE);
-		this.shrinkRangesToJoinBorders(head.getBestContext());
+		this.shrinkRangesToJoinBorders(bestContext);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+
+		modified = true;
 	}
 
 	/**
@@ -580,6 +582,13 @@ public class Context extends AmoebaAgent {
 
 	}
 
+
+	public boolean isSameModel(Context ctxt) {
+		return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
+				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
+          this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().data.initRegressionPerformance/ this.getLocalModel().getCoef().length);
+	}
+
 	public void analyzeResults4(Head head) {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -587,9 +596,8 @@ public class Context extends AmoebaAgent {
 		
 		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
 		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
-		if(lastDistanceToModel <= lastAverageRegressionPerformanceIndicator) {
-		//if(getLocalModel().distance(this.getCurrentExperiment()) < head.getAverageRegressionPerformanceIndicator()) {
-		//if (head.getCriticity(this) < head.getErrorAllowed()) {
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
+		if(isSameModel(head.getBestContext())) {
 			confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
 		} else {
@@ -688,7 +696,6 @@ public class Context extends AmoebaAgent {
 		ArrayList<EndogenousRequest> potentialRequests = new ArrayList<>();
 		
 		double currentDistance = 0.0;
-		boolean differentModel = false;
 
 		double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 		double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
@@ -696,7 +703,8 @@ public class Context extends AmoebaAgent {
 		Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 		Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 
-		if(distanceDifference>averageDistanceToOraclePrediction) differentModel=true;
+		//if(distanceDifference>averageDistanceToOraclePrediction) differentModel=true;
+		boolean differentModel=!isSameModel(ctxt);
 
 		int overlapCounts = 0;
 		for (Percept pct : getAmas().getPercepts()) {
@@ -755,6 +763,8 @@ public class Context extends AmoebaAgent {
 					frontierRequestLeft.put(pct, frontierBounds.get(pct).getA()+ (pct.getMappingErrorAllowedMin()/2));
 					frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
 					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
+
+					int chances = (getAmas().getCycle()>1000) ? 2 : 5;
 					if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(5) && getAmas().data.isFrontierRequest){
 
 						potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
@@ -782,10 +792,10 @@ public class Context extends AmoebaAgent {
 					
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
 				
-				if(distanceDifference<=averageDistanceToOraclePrediction && getAmas().data.isConcurrenceDetection) {
+				if(!differentModel && getAmas().data.isConcurrenceDetection) {
 					potentialRequests.add( new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE));
 				}
-				else if(distanceDifference > averageDistanceToOraclePrediction &&  getAmas().data.isConflictDetection){
+				else if(differentModel &&  getAmas().data.isConflictDetection){
 					potentialRequests.add( new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT));
 				}
 				
@@ -1087,17 +1097,17 @@ public class Context extends AmoebaAgent {
 	
 				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
-				double modelDifference = this.getLocalModel().getModelDifference(ctxt.getLocalModel());
+
 				
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
 				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 					
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + modelDifference)));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + this.getLocalModel().getModelDifference(ctxt.getLocalModel()))));
 				
 				//if(distanceDifference<averageDistanceToOraclePrediction) {
 				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
-				if(modelDifference<getAmas().data.initRegressionPerformance) {
+				if(isSameModel(ctxt)) {
 					
 					 
 					
@@ -1148,7 +1158,7 @@ public class Context extends AmoebaAgent {
 							if(fusionTest) {
 								solveNCS_OverMapping(ctxt, pct);
 							}
-							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.conflictResolved && !ctxt.conflictResolved){
+							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified){
 								solveNCS_Restructure(ctxt, sameBorderPercept, range, pct);
 							}
 							
@@ -1161,6 +1171,8 @@ public class Context extends AmoebaAgent {
 		}
 		
 	}
+
+
 
 	private void solveNCS_OverMapping(Context fusionContext, Percept frontierPercept) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
@@ -1324,7 +1336,7 @@ public class Context extends AmoebaAgent {
 			ranges.get(p).adapt(p.getValue(), false, null);
 		}
 
-		conflictResolved = true;
+		modified = true;
 
 
 

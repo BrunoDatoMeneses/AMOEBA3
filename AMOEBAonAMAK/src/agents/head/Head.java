@@ -50,6 +50,7 @@ public class Head extends AmoebaAgent {
 	public Double minNeighborhoodEndIncrement = null;
 	
 	public EndogenousRequest lastEndogenousRequest = null;
+	public EndogenousRequest currentEndogenousRequest = null;
 
 	static final int NEIGH_VOID_CYCLE_START = 0;
 
@@ -124,7 +125,7 @@ public class Head extends AmoebaAgent {
 		setContextFromPropositionWasSelected(false);
 		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
 		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
-		setAverageRegressionPerformanceIndicator();
+		//setAverageRegressionPerformanceIndicator(); //TODO not working
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;
@@ -159,7 +160,7 @@ public class Head extends AmoebaAgent {
 				
 				ctxt.isInNeighborhood = true;
 				ctxt.restructured = false;
-				ctxt.conflictResolved = false;
+				ctxt.modified = false;
 				neighborhoodVolumesSum += ctxt.getVolume();
 
 
@@ -1178,7 +1179,7 @@ public class Head extends AmoebaAgent {
 		}
 		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 
-		
+		resetLastEndogenousRequest();
 	}
 
 	private void NCSDetection_Context_Overmapping() {
@@ -1221,9 +1222,8 @@ public class Head extends AmoebaAgent {
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("", "" + ( activatedContexts.get(i).getLocalModel().distance(activatedContexts.get(i).getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()))));
 
-					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && activatedContexts.get(i).getLocalModel().distance(activatedContexts.get(i).getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
-		
-						activatedContexts.get(i).solveNCS_Concurrence(this);
+					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && activatedContexts.get(i).isSameModel(bestContext)) {
+						activatedContexts.get(i).solveNCS_Concurrence(bestContext);
 					}
 			}
 		}
@@ -1612,7 +1612,7 @@ public class Head extends AmoebaAgent {
 			getAmas().data.firstContext = true;
 		}
 
-		resetLastEndogenousRequest();
+
 		return context;
 	}
 
@@ -2351,8 +2351,11 @@ public class Head extends AmoebaAgent {
 	}
 	
 	public void resetLastEndogenousRequest() {
+		currentEndogenousRequest = lastEndogenousRequest;
 		lastEndogenousRequest = null;
 	}
+
+
 	
 	public void deleteRequest(Context ctxt) {
 		
@@ -2443,7 +2446,8 @@ public class Head extends AmoebaAgent {
 	
 	public Double getAverageRegressionPerformanceIndicator() {
 		
-		return getAmas().data.averageRegressionPerformanceIndicator;
+		//return getAmas().data.averageRegressionPerformanceIndicator; //TODO solution ?
+		return getAmas().data.initRegressionPerformance;
 		
 	}
 	

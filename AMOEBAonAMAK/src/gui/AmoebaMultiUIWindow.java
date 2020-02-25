@@ -69,6 +69,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		point.setName("Cursor");
 		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
 		rectangle.setName("Neighborhood");
+
 		rectangle.setColor(new Color(1, 1, 1, 0));
 		
 		plots.put("This loop NCS", new AmakPlot(this, "This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));

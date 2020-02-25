@@ -321,7 +321,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
 		/* Square */
-		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+//		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
 
 		/* Square artcile JFSMA 2020*/
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
@@ -332,13 +332,10 @@ public class F_N_Manager implements StudiedSystem{
 		/* Split */
 		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
+		/* Gaussian */
+		return gaussianModel(xRequest, center, 500, 20);
 		
-		
-		/* Cercle */
-//		double rho = Math.sqrt(x1*x1 + x0*x0);
-//		double start = 50.0;
-//		double width = 25.0;
-//		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
+
 		
 		
 		
@@ -448,6 +445,8 @@ private double[] subZoneCenter3D(int nb) {
 	private double gaussianMapping2D(Double[] xRequest) {
 		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/5, 2))/2) -50) ? model1() : model2();
 	}
+
+
 	
 	private double square2DModel(Double[] xRequest, double[] center) {
 		return ((center[0]-spaceSize/2)  < xRequest[0]  && 

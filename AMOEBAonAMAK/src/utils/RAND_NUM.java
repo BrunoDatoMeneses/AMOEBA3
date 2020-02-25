@@ -7,6 +7,6 @@ public class RAND_NUM {
     }
 
     public static boolean oneChanceIn(int chances){
-        return randInt(0,chances)<1;
+        return randInt(1,chances)==1;
     }
 }

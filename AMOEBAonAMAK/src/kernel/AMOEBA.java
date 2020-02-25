@@ -698,6 +698,15 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
 		((AmoebaMultiUIWindow)amasMultiUIWindow).point.toFront();
 		((AmoebaMultiUIWindow)amasMultiUIWindow).point.setInfo(getCursorInfo());
+		if(getHeadAgent() != null){
+			if(getHeadAgent().currentEndogenousRequest != null){
+				((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setInfo(""+getHeadAgent().currentEndogenousRequest.getType());
+			}else{
+				((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setInfo(""+REQUEST.RDM);
+			}
+		}
+
+
 	}
 	
 	/**

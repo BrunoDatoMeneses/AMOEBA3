@@ -30,31 +30,6 @@ import utils.TRACE_LEVEL;
 public class F_N_LauncherUI  extends Application implements Serializable {
 
 
-	public static final double oracleNoiseRange = 0.5;
-	public static final double learningSpeed = 0.01;
-	public static final int regressionPoints = 100;
-	public static final int dimension = 2;
-	public static final double spaceSize = 50.0	;
-	public static final int nbOfModels = 2	;
-	public static final int normType = 2	;
-	public static final boolean randomExploration = true;
-	public static final boolean limitedToSpaceZone = true;
-	//public static final double mappingErrorAllowed = 0.07; // BIG SQUARE
-	public static double mappingErrorAllowed = 0.05; // MULTI
-	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 0.5	;
-	public static final boolean setActiveLearning = true	;
-	public static final boolean setSelfLearning = false	;
-	public static final int nbCycle = 1000;
-
-	public static final boolean setConflictDetection = true ;
-	public static final boolean setConcurrenceDetection = true ;
-	public static final boolean setVoidDetection = false ;
-	public static final boolean setVoidDetection2 = true ;
-
-	public static final boolean setConflictResolution = true ;
-	public static final boolean setConcurrenceResolution = true ;
-
 
 	public static void main(String[] args) throws IOException {
 		
@@ -79,28 +54,28 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		VUIMulti amoebaVUI = new VUIMulti("2D");
 		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
 		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
+		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/twoDimensionsLauncher.xml");
+		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 		
 		amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 		
 		amoeba.allowGraphicalScheduler(true);
 		amoeba.setRenderUpdate(false);
-		amoeba.data.learningSpeed = learningSpeed;
-		amoeba.data.numberOfPointsForRegression = regressionPoints;
-		amoeba.data.isActiveLearning = setActiveLearning;
-		amoeba.data.isSelfLearning = setSelfLearning;
-		amoeba.data.isConflictDetection = setConflictDetection;
-		amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
-		amoeba.data.isVoidDetection = setVoidDetection;
-		amoeba.data.isVoidDetection2 = setVoidDetection2;
-		amoeba.data.isConflictResolution = setConflictResolution;
-		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
-		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-		amoeba.data.initRegressionPerformance = 1.0;
+		amoeba.data.learningSpeed = PARAMS.learningSpeed;
+		amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+		amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
+		amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
+		amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
+		amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
+		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 		World.minLevel = TRACE_LEVEL.DEBUG;
 		
 		//for (int i = 0; i < nbCycle; ++i) {

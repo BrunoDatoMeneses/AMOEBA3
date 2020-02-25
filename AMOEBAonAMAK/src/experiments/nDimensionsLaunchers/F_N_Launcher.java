@@ -34,36 +34,7 @@ import utils.TRACE_LEVEL;
 public class F_N_Launcher implements Serializable {
 
 
-	public static final double oracleNoiseRange = 0.5;
-	public static final double learningSpeed = 0.01;
-	public static final int regressionPoints = 100;
-	public static final int dimension = 2;
-	public static final double spaceSize = 50.0	;
-	public static final int nbOfModels = 2	;
-	public static final int normType = 2	;
-	public static final boolean randomExploration = true;
-	public static final boolean limitedToSpaceZone = true;
-	//public static final double mappingErrorAllowed = 0.07; // BIG SQUARE
-	public static double mappingErrorAllowed = 0.05; // MULTI
-	public static final double explorationIncrement = 1.0	;
-	public static final double explorationWidht = 0.5	;
-	public static final boolean setActiveLearning = true	;
-	public static final boolean setSelfLearning = false	;
-	public static final int nbCycle = 1000;
-	public static final int nbTest = 10;
 
-	public static final boolean setVoidDetection = false ;
-
-
-	public static final boolean setConflictDetection = true ;
-	public static final boolean setConflictResolution = setConflictDetection ;
-
-	public static final boolean setConcurrenceDetection = true ;
-	public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
-
-	public static final boolean setVoidDetection2 = true ;
-
-	public static final boolean setFrontierRequest = true ;
 
 
 	public static void main(String[] args) throws Exception {
@@ -97,13 +68,13 @@ public class F_N_Launcher implements Serializable {
 		}
 
 		double start = System.currentTimeMillis();
-		for (int i = 0; i < nbTest; ++i) {
+		for (int i = 0; i < PARAMS.nbTest; ++i) {
 			System.out.print(i + " ");
 			ellsaTest(data);
 		}
 		System.out.println("");
 		double total = (System.currentTimeMillis()- start)/1000;
-		double mean = total/ nbTest;
+		double mean = total/ PARAMS.nbTest;
 		System.out.println("[TIME MEAN] " + mean + " s");
 		System.out.println("[TIME TOTAL] " + total + " s");
 		
@@ -164,27 +135,28 @@ public class F_N_Launcher implements Serializable {
 
 	private static void ellsaTest(HashMap<String, ArrayList<Double>> data) {
 		AMOEBA amoeba = new AMOEBA(null,  null);
-		StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
+		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
-		File file = new File("resources/twoDimensionsLauncher.xml");
+		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 		
 		
 		amoeba.allowGraphicalScheduler(false);
 		amoeba.setRenderUpdate(false);		
-		amoeba.data.learningSpeed = learningSpeed;
-		amoeba.data.numberOfPointsForRegression = regressionPoints;
-		amoeba.data.isActiveLearning = setActiveLearning;
-		amoeba.data.isSelfLearning = setSelfLearning;
-		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-		amoeba.data.isConflictDetection = setConflictDetection;
-		amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
-		amoeba.data.isVoidDetection = setVoidDetection;
-		amoeba.data.isConflictResolution = setConflictResolution;
-		amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
-		amoeba.data.isVoidDetection2 = setVoidDetection2;
-		amoeba.data.isFrontierRequest = setFrontierRequest;
+		amoeba.data.learningSpeed = PARAMS.learningSpeed;
+		amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+		amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
+		amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
+		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+		amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
+		amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+		amoeba.data.isVoidDetection = PARAMS.setVoidDetection;
+		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
+		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 		
 		amoeba.setRenderUpdate(false);
 		
@@ -194,15 +166,15 @@ public class F_N_Launcher implements Serializable {
 
 		
 		
-		for (int i = 0; i < nbCycle; ++i) {
+		for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			amoeba.cycle();
 		}
 
 		double errorsMean = 0;
-		for (int i = 0; i < nbCycle/4; ++i) {
+		for (int i = 0; i < PARAMS.nbCycle/4; ++i) {
 			errorsMean += studiedSystem.getErrorOnRequest(amoeba);
 		}
-		errorsMean = errorsMean/(nbCycle/4);
+		errorsMean = errorsMean/(PARAMS.nbCycle/4);
 
 		HashMap<String, Double> mappingScores = amoeba.getHeadAgent().getMappingScores();
 		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
