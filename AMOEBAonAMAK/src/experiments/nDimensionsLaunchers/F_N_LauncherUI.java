@@ -78,9 +78,9 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 		World.minLevel = TRACE_LEVEL.DEBUG;
 		
-		//for (int i = 0; i < nbCycle; ++i) {
-		//	amoeba.cycle();
-		//}
+		for (int i = 0; i < PARAMS.nbCycle; ++i) {
+			amoeba.cycle();
+		}
 		
 		
 		// Exemple for adding a tool in the toolbar

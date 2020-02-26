@@ -2,9 +2,9 @@ package experiments.nDimensionsLaunchers;
 
 public class PARAMS {
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
-    public static final int nbCycle = 1000;
+    public static final String configFile = "threeDimensionsLauncher.xml";
+    public static final int dimension = 3;
+    public static final int nbCycle = 10000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
     public static double mappingErrorAllowed = 0.07;
@@ -44,7 +44,7 @@ public class PARAMS {
 
     public static final boolean setVoidDetection2 = true ;
 
-    public static final boolean setFrontierRequest = false ;
+    public static final boolean setFrontierRequest = true ;
 
 
 }

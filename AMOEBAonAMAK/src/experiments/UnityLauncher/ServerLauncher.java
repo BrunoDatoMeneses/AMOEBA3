@@ -1,5 +1,7 @@
 package experiments.UnityLauncher;
 
+import javafx.application.Application;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
@@ -23,7 +25,7 @@ public class ServerLauncher implements Serializable{
 			t.start();
 
 		} catch (IOException e) {
-			System.err.println("Le port " + socket.getLocalPort() + " est dÈj‡ utilisÈ !");
+			System.err.println("Le port " + socket.getLocalPort() + " est d√©j√† utilis√© !");
 			e.printStackTrace();
 		}
 	}
