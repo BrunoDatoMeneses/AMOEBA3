@@ -30,6 +30,7 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	AmoebaMultiUIWindow amoebaUI;
+	boolean test = true;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -131,9 +132,10 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 			e.printStackTrace();
 		}
 
+		int i = 0;
 
-
-		for(int i = 0; i < cycles; i++)
+		while(test)
+		//for(int i = 0; i < cycles; i++)
 		{
 			if(i%100==0){
 				System.out.print(i + " ");
@@ -150,6 +152,9 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 					public void run()
 					{
 						amoeba.cycle();
+						test = amoeba.data.normalizedCriticality < 100000;
+						//System.out.println(amoeba.data.normalizedCriticality);
+
 
 
 					}
@@ -161,7 +166,12 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 			{
 				e.printStackTrace();
 			}
+
+			i+=1;
 		}
+		System.out.println(i-1);
+		System.out.println(amoeba.data.normalizedCriticality);
+		System.out.println(amoeba.getHeadAgent().getBestContext().getName());
 
 
 	}

@@ -2,17 +2,17 @@ package experiments.nDimensionsLaunchers;
 
 public class PARAMS {
 
-    public static final String configFile = "threeDimensionsLauncher.xml";
-    public static final int dimension = 3;
-    public static final int nbCycle = 10000;
+    public static final String configFile = "twoDimensionsLauncher.xml";
+    public static final int dimension = 2;
+    public static final int nbCycle = 1000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.07;
+    public static double mappingErrorAllowed = 0.04;
 
     /* REGRESSION */
     public static final double oracleNoiseRange = 0.5;
-    public static final double learningSpeed = 0.01;
-    public static final int regressionPoints = 100;
+    public static final double learningSpeed = 0.1;
+    public static final int regressionPoints = 10;
 
     /* XP */
     public static final int nbOfModels = 2	;
@@ -30,7 +30,7 @@ public class PARAMS {
     public static final boolean setSelfLearning = false	;
 
     /* PREDICTION */
-    public static final double setRegressionPerformance = 1.0;
+    public static final double setRegressionPerformance = 1;
 
 
     /*NCS*/
@@ -44,7 +44,13 @@ public class PARAMS {
 
     public static final boolean setVoidDetection2 = true ;
 
-    public static final boolean setFrontierRequest = true ;
+    public static final boolean setFrontierRequest = false ;
 
+
+    /*UI*/
+
+    public static final boolean contextColorByCoef = false ;
+    public static final double maxPrediction = 500 ;
+    public static final double minPrediction = 0 ;
 
 }

@@ -76,11 +76,11 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
 		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		World.minLevel = TRACE_LEVEL.DEBUG;
+		World.minLevel = TRACE_LEVEL.EVENT;
 		
-		for (int i = 0; i < PARAMS.nbCycle; ++i) {
+		/*for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			amoeba.cycle();
-		}
+		}*/
 		
 		
 		// Exemple for adding a tool in the toolbar

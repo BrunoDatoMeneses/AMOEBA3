@@ -31,6 +31,8 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	public boolean isReinforcement = false;
 
+	public int experiemntNb = 0;
+
 	/**
 	 * Instantiates a new local model miller regression.
 	 *
@@ -222,6 +224,7 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
+		experiemntNb +=1;
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
 		
 		if(isReinforcement) {

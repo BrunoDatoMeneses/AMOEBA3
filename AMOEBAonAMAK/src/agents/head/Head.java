@@ -343,7 +343,7 @@ public class Head extends AmoebaAgent {
 		}
 
 		/* Compute the criticity. Will be used by context agents. */
-		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction);
+		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
 		
 
 		/* If we have a bestcontext, send a selection message to it */
@@ -1627,7 +1627,7 @@ public class Head extends AmoebaAgent {
 			}
 			
 
-			getAmas().data.normalizedCriticality = getAmas().data.criticity/getAmas().data.maxPrediction;
+			getAmas().data.normalizedCriticality = getAmas().data.criticity;// /getAmas().data.maxPrediction;
 			criticalities.addCriticality("predictionCriticality", getAmas().data.normalizedCriticality);
 			
 			criticalities.updateMeans();
