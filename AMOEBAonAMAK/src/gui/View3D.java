@@ -25,6 +25,7 @@ import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.Range;
 import org.jzy3d.plot3d.builder.Builder;
 import org.jzy3d.plot3d.builder.Mapper;
+import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
 import org.jzy3d.plot3d.primitives.Shape;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
@@ -103,13 +104,17 @@ public class View3D {
 
         // Define range and precision for the function to plot
         Range range = new Range(-100, 100);
-        int steps = 80;
+        int steps = 50;
 
         // Create the object to represent the function over the given range.
-        final Shape surface = Builder.buildOrthonormal(mapper, range, steps);
+        final Shape surface = Builder.buildOrthonormal(new OrthonormalGrid(range, steps, range, steps), mapper);
         surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1, 1, 1, .5f)));
-        surface.setFaceDisplayed(true);
-        surface.setWireframeDisplayed(false);
+        surface.setFaceDisplayed(true); // draws surface polygons content
+        surface.setWireframeDisplayed(true); // draw surface polygons border
+        surface.setWireframeColor(Color.BLACK); // set polygon border in black
+
+
+
 
         // -------------------------------
         // Create a chart

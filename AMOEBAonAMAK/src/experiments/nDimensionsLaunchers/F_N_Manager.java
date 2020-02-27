@@ -314,7 +314,7 @@ public class F_N_Manager implements StudiedSystem{
 		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
-//		return multiModel(xRequest, subzone);
+		//return multiModel(xRequest, subzone);
 		
 
 		/* LINEAR */
