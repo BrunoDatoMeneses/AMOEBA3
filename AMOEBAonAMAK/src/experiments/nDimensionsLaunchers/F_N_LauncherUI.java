@@ -51,10 +51,12 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
-		VUIMulti amoebaVUI = new VUIMulti("2D");
-		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
-		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+
+
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+		VUIMulti amoebaVUI = new VUIMulti("2D");
+		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
+		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/"+PARAMS.configFile);

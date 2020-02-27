@@ -11,8 +11,8 @@ public class PARAMS {
 
     /* REGRESSION */
     public static final double oracleNoiseRange = 0.5;
-    public static final double learningSpeed = 0.1;
-    public static final int regressionPoints = 10;
+    public static final double learningSpeed = 0.01;
+    public static final int regressionPoints = (int)(1/learningSpeed);
 
     /* XP */
     public static final int nbOfModels = 2	;
@@ -50,7 +50,7 @@ public class PARAMS {
     /*UI*/
 
     public static final boolean contextColorByCoef = false ;
-    public static final double maxPrediction = 500 ;
-    public static final double minPrediction = 0 ;
+    public static double maxPrediction = 500 ;
+    public static double minPrediction = 0 ;
 
 }

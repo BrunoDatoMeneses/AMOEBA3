@@ -24,8 +24,10 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import kernel.AMOEBA;
+import kernel.StudiedSystem;
 import kernel.backup.SaveHelperImpl;
 
 /**
@@ -41,6 +43,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 	 * The main {@link VUI} for AMOEBA, by default it's the 2D representation of the contexts.
 	 */
 	public VUIMulti mainVUI;
+	public View3D view3D;
 	
 	public Drawable point;
 	public Drawable rectangle;
@@ -48,10 +51,13 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 	public SchedulerToolbar schedulerToolbar;
 	public DimensionSelector dimensionSelector;
 	public Menu windowMenu;
+
+	public StudiedSystem studiedSystem = null;
 	
-	public AmoebaMultiUIWindow(String title, VUIMulti vui) {
+	public AmoebaMultiUIWindow(String title, VUIMulti vui, StudiedSystem ss) {
 		super(title);
 		mainVUI = vui;
+		studiedSystem = ss;
 	}
 	
 	public void initialize(AMOEBA amoeba) {
@@ -71,6 +77,12 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		rectangle.setName("Neighborhood");
 
 		rectangle.setColor(new Color(1, 1, 1, 0));
+
+		if(studiedSystem != null){
+			View3D view3D = new View3D(studiedSystem);
+			this.addTabbedPanel("3D", view3D.getPane());
+		}
+
 		
 		plots.put("This loop NCS", new AmakPlot(this, "This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
 		plots.put("All time NCS", new AmakPlot(this, "All time NCS", ChartType.LINE, "Cycle", "Number of NCS"));

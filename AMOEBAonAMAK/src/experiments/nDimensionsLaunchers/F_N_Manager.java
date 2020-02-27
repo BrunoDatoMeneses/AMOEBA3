@@ -316,7 +316,8 @@ public class F_N_Manager implements StudiedSystem{
 		/* Multi */
 //		return multiModel(xRequest, subzone);
 		
-		
+
+		/* LINEAR */
 		/* Disc */
 		//return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 		
@@ -331,9 +332,16 @@ public class F_N_Manager implements StudiedSystem{
 		
 		/* Split */
 		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
-		
+
+		/* NON LINEAR */
 		/* Gaussian */
-		return gaussianModel(xRequest, center, 500, 60);
+		//return gaussianModel(xRequest, center, 500, 60);
+
+		/* Poly 2 */
+		//return polynomialModel(xRequest, 2, 50);
+
+		/* Goutte */
+		return goutteModel(xRequest, center);
 		
 
 		
@@ -477,6 +485,28 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		return factor*result;
 	}
+
+
+	private double polynomialModel(Double[] xRequest, double power, double division) {
+		double result = 0.0;
+		for(int i=0;i<dimension;i++) {
+			result += Math.pow(xRequest[i],power);
+		}
+		return result/division;
+	}
+
+	private double cosCommeCarreModel(Double[] xRequest, double param) {
+		double result = 0.0;
+		for(int i=0;i<dimension;i++) {
+			result += Math.pow(xRequest[i],2);
+		}
+		return Math.cos(param*result);
+	}
+
+	private double goutteModel(Double[] xRequest, double[] center) {
+		return  gaussianModel(xRequest, center, 200, 50)*cosCommeCarreModel(xRequest, 0.0004) + 200;
+	}
+
 	
 	private double modelN() {
 		
@@ -816,7 +846,7 @@ private double[] subZoneCenter3D(int nb) {
 
 		double prediction = amoeba.request(out);
 		double error = Math.abs(oracleValue-prediction)/Math.abs(oracleValue);
-		System.out.println(oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
+		//System.out.println(oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
 
 		return error;
 

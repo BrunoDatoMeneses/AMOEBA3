@@ -104,7 +104,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		Configuration.commandLineMode = false;
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 		AMOEBA amoeba2 = new AMOEBA(amoebaUI,  amoebaVUI);
 		StudiedSystem studiedSystem2 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba2.setStudiedSystem(studiedSystem2);

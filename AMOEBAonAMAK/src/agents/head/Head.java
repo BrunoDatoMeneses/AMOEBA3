@@ -8,6 +8,7 @@ import agents.context.CustomComparator;
 import agents.context.Experiment;
 import agents.context.VOID;
 import agents.percept.Percept;
+import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
 import kernel.AmoebaData;
 import ncs.NCS;
@@ -1624,6 +1625,11 @@ public class Head extends AmoebaAgent {
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
 				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
+				PARAMS.maxPrediction=getAmas().data.maxPrediction;
+			}
+			if(Math.abs(getAmas().data.oracleValue)<getAmas().data.minPrediction) {
+				getAmas().data.minPrediction = Math.abs(getAmas().data.oracleValue);
+				PARAMS.minPrediction= getAmas().data.minPrediction;
 			}
 			
 

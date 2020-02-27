@@ -112,13 +112,13 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI);
+		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
 		
 		amoebaActionModel1VUI = new VUIMulti("2D");
-		amoebaActionModel1UI = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModel1VUI);
+		amoebaActionModel1UI = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModel1VUI, null);
 		
 		amoebaActionModel2VUI = new VUIMulti("2D");
-		amoebaActionModel2UI = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModel2VUI);
+		amoebaActionModel2UI = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModel2VUI, null);
 		
 		startTask(100, 0);		
 	}

@@ -78,7 +78,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 		
 		// Exemple for adding a tool in the toolbar
@@ -98,7 +98,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		
 		
 		amoebaVUI2 = new VUIMulti("2D");
-		amoebaUI2 = new AmoebaMultiUIWindow("ELLSA", amoebaVUI2);
+		amoebaUI2 = new AmoebaMultiUIWindow("ELLSA", amoebaVUI2, null);
 		
 		
 		// Exemple for adding a tool in the toolbar

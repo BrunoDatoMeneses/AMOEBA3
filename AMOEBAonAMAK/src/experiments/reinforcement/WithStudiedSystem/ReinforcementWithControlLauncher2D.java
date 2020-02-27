@@ -97,13 +97,13 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D REWARD");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI);
+		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
 		
 		amoebaActionModelVUI1 = new VUIMulti("2D");
-		amoebaActionModelUI1 = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModelVUI1);
+		amoebaActionModelUI1 = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModelVUI1, null);
 		
 		amoebaActionModelVUI2 = new VUIMulti("2D");
-		amoebaActionModelUI2 = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModelVUI2);
+		amoebaActionModelUI2 = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModelVUI2, null);
 		
 
 		

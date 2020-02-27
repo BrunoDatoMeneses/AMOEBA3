@@ -73,7 +73,7 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         Configuration.plotMilliSecondsUpdate = 20000;
 
         VUIMulti amoebaVUI = new VUIMulti("2D");
-        AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+        AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
         AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
         StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
         amoeba.setStudiedSystem(studiedSystem);

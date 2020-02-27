@@ -88,7 +88,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 //		amoebaSpatialRewardVUI = new VUIMulti("2D");
 //		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL_REWARD", amoebaSpatialRewardVUI);

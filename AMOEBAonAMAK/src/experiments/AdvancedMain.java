@@ -56,7 +56,7 @@ public class AdvancedMain extends Application{
 
 		
 		VUIMulti amoebaVUI = new VUIMulti("2D");
-		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 		// Create an AMOEBA
 		AMOEBA amoeba = new AMOEBA(amoebaUI, amoebaVUI);

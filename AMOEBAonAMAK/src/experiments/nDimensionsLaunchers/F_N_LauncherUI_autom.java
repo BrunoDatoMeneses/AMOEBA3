@@ -53,7 +53,7 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 
 
 		startTask(100, PARAMS.nbCycle);

@@ -58,7 +58,7 @@ public class AmoebaData implements Serializable {
 	public Double maxConfidence;
 	public Double minConfidence;
 	
-	public Double maxPrediction = 1.0;
+	public Double maxPrediction = Double.NEGATIVE_INFINITY;
 	public Double minPrediction = Double.POSITIVE_INFINITY;
 	
 	public double normalizedCriticality = 0.0;

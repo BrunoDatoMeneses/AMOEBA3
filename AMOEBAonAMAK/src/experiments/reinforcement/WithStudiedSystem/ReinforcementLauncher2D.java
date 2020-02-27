@@ -77,7 +77,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("ELLSA", amoebaSpatialRewardVUI);
+		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("ELLSA", amoebaSpatialRewardVUI, null);
 		
 		
 		// Exemple for adding a tool in the toolbar

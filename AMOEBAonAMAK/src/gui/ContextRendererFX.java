@@ -70,11 +70,17 @@ public class ContextRendererFX extends RenderStrategy {
 		if(context.lastPrediction!=null) {
 
 			double range = max-min;
-			r = (context.lastPrediction-min)/range;
-			b = (max-context.lastPrediction)/range;
+			double middle = (max+min)/2;
+			double prediction = context.lastPrediction;
+			if(prediction < middle){
+				r = (prediction-min)/(range/2);
+				b = (middle-prediction)/(range/2);
+			}else{
+				g = (prediction-middle)/(range/2);
+				r = 1.0;
+			}
 
-			r = r > 1.0 ? 1.0 : r;
-			g = g > 1.0 ? 1.0 : g;
+
 		}else {
 			g = 1.0;
 		}
@@ -83,14 +89,14 @@ public class ContextRendererFX extends RenderStrategy {
 			g = 1.0;
 			b = 0.0;
 		}
-		if(Math.abs(context.lastPrediction) > max) {
-			
-			r = 1.0;
-			g = 0.0;
-			b = 1.0;
-		}
 
 
+		r = r > 1.0 ? 1.0 : r;
+		g = g > 1.0 ? 1.0 : g;
+		b = b > 1.0 ? 1.0 : b;
+		r = r < 0.0 ? 0.0 : r;
+		g = g < 0.0 ? 0.0 : g;
+		b = b < 0.0 ? 0.0 : b;
 		if(context.isInNeighborhood) {
 			drawable.setColor(new Color(r, g, b, 200d / 255d));
 		}else {

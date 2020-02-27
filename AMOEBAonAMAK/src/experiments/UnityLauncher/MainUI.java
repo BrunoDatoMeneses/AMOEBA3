@@ -98,7 +98,7 @@ public class MainUI extends Application{
 		Configuration.plotMilliSecondsUpdate = 20000;
 
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI);
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 
 
 		startTask(100, PARAMS.nbCycle);
