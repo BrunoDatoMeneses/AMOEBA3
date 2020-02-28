@@ -91,6 +91,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public AMOEBA(AmoebaMultiUIWindow window, VUIMulti vui) {
 		super(window, vui, new World(), Scheduling.HIDDEN);
 		vuiMulti = vui;
+		multiUIWindow = window;
 	}
 	
 	/**
@@ -105,6 +106,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		setRenderUpdate(true);
 		saver = new SaveHelperImpl(this, window);
 		saver.load(path);
+		multiUIWindow = window;
 	}
 
 	@Override
@@ -707,6 +709,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 
 
+		if(getCycle()>0 && cycle % 100 == 0){
+
+			multiUIWindow.view3D.updateContextChart();
+		}
 	}
 	
 	/**

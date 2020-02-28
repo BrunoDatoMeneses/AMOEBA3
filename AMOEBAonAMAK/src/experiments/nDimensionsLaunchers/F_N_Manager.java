@@ -31,7 +31,7 @@ public class F_N_Manager implements StudiedSystem{
 	boolean firstStep = true;
 	boolean randomExploration = false;
 	boolean spaceLimited = true;
-	double spaceSize;
+	public double spaceSize;
 	
 	int dimension;
 	int numberOfModels;

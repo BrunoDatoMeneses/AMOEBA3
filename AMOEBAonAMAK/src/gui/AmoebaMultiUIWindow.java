@@ -79,7 +79,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		rectangle.setColor(new Color(1, 1, 1, 0));
 
 		if(studiedSystem != null){
-			View3D view3D = new View3D(studiedSystem);
+			view3D = new View3D(studiedSystem, amoeba);
 			this.addTabbedPanel("3D", view3D.getPane());
 		}
 

@@ -124,6 +124,22 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 		return result;
 	}
+
+	public double getPropositionFrom2DPerceptions(double[] situation) {
+
+		double result = coefs[0];
+
+		if (coefs[0] == Double.NaN) System.exit(0);
+
+		for (int i = 1 ; i < coefs.length ; i++) {
+
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+			result += coefs[i] * situation[i-1];
+
+		}
+
+		return result;
+	}
 	
 	@Override
 	public double getMaxProposition() {
