@@ -13,6 +13,7 @@ import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
+import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -709,7 +710,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 
 
-		if(getCycle()>0 && cycle % 100 == 0){
+		if(getCycle()>0 && cycle % PARAMS.nbCycleRefresh3DView == 0){
 
 			multiUIWindow.view3D.updateContextChart();
 		}

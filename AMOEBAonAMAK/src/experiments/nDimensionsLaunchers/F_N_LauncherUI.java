@@ -78,7 +78,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
 		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		World.minLevel = TRACE_LEVEL.CYCLE;
+		World.minLevel = PARAMS.traceLevel;
 		
 		/*for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			amoeba.cycle();

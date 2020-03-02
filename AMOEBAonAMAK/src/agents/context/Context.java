@@ -48,7 +48,7 @@ public class Context extends AmoebaAgent {
 	private int nSelection = 0;
 	private int tickCreation;
 
-	private double action;
+	private Double action;
 
 	private Double actionProposition = null;
 	public Double lastPrediction = null;
@@ -294,7 +294,7 @@ public class Context extends AmoebaAgent {
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
-			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && getAmas().data.isActiveLearning) {
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && (getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
 				
 				
 				
@@ -332,7 +332,11 @@ public class Context extends AmoebaAgent {
 		
 		localModel.setFirstExperiments(new ArrayList<Experiment>(bestNearestContext.getLocalModel().getFirstExperiments()));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.learningSpeed);
+		Experiment currentExperiment = this.getCurrentExperiment();
+		if(currentExperiment != null){
+			localModel.updateModel(currentExperiment, getAmas().data.learningSpeed);
+		}
+
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
@@ -482,7 +486,7 @@ public class Context extends AmoebaAgent {
 	 * @param head the head
 	 */
 	public void solveNCS_IncompetentHead(Head head) {
-		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS INCOMPETENT HEAD")));
 
 		getEnvironment().raiseNCS(NCS.HEAD_INCOMPETENT);
@@ -495,11 +499,11 @@ public class Context extends AmoebaAgent {
 	 *
 	 * @param head the head
 	 */
-	public void solveNCS_Concurrence(Context bestContext) {
+	public void solveNCS_Overlap(Context bestContext) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
-				"*********************************************************************************************************** SOLVE NCS CONCURENCE")));
+				"*********************************************************************************************************** SOLVE NCS OVERLAP")));
 
-		getEnvironment().raiseNCS(NCS.CONTEXT_CONCURRENCE);
+		getEnvironment().raiseNCS(NCS.CONTEXT_OVERLAP);
 		this.shrinkRangesToJoinBorders(bestContext);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
@@ -583,6 +587,10 @@ public class Context extends AmoebaAgent {
           this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().data.initRegressionPerformance/ this.getLocalModel().getCoef().length);
 	}
 
+	public boolean isSameModelWithoutOracle(Context ctxt) {
+		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().data.initRegressionPerformance/ this.getLocalModel().getCoef().length);
+	}
+
 	public void analyzeResults4(Head head) {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -591,11 +599,20 @@ public class Context extends AmoebaAgent {
 		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
 		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
-		if(isSameModel(head.getBestContext())) {
+		if(head.getBestContext() == this){
+			confidence++;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
+		}
+		else if(isSameModel(head.getBestContext())) {
 			confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
 		} else {
-			this.solveNCS_BadPrediction(head);
+			if ( getAmas().data.contextFromPropositionWasSelected ){
+				solveNCS_Overlap(head.getBestContext());
+			}else{
+				solveNCS_BadPrediction(head); // TODO always good ?
+			}
+
 		}
 	}
 
@@ -1078,49 +1095,49 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void NCSDetection_OverMapping() {
-		
-		
-		
-		
-		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
-			
-			
-			if(ctxt != this && !ctxt.isDying()) {
-				
 
-	
+
+
+
+		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
+
+
+			if(ctxt != this && !ctxt.isDying()) {
+
+
+
 				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
 
-				
+
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
 				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
-					
+
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + this.getLocalModel().getModelDifference(ctxt.getLocalModel()))));
-				
+
 				//if(distanceDifference<averageDistanceToOraclePrediction) {
 				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
 				if(isSameModel(ctxt)) {
-					
-					 
-					
-					
+
+
+
+
 					for(Percept pct : ranges.keySet()) {
-						
+
 						boolean fusionTest = true;
 						int sameRanges = 0;
 						int sameBorders = 0;
 						Percept sameBorderPercept = null;
 						String range = "";
-						
+
 						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
-						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowedOverMapping()){		
-														
+						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowedOverMapping()){
+
 							for(Percept otherPct : ranges.keySet()) {
-								
+
 								if(otherPct != pct) {
-																		
+
 									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
 									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
 
@@ -1148,22 +1165,100 @@ public class Context extends AmoebaAgent {
 
 								}
 							}
-							
+
 							if(fusionTest) {
 								solveNCS_OverMapping(ctxt, pct);
 							}
 							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified){
 								solveNCS_Restructure(ctxt, sameBorderPercept, range, pct);
 							}
-							
+
 						}
 					}
-					
+
 				}
-								
+
 			}
 		}
-		
+
+	}
+
+	public void NCSDetection_OverMappingWithouOracle() {
+
+
+
+
+		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
+
+
+			if(ctxt != this && !ctxt.isDying()) {
+
+
+				//if(distanceDifference<averageDistanceToOraclePrediction) {
+				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
+				if(isSameModelWithoutOracle(ctxt)) {
+
+
+
+
+					for(Percept pct : ranges.keySet()) {
+
+						boolean fusionTest = true;
+						int sameRanges = 0;
+						int sameBorders = 0;
+						Percept sameBorderPercept = null;
+						String range = "";
+
+						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),pct.getName(), ""+Math.abs(this.distance(ctxt, pct)), "DISTANCE", "" + getEnvironment().getMappingErrorAllowed())));
+						if(Math.abs(this.distance(ctxt, pct)) < pct.getMappingErrorAllowedOverMapping()){
+
+							for(Percept otherPct : ranges.keySet()) {
+
+								if(otherPct != pct) {
+
+									double lengthDifference = Math.abs(ranges.get(otherPct).getLenght() - ctxt.getRanges().get(otherPct).getLenght());
+									double centerDifference = Math.abs(ranges.get(otherPct).getCenter() - ctxt.getRanges().get(otherPct).getCenter());
+
+									double startDifference = Math.abs(ranges.get(otherPct).getStart() - ctxt.getRanges().get(otherPct).getStart());
+									double endDifference = Math.abs(ranges.get(otherPct).getEnd() - ctxt.getRanges().get(otherPct).getEnd());
+
+									getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(),ctxt.getName(),otherPct.getName(), ""+lengthDifference,""+centerDifference, "LENGTH & CENTER DIFF", ""  + getEnvironment().getMappingErrorAllowed())));
+									fusionTest = fusionTest && (lengthDifference < otherPct.getMappingErrorAllowedOverMapping()) && (centerDifference< otherPct.getMappingErrorAllowedOverMapping());
+
+									sameRanges += (startDifference < otherPct.getMappingErrorAllowedOverMapping()) && (endDifference< otherPct.getMappingErrorAllowedOverMapping()) ? 1 : 0;
+
+									if((startDifference < otherPct.getMappingErrorAllowedOverMapping()) && !(endDifference< otherPct.getMappingErrorAllowedOverMapping())  ||
+											!(startDifference < otherPct.getMappingErrorAllowedOverMapping()) && (endDifference< otherPct.getMappingErrorAllowedOverMapping())){
+										sameBorders +=1;
+										sameBorderPercept = otherPct;
+
+										if(startDifference < otherPct.getMappingErrorAllowedOverMapping()){
+											range = "Start";
+										}
+										if(endDifference < otherPct.getMappingErrorAllowedOverMapping()){
+											range = "End";
+										}
+									}
+
+
+								}
+							}
+
+							if(fusionTest) {
+								solveNCS_OverMapping(ctxt, pct);
+							}
+							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified){
+								solveNCS_Restructure(ctxt, sameBorderPercept, range, pct);
+							}
+
+						}
+					}
+
+				}
+
+			}
+		}
+
 	}
 
 
@@ -1255,6 +1350,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public Experiment getCurrentExperiment() {
+		if(getAmas().getHeadAgent().getOracleValue() == null) return null;
 		ArrayList<Percept> percepts = getAmas().getPercepts();
 		Experiment exp = new Experiment(this);
 		for (Percept pct : percepts) {
