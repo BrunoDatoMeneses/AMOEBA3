@@ -5,7 +5,9 @@ import java.util.*;
 import agents.AmoebaAgent;
 import agents.context.Context;
 import agents.context.CustomComparator;
+import agents.context.Experiment;
 import agents.context.VOID;
+import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
@@ -261,11 +263,13 @@ public class Head extends AmoebaAgent {
 	}
 
 	public void testIfrequest() {
-		if(isSelfRequest() && getAmas().data.isSelfLearning) {
+
+		boolean testIfSelfRequest = isSelfRequest();
+		boolean testIfChildSelfRequest = isSelfChildRequest();
+		if((testIfSelfRequest||testIfChildSelfRequest) && getAmas().data.isSelfLearning){
 			getAmas().data.selfLearning = true;
-		}else if(isSelfRequest() && getAmas().data.isActiveLearning) {
-			getAmas().data.activeLearning = true;
-		}else if(isSelfChildRequest() && getAmas().data.isActiveLearning) {
+		}
+		if((testIfSelfRequest||testIfChildSelfRequest) && getAmas().data.isActiveLearning) {
 			getAmas().data.activeLearning = true;
 		}
 	}
@@ -528,6 +532,9 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];*/
 
 
+		NCSDetection_LearnFromNeighbors();
+
+
 		getAmas().data.executionTimes[4]=System.currentTimeMillis();
 		NCSDetection_ConcurrenceAndConclictWithoutOracle(); // If result is good, shrink redundant context (concurrence NCS)
 		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
@@ -541,13 +548,37 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 
-
+		getAmas().data.executionTimes[11]=System.currentTimeMillis();
+		NCSDetection_ChildContext();
+		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 
 		/*getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
 		}
 		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];*/
+	}
+
+	private void NCSDetection_LearnFromNeighbors() {
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
+		if(lastEndogenousRequest.getType() == REQUEST.SELF && activatedNeighborsContexts.size() > PARAMS.nbOfNeighborForCoopLearning){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(), "ASKING HELP TO NEIGHBORS")));
+			Experiment cooperativeExperiment = bestContext.getPerceptionsAsExperiment();
+			double weightedPreditions = 0;
+			double normalization = 0;
+			for(Context ctxt : activatedNeighborsContexts){
+
+				double distanceToPerceptions = ctxt.distanceBetweenCurrentPercetionsAndCenter();
+				double prediction = ((LocalModelMillerRegression)ctxt.getLocalModel()).getProposition(cooperativeExperiment);
+				weightedPreditions += prediction / distanceToPerceptions;
+				normalization += (1/distanceToPerceptions);
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(ctxt.getName(),""+prediction, ""+distanceToPerceptions )));
+			}
+			cooperativeExperiment.setOracleProposition(weightedPreditions/normalization);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(cooperativeExperiment+"" )));
+			bestContext.getLocalModel().updateModel(cooperativeExperiment, getAmas().data.learningSpeed);
+		}
 	}
 
 	public HashMap<String, Double> getMappingScoresAndPrint(){
@@ -1109,24 +1140,49 @@ public class Head extends AmoebaAgent {
 	}
 	
 	private void NCSDetection_ChildContext() {
-		
+
 		if(getAmas().data.isActiveLearning) {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
-			
+
 			if(bestContext!=null) {
 				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
 					bestContext.solveNCS_ChildContext();
-					
-					
+
+
 				}
 			}
 		}
-		
-		
-		
-		
-		
+		else if(getAmas().data.isSelfLearning) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
+
+			if(bestContext!=null && activatedNeighborsContexts.size()> PARAMS.nbOfNeighborForCoopLearning) {
+				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+					bestContext.solveNCS_ChildContext();
+
+
+				}
+			}
+		}
+
+	}
+
+	private void NCSDetection_ChildContextWithoutOracle() {
+
+		if(getAmas().data.isSelfLearning) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
+
+			if(bestContext!=null && activatedNeighborsContexts.size()>0) {
+				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+					bestContext.solveNCS_ChildContext();
+
+
+				}
+			}
+		}
+
 	}
 	
 	
@@ -2521,14 +2577,23 @@ public class Head extends AmoebaAgent {
 	
 	
 	public HashMap<Percept, Double> getSelfRequest(){
-		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE SELF LEARNING", ""+endogenousRequests.element())));
-		EndogenousRequest futureRequest = pollRequest(endogenousRequests);
+		EndogenousRequest futureRequest = null;
+		if(endogenousChildRequests.size()>0) {
+			futureRequest = endogenousChildRequests.poll();
+		}else if(endogenousRequests.size()>0) {
+
+			futureRequest = pollRequest(endogenousRequests);
+		}
+		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE SELF LEARNING", ""+futureRequest)));
+
 		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
 		}
-		
+
+		getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
 		return futureRequest.getRequest();
+
 	}
 	
 	public HashMap<Percept, Double> getActiveRequest(){
@@ -2601,7 +2666,7 @@ public class Head extends AmoebaAgent {
 	
 	public void addChildRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
 		
-		getAmas().data.activeLearning = true;
+		//getAmas().data.activeLearning = true;
 		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF), endogenousChildRequests);
 	}
 	

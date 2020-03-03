@@ -29,26 +29,29 @@ public class PARAMS {
 
     /* LEARNING */
     public static final boolean setActiveLearning = false	;
-    public static final boolean setSelfLearning = true	;
+    public static final boolean setSelfLearning = !setActiveLearning;
 
     /* PREDICTION */
     public static final double setRegressionPerformance = 1;
 
 
     /*NCS*/
-    public static final boolean setVoidDetection = false ;
+    public static final boolean setVoidDetection = false ; // OLD VOID
     public static final boolean setConflictDetection = true ;
     public static final boolean setConflictResolution = setConflictDetection ;
     public static final boolean setConcurrenceDetection = true ;
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
     public static final boolean setVoidDetection2 = false ;
-    public static final boolean setFrontierRequest = false ;
+    public static final boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
+    public static final boolean setSelfModelRequest = false ;
+
+    public static final int nbOfNeighborForCoopLearning = 1000;
 
 
     /*UI*/
 
-    public static final boolean contextColorByCoef = false ;
-    public static final int nbCycleRefresh3DView = 100;
+    public static final boolean contextColorByCoef = true ;
+    public static final int nbCycleRefresh3DView = 50;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.DEBUG;

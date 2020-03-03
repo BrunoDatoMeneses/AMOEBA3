@@ -678,7 +678,16 @@ public class Context extends AmoebaAgent {
 
 	}
 	
-	
+	public double distanceBetweenCurrentPercetionsAndCenter(){
+		double distance = 0;
+		for(Percept pct : getAmas().getPercepts()){
+
+			distance += Math.pow(ranges.get(pct).getCenter() - pct.getValue() ,2);
+
+		}
+
+		return Math.sqrt(distance);
+	}
 	
 	public HashMap<Percept, Double> boundsToRequest(HashMap<Percept, Pair<Double, Double>> bounds) {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
@@ -1357,6 +1366,16 @@ public class Context extends AmoebaAgent {
 			exp.addDimension(pct, pct.getValue());
 		}
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
+
+		return exp;
+	}
+
+	public Experiment getPerceptionsAsExperiment() {
+		ArrayList<Percept> percepts = getAmas().getPercepts();
+		Experiment exp = new Experiment(this);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, pct.getValue());
+		}
 
 		return exp;
 	}

@@ -3,6 +3,7 @@ package gui;
 import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.nDimensionsLaunchers.PARAMS;
 import experiments.tests.JZY3D_Test;
 import fr.irit.smac.amak.ui.VuiExplorer;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -134,23 +135,27 @@ public class View3D {
             @Override
             public void run()
             {
+
                 // Jzy3d
                 JavaFXChartFactory factory1 = new JavaFXChartFactory();
                 //AWTChart chart  = getSurfaceChart(factory, "offscreen");
-                chart1  = getScatterPlotChartFromContexts(factory1, "offscreen");
-
-
+                chart1  = getScatterPlotChart(factory1, "offscreen");
                 imageView1 = factory1.bindImageView(chart1);
+                // JavaFX
+                pane.setLeft(paneLeft);
+                paneLeft.prefHeightProperty().bind(pane.heightProperty());
+                paneLeft.setCenter(imageView1);
+                imageView1.fitWidthProperty().bind(paneLeft.widthProperty());
 
-
-
-
+                // Jzy3d
+                JavaFXChartFactory factory2 = new JavaFXChartFactory();
+                //AWTChart chart  = getSurfaceChart(factory, "offscreen");
+                chart2  = getScatterPlotChartFromContexts(factory2, "offscreen");
+                imageView2 = factory2.bindImageView(chart2);
                 //paneRight.prefHeightProperty().bind(pane.heightProperty());
-
-                paneRight.setCenter(imageView1);
-
-                imageView1.fitWidthProperty().bind(paneRight.widthProperty());
-                imageView1.fitHeightProperty().bind(paneRight.heightProperty());
+                paneRight.setCenter(imageView2);
+                imageView2.fitWidthProperty().bind(paneRight.widthProperty());
+                imageView2.fitHeightProperty().bind(paneRight.heightProperty());
 
             }
         });
@@ -223,7 +228,7 @@ public class View3D {
                 z = (float)model(x,y);
 
                 points[i] = new Coord3d(x, y, z);
-                colors[i] = getColor(150.0f,400.0f, z);
+                colors[i] = getColor((float)PARAMS.minPrediction,(float)PARAMS.maxPrediction, z);
 
 
                 i++;
@@ -285,7 +290,7 @@ public class View3D {
         int i =0;
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
-            colors[i] = getColor(150.0f,400.0f, coord.z);
+            colors[i] = getColor((float)PARAMS.minPrediction,(float)PARAMS.maxPrediction, coord.z);
             i++;
         }
 
