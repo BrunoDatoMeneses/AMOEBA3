@@ -98,6 +98,8 @@ public class AmoebaData implements Serializable {
 	public boolean isConcurrenceDetection = false;
 	public boolean isVoidDetection2 = false;
 	public boolean isFrontierRequest = false;
+	public boolean isSelfModelRequest = false;
+	public boolean isCoopLearningWithoutOracle = false;
 
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
 }

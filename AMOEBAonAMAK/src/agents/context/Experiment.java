@@ -103,9 +103,9 @@ public class Experiment implements Serializable {
 	
 	
 	public String toString() {
-		String string = "\n";
+		String string = "";
 		for(Percept pct : values.keySet()) {
-			string += pct.getName() + " " + values.get(pct) + "\n";
+			string += pct.getName() + " " + values.get(pct) + " ";
 		}
 		string += "Oracle : " + oracleProposition + "\n";
 		return string;

@@ -688,6 +688,19 @@ public class Context extends AmoebaAgent {
 
 		return Math.sqrt(distance);
 	}
+
+	public boolean currentPerceptionsFarEnoughOfCenter(){
+		boolean test = true;
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("currentPerceptionsFarEnoughOfCenter")));
+		for(Percept pct : getAmas().getPercepts()){
+			double distance = Math.abs(ranges.get(pct).getCenter() - pct.getValue());
+			test = test || (distance > pct.getMappingErrorAllowedMin());
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(pct.getName(), "distance " + distance, "threshold " + pct.getMappingErrorAllowedMin(), "test " + test)));
+
+		}
+
+		return test;
+	}
 	
 	public HashMap<Percept, Double> boundsToRequest(HashMap<Percept, Pair<Double, Double>> bounds) {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
@@ -706,7 +719,19 @@ public class Context extends AmoebaAgent {
 		
 		return request;
 	}
-	
+
+	public boolean isOverlaping(Context otherCtxt){
+		boolean test = true;
+		int indicePercept = 0;
+		while(test && indicePercept<getAmas().getPercepts().size()){
+			Percept currentPct = getAmas().getPercepts().get(indicePercept);
+			test = test && this.distance(otherCtxt, currentPct) < currentPct.getMappingErrorAllowedMin();
+			indicePercept++;
+		}
+
+		return test;
+	}
+
 	public ArrayList<EndogenousRequest> endogenousRequest(Context ctxt) {
 		
 		HashMap<Percept, Double> voidDistances = new HashMap<Percept, Double>();
@@ -1823,11 +1848,11 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
-	private double distance(Context ctxt, Percept pct) {
+	public double distance(Context ctxt, Percept pct) {
 		return this.getRanges().get(pct).distance(ctxt.getRanges().get(pct));
 	}
 	
-	private Pair<Double,Double> overlapBounds(Context ctxt, Percept pct) {
+	public Pair<Double,Double> overlapBounds(Context ctxt, Percept pct) {
 
 		
 		if (pct.contextIncludedIn(this, ctxt)) {
@@ -2026,6 +2051,10 @@ public class Context extends AmoebaAgent {
 		s += "Model "+this.localModel.getType()+" :";
 		s += this.localModel.getCoefsFormula() + "\n";
 		s += "Last Predicition " + lastPrediction  +"\n";
+		s += "Frist experiments"+"\n";
+		for(Experiment exp : getLocalModel().getFirstExperiments()){
+			s += exp+"\n";
+		}
 		s += "Nb updates " + ((LocalModelMillerRegression)getLocalModel()).experiemntNb  +"\n";
 		//s += "Smoothed Predicition " + smoothedPrediction  +"\n";
 		

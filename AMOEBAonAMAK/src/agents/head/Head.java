@@ -479,6 +479,7 @@ public class Head extends AmoebaAgent {
 
 		NCSDetection_Uselessness();
 
+
 		getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		if(lastEndogenousRequest==null){
 			NCSDetection_IncompetentHead();
@@ -504,6 +505,7 @@ public class Head extends AmoebaAgent {
 		NCSDetection_Context_Overmapping();
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
+		NCSDetection_LearnFromNeighbors();
 
 		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 		NCSDetection_ChildContext();
@@ -522,6 +524,7 @@ public class Head extends AmoebaAgent {
 
 		NCSDetection_Uselessness();
 
+
 		/*getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		if(lastEndogenousRequest==null){
 			NCSDetection_IncompetentHeadWitoutOracle();
@@ -532,7 +535,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];*/
 
 
-		NCSDetection_LearnFromNeighbors();
+
 
 
 		getAmas().data.executionTimes[4]=System.currentTimeMillis();
@@ -548,8 +551,10 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
 
+		NCSDetection_LearnFromNeighbors();
+
 		getAmas().data.executionTimes[11]=System.currentTimeMillis();
-		NCSDetection_ChildContext();
+		//NCSDetection_ChildContext();
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 
 		/*getAmas().data.executionTimes[12]=System.currentTimeMillis();
@@ -560,25 +565,88 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void NCSDetection_LearnFromNeighbors() {
-		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
-		if(lastEndogenousRequest.getType() == REQUEST.SELF && activatedNeighborsContexts.size() > PARAMS.nbOfNeighborForCoopLearning){
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(), "ASKING HELP TO NEIGHBORS")));
-			Experiment cooperativeExperiment = bestContext.getPerceptionsAsExperiment();
-			double weightedPreditions = 0;
-			double normalization = 0;
-			for(Context ctxt : activatedNeighborsContexts){
 
-				double distanceToPerceptions = ctxt.distanceBetweenCurrentPercetionsAndCenter();
-				double prediction = ((LocalModelMillerRegression)ctxt.getLocalModel()).getProposition(cooperativeExperiment);
-				weightedPreditions += prediction / distanceToPerceptions;
-				normalization += (1/distanceToPerceptions);
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(ctxt.getName(),""+prediction, ""+distanceToPerceptions )));
+		if(getAmas().data.isCoopLearningWithoutOracle){
+
+
+			getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
+
+			int i = 1;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NB NEIGHBORS", activatedNeighborsContexts.size()+"")));
+			for (Context ctxt : activatedNeighborsContexts) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(ctxt.getName())));
 			}
-			cooperativeExperiment.setOracleProposition(weightedPreditions/normalization);
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(cooperativeExperiment+"" )));
-			bestContext.getLocalModel().updateModel(cooperativeExperiment, getAmas().data.learningSpeed);
+			if(activatedNeighborsContexts.size()>1){
+				for (Context ctxt : activatedNeighborsContexts) {
+					for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
+						if (!ctxt.isDying() && !otherCtxt.isDying() /*&& !ctxt.isOverlaping(otherCtxt)*/) {
+							getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("CTXTS", ctxt.getName(), otherCtxt.getName())));
+							Pair<Experiment, Experiment> closestExperiments = getClosestExperiments(ctxt, otherCtxt);
+							getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("EXPS", "\n"+closestExperiments.getA()+"", closestExperiments.getB()+"")));
+							double prediction = ((LocalModelMillerRegression)ctxt.getLocalModel()).getProposition(closestExperiments.getA());
+							double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(closestExperiments.getA());
+							getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("PREDICTIONS", prediction+"", otherPrediction+"")));
+							double meanPrediction = (prediction + otherPrediction)/2;
+							getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MEAN PREDICTION TO LEARN", meanPrediction+"")));
+							closestExperiments.getA().setOracleProposition(meanPrediction);
+							closestExperiments.getB().setOracleProposition(meanPrediction);
+							ctxt.getLocalModel().updateModel(closestExperiments.getA(), getAmas().data.learningSpeed);
+							otherCtxt.getLocalModel().updateModel(closestExperiments.getB(), getAmas().data.learningSpeed);
+						}
+					}
+					i++;
+				}
+			}
+
+
+			/*if(lastEndogenousRequest.getType() == REQUEST.SELF && activatedNeighborsContexts.size() > PARAMS.nbOfNeighborForCoopLearning){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(), "ASKING HELP TO NEIGHBORS")));
+				Experiment cooperativeExperiment = bestContext.getPerceptionsAsExperiment();
+				double weightedPreditions = 0;
+				double normalization = 0;
+				for(Context ctxt : activatedNeighborsContexts){
+
+					double distanceToPerceptions = ctxt.distanceBetweenCurrentPercetionsAndCenter();
+					double prediction = ((LocalModelMillerRegression)ctxt.getLocalModel()).getProposition(cooperativeExperiment);
+					weightedPreditions += prediction / distanceToPerceptions;
+					normalization += (1/distanceToPerceptions);
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(ctxt.getName(),""+prediction, ""+distanceToPerceptions )));
+				}
+				cooperativeExperiment.setOracleProposition(weightedPreditions/normalization);
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(cooperativeExperiment+"" )));
+				bestContext.getLocalModel().updateModel(cooperativeExperiment, getAmas().data.learningSpeed);
+
+			}*/
+
+
 		}
+
+
+	}
+
+
+	private Pair<Experiment, Experiment> getClosestExperiments(Context ctxt1, Context ctxt2){
+
+		Experiment exp1 = new Experiment(ctxt1);
+		Experiment exp2 = new Experiment(ctxt2);
+
+		for (Percept pct : getAmas().getPercepts()){
+			if(ctxt1.distance(ctxt2,pct) < 0){
+				Pair<Double,Double> bounds = ctxt1.overlapBounds(ctxt2, pct);
+				exp1.addDimension(pct, (bounds.getB() + bounds.getB())/2);
+				exp2.addDimension(pct, (bounds.getB() + bounds.getB())/2);
+			}else if (ctxt1.getRanges().get(pct).getCenter() < ctxt2.getRanges().get(pct).getCenter()){
+				exp1.addDimension(pct,ctxt1.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin());
+				exp2.addDimension(pct,ctxt2.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin());
+			}else{
+				exp1.addDimension(pct,ctxt1.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin());
+				exp2.addDimension(pct,ctxt2.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin());
+			}
+
+		}
+
+		return new Pair<>(exp1, exp2);
 	}
 
 	public HashMap<String, Double> getMappingScoresAndPrint(){
@@ -1141,30 +1209,34 @@ public class Head extends AmoebaAgent {
 	
 	private void NCSDetection_ChildContext() {
 
-		if(getAmas().data.isActiveLearning) {
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
+		if(getAmas().data.isSelfModelRequest){
+			if(getAmas().data.isActiveLearning) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
 
-			if(bestContext!=null) {
-				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
-					bestContext.solveNCS_ChildContext();
+				if(bestContext!=null) {
+					if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+						bestContext.solveNCS_ChildContext();
 
 
+					}
 				}
 			}
-		}
-		else if(getAmas().data.isSelfLearning) {
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
+			/*else if(getAmas().data.isSelfLearning) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
 
-			if(bestContext!=null && activatedNeighborsContexts.size()> PARAMS.nbOfNeighborForCoopLearning) {
-				if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
-					bestContext.solveNCS_ChildContext();
+				if(bestContext!=null && activatedNeighborsContexts.size()> PARAMS.nbOfNeighborForCoopLearning) {
+					if(!bestContext.getLocalModel().finishedFirstExperiments() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+						bestContext.solveNCS_ChildContext();
 
 
+					}
 				}
-			}
+			}*/
 		}
+
+
 
 	}
 
@@ -1518,7 +1590,7 @@ public class Head extends AmoebaAgent {
 				int i = 1;
 				for (Context ctxt : activatedNeighborsContexts) {
 					for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
-						if(!this.isDying() && !ctxt.isDying()) {
+						if(!this.isDying() && !ctxt.isDying() ) {
 							ArrayList<EndogenousRequest> potentialRequests = ctxt.endogenousRequest(otherCtxt);
 							if(potentialRequests.size()>0) {
 								

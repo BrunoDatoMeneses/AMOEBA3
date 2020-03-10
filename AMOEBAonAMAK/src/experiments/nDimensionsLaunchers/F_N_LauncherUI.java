@@ -76,6 +76,9 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
 		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+		amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+
 		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 		World.minLevel = PARAMS.traceLevel;

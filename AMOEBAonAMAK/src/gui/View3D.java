@@ -101,6 +101,8 @@ public class View3D {
 
                 imageView1 = factory1.bindImageView(chart1);
                 imageView2 = factory2.bindImageView(chart2);
+                imageView1.setFitHeight(100);
+                imageView1.setFitWidth(100);
 
                 // JavaFX
 
@@ -109,6 +111,8 @@ public class View3D {
 
                 paneLeft.prefHeightProperty().bind(pane.heightProperty());
                 paneRight.prefHeightProperty().bind(pane.heightProperty());
+                paneLeft.setPrefWidth(paneLeft.getHeight());
+                paneRight.setPrefWidth(paneRight.getHeight());
 
                 paneLeft.setCenter(imageView1);
                 paneRight.setCenter(imageView2);
@@ -143,9 +147,12 @@ public class View3D {
                 imageView1 = factory1.bindImageView(chart1);
                 // JavaFX
                 pane.setLeft(paneLeft);
+
                 paneLeft.prefHeightProperty().bind(pane.heightProperty());
+                paneLeft.setPrefWidth(paneLeft.getHeight());
                 paneLeft.setCenter(imageView1);
                 imageView1.fitWidthProperty().bind(paneLeft.widthProperty());
+                imageView1.fitHeightProperty().bind(paneLeft.heightProperty());
 
                 // Jzy3d
                 JavaFXChartFactory factory2 = new JavaFXChartFactory();
@@ -153,6 +160,8 @@ public class View3D {
                 chart2  = getScatterPlotChartFromContexts(factory2, "offscreen");
                 imageView2 = factory2.bindImageView(chart2);
                 //paneRight.prefHeightProperty().bind(pane.heightProperty());
+                paneRight.prefHeightProperty().bind(pane.heightProperty());
+                paneRight.setPrefWidth(paneRight.getHeight());
                 paneRight.setCenter(imageView2);
                 imageView2.fitWidthProperty().bind(paneRight.widthProperty());
                 imageView2.fitHeightProperty().bind(paneRight.heightProperty());

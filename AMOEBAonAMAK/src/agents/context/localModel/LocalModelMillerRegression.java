@@ -240,23 +240,30 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 	@Override
 	public void updateModel(Experiment newExperiment, double weight) {
-		experiemntNb +=1;
-		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString()))); 
-		
-		if(isReinforcement) {
-			updateModelReinforcement(newExperiment, weight);
+
+		if(context.currentPerceptionsFarEnoughOfCenter()){
+			experiemntNb +=1;
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString())));
+
+			if(isReinforcement) {
+				updateModelReinforcement(newExperiment, weight);
+			}
+			else if(firstExperiments.size()< (nParameters + 2)) {
+				firstExperiments.add(newExperiment);
+				updateModel();
+
+			}else {
+				updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.numberOfPointsForRegression);
+			}
+
+			context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString())));
+
+		}else{
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT TO CLOSE TO CONTEXT CENTER", "" + newExperiment)));
 		}
-		else if(firstExperiments.size()< (nParameters + 2)) {
-			firstExperiments.add(newExperiment); 
-			updateModel();
-			
-		}else {
-			updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.numberOfPointsForRegression);
+
 		}
-		
-		context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
-		context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "MODEL :", coefsToString()))); 
-	}
 	
 	
 	
