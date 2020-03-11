@@ -749,7 +749,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	}
 	
 	public void addSpatiallyAlteredContextForUnityUI(Context ctxt) {
-		if(!ctxt.isFlat())
+		//if(!ctxt.isFlat())
 			spatiallyAlteredContext.add(ctxt);
 	}
 	

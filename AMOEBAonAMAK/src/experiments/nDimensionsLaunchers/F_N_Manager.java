@@ -342,7 +342,9 @@ public class F_N_Manager implements StudiedSystem{
 
 		/* Goutte */
 		return goutteModel(xRequest, center);
-		
+
+		/* Goutte */
+		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
 
 		
 		
@@ -505,6 +507,13 @@ private double[] subZoneCenter3D(int nb) {
 
 	private double goutteModel(Double[] xRequest, double[] center) {
 		return  gaussianModel(xRequest, center, 200, 50)*cosCommeCarreModel(xRequest, 0.0004) + 200;
+	}
+
+	private double rosenbrock2DModel(Double[] xRequest, double a, double b, double yOffset, double xFactor, double scale) {
+		double part1 = Math.pow(a-xRequest[0]*xFactor,2);
+		double part2 = b* Math.pow(xRequest[1]-yOffset -  Math.pow(xRequest[0]*xFactor,2),2);
+
+		return  scale*(part1 + part2) + 200;
 	}
 
 	

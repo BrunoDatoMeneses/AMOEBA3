@@ -616,6 +616,28 @@ public class Context extends AmoebaAgent {
 		}
 	}
 
+	public void analyzeResults5(Head head) {
+
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+				+ "---------------------------------------- ANALYSE RESULTS " + this.getName())));
+
+		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
+		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
+
+		if(lastDistanceToModel<lastAverageRegressionPerformanceIndicator){
+			confidence++;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
+		}else{
+			if ( getAmas().data.contextFromPropositionWasSelected ){
+				solveNCS_Overlap(head.getBestContext());
+			}else{
+				solveNCS_BadPrediction(head); // TODO always good ?
+			}
+		}
+
+	}
+
 //	public double distance(Context ctxt) {
 //		double totalDistance = 1.0;
 //		double currentDistance = 0.0;
@@ -725,7 +747,7 @@ public class Context extends AmoebaAgent {
 		int indicePercept = 0;
 		while(test && indicePercept<getAmas().getPercepts().size()){
 			Percept currentPct = getAmas().getPercepts().get(indicePercept);
-			test = test && this.distance(otherCtxt, currentPct) < currentPct.getMappingErrorAllowedMin();
+			test = test && this.distance(otherCtxt, currentPct) < -currentPct.getMappingErrorAllowedMin();
 			indicePercept++;
 		}
 
@@ -1073,6 +1095,39 @@ public class Context extends AmoebaAgent {
 		return Math.abs(totalDistanceAsVolume);
 	}
 
+	public double externalDistance(Context otherContext){
+
+		double distance = 0;
+
+		for (Percept pct : getAmas().getPercepts()){
+			double pctDistance = this.distance(otherContext,pct);
+			if(pctDistance > 0){
+				distance += Math.pow(pctDistance,2);
+			}
+
+
+		}
+
+		return Math.sqrt(distance);
+	}
+
+
+	public boolean isNearby(Context otherCtxt){
+		boolean test = true;
+		int indicePercept = 0;
+		while(test && indicePercept<getAmas().getPercepts().size()){
+
+			Percept currentPct = getAmas().getPercepts().get(indicePercept);
+			double pctDistance = this.distance(otherCtxt,currentPct);
+			test = test && Math.abs(pctDistance) < currentPct.getMappingErrorAllowedMin() ;
+			indicePercept++;
+		}
+
+		return test;
+	}
+
+
+
 	public double maxDistance(Context ctxt) {
 		double maxDistance = Double.NEGATIVE_INFINITY;
 
@@ -1377,6 +1432,180 @@ public class Context extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);
 		
+	}
+
+	public void solveNCS_ChildContextWithoutOracle() {
+		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
+		for(Percept pct : getAmas().getPercepts()) {
+			request.put(pct, pct.getValue());
+		}
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
+		getAmas().getHeadAgent().addChildRequest(request, 10,this);
+
+	}
+
+	public void solveNCS_ChildContextWithoutOracle2() {
+		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
+
+		while(this.isChild()){
+			Experiment exp = new Experiment(this);
+			for(Percept pct : getAmas().getPercepts()) {
+				exp.addDimension(pct, getRandomValueInRange(pct));
+			}
+			exp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(exp));
+
+			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING", ""+this.getName())));
+
+			this.getLocalModel().updateModel(exp, getAmas().data.learningSpeed);
+		}
+
+
+
+
+	}
+
+	public void solveNCS_LearnFromNeighbors(){
+
+		Context otherCtxt = getNearestContextFromNeighbors();
+
+		if (otherCtxt != this && !this.isDying() && !otherCtxt.isDying() /*&& this.isNearby(otherCtxt)*/ ) {
+
+			Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> closestExperimentsAndPivots = getClosestExperimentsPairs(otherCtxt, 1);
+
+
+
+			//if(otherCtxt.isChild()){
+			if(closestExperimentsAndPivots != null){
+
+				ArrayList<Pair<Experiment, Experiment>> closestExperiments = closestExperimentsAndPivots.getA();
+				ArrayList<Pair<Experiment, Experiment>> pivots = closestExperimentsAndPivots.getB();
+
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("EXPS " + closestExperiments.size(), "\n"+closestExperiments+"")));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("CTXTS", this.getName(), otherCtxt.getName())));
+
+				for(Pair<Experiment, Experiment> pivot : pivots){
+
+					double prediction = ((LocalModelMillerRegression)this.getLocalModel()).getProposition(pivot.getA());
+					double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(pivot.getB());
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("PREDICTIONS PIVOTS", prediction+"", otherPrediction+"")));
+
+					pivot.getA().setOracleProposition(prediction);
+					pivot.getB().setOracleProposition(otherPrediction);
+					this.getLocalModel().updateModel(pivot.getA(), getAmas().data.learningSpeed);
+					otherCtxt.getLocalModel().updateModel(pivot.getB(), getAmas().data.learningSpeed);
+				}
+
+				/*for(Pair<Experiment, Experiment> pairExp : closestExperiments){
+
+					double prediction = ((LocalModelMillerRegression)this.getLocalModel()).getProposition(pairExp.getA());
+					double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(pairExp.getB());
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("PREDICTIONS", prediction+"", otherPrediction+"")));
+					double meanPrediction = (prediction + otherPrediction)/2;
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MEAN PREDICTION TO LEARN", meanPrediction+"")));
+					pairExp.getA().setOracleProposition(otherPrediction);
+					pairExp.getB().setOracleProposition(meanPrediction);
+					this.getLocalModel().updateModel(pairExp.getA(), getAmas().data.learningSpeed);
+					//otherCtxt.getLocalModel().updateModel(pairExp.getB(), getAmas().data.learningSpeed);
+				}*/
+
+
+
+
+
+
+
+
+
+
+
+			}
+
+		}
+
+	}
+
+
+
+
+
+	private Context getNearestContextFromNeighbors() {
+		Context nearestContext = null;
+		double nearestDistance = -1;
+		for (Context otherCtxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
+			if (otherCtxt != this) {
+				if (nearestContext == null) {
+					nearestContext = otherCtxt;
+					nearestDistance = this.externalDistance(nearestContext);
+				} else {
+					double currentExternalDistance = this.externalDistance(otherCtxt);
+					if (currentExternalDistance < nearestDistance) {
+						nearestContext = otherCtxt;
+						nearestDistance = currentExternalDistance;
+					}
+
+				}
+
+
+			}
+		}
+		return nearestContext;
+	}
+
+	private Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> getClosestExperimentsPairs(Context otherCtxt, int nbPairs){
+
+		ArrayList<Pair<Experiment, Experiment>> experimentsPairs = new ArrayList<>();
+		ArrayList<Pair<Experiment, Experiment>> experimentsPairsPivots = new ArrayList<>();
+		int overlapsCounts = 0;
+
+		for(int i=0;i<nbPairs;i++){
+			Experiment exp1 = new Experiment(this);
+			Experiment exp2 = new Experiment(otherCtxt);
+			Experiment pivotExp1 = new Experiment(this);
+			Experiment pivotExp2 = new Experiment(this);
+
+			for (Percept pct : getAmas().getPercepts()){
+
+				if(this.distance(otherCtxt,pct) < 0){
+					overlapsCounts++;
+					Pair<Double,Double> bounds = this.overlapBounds(otherCtxt, pct);
+					double valueBetweenBounds = getRandomValueInRange(bounds.getA(), bounds.getB() - bounds.getA());
+					exp1.addDimension(pct, valueBetweenBounds);
+					exp2.addDimension(pct, valueBetweenBounds);
+					pivotExp1.addDimension(pct, valueBetweenBounds);
+					pivotExp2.addDimension(pct, valueBetweenBounds);
+				}else if (this.getRanges().get(pct).getCenter() < otherCtxt.getRanges().get(pct).getCenter()){
+					double valueExp1 = getRandomValueInRange(this.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin(), pct.getMappingErrorAllowedMin());
+					double valueExp2 = getRandomValueInRange( otherCtxt.getRanges().get(pct).getStart(), pct.getMappingErrorAllowedMin());
+					exp1.addDimension(pct, valueExp1);
+					exp2.addDimension(pct, valueExp2);
+					pivotExp1.addDimension(pct, this.getRanges().get(pct).getCenter());
+					pivotExp2.addDimension(pct, otherCtxt.getRanges().get(pct).getCenter());
+				}else{
+					double valueExp1 = getRandomValueInRange( this.getRanges().get(pct).getStart(), pct.getMappingErrorAllowedMin());
+					double valueExp2 = getRandomValueInRange(otherCtxt.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin(), pct.getMappingErrorAllowedMin());
+					exp1.addDimension(pct, valueExp1);
+					exp2.addDimension(pct, valueExp2);
+					pivotExp1.addDimension(pct, this.getRanges().get(pct).getCenter());
+					pivotExp2.addDimension(pct, otherCtxt.getRanges().get(pct).getCenter());
+				}
+
+			}
+			experimentsPairs.add(new Pair<>(exp1, exp2));
+			experimentsPairsPivots.add(new Pair<>(pivotExp1, pivotExp2));
+		}
+
+		return new Pair<>(experimentsPairs, experimentsPairsPivots);
+		/*if(overlapsCounts==1){
+			return new Pair<>(experimentsPairs, experimentsPairsPivots);
+		}else{
+			return null;
+		}*/
+
+
+	}
+
+	private double getRandomValueInRange(double start, double length) {
+		return start + length*Math.random();
 	}
 	
 	private Double getRandomValueInRange(Percept pct) {
@@ -2298,6 +2527,10 @@ public class Context extends AmoebaAgent {
 			}
 		}
 		return false;
+	}
+
+	public boolean isChild(){
+		return !getLocalModel().finishedFirstExperiments();
 	}
 
 
