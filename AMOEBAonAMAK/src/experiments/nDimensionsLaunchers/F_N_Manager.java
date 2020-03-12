@@ -16,6 +16,8 @@ public class F_N_Manager implements StudiedSystem{
 
 	/** The x. */
 	Double[] x ;
+
+	public int cycle;
 	
 	
 	/** The result. */
@@ -319,19 +321,19 @@ public class F_N_Manager implements StudiedSystem{
 
 		/* LINEAR */
 		/* Disc */
-		//return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		//return discModel(xRequest);
 		
 		/* Square */
-		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+		return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
-		//return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		//return diagModel(xRequest);
 		
 		/* Split */
-		//return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+		//return splitModel(xRequest);
 
 		/* NON LINEAR */
 		/* Gaussian */
@@ -341,16 +343,40 @@ public class F_N_Manager implements StudiedSystem{
 		//return polynomialModel(xRequest, 2, 50);
 
 		/* Goutte */
-		return goutteModel(xRequest, center);
+		//return goutteModel(xRequest, center);
 
-		/* Goutte */
+		/* Rosenbrock */
 		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
 
-		
-		
-		
-		
-		
+
+		//////////// DYNAMICAL ///////////////////////
+
+
+		//return squareSplitDiagModel(xRequest, 1000);
+
+
+	}
+
+	private double squareSplitDiagModel(Double[] xRequest, int cycleChange) {
+		if(cycle<cycleChange) return squareModel(xRequest);
+		else if(cycle<2*cycleChange) return splitModel(xRequest);
+		else return diagModel(xRequest);
+	}
+
+	private double splitModel(Double[] xRequest) {
+		return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+	}
+
+	private double diagModel(Double[] xRequest) {
+		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+	}
+
+	private double squareModel(Double[] xRequest) {
+		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+	}
+
+	private double discModel(Double[] xRequest) {
+		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
 
 

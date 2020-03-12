@@ -13,6 +13,7 @@ import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
+import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
@@ -199,6 +200,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		cycle++;
 		if (cycle % 1000 == 0) {
 			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
+		}
+		if(studiedSystem != null){
+			((F_N_Manager)studiedSystem).cycle = cycle;
 		}
 		
 		if(isRenderUpdate()) {

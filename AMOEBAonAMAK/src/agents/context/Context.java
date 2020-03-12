@@ -15,6 +15,7 @@ import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
+import experiments.nDimensionsLaunchers.PARAMS;
 import gui.ContextRendererFX;
 import gui.RenderStrategy;
 import kernel.AMOEBA;
@@ -584,11 +585,11 @@ public class Context extends AmoebaAgent {
 	public boolean isSameModel(Context ctxt) {
 		return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
 				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
-          this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().data.initRegressionPerformance/ this.getLocalModel().getCoef().length);
+          this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
 	}
 
 	public boolean isSameModelWithoutOracle(Context ctxt) {
-		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().data.initRegressionPerformance/ this.getLocalModel().getCoef().length);
+		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
 	}
 
 	public void analyzeResults4(Head head) {
@@ -625,18 +626,18 @@ public class Context extends AmoebaAgent {
 		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
 
-		if(lastDistanceToModel<lastAverageRegressionPerformanceIndicator){
+		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
 			confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
-		}else{
-			if ( getAmas().data.contextFromPropositionWasSelected ){
+			if ( this !=  head.getBestContext()) {
 				solveNCS_Overlap(head.getBestContext());
-			}else{
-				solveNCS_BadPrediction(head); // TODO always good ?
 			}
-		}
-
+		} else {
+			solveNCS_BadPrediction(head); // TODO always good ?
+			}
 	}
+
+
 
 //	public double distance(Context ctxt) {
 //		double totalDistance = 1.0;
@@ -1111,6 +1112,25 @@ public class Context extends AmoebaAgent {
 		return Math.sqrt(distance);
 	}
 
+	public double centerDistance(Context otherContext){
+
+		double distance = 0;
+
+		for (Percept pct : getAmas().getPercepts()){
+			double pctDistance = centerDistance(otherContext, pct);
+			distance += Math.pow(pctDistance,2);
+
+
+
+		}
+
+		return Math.sqrt(distance);
+	}
+
+	private double centerDistance(Context otherContext, Percept pct) {
+		return this.getRanges().get(pct).centerDistance(otherContext.getRanges().get(pct));
+	}
+
 
 	public boolean isNearby(Context otherCtxt){
 		boolean test = true;
@@ -1437,34 +1457,43 @@ public class Context extends AmoebaAgent {
 	public void solveNCS_ChildContextWithoutOracle() {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
 		for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct, pct.getValue());
+			request.put(pct, getRandomValueInRange(pct));
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);
 
 	}
 
-	public void solveNCS_ChildContextWithoutOracle2() {
-		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
+	public void solveNCS_LearnFromNeighbors(){
 
-		while(this.isChild()){
-			Experiment exp = new Experiment(this);
-			for(Percept pct : getAmas().getPercepts()) {
-				exp.addDimension(pct, getRandomValueInRange(pct));
+		Experiment currentExp = getCurrentExperimentWithouOracle();
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("CHILD EXPERIMENT",""+currentExp)));
+		/*if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForCoopLearning){
+			double weightedSumOfPredictions = 0;
+			double normalisation = 0;
+			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
+
+				if(ctxtNeighbor != this){
+					double neighborDistance = this.centerDistance(ctxtNeighbor);
+					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(currentExp)/neighborDistance;
+					normalisation += 1/neighborDistance;
+				}
+
 			}
-			exp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(exp));
 
-			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING", ""+this.getName())));
+			currentExp.setOracleProposition(weightedSumOfPredictions/normalisation);
+			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITH NEIGHBORS", ""+this.getName())) );
+		}else{
+			currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
+			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
+		}*/
 
-			this.getLocalModel().updateModel(exp, getAmas().data.learningSpeed);
-		}
-
-
-
-
+		currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
+		this.getLocalModel().updateModel(currentExp, getAmas().data.learningSpeed);
 	}
 
-	public void solveNCS_LearnFromNeighbors(){
+	public void solveNCS_FitWithNeighbors(){
 
 		Context otherCtxt = getNearestContextFromNeighbors();
 
@@ -1620,6 +1649,17 @@ public class Context extends AmoebaAgent {
 			exp.addDimension(pct, pct.getValue());
 		}
 		exp.setOracleProposition(getAmas().getHeadAgent().getOracleValue());
+
+		return exp;
+	}
+
+	public Experiment getCurrentExperimentWithouOracle() {
+		ArrayList<Percept> percepts = getAmas().getPercepts();
+		Experiment exp = new Experiment(this);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, pct.getValue());
+		}
+
 
 		return exp;
 	}

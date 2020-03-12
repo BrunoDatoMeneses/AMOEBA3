@@ -13,7 +13,7 @@ public class PARAMS {
 
     /* REGRESSION */
     public static final double oracleNoiseRange = 0.5;
-    public static final double learningSpeed = 0.2;
+    public static final double learningSpeed = 0.1;
     public static final int regressionPoints = (int)(1/learningSpeed);
 
     /* XP */
@@ -28,7 +28,7 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = false	;
+    public static final boolean setActiveLearning = true	;
     public static final boolean setSelfLearning = !setActiveLearning;
 
     /* PREDICTION */
@@ -41,7 +41,7 @@ public class PARAMS {
     public static final boolean setConflictResolution = setConflictDetection ;
     public static final boolean setConcurrenceDetection = true ;
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static final boolean setVoidDetection2 = false ;
+    public static final boolean setVoidDetection2 = true ;
     public static final boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
     public static final boolean setSelfModelRequest = true ;
 
@@ -52,9 +52,9 @@ public class PARAMS {
 
     /*UI*/
 
-    public static final boolean contextColorByCoef = false ;
+    public static final boolean contextColorByCoef = true ;
     public static final int nbCycleRefresh3DView = 100;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }

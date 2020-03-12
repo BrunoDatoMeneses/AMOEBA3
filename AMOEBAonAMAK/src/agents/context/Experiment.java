@@ -107,7 +107,7 @@ public class Experiment implements Serializable {
 		for(Percept pct : values.keySet()) {
 			string += pct.getName() + " " + values.get(pct) + " ";
 		}
-		string += "Oracle : " + oracleProposition + "\n";
+		string += "Oracle : " + oracleProposition ;
 		return string;
 	}
 	

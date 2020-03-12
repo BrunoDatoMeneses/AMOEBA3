@@ -1671,6 +1671,12 @@ public class Range implements Serializable, Comparable, Cloneable {
 		//return Math.abs(this.getCenter() - otherRange.getCenter()) - this.getRadius() - otherRange.getRadius();
 	}
 
+	public double centerDistance(Range otherRange) {
+		double centerDistance = Math.abs(this.getCenter() - otherRange.getCenter());
+
+		return centerDistance;
+	}
+
 	public double distanceForVolume(Range otherRange) {
 		double centerDistance = Math.abs(this.getCenter() - otherRange.getCenter());
 
