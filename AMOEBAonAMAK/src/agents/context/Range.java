@@ -1358,6 +1358,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 	}
 
+
+
 	/**
 	 * Compare to.
 	 *
@@ -1635,8 +1637,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	public boolean contains2(Double value) {
-		return Math.abs(value - getCenter()) <= getRadius();
+		return Math.abs(value - getCenter()) < getRadius();
 	}
+	//return start < d && d < end;
 
 	public Range clone() throws CloneNotSupportedException {
 		return (Range) super.clone();

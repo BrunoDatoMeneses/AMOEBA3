@@ -524,14 +524,14 @@ public class Head extends AmoebaAgent {
 		NCSDetection_Uselessness();
 
 
-		/*getAmas().data.executionTimes[3]=System.currentTimeMillis();
+		getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		if(lastEndogenousRequest==null){
 			NCSDetection_IncompetentHeadWitoutOracle();
 		}
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
 			NCSDetection_IncompetentHeadWitoutOracle();
 		}
-		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];*/
+		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
 
 
 
@@ -557,6 +557,7 @@ public class Head extends AmoebaAgent {
 		NCSDetection_ChildContext();
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 
+		resetLastEndogenousRequest();
 		/*getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
@@ -567,8 +568,10 @@ public class Head extends AmoebaAgent {
 	private void NCSDetection_LearnFromNeighbors() {
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
-		if(bestContext.isChild()){
-			bestContext.solveNCS_LearnFromNeighbors();
+
+		if(bestContext.isChild() && lastEndogenousRequest!= null){
+			if(lastEndogenousRequest.getType()== REQUEST.SELF)
+				bestContext.solveNCS_LearnFromNeighbors();
 		}
 	}
 
@@ -1392,7 +1395,7 @@ public class Head extends AmoebaAgent {
 		}
 		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 
-		resetLastEndogenousRequest();
+
 	}
 
 	private void NCSDetection_Context_Overmapping() {
@@ -1610,8 +1613,16 @@ public class Head extends AmoebaAgent {
 						}*/
 					}
 					if(isInMinMax && isNotTooSmall){
-						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
-						addEndogenousRequest(potentialRequest, endogenousRequests);
+						if(getAmas().data.isSelfLearning){
+							if(activatedNeighborsContexts.size()>PARAMS.nbOfNeighborForLearningFromNeighbors){
+								EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
+								addEndogenousRequest(potentialRequest, endogenousRequests);
+							}
+						}else{
+							EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
+							addEndogenousRequest(potentialRequest, endogenousRequests);
+						}
+
 					}
 
 				}
@@ -1904,12 +1915,32 @@ public class Head extends AmoebaAgent {
 	private Context createNewContextWithoutOracle(Context bestNearestCtxt) {
 
 
-		Context context;
+		Context context = null;
 		if (getAmas().data.firstContext) {
-			getAmas().data.newContextWasCreated = true;
+
 			getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
-			context = new Context(getAmas(), bestNearestCtxt); //TODO à finir
-			logger().debug("HEAD", "new context agent");
+			//double endogenousPrediction = ((LocalModelMillerRegression)bestNearestCtxt.getLocalModel()).getProposition(bestNearestCtxt.getCurrentExperimentWithouOracle());
+			Experiment currentExp = bestNearestCtxt.getCurrentExperimentWithouOracle();
+			double endogenousPrediction;
+			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForCoopLearning){
+				double weightedSumOfPredictions = 0;
+				double normalisation = 0;
+				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
+
+
+					double neighborDistance = ctxtNeighbor.distanceBetweenCurrentPercetionsAndCenter();
+					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(ctxtNeighbor.getCurrentExperimentWithouOracle())/neighborDistance;
+					normalisation += 1/neighborDistance;
+
+
+				}
+				endogenousPrediction = weightedSumOfPredictions/normalisation;
+				currentExp.setOracleProposition(endogenousPrediction);
+				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
+				context = new Context(getAmas(), endogenousPrediction);
+				getAmas().data.newContextWasCreated = true;
+			}
+
 			return context;
 		}
 

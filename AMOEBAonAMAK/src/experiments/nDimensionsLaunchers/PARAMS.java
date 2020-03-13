@@ -48,11 +48,12 @@ public class PARAMS {
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
     public static final int nbOfNeighborForCoopLearning = 1;
+    public static final int nbOfNeighborForLearningFromNeighbors = 1;
 
 
     /*UI*/
 
-    public static final boolean contextColorByCoef = true ;
+    public static final boolean contextColorByCoef = false ;
     public static final int nbCycleRefresh3DView = 100;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;

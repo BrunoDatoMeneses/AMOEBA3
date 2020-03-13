@@ -112,6 +112,17 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
+	public Context(AMOEBA amoeba, double endogenousPrediction) {
+		super(amoeba);
+		buildContextWithoutOracle(endogenousPrediction);
+		getAmas().getEnvironment()
+				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
+		criticalities = new Criticalities(5);
+
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		getAmas().addSpatiallyAlteredContextForUnityUI(this);
+	}
+
 	public Context(AMOEBA amoeba, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
 		super(amoeba);
 		buildContext(fatherContext, contextDimensions);
@@ -282,6 +293,59 @@ public class Context extends AmoebaAgent {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
 	}
 
+
+	private void buildContextWithoutOracle(double endogenousPredicion) {
+
+		buildContextCommon();
+
+		Experiment firstPoint = new Experiment(this);
+		ArrayList<Percept> var = getAmas().getPercepts();
+		for (Percept p : var) {
+			Range r = null;
+			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
+			//TODO use neihbors sizes to define radiuses for creation !??? pas sûr ? 12/03/2020
+			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
+
+
+			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && (getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
+
+
+
+				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
+					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
+						r = initRangeFromVOID(p);
+					}
+				}
+				if(r==null) {
+					r = initRangeFromNeighbors(p);
+				}
+			}
+			if(r==null) {
+				r = initRange(p, radiuses);
+			}
+
+
+			ranges.put(p, r);
+			ranges.get(p).setValue(p.getValue());
+
+			firstPoint.addDimension(p, p.getValue());
+
+			p.addContextProjection(this);;
+		}
+
+
+
+		localModel = getAmas().buildLocalModel(this);
+		firstPoint.setOracleProposition(endogenousPredicion);
+		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
+		// firstPoint.toString())));
+
+		localModel.updateModel(firstPoint, getAmas().data.learningSpeed);
+		getAmas().addAlteredContext(this);
+		this.setName(String.valueOf(this.hashCode()));
+
+	}
+
 	private void buildContext(Context bestNearestContext) {
 
 		buildContextCommon();
@@ -291,7 +355,7 @@ public class Context extends AmoebaAgent {
 		for (Percept p : var) {
 			Range r = null;
 			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
-			//TODO use neihbors sizes to define radiuses for creation !!!!!!!!!!!
+			//TODO use neihbors sizes to define radiuses for creation !??? pas sûr ? 12/03/2020
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
@@ -1455,12 +1519,13 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void solveNCS_ChildContextWithoutOracle() {
-		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
+		solveNCS_ChildContext();
+		/*HashMap<Percept, Double> request = new HashMap<Percept, Double>();
 		for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct, getRandomValueInRange(pct));
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
-		getAmas().getHeadAgent().addChildRequest(request, 10,this);
+		getAmas().getHeadAgent().addChildRequest(request, 10,this);*/
 
 	}
 
@@ -1468,29 +1533,56 @@ public class Context extends AmoebaAgent {
 
 		Experiment currentExp = getCurrentExperimentWithouOracle();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("CHILD EXPERIMENT",""+currentExp)));
-		/*if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForCoopLearning){
-			double weightedSumOfPredictions = 0;
-			double normalisation = 0;
-			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
+		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForCoopLearning){
 
-				if(ctxtNeighbor != this){
+			ArrayList<Context> neighborsToKeep = new ArrayList<>();
+			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
+				if (ctxtNeighbor != this) {
+
+					boolean test = true;
+					for(Percept pct : getAmas().getPercepts()){
+						if(!this.getRanges().get(pct).contains2(ctxtNeighbor.getRanges().get(pct).getCenter())){
+
+							test = test && perceptIsContainedBetweentContextsCenter(ctxtNeighbor, pct);
+						}
+					}
+					if(test){
+						neighborsToKeep.add(ctxtNeighbor);
+					}
+				}
+			}
+
+			if(neighborsToKeep.size()>0){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBORS", ""+neighborsToKeep.size())) );
+				double weightedSumOfPredictions = 0;
+				double normalisation = 0;
+				for (Context ctxtNeighbor : neighborsToKeep){
+					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBOR", ""+ctxtNeighbor.getName())) );
 					double neighborDistance = this.centerDistance(ctxtNeighbor);
 					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(currentExp)/neighborDistance;
 					normalisation += 1/neighborDistance;
+
 				}
 
+				currentExp.setOracleProposition(weightedSumOfPredictions/normalisation);
+				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITH NEIGHBORS", ""+this.getName())) );
+			}else{
+				currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
+				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
 			}
 
-			currentExp.setOracleProposition(weightedSumOfPredictions/normalisation);
-			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITH NEIGHBORS", ""+this.getName())) );
 		}else{
 			currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
 			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
-		}*/
+		}
 
-		currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
-		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
+		/*currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );*/
 		this.getLocalModel().updateModel(currentExp, getAmas().data.learningSpeed);
+	}
+
+	private boolean perceptIsContainedBetweentContextsCenter(Context ctxtNeighbor, Percept pct) {
+		return (this.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < ctxtNeighbor.getRanges().get(pct).getCenter() ) || (ctxtNeighbor.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < this.getRanges().get(pct).getCenter());
 	}
 
 	public void solveNCS_FitWithNeighbors(){
@@ -1638,7 +1730,12 @@ public class Context extends AmoebaAgent {
 	}
 	
 	private Double getRandomValueInRange(Percept pct) {
-		return ranges.get(pct).getStart() + ranges.get(pct).getLenght()*Math.random();
+		if(Math.random()<0.5){
+			return ranges.get(pct).getStart() + pct.getMappingErrorAllowedMin()*Math.random();
+		}else{
+			return ranges.get(pct).getEnd() - pct.getMappingErrorAllowedMin()*Math.random();
+		}
+
 	}
 
 	public Experiment getCurrentExperiment() {
