@@ -104,7 +104,7 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 					File file = new File("resources/"+PARAMS.configFile);
 					backupSystem.load(file);
 
-					amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+					//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
 					amoeba.allowGraphicalScheduler(true);
 					amoeba.setRenderUpdate(false);

@@ -28,7 +28,7 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = true	;
+    public static final boolean setActiveLearning = false	;
     public static final boolean setSelfLearning = !setActiveLearning;
 
     /* PREDICTION */
@@ -41,20 +41,22 @@ public class PARAMS {
     public static final boolean setConflictResolution = setConflictDetection ;
     public static final boolean setConcurrenceDetection = true ;
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static final boolean setVoidDetection2 = true ;
+    public static final boolean setVoidDetection2 = false ;
     public static final boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
     public static final boolean setSelfModelRequest = true ;
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static final int nbOfNeighborForCoopLearning = 1;
+    public static final int nbOfNeighborForCoopLearning = 6;
     public static final int nbOfNeighborForLearningFromNeighbors = 1;
+    public static final int nbOfNeighborForContexCreationWithouOracle = 5;
+    public static final int nbOfNeighborForVoidDetectionInSelfLearning = 5;
 
 
     /*UI*/
 
     public static final boolean contextColorByCoef = false ;
-    public static final int nbCycleRefresh3DView = 100;
+    public static final int nbCycleRefresh3DView = 1;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;

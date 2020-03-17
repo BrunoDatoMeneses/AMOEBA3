@@ -248,11 +248,21 @@ public class LocalModelMillerRegression extends LocalModel{
 			if(isReinforcement) {
 				updateModelReinforcement(newExperiment, weight);
 			}
-			else if(firstExperiments.size()< (nParameters + 2)) {
-				firstExperiments.add(newExperiment);
-				updateModel();
+			else if(context.getAmas().data.isSelfLearning){
+				if(firstExperiments.size()< Math.pow(2,nParameters) + 1) {
+					firstExperiments.add(newExperiment);
+					updateModel();
 
-			}else {
+				}
+			}
+			else if(context.getAmas().data.activeLearning){
+				if(firstExperiments.size()< (nParameters + 2)) {
+					firstExperiments.add(newExperiment);
+					updateModel();
+
+				}
+			}
+			else {
 				updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.numberOfPointsForRegression);
 			}
 

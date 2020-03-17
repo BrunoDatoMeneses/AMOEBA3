@@ -2,9 +2,7 @@ package agents.context;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 import agents.AmoebaAgent;
 import agents.context.localModel.LocalModel;
@@ -77,6 +75,10 @@ public class Context extends AmoebaAgent {
 	
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
+
+	public Queue<HashMap<Percept, Double>> childRequests = new ArrayDeque<>();
+
+
 
 	int lastFrontierRequestTick = 0;
 	
@@ -405,6 +407,46 @@ public class Context extends AmoebaAgent {
 
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
+
+	}
+
+
+	private void nestedLoopOperation(int[] counters, int[] length, int level) {
+		if(level == counters.length) addEndoChildRequest(counters);
+		else {
+			for (counters[level] = 0; counters[level] < length[level]; counters[level]++) {
+				nestedLoopOperation(counters, length, level + 1);
+			}
+		}
+	}
+
+	private void addEndoChildRequest(int[] counters) {
+
+		HashMap<Percept, Double> endoRequest = new HashMap<>();
+
+		for (int level = 0; level < counters.length; level++) {
+			Percept pct = getAmas().getPercepts().get(level);
+			if (counters[level] == 0){
+				endoRequest.put(pct, this.ranges.get(pct).getStart() + pct.getMappingErrorAllowedMin());
+			}else{
+				endoRequest.put(pct, this.ranges.get(pct).getEnd() - pct.getMappingErrorAllowedMin());
+			}
+		}
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<>(Arrays.asList(""+ endoRequest)));
+		childRequests.add(endoRequest);
+
+	}
+
+	public void initEndoChildRequests(){
+
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),"INIT ENDO CHILD REQUESTS")));
+		int depth = getAmas().getPercepts().size();
+		int[] length = new int[depth];
+		int[] counters = new int[depth];
+		Arrays.fill(counters,0);
+		Arrays.fill(length,2);
+
+		nestedLoopOperation(counters, length, 0);
 
 	}
 
@@ -1510,9 +1552,15 @@ public class Context extends AmoebaAgent {
 	
 	public void solveNCS_ChildContext() {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
-		for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct, getRandomValueInRange(pct));
+		if(getAmas().data.isActiveLearning){
+			for(Percept pct : getAmas().getPercepts()) {
+				request.put(pct, getRandomValueInRange(pct));
+			}
+		}else if(getAmas().data.isSelfLearning){
+			request = childRequests.poll();
 		}
+
+
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);
 		
@@ -1533,7 +1581,7 @@ public class Context extends AmoebaAgent {
 
 		Experiment currentExp = getCurrentExperimentWithouOracle();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("CHILD EXPERIMENT",""+currentExp)));
-		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForCoopLearning){
+		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForLearningFromNeighbors){
 
 			ArrayList<Context> neighborsToKeep = new ArrayList<>();
 			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
@@ -1553,12 +1601,13 @@ public class Context extends AmoebaAgent {
 			}
 
 			if(neighborsToKeep.size()>0){
+				neighborsToKeep.add(this);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBORS", ""+neighborsToKeep.size())) );
 				double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : neighborsToKeep){
 					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBOR", ""+ctxtNeighbor.getName())) );
-					double neighborDistance = this.centerDistance(ctxtNeighbor);
+					double neighborDistance = ctxtNeighbor.distanceBetweenCurrentPercetionsAndCenter();
 					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(currentExp)/neighborDistance;
 					normalisation += 1/neighborDistance;
 
@@ -1578,6 +1627,7 @@ public class Context extends AmoebaAgent {
 
 		/*currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );*/
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("LEARNED EXP", ""+currentExp)) );
 		this.getLocalModel().updateModel(currentExp, getAmas().data.learningSpeed);
 	}
 
@@ -2667,7 +2717,18 @@ public class Context extends AmoebaAgent {
 	}
 
 	public boolean isChild(){
-		return !getLocalModel().finishedFirstExperiments();
+
+		if(getAmas().data.isSelfLearning){
+			if(childRequests.size()>0){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO CHILD REQUESTS")));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(""+childRequests)));
+			}
+
+			return childRequests.size()>0;
+		}else{
+			return !getLocalModel().finishedFirstExperiments();
+		}
+
 	}
 
 
