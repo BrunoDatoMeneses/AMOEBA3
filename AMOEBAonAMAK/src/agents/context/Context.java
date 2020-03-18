@@ -1575,10 +1575,7 @@ public class Context extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CHILD WITHOUT ORACLE", this.getName())));
 
-		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
-		for(Percept pct : getAmas().getPercepts()){
-			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
-		}
+
 
 
 
@@ -1596,27 +1593,7 @@ public class Context extends AmoebaAgent {
 
 			}
 
-			for(Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
-
-
-				Experiment endoExp = new Experiment(this);
-				if(ctxtNeighbor != this) {
-					for (Percept pct : getAmas().getPercepts()) {
-						double start = Math.max(neighborhoodBounds.get(pct).getA(), ctxtNeighbor.getRanges().get(pct).getStart());
-						double length = Math.min(neighborhoodBounds.get(pct).getB(), ctxtNeighbor.getRanges().get(pct).getEnd()) - start;
-
-
-						endoExp.addDimension(pct, getRandomValueInRange(start, length));
-					}
-
-
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
-					double neighborPrediction = ((LocalModelMillerRegression) ctxtNeighbor.getLocalModel()).getProposition(endoExp);
-					endoExp.setOracleProposition(neighborPrediction);
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
-					getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
-				}
-			}
+			learnFromNeighbors();
 
 
 		}else{
@@ -1639,6 +1616,35 @@ public class Context extends AmoebaAgent {
 		/*getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);*/
 
+	}
+
+	public void learnFromNeighbors() {
+		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
+		for(Percept pct : getAmas().getPercepts()){
+			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
+		}
+
+		for(Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
+
+
+			Experiment endoExp = new Experiment(this);
+			if(ctxtNeighbor != this) {
+				for (Percept pct : getAmas().getPercepts()) {
+					double start = Math.max(neighborhoodBounds.get(pct).getA(), ctxtNeighbor.getRanges().get(pct).getStart());
+					double length = Math.min(neighborhoodBounds.get(pct).getB(), ctxtNeighbor.getRanges().get(pct).getEnd()) - start;
+
+
+					endoExp.addDimension(pct, getRandomValueInRange(start, length));
+				}
+
+
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
+				double neighborPrediction = ((LocalModelMillerRegression) ctxtNeighbor.getLocalModel()).getProposition(endoExp);
+				endoExp.setOracleProposition(neighborPrediction);
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
+				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+			}
+		}
 	}
 
 	public void solveNCS_LearnFromNeighbors(){

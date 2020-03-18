@@ -41,7 +41,7 @@ public class PARAMS {
     public static final boolean setConflictResolution = setConflictDetection ;
     public static final boolean setConcurrenceDetection = true ;
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static final boolean setVoidDetection2 = false ;
+    public static final boolean setVoidDetection2 = true ;
     public static final boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
     public static final boolean setSelfModelRequest = true ;
 
@@ -59,5 +59,5 @@ public class PARAMS {
     public static final int nbCycleRefresh3DView = 1;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.DEBUG;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }

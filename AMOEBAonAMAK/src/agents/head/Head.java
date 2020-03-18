@@ -1210,6 +1210,8 @@ public class Head extends AmoebaAgent {
 						bestContext.solveNCS_ChildContextWithoutOracle();
 
 
+					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+						bestContext.learnFromNeighbors();
 					}
 				}
 
