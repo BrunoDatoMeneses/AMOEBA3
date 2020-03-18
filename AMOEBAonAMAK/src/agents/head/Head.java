@@ -534,7 +534,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
 
 
-		NCSDetection_LearnFromNeighbors();
+		//NCSDetection_LearnFromNeighbors();
 
 
 		getAmas().data.executionTimes[4]=System.currentTimeMillis();
@@ -1202,31 +1202,17 @@ public class Head extends AmoebaAgent {
 				}
 			}
 			else if (getAmas().data.isSelfLearning){
-				if(lastEndogenousRequest==null) {
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-							+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
 
-					if(bestContext!=null) {
-						if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
-							bestContext.solveNCS_ChildContextWithoutOracle();
-
-
-						}
-					}
-				}else{
-					if(getAmas().data.isSelfLearning && lastEndogenousRequest.getType() != REQUEST.VOID) {
-						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-								+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
-
-						if(bestContext!=null) {
-							if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
-								bestContext.solveNCS_ChildContextWithoutOracle();
+				if(bestContext!=null) {
+					if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
+						bestContext.solveNCS_ChildContextWithoutOracle();
 
 
-							}
-						}
 					}
 				}
+
 			}
 		}
 

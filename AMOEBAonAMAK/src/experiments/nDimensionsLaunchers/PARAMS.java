@@ -59,5 +59,5 @@ public class PARAMS {
     public static final int nbCycleRefresh3DView = 1;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.DEBUG;
 }

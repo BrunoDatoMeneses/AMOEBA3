@@ -1553,26 +1553,90 @@ public class Context extends AmoebaAgent {
 	public void solveNCS_ChildContext() {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
 		if(getAmas().data.isActiveLearning){
+			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
+					"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
 			for(Percept pct : getAmas().getPercepts()) {
 				request.put(pct, getRandomValueInRange(pct));
 			}
+			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
+			getAmas().getHeadAgent().addChildRequest(request, 10,this);
+
 		}else if(getAmas().data.isSelfLearning){
-			request = childRequests.poll();
+			solveNCS_ChildContextWithoutOracle();
 		}
 
 
-		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
-		getAmas().getHeadAgent().addChildRequest(request, 10,this);
+
 		
 	}
 
 	public void solveNCS_ChildContextWithoutOracle() {
-		solveNCS_ChildContext();
-		/*HashMap<Percept, Double> request = new HashMap<Percept, Double>();
-		for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct, getRandomValueInRange(pct));
+
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
+				"*********************************************************************************************************** SOLVE NCS CHILD WITHOUT ORACLE", this.getName())));
+
+		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
+		for(Percept pct : getAmas().getPercepts()){
+			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
 		}
-		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
+
+
+
+		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>PARAMS.nbOfNeighborForLearningFromNeighbors){
+
+
+			while (getLocalModel().getFirstExperiments().size()< (getAmas().getPercepts().size() + 3 - getAmas().getHeadAgent().getActivatedNeighborsContexts().size())){
+				Experiment endoExp = new Experiment(this);
+				for(Percept pct : getAmas().getPercepts()) {
+					endoExp.addDimension(pct, getRandomValueInRange(pct));
+				}
+				endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF BEFORE NEIGHBORS", ""+endoExp)));
+				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+
+			}
+
+			for(Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
+
+
+				Experiment endoExp = new Experiment(this);
+				if(ctxtNeighbor != this) {
+					for (Percept pct : getAmas().getPercepts()) {
+						double start = Math.max(neighborhoodBounds.get(pct).getA(), ctxtNeighbor.getRanges().get(pct).getStart());
+						double length = Math.min(neighborhoodBounds.get(pct).getB(), ctxtNeighbor.getRanges().get(pct).getEnd()) - start;
+
+
+						endoExp.addDimension(pct, getRandomValueInRange(start, length));
+					}
+
+
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
+					double neighborPrediction = ((LocalModelMillerRegression) ctxtNeighbor.getLocalModel()).getProposition(endoExp);
+					endoExp.setOracleProposition(neighborPrediction);
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
+					getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+				}
+			}
+
+
+		}else{
+
+			while (isChild()){
+				Experiment endoExp = new Experiment(this);
+				for(Percept pct : getAmas().getPercepts()) {
+					endoExp.addDimension(pct, getRandomValueInRange(pct));
+				}
+				endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
+				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+
+			}
+
+		}
+
+
+
+		/*getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);*/
 
 	}
@@ -2718,16 +2782,8 @@ public class Context extends AmoebaAgent {
 
 	public boolean isChild(){
 
-		if(getAmas().data.isSelfLearning){
-			if(childRequests.size()>0){
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO CHILD REQUESTS")));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(""+childRequests)));
-			}
+		return !getLocalModel().finishedFirstExperiments();
 
-			return childRequests.size()>0;
-		}else{
-			return !getLocalModel().finishedFirstExperiments();
-		}
 
 	}
 
