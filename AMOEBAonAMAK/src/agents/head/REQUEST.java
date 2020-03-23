@@ -10,6 +10,7 @@ public enum REQUEST implements Serializable {
 	VOID,
 	SELF,
 	RDM,
+	DREAM,
 	
 }
 

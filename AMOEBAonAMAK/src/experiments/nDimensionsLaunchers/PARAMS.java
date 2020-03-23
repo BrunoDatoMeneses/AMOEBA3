@@ -21,10 +21,11 @@ public class PARAMS {
     public static final int normType = 2	;
 
     /* EXPLORATION */
-    public static final boolean randomExploration = true;
+    public static final boolean continousExploration = true;
+    public static final boolean randomExploration = !continousExploration;
     public static final boolean limitedToSpaceZone = true;
-    public static final double explorationIncrement = 1.0	;
-    public static final double explorationWidht = 0.5	;
+    public static final double explorationIncrement = 2.0	;
+    public static final double explorationWidht = 0.75	;
 
 
     /* LEARNING */
@@ -37,6 +38,7 @@ public class PARAMS {
 
     /*NCS*/
     public static final boolean setVoidDetection = false ; // OLD VOID
+
     public static final boolean setConflictDetection = true ;
     public static final boolean setConflictResolution = setConflictDetection ;
     public static final boolean setConcurrenceDetection = true ;
@@ -47,16 +49,20 @@ public class PARAMS {
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
+    public static final boolean setDream = true ;
+
+    public static final boolean setLearnFromNeighbors = true ;
+
     public static final int nbOfNeighborForCoopLearning = 6;
     public static final int nbOfNeighborForLearningFromNeighbors = 1;
-    public static final int nbOfNeighborForContexCreationWithouOracle = 5;
+    public static final int nbOfNeighborForContexCreationWithouOracle = 3;
     public static final int nbOfNeighborForVoidDetectionInSelfLearning = 5;
 
 
     /*UI*/
 
     public static final boolean contextColorByCoef = false ;
-    public static final int nbCycleRefresh3DView = 1;
+    public static final int nbCycleRefresh3DView = 50;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;

@@ -16,6 +16,7 @@ public class F_N_Manager implements StudiedSystem{
 
 	/** The x. */
 	Double[] x ;
+	Double[] xEploration ;
 
 	public int cycle;
 	
@@ -89,6 +90,7 @@ public class F_N_Manager implements StudiedSystem{
 		numberOfModels = nbOfModels;
 		normType = nrmType;
 		x = new Double[dimension];
+		xEploration = new Double[dimension];
 		
 		noiseRange = noise;
 		spaceLimited = limiteToSpace;
@@ -102,6 +104,7 @@ public class F_N_Manager implements StudiedSystem{
 		for(int nb = 0; nb<nbOfModels; nb++) {
 			for(int i = 0; i<dimension; i++) {
 				x[i] = 0.0;
+				xEploration[i] = 0.0;
 				
 				modelCoefs[nb][i] = (int) (Math.random() * 500 - 255);
 				modelCenterZones[nb][i] = spaceSize +  (Math.random() - 0.5) * spaceSize * 2;
@@ -115,6 +118,7 @@ public class F_N_Manager implements StudiedSystem{
 		modelCoefs2 = new int[dim+1];
 		for(int i = 0; i<dimension; i++) {
 			x[i] = 0.0;
+			xEploration[i] = 0.0;
 			
 			modelCoefs1[i] = (int) (Math.random() * 500 - 255);
 			modelCoefs2[i] = (int) (Math.random() * 500 - 255);
@@ -179,26 +183,27 @@ public class F_N_Manager implements StudiedSystem{
 	 */
 	@Override
 	public HashMap<String, Double> playOneStep() {
-		
 
-		if(!randomExploration) {
-			
-			nonRandomExplorationStep();
-			
-		}
-		else if(selfLearning) {
-					
+
+		if(selfLearning) {
+
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
 			selfRequestCounts++;
 		}
 		else if(activeLearning) {
-			
+
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
 			activeRequestCounts ++;
+		}
+		else if(!randomExploration) {
+
+			nonRandomExplorationStep();
+			//nonRandomExplorationStep2D();
+
 		}
 
 		else {
@@ -220,6 +225,7 @@ public class F_N_Manager implements StudiedSystem{
 		
 		
 		for(int i = 0 ; i < dimension ; i++) {
+			//explorationVector[i] += explorationMaxVariation;
 			explorationVector[i] += Math.random()*explorationMaxVariation - (explorationMaxVariation/2);
 		}
 		double vectorNorm = normeP(explorationVector, 2);
@@ -228,16 +234,44 @@ public class F_N_Manager implements StudiedSystem{
 		}
 		
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] += explorationIncrement*explorationVector[i];
+			xEploration[i] += explorationIncrement*explorationVector[i];
 			if(spaceLimited) {
-				if(x[i]>2*spaceSize) x[i]= -2*spaceSize;
-				if(x[i]<-2*spaceSize) x[i]= 2*spaceSize;
+				if(xEploration[i]>2*spaceSize) xEploration[i]= -2*spaceSize;
+				if(xEploration[i]<-2*spaceSize) xEploration[i]= 2*spaceSize;
 			}
+			x[i] = xEploration[i];
 			
 		}
 
-		
 	}
+
+	private void nonRandomExplorationStep2D() {
+
+
+
+		explorationVector[0] = Math.cos(cycle * explorationMaxVariation * 0.05);
+		explorationVector[1] = Math.sin(cycle * explorationMaxVariation * 0.05);
+
+
+		double vectorNorm = normeP(explorationVector, 2);
+		for(int i = 0 ; i < dimension ; i++) {
+			explorationVector[i] /= vectorNorm;
+		}
+
+		for(int i = 0 ; i < dimension ; i++) {
+			xEploration[i] += explorationIncrement*explorationVector[i];
+			if(spaceLimited) {
+				if(xEploration[i]>2*spaceSize) xEploration[i]= -2*spaceSize;
+				if(xEploration[i]<-2*spaceSize) xEploration[i]= 2*spaceSize;
+			}
+			x[i] = xEploration[i];
+
+		}
+
+
+	}
+
+
 	
 	public void playOneStepConstrained(double[][] constrains) {		
 		

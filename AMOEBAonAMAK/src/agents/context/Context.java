@@ -1593,23 +1593,26 @@ public class Context extends AmoebaAgent {
 
 			}
 
-			learnFromNeighbors();
-
-
-		}else{
-
-			while (isChild()){
-				Experiment endoExp = new Experiment(this);
-				for(Percept pct : getAmas().getPercepts()) {
-					endoExp.addDimension(pct, getRandomValueInRange(pct));
-				}
-				endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
-				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
-
+			if(PARAMS.setLearnFromNeighbors){
+				learnFromNeighbors();
 			}
 
+
+
 		}
+
+		while (isChild()){
+			Experiment endoExp = new Experiment(this);
+			for(Percept pct : getAmas().getPercepts()) {
+				endoExp.addDimension(pct, getRandomValueInRange(pct));
+			}
+			endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
+			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
+			getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+
+		}
+
+
 
 
 

@@ -311,7 +311,7 @@ public class View3D {
         chart.getScene().add(scatter);
 
 
-        amoeba.getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("UPDATE CONTEXTS 3D MODEL VIEW")));
+        amoeba.getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("UPDATE CONTEXTS 3D MODEL VIEW")));
 
         return chart;
     }

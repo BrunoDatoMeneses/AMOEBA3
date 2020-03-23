@@ -9,6 +9,7 @@ import agents.context.Experiment;
 import agents.context.VOID;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
+import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
 import ncs.NCS;
@@ -67,6 +68,12 @@ public class Head extends AmoebaAgent {
 			      return r2.getPriority().compareTo(r1.getPriority());
 			   }
 			});
+
+	public Queue<EndogenousRequest> endogenousDreamRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+		public int compare(EndogenousRequest r1, EndogenousRequest r2) {
+			return r2.getPriority().compareTo(r1.getPriority());
+		}
+	});
 	
 	static double lembda = 0.99;
 	// -----------------------------
@@ -266,10 +273,11 @@ public class Head extends AmoebaAgent {
 
 		boolean testIfSelfRequest = isSelfRequest();
 		boolean testIfChildSelfRequest = isSelfChildRequest();
-		if((testIfSelfRequest||testIfChildSelfRequest) && getAmas().data.isSelfLearning){
+		boolean testIfDreamRequest = isDreamRequest();
+		if((testIfSelfRequest||testIfChildSelfRequest||testIfDreamRequest) && getAmas().data.isSelfLearning){
 			getAmas().data.selfLearning = true;
 		}
-		if((testIfSelfRequest||testIfChildSelfRequest) && getAmas().data.isActiveLearning) {
+		if((testIfSelfRequest||testIfChildSelfRequest||testIfDreamRequest) && getAmas().data.isActiveLearning) {
 			getAmas().data.activeLearning = true;
 		}
 	}
@@ -285,8 +293,14 @@ public class Head extends AmoebaAgent {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
-		getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- PLAY WITH ORACLE")));
+		if(lastEndogenousRequest != null){
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType())));
+		}else{
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITH ORACLE")));
+		}
+
 
 		updateBestContextWithOracle();
 
@@ -326,6 +340,21 @@ public class Head extends AmoebaAgent {
 
 	private void updateCriticalityWithOracle() {
 		/* Compute the criticity. Will be used by context agents. */
+		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+		if(bestContext != null){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),
+					"Best Context Cricicality",""+getAmas().data.criticity)));
+		}
+
+	}
+
+	private void updateCriticalityWithoutOracle() {
+		/* Compute the criticity. Will be used by context agents. */
+		Double[] request = new Double[getAmas().getPercepts().size()];
+		for(int i=0;i<getAmas().getPercepts().size();i++){
+			request[i]=getAmas().getPercepts().get(i).getValue();
+		}
+		getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).model(request);
 		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
 		if(bestContext != null){
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),
@@ -515,6 +544,8 @@ public class Head extends AmoebaAgent {
 			NCSDetection_PotentialRequest();
 		}
 
+		NCSDetection_Dream();
+
 		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 	}
 
@@ -557,12 +588,18 @@ public class Head extends AmoebaAgent {
 		NCSDetection_ChildContext();
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 
-		resetLastEndogenousRequest();
-		/*getAmas().data.executionTimes[12]=System.currentTimeMillis();
-		if(getAmas().getCycle()>0){
-			NCSDetection_PotentialRequest();
+
+
+		NCSDetection_Dream();
+		getAmas().data.executionTimes[12]=System.currentTimeMillis();
+		if(lastEndogenousRequest!= null){
+			if(getAmas().getCycle()>0 && lastEndogenousRequest.getType() == REQUEST.DREAM){
+				NCSDetection_PotentialRequest();
+			}
 		}
-		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];*/
+		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
+
+		resetLastEndogenousRequest();
 	}
 
 	private void NCSDetection_LearnFromNeighbors() {
@@ -726,12 +763,18 @@ public class Head extends AmoebaAgent {
 	 */
 	private void playWithoutOracle() {
 		getAmas().data.oracleValue = null;
-		
-		getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- PLAY WITHOUT ORACLE")));
+
+		if(lastEndogenousRequest != null){
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType())));
+		}else{
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITHOUT ORACLE")));
+		}
 
 		updateBestContextAndPropositionWithoutOracle();
 
+		updateCriticalityWithoutOracle();
 
 		allNCSDetectionsWithoutOracle();
 
@@ -798,8 +841,8 @@ public class Head extends AmoebaAgent {
 				// To limit performance impact, we limit our search on a random sample.
 				// A better way would be to increase neighborhood.
 				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
-				List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
-				nearestContext = this.getNearestContext(searchList);
+				//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
+				nearestContext = this.getNearestContext(getAmas().getContexts());
 				if(nearestContext != null) {
 					getAmas().data.prediction = nearestContext.getActionProposal();
 					bestContext = nearestContext;
@@ -1198,7 +1241,13 @@ public class Head extends AmoebaAgent {
 						bestContext.solveNCS_ChildContext();
 
 
+					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+						if(PARAMS.setLearnFromNeighbors){
+							bestContext.learnFromNeighbors();
+						}
+
 					}
+
 				}
 			}
 			else if (getAmas().data.isSelfLearning){
@@ -1211,7 +1260,10 @@ public class Head extends AmoebaAgent {
 
 
 					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						bestContext.learnFromNeighbors();
+						if(PARAMS.setLearnFromNeighbors){
+							bestContext.learnFromNeighbors();
+						}
+
 					}
 				}
 
@@ -1563,7 +1615,23 @@ public class Head extends AmoebaAgent {
 
 		}
 	}
-	
+
+	public void NCSDetection_Dream() {
+
+		if(getAmas().getCycle() % 2000 ==0 && PARAMS.setDream){
+			for(Context ctxt : getAmas().getContexts()){
+				HashMap<Percept,Double> request = new HashMap<>();
+				for(Percept pct : getAmas().getPercepts()){
+					request.put(pct,ctxt.getRanges().get(pct).getCenter());
+				}
+				addDreamRequest(request,5,ctxt);
+
+			}
+		}
+
+
+	}
+
 	public void NCSDetection_PotentialRequest() {
 		
 		if(getAmas().data.isActiveLearning || getAmas().data.isSelfLearning) {
@@ -1589,8 +1657,16 @@ public class Head extends AmoebaAgent {
 				}
 			}
 
+			boolean testVoid = false;
+			if(getAmas().data.isActiveLearning){
+				testVoid = true;
+			}else{
+				if(lastEndogenousRequest!=null){
+					testVoid = lastEndogenousRequest.getType() == REQUEST.DREAM;
+				}
+			}
 
-			if(getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.isVoidDetection2){
+			if((getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.isVoidDetection2) && testVoid){
 				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
 					neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
@@ -1927,7 +2003,7 @@ public class Head extends AmoebaAgent {
 			//double endogenousPrediction = ((LocalModelMillerRegression)bestNearestCtxt.getLocalModel()).getProposition(bestNearestCtxt.getCurrentExperimentWithouOracle());
 			Experiment currentExp = bestNearestCtxt.getCurrentExperimentWithouOracle();
 			double endogenousPrediction;
-			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForContexCreationWithouOracle){
+			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= PARAMS.nbOfNeighborForContexCreationWithouOracle){
 				double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
@@ -2667,8 +2743,11 @@ public class Head extends AmoebaAgent {
 		}else if(endogenousRequests.size()>0) {
 
 			futureRequest = pollRequest(endogenousRequests);
+		}else if(endogenousDreamRequests.size()>0){
+			futureRequest = endogenousDreamRequests.poll();
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE SELF LEARNING", ""+futureRequest)));
+
 
 		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
@@ -2687,9 +2766,11 @@ public class Head extends AmoebaAgent {
 		}else if(endogenousRequests.size()>0) {
 
 			futureRequest = pollRequest(endogenousRequests);
+		}else if(endogenousDreamRequests.size()>0){
+		futureRequest = endogenousDreamRequests.poll();
 		}
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("FUTURE ACTIVE LEARNING", ""+futureRequest)));
-		
+
 		lastEndogenousRequest = futureRequest;
 		for(Context ctxt : futureRequest.getAskingContexts()) {
 			ctxt.deleteWaitingRequest(futureRequest);
@@ -2739,6 +2820,12 @@ public class Head extends AmoebaAgent {
 		}
 		return endogenousChildRequests.size()>0;
 	}
+
+	public boolean isDreamRequest(){
+		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO DREAM REQUESTS", ""+endogenousDreamRequests.size())));
+
+		return endogenousDreamRequests.size()>0;
+	}
 	
 	public boolean isSelfRequest(){
 		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
@@ -2752,6 +2839,11 @@ public class Head extends AmoebaAgent {
 		
 		//getAmas().data.activeLearning = true;
 		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF), endogenousChildRequests);
+	}
+
+	public void addDreamRequest(HashMap<Percept, Double> request, int priority, Context ctxt){
+
+		endogenousDreamRequests.add(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.DREAM));
 	}
 	
 	public void addEndogenousRequest(EndogenousRequest request, Queue<EndogenousRequest> endogenousRequestsList) {
