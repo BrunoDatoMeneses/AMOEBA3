@@ -2,6 +2,7 @@ package gui;
 
 import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
+import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import experiments.tests.JZY3D_Test;
@@ -265,31 +266,53 @@ public class View3D {
         ArrayList<Coord3d> pointAAjouter = new ArrayList<>();
         for (Context ctxt : amoeba.getContexts()){
 
-            float xStart = (float)ctxt.getRanges().get(amoeba.getPercepts().get(0)).getStart();
-            float xEnd = (float)ctxt.getRanges().get(amoeba.getPercepts().get(0)).getEnd();
-            float yStart = (float)ctxt.getRanges().get(amoeba.getPercepts().get(1)).getStart();
-            float yEnd = (float)ctxt.getRanges().get(amoeba.getPercepts().get(1)).getEnd();
+            Percept pct1 =  amoeba.getDimensionSelector().d1();
+            Percept pct2 =  amoeba.getDimensionSelector().d2();
 
-            float x=xStart;
-            float y=yStart;
-            float z;
-
-            while(x<=xEnd){
-                y = yStart;
-                while(y<=yEnd){
-                    double[] perception = new double[2];
-                    perception[0]=x;
-                    perception[1]=y;
-                    z = (float) ((LocalModelMillerRegression)ctxt.getLocalModel()).getPropositionFrom2DPerceptions(perception);
-
-                    pointAAjouter.add(new Coord3d(x, y, z));
-
-
-                    y += increment;
+            boolean testIfDraw = true;
+            for(Percept pct : amoeba.getPercepts()){
+                if(pct != pct1 && pct != pct2){
+                    testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(0.0);
                 }
-
-                x+= increment;
             }
+            if(testIfDraw){
+                float xStart = (float)ctxt.getRanges().get(pct1).getStart();
+                float xEnd = (float)ctxt.getRanges().get(pct1).getEnd();
+                float yStart = (float)ctxt.getRanges().get(pct2).getStart();
+                float yEnd = (float)ctxt.getRanges().get(pct2).getEnd();
+
+                float x=xStart;
+                float y=yStart;
+                float z;
+
+                while(x<=xEnd){
+                    y = yStart;
+                    while(y<=yEnd){
+                        int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
+                        int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+
+                        double[] perception = new double[((F_N_Manager)studiedSystem).dimension];
+                        for(int i=0;i<perception.length;i++){
+                            if(i == pct1Index){
+                                perception[i] = x;
+                            }else if(i == pct2Index){
+                                perception[i] = y;
+                            }else{
+                                perception[i] = 0.0;
+                            }
+                        }
+                        z = (float) ((LocalModelMillerRegression)ctxt.getLocalModel()).getPropositionFrom2DPerceptions(perception);
+
+                        pointAAjouter.add(new Coord3d(x, y, z));
+
+
+                        y += increment;
+                    }
+
+                    x+= increment;
+                }
+            }
+
 
         }
 
@@ -318,9 +341,28 @@ public class View3D {
 
 
     double model(double x, double y){
-        Double[] request = new Double[2];
-        request[0]=x;
-        request[1]=y;
+
+        /*for(int i = 0; i<dimension; i++) {
+
+            out.put("px" + i,x[i]);
+
+        }*/
+
+        int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
+        int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+
+        Double[] request = new Double[((F_N_Manager)studiedSystem).dimension];
+        for(int i=0;i<request.length;i++){
+            if(i == pct1Index){
+                request[i] = x;
+            }else if(i == pct2Index){
+                request[i] = y;
+            }else{
+                request[i] = null;
+            }
+        }
+        /*request[pct1Index]=x;
+        request[pct2Index]=y;*/
         return ((F_N_Manager)(studiedSystem)).model(request);
     }
 

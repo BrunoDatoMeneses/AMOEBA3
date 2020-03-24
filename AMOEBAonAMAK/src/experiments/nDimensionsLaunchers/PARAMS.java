@@ -4,12 +4,20 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
+    /*public static final String configFile = "twoDimensionsLauncher.xml";
+    public static final int dimension = 2;*/
+
+    public static final String configFile = "threeDimensionsLauncher.xml";
+    public static final int dimension = 3;
+
     public static final int nbCycle = 1000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.04;
+    //public static double mappingErrorAllowed = 0.04;
+    public static double mappingErrorAllowed = 0.07; // OTHER
+
+    /* PREDICTION */
+    public static final double setRegressionPerformance = 1;
 
     /* REGRESSION */
     public static final double oracleNoiseRange = 0.5;
@@ -21,7 +29,7 @@ public class PARAMS {
     public static final int normType = 2	;
 
     /* EXPLORATION */
-    public static final boolean continousExploration = true;
+    public static final boolean continousExploration = false;
     public static final boolean randomExploration = !continousExploration;
     public static final boolean limitedToSpaceZone = true;
     public static final double explorationIncrement = 2.0	;
@@ -29,11 +37,10 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = false	;
+    public static final boolean setActiveLearning = true	;
     public static final boolean setSelfLearning = !setActiveLearning;
 
-    /* PREDICTION */
-    public static final double setRegressionPerformance = 1;
+
 
 
     /*NCS*/
@@ -49,7 +56,7 @@ public class PARAMS {
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static final boolean setDream = true ;
+    public static final boolean setDream = false ;
 
     public static final boolean setLearnFromNeighbors = true ;
 
@@ -65,5 +72,5 @@ public class PARAMS {
     public static final int nbCycleRefresh3DView = 50;
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 }

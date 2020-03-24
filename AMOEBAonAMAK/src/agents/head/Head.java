@@ -123,6 +123,9 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void onActInit() {
+		if(getAmas().getCycle()%1000 == 0) {
+			getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("")));
+		}
 		meanNeighborhoodVolume = null;
 		meanNeighborhoodRaduises = null;
 		minNeighborhoodRaduises = null;
@@ -150,7 +153,7 @@ public class Head extends AmoebaAgent {
 		setContextFromPropositionWasSelected(false);
 		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
 		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
-		setAverageRegressionPerformanceIndicator(); //TODO not working ?
+		setAverageRegressionPerformanceIndicator(); //TODO not working ? Seems to works after all
 
 		/* The head memorize last used context agent */
 		lastUsedContext = bestContext;

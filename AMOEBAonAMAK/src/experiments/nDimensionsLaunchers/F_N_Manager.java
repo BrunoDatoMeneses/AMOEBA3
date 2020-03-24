@@ -36,7 +36,7 @@ public class F_N_Manager implements StudiedSystem{
 	boolean spaceLimited = true;
 	public double spaceSize;
 	
-	int dimension;
+	public int dimension;
 	int numberOfModels;
 	int normType;
 	
@@ -333,15 +333,19 @@ public class F_N_Manager implements StudiedSystem{
 	
 	public double model(Double[] situation) {
 		
-		Double[] xRequest;
+		Double[] xRequest = new Double[dimension];
 		
 		if(situation == null) {
 			xRequest = x;
 		}else {
-			xRequest = situation;
+			for( int i = 0; i<situation.length;i++){
+				if(situation[i] == null) xRequest[i] = 0.0;
+				else xRequest[i] = situation[i];
+			}
+			//xRequest = situation;
 		}
 		
-		double[] center =  new double[2];
+		double[] center =  new double[dimension];
 		center[0]=0.0;
 		center[1]=0.0;
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
