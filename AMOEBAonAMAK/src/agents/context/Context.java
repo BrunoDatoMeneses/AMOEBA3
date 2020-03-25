@@ -13,7 +13,6 @@ import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
-import experiments.nDimensionsLaunchers.PARAMS;
 import gui.ContextRendererFX;
 import gui.RenderStrategy;
 import kernel.AMOEBA;
@@ -1579,7 +1578,7 @@ public class Context extends AmoebaAgent {
 
 
 
-		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>PARAMS.nbOfNeighborForLearningFromNeighbors){
+		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.nbOfNeighborForLearningFromNeighbors){
 
 
 			while (getLocalModel().getFirstExperiments().size()< (getAmas().getPercepts().size() + 3 - getAmas().getHeadAgent().getActivatedNeighborsContexts().size())){
@@ -1593,7 +1592,7 @@ public class Context extends AmoebaAgent {
 
 			}
 
-			if(PARAMS.setLearnFromNeighbors){
+			if(getAmas().data.isLearnFromNeighbors){
 				learnFromNeighbors();
 			}
 
@@ -1654,7 +1653,7 @@ public class Context extends AmoebaAgent {
 
 		Experiment currentExp = getCurrentExperimentWithouOracle();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("CHILD EXPERIMENT",""+currentExp)));
-		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> PARAMS.nbOfNeighborForLearningFromNeighbors){
+		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> getAmas().data.nbOfNeighborForLearningFromNeighbors){
 
 			ArrayList<Context> neighborsToKeep = new ArrayList<>();
 			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {

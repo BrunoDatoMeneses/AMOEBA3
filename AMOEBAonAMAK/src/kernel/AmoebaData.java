@@ -101,5 +101,17 @@ public class AmoebaData implements Serializable {
 	public boolean isSelfModelRequest = false;
 	public boolean isCoopLearningWithoutOracle = false;
 
+	public boolean isLearnFromNeighbors = false;
+	public boolean isDream = false;
+
+
+	public int nbOfNeighborForLearningFromNeighbors = 10000;
+	public int nbOfNeighborForVoidDetectionInSelfLearning = 10000;
+	public int nbOfNeighborForContexCreationWithouOracle = 10000;
+
+
+
+
+
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
 }

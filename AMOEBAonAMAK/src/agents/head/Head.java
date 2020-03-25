@@ -1245,7 +1245,7 @@ public class Head extends AmoebaAgent {
 
 
 					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(PARAMS.setLearnFromNeighbors){
+						if(getAmas().data.isLearnFromNeighbors){
 							bestContext.learnFromNeighbors();
 						}
 
@@ -1263,7 +1263,7 @@ public class Head extends AmoebaAgent {
 
 
 					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(PARAMS.setLearnFromNeighbors){
+						if(getAmas().data.isLearnFromNeighbors){
 							bestContext.learnFromNeighbors();
 						}
 
@@ -1621,7 +1621,7 @@ public class Head extends AmoebaAgent {
 
 	public void NCSDetection_Dream() {
 
-		if(getAmas().getCycle() % 2000 ==0 && PARAMS.setDream){
+		if(getAmas().getCycle() % 2000 ==0 && getAmas().data.isDream){
 			for(Context ctxt : getAmas().getContexts()){
 				HashMap<Percept,Double> request = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
@@ -1698,7 +1698,7 @@ public class Head extends AmoebaAgent {
 					}
 					if(isInMinMax && isNotTooSmall){
 						if(getAmas().data.isSelfLearning){
-							if(activatedNeighborsContexts.size()>PARAMS.nbOfNeighborForVoidDetectionInSelfLearning){
+							if(activatedNeighborsContexts.size()>getAmas().data.nbOfNeighborForVoidDetectionInSelfLearning){
 								EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
 								addEndogenousRequest(potentialRequest, endogenousRequests);
 							}
@@ -2006,7 +2006,7 @@ public class Head extends AmoebaAgent {
 			//double endogenousPrediction = ((LocalModelMillerRegression)bestNearestCtxt.getLocalModel()).getProposition(bestNearestCtxt.getCurrentExperimentWithouOracle());
 			Experiment currentExp = bestNearestCtxt.getCurrentExperimentWithouOracle();
 			double endogenousPrediction;
-			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= PARAMS.nbOfNeighborForContexCreationWithouOracle){
+			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.nbOfNeighborForContexCreationWithouOracle){
 				double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
