@@ -362,7 +362,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return discModel(xRequest);
 		
 		/* Square */
-		//return squareModel(xRequest);
+		return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
@@ -381,7 +381,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return polynomialModel(xRequest, 2, 50);
 
 		/* Goutte */
-		return goutteModel(xRequest, center);
+		//return goutteModel(xRequest, center);
 
 		/* Rosenbrock */
 		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);

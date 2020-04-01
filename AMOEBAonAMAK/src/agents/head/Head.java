@@ -1621,7 +1621,7 @@ public class Head extends AmoebaAgent {
 
 	public void NCSDetection_Dream() {
 
-		if(getAmas().getCycle() % 2000 ==0 && getAmas().data.isDream){
+		if(getAmas().getCycle() % (1000 * getAmas().getPercepts().size()) ==0 && getAmas().data.isDream){
 			for(Context ctxt : getAmas().getContexts()){
 				HashMap<Percept,Double> request = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){

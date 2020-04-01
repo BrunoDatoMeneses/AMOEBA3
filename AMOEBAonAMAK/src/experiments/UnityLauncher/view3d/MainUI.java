@@ -1,9 +1,11 @@
-package experiments.UnityLauncher;
+package experiments.UnityLauncher.view3d;
 
 import agents.context.Context;
 import experiments.FILE;
+import experiments.UnityLauncher.Sender;
+import experiments.UnityLauncher.SocketServer;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
+
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
 import gui.AmoebaMultiUIWindow;
@@ -15,11 +17,8 @@ import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import kernel.backup.SaveHelperImpl;
-import utils.TRACE_LEVEL;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class MainUI extends Application{
 		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
 
 
-		startTask(100, PARAMS.nbCycle);
+		startTask(100, PARAMS_UNITY.nbCycle);
 
 
 
@@ -143,29 +142,38 @@ public class MainUI extends Application{
 				{
 
 					amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
-					studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+					studiedSystem = new F_N_Manager(PARAMS_UNITY.spaceSize, PARAMS_UNITY.dimension, PARAMS_UNITY.nbOfModels, PARAMS_UNITY.normType, PARAMS_UNITY.randomExploration, PARAMS_UNITY.explorationIncrement,PARAMS_UNITY.explorationWidht,PARAMS_UNITY.limitedToSpaceZone, PARAMS_UNITY.oracleNoiseRange);
 					amoeba.setStudiedSystem(studiedSystem);
 					IBackupSystem backupSystem = new BackupSystem(amoeba);
-					File file = new File("resources/"+PARAMS.configFile);
+					File file = new File("resources/"+PARAMS_UNITY.configFile);
 					backupSystem.load(file);
 
-					amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+					//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
 					amoeba.allowGraphicalScheduler(true);
 					amoeba.setRenderUpdate(false);
-					amoeba.data.learningSpeed = PARAMS.learningSpeed;
-					amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-					amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
-					amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
-					amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
-					amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-					amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-					amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
-					amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-					amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
-					amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-					amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-					World.minLevel = TRACE_LEVEL.ERROR;
+					amoeba.data.learningSpeed = PARAMS_UNITY.learningSpeed;
+					amoeba.data.numberOfPointsForRegression = PARAMS_UNITY.regressionPoints;
+					amoeba.data.isActiveLearning = PARAMS_UNITY.setActiveLearning;
+					amoeba.data.isSelfLearning = PARAMS_UNITY.setSelfLearning;
+					amoeba.data.isConflictDetection = PARAMS_UNITY.setConflictDetection;
+					amoeba.data.isConcurrenceDetection = PARAMS_UNITY.setConcurrenceDetection;
+					amoeba.data.isVoidDetection2 = PARAMS_UNITY.setVoidDetection2;
+					amoeba.data.isConflictResolution = PARAMS_UNITY.setConflictResolution;
+					amoeba.data.isConcurrenceResolution = PARAMS_UNITY.setConcurrenceResolution;
+					amoeba.data.isFrontierRequest = PARAMS_UNITY.setFrontierRequest;
+					amoeba.data.isSelfModelRequest = PARAMS_UNITY.setSelfModelRequest;
+					amoeba.data.isCoopLearningWithoutOracle = PARAMS_UNITY.setCoopLearning;
+
+					amoeba.data.isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
+					amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
+					amoeba.data.isDream = PARAMS_UNITY.setDream;
+					amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
+					amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
+
+					amoeba.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
+					amoeba.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
+					World.minLevel = PARAMS_UNITY.traceLevel;
 
 					sender = new Sender(server, amoeba);
 

@@ -1,8 +1,8 @@
-package experiments.nDimensionsLaunchers;
+package experiments.UnityLauncher.view3d;
 
 import utils.TRACE_LEVEL;
 
-public class PARAMS {
+public class PARAMS_UNITY {
 
     /*public static final String configFile = "twoDimensionsLauncher.xml";
     public static final int dimension = 2;*/
@@ -10,11 +10,11 @@ public class PARAMS {
     public static final String configFile = "threeDimensionsLauncher.xml";
     public static final int dimension = 3;
 
-    public static final int nbCycle = 1000;
+    public static final int nbCycle = 100000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
-    //public static double mappingErrorAllowed = 0.04; // USUAL
-    public static double mappingErrorAllowed = 0.08; // OTHER
+    public static double mappingErrorAllowed = 0.15;
+    //public static double mappingErrorAllowed = 0.07; // OTHER
 
     /* PREDICTION */
     public static final double setRegressionPerformance = 1;
@@ -56,7 +56,7 @@ public class PARAMS {
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static final boolean setDream = true ;
+    public static final boolean setDream = false ;
 
     public static final boolean setLearnFromNeighbors = false ;
 
@@ -74,4 +74,5 @@ public class PARAMS {
     public static double maxPrediction = 500 ;
     public static double minPrediction = 0 ;
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+
 }
