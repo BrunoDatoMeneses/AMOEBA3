@@ -1,6 +1,7 @@
-package experiments.nDimensionsLaunchers;
+package experiments.UnityLauncher.view3d;
 
-import experiments.FILE;
+import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
 import gui.AmoebaMultiUIWindow;
@@ -12,25 +13,27 @@ import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import kernel.backup.SaveHelperImpl;
-import utils.TRACE_LEVEL;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 
 /**
  * The Class BadContextLauncherEasy.
  */
-public class F_N_LauncherUI_autom extends Application implements Serializable {
+public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 	AMOEBA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	AmoebaMultiUIWindow amoebaUI;
 	boolean test = true;
+
+	private ServerSocket socketserver = null;
+	private  Socket socket = null;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -87,6 +90,17 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 
 	public void runTask(long wait, int cycles)
 	{
+		try {
+			socketserver = new ServerSocket(2009);
+			System.out.println("Server ready...");
+			socket = socketserver.accept(); // Un client se connecte on
+			// l'accepte
+			System.out.println("Client connected...");
+
+		} catch (IOException e) {
+			System.err.println("Le port " + socket.getLocalPort() + " est déjà utilisé !");
+			e.printStackTrace();
+		}
 
 		try
 		{

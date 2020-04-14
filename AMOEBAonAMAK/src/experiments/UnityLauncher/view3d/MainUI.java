@@ -32,20 +32,41 @@ public class MainUI extends Application{
 	Sender sender;
 
 	private SocketServer server;
+	private static Socket socket = null;
 
 	/* GUI or not */
 	public static final boolean viewer = false;
 	private String message = "";
 	private Boolean shutDown;
 
-	public MainUI(ServerSocket ss, Socket s) {
-		
-		server = new SocketServer(ss, s);
-		shutDown = false;
-		
-	}
-	
 
+
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+	@Override
+	public void start(Stage arg0) throws Exception {
+
+
+		// Set AMAK configuration before creating an AMOEBA
+		Configuration.multiUI=true;
+		Configuration.commandLineMode = false;
+		Configuration.allowedSimultaneousAgentsExecution = 1;
+		Configuration.waitForGUI = true;
+		Configuration.plotMilliSecondsUpdate = 20000;
+
+		amoebaVUI = new VUIMulti("2D");
+		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
+
+
+
+		/*startTask(100, PARAMS_UNITY.nbCycle);*/
+		startTask(100, 0);
+
+
+
+	}
 
 	private void updateContextsOnUnity(AMOEBA amoeba, Sender sender) {
 		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
@@ -82,28 +103,6 @@ public class MainUI extends Application{
 				}
 			}
 		}
-	}
-
-
-	@Override
-	public void start(Stage arg0) throws Exception {
-
-
-		// Set AMAK configuration before creating an AMOEBA
-		Configuration.multiUI=true;
-		Configuration.commandLineMode = false;
-		Configuration.allowedSimultaneousAgentsExecution = 1;
-		Configuration.waitForGUI = true;
-		Configuration.plotMilliSecondsUpdate = 20000;
-
-		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
-
-
-		startTask(100, PARAMS_UNITY.nbCycle);
-
-
-
 	}
 
 
@@ -175,7 +174,7 @@ public class MainUI extends Application{
 					amoeba.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
 					World.minLevel = PARAMS_UNITY.traceLevel;
 
-					sender = new Sender(server, amoeba);
+					//sender = new Sender(server, amoeba);
 
 				}
 			});
