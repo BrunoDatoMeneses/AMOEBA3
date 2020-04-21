@@ -12,6 +12,7 @@ import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
+import kernel.StudiedSystem;
 import ncs.NCS;
 import utils.Pair;
 import utils.PrintOnce;
@@ -352,18 +353,29 @@ public class Head extends AmoebaAgent {
 	}
 
 	private void updateCriticalityWithoutOracle() {
-		/* Compute the criticity. Will be used by context agents. */
-		Double[] request = new Double[getAmas().getPercepts().size()];
-		for(int i=0;i<getAmas().getPercepts().size();i++){
-			request[i]=getAmas().getPercepts().get(i).getValue();
-		}
-		getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).model(request);
-		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
-		if(bestContext != null){
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),
-					"Best Context Cricicality",""+getAmas().data.criticity)));
+
+		if(getAmas().studiedSystem != null){
+			/* Compute the criticity. Will be used by context agents. */
+			Double[] request = new Double[getAmas().getPercepts().size()];
+			for(int i=0;i<getAmas().getPercepts().size();i++){
+				request[i]=getAmas().getPercepts().get(i).getValue();
+			}
+
+			getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).model(request);
+			getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+			//System.out.println("A " + getAmas().getCycle() + "\t\t\t" + getAmas().data.oracleValue + "\t\t\t" + getAmas().data.prediction + "\t\t\t" + getAmas().data.criticity);
+			if(bestContext != null){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),
+						"Best Context Cricicality",""+getAmas().data.criticity)));
+			}
 		}
 
+
+
+	}
+
+	public StudiedSystem getStudiedSystem(){
+		return getAmas().studiedSystem;
 	}
 
 	private void updateBestContextWithOracle() {
@@ -2779,7 +2791,7 @@ public class Head extends AmoebaAgent {
 			ctxt.deleteWaitingRequest(futureRequest);
 		}
 
-		getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
+		if(getAmas().getCycle()>999) getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
 		return futureRequest.getRequest();
 	}
 

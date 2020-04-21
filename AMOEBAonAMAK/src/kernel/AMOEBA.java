@@ -274,6 +274,9 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				data.activeLearning = false;
 				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getActiveRequest());
+			}else{
+
+				if(getCycle()>999) data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);
 			}
 		}
 		
@@ -716,7 +719,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 		if(getCycle()>0 && cycle % PARAMS.nbCycleRefresh3DView == 0){
 
-			multiUIWindow.view3D.updateContextChart();
+			if(multiUIWindow.view3D != null)
+				multiUIWindow.view3D.updateContextChart();
 		}
 	}
 	

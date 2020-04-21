@@ -1,5 +1,8 @@
 package experiments.UnityLauncher.view3d;
 
+import agents.context.Context;
+import experiments.UnityLauncher.Sender;
+import experiments.UnityLauncher.SocketServer;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Configuration;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 
 /**
@@ -30,10 +34,12 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	AmoebaMultiUIWindow amoebaUI;
+	Sender sender;
 	boolean test = true;
 
-	private ServerSocket socketserver = null;
-	private  Socket socket = null;
+	private static ServerSocket socketserver = null;
+	private static  Socket socket = null;
+	private SocketServer server;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -96,6 +102,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 			socket = socketserver.accept(); // Un client se connecte on
 			// l'accepte
 			System.out.println("Client connected...");
+			server = new SocketServer(socketserver, socket);
 
 		} catch (IOException e) {
 			System.err.println("Le port " + socket.getLocalPort() + " est déjà utilisé !");
@@ -122,7 +129,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 					//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
 					amoeba.allowGraphicalScheduler(true);
-					amoeba.setRenderUpdate(false);
+					amoeba.setRenderUpdate(true);
 					amoeba.data.learningSpeed = PARAMS.learningSpeed;
 					amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
 					amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
@@ -146,6 +153,8 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 					amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 					World.minLevel = PARAMS.traceLevel;
 
+					sender = new Sender(server, amoeba);
+
 				}
 			});
 
@@ -158,7 +167,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 		int i = 0;
 
-		/*while(test)
+		while(test)
 		//for(int i = 0; i < cycles; i++)
 		{
 			if(i%100==0){
@@ -169,20 +178,24 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 				// Get the Status
 				final String status = "Processing " + i + " of " + cycles;
 
+
+
 				// Update the Label on the JavaFx Application Thread
 				Platform.runLater(new Runnable()
 				{
 					@Override
 					public void run()
 					{
+
 						amoeba.cycle();
-						test = amoeba.data.normalizedCriticality < 100000;
+						//test = amoeba.data.normalizedCriticality < 100000;
 						//System.out.println(amoeba.data.normalizedCriticality);
-
-
+						updateContextsOnUnity(amoeba, sender);
 
 					}
 				});
+
+
 
 				Thread.sleep(wait);
 			}
@@ -195,14 +208,49 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 		}
 		System.out.println(i-1);
 		System.out.println(amoeba.data.normalizedCriticality);
-		System.out.println(amoeba.getHeadAgent().getBestContext().getName());*/
+		System.out.println(amoeba.getHeadAgent().getBestContext().getName());
 
 
 	}
-	
-	
 
 
+
+	private void updateContextsOnUnity(AMOEBA amoeba, Sender sender) {
+		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
+		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
+
+		if(spatiallyAlteredContexts.size()>0) {
+
+			sender.sendContexts(spatiallyAlteredContexts);
+
+			while (!sender.acq("CTXTS", amoeba.getCycle())) {
+				try
+				{
+					Thread.sleep(10);
+				}
+				catch(InterruptedException ex)
+				{
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
+
+		if(toKillContexts.size()>0) {
+
+			sender.sendContextsToKill(toKillContexts);
+
+			while (!sender.acq("KILL", amoeba.getCycle())) {
+				try
+				{
+					Thread.sleep(10);
+				}
+				catch(InterruptedException ex)
+				{
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
+	}
 
 
 	

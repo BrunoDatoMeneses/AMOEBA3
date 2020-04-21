@@ -197,7 +197,7 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
-			activeRequestCounts ++;
+			if(cycle>999) activeRequestCounts ++;
 		}
 		else if(!randomExploration) {
 
@@ -212,7 +212,7 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
-			randomRequestCounts++;
+			if(cycle>999) randomRequestCounts++;
 		}
 		
 		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
@@ -362,7 +362,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return discModel(xRequest);
 		
 		/* Square */
-		return squareModel(xRequest);
+		//return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
@@ -392,7 +392,16 @@ public class F_N_Manager implements StudiedSystem{
 
 		//return squareSplitDiagModel(xRequest, 1000);
 
+		return jfsmaDynamicalModel(xRequest, 1000);
 
+
+	}
+
+	private double jfsmaDynamicalModel(Double[] xRequest, int cycleChange) {
+		if(cycle<cycleChange) {
+			return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
+		}
+		else return (xRequest[0] > xRequest[1]) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
 	}
 
 	private double squareSplitDiagModel(Double[] xRequest, int cycleChange) {
@@ -919,7 +928,7 @@ private double[] subZoneCenter3D(int nb) {
 
 		double prediction = amoeba.request(out);
 		double error = Math.abs(oracleValue-prediction)/Math.abs(oracleValue);
-		//System.out.println(oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
+		//System.out.println("M" + cycle + "\t\t\t" + oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
 
 		return error;
 

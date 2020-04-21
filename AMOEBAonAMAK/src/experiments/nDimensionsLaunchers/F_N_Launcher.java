@@ -140,27 +140,32 @@ public class F_N_Launcher implements Serializable {
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
-		
-		
+
+
 		amoeba.allowGraphicalScheduler(false);
-		amoeba.setRenderUpdate(false);		
+		amoeba.setRenderUpdate(false);
 		amoeba.data.learningSpeed = PARAMS.learningSpeed;
 		amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
 		amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
 		amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
-		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
 		amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		amoeba.data.isVoidDetection = PARAMS.setVoidDetection;
+		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
 		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
 		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
 		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+		amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+
+		amoeba.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+		amoeba.data.isDream = PARAMS.setDream;
+		amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
+		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		
-		amoeba.setRenderUpdate(false);
-		
-		World.minLevel = TRACE_LEVEL.ERROR;
+		World.minLevel = PARAMS.traceLevel;
 		
 		
 
@@ -171,13 +176,18 @@ public class F_N_Launcher implements Serializable {
 		}
 
 		double errorsMean = 0;
-		for (int i = 0; i < PARAMS.nbCycle/4; ++i) {
-			errorsMean += studiedSystem.getErrorOnRequest(amoeba);
+
+		for (int i = 0; i < 250; ++i) {
+			double currentError = studiedSystem.getErrorOnRequest(amoeba);
+			errorsMean += currentError;
+
 		}
-		errorsMean = errorsMean/(PARAMS.nbCycle/4);
+		errorsMean = errorsMean/(250);
 
 		HashMap<String, Double> mappingScores = amoeba.getHeadAgent().getMappingScores();
+		System.out.println(mappingScores);
 		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
+		System.out.println(requestCounts);
 
 		data.get("mappingScore").add(mappingScores.get("CTXT"));
 		data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));

@@ -73,9 +73,18 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
 		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+		amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+
+		amoeba.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+		amoeba.data.isDream = PARAMS.setDream;
+		amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
 		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		World.minLevel = TRACE_LEVEL.ERROR;
+		World.minLevel = PARAMS.traceLevel;
 
 		for(int i=0;i<PARAMS.nbCycle;i++){
 			amoeba.cycle();
@@ -91,6 +100,8 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		System.out.println("CTXT NB " + amoeba.getContexts().size());
 		System.out.println("REQUEST TYPES");
 		System.out.println(amoeba.data.requestCounts);
+
+		System.out.println(amoeba.getHeadAgent().getMappingScores());
 
 		/*double errorsMean = 0;
 		for (int i = 0; i < nbCycle/4; ++i) {
