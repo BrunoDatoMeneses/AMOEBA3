@@ -188,6 +188,7 @@ public class F_N_Launcher implements Serializable {
 		System.out.println(mappingScores);
 		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
 		System.out.println(requestCounts);
+		System.out.println(errorsMean*100);
 
 		data.get("mappingScore").add(mappingScores.get("CTXT"));
 		data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));

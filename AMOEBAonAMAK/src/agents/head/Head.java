@@ -751,7 +751,7 @@ public class Head extends AmoebaAgent {
 			for (Context otherCtxt : getAmas().getContexts().subList(i, getAmas().getContexts().size())) {
 				if(otherCtxt != ctxt){
 
-
+					//ctxt.isSameModel()
 
 					if(ctxt.getLocalModel().getModelDifference(otherCtxt.getLocalModel())<0.1){
 						allConcurrencesVolume += ctxt.getOverlappingVolume(otherCtxt);
