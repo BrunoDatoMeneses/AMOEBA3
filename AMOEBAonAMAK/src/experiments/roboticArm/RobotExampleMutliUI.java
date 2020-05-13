@@ -95,9 +95,9 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 		}
 
 
-		System.out.println("AFTER INI " + "test" + jointsNumber);
 
-		System.out.println("BEFORE INIREDNER " + "test" + jointsNumber);
+
+
 
 
 		circleBase = getAmas().getVUIMulti().createAndAddCircle(xStart, yStart,4);
@@ -107,7 +107,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
 		}
 
-		System.out.println("AFTER INIRENDER " + "test" + jointsNumber);
+
 
 	}
 	@Override
@@ -133,26 +133,14 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	@Override
 	protected void onDecideAndAct() {
 
-		System.out.println("BEFORE DA " +jointsNumber);
-
-		Double xPos = 0.0;
-		Double yPos = 0.0;
-
-		/*int jointToMove = (int)(1 + (Math.random() * jointsNumber));*/
+		Pair<Pair<Double,Double>[],Pair<Double,Double>[]> startEndEnds = robotArmManager.decideAndAct(getAmas().getCycle(), anglesBase, angles);
+		starts = startEndEnds.getA();
+		ends = startEndEnds.getB();
 
 
-		for (int i = 0;i<jointsNumber;i++){
 
-			robotController.setJoint(i, getAmas().getCycle(), anglesBase, angles);;
-			starts[i] = new Pair<>(xPos,yPos);
-			double[] position = robotArmManager.forwardKinematics(angles,i+1);
-			xPos = position[0];
-			yPos = position[1];
-			ends[i] = new Pair<>(xPos,yPos);
 
-		}
 
-		System.out.println("AFTER DA " +jointsNumber);
 
 	}
 
@@ -166,14 +154,16 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			@Override
 			public void run()
 			{
+				getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
 				circleBase.move(xStart, yStart);
 
-				System.out.println("RENDER DA " +jointsNumber);
+
 
 				for(int i = 0; i<jointsNumber; i++){
 					lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
 					circles[i].move(ends[i].getA(),ends[i].getB());
 				}
+
 
 			}
 		});

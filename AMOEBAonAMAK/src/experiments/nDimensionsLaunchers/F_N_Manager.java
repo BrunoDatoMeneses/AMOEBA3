@@ -381,7 +381,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return polynomialModel(xRequest, 2, 50);
 
 		/* Goutte */
-		//return goutteModel(xRequest, center);
+		return goutteModel(xRequest, center);
 
 		/* Rosenbrock */
 		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
@@ -392,7 +392,7 @@ public class F_N_Manager implements StudiedSystem{
 
 		//return squareSplitDiagModel(xRequest, 1000);
 
-		return jfsmaDynamicalModel(xRequest, 1000);
+		//return jfsmaDynamicalModel(xRequest, 1000);
 
 
 	}

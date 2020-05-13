@@ -4,7 +4,7 @@ import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
+import experiments.UI_PARAMS;
 import experiments.tests.JZY3D_Test;
 import fr.irit.smac.amak.ui.VuiExplorer;
 import fr.irit.smac.amak.ui.drawables.Drawable;
@@ -173,7 +173,7 @@ public class View3D {
 
     }
 
-    private AWTChart getSurfaceChart(JavaFXChartFactory factory, String toolkit) {
+    /*private AWTChart getSurfaceChart(JavaFXChartFactory factory, String toolkit) {
         // -------------------------------
         // Define a function to plot
         Mapper mapper = new Mapper() {
@@ -211,7 +211,7 @@ public class View3D {
         AWTChart chart = (AWTChart) factory.newChart(quality, toolkit);
         chart.getScene().getGraph().add(surface);
         return chart;
-    }
+    }*/
 
 
 
@@ -238,7 +238,7 @@ public class View3D {
                 z = (float)model(x,y);
 
                 points[i] = new Coord3d(x, y, z);
-                colors[i] = getColor((float)PARAMS.minPrediction,(float)PARAMS.maxPrediction, z);
+                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, z);
 
 
                 i++;
@@ -264,6 +264,7 @@ public class View3D {
 
 
         ArrayList<Coord3d> pointAAjouter = new ArrayList<>();
+
         for (Context ctxt : amoeba.getContexts()){
 
             Percept pct1 =  amoeba.getDimensionSelector().d1();
@@ -272,10 +273,12 @@ public class View3D {
             boolean testIfDraw = true;
             for(Percept pct : amoeba.getPercepts()){
                 if(pct != pct1 && pct != pct2){
-                    testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(0.0);
+                    testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
                 }
             }
+
             if(testIfDraw){
+
                 float xStart = (float)ctxt.getRanges().get(pct1).getStart();
                 float xEnd = (float)ctxt.getRanges().get(pct1).getEnd();
                 float yStart = (float)ctxt.getRanges().get(pct2).getStart();
@@ -322,7 +325,7 @@ public class View3D {
         int i =0;
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
-            colors[i] = getColor((float)PARAMS.minPrediction,(float)PARAMS.maxPrediction, coord.z);
+            colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, coord.z);
             i++;
         }
 

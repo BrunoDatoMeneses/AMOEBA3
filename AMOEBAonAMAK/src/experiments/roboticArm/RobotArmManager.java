@@ -1,31 +1,40 @@
 package experiments.roboticArm;
 
+import kernel.AMOEBA;
+import utils.Pair;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class RobotArmManager {
 
     int jointsNb;
     double[] l;
     double[] joints;
+    AMOEBA[] amoebas;
+    RobotController controller;
 
-    public RobotArmManager(int jointsNumber, double[] jointDistances){
+    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController){
 
         jointsNb = jointsNumber;
         l = jointDistances;
+        amoebas = ambs;
+        controller = robotController;
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
 
-        System.out.println("JOINT "+ joint);
+
         double[] position = new double[3];
         joints = jointsAngles;
 
-        System.out.println("TR01");
+
         double[][] T = TRZ(0,1) ;
 
         int i = 2;
         while (i<=joint){
-            System.out.println("TR"+(i-1)+""+i);
+
             T = product(T,TRZ(i-1,i));
             i++;
         }
@@ -34,8 +43,56 @@ public class RobotArmManager {
         position[1] = T[1][3];
         position[2] = T[2][3];
 
+
+
         return position;
     }
+
+    public void learn(double[] jointsAngles){
+
+
+        double[] position = new double[3];
+        joints = jointsAngles;
+
+
+        double[][] T = TRZ(0,1) ;
+
+        int i = 2;
+        while (i<=jointsNb){
+
+            T = product(T,TRZ(i-1,i));
+            i++;
+        }
+
+        position[0] = T[0][3];
+        position[1] = T[1][3];
+        position[2] = T[2][3];
+
+
+
+        HashMap<String, Double> out0 = new HashMap<String, Double>();
+        HashMap<String, Double> out1 = new HashMap<String, Double>();
+
+
+        double result = jointsAngles[0];
+        out0.put("px",position[0]);
+        out0.put("py",position[1]);
+        out0.put("ptheta",jointsAngles[1]);
+        out0.put("oracle",result);
+        amoebas[0].learn(out0);
+
+        result = jointsAngles[1];
+        out1.put("px",position[0]);
+        out1.put("py",position[1]);
+        out1.put("ptheta",jointsAngles[0]);
+        out1.put("oracle",result);
+        amoebas[1].learn(out1);
+
+
+
+    }
+
+
 
 
     private double[][] TRZ(int i_1, int i){
@@ -74,6 +131,72 @@ public class RobotArmManager {
 
         return prodcutResult;
 
+    }
+
+    public HashMap<String, Double> getOutput() {
+        HashMap<String, Double> out = new HashMap<String, Double>();
+
+
+
+        return out;
+    }
+
+
+    public double[] request(double[] jointsAngles, double[] goalPosition){ // TODO
+
+        double[] goalJoint = new double[jointsNb];
+        joints = jointsAngles;
+
+        HashMap<String, Double> out0 = new HashMap<String, Double>();
+        HashMap<String, Double> out1 = new HashMap<String, Double>();
+
+
+
+        out0.put("px",goalPosition[0]);
+        out0.put("py",goalPosition[1]);
+        out0.put("ptheta",jointsAngles[1]);
+        amoebas[0].request(out0);
+
+
+        out1.put("px",goalPosition[0]);
+        out1.put("py",goalPosition[1]);
+        out1.put("ptheta",jointsAngles[0]);
+        amoebas[1].request(out1);
+
+
+
+    }
+
+    public Pair<Pair<Double,Double>[],Pair<Double,Double>[]> decideAndAct(int cycle, double[] anglesBase, double[] angles){
+
+        double xPos = 0.0;
+        double yPos = 0.0;
+        Pair<Double,Double>[] starts = new Pair[jointsNb];
+        Pair<Double,Double>[]  ends = new Pair[jointsNb];
+
+        if(cycle<500){
+            for (int i = 0;i<jointsNb;i++){
+
+                controller.setJoint(i, cycle, anglesBase, angles);;
+                starts[i] = new Pair<>(xPos,yPos);
+                double[] position = forwardKinematics(angles,i+1);
+                xPos = position[0];
+                yPos = position[1];
+                ends[i] = new Pair<>(xPos,yPos);
+
+            }
+
+            learn(angles);
+        }else{
+
+
+
+
+        }
+
+
+
+        return new Pair<>(starts, ends);
     }
 
 

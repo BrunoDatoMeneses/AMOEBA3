@@ -9,6 +9,7 @@ import agents.context.Experiment;
 import agents.context.VOID;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
+import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
@@ -2052,11 +2053,11 @@ public class Head extends AmoebaAgent {
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
 				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
-				PARAMS.maxPrediction=getAmas().data.maxPrediction;
+				UI_PARAMS.maxPrediction=getAmas().data.maxPrediction;
 			}
 			if(Math.abs(getAmas().data.oracleValue)<getAmas().data.minPrediction) {
 				getAmas().data.minPrediction = Math.abs(getAmas().data.oracleValue);
-				PARAMS.minPrediction= getAmas().data.minPrediction;
+				UI_PARAMS.minPrediction= getAmas().data.minPrediction;
 			}
 			
 

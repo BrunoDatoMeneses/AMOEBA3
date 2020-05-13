@@ -1,11 +1,11 @@
-package experiments.nDimensionsLaunchers;
+package experiments.roboticArm;
 
 import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
+    public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
+    public static final int dimension = 3;
 
     /*public static final String configFile = "threeDimensionsLauncher.xml";
     public static final int dimension = 3;*/
@@ -67,6 +67,8 @@ public class PARAMS {
     public static final int nbOfNeighborForVoidDetectionInSelfLearning = 5;
 
 
+    /*UI*/
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }
