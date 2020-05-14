@@ -1,7 +1,7 @@
 package utils;
 
 public enum TRACE_LEVEL {
-	ERROR(200), CYCLE(150), NCS(100), EVENT(50), STATE(40), INFORM(20), DEBUG(0);
+	ERROR(200), SUBCYCLE(170), CYCLE(150), NCS(100), EVENT(50), STATE(40), INFORM(20), DEBUG(0);
 
 	private final int order;
 

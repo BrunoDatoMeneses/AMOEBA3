@@ -23,4 +23,22 @@ public class RobotController {
         angles[jointIndice] = Math.random()* 2 * Math.PI;
     }
 
+    public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){
+
+        for(int i=0;i<jointsNumber;i++){
+
+            double difference = goalAngles[i]-currentAngles[i];
+            double deltaTheta;
+
+            if(Math.abs(difference)> Math.PI){
+                deltaTheta = difference>0 ? - variation :  variation;
+            }else{
+                deltaTheta = difference>0 ?  variation : - variation;
+            }
+            System.out.println(i + " Goal " + goalAngles[i] + " Current " + currentAngles[i] + " diff " + difference + " delta " + deltaTheta);
+            currentAngles[i] += deltaTheta;
+        }
+
+    }
+
 }

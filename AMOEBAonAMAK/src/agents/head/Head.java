@@ -298,6 +298,15 @@ public class Head extends AmoebaAgent {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 		getAmas().data.executionTimes[0]=System.currentTimeMillis();
+		if(getAmas().getCycle() % 50 == 0){
+			if(lastEndogenousRequest != null){
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType())));
+			}else{
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITH ORACLE")));
+			}
+		}
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType())));
@@ -779,6 +788,17 @@ public class Head extends AmoebaAgent {
 	 */
 	private void playWithoutOracle() {
 		getAmas().data.oracleValue = null;
+
+
+		if(getAmas().getCycle() % 50 == 0){
+			if(lastEndogenousRequest != null){
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType())));
+			}else{
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITHOUT ORACLE")));
+			}
+		}
 
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"

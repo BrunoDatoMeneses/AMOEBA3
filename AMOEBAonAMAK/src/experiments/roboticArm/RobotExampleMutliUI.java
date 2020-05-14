@@ -27,6 +27,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public double anglesBase[];
 	public DrawableLine lines[];
 	public DrawableCircle circles[];
+	public DrawableCircle goalCircle;
 
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
@@ -64,6 +65,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 		anglesBase = new double[jointsNumber];
 		lines = new DrawableLine[jointsNumber];
 		circles = new DrawableCircle[jointsNumber];
+
 
 
 
@@ -106,6 +108,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			lines[i] = getAmas().getVUIMulti().createAndAddLine(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
 			circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
 		}
+
+		goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,2);
 
 
 
@@ -154,7 +158,10 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			@Override
 			public void run()
 			{
-				getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+				if(getAmas().getCycle()<robotArmManager.trainingCycles){
+					getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+				}
+
 				circleBase.move(xStart, yStart);
 
 
@@ -164,6 +171,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 					circles[i].move(ends[i].getA(),ends[i].getB());
 				}
 
+				double[] goal = robotArmManager.getGoal();
+				goalCircle.move(goal[0], goal[1]);
 
 			}
 		});

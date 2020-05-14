@@ -70,5 +70,5 @@ public class PARAMS {
     /*UI*/
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
 }
