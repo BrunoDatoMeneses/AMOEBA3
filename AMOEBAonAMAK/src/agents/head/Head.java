@@ -582,7 +582,10 @@ public class Head extends AmoebaAgent {
 
 		getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		if(lastEndogenousRequest==null){
-			NCSDetection_IncompetentHeadWitoutOracle();
+			if(getAmas().data.isSelfLearning){
+				NCSDetection_IncompetentHeadWitoutOracle();
+			}
+
 		}
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
 			NCSDetection_IncompetentHeadWitoutOracle();
@@ -1431,7 +1434,7 @@ public class Head extends AmoebaAgent {
 
 		boolean newContextCreated = false;
 		getAmas().data.executionTimes[9]=System.currentTimeMillis();
-		if (activatedContexts.size() == 0 && activatedNeighborsContexts.size()>0) {
+		if (activatedContexts.size() == 0 && activatedNeighborsContexts.size()>0 && getAmas().data.isSelfLearning) {
 
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));

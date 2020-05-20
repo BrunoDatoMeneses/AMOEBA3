@@ -37,8 +37,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = true	;
-    public static final boolean setSelfLearning = !setActiveLearning;
+    public static final boolean setActiveLearning = false	;
+    public static final boolean setSelfLearning = false ;//!setActiveLearning;
 
 
 

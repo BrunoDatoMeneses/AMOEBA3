@@ -27,7 +27,9 @@ public class RobotController {
 
         for(int i=0;i<jointsNumber;i++){
 
-            double difference = goalAngles[i]-currentAngles[i];
+
+
+            double difference = modulo2PI(goalAngles[i] ) -currentAngles[i];
             double deltaTheta;
 
             if(Math.abs(difference)> Math.PI){
@@ -37,8 +39,30 @@ public class RobotController {
             }
             System.out.println(i + " Goal " + goalAngles[i] + " Current " + currentAngles[i] + " diff " + difference + " delta " + deltaTheta);
             currentAngles[i] += deltaTheta;
+            currentAngles[i] = modulo2PI(currentAngles[i] );
+            //currentAngles[i] = goalAngles[i];
+            if(currentAngles[i] > Math.PI*2 || currentAngles[i]< 0){
+                System.out.println("-----------------\n-------------\n----------------\n----------------- ERROR " + currentAngles[i]);
+            }
         }
 
+    }
+
+
+    private double modulo2PI(double angle){
+        double newAngle = angle;
+        if(newAngle> 2* Math.PI){
+            while(newAngle > 2* Math.PI){
+                newAngle -= 2* Math.PI;
+            }
+
+        }else if(newAngle < 0){
+            while(newAngle <0){
+                newAngle += 2* Math.PI;
+            }
+        }
+
+        return newAngle;
     }
 
 }
