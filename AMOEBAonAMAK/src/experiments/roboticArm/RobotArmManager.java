@@ -22,7 +22,7 @@ public class RobotArmManager {
     double[] goalAngles;
 
 
-    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController){
+    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb){
 
         jointsNb = jointsNumber;
         l = jointDistances;
@@ -31,7 +31,7 @@ public class RobotArmManager {
         poseGoal = new double[2];
         poseGoal[0] = 0.0;
         poseGoal[1] = 0.0;
-        trainingCycles = 1000;
+        trainingCycles = trainingCycleNb;
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
@@ -220,7 +220,7 @@ public class RobotArmManager {
 
                 System.out.println("[" + cycle + "]");
                 System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
-                controller.setJointsFromRequest(angles, goalAngles, Math.PI/50);
+                controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
                 System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
 
                 for (int i = 0;i<jointsNb;i++){

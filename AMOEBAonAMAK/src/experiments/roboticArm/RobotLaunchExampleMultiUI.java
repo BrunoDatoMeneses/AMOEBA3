@@ -131,7 +131,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         amoebas[0] = amoebaTheta0;
         amoebas[1] = amoebaTheta1;
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, 200);
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 

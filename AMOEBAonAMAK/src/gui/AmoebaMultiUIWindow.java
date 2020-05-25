@@ -44,12 +44,14 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 	 */
 	public VUIMulti mainVUI;
 	public View3D view3D;
+	public View3DContexts view3DContexts;
 	
 	public Drawable point;
 	public Drawable rectangle;
 	public ToggleButton toggleRender;
 	public SchedulerToolbar schedulerToolbar;
 	public DimensionSelector dimensionSelector;
+	public DimensionSelector3D dimensionSelector3D;
 	public Menu windowMenu;
 
 	public StudiedSystem studiedSystem = null;
@@ -80,8 +82,11 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 
 		if(studiedSystem != null){
 			view3D = new View3D(studiedSystem, amoeba);
-			this.addTabbedPanel("3D", view3D.getPane());
+			this.addTabbedPanel("3D Models", view3D.getPane());
 		}
+		view3DContexts = new View3DContexts(amoeba);
+		this.addTabbedPanel("3D Contexts", view3DContexts.getPane());
+
 
 		
 		plots.put("This loop NCS", new AmakPlot(this, "This loop NCS", ChartType.LINE, "Cycle", "Number of NCS"));
@@ -113,6 +118,15 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 			}
 		});
 		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
+
+		// dimension selector 3D
+		dimensionSelector3D = new DimensionSelector3D(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				amoeba.updateAgentsVisualisation();
+			}
+		});
+		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector3D));
 		
 		// contextMenu "Request Here" on VUI
 		new ContextMenuVUIMulti(amoeba, mainVUI); //the ContextMenu add itself to the VUI

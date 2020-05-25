@@ -20,7 +20,28 @@ public class RobotController {
     }
 
     private void setRandomJoints(int jointIndice, double[] angles) {
-        angles[jointIndice] = Math.random()* 2 * Math.PI;
+        //angles[jointIndice] = Math.random()* 2 * Math.PI;
+        angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI, 2 * Math.PI / 10) ;
+        /*if(jointIndice==0){
+            angles[jointIndice] = -Math.PI / 2;
+        }
+        if(jointIndice==1){
+            angles[jointIndice] = modulo2PI(angles[jointIndice] +Math.PI / 4);
+        }*/
+        //System.out.println(jointIndice + " " + angles[jointIndice]);
+    }
+
+    private double addConstrains(double angleValue, double limit){
+        /*if (Math.PI - limit < angleValue && angleValue < Math.PI){
+            return Math.PI - limit;
+        }
+        else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
+            return Math.PI + limit;
+        }
+        else{
+            return angleValue;
+        }*/
+        return angleValue;
     }
 
     public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){
@@ -39,8 +60,9 @@ public class RobotController {
             }
             System.out.println(i + " Goal " + goalAngles[i] + " Current " + currentAngles[i] + " diff " + difference + " delta " + deltaTheta);
             currentAngles[i] += deltaTheta;
-            currentAngles[i] = modulo2PI(currentAngles[i] );
-            //currentAngles[i] = goalAngles[i];
+            //currentAngles[i] = modulo2PI(currentAngles[i] );
+            currentAngles[i] = addConstrains(modulo2PI(currentAngles[i] ), 2 * Math.PI / 10) ;
+            //currentAngles[i] = goalAngles[i];;
             if(currentAngles[i] > Math.PI*2 || currentAngles[i]< 0){
                 System.out.println("-----------------\n-------------\n----------------\n----------------- ERROR " + currentAngles[i]);
             }

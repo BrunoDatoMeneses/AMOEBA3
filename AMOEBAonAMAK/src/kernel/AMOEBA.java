@@ -27,6 +27,7 @@ import fr.irit.smac.amak.ui.VUIMulti;
 import gui.AmoebaMultiUIWindow;
 import gui.AmoebaWindow;
 import gui.DimensionSelector;
+import gui.DimensionSelector3D;
 import kernel.backup.IBackupSystem;
 import kernel.backup.ISaveHelper;
 import kernel.backup.SaveHelperDummy;
@@ -566,6 +567,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		nextCycleRunAllAgents();
 		if(!Configuration.commandLineMode) {
 			((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.update(getPercepts());
+			((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector3D.update(getPercepts());
 			updateAgentsVisualisation();
 		}
 	}
@@ -721,9 +723,12 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if(getCycle()>0 && cycle % UI_PARAMS.nbCycleRefresh3DView == 0){
 
 
-			if(multiUIWindow.view3D != null)
-
+			if(multiUIWindow.view3D != null){
 				multiUIWindow.view3D.updateContextChart();
+				multiUIWindow.view3DContexts.updateContextChart();
+			}
+
+
 		}
 	}
 	
@@ -734,7 +739,11 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public DimensionSelector getDimensionSelector() {
 		return ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector;
 	}
-	
+
+	public DimensionSelector3D getDimensionSelector3D() {
+		return ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector3D;
+	}
+
 	/**
 	 * Get the last perception.
 	 * @return
