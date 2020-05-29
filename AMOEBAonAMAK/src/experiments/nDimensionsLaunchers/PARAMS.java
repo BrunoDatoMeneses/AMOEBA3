@@ -37,7 +37,7 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = true	;
+    public static final boolean setActiveLearning = false	;
     public static final boolean setSelfLearning = !setActiveLearning;
 
 
@@ -56,9 +56,9 @@ public class PARAMS {
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static final boolean setDream = false ;
+    public static final boolean setDream = true ;
 
-    public static final boolean setLearnFromNeighbors = false ;
+    public static final boolean setLearnFromNeighbors = true ;
 
     public static final int nbOfNeighborForCoopLearning = 6;
 
@@ -68,5 +68,5 @@ public class PARAMS {
 
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }

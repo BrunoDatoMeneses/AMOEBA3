@@ -16,6 +16,8 @@ import agents.percept.Percept;
  */
 public class AmoebaData implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	public String nameID = null;
 	
 	public int nPropositionsReceived;
 	public int averagePredictionCriticityWeight = 0;
@@ -78,6 +80,8 @@ public class AmoebaData implements Serializable {
 	public int numberOfPointsForRegression = 50;
 
 	public boolean contextNotFinished = false;
+
+	public boolean isAutonomousMode = false;
 	
 	public DynamicPerformance predictionPerformance;
 	public DynamicPerformance regressionPerformance;
@@ -110,7 +114,7 @@ public class AmoebaData implements Serializable {
 	public int nbOfNeighborForContexCreationWithouOracle = 10000;
 
 
-
+	public boolean isSubPercepts = false;
 
 
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();

@@ -15,7 +15,6 @@ import agents.head.REQUEST;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -25,7 +24,6 @@ import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmakPlot;
 import fr.irit.smac.amak.ui.VUIMulti;
 import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
 import gui.DimensionSelector;
 import gui.DimensionSelector3D;
 import kernel.backup.IBackupSystem;
@@ -84,6 +82,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	public AmoebaData data;
 	private ArrayList<Percept> percepts;
+	private ArrayList<Percept> subPercepts;
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -341,8 +340,69 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	private void runAgents() {
 		// run percepts
-		List<Percept> synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
-				.collect(Collectors.toList());
+		Stream<Context> contextStream = runPercepts();
+
+		// run contexts
+		runContexts(contextStream);
+
+		// run head
+		runHeads();
+	}
+
+
+
+
+	private void runHeads() {
+		List<Head> heads = new ArrayList<>();
+		heads.add(head);
+		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous()).collect(Collectors.toList());
+		//Collections.sort(synchronousHeads, new AgentOrderComparator());
+
+		for (Head agent : synchronousHeads) {
+			executor.execute(agent);
+		}
+		try {
+			perceptionPhaseSemaphore.acquire(synchronousHeads.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			decisionAndActionPhasesSemaphore.acquire(synchronousHeads.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void runContexts(Stream<Context> contextStream) {
+		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
+		//Collections.sort(synchronousContexts, new AgentOrderComparator());
+
+		for (Context agent : synchronousContexts) {
+			executor.execute(agent);
+		}
+		try {
+			perceptionPhaseSemaphore.acquire(synchronousContexts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			decisionAndActionPhasesSemaphore.acquire(synchronousContexts.size());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Stream<Context> runPercepts() {
+		List<Percept> synchronousPercepts;
+
+		if(data.isSubPercepts){
+			synchronousPercepts = getSubPercepts().stream().filter(a -> a.isSynchronous())
+					.collect(Collectors.toList());
+		}else{
+			synchronousPercepts = getPercepts().stream().filter(a -> a.isSynchronous())
+					.collect(Collectors.toList());
+		}
+
 		//Collections.sort(synchronousPercepts, new AgentOrderComparator());
 
 		for (Percept agent : synchronousPercepts) {
@@ -379,45 +439,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		}
 
 		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
-
-
-		// run contexts
-		List<Context> synchronousContexts = contextStream.filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		//Collections.sort(synchronousContexts, new AgentOrderComparator());
-
-		for (Context agent : synchronousContexts) {
-			executor.execute(agent);
-		}
-		try {
-			perceptionPhaseSemaphore.acquire(synchronousContexts.size());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		try {
-			decisionAndActionPhasesSemaphore.acquire(synchronousContexts.size());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		// run head
-		List<Head> heads = new ArrayList<>();
-		heads.add(head);
-		List<Head> synchronousHeads = heads.stream().filter(a -> a.isSynchronous()).collect(Collectors.toList());
-		//Collections.sort(synchronousHeads, new AgentOrderComparator());
-
-		for (Head agent : synchronousHeads) {
-			executor.execute(agent);
-		}
-		try {
-			perceptionPhaseSemaphore.acquire(synchronousHeads.size());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		try {
-			decisionAndActionPhasesSemaphore.acquire(synchronousHeads.size());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		return contextStream;
 	}
 
 	public void renderUI() {
@@ -451,8 +473,40 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		studiedSystem = ss;
+
+		while(data.selfLearning && data.isAutonomousMode) {
+			data.selfLearning = false;
+			request(convertRequestPerceptToString(head.getSelfRequest()));
+		}
+
+
+
 		
 		return null;
+	}
+
+	private HashMap<String, Double> convertRequestPerceptToString(HashMap<Percept, Double> selfRequest) {
+		HashMap<String,Double> newRequest = new HashMap<String,Double>();
+
+		for(Percept pct : selfRequest.keySet()) {
+			newRequest.put(pct.getName(), selfRequest.get(pct));
+		}
+		return newRequest;
+	}
+
+	private ArrayList<Percept> convertStringToPercept(ArrayList<String> perceptsStrings) {
+		ArrayList<Percept> perceptsToReturn = new ArrayList<>();
+
+		for(Percept pct : getPercepts()) {
+			for(String pctName : perceptsStrings){
+				if(pct.getName().equals(pctName)){
+					perceptsToReturn.add(pct);
+				}
+			}
+
+		}
+
+		return perceptsToReturn;
 	}
 
 	@Override
@@ -467,7 +521,39 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		if (usingOracle)
 			head.changeOracleConnection();
 		studiedSystem = ss;
-		return getAction();
+		double action = getAction();
+		while(data.selfLearning && data.isAutonomousMode) {
+			data.selfLearning = false;
+			request(convertRequestPerceptToString(head.getSelfRequest()));
+		}
+
+		return action;
+	}
+
+	public HashMap<String,Double> requestWithLesserPercepts(HashMap<String, Double> perceptionsActionState, ArrayList<String> unconsideredPerceptsString) {
+		HashMap<String,Double> actions = new HashMap<>();
+		boolean usingOracle = isUseOracle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
+		ArrayList<Percept>  unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
+		subPercepts = new ArrayList<>(percepts);
+		subPercepts.removeAll(unconsideredPercepts);
+		data.isSubPercepts = true;
+		setPerceptionsAndActionState(perceptionsActionState);
+		cycle();
+		if (usingOracle)
+			head.changeOracleConnection();
+		studiedSystem = ss;
+		actions.put("action",getAction());
+		for(Percept pct : unconsideredPercepts){
+			actions.put(pct.getName(), getHeadAgent().getBestContext().getRanges().get(pct).getCenter());
+		}
+		data.isSubPercepts = false;
+
+
+		return actions;
 	}
 	
 	
@@ -654,6 +740,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			setPercepts();
 		}	
 		return percepts;
+	}
+
+	public ArrayList<Percept> getSubPercepts() {
+		return subPercepts;
 	}
 
 	/**
@@ -885,6 +975,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				}
 			}
 		}
+
 	}
 	
 	public void addPercept(Percept pct) {

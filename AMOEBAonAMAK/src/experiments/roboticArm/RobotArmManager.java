@@ -1,10 +1,11 @@
 package experiments.roboticArm;
 
+import agents.percept.Percept;
 import kernel.AMOEBA;
 import utils.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class RobotArmManager {
@@ -21,6 +22,10 @@ public class RobotArmManager {
     double[] poseGoal;
     double[] goalAngles;
 
+    int learningCycle;
+
+    ArrayList<Pair<Double,Double>> learnedPositions;
+
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb){
 
@@ -32,6 +37,8 @@ public class RobotArmManager {
         poseGoal[0] = 0.0;
         poseGoal[1] = 0.0;
         trainingCycles = trainingCycleNb;
+        learningCycle = 0;
+        learnedPositions = new ArrayList<>();
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
@@ -99,7 +106,7 @@ public class RobotArmManager {
         out1.put("oracle",result*100.0);
         amoebas[1].learn(out1);
 
-
+        learningCycle++;
 
     }
 
@@ -153,14 +160,14 @@ public class RobotArmManager {
     }
 
 
-    public double[] request(double[] jointsAngles, double[] goalPosition){ // TODO
+    public double[] request(double[] jointsAngles, double[] goalPosition, int cycle){ // TODO
 
         double[] goalJoints = new double[jointsNb];
         joints = jointsAngles;
 
         HashMap<String, Double> out0 = new HashMap<String, Double>();
         HashMap<String, Double> out1 = new HashMap<String, Double>();
-
+        HashMap<String, Double> out2 = new HashMap<String, Double>();
 
 
         out0.put("px",goalPosition[0]);
@@ -174,6 +181,20 @@ public class RobotArmManager {
         out1.put("ptheta",jointsAngles[0]*100.0);
         goalJoints[1]=amoebas[1].request(out1)/100.0;
 
+        //goalJoints[1]=amoebas[1].request(out1)/100.0;
+
+        out2.put("px",goalPosition[0]);
+        out2.put("py",goalPosition[1]);
+        ArrayList<String> otherPercepts = new ArrayList<>(Collections.singleton("ptheta"));
+        HashMap<String,Double> actions = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
+        System.out.println(actions);
+        System.out.println("B " + amoebas[0].getHeadAgent().getBestContext());
+        System.out.println("A " + amoebas[0].getHeadAgent().getActivatedContexts());
+        System.out.println("N " + amoebas[0].getHeadAgent().getActivatedNeighborsContexts());
+        goalJoints[0] = actions.get("action")/100.0;
+        goalJoints[1] = actions.get("ptheta")/100.0;
+
+        //amoebas[0].getHeadAgent().getActivatedContexts().get(0).getLocalModel().getProposition()
 
         return goalJoints;
     }
@@ -185,7 +206,11 @@ public class RobotArmManager {
         Pair<Double,Double>[] starts = new Pair[jointsNb];
         Pair<Double,Double>[]  ends = new Pair[jointsNb];
 
-        if(cycle<trainingCycles){
+        if(learningCycle <trainingCycles){
+
+
+
+
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i, cycle, anglesBase, angles);;
@@ -195,15 +220,28 @@ public class RobotArmManager {
                 yPos = position[1];
                 ends[i] = new Pair<>(xPos,yPos);
 
+
+
+
             }
+            learnedPositions.add(ends[jointsNb-1]);
 
             learn(angles);
         }else{
+            /*amoebas[0].data.isSelfLearning = false;
+            amoebas[1].data.isSelfLearning = false;*/
 
-            if(cycle%150 == 0){
-                poseGoal[0] = Math.random() < 0.5 ? 20 + Math.random()*120 : - 20 - Math.random()*120;
-                poseGoal[1] = Math.random() < 0.5 ? 20 + Math.random()*120 : - 20 - Math.random()*120;
-                System.out.println(poseGoal[0] + " " + poseGoal[1]);
+            if(cycle%3 == 0){
+                double randomAngle = Math.random()*Math.PI*2;
+                double randomRadius = Math.random()*180;
+                poseGoal[0] = randomRadius*Math.cos(randomAngle);
+                poseGoal[1] = randomRadius*Math.sin(randomAngle);
+
+                /*int j = (int)(Math.random() * learnedPositions.size());
+                poseGoal[0] = learnedPositions.get(j).getA();
+                poseGoal[1] = learnedPositions.get(j).getB();*/
+
+                //System.out.println(poseGoal[0] + " " + poseGoal[1]);
                 for (int i = 0;i<jointsNb;i++){
 
                     controller.setJoint(i, cycle, anglesBase, angles);
@@ -216,12 +254,12 @@ public class RobotArmManager {
                 }
 
             }else{
-                goalAngles = request(angles, poseGoal);
+                goalAngles = request(angles, poseGoal, cycle);
 
-                System.out.println("[" + cycle + "]");
-                System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
+                //System.out.println("[" + cycle + "]");
+                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
                 controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
-                System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
+                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
 
                 for (int i = 0;i<jointsNb;i++){
 
@@ -233,7 +271,7 @@ public class RobotArmManager {
 
                 }
 
-                System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1] + " " + ends[jointsNb-1]);
+                System.out.println("[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1] + " " + ends[jointsNb-1]);
             }
 
 

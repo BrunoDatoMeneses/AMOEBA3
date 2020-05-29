@@ -110,7 +110,10 @@ public class Head extends AmoebaAgent {
 
 		onActInit();
 
-		if (getAmas().data.useOracle) {
+		if(getAmas().data.isSubPercepts){
+			playWithoutOracleAndAllPercets();
+		}
+		else if (getAmas().data.useOracle) {
 			playWithOracle();
 		} else {
 			playWithoutOracle();
@@ -301,18 +304,18 @@ public class Head extends AmoebaAgent {
 		if(getAmas().getCycle() % 50 == 0){
 			if(lastEndogenousRequest != null){
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType())));
+						+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
 			}else{
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITH ORACLE")));
+						+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests())));
 			}
 		}
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType())));
+					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
 		}else{
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITH ORACLE")));
+					+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests())));
 		}
 
 
@@ -796,26 +799,29 @@ public class Head extends AmoebaAgent {
 		if(getAmas().getCycle() % 50 == 0){
 			if(lastEndogenousRequest != null){
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType())));
+						+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
 			}else{
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITHOUT ORACLE")));
+						+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests())));
 			}
 		}
 
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType())));
+					+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
 		}else{
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITHOUT ORACLE")));
+					+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests())));
 		}
 
 		updateBestContextAndPropositionWithoutOracle();
 
 		updateCriticalityWithoutOracle();
 
-		allNCSDetectionsWithoutOracle();
+		if(getAmas().data.isSelfLearning){
+			allNCSDetectionsWithoutOracle();
+		}
+
 
 
 		if(getAmas().isReinforcement()) {
@@ -824,6 +830,50 @@ public class Head extends AmoebaAgent {
 		
 		
 
+	}
+
+	private void playWithoutOracleAndAllPercets() {
+		getAmas().data.oracleValue = null;
+
+
+		if(getAmas().getCycle() % 50 == 0){
+			if(lastEndogenousRequest != null){
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITHOUT ORACLE AND ALL PERCEPTS \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+			}else{
+				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- PLAY WITHOUT ORACLE AND ALL PERCEPTS" + " " + getWaitingEndogenousRequests())));
+			}
+		}
+
+		if(lastEndogenousRequest != null){
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITHOUT ORACLE AND ALL PERCEPTS \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+		}else{
+			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- PLAY WITHOUT ORACLE AND ALL PERCEPTS" + " " + getWaitingEndogenousRequests())));
+		}
+
+		updateBestContextAndPropositionWithoutOracleFromPseudoActivatedContexts();
+
+		//updateCriticalityWithoutOracle();
+
+		/*if(getAmas().data.isSelfLearning){
+			allNCSDetectionsWithoutOracle();
+		}
+
+
+
+		if(getAmas().isReinforcement()) {
+			reinforcementWithouOracle();
+		}*/
+
+
+
+	}
+
+	private int getWaitingEndogenousRequests() {
+		return endogenousChildRequests.size()+endogenousDreamRequests.size()+endogenousRequests.size();
 	}
 
 	private void reinforcementWithouOracle() {
@@ -895,6 +945,50 @@ public class Head extends AmoebaAgent {
 			// Config.print("With function : " +
 			// bestContext.getFunction().getFormula(bestContext), 0);
 			logger().debug("HEAD without oracle",
+					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+			// functionSelected = bestContext.getFunction().getFormula(bestContext);
+
+		}
+		else {
+			logger().debug("HEAD without oracle", "no Best context selected ");
+		}
+	}
+
+	private void updateBestContextAndPropositionWithoutOracleFromPseudoActivatedContexts() {
+		logger().debug("HEAD without oracle and all percepts", "Nombre de contextes activés: " + activatedContexts.size());
+
+		//selectBestContextWithConfidenceAndVolume();
+		selectBestContextWithConfidence();
+		if (bestContext != null) {
+			getAmas().data.noBestContext = false;
+			getAmas().data.prediction = bestContext.getActionProposal();
+		} else {
+
+			getAmas().data.noBestContext = true;
+			Context nearestContext = this.getNearestContextWithoutAllPercepts(activatedNeighborsContexts);
+			if(nearestContext != null) {
+				getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
+				bestContext = nearestContext;
+			} else {
+				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
+				// To limit performance impact, we limit our search on a random sample.
+				// A better way would be to increase neighborhood.
+				PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
+				//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
+				nearestContext = this.getNearestContextWithoutAllPercepts(getAmas().getContexts());
+				if(nearestContext != null) {
+					getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
+					bestContext = nearestContext;
+				} else {
+					getAmas().data.prediction = 0.0;
+				}
+			}
+		}
+		if(bestContext != null) {
+			logger().debug("HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
+			// Config.print("With function : " +
+			// bestContext.getFunction().getFormula(bestContext), 0);
+			logger().debug("HEAD without oracle and all percepts",
 					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
 			// functionSelected = bestContext.getFunction().getFormula(bestContext);
 
@@ -1657,7 +1751,8 @@ public class Head extends AmoebaAgent {
 
 	public void NCSDetection_Dream() {
 
-		if(getAmas().getCycle() % (1000 * getAmas().getPercepts().size()) ==0 && getAmas().data.isDream){
+		//if(getAmas().getCycle() % (500 * getAmas().getPercepts().size()) ==0 && getAmas().data.isDream){
+		if(getAmas().getCycle() == 100 && getAmas().data.isDream){
 			for(Context ctxt : getAmas().getContexts()){
 				HashMap<Percept,Double> request = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
@@ -1947,6 +2042,22 @@ public class Head extends AmoebaAgent {
 		return nearest;
 	}
 
+	private Context getNearestContextWithoutAllPercepts(List<Context> contextNeighboors) {
+		Context nearest = null;
+		double distanceToNearest = Double.MAX_VALUE;
+		for (Context c : contextNeighboors) {
+			if (c != newContext && !c.isDying()) {
+				double externalDistanceToContext = getExternalDistanceToContextWithSubPercepts(c);
+				if (nearest == null || externalDistanceToContext < distanceToNearest) {
+					nearest = c;
+					distanceToNearest = externalDistanceToContext;
+				}
+			}
+		}
+
+		return nearest;
+	}
+
 	/**
 	 * Gets the external distance to context.
 	 *
@@ -1955,7 +2066,32 @@ public class Head extends AmoebaAgent {
 	 */
 	private double getExternalDistanceToContext(Context context) {
 		double d = 0.0;
-		ArrayList<Percept> percepts = getAmas().getPercepts();
+		ArrayList<Percept> percepts;
+		percepts = getAmas().getPercepts();
+		for (Percept p : percepts) {
+			if (p.isEnum()) {
+				if (!(context.getRanges().get(p).getStart() == p.getValue())) {
+					d += Double.MAX_VALUE;
+				}
+			} else {
+				double min = context.getRanges().get(p).getStart();
+				double max = context.getRanges().get(p).getEnd();
+
+				if (min > p.getValue() || max < p.getValue()) {
+					d += Math.min(Math.abs(p.getValue() - min), Math.abs(p.getValue() - max));
+				}
+			}
+
+		}
+
+		return d;
+	}
+
+	private double getExternalDistanceToContextWithSubPercepts(Context context) {
+		double d = 0.0;
+		ArrayList<Percept> percepts;
+		percepts = getAmas().getSubPercepts();
+
 		for (Percept p : percepts) {
 			if (p.isEnum()) {
 				if (!(context.getRanges().get(p).getStart() == p.getValue())) {

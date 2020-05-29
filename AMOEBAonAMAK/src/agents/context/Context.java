@@ -870,11 +870,11 @@ public class Context extends AmoebaAgent {
 		
 		double currentDistance = 0.0;
 
-		double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
-		double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
+		//double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
+		//double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
 
 		Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-		Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
+		//Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 
 		//boolean differentModel=distanceDifference>averageDistanceToOraclePrediction;
 		boolean differentModel=!isSameModel(ctxt);
@@ -963,7 +963,7 @@ public class Context extends AmoebaAgent {
 				
 
 					
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
+				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
 				
 				if(!differentModel && getAmas().data.isConcurrenceDetection) {
 					potentialRequests.add( new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE));
@@ -1325,10 +1325,10 @@ public class Context extends AmoebaAgent {
 
 
 				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
-				Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-				Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
+				//Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+				//Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
 
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + this.getLocalModel().getModelDifference(ctxt.getLocalModel()))));
+				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + this.getLocalModel().getModelDifference(ctxt.getLocalModel()))));
 
 				//if(distanceDifference<averageDistanceToOraclePrediction) {
 				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
@@ -2640,6 +2640,12 @@ public class Context extends AmoebaAgent {
 		
 		
 		return localModel.getProposition();
+	}
+
+	public double getActionProposalWithSubPercepts() {
+
+
+		return ((LocalModelMillerRegression)localModel).getPropositionWithouAllPercepts(getAmas().getPercepts(), getAmas().getSubPercepts());
 	}
 
 	public double getCenterByPercept(Percept pct) {

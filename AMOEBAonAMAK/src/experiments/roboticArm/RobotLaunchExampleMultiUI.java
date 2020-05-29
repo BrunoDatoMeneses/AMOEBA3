@@ -2,7 +2,6 @@ package experiments.roboticArm;
 
 
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.roboticArm.PARAMS;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUIMulti;
@@ -47,7 +46,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         VUIMulti amoebaVUITheta0 = new VUIMulti("2D");
         AmoebaMultiUIWindow amoebaUITheta0 = new AmoebaMultiUIWindow("ELLSA Theta 0", amoebaVUITheta0, studiedSystemTheta0);
         AMOEBA amoebaTheta0 = new AMOEBA(amoebaUITheta0,  amoebaVUITheta0);
-
+        amoebaTheta0.setStudiedSystem(studiedSystemTheta0);
         IBackupSystem backupSystem = new BackupSystem(amoebaTheta0);
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
@@ -56,10 +55,12 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         amoebaTheta0.allowGraphicalScheduler(true);
         amoebaTheta0.setRenderUpdate(false);
+        amoebaTheta0.data.nameID = "ellsaTheta0";
         amoebaTheta0.data.learningSpeed = PARAMS.learningSpeed;
         amoebaTheta0.data.numberOfPointsForRegression = PARAMS.regressionPoints;
         amoebaTheta0.data.isActiveLearning = PARAMS.setActiveLearning;
         amoebaTheta0.data.isSelfLearning = PARAMS.setSelfLearning;
+        amoebaTheta0.data.isAutonomousMode = PARAMS.setAutonomousMode;
         amoebaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
         amoebaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
         amoebaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
@@ -83,7 +84,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         VUIMulti amoebaVUITheta1 = new VUIMulti("2D");
         AmoebaMultiUIWindow amoebaUITheta1 = new AmoebaMultiUIWindow("ELLSA Theta 1", amoebaVUITheta1, studiedSystemTheta1);
         AMOEBA amoebaTheta1 = new AMOEBA(amoebaUITheta1,  amoebaVUITheta1);
-
+        amoebaTheta1.setStudiedSystem(studiedSystemTheta1);
         IBackupSystem backupSystem1 = new BackupSystem(amoebaTheta1);
         File file1 = new File("resources/"+PARAMS.configFile);
         backupSystem1.load(file1);
@@ -92,10 +93,12 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         amoebaTheta1.allowGraphicalScheduler(true);
         amoebaTheta1.setRenderUpdate(false);
+        amoebaTheta1.data.nameID = "ellsaTheta1";
         amoebaTheta1.data.learningSpeed = PARAMS.learningSpeed;
         amoebaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
         amoebaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
         amoebaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
+        amoebaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
         amoebaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
         amoebaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
         amoebaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
@@ -131,7 +134,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         amoebas[0] = amoebaTheta0;
         amoebas[1] = amoebaTheta1;
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, 200);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, 100);
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 

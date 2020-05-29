@@ -13,7 +13,7 @@ public class PARAMS {
     public static final int nbCycle = 2000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.06; // USUAL
+    public static double mappingErrorAllowed = 0.03; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
 
     /* PREDICTION */
@@ -39,6 +39,9 @@ public class PARAMS {
     /* LEARNING */
     public static final boolean setActiveLearning = false	;
     public static final boolean setSelfLearning = false ;//!setActiveLearning;
+
+    public static final boolean setAutonomousMode = true ;
+
 
 
 
@@ -70,5 +73,5 @@ public class PARAMS {
     /*UI*/
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }

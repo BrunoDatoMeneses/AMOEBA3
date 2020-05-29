@@ -43,8 +43,8 @@ public class F_N_Manager implements StudiedSystem{
 	double[] explorationVector;
 	
 	HashMap<String,Double> selfRequest;
-	boolean activeLearning = false;
-	boolean selfLearning = false;
+	public boolean activeLearning = false;
+	public boolean selfLearning = false;
 	
 	double noiseRange;
 	

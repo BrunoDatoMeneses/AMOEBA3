@@ -106,6 +106,29 @@ public class LocalModelMillerRegression extends LocalModel{
 	
 		return result;
 	}
+
+	public double getPropositionWithouAllPercepts(ArrayList<Percept> allPercepts, ArrayList<Percept> subPercepts) {
+
+
+		double result = coefs[0];
+
+		if (coefs[0] == Double.NaN) System.exit(0);
+
+		for (int i = 1 ; i < coefs.length ; i++) {
+
+			if (Double.isNaN(coefs[i])) coefs[i] = 0.0;
+
+			if(subPercepts.contains(allPercepts.get(i-1))){
+				result += coefs[i] * allPercepts.get(i-1).getValue();
+			}else{
+				result += coefs[i] * context.getRanges().get(allPercepts.get(i-1)).getCenter();
+			}
+
+
+		}
+
+		return result;
+	}
 	
 	
 	
