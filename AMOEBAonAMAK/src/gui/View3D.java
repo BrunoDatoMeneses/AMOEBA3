@@ -8,6 +8,7 @@ import experiments.UI_PARAMS;
 import experiments.tests.JZY3D_Test;
 import fr.irit.smac.amak.ui.VuiExplorer;
 import fr.irit.smac.amak.ui.drawables.Drawable;
+import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -264,6 +265,7 @@ public class View3D {
 
 
         ArrayList<Coord3d> pointAAjouter = new ArrayList<>();
+        ArrayList<Context> correspondingContexts = new ArrayList<>();
 
         for (Context ctxt : amoeba.getContexts()){
 
@@ -307,6 +309,7 @@ public class View3D {
                         z = (float) ((LocalModelMillerRegression)ctxt.getLocalModel()).getPropositionFrom2DPerceptions(perception);
 
                         pointAAjouter.add(new Coord3d(x, y, z));
+                        correspondingContexts.add(ctxt);
 
 
                         y += increment;
@@ -325,7 +328,14 @@ public class View3D {
         int i =0;
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
-            colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, coord.z);
+
+            if(UI_PARAMS.contextColorByCoef){
+                colors[i] = getColorFromCoefs(correspondingContexts.get(i));
+            }else{
+                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, coord.z);
+            }
+            //System.out.println(colors[i]);
+
             i++;
         }
 
@@ -397,6 +407,12 @@ public class View3D {
         g = Math.max(g, 0.0f);
         b = Math.max(b, 0.0f);
         return new Color(r, g, b, 0.75f);
+    }
+
+    private Color getColorFromCoefs(Context ctxt){
+        Double[] c = ContextColor.colorFromCoefs(ctxt.getFunction().getCoef());
+        return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
+
     }
 }
 

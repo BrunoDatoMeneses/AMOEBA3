@@ -5,6 +5,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -166,6 +167,8 @@ public class View3DContexts {
 
 
         ArrayList<Coord3d> pointAAjouter = new ArrayList<>();
+        ArrayList<Double> predictions = new ArrayList<>();
+        ArrayList<Context> correspondingContexts = new ArrayList<>();
 
         for (Context ctxt : amoeba.getContexts()){
 
@@ -181,41 +184,14 @@ public class View3DContexts {
             float zStart = (float)ctxt.getRanges().get(pct3).getStart();
             float zEnd = (float)ctxt.getRanges().get(pct3).getEnd();
 
-            float x=xStart;
-            float y;
-            float z;
+            //addCubePoints(pointAAjouter, predictions, correspondingContexts, ctxt, xStart, xEnd, yStart, yEnd, zStart, zEnd);
 
-            while(x<=xEnd){
-                y = yStart;
-                while(y<=yEnd){
-                    z = zStart;
-                    while(z<=zEnd){
-                        int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
-                        int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
-                        int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
-
-                        double[] perception = new double[3];
-                        for(int i=0;i<perception.length;i++){
-                            if(i == pct1Index){
-                                perception[i] = x;
-                            }else if(i == pct2Index){
-                                perception[i] = y;
-                            }else if(i == pct3Index){
-                                perception[i] = z;
-                            }else{
-                                perception[i] = 0.0;
-                            }
-                        }
-
-                        pointAAjouter.add(new Coord3d(x, y, z));
-
-                        z += increment*6;
-                    }
-                    y += increment*6;
-                }
-                x+= increment*6;
-            }
-
+            pointsCubeXStart(pointAAjouter, predictions, correspondingContexts, ctxt, xStart, yStart, yEnd, zStart, zEnd);
+            pointsCubeXEnd(pointAAjouter, predictions, correspondingContexts, ctxt, xEnd, yStart, yEnd, zStart, zEnd);
+            pointsCubeYStart(pointAAjouter, predictions, correspondingContexts, ctxt, yStart, xStart, xEnd, zStart, zEnd);
+            pointsCubeYEnd(pointAAjouter, predictions, correspondingContexts, ctxt, yEnd,  xStart, xEnd, zStart, zEnd);
+            pointsCubeZStart(pointAAjouter, predictions, correspondingContexts, ctxt, zStart, xStart, xEnd, yStart, yEnd);
+            pointsCubeZEnd(pointAAjouter, predictions, correspondingContexts, ctxt, zEnd, xStart, xEnd, yStart, yEnd);
 
 
         }
@@ -226,7 +202,12 @@ public class View3DContexts {
         int i =0;
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
-            colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, coord.z);
+            if(UI_PARAMS.contextColorByCoef){
+                colors[i] = getColorFromCoefs(correspondingContexts.get(i));
+            }else{
+                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (predictions.get(i).doubleValue()) );
+            }
+
             i++;
         }
 
@@ -243,7 +224,261 @@ public class View3DContexts {
         return chart;
     }
 
+    private void addCubePoints(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float xStart, float xEnd, float yStart, float yEnd, float zStart, float zEnd) {
+        float x=xStart;
+        float y;
+        float z;
 
+
+        while(x<=xEnd){
+            y = yStart;
+            while(y<=yEnd){
+                z = zStart;
+                while(z<=zEnd){
+                    int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                    int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                    int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                    double[] perception = new double[3];
+                    for(int i=0;i<perception.length;i++){
+                        if(i == pct1Index){
+                            perception[i] = x;
+                        }else if(i == pct2Index){
+                            perception[i] = y;
+                        }else if(i == pct3Index){
+                            perception[i] = z;
+                        }else{
+                            perception[i] = 0.0;
+                        }
+                    }
+
+                    pointAAjouter.add(new Coord3d(x, y, z));
+                    predictions.add(ctxt.lastPrediction);
+                    correspondingContexts.add(ctxt);
+
+                    z += increment*3;
+                }
+                y += increment*3;
+            }
+            x+= increment*3;
+        }
+    }
+
+    private void pointsCubeXStart(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float xStart, float yStart, float yEnd, float zStart, float zEnd) {
+        float x;
+        float y;
+        float z;
+        x=xStart;
+        y = yStart;
+        while(y<=yEnd){
+            z = zStart;
+            while(z<=zEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                z += increment*3;
+            }
+            y += increment*3;
+        }
+    }
+
+    private void pointsCubeXEnd(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float xEnd, float yStart, float yEnd, float zStart, float zEnd) {
+        float x;
+        float y;
+        float z;
+        x=xEnd;
+        y = yStart;
+        while(y<=yEnd){
+            z = zStart;
+            while(z<=zEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                z += increment*3;
+            }
+            y += increment*3;
+        }
+    }
+
+    private void pointsCubeYStart(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float yStart, float xStart, float xEnd, float zStart, float zEnd) {
+        float x;
+        float y;
+        float z;
+        y=yStart;
+        x = xStart;
+        while(x<=xEnd){
+            z = zStart;
+            while(z<=zEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                z += increment*3;
+            }
+            x += increment*3;
+        }
+    }
+
+    private void pointsCubeYEnd(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float yEnd, float xStart, float xEnd, float zStart, float zEnd) {
+        float x;
+        float y;
+        float z;
+        y=yEnd;
+        x = xStart;
+        while(x<=xEnd){
+            z = zStart;
+            while(z<=zEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                z += increment*3;
+            }
+            x += increment*3;
+        }
+    }
+
+    private void pointsCubeZStart(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float zStart, float xStart, float xEnd, float yStart, float yEnd) {
+        float x;
+        float y;
+        float z;
+        z=zStart;
+        x = xStart;
+        while(x<=xEnd){
+            y = yStart;
+            while(y<=yEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                y += increment*3;
+            }
+            x += increment*3;
+        }
+    }
+
+    private void pointsCubeZEnd(ArrayList<Coord3d> pointAAjouter, ArrayList<Double> predictions, ArrayList<Context> correspondingContexts, Context ctxt, float zEnd, float xStart, float xEnd, float yStart, float yEnd) {
+        float x;
+        float y;
+        float z;
+        z=zEnd;
+        x = xStart;
+        while(x<=xEnd){
+            y = yStart;
+            while(y<=yEnd){
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d2());
+                int pct3Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector3D().d3());
+
+                double[] perception = new double[3];
+                for(int i=0;i<perception.length;i++){
+                    if(i == pct1Index){
+                        perception[i] = x;
+                    }else if(i == pct2Index){
+                        perception[i] = y;
+                    }else if(i == pct3Index){
+                        perception[i] = z;
+                    }else{
+                        perception[i] = 0.0;
+                    }
+                }
+
+                pointAAjouter.add(new Coord3d(x, y, z));
+                predictions.add(ctxt.lastPrediction);
+                correspondingContexts.add(ctxt);
+
+                y += increment*3;
+            }
+            x += increment*3;
+        }
+    }
 
 
     private Color getColor(float min, float max, float prediction) {
@@ -274,6 +509,13 @@ public class View3DContexts {
         g = Math.max(g, 0.0f);
         b = Math.max(b, 0.0f);
         return new Color(r, g, b, 0.75f);
+    }
+
+
+    private Color getColorFromCoefs(Context ctxt){
+        Double[] c = ContextColor.colorFromCoefs(ctxt.getFunction().getCoef());
+        return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
+
     }
 }
 

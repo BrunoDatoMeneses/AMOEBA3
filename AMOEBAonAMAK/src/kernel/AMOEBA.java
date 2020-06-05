@@ -183,6 +183,8 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			timeExecution.addData("UpdateStatitics", cycle, data.executionTimesSums[10], notify);
 			timeExecution.addData("ChildContext", cycle, data.executionTimesSums[11], notify);
 			timeExecution.addData("PotentialRequest", cycle, data.executionTimesSums[12], notify);
+			timeExecution.addData("EndogenousRequestOverlaps", cycle, data.executionTimesSums[13], notify);
+			timeExecution.addData("EndogenousRequestVoids", cycle, data.executionTimesSums[14], notify);
 			
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);

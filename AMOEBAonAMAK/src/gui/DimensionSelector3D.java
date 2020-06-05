@@ -54,7 +54,7 @@ public class DimensionSelector3D extends HBox {
 			else if(percepts.size() == 2) {
 				dim1.setValue(percepts.get(0));
 				dim2.setValue(percepts.get(1));
-				dim2.setValue(percepts.get(1));
+				dim3.setValue(percepts.get(1));
 			} else if (percepts.size() == 1) {
 				dim1.setValue(percepts.get(0));
 				dim2.setValue(percepts.get(0));

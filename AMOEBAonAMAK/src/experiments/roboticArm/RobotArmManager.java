@@ -12,6 +12,7 @@ public class RobotArmManager {
 
     int jointsNb;
     public int trainingCycles;
+    public int requestCycles;
     double[] l;
     double[] joints;
     AMOEBA[] amoebas;
@@ -23,11 +24,13 @@ public class RobotArmManager {
     double[] goalAngles;
 
     int learningCycle;
+    int requestCycle;
+    double goalErrors;
 
     ArrayList<Pair<Double,Double>> learnedPositions;
 
 
-    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb){
+    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
         jointsNb = jointsNumber;
         l = jointDistances;
@@ -37,8 +40,11 @@ public class RobotArmManager {
         poseGoal[0] = 0.0;
         poseGoal[1] = 0.0;
         trainingCycles = trainingCycleNb;
+        requestCycles = requestCycleNb;
         learningCycle = 0;
+        requestCycle = 0;
         learnedPositions = new ArrayList<>();
+        goalErrors = 0.0;
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
@@ -195,6 +201,7 @@ public class RobotArmManager {
         goalJoints[1] = actions.get("ptheta")/100.0;
 
         //amoebas[0].getHeadAgent().getActivatedContexts().get(0).getLocalModel().getProposition()
+        requestCycle++;
 
         return goalJoints;
     }
@@ -225,13 +232,13 @@ public class RobotArmManager {
 
             }
             learnedPositions.add(ends[jointsNb-1]);
-
+            System.out.println("LEARNING [" + learningCycle + "] ");
             learn(angles);
-        }else{
+        }else if (requestCycle < requestCycles){
             /*amoebas[0].data.isSelfLearning = false;
             amoebas[1].data.isSelfLearning = false;*/
 
-            if(cycle%3 == 0){
+            if(cycle%2 == 0){
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius = Math.random()*180;
                 poseGoal[0] = randomRadius*Math.cos(randomAngle);
@@ -272,8 +279,27 @@ public class RobotArmManager {
                 }
 
                 System.out.println("[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1] + " " + ends[jointsNb-1]);
+
+                double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
+                System.out.println("ERROR " + currentError + " [" + requestCycle + "]");
+                goalErrors += currentError;
             }
 
+            if(requestCycle == requestCycles-1){
+                goalErrors /= requestCycles;
+            }
+        }else{
+            System.out.println(goalErrors);
+            for (int i = 0;i<jointsNb;i++){
+
+                controller.setJoint(i, cycle, anglesBase, angles);
+                starts[i] = new Pair<>(xPos,yPos);
+                double[] position = forwardKinematics(angles,i+1);
+                xPos = position[0];
+                yPos = position[1];
+                ends[i] = new Pair<>(xPos,yPos);
+
+            }
 
         }
 

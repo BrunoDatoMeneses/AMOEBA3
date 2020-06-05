@@ -600,7 +600,7 @@ public class LocalModelMillerRegression extends LocalModel{
 	}
 
 	@Override
-	public double getModelDifference(LocalModel otherModel) {
+	public double getModelDifference(LocalModel otherModel) { //TODO différente max ?
 		double difference = 0;
 
 		for(int i=0;i<coefs.length;i++){

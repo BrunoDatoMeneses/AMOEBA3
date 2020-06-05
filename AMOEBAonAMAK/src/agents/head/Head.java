@@ -1771,7 +1771,8 @@ public class Head extends AmoebaAgent {
 		if(getAmas().data.isActiveLearning || getAmas().data.isSelfLearning) {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 					+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
-			
+
+			getAmas().data.executionTimes[13]=System.currentTimeMillis();
 			if (activatedNeighborsContexts.size() > 1) {
 				int i = 1;
 				for (Context ctxt : activatedNeighborsContexts) {
@@ -1790,7 +1791,9 @@ public class Head extends AmoebaAgent {
 					i++;
 				}
 			}
+			getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 
+			getAmas().data.executionTimes[14]=System.currentTimeMillis();
 			boolean testVoid = false;
 			if(getAmas().data.isActiveLearning){
 				testVoid = true;
@@ -1842,7 +1845,7 @@ public class Head extends AmoebaAgent {
 
 				}
 			}
-
+			getAmas().data.executionTimes[14]=System.currentTimeMillis()- getAmas().data.executionTimes[14];
 			
 			
 		}

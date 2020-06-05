@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import agents.context.Context;
 import agents.head.EndogenousRequest;
 import fr.irit.smac.amak.tools.Log.Level;
  
@@ -47,12 +48,26 @@ public class TestMain {
 			}
 	}
 	
-	
+	public static void boucle2a2(){
 
+		ArrayList<String> test = new ArrayList<>();
+		for(int j=0;j<10;j++)
+			test.add(""+j);
+
+		int i = 1;
+		for (String s : test) {
+			for (String otherS : test.subList(i, test.size())) {
+				System.out.println(s+otherS);
+
+			}
+			i++;
+		}
+
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		testLvlTrace();
+		boucle2a2();
 		
 
 		

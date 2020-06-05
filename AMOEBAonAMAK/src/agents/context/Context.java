@@ -872,111 +872,38 @@ public class Context extends AmoebaAgent {
 
 		//double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
 		//double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
-
-		Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
+		//Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
 		//Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
-
 		//boolean differentModel=distanceDifference>averageDistanceToOraclePrediction;
+
 		boolean differentModel=!isSameModel(ctxt);
 
 		int overlapCounts = 0;
 		for (Percept pct : getAmas().getPercepts()) {
-			currentDistance = this.distance(ctxt, pct);
-			
-			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>OVERLAP_CYCLE_START) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
-				overlapCounts+=1;
-				overlapDistances.put(pct, Math.abs(currentDistance));
-				bounds.put(pct, this.overlapBounds(ctxt, pct));
-				
-				
-			}
-			
 
-			if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
-				voidDistances.put(pct, currentDistance);
-				bounds.put(pct, this.voidBounds(ctxt, pct));
-			}
+			currentDistance = this.distance(ctxt, pct);
 
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("FRONTIER TEST",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance , "ErrorAllowedMin", ""+pct.getMappingErrorAllowedMin(), "differentModel", ""+differentModel)) );
-			if ( -pct.getMappingErrorAllowedMin()<currentDistance && currentDistance< pct.getMappingErrorAllowedMin() && differentModel){
-				HashMap<Percept, Pair<Double, Double>> frontierBounds = new HashMap<>();
-
-				double leftBound ;
-				double rightBound ;
-				if(this.getRanges().get(pct).getCenter() < ctxt.getRanges().get(pct).getCenter() ){
-					leftBound = this.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
-					rightBound = ctxt.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
-				}
-				else{
-					leftBound = ctxt.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
-					rightBound = this.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
-				}
-				frontierBounds.put(pct, new Pair<>(leftBound, rightBound));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("FIRST BOUNDS", pct.getName(), ""+frontierBounds.get(pct))) );
-				for(Percept otherPercept : getAmas().getPercepts()){
-					if(otherPercept!=pct){
-						double frontierOverlapDistance = this.distance(ctxt, otherPercept);
-						if(frontierOverlapDistance < - otherPercept.getMappingErrorAllowedMin()){
-							frontierBounds.put(otherPercept, this.overlapBounds(ctxt, otherPercept));
-							getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OTHERS BOUNDS", otherPercept.getName(), ""+frontierBounds.get(otherPercept))) );
-						}
 
 
-					}
-				}
+			if(currentDistance<-pct.getMappingErrorAllowedMin() && getAmas().getCycle()>OVERLAP_CYCLE_START) {
+				overlapCounts = addOverlapCount(ctxt, overlapDistances, bounds, currentDistance, overlapCounts, pct);
+			}
+			else if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
+				addVoids(ctxt, voidDistances, bounds, currentDistance, pct);
+			}
+			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && getAmas().data.isFrontierRequest){
+				HashMap<Percept, Pair<Double, Double>> frontierBounds = getFrontierBounds(ctxt, pct);
 
 				if (frontierBounds.size()==getAmas().getPercepts().size()){
-
-					HashMap<Percept, Double> frontierRequestLeft = boundsToRequest(frontierBounds);
-					HashMap<Percept, Double> frontierRequestRight = boundsToRequest(frontierBounds);
-
-					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
-					frontierRequestLeft.put(pct, frontierBounds.get(pct).getA()+ (pct.getMappingErrorAllowedMin()/2));
-					frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
-					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
-
-					int chances = (getAmas().getCycle()>1000) ? 2 : 5;
-					if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(10) && getAmas().data.isFrontierRequest){
-
-						potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
-						potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
-					}
-
+					addFrontierRequests(ctxt, potentialRequests, pct, frontierBounds);
 				}
-
-
-
 			}
-
-			
-
 		}
 
-		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START ) {
-			
-			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
-			
-			HashMap<Percept, Double> request = boundsToRequest(bounds);
-			if(request != null) {
-				
+		addPotentialConcurrencesAndConflictsRequests(ctxt, bounds, potentialRequests, differentModel, overlapCounts);
 
-					
-				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
-				
-				if(!differentModel && getAmas().data.isConcurrenceDetection) {
-					potentialRequests.add( new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE));
-				}
-				else if(differentModel &&  getAmas().data.isConflictDetection){
-					potentialRequests.add( new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT));
-				}
-				
-				
-				
-			}		
-		}
-		else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > VOID_CYCLE_START) {
+		/*else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > VOID_CYCLE_START) {
 			
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
 			
@@ -991,10 +918,89 @@ public class Context extends AmoebaAgent {
 					potentialRequests.add( new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID));
 				}		
 			}
-		}
+		}*/
 
 
 		return potentialRequests;
+	}
+
+	private void addVoids(Context ctxt, HashMap<Percept, Double> voidDistances, HashMap<Percept, Pair<Double, Double>> bounds, double currentDistance, Percept pct) {
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("VOID",pct.getName(), ""+this,""+ctxt, "distance", ""+currentDistance)) );
+		voidDistances.put(pct, currentDistance);
+		bounds.put(pct, this.voidBounds(ctxt, pct));
+	}
+
+	private void addFrontierRequests(Context ctxt, ArrayList<EndogenousRequest> potentialRequests, Percept pct, HashMap<Percept, Pair<Double, Double>> frontierBounds) {
+		HashMap<Percept, Double> frontierRequestLeft = boundsToRequest(frontierBounds);
+		HashMap<Percept, Double> frontierRequestRight = boundsToRequest(frontierBounds);
+
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
+		frontierRequestLeft.put(pct, frontierBounds.get(pct).getA()+ (pct.getMappingErrorAllowedMin()/2));
+		frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
+
+		int chances = (getAmas().getCycle()>1000) ? 2 : 5;
+		if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(10) && getAmas().data.isFrontierRequest){
+
+			potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
+			potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
+		}
+	}
+
+	private HashMap<Percept, Pair<Double, Double>> getFrontierBounds(Context ctxt, Percept pct) {
+		HashMap<Percept, Pair<Double, Double>> frontierBounds = new HashMap<>();
+
+		double leftBound ;
+		double rightBound ;
+		if(this.getRanges().get(pct).getCenter() < ctxt.getRanges().get(pct).getCenter() ){
+			leftBound = this.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
+			rightBound = ctxt.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
+		}
+		else{
+			leftBound = ctxt.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin();
+			rightBound = this.getRanges().get(pct).getStart() + pct.getMappingErrorAllowedMin();
+		}
+		frontierBounds.put(pct, new Pair<>(leftBound, rightBound));
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("FIRST BOUNDS", pct.getName(), ""+frontierBounds.get(pct))) );
+		for(Percept otherPercept : getAmas().getPercepts()){
+			if(otherPercept!=pct){
+				double frontierOverlapDistance = this.distance(ctxt, otherPercept);
+				if(frontierOverlapDistance < - otherPercept.getMappingErrorAllowedMin()){
+					frontierBounds.put(otherPercept, this.overlapBounds(ctxt, otherPercept));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OTHERS BOUNDS", otherPercept.getName(), ""+frontierBounds.get(otherPercept))) );
+				}
+
+
+			}
+		}
+		return frontierBounds;
+	}
+
+	private int addOverlapCount(Context ctxt, HashMap<Percept, Double> overlapDistances, HashMap<Percept, Pair<Double, Double>> bounds, double currentDistance, int overlapCounts, Percept pct) {
+		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("OVERLAP",pct.getName(), ""+this,""+ctxt)) );
+		overlapCounts+=1;
+		overlapDistances.put(pct, Math.abs(currentDistance));
+		bounds.put(pct, this.overlapBounds(ctxt, pct));
+		return overlapCounts;
+	}
+
+	private void addPotentialConcurrencesAndConflictsRequests(Context ctxt, HashMap<Percept, Pair<Double, Double>> bounds, ArrayList<EndogenousRequest> potentialRequests, boolean differentModel, int overlapCounts) {
+		if (overlapCounts == getAmas().getPercepts().size() && getAmas().getCycle() > OVERLAP_CYCLE_START ) {
+
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(getAmas().getPercepts().size() + "OVERLAPS", ""+this,""+ctxt)) );
+
+			HashMap<Percept, Double> request = boundsToRequest(bounds);
+			if(request != null) {
+				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference)));
+
+				if(!differentModel && getAmas().data.isConcurrenceDetection) {
+					potentialRequests.add( new EndogenousRequest(request, bounds, 6, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONCURRENCE));
+				}
+				else if(differentModel &&  getAmas().data.isConflictDetection){
+					potentialRequests.add( new EndogenousRequest(request, bounds, 7, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.CONFLICT));
+				}
+			}
+		}
 	}
 
 

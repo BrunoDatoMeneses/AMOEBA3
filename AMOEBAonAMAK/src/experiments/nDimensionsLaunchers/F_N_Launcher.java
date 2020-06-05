@@ -127,7 +127,7 @@ public class F_N_Launcher implements Serializable {
 		OptionalDouble averageScore = data.get("prediction").stream().mapToDouble(a->a).average();
 		Double deviationScore = data.get("prediction").stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
 		System.out.println("[PREDICTION AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get("prediction").size()));
-		System.out.println("[PREDICTION AVERAGE] " + df.format(100*averageScore.getAsDouble()) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())));
+		System.out.println("[PREDICTION AVERAGE %] " + df.format(100*averageScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())));
 		
 		
 	}

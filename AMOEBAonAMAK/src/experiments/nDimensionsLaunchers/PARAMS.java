@@ -4,17 +4,18 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
+    /*public static final String configFile = "twoDimensionsLauncher.xml";
+    public static final int dimension = 2;*/
 
-    /*public static final String configFile = "threeDimensionsLauncher.xml";
-    public static final int dimension = 3;*/
+    public static final String configFile = "threeDimensionsLauncher.xml";
+    public static final int dimension = 3;
 
-    public static final int nbCycle = 2000;
+    public static final int nbCycle = 10000;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.06; // USUAL
+    //public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
+    public static double mappingErrorAllowed = 0.2; // BIG 3D
 
     /* PREDICTION */
     public static final double setRegressionPerformance = 1;
@@ -37,8 +38,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = false	;
-    public static final boolean setSelfLearning = !setActiveLearning;
+    public static final boolean setActiveLearning = true	;
+    public static final boolean setSelfLearning = false;
 
 
 
@@ -56,9 +57,9 @@ public class PARAMS {
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static final boolean setDream = true ;
+    public static final boolean setDream = false ;
 
-    public static final boolean setLearnFromNeighbors = true ;
+    public static final boolean setLearnFromNeighbors = false ;
 
     public static final int nbOfNeighborForCoopLearning = 6;
 
@@ -68,5 +69,5 @@ public class PARAMS {
 
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 }
