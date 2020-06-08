@@ -5,22 +5,26 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.tests.plot3Dpolygon.ACUbe;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
 import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.primitives.Scatter;
+import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import utils.TRACE_LEVEL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class View3DContexts {
@@ -99,11 +103,13 @@ public class View3DContexts {
                 // Jzy3d
                 JavaFXChartFactory factory1 = new JavaFXChartFactory();
                 //AWTChart chart  = getSurfaceChart(factory, "offscreen");
-                chart1  = getScatterPlotChartFromContexts(factory1, "offscreen");
+                chart1  = get3DContextWithsPolygonsPlotChart(factory1, "offscreen");
                 imageView1 = factory1.bindImageView(chart1);
+
                 // JavaFX
 
                 pane.setCenter(imageView1);
+                factory1.addSceneSizeChangedListener(chart1, pane.getScene());
                 imageView1.fitWidthProperty().bind(pane.widthProperty());
                 imageView1.fitHeightProperty().bind(pane.heightProperty());
 
@@ -162,6 +168,58 @@ public class View3DContexts {
         return chart;
     }
 
+
+
+
+    public AWTChart get3DContextWithsPolygonsPlotChart(JavaFXChartFactory factory, String toolkit){
+
+
+        HistogramBar myBar = new HistogramBar();
+
+        Percept pct1 =  amoeba.getDimensionSelector3D().d1();
+        Percept pct2 =  amoeba.getDimensionSelector3D().d2();
+        Percept pct3 =  amoeba.getDimensionSelector3D().d3();
+
+        for (Context ctxt : amoeba.getContexts()){
+
+            float xStart = (float)ctxt.getRanges().get(pct1).getStart();
+            float xEnd = (float)ctxt.getRanges().get(pct1).getEnd();
+            float yStart = (float)ctxt.getRanges().get(pct2).getStart();
+            float yEnd = (float)ctxt.getRanges().get(pct2).getEnd();
+            float zStart = (float)ctxt.getRanges().get(pct3).getStart();
+            float zEnd = (float)ctxt.getRanges().get(pct3).getEnd();
+
+            //addCubePoints(pointAAjouter, predictions, correspondingContexts, ctxt, xStart, xEnd, yStart, yEnd, zStart, zEnd);
+
+            Color ctxtColor;
+            if(UI_PARAMS.contextColorByCoef){
+                ctxtColor = getColorFromCoefs(ctxt);
+            }else{
+                ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
+            }
+
+            Shape ctxtShape = createContextShape(ctxtColor, xStart, xEnd, yStart, yEnd, zStart, zEnd);
+            myBar.add(ctxtShape);
+
+        }
+
+
+
+        //stage.setTitle(ACUbe.class.getSimpleName());
+        //JavaFXChartFactory factory = new JavaFXChartFactory();
+        Quality quality = Quality.Advanced;
+        quality.setSmoothPolygon(true);
+        //quality.setAnimated(true);
+        // let factory bind mouse and keyboard controllers to JavaFX node
+        AWTChart chart = (AWTChart) factory.newChart(quality, toolkit);
+        chart.getScene().getGraph().add(myBar);
+
+
+        return  chart;
+
+    }
+
+
     public AWTChart getScatterPlotChartFromContexts(JavaFXChartFactory factory, String toolkit) {
 
 
@@ -170,11 +228,13 @@ public class View3DContexts {
         ArrayList<Double> predictions = new ArrayList<>();
         ArrayList<Context> correspondingContexts = new ArrayList<>();
 
+        Percept pct1 =  amoeba.getDimensionSelector3D().d1();
+        Percept pct2 =  amoeba.getDimensionSelector3D().d2();
+        Percept pct3 =  amoeba.getDimensionSelector3D().d3();
+
         for (Context ctxt : amoeba.getContexts()){
 
-            Percept pct1 =  amoeba.getDimensionSelector3D().d1();
-            Percept pct2 =  amoeba.getDimensionSelector3D().d2();
-            Percept pct3 =  amoeba.getDimensionSelector3D().d3();
+
 
 
             float xStart = (float)ctxt.getRanges().get(pct1).getStart();
@@ -516,6 +576,82 @@ public class View3DContexts {
         Double[] c = ContextColor.colorFromCoefs(ctxt.getFunction().getCoef());
         return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
 
+    }
+
+    private Shape createContextShape(Color contextColor, float xStart, float xEnd, float yStart, float yEnd, float zStart, float zEnd) {
+        List<Polygon> faces = new ArrayList<Polygon>();
+        Quad face1 = new Quad();
+        face1.add(new Point(
+                new Coord3d(xStart, yStart, zStart)));
+        face1.add(new Point(
+                new Coord3d(xEnd, yStart, zStart)));
+        face1.add(new Point(
+                new Coord3d(xEnd, yEnd, zStart)));
+        face1.add(new Point(
+                new Coord3d(xStart, yEnd, zStart)));
+        face1.setColor(contextColor);
+        faces.add(face1);
+
+        Quad face2 = new Quad();
+        face2.add(new Point(
+                new Coord3d(xStart, yStart, zEnd)));
+        face2.add(new Point(
+                new Coord3d(xEnd, yStart, zEnd)));
+        face2.add(new Point(
+                new Coord3d(xEnd, yEnd, zEnd)));
+        face2.add(new Point(
+                new Coord3d(xStart, yEnd, zEnd)));
+        face2.setColor(contextColor);
+        faces.add(face2);
+
+        Quad face3 = new Quad();
+        face3.add(new Point(
+                new Coord3d(xStart,yStart,zStart)));
+        face3.add(new Point(
+                new Coord3d(xStart,yEnd,zStart)));
+        face3.add(new Point(
+                new Coord3d(xStart,yEnd,zEnd)));
+        face3.add(new Point(
+                new Coord3d(xStart,yStart,zEnd)));
+        face3.setColor(contextColor);
+        faces.add(face3);
+
+        Quad face4 = new Quad();
+        face4.add(new Point(
+                new Coord3d(xEnd,yStart,zStart)));
+        face4.add(new Point(
+                new Coord3d(xEnd,yEnd,zStart)));
+        face4.add(new Point(
+                new Coord3d(xEnd,yEnd,zEnd)));
+        face4.add(new Point(
+                new Coord3d(xEnd,yStart,zEnd)));
+        face4.setColor(contextColor);
+        faces.add(face4);
+
+        Quad face5 = new Quad();
+        face5.add(new Point(
+                new Coord3d(xStart,yStart,zStart)));
+        face5.add(new Point(
+                new Coord3d(xEnd,yStart,zStart)));
+        face5.add(new Point(
+                new Coord3d(xEnd,yStart,zEnd)));
+        face5.add(new Point(
+                new Coord3d(xStart,yStart,zEnd)));
+        face5.setColor(contextColor);
+        faces.add(face5);
+
+        Quad face6 = new Quad();
+        face6.add(new Point(
+                new Coord3d(xStart,yEnd,zStart)));
+        face6.add(new Point(
+                new Coord3d(xEnd,yEnd,zStart)));
+        face6.add(new Point(
+                new Coord3d(xEnd,yEnd,zEnd)));
+        face6.add(new Point(
+                new Coord3d(xStart,yEnd,zEnd)));
+        face6.setColor(contextColor);
+        faces.add(face6);
+        return new Shape(faces);
     }
 }
 
