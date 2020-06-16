@@ -1511,6 +1511,7 @@ public class Context extends AmoebaAgent {
 		fusionContext.destroy();
 		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+		getAmas().data.requestCounts.put(REQUEST.FUSION,getAmas().data.requestCounts.get(REQUEST.FUSION)+1);
 	}
 
 	private void solveNCS_Restructure(Context otherContext, Percept sameBorderPercept, String range, Percept frontierPercept) {
@@ -1553,22 +1554,23 @@ public class Context extends AmoebaAgent {
 		restructured =  true;
 		otherContext.restructured = true;
 		//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+		getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
 	}
 	
 	public void solveNCS_ChildContext() {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
-		if(getAmas().data.isActiveLearning){
-			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
-					"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
-			for(Percept pct : getAmas().getPercepts()) {
-				request.put(pct, getRandomValueInRange(pct));
-			}
-			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
-			getAmas().getHeadAgent().addChildRequest(request, 10,this);
-
-		}else if(getAmas().data.isSelfLearning){
-			solveNCS_ChildContextWithoutOracle();
+		//if(getAmas().data.isActiveLearning){
+		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
+				"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
+		for(Percept pct : getAmas().getPercepts()) {
+			request.put(pct, getRandomValueInRange(pct));
 		}
+		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
+		getAmas().getHeadAgent().addChildRequest(request, 10,this);
+
+		/*}else if(getAmas().data.isSelfLearning){
+			solveNCS_ChildContextWithoutOracle();
+		}*/
 
 
 
@@ -1582,12 +1584,23 @@ public class Context extends AmoebaAgent {
 
 
 
+		while (isChild()){
+			Experiment endoExp = new Experiment(this);
+			for(Percept pct : getAmas().getPercepts()) {
+				endoExp.addDimension(pct, getRandomValueInRange(pct));
+			}
+			endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
+			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
+			getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
 
+
+		}
 
 		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.nbOfNeighborForLearningFromNeighbors){
 
 
-			while (getLocalModel().getFirstExperiments().size()< (getAmas().getPercepts().size() + 3 - getAmas().getHeadAgent().getActivatedNeighborsContexts().size())){
+			/*while (getLocalModel().getFirstExperiments().size()< (getAmas().getPercepts().size() + 3 - getAmas().getHeadAgent().getActivatedNeighborsContexts().size())){
 				Experiment endoExp = new Experiment(this);
 				for(Percept pct : getAmas().getPercepts()) {
 					endoExp.addDimension(pct, getRandomValueInRange(pct));
@@ -1596,7 +1609,7 @@ public class Context extends AmoebaAgent {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF BEFORE NEIGHBORS", ""+endoExp)));
 				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
 
-			}
+			}*/
 
 			if(getAmas().data.isLearnFromNeighbors){
 				learnFromNeighbors();
@@ -1606,16 +1619,7 @@ public class Context extends AmoebaAgent {
 
 		}
 
-		while (isChild()){
-			Experiment endoExp = new Experiment(this);
-			for(Percept pct : getAmas().getPercepts()) {
-				endoExp.addDimension(pct, getRandomValueInRange(pct));
-			}
-			endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
-			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
-			getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
 
-		}
 
 
 
@@ -1643,6 +1647,7 @@ public class Context extends AmoebaAgent {
 
 
 					endoExp.addDimension(pct, getRandomValueInRange(start, length));
+					//endoExp.addDimension(pct, ctxtNeighbor.getRanges().get(pct).getCenter());
 				}
 
 
@@ -1651,6 +1656,7 @@ public class Context extends AmoebaAgent {
 				endoExp.setOracleProposition(neighborPrediction);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
 				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+1);
 			}
 		}
 	}
@@ -1933,7 +1939,7 @@ public class Context extends AmoebaAgent {
 
 	public void solveNCS_BadPrediction(Head head) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
-				"*********************************************************************************************************** SOLVE NCS CONFLICT")));
+				"*********************************************************************************************************** SOLVE NCS BAD PREDICTION")));
 		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);
 
 		if (head.getNewContext() == this) {
@@ -1962,6 +1968,10 @@ public class Context extends AmoebaAgent {
 			}
 		}else{
 			ranges.get(p).adapt(p.getValue(), false, null);
+		}
+
+		if(!ranges.get(p).contains2(p.getValue())){
+			getAmas().getHeadAgent().activatedContexts.remove(this);
 		}
 
 		modified = true;

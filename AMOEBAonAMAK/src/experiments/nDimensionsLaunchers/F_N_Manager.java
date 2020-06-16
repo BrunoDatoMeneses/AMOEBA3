@@ -197,7 +197,7 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = selfRequest.get("px" + i);
 			}
-			if(cycle>999) activeRequestCounts ++;
+			activeRequestCounts ++;
 		}
 		else if(!randomExploration) {
 
@@ -212,7 +212,7 @@ public class F_N_Manager implements StudiedSystem{
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
-			if(cycle>999) randomRequestCounts++;
+			randomRequestCounts++;
 		}
 		
 		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
@@ -365,7 +365,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
-		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
 		//return diagModel(xRequest);
@@ -384,7 +384,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return goutteModel(xRequest, center);
 
 		/* Rosenbrock */
-		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
+		return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
 
 
 		//////////// DYNAMICAL ///////////////////////

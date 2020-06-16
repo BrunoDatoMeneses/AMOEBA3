@@ -279,7 +279,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 				studiedSystem.setSelfRequest(head.getActiveRequest());
 			}else{
 
-				if(getCycle()>999) data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);
+				data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);
 			}
 		}
 		
@@ -514,14 +514,13 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	@Override
 	public double request(HashMap<String, Double> perceptionsActionState) {
 		boolean usingOracle = isUseOracle();
-		if (usingOracle)
-			head.changeOracleConnection();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
+		data.useOracle = false;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
 		if (usingOracle)
-			head.changeOracleConnection();
+			data.useOracle = true;
 		studiedSystem = ss;
 		double action = getAction();
 		while(data.selfLearning && data.isAutonomousMode) {

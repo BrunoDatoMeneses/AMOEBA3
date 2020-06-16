@@ -11,13 +11,12 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
+import kernel.World;
 import ncs.NCS;
 import utils.Pair;
 import utils.PrintOnce;
-import utils.RandomUtils;
 import utils.TRACE_LEVEL;
 
 /**
@@ -36,7 +35,7 @@ public class Head extends AmoebaAgent {
 	public Criticalities criticalities;
 	public Criticalities endogenousCriticalities;
 
-	private ArrayList<Context> activatedContexts = new ArrayList<Context>();
+	public ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	public ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
 	
 	public Double meanNeighborhoodVolume;
@@ -638,7 +637,7 @@ public class Head extends AmoebaAgent {
 				+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
 
 		if(bestContext.isChild() && lastEndogenousRequest!= null){
-			if(lastEndogenousRequest.getType()== REQUEST.SELF)
+			if(lastEndogenousRequest.getType()== REQUEST.MODEL)
 				bestContext.solveNCS_LearnFromNeighbors();
 		}
 	}
@@ -1459,6 +1458,14 @@ public class Head extends AmoebaAgent {
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION CREATE NEW CONTEXT")));
+
+		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("Activated contexts")));
+		if(((World)getAmas().getEnvironment()).minLevel ==TRACE_LEVEL.DEBUG){
+			for(Context ctxt : activatedContexts){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(ctxt.getName())));
+			}
+		}
+
 		
 		
 		boolean newContextCreated = false;
@@ -2954,7 +2961,7 @@ public class Head extends AmoebaAgent {
 			ctxt.deleteWaitingRequest(futureRequest);
 		}
 
-		if(getAmas().getCycle()>999) getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
+		getAmas().data.requestCounts.put(futureRequest.getType(),getAmas().data.requestCounts.get(futureRequest.getType())+1);
 		return futureRequest.getRequest();
 	}
 
@@ -3016,7 +3023,7 @@ public class Head extends AmoebaAgent {
 	public void addChildRequest(HashMap<Percept, Double> request, int priority, Context ctxt){		
 		
 		//getAmas().data.activeLearning = true;
-		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.SELF), endogenousChildRequests);
+		addEndogenousRequest(new EndogenousRequest(request, null, priority,new ArrayList<Context>(Arrays.asList(ctxt)), REQUEST.MODEL), endogenousChildRequests);
 	}
 
 	public void addDreamRequest(HashMap<Percept, Double> request, int priority, Context ctxt){

@@ -241,12 +241,12 @@ public class RobotArmManager {
             if(cycle%2 == 0){
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius = Math.random()*180;
-                poseGoal[0] = randomRadius*Math.cos(randomAngle);
-                poseGoal[1] = randomRadius*Math.sin(randomAngle);
+                /*poseGoal[0] = randomRadius*Math.cos(randomAngle);
+                poseGoal[1] = randomRadius*Math.sin(randomAngle);*/
 
-                /*int j = (int)(Math.random() * learnedPositions.size());
+                int j = (int)(Math.random() * learnedPositions.size());
                 poseGoal[0] = learnedPositions.get(j).getA();
-                poseGoal[1] = learnedPositions.get(j).getB();*/
+                poseGoal[1] = learnedPositions.get(j).getB();
 
                 //System.out.println(poseGoal[0] + " " + poseGoal[1]);
                 for (int i = 0;i<jointsNb;i++){
