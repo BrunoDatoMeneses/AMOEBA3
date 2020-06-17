@@ -44,7 +44,7 @@ public class F_N_Launcher implements Serializable {
 
 		String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 		String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
-		xpCSV = new CSVWriter(date,dateAndHour);
+		xpCSV = new CSVWriter(date,dateAndHour+"_Dim_"+PARAMS.dimension);
 
 		String model = "Square";
 

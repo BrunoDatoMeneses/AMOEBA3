@@ -4,13 +4,16 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
+    /*public static final String configFile = "twoDimensionsLauncher.xml";
+    public static final int dimension = 2;*/
 
-    /*public static final String configFile = "threeDimensionsLauncher.xml";
-    public static final int dimension = 3;*/
+    public static final String configFile = "threeDimensionsLauncher.xml";
+    public static final int dimension = 3;
 
-    public static final int nbCycle = 1000;
+    /*public static final String configFile = "fourDimensionsLauncher.xml";
+    public static final int dimension = 4;*/
+
+    public static final int nbCycle = 2000;
     public static final int nbCycleTest = 500;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;

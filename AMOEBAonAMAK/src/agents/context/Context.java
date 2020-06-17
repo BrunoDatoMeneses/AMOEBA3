@@ -822,7 +822,7 @@ public class Context extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("currentPerceptionsFarEnoughOfCenter")));
 		for(Percept pct : getAmas().getPercepts()){
 			double distance = Math.abs(ranges.get(pct).getCenter() - pct.getValue());
-			test = test || (distance > pct.getMappingErrorAllowedMin());
+			test = test || (distance > pct.getMinDistanceFromCenterForNewRegressionPoint());
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(pct.getName(), "distance " + distance, "threshold " + pct.getMappingErrorAllowedMin(), "test " + test)));
 
 		}
@@ -1636,6 +1636,8 @@ public class Context extends AmoebaAgent {
 			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
 		}
 
+		ArrayList<Experiment> endoExperiments = new ArrayList<>();
+
 		for(Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
 
 
@@ -1655,10 +1657,14 @@ public class Context extends AmoebaAgent {
 				double neighborPrediction = ((LocalModelMillerRegression) ctxtNeighbor.getLocalModel()).getProposition(endoExp);
 				endoExp.setOracleProposition(neighborPrediction);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
-				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
-				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+1);
+				endoExperiments.add(endoExp);
+				//getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
+				//getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+1);
 			}
 		}
+
+		((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+		getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 	}
 
 	public void solveNCS_LearnFromNeighbors(){

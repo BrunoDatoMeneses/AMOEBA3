@@ -287,7 +287,78 @@ public class LocalModelMillerRegression extends LocalModel{
 			context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM,new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT TO CLOSE TO CONTEXT CENTER", "" + newExperiment)));
 		}
 
+	}
+
+	public void updateModel(ArrayList<Experiment> newExperiments, double weight) {
+
+
+		experiemntNb +=newExperiments.size();
+		//context.getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList(context.getName(),"NEW POINT REGRESSION", "FIRST POINTS :", ""+firstExperiments.size(), "OLD MODEL :", coefsToString())));
+
+
+
+
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"EXPERIMENTS WITH WEIGHT")));
+
+		regression = new Regression(nParameters,true);
+
+
+		int numberOfArtificialPoints = (int)(newExperiments.size()*(1-weight)/weight) ;
+		int factor = 1;
+		while(numberOfArtificialPoints + newExperiments.size() < nParameters + 2){
+			numberOfArtificialPoints+=numberOfArtificialPoints;
+			factor++;
 		}
+
+		Pair<double[][], double[]> artificialSituations = getRandomlyDistributedArtificialExperiments(numberOfArtificialPoints);
+
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"ARTIFICIAL" )));
+
+		for (int i =0;i<numberOfArtificialPoints;i++) {
+
+			context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),i+"", ""+artificialSituations.getA()[i].toString(), artificialSituations.getB()[i]+"" )));
+			regression.addObservation(artificialSituations.getA()[i], artificialSituations.getB()[i]);
+		}
+
+
+
+		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"XP")));
+		int repeatIndice = 0;
+		while(repeatIndice<factor){
+			for (Experiment newExperiment : newExperiments) {
+
+				context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(), ""+newExperiment.getValuesAsArray(), newExperiment.getOracleProposition()+"" )));
+				regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
+
+			}
+			repeatIndice++;
+		}
+
+
+		while (regression.getN() < nParameters + 2) {
+
+			regression.addObservation(artificialSituations.getA()[0], artificialSituations.getB()[0]);
+
+			System.out.println("ADING Observations with neighbors" + regression.getN()); //Should not happen
+
+		}
+
+
+
+		double[] coef = regression.regress().getParameterEstimates();
+		coefs = new Double[coef.length];
+		for(int i = 0; i < coef.length; i++) {
+			coefs[i] = coef[i];
+		}
+
+		context.getAmas().getEnvironment().regressionPoints = newExperiments.size() + numberOfArtificialPoints;
+
+
+		context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
+
+
+
+	}
 	
 	
 	
@@ -410,7 +481,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			
 			regression.addObservation(newExperiment.getValuesAsArray(), newExperiment.getOracleProposition());
 			
-			System.out.println("ADING Observations " + regression.getN());
+			System.out.println("ADING Observations " + regression.getN()); //Should not happen
 			
 		}
 		

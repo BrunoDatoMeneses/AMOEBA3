@@ -1374,7 +1374,7 @@ public class Head extends AmoebaAgent {
 
 
 					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(getAmas().data.isLearnFromNeighbors){
+						if(getAmas().data.isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.nbOfNeighborForLearningFromNeighbors){
 							bestContext.learnFromNeighbors();
 						}
 
@@ -1392,7 +1392,7 @@ public class Head extends AmoebaAgent {
 
 
 					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(getAmas().data.isLearnFromNeighbors){
+						if(getAmas().data.isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.nbOfNeighborForLearningFromNeighbors){
 							bestContext.learnFromNeighbors();
 						}
 
