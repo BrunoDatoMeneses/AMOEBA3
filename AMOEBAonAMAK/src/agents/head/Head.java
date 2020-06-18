@@ -583,7 +583,7 @@ public class Head extends AmoebaAgent {
 
 
 		getAmas().data.executionTimes[3]=System.currentTimeMillis();
-		if(lastEndogenousRequest==null){
+		/*if(lastEndogenousRequest==null){
 			if(getAmas().data.isSelfLearning){
 				NCSDetection_IncompetentHeadWitoutOracle();
 			}
@@ -591,7 +591,7 @@ public class Head extends AmoebaAgent {
 		}
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
 			NCSDetection_IncompetentHeadWitoutOracle();
-		}
+		}*/
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
 
 
@@ -3150,6 +3150,14 @@ public class Head extends AmoebaAgent {
 
 		}
 		return currentVoids;
+	}
+
+	public double getMinMaxPredictionRange(){
+		return getAmas().data.maxPrediction-getAmas().data.minPrediction;
+	}
+
+	public double getPredictionNeighborhoodRange(){
+		return getEnvironment().getMappingErrorAllowed()*getMinMaxPredictionRange();
 	}
 	
 }

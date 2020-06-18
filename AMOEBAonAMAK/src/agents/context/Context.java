@@ -1656,15 +1656,20 @@ public class Context extends AmoebaAgent {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
 				double neighborPrediction = ((LocalModelMillerRegression) ctxtNeighbor.getLocalModel()).getProposition(endoExp);
 				endoExp.setOracleProposition(neighborPrediction);
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
-				endoExperiments.add(endoExp);
+				if(Math.abs(lastPrediction-neighborPrediction)<getAmas().getHeadAgent().getPredictionNeighborhoodRange()){
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
+					endoExperiments.add(endoExp);
+				}
 				//getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
 				//getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+1);
 			}
 		}
 
-		((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
-		getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+		if(endoExperiments.size()>0){
+			((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+			getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+		}
+
 	}
 
 	public void solveNCS_LearnFromNeighbors(){

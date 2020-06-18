@@ -119,7 +119,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         World.minLevel = PARAMS.traceLevel;
 
 
-        int jointsNb = 2;
+        int jointsNb = PARAMS.nbJoints;
         AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
         WorldExampleMultiUI env = new WorldExampleMultiUI(window);
         VUIMulti vui = new VUIMulti("Robot");
@@ -127,14 +127,14 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         double distances[] = new double[jointsNb];
         for(int i = 0;i<jointsNb;i++){
-            distances[i] = 100 - (i*20);
+            distances[i] = PARAMS.armBaseSize - (i*20);
         }
 
-        AMOEBA amoebas[] = new AMOEBA[jointsNb];
+        AMOEBA amoebas[] = new AMOEBA[2];
         amoebas[0] = amoebaTheta0;
         amoebas[1] = amoebaTheta1;
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, 500, 500);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 

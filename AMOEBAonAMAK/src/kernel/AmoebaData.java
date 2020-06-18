@@ -118,4 +118,7 @@ public class AmoebaData implements Serializable {
 
 
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
+
+
+
 }

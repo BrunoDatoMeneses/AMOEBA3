@@ -10,7 +10,6 @@
 	
 		<Sensor Name="px" Enum="false" />
 		<Sensor Name="py" Enum="false" />
-		<Sensor Name="ptheta0" Enum="false" />
 	
 	  	<Controller Name="Controller">
               <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />

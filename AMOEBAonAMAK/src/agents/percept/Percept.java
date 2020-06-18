@@ -49,6 +49,7 @@ public class Percept extends AmoebaAgent {
 
 	@Override
 	public void onAct() {
+
 		value = getAmas().getPerceptions(this.name);
 		ajustMinMax();
 		computeContextProjectionValidityOptimized();
