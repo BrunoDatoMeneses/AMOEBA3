@@ -44,11 +44,26 @@ public class F_N_Launcher implements Serializable {
 
 		String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 		String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
-		xpCSV = new CSVWriter(date,dateAndHour+"_Dim_"+PARAMS.dimension);
+		xpCSV = new CSVWriter(date,dateAndHour+"_Dim_"+PARAMS.dimension
+				+"_LearningCycles_" + PARAMS.nbCycle
+				+"_ExplotationCycles_" + PARAMS.nbCycleTest
+				+"_Episodes_" + PARAMS.nbTest
+				+"_ActiveLearning_" + PARAMS.setActiveLearning
+				+"_SelfLearning_" + PARAMS.setSelfLearning
+				+"_Conflicts_" + PARAMS.setConflictDetection
+				+"_Concurrence_" + PARAMS.setConcurrenceDetection
+				+"_Voids_" + PARAMS.setVoidDetection2
+				+"_Frontiers_" + PARAMS.setFrontierRequest
+				+"_Models_" + PARAMS.setSelfModelRequest
+				+"_Neighbors_" + PARAMS.setLearnFromNeighbors
 
-		String model = "Square";
+		);
 
-		writeParams(model);
+
+
+
+
+		writeParams(PARAMS.model);
 
 
 		// Set AMAK configuration before creating an AMOEBA

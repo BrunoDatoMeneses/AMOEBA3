@@ -83,6 +83,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	public AmoebaData data;
 	private ArrayList<Percept> percepts;
 	private ArrayList<Percept> subPercepts;
+	private ArrayList<Percept> unconsideredPercepts;
 
 	/**
 	 * Instantiates a new, empty, amoeba.
@@ -538,7 +539,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 			head.changeOracleConnection();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
-		ArrayList<Percept>  unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
+		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
 		subPercepts = new ArrayList<>(percepts);
 		subPercepts.removeAll(unconsideredPercepts);
 		data.isSubPercepts = true;
@@ -549,7 +550,7 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		studiedSystem = ss;
 		actions.put("action",getAction());
 		for(Percept pct : unconsideredPercepts){
-			actions.put(pct.getName(), getHeadAgent().getBestContext().getRanges().get(pct).getCenter());
+			actions.put(pct.getName(), data.nonCondireredPerceptsSyntheticValues.get(pct));
 		}
 		data.isSubPercepts = false;
 
@@ -745,6 +746,10 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 
 	public ArrayList<Percept> getSubPercepts() {
 		return subPercepts;
+	}
+
+	public ArrayList<Percept> getUnconsideredPercepts() {
+		return unconsideredPercepts;
 	}
 
 	/**

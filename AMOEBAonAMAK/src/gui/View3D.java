@@ -34,13 +34,13 @@ import org.jzy3d.maths.Range;
 import org.jzy3d.plot3d.builder.Builder;
 import org.jzy3d.plot3d.builder.Mapper;
 import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
-import org.jzy3d.plot3d.primitives.Scatter;
-import org.jzy3d.plot3d.primitives.Shape;
+import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import utils.TRACE_LEVEL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class View3D {
@@ -159,7 +159,9 @@ public class View3D {
                 // Jzy3d
                 JavaFXChartFactory factory2 = new JavaFXChartFactory();
                 //AWTChart chart  = getSurfaceChart(factory, "offscreen");
-                chart2  = getScatterPlotChartFromContexts(factory2, "offscreen");
+                //chart2  = getScatterPlotChartFromContexts(factory2, "offscreen"); // POINTS
+                chart2  = getContextModelWithsPolygonsPlotChart(factory2, "offscreen"); // PLANES
+
                 imageView2 = factory2.bindImageView(chart2);
                 //paneRight.prefHeightProperty().bind(pane.heightProperty());
                 paneRight.prefHeightProperty().bind(pane.heightProperty());
@@ -258,6 +260,114 @@ public class View3D {
         chart.getScene().add(scatter);
 
         return chart;
+    }
+
+    public AWTChart getContextModelWithsPolygonsPlotChart(JavaFXChartFactory factory, String toolkit){
+
+
+        HistogramBar myBar = new HistogramBar();
+
+        Percept pct1 =  amoeba.getDimensionSelector3D().d1();
+        Percept pct2 =  amoeba.getDimensionSelector3D().d2();
+
+        for (Context ctxt : amoeba.getContexts()){
+
+
+
+
+            boolean testIfDraw = true;
+            if(amoeba.getPercepts().size()>2){
+                for(Percept pct : amoeba.getPercepts()){
+                    if(pct != pct1 && pct != pct2){
+                        testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
+                    }
+                }
+            }
+
+            if(testIfDraw) {
+
+                float xStart = (float) ctxt.getRanges().get(pct1).getStart();
+                float xEnd = (float) ctxt.getRanges().get(pct1).getEnd();
+                float yStart = (float) ctxt.getRanges().get(pct2).getStart();
+                float yEnd = (float) ctxt.getRanges().get(pct2).getEnd();
+
+                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
+                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+
+
+                float xSySPrediction = getPrediction(pct1Index, pct2Index, xStart, yStart, ctxt);
+                float xSyEPrediction = getPrediction(pct1Index, pct2Index, xStart, yEnd, ctxt);
+                float xEySPrediction = getPrediction(pct1Index, pct2Index, xEnd, yStart, ctxt);
+                float xEyEPrediction = getPrediction(pct1Index, pct2Index, xEnd, yEnd, ctxt);
+
+                Color ctxtColor;
+                if(UI_PARAMS.contextColorByCoef){
+                    ctxtColor = getColorFromCoefs(ctxt);
+                }else{
+                    ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
+                }
+
+
+                Shape ctxtShape = createPlaneShape(ctxtColor, xStart, xEnd, yStart, yEnd, xSySPrediction, xSyEPrediction, xEySPrediction, xEyEPrediction);
+
+                myBar.add(ctxtShape);
+            }
+
+            //addCubePoints(pointAAjouter, predictions, correspondingContexts, ctxt, xStart, xEnd, yStart, yEnd, zStart, zEnd);
+
+
+
+
+
+
+        }
+
+
+
+        //stage.setTitle(ACUbe.class.getSimpleName());
+        //JavaFXChartFactory factory = new JavaFXChartFactory();
+        Quality quality = Quality.Advanced;
+        quality.setSmoothPolygon(true);
+        //quality.setAnimated(true);
+        // let factory bind mouse and keyboard controllers to JavaFX node
+        AWTChart chart = (AWTChart) factory.newChart(quality, toolkit);
+        chart.getScene().getGraph().add(myBar);
+
+
+        return  chart;
+
+    }
+
+    private float getPrediction(int pct1Index, int pct2Index, double xPerception, double yPerception, Context ctxt){
+        double[] perception = new double[amoeba.getPercepts().size()];
+        for(int i=0;i<perception.length;i++){
+            if(i == pct1Index){
+                perception[i] = xPerception;
+            }else if(i == pct2Index){
+                perception[i] = yPerception;
+            }else{
+                perception[i] = UI_PARAMS.defaultValue3DViewNonSeletedPercept;
+            }
+        }
+        return (float) ((LocalModelMillerRegression)ctxt.getLocalModel()).getPropositionFrom2DPerceptions(perception);
+    }
+
+    private Shape createPlaneShape(Color contextColor, float xStart, float xEnd, float yStart, float yEnd, float xSySPrediction, float xSyEPrediction, float xEySPrediction, float xEyEPrediction) {
+        List<Polygon> faces = new ArrayList<Polygon>();
+        Quad face1 = new Quad();
+        face1.add(new Point(
+                new Coord3d(xStart, yStart, xSySPrediction)));
+        face1.add(new Point(
+                new Coord3d(xEnd, yStart, xEySPrediction)));
+        face1.add(new Point(
+                new Coord3d(xEnd, yEnd, xEyEPrediction)));
+        face1.add(new Point(
+                new Coord3d(xStart, yEnd, xSyEPrediction)));
+        face1.setColor(contextColor);
+        faces.add(face1);
+
+
+        return new Shape(faces);
     }
 
     public AWTChart getScatterPlotChartFromContexts(JavaFXChartFactory factory, String toolkit) {

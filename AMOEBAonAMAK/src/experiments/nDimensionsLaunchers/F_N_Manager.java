@@ -19,7 +19,7 @@ public class F_N_Manager implements StudiedSystem{
 	Double[] xEploration ;
 
 	public int cycle;
-	
+	public String model;
 	
 	/** The result. */
 	double result = 0;
@@ -207,7 +207,8 @@ public class F_N_Manager implements StudiedSystem{
 		}
 
 		else {
-			if (generator == null)	generator = new Random(29);
+			//if (generator == null)	generator = new Random(29);
+			if (generator == null)	generator = new Random();
 			
 			for(int i = 0 ; i < dimension ; i++) {
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
@@ -354,40 +355,55 @@ public class F_N_Manager implements StudiedSystem{
 		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
+		//model="Multi";
 		//return multiModel(xRequest, subzone);
 		
 
 		/* LINEAR */
 		/* Disc */
+		//model="Disc";
 		//return discModel(xRequest);
 		
 		/* Square */
+		//model="Square";
 		//return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
+		//model="SquareJFSMA2020";
 		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
+		//model="Triangle";
 		//return diagModel(xRequest);
 		
 		/* Split */
+		//model="Split";
 		//return splitModel(xRequest);
 
 		/* NON LINEAR */
 		/* Gaussian */
+		//model="Gaussian";
 		//return gaussianModel(xRequest, center, 500, 60);
 
 		/* Poly 2 */
+		//model="Polynomial";
 		//return polynomialModel(xRequest, 2, 50);
 
 		/* Goutte */
-		//return goutteModel(xRequest, center);
+		/*model="Goutte";
+		return goutteModel(xRequest, center);*/
+
+		/* Cos */
+		model="Cos";
+		return cosX(xRequest, 0.07) + 3;
 
 		/* Rosenbrock */
-		return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
+		//model="Rosenbrock";
+		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
 
 
 		//////////// DYNAMICAL ///////////////////////
+
 
 
 		//return squareSplitDiagModel(xRequest, 1000);
@@ -576,6 +592,10 @@ private double[] subZoneCenter3D(int nb) {
 			result += Math.pow(xRequest[i],2);
 		}
 		return Math.cos(param*result);
+	}
+
+	private double cosX(Double[] xRequest, double param) {
+		return Math.cos(xRequest[0]*param);
 	}
 
 	private double goutteModel(Double[] xRequest, double[] center) {

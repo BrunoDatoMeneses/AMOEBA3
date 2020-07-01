@@ -7,6 +7,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import agents.context.Context;
+import agents.context.Experiment;
 import agents.head.EndogenousRequest;
 import fr.irit.smac.amak.tools.Log.Level;
  
@@ -67,10 +68,27 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		boucle2a2();
-		
 
+		logic();
 		
+	}
+
+	public static  void logic(){
+
+		boolean initTest = true;
+		boolean test1 = initTest;
+		boolean test2 = initTest;
+		for(int i = 0; i<10;i++){
+			boolean localTest;
+			//boolean localTest = false;
+			if(i==5) localTest = !initTest;
+			else localTest = initTest;
+			test1 = test1 && localTest;
+			test2 = test2 || localTest;
+		}
+
+		System.out.println(test1 + " " + test2);
+
 	}
 	
 	public static void testLvlTrace() {

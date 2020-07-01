@@ -817,6 +817,28 @@ public class Context extends AmoebaAgent {
 		return Math.sqrt(distance);
 	}
 
+	public double distanceBetweenCurrentPercetionsAndBorders(){
+		double distance = 0;
+		for(Percept pct : getAmas().getPercepts()){
+
+			distance += Math.min(Math.pow(ranges.get(pct).getStart() - pct.getValue() ,2),Math.pow(ranges.get(pct).getEnd() - pct.getValue() ,2));
+
+		}
+
+		return Math.sqrt(distance);
+	}
+
+	public double distanceBetweenCurrentPercetionsAndBordersWithSubPercepts(){
+		double distance = 0;
+		for(Percept pct : getAmas().getSubPercepts()){
+
+			distance += Math.min(Math.pow(ranges.get(pct).getStart() - pct.getValue() ,2),Math.pow(ranges.get(pct).getEnd() - pct.getValue() ,2));
+
+		}
+
+		return Math.sqrt(distance);
+	}
+
 	public boolean currentPerceptionsFarEnoughOfCenter(){
 		boolean test = true;
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("currentPerceptionsFarEnoughOfCenter")));
@@ -1563,8 +1585,15 @@ public class Context extends AmoebaAgent {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
 		for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct, getRandomValueInRange(pct));
+			request.put(pct, getRandomValueInRangeNextToStartAndEnd(pct));
 		}
+		/*while(isToCloseToFirstExperimements(request,(localModel).getFirstExperiments())){
+			request = new HashMap<>();
+			for(Percept pct : getAmas().getPercepts()) {
+				request.put(pct, getRandomRangeBorder(pct));
+			}
+			System.out.println("......................................................................................................CA ARRIVE !!!!!!!!!!!!!");
+		}*/
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);
 
@@ -1587,8 +1616,16 @@ public class Context extends AmoebaAgent {
 		while (isChild()){
 			Experiment endoExp = new Experiment(this);
 			for(Percept pct : getAmas().getPercepts()) {
-				endoExp.addDimension(pct, getRandomValueInRange(pct));
+				endoExp.addDimension(pct, getRandomValueInRangeNextToStartAndEnd(pct));
 			}
+			/*while(isToCloseToFirstExperimements(endoExp,((LocalModelMillerRegression)localModel).getFirstExperiments())){
+				endoExp = new Experiment(this);
+				for(Percept pct : getAmas().getPercepts()) {
+					endoExp.addDimension(pct, getRandomRangeBorder(pct));
+				}
+				System.out.println("......................................................................................................CA ARRIVE !!!!!!!!!!!!!");
+			}*/
+
 			endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
@@ -1630,6 +1667,36 @@ public class Context extends AmoebaAgent {
 
 	}
 
+	public boolean isToCloseToFirstExperimements(Experiment newExperiment, ArrayList<Experiment> firstExperiements){
+		for(Experiment firstExp : firstExperiements){
+			if(newExperiment.distance(firstExp)<(getMinRangeLenght()/2)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isToCloseToFirstExperimements(HashMap<Percept, Double> request, ArrayList<Experiment> firstExperiements){
+		for(Experiment firstExp : firstExperiements){
+			if(firstExp.distance(request)<(getMinRangeLenght()/2)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public double getMinRangeLenght(){
+		Double minRangeLength = Double.POSITIVE_INFINITY;
+		for(Range rng : ranges.values()){
+
+			if(rng.getLenght()<minRangeLength){
+				minRangeLength = rng.getLenght();
+			}
+		}
+		return minRangeLength;
+
+	}
+
 	public void learnFromNeighbors() {
 		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 		for(Percept pct : getAmas().getPercepts()){
@@ -1665,11 +1732,40 @@ public class Context extends AmoebaAgent {
 			}
 		}
 
-		if(endoExperiments.size()>0){
-			((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
-			getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-		}
 
+		if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
+			if(endoExperiments.size()>1){
+				if(testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){
+
+					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+
+				}
+			}else{
+				if(endoExperiments.size()>0){
+					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+				}
+			}
+		}
+	}
+
+	private boolean testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(ArrayList<Experiment> endoExperiments){
+		Experiment centerExp = new Experiment(this);
+		for (Percept pct : getAmas().getPercepts()) {
+			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
+		}
+		double centerprediction = ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
+
+		boolean initTest = centerprediction < endoExperiments.get(0).getOracleProposition();
+		boolean test1 = initTest;
+		boolean test2 = initTest;
+		for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size()-1)){
+			boolean localTest = centerprediction< endoExp.getOracleProposition();
+			test1 = test1 && localTest;
+			test2 = test2 || localTest;
+		}
+		return  initTest!=test1  || initTest!=test2;
 	}
 
 	public void solveNCS_LearnFromNeighbors(){
@@ -1702,7 +1798,7 @@ public class Context extends AmoebaAgent {
 				double normalisation = 0;
 				for (Context ctxtNeighbor : neighborsToKeep){
 					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBOR", ""+ctxtNeighbor.getName())) );
-					double neighborDistance = ctxtNeighbor.distanceBetweenCurrentPercetionsAndCenter();
+					double neighborDistance = ctxtNeighbor.distanceBetweenCurrentPercetionsAndBorders();
 					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(currentExp)/neighborDistance;
 					normalisation += 1/neighborDistance;
 
@@ -1874,11 +1970,20 @@ public class Context extends AmoebaAgent {
 		return start + length*Math.random();
 	}
 	
-	private Double getRandomValueInRange(Percept pct) {
+	private Double getRandomValueInRangeNextToStartAndEnd(Percept pct) {
 		if(Math.random()<0.5){
 			return ranges.get(pct).getStart() + pct.getMappingErrorAllowedMin()*Math.random();
 		}else{
 			return ranges.get(pct).getEnd() - pct.getMappingErrorAllowedMin()*Math.random();
+		}
+
+	}
+
+	private Double getRandomRangeBorder(Percept pct) {
+		if(Math.random()<0.5){
+			return ranges.get(pct).getStart();
+		}else{
+			return ranges.get(pct).getEnd();
 		}
 
 	}

@@ -116,4 +116,23 @@ public class Experiment implements Serializable {
 		// if it look like a duck, and quack like a duck, it's a duck
 		return getClass().equals(obj.getClass()) && toString().equals(obj.toString());
 	}
+
+	public double distance(Experiment exp){
+		double distance = 0;
+
+		for(Percept pct  : values.keySet()){
+			distance +=  Math.pow(values.get(pct)-exp.values.get(pct),2);
+		}
+		return Math.sqrt(distance);
+	}
+
+	public double distance(HashMap<Percept, Double> request){
+		double distance = 0;
+
+		for(Percept pct  : values.keySet()){
+			distance +=  Math.pow(values.get(pct)-request.get(pct),2);
+		}
+		return Math.sqrt(distance);
+	}
+
 }

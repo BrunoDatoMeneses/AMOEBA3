@@ -217,16 +217,33 @@ public class RobotArmManager {
 
         //goalJoints[1]=amoebas[1].request(out1)/100.0;
         if(PARAMS.nbJoints>1){
+
             out2.put("px",goalPosition[0]);
             out2.put("py",goalPosition[1]);
             ArrayList<String> otherPercepts = new ArrayList<>(Collections.singleton("ptheta0"));
-            HashMap<String,Double> actions = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
-            System.out.println(actions);
+
+            HashMap<String,Double> actions1 = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
+            System.out.println(actions1);
             System.out.println("B " + amoebas[0].getHeadAgent().getBestContext());
             System.out.println("A " + amoebas[0].getHeadAgent().getActivatedContexts());
             System.out.println("N " + amoebas[0].getHeadAgent().getActivatedNeighborsContexts());
-            goalJoints[0] = actions.get("action")/100.0;
-            goalJoints[1] = actions.get("ptheta0")/100.0;
+
+            HashMap<String,Double> actions2 = amoebas[1].requestWithLesserPercepts(out2, otherPercepts);
+            System.out.println(actions2);
+            System.out.println("B " + amoebas[1].getHeadAgent().getBestContext());
+            System.out.println("A " + amoebas[1].getHeadAgent().getActivatedContexts());
+            System.out.println("N " + amoebas[1].getHeadAgent().getActivatedNeighborsContexts());
+
+            goalJoints[0] = actions1.get("action")/100.0;
+            goalJoints[1] = actions1.get("ptheta0")/100.0;
+
+            /*goalJoints[1] = actions2.get("action")/100.0;
+            goalJoints[0] = actions2.get("ptheta0")/100.0;*/
+
+            /*goalJoints[0] = ((actions1.get("action")/100.0) + (actions2.get("ptheta0")/100.0)) / 2;
+            goalJoints[1] = ((actions1.get("ptheta0")/100.0) + (actions2.get("action")/100.0)) / 2;*/
+
+
         }else{
             out0.put("px",goalPosition[0]);
             out0.put("py",goalPosition[1]);

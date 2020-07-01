@@ -25,6 +25,7 @@ public class AmoebaData implements Serializable {
 	public int numberOfCriticityValuesForAverageforVizualisation = 300;
 
 	public Double prediction;
+	public HashMap<Percept, Double> nonCondireredPerceptsSyntheticValues;
 	public HashMap<String, Double> higherNeighborLastPredictionPercepts = null;
 	public Double endogenousPredictionActivatedContextsOverlaps = 0.0;
 	public Double endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = 0.0;
