@@ -341,7 +341,10 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 
 
-		allNCSDetectionsWithOracle();
+		if(getAmas().getCycle()>3){
+			allNCSDetectionsWithOracle();
+		}
+
 
 
 		updatePerformanceIndicators();
@@ -817,7 +820,7 @@ public class Head extends AmoebaAgent {
 
 		updateCriticalityWithoutOracle();
 
-		if(getAmas().data.isSelfLearning){
+		if(getAmas().data.isSelfLearning && getAmas().getCycle()>3){
 			allNCSDetectionsWithoutOracle();
 		}
 
@@ -3220,7 +3223,8 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		return 0.5*getMinMaxPredictionRange();
+		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed() * 2.0 ;
+		//return getMinMaxPredictionRange()*0.25 ;
 	}
 	
 }

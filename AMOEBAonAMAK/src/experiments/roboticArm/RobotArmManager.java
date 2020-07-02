@@ -97,50 +97,65 @@ public class RobotArmManager {
         position[1] = T[1][3];
         position[2] = T[2][3];
 
+        if(position[1]>0.0){
+            HashMap<String, Double> out0 = new HashMap<String, Double>();
+            HashMap<String, Double> out1 = new HashMap<String, Double>();
+
+            if(PARAMS.nbJoints>1){
+                double result = jointsAngles[0];
 
 
-        HashMap<String, Double> out0 = new HashMap<String, Double>();
-        HashMap<String, Double> out1 = new HashMap<String, Double>();
+                if(PARAMS.dimension == 3 ){
+                    out0.put("px",position[0]);
+                    out0.put("py",position[1]);
+                }
+                else if(PARAMS.dimension == 2){
+                    out0.put("px",position[0]);
+                }
 
-        if(PARAMS.nbJoints>1){
-            double result = jointsAngles[0];
+                int j = PARAMS.nbJoints-1;
+                int k = 0;
+                while(j>0){
+                    out0.put("ptheta"+k,jointsAngles[j]*100.0);
+                    j--;
+                    k++;
+                }
+                out0.put("oracle",result*100.0);
 
-            out0.put("px",position[0]);
-            out0.put("py",position[1]);
-            int j = PARAMS.nbJoints-1;
-            int k = 0;
-            while(j>0){
-                out0.put("ptheta"+k,jointsAngles[j]*100.0);
-                j--;
-                k++;
+                amoebas[0].learn(out0);
+
+                result = jointsAngles[1];
+                if(PARAMS.dimension == 3 ){
+                    out1.put("px",position[0]);
+                    out1.put("py",position[1]);
+                }
+                else if(PARAMS.dimension == 2){
+                    out1.put("px",position[0]);
+                }
+
+                j = 0;
+                k = 0;
+                while(j<PARAMS.nbJoints-1){
+                    out1.put("ptheta"+k,jointsAngles[j]*100.0);
+                    j++;
+                    k++;
+                }
+                out1.put("oracle",result*100.0);
+
+                amoebas[1].learn(out1);
+            }else{
+                double result = jointsAngles[0];
+                out0.put("px",position[0]);
+                out0.put("py",position[1]);
+                out0.put("oracle",result*100.0);
+                amoebas[0].learn(out0);
             }
-            out0.put("oracle",result*100.0);
 
-            amoebas[0].learn(out0);
 
-            result = jointsAngles[1];
-            out1.put("px",position[0]);
-            out1.put("py",position[1]);
-            j = 0;
-            k = 0;
-            while(j<PARAMS.nbJoints-1){
-                out1.put("ptheta"+k,jointsAngles[j]*100.0);
-                j++;
-                k++;
-            }
-            out1.put("oracle",result*100.0);
-
-            amoebas[1].learn(out1);
-        }else{
-            double result = jointsAngles[0];
-            out0.put("px",position[0]);
-            out0.put("py",position[1]);
-            out0.put("oracle",result*100.0);
-            amoebas[0].learn(out0);
+            learningCycle++;
         }
 
 
-        learningCycle++;
 
     }
 
@@ -218,8 +233,13 @@ public class RobotArmManager {
         //goalJoints[1]=amoebas[1].request(out1)/100.0;
         if(PARAMS.nbJoints>1){
 
-            out2.put("px",goalPosition[0]);
-            out2.put("py",goalPosition[1]);
+            if(PARAMS.dimension ==3){
+                out2.put("px",goalPosition[0]);
+                out2.put("py",goalPosition[1]);
+            }else if (PARAMS.dimension ==2){
+                out2.put("px",goalPosition[0]);
+            }
+
             ArrayList<String> otherPercepts = new ArrayList<>(Collections.singleton("ptheta0"));
 
             HashMap<String,Double> actions1 = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
@@ -284,7 +304,7 @@ public class RobotArmManager {
 
             }
             learnedPositions.add(ends[jointsNb-1]);
-            System.out.println("LEARNING [" + learningCycle + "] ");
+            if(learningCycle%50==0)  System.out.println("LEARNING [" + learningCycle + "] ");
             learn(angles);
         }else if (requestCycle < requestCycles){
             /*amoebas[0].data.isSelfLearning = false;
@@ -352,8 +372,17 @@ public class RobotArmManager {
 
                 System.out.println("[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
 
+                double currentError = 0.0;
                 //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
-                double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/360.0;
+                if(PARAMS.dimension == 3){
+                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/360.0;
+                }else if(PARAMS.dimension == 2 && PARAMS.nbJoints==1){
+                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/360.0;
+                }else if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
+                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/360.0;
+                }
+
+
                 System.out.println("ERROR " + currentError + " [" + requestCycle + "]");
                 goalErrors += currentError;
                 allGoalErrors.add(new Double(currentError));

@@ -77,7 +77,7 @@ public class Context extends AmoebaAgent {
 
 	public Queue<HashMap<Percept, Double>> childRequests = new ArrayDeque<>();
 
-
+	private int[] childContextCounter = null;
 
 	int lastFrontierRequestTick = 0;
 	
@@ -1584,9 +1584,15 @@ public class Context extends AmoebaAgent {
 		//if(getAmas().data.isActiveLearning){
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
-		for(Percept pct : getAmas().getPercepts()) {
+
+
+
+		request = getNextEtremityChildRequest();
+
+		/*for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct, getRandomValueInRangeNextToStartAndEnd(pct));
-		}
+		}*/
+
 		/*while(isToCloseToFirstExperimements(request,(localModel).getFirstExperiments())){
 			request = new HashMap<>();
 			for(Percept pct : getAmas().getPercepts()) {
@@ -1615,9 +1621,11 @@ public class Context extends AmoebaAgent {
 
 		while (isChild()){
 			Experiment endoExp = new Experiment(this);
-			for(Percept pct : getAmas().getPercepts()) {
+
+			endoExp = getNextEtremityChildExperiment();
+			/*for(Percept pct : getAmas().getPercepts()) {
 				endoExp.addDimension(pct, getRandomValueInRangeNextToStartAndEnd(pct));
-			}
+			}*/
 			/*while(isToCloseToFirstExperimements(endoExp,((LocalModelMillerRegression)localModel).getFirstExperiments())){
 				endoExp = new Experiment(this);
 				for(Percept pct : getAmas().getPercepts()) {
@@ -1698,6 +1706,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	public void learnFromNeighbors() {
+		//System.err.println("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 		for(Percept pct : getAmas().getPercepts()){
 			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
@@ -1735,15 +1744,17 @@ public class Context extends AmoebaAgent {
 
 		if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
 			if(endoExperiments.size()>1){
-				if(testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){
+				//if(testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){
+				if(testIfNeighborsPredictionsMeanAreInContextPredictionRanges(endoExperiments)){
 
-					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+
+					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed/2);
 					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 
 				}
 			}else{
 				if(endoExperiments.size()>0){
-					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed/2);
 					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 				}
 			}
@@ -1766,6 +1777,22 @@ public class Context extends AmoebaAgent {
 			test2 = test2 || localTest;
 		}
 		return  initTest!=test1  || initTest!=test2;
+	}
+
+	private boolean testIfNeighborsPredictionsMeanAreInContextPredictionRanges(ArrayList<Experiment> endoExperiments){
+		Experiment centerExp = new Experiment(this);
+		for (Percept pct : getAmas().getPercepts()) {
+			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
+		}
+		double centerprediction = ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
+
+		double meanPrediction = 0.0;
+		for(Experiment endoExp : endoExperiments){
+			meanPrediction += endoExp.getOracleProposition();
+		}
+		meanPrediction /= endoExperiments.size();
+
+		return  Math.abs(meanPrediction - centerprediction) < (getAmas().getHeadAgent().getPredictionNeighborhoodRange()/2);
 	}
 
 	public void solveNCS_LearnFromNeighbors(){
@@ -1976,6 +2003,99 @@ public class Context extends AmoebaAgent {
 		}else{
 			return ranges.get(pct).getEnd() - pct.getMappingErrorAllowedMin()*Math.random();
 		}
+
+	}
+
+	private HashMap<Percept, Double> getRequestFromCounter(){
+		HashMap<Percept, Double> request = new HashMap<>();
+		for(Percept pct : getAmas().getPercepts()){
+			int counterValue = childContextCounter[getAmas().getPercepts().indexOf(pct)];
+			if(counterValue == 0){
+				request.put(pct,getRanges().get(pct).getStart());
+			}else{
+				request.put(pct,getRanges().get(pct).getEnd());
+			}
+
+		}
+		return request;
+	}
+
+	private Experiment getexperimentFromCounter(){
+		Experiment experiment = new Experiment(this);
+		for(Percept pct : getAmas().getPercepts()){
+			int counterValue = childContextCounter[getAmas().getPercepts().indexOf(pct)];
+			if(counterValue == 0){
+				experiment.addDimension(pct,getRanges().get(pct).getStart());
+			}else{
+				experiment.addDimension(pct,getRanges().get(pct).getEnd());
+			}
+
+		}
+		return experiment;
+	}
+
+
+
+	private HashMap<Percept, Double> getNextEtremityChildRequest() {
+
+		if(childContextCounter == null){
+			childContextCounter = new int[getAmas().getPercepts().size()];
+			for(int i = 0;i<childContextCounter.length;i++){
+				childContextCounter[i]=0;
+			}
+			return getRequestFromCounter();
+
+		}else{
+			nextMultiDimCounterForContextRanges(childContextCounter);
+			return getRequestFromCounter();
+		}
+
+	}
+
+	private Experiment getNextEtremityChildExperiment() {
+
+		if(childContextCounter == null){
+			childContextCounter = new int[getAmas().getPercepts().size()];
+			for(int i = 0;i<childContextCounter.length;i++){
+				childContextCounter[i]=0;
+			}
+			return getexperimentFromCounter();
+
+		}else{
+			nextMultiDimCounterForContextRanges(childContextCounter);
+			return getexperimentFromCounter();
+		}
+
+	}
+
+
+
+
+
+	private static boolean nextMultiDimCounterForContextRanges(int[] indices){
+
+
+
+		for(int i = 0; i<indices.length;i++) {
+
+			if(indices[i]==1) {
+				if(i==indices.length-1) {
+					indices[i]=0;
+					return false;
+				}
+				else {
+					indices[i]=0;
+				}
+			}
+			else {
+				indices[i] += 1;
+				return true;
+			}
+
+		}
+
+		return false;
+
 
 	}
 

@@ -15,7 +15,14 @@ import fr.irit.smac.amak.tools.Log.Level;
 
 
 public class TestMain {
-	
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+
+		testCompteurTailleN();
+
+	}
 	
 	public static double fact(double n) {
 		
@@ -65,13 +72,7 @@ public class TestMain {
 		}
 
 	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
-
-		logic();
-		
-	}
 
 	public static  void logic(){
 
@@ -88,6 +89,34 @@ public class TestMain {
 		}
 
 		System.out.println(test1 + " " + test2);
+
+	}
+
+	public static  void multiBoucle(double[] compteur, double[] limites){
+
+
+
+
+
+	}
+
+	public void incrementerCompteur(double[] compteur, double[] limites){
+
+
+		/*int i = 0;
+		boolean inc = false;
+		while(i<compteur.length || inc){
+
+			if(compteur[i]<limites[i]){
+				compteur[i]+=1;
+				inc = true;
+			}
+
+		}
+		for(int i=0;i<compteur.length;i++){
+
+			if (compteur[i]==)
+		}*/
 
 	}
 	
@@ -202,23 +231,22 @@ public class TestMain {
 		countIndices[1]=0;
 		countIndices[2]=0;
 		
-		bounds[0]=1;
+		bounds[0]=2;
 		bounds[1]=3;
-		bounds[2]=2;
+		bounds[2]=4;
 		
 		boolean test = true;
 		
-		int i = 0;
+
 		
 		System.out.println(test + " "  + countIndices[0]  + " "  + countIndices[1]  + " "  + countIndices[2] );
 		
-		while(i<100) {
+		while(test) {
 			
 			test =  nextMultiDimCounter(countIndices,bounds);
 			
 			System.out.println(test + " "  + countIndices[0]  + " "  + countIndices[1]  + " "  + countIndices[2]  );
-			
-			i++;
+
 		}
 		
 	}

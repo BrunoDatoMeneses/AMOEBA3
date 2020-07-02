@@ -15,11 +15,11 @@ public class PARAMS {
     /*public static final String configFile = "fourDimensionsLauncher.xml";
     public static final int dimension = 4;*/
 
-    public static final int nbCycle = 2000;
+    public static final int nbCycle = 1500;
     public static final int nbCycleTest = 500;
-    public static final int nbTest = 10;
+    public static final int nbTest = 5;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.02;
+    public static double mappingErrorAllowed = 0.03;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.1; // BIG 3D
@@ -66,7 +66,7 @@ public class PARAMS {
 
     public static final boolean setDream = false ;
 
-    public static final boolean setLearnFromNeighbors = true ;
+    public static final boolean setLearnFromNeighbors = false ;
 
 
 
@@ -77,5 +77,5 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = false;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
 }
