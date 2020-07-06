@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import agents.context.Context;
 import agents.percept.Percept;
 
 /**
@@ -16,7 +15,7 @@ public class Experiment implements Serializable {
 	private LinkedHashMap<Percept, Double> values = new LinkedHashMap<Percept, Double>();
 	
 	/** The proposition. */
-	private double oracleProposition;
+	private double proposition;
 
 	private Context context;
 	
@@ -71,8 +70,8 @@ public class Experiment implements Serializable {
 	 *
 	 * @return the proposition
 	 */
-	public double getOracleProposition() {
-		return oracleProposition;
+	public double getProposition() {
+		return proposition;
 	}
 
 
@@ -81,8 +80,8 @@ public class Experiment implements Serializable {
 	 *
 	 * @param proposition the new proposition
 	 */
-	public void setOracleProposition(double oracleProposition) {
-		this.oracleProposition = oracleProposition;
+	public void setProposition(double proposition) {
+		this.proposition = proposition;
 	}
 	
 	/**
@@ -107,7 +106,7 @@ public class Experiment implements Serializable {
 		for(Percept pct : values.keySet()) {
 			string += pct.getName() + " " + values.get(pct) + " ";
 		}
-		string += "Oracle : " + oracleProposition ;
+		string += "Oracle : " + proposition;
 		return string;
 	}
 	

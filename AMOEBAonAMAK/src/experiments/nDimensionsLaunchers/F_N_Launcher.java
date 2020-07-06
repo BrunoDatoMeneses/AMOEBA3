@@ -50,12 +50,7 @@ public class F_N_Launcher implements Serializable {
 				+"_Episodes_" + PARAMS.nbTest
 				+"_ActiveLearning_" + PARAMS.setActiveLearning
 				+"_SelfLearning_" + PARAMS.setSelfLearning
-				+"_Conflicts_" + PARAMS.setConflictDetection
-				+"_Concurrence_" + PARAMS.setConcurrenceDetection
-				+"_Voids_" + PARAMS.setVoidDetection2
-				+"_Frontiers_" + PARAMS.setFrontierRequest
-				+"_Models_" + PARAMS.setSelfModelRequest
-				+"_Neighbors_" + PARAMS.setLearnFromNeighbors
+				+"_Notes_" + PARAMS.model
 
 		);
 

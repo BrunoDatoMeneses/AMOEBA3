@@ -394,8 +394,12 @@ public class F_N_Manager implements StudiedSystem{
 		return goutteModel(xRequest, center);*/
 
 		/* Cos */
-		model="Cos";
-		return cosX(xRequest, 0.07) + 3;
+		/*model="Cos";
+		return cosX(xRequest, 0.045) + 3;*/
+
+		/* Cos */
+		model="CosSin";
+		return cosSinX(xRequest, 0.045) + 3;
 
 		/* Rosenbrock */
 		//model="Rosenbrock";
@@ -596,6 +600,10 @@ private double[] subZoneCenter3D(int nb) {
 
 	private double cosX(Double[] xRequest, double param) {
 		return Math.cos(xRequest[0]*param);
+	}
+
+	private double cosSinX(Double[] xRequest, double param) {
+		return xRequest[0]>-12.5 ?   Math.cos(xRequest[0]*param) : Math.sin(xRequest[0]*param);
 	}
 
 	private double goutteModel(Double[] xRequest, double[] center) {

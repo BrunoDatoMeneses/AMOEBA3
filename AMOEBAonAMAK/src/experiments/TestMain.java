@@ -20,7 +20,7 @@ public class TestMain {
 		// TODO Auto-generated method stub
 
 
-		testCompteurTailleN();
+		gaussianDistribution();
 
 	}
 	
@@ -303,6 +303,20 @@ public class TestMain {
 		return false;
 
 		
+	}
+
+	private static void gaussianDistribution(){
+
+		java.util.Random r = new java.util.Random();
+		double variance = 3.0/5;
+		double mean = 0.0;
+		for(int i =0;i<10;i++){
+			double noise = r.nextGaussian() * Math.sqrt(variance) + mean;
+			System.out.println(noise);
+		}
+
+
+
 	}
 
 }

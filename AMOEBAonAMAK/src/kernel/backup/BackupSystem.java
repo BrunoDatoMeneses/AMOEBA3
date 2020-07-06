@@ -304,7 +304,7 @@ public class BackupSystem implements IBackupSystem {
 			Experiment experiment = new Experiment(context);
 
 			double proposition = Double.valueOf(experimentElement.getAttributeValue("Proposition"));
-			experiment.setOracleProposition(proposition);
+			experiment.setProposition(proposition);
 
 			for (Element valueElement : valuesElement.getChildren()) {
 				String perceptName = valueElement.getAttributeValue(PERCEPT_NODE);
@@ -503,7 +503,7 @@ public class BackupSystem implements IBackupSystem {
 			Element experimentElement = new Element("Experiment");
 			experimentElement.addContent(valuesElement);
 			experimentElement
-					.setAttribute(new Attribute("Proposition", String.valueOf(experiment.getOracleProposition())));
+					.setAttribute(new Attribute("Proposition", String.valueOf(experiment.getProposition())));
 
 			experimentsElement.addContent(experimentElement);
 		}

@@ -16,7 +16,6 @@ import kernel.StudiedSystem;
 import kernel.World;
 import ncs.NCS;
 import utils.Pair;
-import utils.PrintOnce;
 import utils.TRACE_LEVEL;
 
 /**
@@ -820,6 +819,8 @@ public class Head extends AmoebaAgent {
 
 		updateCriticalityWithoutOracle();
 
+		updateActivatedContextLastPredictions();
+
 		if(getAmas().data.isSelfLearning && getAmas().getCycle()>3){
 			allNCSDetectionsWithoutOracle();
 		}
@@ -832,6 +833,12 @@ public class Head extends AmoebaAgent {
 		
 		
 
+	}
+
+	private void updateActivatedContextLastPredictions() {
+		for(Context activatedContext : activatedContexts){
+			activatedContext.lastPrediction = activatedContext.getActionProposal();
+		}
 	}
 
 	private void playWithoutOracleAndAllPercets() {
@@ -2267,7 +2274,7 @@ public class Head extends AmoebaAgent {
 
 				}
 				endogenousPrediction = weightedSumOfPredictions/normalisation;
-				currentExp.setOracleProposition(endogenousPrediction);
+				currentExp.setProposition(endogenousPrediction);
 				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
 				context = new Context(getAmas(), endogenousPrediction);
 				getAmas().data.newContextWasCreated = true;
@@ -3160,8 +3167,8 @@ public class Head extends AmoebaAgent {
 	
 	public Double getAverageRegressionPerformanceIndicator() {
 		
-		return getAmas().data.averageRegressionPerformanceIndicator; //TODO solution ?
-		//return getAmas().data.initRegressionPerformance;
+		//return getAmas().data.averageRegressionPerformanceIndicator; //TODO solution ?
+		return getAmas().data.initRegressionPerformance;
 		
 	}
 	
@@ -3223,7 +3230,8 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed() * 2.0 ;
+		//return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed() * 2.0 ;
+		return getMinMaxPredictionRange()*0.33 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}
 	

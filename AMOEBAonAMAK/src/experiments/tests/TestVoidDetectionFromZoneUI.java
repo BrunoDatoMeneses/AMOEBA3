@@ -3,7 +3,6 @@ package experiments.tests;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.Range;
-import agents.context.VOID;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
@@ -17,7 +16,6 @@ import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
-import utils.Pair;
 import utils.TRACE_LEVEL;
 
 import java.io.File;
@@ -162,7 +160,7 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         for (Percept pct : percepts) {
             exp.addDimension(pct, pct.getValue());
         }
-        exp.setOracleProposition(0.0);
+        exp.setProposition(0.0);
 
         return exp;
     }

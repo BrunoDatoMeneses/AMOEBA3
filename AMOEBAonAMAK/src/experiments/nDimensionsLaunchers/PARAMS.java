@@ -4,7 +4,8 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static String model = "Cos";
+    public static String model = "CosSin_AvecVoisinTestMaximaLocaux";
+    //public static String model = "Goutte_AvecVoisin";
 
     public static final String configFile = "twoDimensionsLauncher.xml";
     public static final int dimension = 2;
@@ -19,13 +20,13 @@ public class PARAMS {
     public static final int nbCycleTest = 500;
     public static final int nbTest = 5;
     public static final double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.03;
-    //public static double mappingErrorAllowed = 0.06; // USUAL
+    //public static double mappingErrorAllowed = 0.04;
+    public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.1; // BIG 3D
 
     /* PREDICTION */
-    public static final double setRegressionPerformance = 1;
+    public static final double setRegressionPerformance = 0.1;
 
     /* REGRESSION */
     public static final double oracleNoiseRange = 0.0;
@@ -66,7 +67,7 @@ public class PARAMS {
 
     public static final boolean setDream = false ;
 
-    public static final boolean setLearnFromNeighbors = false ;
+    public static final boolean setLearnFromNeighbors = true ;
 
 
 
@@ -77,5 +78,5 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = false;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 }

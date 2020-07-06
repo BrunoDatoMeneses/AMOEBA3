@@ -9,6 +9,7 @@ import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperDummy;
 
+
 /**
  * The most minimal main possible producing a functioning amoeba.
  * @author Hugo
