@@ -305,6 +305,15 @@ public class View3D {
                     ctxtColor = getColorFromCoefs(ctxt);
                 }else{
                     ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
+                    if(ctxt.isBest) {
+                        ctxtColor = new Color(0.0f, 1.0f, 0.0f, 0.75f);
+                    }else if(ctxt.isActivated) {
+                        ctxtColor = new Color(0.0f, 0.0f, 0.0f, 0.75f);
+                    }else if(ctxt.isInNeighborhood) {
+                        ctxtColor.a = 0.75f;
+                    }else {
+                        ctxtColor.a = 0.5f;;
+                    }
                 }
 
 
@@ -521,7 +530,15 @@ public class View3D {
 
     private Color getColorFromCoefs(Context ctxt){
         Double[] c = ContextColor.colorFromCoefs(ctxt.getFunction().getCoef());
-        return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
+        if(ctxt.isBest) {
+            return new Color(0.0f, 1.0f, 0.0f, 0.75f);
+        }else if(ctxt.isActivated) {
+            return new Color(0.0f, 0.0f, 0.0f, 0.75f);
+        }else if(ctxt.isInNeighborhood) {
+            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
+        }else {
+            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.5f);
+        }
 
     }
 }

@@ -14,6 +14,7 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
+import fr.irit.smac.amak.ui.drawables.DrawableLine;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,6 +48,8 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 	public View3DContexts view3DContexts;
 	
 	public Drawable point;
+	public Drawable pointVerticalLine;
+	public Drawable pointHorizontalLine;
 	public Drawable rectangle;
 	public ToggleButton toggleRender;
 	public SchedulerToolbar schedulerToolbar;
@@ -77,6 +80,10 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		point.setName("Cursor");
 		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
 		rectangle.setName("Neighborhood");
+		pointHorizontalLine = mainVUI.createAndAddRectangle(0,0,2000,0.1);
+		pointVerticalLine = mainVUI.createAndAddRectangle(0,0,0.1,2000);
+		pointHorizontalLine.setName("pointHorizontalLine");
+		pointVerticalLine.setName("pointVerticalLine");
 
 		rectangle.setColor(new Color(1, 1, 1, 0));
 

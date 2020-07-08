@@ -117,6 +117,9 @@ public class Head extends AmoebaAgent {
 			playWithoutOracle();
 		}
 
+		if(bestContext != null){
+			bestContext.isBest = true;
+		}
 
 		testIfrequest();
 
@@ -191,7 +194,9 @@ public class Head extends AmoebaAgent {
 				ctxt.restructured = false;
 				ctxt.modified = false;
 				neighborhoodVolumesSum += ctxt.getVolume();
-
+				if(activatedContexts.contains(ctxt)){
+					ctxt.isActivated = true;
+				}
 
 
 				for (Percept pct : ctxt.getRanges().keySet()) {
@@ -991,15 +996,37 @@ public class Head extends AmoebaAgent {
 
 		//selectBestContextWithConfidenceAndVolume();
 		selectBestContextWithConfidence();
+		//selectBestContextWithDistance();
+
 		if (bestContext != null) {
 			getAmas().data.noBestContext = false;
-			getAmas().data.prediction = bestContext.getActionProposal();
+			getAmas().data.prediction = bestContext.getActionProposalWithSubPercepts();
 		} else {
 
 			getAmas().data.noBestContext = true;
 			Context nearestContext = this.getNearestContextWithoutAllPercepts(activatedNeighborsContexts);
 
-			if(activatedNeighborsContexts.size()>0) {
+			if(nearestContext != null) {
+				getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
+				bestContext = nearestContext;
+			} else {
+				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
+				// To limit performance impact, we limit our search on a random sample.
+				// A better way would be to increase neighborhood.
+				System.err.println("Play without oracle : no nearest context in neighbors, searching in a all Contexts");
+				//PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
+				//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
+				nearestContext = this.getNearestContextWithoutAllPercepts(getAmas().getContexts());
+				if(nearestContext != null) {
+					getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
+					bestContext = nearestContext;
+				} else {
+					System.out.println("NO NEAREST CONTEXT"); // Sould not happend
+					getAmas().data.prediction = 0.0;
+				}
+			}
+
+			/*if(activatedNeighborsContexts.size()>0) {
 
 				double weightedPredictionSum = 0;
 				double normalisation = 0;
@@ -1021,30 +1048,10 @@ public class Head extends AmoebaAgent {
 						perceptNormalisationValue += (1 / distance);
 					}
 					getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,weightedPerceptSum/perceptNormalisationValue);
-				}
+				}*/
 
 
-			}else{
-				if(nearestContext != null) {
-					getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
-					bestContext = nearestContext;
-				} else {
-					//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
-					// To limit performance impact, we limit our search on a random sample.
-					// A better way would be to increase neighborhood.
-					System.err.println("Play without oracle : no nearest context in neighbors, searching in a random sample");
-					//PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
-					//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
-					nearestContext = this.getNearestContextWithoutAllPercepts(getAmas().getContexts());
-					if(nearestContext != null) {
-						getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
-						bestContext = nearestContext;
-					} else {
-						System.out.println("NO NEAREST CONTEXT"); // Sould not happend
-						getAmas().data.prediction = 0.0;
-					}
-				}
-			}
+
 
 
 
@@ -2404,6 +2411,44 @@ public class Head extends AmoebaAgent {
 			bestContext = null;
 		}
 	}
+
+	private void selectBestContextWithDistance() {
+
+		if(activatedContexts != null && !activatedContexts.isEmpty()) {
+
+			if(activatedContexts.size()>1){
+				HashMap<Context,Double> distancesFromPerception = new HashMap<>();
+				for(Percept pct : getAmas().getSubPercepts()){
+					for(Context ctxt : activatedContexts){
+						if(distancesFromPerception.containsKey(ctxt)){
+							double oldDistance = distancesFromPerception.get(ctxt);
+							double distanceToAdd = Math.abs(ctxt.getRanges().get(pct).getCenter()-pct.getValue());
+							distancesFromPerception.put(ctxt,oldDistance+ distanceToAdd);
+						}else{
+							distancesFromPerception.put(ctxt,Math.abs(ctxt.getRanges().get(pct).getCenter()-pct.getValue()));
+						}
+					}
+				}
+
+				Context bc = activatedContexts.get(0);
+				double minDistance = distancesFromPerception.get(bc);
+				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
+					double distance = distancesFromPerception.get(context);
+					if (distance < minDistance) {
+						bc = context;
+						minDistance = distance;
+					}
+				}
+				bestContext = bc;
+			}else{
+				bestContext=activatedContexts.get(0);
+			}
+		}else{
+			bestContext = null;
+		}
+
+
+	}
 	
 	
 
@@ -2859,6 +2904,10 @@ public class Head extends AmoebaAgent {
 		activatedContexts.clear();
 		for (Context ctxt : activatedNeighborsContexts) {
 			ctxt.isInNeighborhood = false;
+			ctxt.isActivated = false;
+		}
+		if(bestContext!=null){
+			bestContext.isBest = false;
 		}
 		activatedNeighborsContexts.clear();
 	}

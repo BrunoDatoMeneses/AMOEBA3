@@ -71,6 +71,8 @@ public class Context extends AmoebaAgent {
 	public boolean fusionned = false;
 	public boolean restructured = false;
 	public boolean isInNeighborhood = false;
+	public boolean isActivated = false;
+	public boolean isBest = false;
 	
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
@@ -613,6 +615,7 @@ public class Context extends AmoebaAgent {
 		this.shrinkRangesToJoinBorders(bestContext);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+		confidence-=0.5;
 
 		modified = true;
 	}
@@ -688,13 +691,15 @@ public class Context extends AmoebaAgent {
 
 
 	public boolean isSameModel(Context ctxt) {
-		return /*this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
+		/*return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
 				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&*/
-          this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+        return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
 	public boolean isSameModelWithoutOracle(Context ctxt) {
 		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
 	public void analyzeResults4(Head head) {
@@ -1526,7 +1531,7 @@ public class Context extends AmoebaAgent {
 
 		}
 		
-		this.setConfidence(2*Math.max(this.getConfidence(), fusionContext.getConfidence())); // TODO too much ?
+		confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
@@ -1754,14 +1759,15 @@ public class Context extends AmoebaAgent {
 			}
 		}
 
-		/*if(endoExperiments.size()>0){
+		if(endoExperiments.size()>0){
 			((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
 			getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-		}*/
+			confidence+=endoExperiments.size()*0.01;
+		}
 
-		if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
+		/*if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
 			if(endoExperiments.size()>1){
-				if(testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){ //TODO ???
+				if(testIfNeighborsPredictionsAreAllSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){ //TODO ???
 				//if(testIfNeighborsPredictionsMeanAreInContextPredictionRanges(endoExperiments)){
 
 
@@ -1775,10 +1781,10 @@ public class Context extends AmoebaAgent {
 					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 				}
 			}
-		}
+		}*/
 	}
 
-	private boolean testIfNeighborsPredictionsAreSuperiorOrInferiorToContextCenterPrediction(ArrayList<Experiment> endoExperiments){
+	private boolean testIfNeighborsPredictionsAreAllSuperiorOrInferiorToContextCenterPrediction(ArrayList<Experiment> endoExperiments){
 		Experiment centerExp = new Experiment(this);
 		for (Percept pct : getAmas().getPercepts()) {
 			centerExp.addDimension(pct, getRanges().get(pct).getCenter());

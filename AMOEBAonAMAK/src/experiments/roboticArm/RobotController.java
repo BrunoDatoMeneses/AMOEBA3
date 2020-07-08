@@ -22,9 +22,12 @@ public class RobotController {
     private void setRandomJoints(int jointIndice, double[] angles) {
         //angles[jointIndice] = Math.random()* 2 * Math.PI;
         if(jointIndice == 0){
+            //angles[jointIndice] = Math.random()<0.5 ? Math.random()<0.5 ? Math.PI/4 : 3*Math.PI/4 : Math.random()<0.5 ? Math.PI : 0.0 ;
             angles[jointIndice] = addConstrains(Math.random()*  Math.PI, 2 * Math.PI / 10) ;
         }else{
-            angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI, 2 * Math.PI / 10) ;
+            //angles[jointIndice] = Math.PI/4 ;
+            angles[jointIndice] = addConstrains(Math.random()* 2*   Math.PI, 2 * Math.PI / 10) ;
+            //angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI, 2 * Math.PI / 10) ;
         }
 
         /*if(jointIndice==0){

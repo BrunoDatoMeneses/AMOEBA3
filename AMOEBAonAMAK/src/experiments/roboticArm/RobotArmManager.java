@@ -1,5 +1,6 @@
 package experiments.roboticArm;
 
+import agents.context.Context;
 import agents.percept.Percept;
 import kernel.AMOEBA;
 import utils.Pair;
@@ -122,6 +123,10 @@ public class RobotArmManager {
                 }
                 out0.put("oracle",result*100.0);
 
+
+                /*System.err.println(out0.get("px"));
+                System.err.println(out0.get("oracle"));
+                System.err.println(out0.get("ptheta0"));*/
                 amoebas[0].learn(out0);
 
                 result = jointsAngles[1];
@@ -243,9 +248,24 @@ public class RobotArmManager {
             ArrayList<String> otherPercepts = new ArrayList<>(Collections.singleton("ptheta0"));
 
             HashMap<String,Double> actions1 = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
-            System.out.println(actions1);
-            System.out.println("B " + amoebas[0].getHeadAgent().getBestContext());
+
+
+            Context bestContext = amoebas[0].getHeadAgent().getBestContext();
+            if(bestContext!=null){
+                System.out.println("B "  + bestContext + " " +bestContext.getConfidence());
+                for(Percept pct : amoebas[0].getPercepts()){
+                    System.out.println(pct.getName() + " "+ bestContext.getRanges().get(pct).getStart() + " " + bestContext.getRanges().get(pct).getEnd());
+                }
+
+
+            }else{
+                System.out.println("B "  + bestContext);
+            }
+
             System.out.println("A " + amoebas[0].getHeadAgent().getActivatedContexts());
+            for(Context ctxt: amoebas[0].getHeadAgent().getActivatedContexts()){
+                System.out.println(ctxt.getName() + " " +ctxt.getConfidence());
+            }
             System.out.println("N " + amoebas[0].getHeadAgent().getActivatedNeighborsContexts());
 
             HashMap<String,Double> actions2 = amoebas[1].requestWithLesserPercepts(out2, otherPercepts);
@@ -256,6 +276,19 @@ public class RobotArmManager {
 
             goalJoints[0] = actions1.get("action")/100.0;
             goalJoints[1] = actions1.get("ptheta0")/100.0;
+
+            System.err.println("PERCEPTIONS " + out2);
+            System.err.println("ELLSA1");
+            System.err.println("ACTION 0 " + actions1.get("action"));
+            System.err.println("ACTION 1 " + actions1.get("ptheta0"));
+            System.err.println("JOINT 0 " + goalJoints[0]/Math.PI);
+            System.err.println("JOINT 1 " + goalJoints[1]/Math.PI);
+            System.err.println("ELLSA2");
+            System.err.println("ACTION 0 " + actions2.get("ptheta0"));
+            System.err.println("ACTION 1 " + actions2.get("action"));
+            System.err.println("JOINT 0 " + actions2.get("ptheta0")/Math.PI);
+            System.err.println("JOINT 1 " + actions2.get("action")/Math.PI);
+
 
             /*goalJoints[1] = actions2.get("action")/100.0;
             goalJoints[0] = actions2.get("ptheta0")/100.0;*/

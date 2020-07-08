@@ -19,12 +19,12 @@ public class PARAMS {
     /*public static final String configFile = "threeDimensionsLauncher.xml";
     public static final int dimension = 3;*/
 
-    public static final int nbTrainingCycle = 200;
+    public static final int nbTrainingCycle = 500;
     public static final int nbRequestCycle = 200;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
-    public static double mappingErrorAllowed = 0.04; // OTHER
+    public static double mappingErrorAllowed = 0.02; // OTHER
 
     /* PREDICTION */
     public static final double setRegressionPerformance = 1;

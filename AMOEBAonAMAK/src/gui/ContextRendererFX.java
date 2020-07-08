@@ -54,10 +54,14 @@ public class ContextRendererFX extends RenderStrategy {
 	
 	private void setColorWithCoefs() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
-		if(context.isInNeighborhood) {
-			drawable.setColor(new Color(c[0], c[1], c[2], 200d / 255d));
+		if(context.isBest) {
+			drawable.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
+		}else if(context.isActivated) {
+			drawable.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
+		}else if(context.isInNeighborhood) {
+			drawable.setColor(new Color(c[0], c[1], c[2], 225d / 255d));
 		}else {
-			drawable.setColor(new Color(c[0], c[1], c[2], 90d / 255d));
+			drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
 		}
 		
 	}
@@ -98,10 +102,14 @@ public class ContextRendererFX extends RenderStrategy {
 		r = r < 0.0 ? 0.0 : r;
 		g = g < 0.0 ? 0.0 : g;
 		b = b < 0.0 ? 0.0 : b;
-		if(context.isInNeighborhood) {
-			drawable.setColor(new Color(r, g, b, 200d / 255d));
+		if(context.isBest) {
+			drawable.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
+		}else if(context.isActivated) {
+			drawable.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
+		}else if(context.isInNeighborhood) {
+			drawable.setColor(new Color(r, g, b, 225d / 255d));
 		}else {
-			drawable.setColor(new Color(r, g, b, 140d / 255d));
+			drawable.setColor(new Color(r, g, b, 50d / 255d));
 		}
 	}
 

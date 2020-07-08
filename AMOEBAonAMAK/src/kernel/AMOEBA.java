@@ -800,12 +800,18 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 		for(Agent<? extends Amas<World>, World> a : getAgents()) {
 			a.onUpdateRender();
 		}
-		((AmoebaMultiUIWindow)amasMultiUIWindow).point.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue(), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue());
+		double d1DimensionSelector = ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue();
+		double d2DimensionSelector = ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).point.move(d1DimensionSelector, d2DimensionSelector);
+		((AmoebaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.move(d1DimensionSelector-1000,d2DimensionSelector);
+		((AmoebaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.move(d1DimensionSelector,d2DimensionSelector-1000);
 		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
 		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
-		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.move(((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue() - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((AmoebaMultiUIWindow)amasMultiUIWindow).rectangle.move(d1DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), d2DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((AmoebaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
 		((AmoebaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
 		((AmoebaMultiUIWindow)amasMultiUIWindow).point.toFront();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.toFront();
+		((AmoebaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.toFront();
 		((AmoebaMultiUIWindow)amasMultiUIWindow).point.setInfo(getCursorInfo());
 		if(getHeadAgent() != null){
 			if(getHeadAgent().currentEndogenousRequest != null){
