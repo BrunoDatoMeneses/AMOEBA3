@@ -1,6 +1,7 @@
 package experiments.roboticArm;
 
 import fr.irit.smac.amak.Agent;
+import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.drawables.DrawableCircle;
 import fr.irit.smac.amak.ui.drawables.DrawableLine;
@@ -104,18 +105,20 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 
 
+		if(!Configuration.commandLineMode){
+			circleBase = getAmas().getVUIMulti().createAndAddCircle(xStart, yStart,4);
 
-		circleBase = getAmas().getVUIMulti().createAndAddCircle(xStart, yStart,4);
+			for (int i = 0;i<jointsNumber;i++){
+				lines[i] = getAmas().getVUIMulti().createAndAddLine(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
+				circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
+			}
 
-		for (int i = 0;i<jointsNumber;i++){
-			lines[i] = getAmas().getVUIMulti().createAndAddLine(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
-			circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
+			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,2);
+
+			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-1000.0, 0.0,1000.0,0.0);
+			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -1000.0,0.0,1000.0);
 		}
 
-		goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,2);
-
-		goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-1000.0, 0.0,1000.0,0.0);
-		goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -1000.0,0.0,1000.0);
 
 
 
@@ -165,7 +168,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			public void run()
 			{
 				if(getAmas().getCycle()<robotArmManager.trainingCycles){
-					if(ends[jointsNumber-1].getB()>0.0){
+					if(ends[jointsNumber-1].getB()>0.0 || true){
 						getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
 					}
 

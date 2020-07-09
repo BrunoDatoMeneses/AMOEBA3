@@ -4,13 +4,13 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    /*public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
+    public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 3;
-    public static int nbJoints = 2;*/
-
-    public static final String configFile = "2jointsRobot2DimensionsLauncher.xml";
-    public static final int dimension = 2;
     public static int nbJoints = 2;
+
+    /*public static final String configFile = "2jointsRobot2DimensionsLauncher.xml";
+    public static final int dimension = 2;
+    public static int nbJoints = 2;*/
 
     /*public static final String configFile = "1jointRobot2DimensionsLauncher.xml";
     public static final int dimension = 2;
@@ -19,12 +19,12 @@ public class PARAMS {
     /*public static final String configFile = "threeDimensionsLauncher.xml";
     public static final int dimension = 3;*/
 
-    public static final int nbTrainingCycle = 500;
+    public static final int nbTrainingCycle = 200;
     public static final int nbRequestCycle = 200;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
-    public static double mappingErrorAllowed = 0.02; // OTHER
+    public static double mappingErrorAllowed = 0.06; // OTHER
 
     /* PREDICTION */
     public static final double setRegressionPerformance = 1;
@@ -83,7 +83,7 @@ public class PARAMS {
     /*UI*/
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
     public static double armBaseSize = 100.0;
 }

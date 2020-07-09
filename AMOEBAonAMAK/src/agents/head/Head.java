@@ -3279,8 +3279,8 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		//return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed() * 2.0 ;
-		return getMinMaxPredictionRange()*0.33 ;
+		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*2  ;
+		//return getMinMaxPredictionRange()*0.25 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}
 	

@@ -1,5 +1,8 @@
 package experiments.roboticArm;
 
+import utils.TRACE;
+import utils.TRACE_LEVEL;
+
 public class RobotController {
 
     int jointsNumber;
@@ -20,15 +23,15 @@ public class RobotController {
     }
 
     private void setRandomJoints(int jointIndice, double[] angles) {
-        //angles[jointIndice] = Math.random()* 2 * Math.PI;
-        if(jointIndice == 0){
+        angles[jointIndice] = Math.random()* 2 * Math.PI;
+        /*if(jointIndice == 0){
             //angles[jointIndice] = Math.random()<0.5 ? Math.random()<0.5 ? Math.PI/4 : 3*Math.PI/4 : Math.random()<0.5 ? Math.PI : 0.0 ;
             angles[jointIndice] = addConstrains(Math.random()*  Math.PI, 2 * Math.PI / 10) ;
         }else{
             //angles[jointIndice] = Math.PI/4 ;
             angles[jointIndice] = addConstrains(Math.random()* 2*   Math.PI, 2 * Math.PI / 10) ;
             //angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI, 2 * Math.PI / 10) ;
-        }
+        }*/
 
         /*if(jointIndice==0){
             angles[jointIndice] = -Math.PI / 2;
@@ -58,7 +61,7 @@ public class RobotController {
 
 
 
-            double difference = modulo2PI(goalAngles[i] ) -currentAngles[i];
+            /*double difference = modulo2PI(goalAngles[i] ) -currentAngles[i];
             double deltaTheta;
 
             if(Math.abs(difference)> Math.PI){
@@ -69,15 +72,29 @@ public class RobotController {
             //System.out.println(i + " Goal " + goalAngles[i] + " Current " + currentAngles[i] + " diff " + difference + " delta " + deltaTheta);
             currentAngles[i] += deltaTheta;
             //currentAngles[i] = modulo2PI(currentAngles[i] );
-            //currentAngles[i] = addConstrains(modulo2PI(currentAngles[i] ), 2 * Math.PI / 10) ;
-            currentAngles[i] = goalAngles[i];
-            if(currentAngles[i] > Math.PI*2 || currentAngles[i]< 0){
-                System.out.println("-----------------\n-------------\n----------------\n----------------- ERROR " + currentAngles[i]);
-            }
+            //currentAngles[i] = addConstrains(modulo2PI(currentAngles[i] ), 2 * Math.PI / 10) ;*/
+
+
+
+            currentAngles[i] = maxMin2PI( goalAngles[i]);
+
         }
 
     }
 
+    private double maxMin2PI(double angle){
+
+        if(angle<0.0){
+            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            return 0.0;
+        }else if(angle>Math.PI*2){
+            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            return Math.PI*2;
+        }else{
+            return angle;
+        }
+
+    }
 
     private double modulo2PI(double angle){
         double newAngle = angle;

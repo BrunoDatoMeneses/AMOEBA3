@@ -4,11 +4,10 @@ import agents.context.Context;
 import agents.percept.Percept;
 import kernel.AMOEBA;
 import utils.Pair;
+import utils.TRACE;
+import utils.TRACE_LEVEL;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.OptionalDouble;
+import java.util.*;
 
 public class RobotArmManager {
 
@@ -29,10 +28,12 @@ public class RobotArmManager {
     int requestCycle;
     double goalErrors;
     ArrayList<Double> allGoalErrors ;
-    OptionalDouble averageError;
+    public OptionalDouble averageError;
     Double errorDispersion;
 
     ArrayList<Pair<Double,Double>> learnedPositions;
+
+    public boolean finished = false;
 
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
@@ -98,7 +99,7 @@ public class RobotArmManager {
         position[1] = T[1][3];
         position[2] = T[2][3];
 
-        if(position[1]>0.0){
+        if(position[1]>0.0 || true){
             HashMap<String, Double> out0 = new HashMap<String, Double>();
             HashMap<String, Double> out1 = new HashMap<String, Double>();
 
@@ -252,42 +253,47 @@ public class RobotArmManager {
 
             Context bestContext = amoebas[0].getHeadAgent().getBestContext();
             if(bestContext!=null){
-                System.out.println("B "  + bestContext + " " +bestContext.getConfidence());
+                TRACE.print(TRACE_LEVEL.DEBUG, "B",bestContext, bestContext.getConfidence());
                 for(Percept pct : amoebas[0].getPercepts()){
-                    System.out.println(pct.getName() + " "+ bestContext.getRanges().get(pct).getStart() + " " + bestContext.getRanges().get(pct).getEnd());
+                    TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(pct.getName(),bestContext.getRanges().get(pct).getStart()+"",bestContext.getRanges().get(pct).getEnd()+"")));
                 }
 
 
             }else{
-                System.out.println("B "  + bestContext);
+                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("B",bestContext+"")));
+
             }
 
-            System.out.println("A " + amoebas[0].getHeadAgent().getActivatedContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("A",""+bestContext, ""+amoebas[0].getHeadAgent().getActivatedContexts())));
             for(Context ctxt: amoebas[0].getHeadAgent().getActivatedContexts()){
-                System.out.println(ctxt.getName() + " " +ctxt.getConfidence());
+                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(ctxt.getName(),""+ctxt.getConfidence())));
             }
-            System.out.println("N " + amoebas[0].getHeadAgent().getActivatedNeighborsContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("N",amoebas[0].getHeadAgent().getActivatedNeighborsContexts()+"")));
+
 
             HashMap<String,Double> actions2 = amoebas[1].requestWithLesserPercepts(out2, otherPercepts);
-            System.out.println(actions2);
-            System.out.println("B " + amoebas[1].getHeadAgent().getBestContext());
-            System.out.println("A " + amoebas[1].getHeadAgent().getActivatedContexts());
-            System.out.println("N " + amoebas[1].getHeadAgent().getActivatedNeighborsContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(actions2.toString())));
+            TRACE.print(TRACE_LEVEL.DEBUG,"B",amoebas[1].getHeadAgent().getBestContext());
+            TRACE.print(TRACE_LEVEL.DEBUG,"A",amoebas[1].getHeadAgent().getActivatedContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG,"N", amoebas[1].getHeadAgent().getActivatedNeighborsContexts());
+
 
             goalJoints[0] = actions1.get("action")/100.0;
             goalJoints[1] = actions1.get("ptheta0")/100.0;
 
-            System.err.println("PERCEPTIONS " + out2);
-            System.err.println("ELLSA1");
-            System.err.println("ACTION 0 " + actions1.get("action"));
-            System.err.println("ACTION 1 " + actions1.get("ptheta0"));
-            System.err.println("JOINT 0 " + goalJoints[0]/Math.PI);
-            System.err.println("JOINT 1 " + goalJoints[1]/Math.PI);
-            System.err.println("ELLSA2");
-            System.err.println("ACTION 0 " + actions2.get("ptheta0"));
-            System.err.println("ACTION 1 " + actions2.get("action"));
-            System.err.println("JOINT 0 " + actions2.get("ptheta0")/Math.PI);
-            System.err.println("JOINT 1 " + actions2.get("action")/Math.PI);
+
+
+            TRACE.print(TRACE_LEVEL.DEBUG,"PERCEPTIONS " + out2);
+            TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA1");
+            TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 0 " + actions1.get("action"));
+            TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions1.get("ptheta0"));
+            TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + goalJoints[0]/Math.PI);
+            TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + goalJoints[1]/Math.PI);
+            TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA2");
+            TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 0 " + actions2.get("ptheta0"));
+            TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions2.get("action"));
+            TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + actions2.get("ptheta0")/Math.PI);
+            TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + actions2.get("action")/Math.PI);
 
 
             /*goalJoints[1] = actions2.get("action")/100.0;
@@ -321,8 +327,6 @@ public class RobotArmManager {
         if(learningCycle <trainingCycles){
 
 
-
-
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i, cycle, anglesBase, angles);;
@@ -337,13 +341,14 @@ public class RobotArmManager {
 
             }
             learnedPositions.add(ends[jointsNb-1]);
-            if(learningCycle%50==0)  System.out.println("LEARNING [" + learningCycle + "] ");
+            if(learningCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"LEARNING [" + learningCycle + "] ");
             learn(angles);
         }else if (requestCycle < requestCycles){
             /*amoebas[0].data.isSelfLearning = false;
             amoebas[1].data.isSelfLearning = false;*/
 
             if(cycle%2 == 0){
+
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius;
 
@@ -377,6 +382,7 @@ public class RobotArmManager {
                 }
 
             }else{
+
                 goalAngles = request(angles, poseGoal, cycle);
 
                 //System.out.println("[" + cycle + "]");
@@ -403,7 +409,7 @@ public class RobotArmManager {
                 }
 
 
-                System.out.println("[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
+                TRACE.print(TRACE_LEVEL.DEBUG,"[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
 
                 double currentError = 0.0;
                 //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
@@ -416,7 +422,7 @@ public class RobotArmManager {
                 }
 
 
-                System.out.println("ERROR " + currentError + " [" + requestCycle + "]");
+                TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentError + " [" + requestCycle + "]");
                 goalErrors += currentError;
                 allGoalErrors.add(new Double(currentError));
             }
@@ -428,7 +434,8 @@ public class RobotArmManager {
 
             }
         }else{
-            System.out.println(averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
+            finished = true;
+            TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i, cycle, anglesBase, angles);

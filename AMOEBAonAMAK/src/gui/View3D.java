@@ -306,13 +306,13 @@ public class View3D {
                 }else{
                     ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
                     if(ctxt.isBest) {
-                        ctxtColor = new Color(0.0f, 1.0f, 0.0f, 0.75f);
+                        ctxtColor = new Color(0.0f, 1.0f, 0.0f, 0.95f);
                     }else if(ctxt.isActivated) {
-                        ctxtColor = new Color(0.0f, 0.0f, 0.0f, 0.75f);
+                        ctxtColor = new Color(0.0f, 0.0f, 0.0f, 0.95f);
                     }else if(ctxt.isInNeighborhood) {
-                        ctxtColor.a = 0.75f;
+                        ctxtColor.a = 0.95f;
                     }else {
-                        ctxtColor.a = 0.5f;;
+                        ctxtColor.a = 0.75f;;
                     }
                 }
 
@@ -531,13 +531,13 @@ public class View3D {
     private Color getColorFromCoefs(Context ctxt){
         Double[] c = ContextColor.colorFromCoefs(ctxt.getFunction().getCoef());
         if(ctxt.isBest) {
-            return new Color(0.0f, 1.0f, 0.0f, 0.75f);
+            return new Color(0.0f, 1.0f, 0.0f, 0.95f);
         }else if(ctxt.isActivated) {
-            return new Color(0.0f, 0.0f, 0.0f, 0.75f);
+            return new Color(0.0f, 0.0f, 0.0f, 0.95f);
         }else if(ctxt.isInNeighborhood) {
-            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
+            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.95f);
         }else {
-            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.5f);
+            return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
         }
 
     }
