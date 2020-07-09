@@ -1760,6 +1760,13 @@ public class Context extends AmoebaAgent {
 		}
 
 		if(endoExperiments.size()>0){
+			if(endoExperiments.size()>1) {
+				if(isLocalMinimum(endoExperiments)) {
+					getAmas().data.countLocalMinina ++;
+					getEnvironment().print(TRACE_LEVEL.ERROR,getAmas().data.countLocalMinina);
+				}
+			}
+
 			((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
 			getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 			confidence+=endoExperiments.size()*0.01;
@@ -1784,7 +1791,7 @@ public class Context extends AmoebaAgent {
 		}*/
 	}
 
-	private boolean testIfNeighborsPredictionsAreAllSuperiorOrInferiorToContextCenterPrediction(ArrayList<Experiment> endoExperiments){
+	private boolean isLocalMinimum(ArrayList<Experiment> endoExperiments){
 		Experiment centerExp = new Experiment(this);
 		for (Percept pct : getAmas().getPercepts()) {
 			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
@@ -1792,14 +1799,18 @@ public class Context extends AmoebaAgent {
 		double centerprediction = ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
 
 		boolean initTest = centerprediction < endoExperiments.get(0).getProposition();
+
+
 		boolean test1 = initTest;
 		boolean test2 = initTest;
 		for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size()-1)){
 			boolean localTest = centerprediction< endoExp.getProposition();
 			test1 = test1 && localTest;
 			test2 = test2 || localTest;
+
 		}
-		return  initTest!=test1  || initTest!=test2;
+
+		return  !(initTest!=test1  || initTest!=test2);
 	}
 
 	public double getCenterProposition(){

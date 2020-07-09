@@ -22,8 +22,8 @@ public class RobotWorlExampleMultiUI extends Amas<WorldExampleMultiUI> {
 
 	}
 
-	@Override
-	public void cycle() {
+
+	public void cycleCommandLine() {
 		cycle++;
 		robotExampleMutliUI.onDecideAndAct();
 	}

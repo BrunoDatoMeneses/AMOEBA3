@@ -120,6 +120,6 @@ public class AmoebaData implements Serializable {
 
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
 
-
+	public int countLocalMinina = 0;
 
 }

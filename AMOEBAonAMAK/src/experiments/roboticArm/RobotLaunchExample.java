@@ -25,7 +25,7 @@ public class RobotLaunchExample{
 
 	public static void main (String[] args)  {
 
-	    TRACE.minLevel = TRACE_LEVEL.ERROR;
+	    TRACE.minLevel = TRACE_LEVEL.SUBCYCLE;
 		
 		start();
 		
@@ -141,7 +141,7 @@ public class RobotLaunchExample{
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, jointsNb);
 
         while(!robotArmManager.finished){
-            robot.cycle();
+            robot.cycleCommandLine();
         }
 
         TRACE.print(TRACE_LEVEL.ERROR,robotArmManager.finished);

@@ -382,6 +382,7 @@ public class RobotArmManager {
                 }
 
             }else{
+                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
 
                 goalAngles = request(angles, poseGoal, cycle);
 

@@ -19,7 +19,7 @@ public class PARAMS {
     /*public static final String configFile = "threeDimensionsLauncher.xml";
     public static final int dimension = 3;*/
 
-    public static final int nbTrainingCycle = 200;
+    public static final int nbTrainingCycle = 500;
     public static final int nbRequestCycle = 200;
     public static final int nbTest = 10;
     public static final double spaceSize = 50.0	;
@@ -75,7 +75,7 @@ public class PARAMS {
 
     public static final int nbOfNeighborForCoopLearning = 6;
 
-    public static final int nbOfNeighborForLearningFromNeighbors = 1;
+    public static final int nbOfNeighborForLearningFromNeighbors = 2;
     public static final int nbOfNeighborForContexCreationWithouOracle = 100;
     public static final int nbOfNeighborForVoidDetectionInSelfLearning = 500;
 

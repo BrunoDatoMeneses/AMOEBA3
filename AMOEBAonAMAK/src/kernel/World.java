@@ -80,7 +80,30 @@ public class World extends Environment {
 			numberOfNCS.put(ncs, x);
 		}
 	}
-	
+
+	public void print(TRACE_LEVEL lvl, Object... infos) {
+		if (lvl.isGE(minLevel)) {
+			String message="";
+
+			if(amoeba.data.nameID != null){
+				message = "[ " + amoeba.data.nameID + " " +amoeba.getCycle() + "]";
+			}else{
+				message = "[" +amoeba.getCycle() + "]";
+			}
+
+			for(Object info : infos) {
+				message += " " + info.toString();
+			}
+			if(lvl == TRACE_LEVEL.ERROR){
+				System.err.println(message);
+			}else{
+				System.out.println(message);
+			}
+
+		}
+
+	}
+
 	public void trace(TRACE_LEVEL lvl, ArrayList<String> infos) {
 		if (lvl.isGE(minLevel)) {
 			String message="";
@@ -95,7 +118,9 @@ public class World extends Environment {
 			}
 			System.out.println(message);
 		}
-		
+
+
+
 	}
 
 	public double getAVT_acceleration() {

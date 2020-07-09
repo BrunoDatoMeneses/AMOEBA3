@@ -14,6 +14,8 @@ import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import utils.TRACE;
+import utils.TRACE_LEVEL;
 
 import java.io.File;
 
@@ -22,8 +24,8 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 
 	public static void main (String[] args) {
-		
-		
+
+        TRACE.minLevel = TRACE_LEVEL.SUBCYCLE;
 		Application.launch(args);
 		
 	

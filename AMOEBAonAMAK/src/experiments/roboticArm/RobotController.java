@@ -12,24 +12,31 @@ public class RobotController {
     }
 
     public void setJoint(int jointIndice, int cycle, double[] anglesBase, double[] angles) {
-        //setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
-        setRandomJoints(jointIndice, angles);
+        setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
+        //setRandomJoints(jointIndice, angles);
     }
 
     private void setContinuousSinusoidJoints(int jointIndice, double cycle, double[] anglesBase, double[] angles) {
         anglesBase[jointIndice] = 10*Math.sin(0.0001* cycle * Math.PI );
         if (jointIndice == 0) angles[jointIndice] = anglesBase[jointIndice] + (7.0/(double)jointsNumber)*Math.sin((0.01)* cycle * Math.PI    +  ((jointsNumber-jointIndice)*0.5) );
         else angles[jointIndice] = (7.0/(double)jointsNumber) * Math.sin(0.01* cycle * Math.PI    +  ((jointsNumber-jointIndice)*0.5) );
+
+        angles[jointIndice] = modulo2PI(angles[jointIndice]);
     }
 
     private void setRandomJoints(int jointIndice, double[] angles) {
-        angles[jointIndice] = Math.random()* 2 * Math.PI;
+        if(Math.random()<0.05) angles[jointIndice] = Math.random()* 2 * Math.PI;
+        else angles[jointIndice] = modulo2PI(angles[jointIndice] + ((Math.random() * Math.PI / 16) - (Math.random() *Math.PI / 5)));
+
+        //angles[jointIndice] = Math.random()* 2 * Math.PI;
         /*if(jointIndice == 0){
+            angles[jointIndice] = Math.random()* 2 * Math.PI;
             //angles[jointIndice] = Math.random()<0.5 ? Math.random()<0.5 ? Math.PI/4 : 3*Math.PI/4 : Math.random()<0.5 ? Math.PI : 0.0 ;
-            angles[jointIndice] = addConstrains(Math.random()*  Math.PI, 2 * Math.PI / 10) ;
+            //angles[jointIndice] = addConstrains(Math.random()*  Math.PI, 2 * Math.PI / 10) ;
         }else{
+            angles[jointIndice] = 3 * Math.PI / 4 + ((Math.random() * Math.PI / 16) - Math.PI / 32);
             //angles[jointIndice] = Math.PI/4 ;
-            angles[jointIndice] = addConstrains(Math.random()* 2*   Math.PI, 2 * Math.PI / 10) ;
+            //angles[jointIndice] = addConstrains(Math.random()* 2*   Math.PI, 2 * Math.PI / 10) ;
             //angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI, 2 * Math.PI / 10) ;
         }*/
 

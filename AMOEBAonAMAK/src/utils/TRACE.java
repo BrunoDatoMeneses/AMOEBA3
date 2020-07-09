@@ -31,7 +31,7 @@ public class TRACE {
             for(Object info : infos) {
                 message += " " + info.toString();
             }
-            if(minLevel == TRACE_LEVEL.ERROR){
+            if(lvl == TRACE_LEVEL.ERROR){
                 System.err.println(message);
             }else{
                 System.out.println(message);
