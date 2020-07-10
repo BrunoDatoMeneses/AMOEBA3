@@ -59,15 +59,15 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
 	
-	ELLSA amoebaSpatialReward;
+	ELLSA ellsaSpatialReward;
 	VUIMulti amoebaSpatialRewardVUI;
 	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	ELLSA amoebaActionModel1;
+	ELLSA ellsaActionModel1;
 	VUIMulti amoebaActionModel1VUI;
 	EllsaMultiUIWindow amoebaActionModel1UI;
 	
-	ELLSA amoebaActionModel2;
+	ELLSA ellsaActionModel2;
 	VUIMulti amoebaActionModel2VUI;
 	EllsaMultiUIWindow amoebaActionModel2UI;
 	
@@ -295,7 +295,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		private Random rand = new Random();
 		
 		public AmoebaRewardAndControl() {
-			amoebaSpatialReward = setupSpatialReward();
+			ellsaSpatialReward = setupSpatialReward();
 			//amoebaActionModel1 = setupControlModel("1", amoebaActionModel1UI, amoebaActionModel1VUI);
 			//amoebaActionModel2 = setupControlModel("2", amoebaActionModel2UI, amoebaActionModel2VUI);
 		}
@@ -350,7 +350,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 			//System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
 			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
-			amoebaSpatialReward.learn(positionAndReward);
+			ellsaSpatialReward.learn(positionAndReward);
 			//amoebaActionModel1.learn(previousStateCurrentStateAction1);
 			//amoebaActionModel2.learn(previousStateCurrentStateAction2);
 			
@@ -486,18 +486,18 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.DEBUG;
-		ELLSA amoeba = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
-		amoeba.setReinforcement(true);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setReinforcement(true);
 		
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 
@@ -519,16 +519,16 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(window, VUI, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(window, VUI, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 		
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
 		
-		return amoeba;
+		return ellsa;
 	}
 
 

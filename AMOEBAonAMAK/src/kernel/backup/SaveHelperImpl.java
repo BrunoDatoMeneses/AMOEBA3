@@ -68,20 +68,20 @@ public class SaveHelperImpl implements ISaveHelper{
 	 */
 	public Path dir;
 
-	private ELLSA amoeba;
+	private ELLSA ellsa;
 
 	/**
 	 * Create a SaveHelper for an amoeba.<br/>
 	 * Saves are stored in {@link SaveHelperImpl#savesRoot}, under a directory named after the amoeba and creation time of the SaveHelper.<br/>
 	 * Autosave for this SaveHelper can be deactivated with {@link SaveHelperImpl#autoSave}.<br/>
 	 * By default, the save folder for this amoeba is deleted when the application is closed, this can be changed with {@link SaveHelperImpl#deleteFolderOnClose}.
-	 * @param amoeba
+	 * @param ellsa
 	 */
-	public SaveHelperImpl(ELLSA amoeba) {
+	public SaveHelperImpl(ELLSA ellsa) {
 		autoSave = !Configuration.commandLineMode;
-		this.amoeba = amoeba;
-		backupSystem = new BackupSystem(amoeba);
-		String dirName = amoeba.toString() + "_" + System.currentTimeMillis();
+		this.ellsa = ellsa;
+		backupSystem = new BackupSystem(ellsa);
+		String dirName = ellsa.toString() + "_" + System.currentTimeMillis();
 		dir = Paths.get(savesRoot, dirName);
 		if (autoSave) {
 			dirAuto = Paths.get(dir.toString(), autosaveDirName);
@@ -105,7 +105,7 @@ public class SaveHelperImpl implements ISaveHelper{
 
 		// add graphical element if relevant
 		if (EllsaWindow.isInstance()) {
-			SaveExplorer se = new SaveExplorer(amoeba);
+			SaveExplorer se = new SaveExplorer(ellsa);
 			EllsaWindow.addTabbedPanel("Save Explorer", se);
 			EllsaWindow.addOnCloseAction(()-> {
 				if(deleteFolderOnClose) {
@@ -121,12 +121,12 @@ public class SaveHelperImpl implements ISaveHelper{
 		}
 	}
 	
-	public SaveHelperImpl(ELLSA amoeba, EllsaMultiUIWindow window) {
+	public SaveHelperImpl(ELLSA ellsa, EllsaMultiUIWindow window) {
 		amoebaMultiUIWindow = window;
 		autoSave = !Configuration.commandLineMode;
-		this.amoeba = amoeba;
-		backupSystem = new BackupSystem(amoeba);
-		String dirName = amoeba.toString() + "_" + System.currentTimeMillis();
+		this.ellsa = ellsa;
+		backupSystem = new BackupSystem(ellsa);
+		String dirName = ellsa.toString() + "_" + System.currentTimeMillis();
 		dir = Paths.get(savesRoot, dirName);
 		if (autoSave) {
 			dirAuto = Paths.get(dir.toString(), autosaveDirName);
@@ -149,7 +149,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		}
 
 		// add graphical element if relevant
-		SaveExplorer se = new SaveExplorer(amoeba);
+		SaveExplorer se = new SaveExplorer(ellsa);
 		window.addTabbedPanel("Save Explorer", se);
 		window.addOnCloseAction(()-> {
 			if(deleteFolderOnClose) {
@@ -192,7 +192,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		String c = (name == null || "".equals(name)) ? "" : ("_" + name);
 		c.replace('/', '-');
 		c.replace('\\', '-');
-		Path p = Paths.get(dirManual.toString(), amoeba.getCycle() + c + "." + backupSystem.getExtension());
+		Path p = Paths.get(dirManual.toString(), ellsa.getCycle() + c + "." + backupSystem.getExtension());
 		backupSystem.setLoadPresetContext(true);
 		backupSystem.save(p.toFile());
 	}
@@ -202,7 +202,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		String c = (name == null || "".equals(name)) ? "" : ("_" + name);
 		c.replace('/', '-');
 		c.replace('\\', '-');
-		Path p = Paths.get(path, amoeba.getCycle() + c + "." + backupSystem.getExtension());
+		Path p = Paths.get(path, ellsa.getCycle() + c + "." + backupSystem.getExtension());
 		backupSystem.setLoadPresetContext(true);
 		backupSystem.save(p.toFile());
 	}
@@ -210,7 +210,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	@Override
 	public void autosave() {
 		if (autoSave) {
-			Path p = Paths.get(dirAuto.toString(), amoeba.getCycle() + "." + backupSystem.getExtension());
+			Path p = Paths.get(dirAuto.toString(), ellsa.getCycle() + "." + backupSystem.getExtension());
 			backupSystem.setLoadPresetContext(true);
 			backupSystem.save(p.toFile());
 		}
@@ -254,7 +254,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		EventHandler<ActionEvent> eventLoad = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
+				ellsa.getScheduler().stop();
 				File file = fileChooser.showOpenDialog(mw);
 				if (file != null)
 					backupSystem.load(file);
@@ -266,7 +266,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
+				ellsa.getScheduler().stop();
 				File file = fileChooser.showSaveDialog(mw);
 				if (file != null)
 					backupSystem.save(file);
@@ -286,7 +286,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		EventHandler<ActionEvent> eventLoad = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
+				ellsa.getScheduler().stop();
 				File file = fileChooser.showOpenDialog(mw);
 				if (file != null)
 					backupSystem.load(file);
@@ -298,7 +298,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		EventHandler<ActionEvent> eventSave = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.getScheduler().stop();
+				ellsa.getScheduler().stop();
 				File file = fileChooser.showSaveDialog(mw);
 				if (file != null)
 					backupSystem.save(file);

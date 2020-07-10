@@ -24,22 +24,22 @@ Launch your project, including rosbridge-server.
 
 Launch `AMOEBAonAMAK/ros.Main` with the arguments `RosbridgeWebsocketURI ConfigFilePath RosToAmoebaTopic AmoebaToRosTopic MsgType`. In our example, and using the provided jar for Amoeba, the command is :
 ```
-java -jar amoeba-ros.jar ws://localhost:9090 MyAmoebaConfig.xml /amoeba_request /amoeba_result your_ros_package/MyAmoebaMessageType
+java -jar ellsa-ros.jar ws://localhost:9090 MyAmoebaConfig.xml /amoeba_request /amoeba_result your_ros_package/MyAmoebaMessageType
 ``` 
 # Demo
 A demo is provided, you'll find it in `documentation/ros_demo`:
 Scripts are provided, for ease of use.
-- `setup.sh` compile amoeba and the catkin workspace.
+- `setup.sh` compile ellsa and the catkin workspace.
 - `start.sh` launch the demo.
 - `stop.sh` stop ROS process created by the demo.
 - `clean.sh` remove files created by the above scripts.
 
-The demo is a turtlesim doing ovals. First we teach (blue background), then we ask amoeba to move the turtle (rose background). Keep in mind that the goal of the demo is to show exemple of ros integration with amoeba. It's not a demonstration of amoeba capabilities, so if the turtle does not learn, it's not a big problem.
+The demo is a turtlesim doing ovals. First we teach (blue background), then we ask ellsa to move the turtle (rose background). Keep in mind that the goal of the demo is to show exemple of ros integration with ellsa. It's not a demonstration of ellsa capabilities, so if the turtle does not learn, it's not a big problem.
 
-You can check that something is learned by looking at amoeba's window.
+You can check that something is learned by looking at ellsa's window.
 
 The python node is at `documentation/ros_demo/catkin_ws/src/amoeba_demo/src/script/demo.py`
 
-In this demo, there's 2 amoebas (one for linear velocity, one for angular velocity), connected to ROS via rosbridge, and communicating with our python node via the topics `/amoeba_lin`, `/amoeba_lin_res`, `/amoeba_rot`, `/amoeba_rot_res`.
+In this demo, there's 2 ellsas (one for linear velocity, one for angular velocity), connected to ROS via rosbridge, and communicating with our python node via the topics `/amoeba_lin`, `/amoeba_lin_res`, `/amoeba_rot`, `/amoeba_rot_res`.
 
- `/amoeba_lin` and `/amoeba_rot` are where we publish our request to the amoebas, and  `/amoeba_lin_res` and `/amoeba_rot_res` is where we retrieve the result.
+ `/amoeba_lin` and `/amoeba_rot` are where we publish our request to the ellsas, and  `/amoeba_lin_res` and `/amoeba_rot_res` is where we retrieve the result.

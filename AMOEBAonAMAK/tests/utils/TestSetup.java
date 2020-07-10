@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import kernel.ELLSA;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import experiments.F_XY_System;
-import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperImpl;
 
 public class TestSetup {
-	protected ELLSA amoeba;
+	protected ELLSA ellsa;
 	/**
 	 * Testing sample : increasing this number lead to slower test and more chance of failure.
 	 */

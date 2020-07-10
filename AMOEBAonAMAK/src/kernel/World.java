@@ -37,7 +37,7 @@ public class World extends Environment {
 	
 	public static TRACE_LEVEL minLevel = TRACE_LEVEL.INFORM;
 	
-	private ELLSA amoeba;
+	private ELLSA ellsa;
 
 	/**
 	 * Instantiates a new world.
@@ -84,10 +84,10 @@ public class World extends Environment {
 		if (lvl.isGE(minLevel)) {
 			String message="";
 
-			if(amoeba.data.nameID != null){
-				message = "[ " + amoeba.data.nameID + " " +amoeba.getCycle() + "]";
+			if(ellsa.data.nameID != null){
+				message = "[ " + ellsa.data.nameID + " " + ellsa.getCycle() + "]";
 			}else{
-				message = "[" +amoeba.getCycle() + "]";
+				message = "[" + ellsa.getCycle() + "]";
 			}
 
 			for(Object info : infos) {
@@ -106,10 +106,10 @@ public class World extends Environment {
 	public void trace(TRACE_LEVEL lvl, ArrayList<String> infos) {
 		if (lvl.isGE(minLevel)) {
 			String message="";
-			if(amoeba.data.nameID != null){
-				message = "[ " + amoeba.data.nameID + " " +amoeba.getCycle() + "]";
+			if(ellsa.data.nameID != null){
+				message = "[ " + ellsa.data.nameID + " " + ellsa.getCycle() + "]";
 			}else{
-				message = "[" +amoeba.getCycle() + "]";
+				message = "[" + ellsa.getCycle() + "]";
 			}
 
 			for(String info : infos) {
@@ -161,8 +161,8 @@ public class World extends Environment {
 		nbActivatedAgent = 0;
 	}
 	
-	public void setAmoeba(ELLSA amoeba) {
-		this.amoeba = amoeba;
+	public void setEllsa(ELLSA ellsa) {
+		this.ellsa = ellsa;
 	}
 	
 	public double getIncrements() {

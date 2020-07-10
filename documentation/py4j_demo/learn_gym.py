@@ -13,7 +13,7 @@ MULTIPLICATOR = 1000.0
 
 def gen_file(percepts:list):
     """
-    Create the config file for amoeba
+    Create the config file for ellsa
     :param percepts: list of tuple (percept:string, enum:bool)
     :return config file name
     """
@@ -69,13 +69,13 @@ def msg_obj(obs:list, act:list, oracle) -> dict:
     return msg
 
 
-def chose_next_action(amoeba, state, env):
+def chose_next_action(ellsa, state, env):
     if isinstance(env.action_space, gym.spaces.discrete.Discrete):
         # Special case for Discrete, work better than maximize
         #proposition = []
         #for i in range(env.action_space.n):
         #    act = [i]
-        #    proposition.append(amoeba.request(msg_obj(state, act, 0)))
+        #    proposition.append(ellsa.request(msg_obj(state, act, 0)))
         #return np.argmax(proposition)
         # ----------------------------------------------------
         n = 1
@@ -85,7 +85,7 @@ def chose_next_action(amoeba, state, env):
     action = [0.0]*n
     msg = msg_obj(state, [], 0)
     msg.pop("oracle", None)
-    res = amoeba.maximize(msg)
+    res = ellsa.maximize(msg)
 
     if (res["oracle"] == -math.inf) or (res is None):
         return random_action()
@@ -99,12 +99,12 @@ def chose_next_action(amoeba, state, env):
         return action
 
 
-def learn_amoeba(amoeba, state, action, reward, env):
+def learn_amoeba(ellsa, state, action, reward, env):
     if isinstance(env.action_space, gym.spaces.discrete.Discrete):
         act = [action]
-        amoeba.learn(msg_obj(state, act, reward))
+        ellsa.learn(msg_obj(state, act, reward))
     else:
-        amoeba.learn(msg_obj(state, action, reward))
+        ellsa.learn(msg_obj(state, action, reward))
 
 
 def random_action():
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     plt.ion()
 
     # Make sure to run setup.sh at least once before running this script
-    subprocess.Popen(["java", "-jar", "amoeba.jar"])
+    subprocess.Popen(["java", "-jar", "ellsa.jar"])
     time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True, auto_field=True))
@@ -134,8 +134,8 @@ if __name__ == '__main__':
     percepts = percepts_from_env(env)
     filename = gen_file(percepts_from_env(env))
 
-    amoeba = gateway.jvm.kernel.ELLSA()
-    backup_sys = gateway.jvm.kernel.backup.BackupSystem(amoeba)
+    ellsa = gateway.jvm.kernel.ELLSA()
+    backup_sys = gateway.jvm.kernel.backup.BackupSystem(ellsa)
     file = gateway.jvm.java.io.File(filename)
     backup_sys.load(file)
 
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         while not done:
 
             if np.random.random() < 1 - epsilon:
-                action = chose_next_action(amoeba, state, env)
+                action = chose_next_action(ellsa, state, env)
             else:
                 action = random_action()
 
@@ -179,14 +179,14 @@ if __name__ == '__main__':
             render()
             reward += r
 
-            learn_amoeba(amoeba, state, action, reward, env)
+            learn_amoeba(ellsa, state, action, reward, env)
 
             tot_reward += reward
 
             state = state2
 
         # for state, action in state_action_list:
-        #     learn_amoeba(amoeba, state, action, tot_reward, env)
+        #     learn_amoeba(ellsa, state, action, tot_reward, env)
         print('Episode {}  Reward: {}  Random actions: {}/{}  Info: {}'.format(i + 1, tot_reward, nb_random_action, i, info))
 
         # Decay epsilon

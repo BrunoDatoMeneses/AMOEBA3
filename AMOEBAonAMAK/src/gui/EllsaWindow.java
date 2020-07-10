@@ -51,14 +51,14 @@ public class EllsaWindow extends MainWindow {
 		super();
 	}
 	
-	public void initialize(ELLSA amoeba) {
+	public void initialize(ELLSA ellsa) {
 		
 		mainVUI = VUI.get("2D");
 		mainVUI.setDefaultView(200, 0, 0);
 		EllsaWindow.addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());
+		schedulerToolbar = new SchedulerToolbar("AMOEBA", ellsa.getScheduler());
 		EllsaWindow.addToolbar(schedulerToolbar);
 		
 		// plots
@@ -80,29 +80,29 @@ public class EllsaWindow extends MainWindow {
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {
-			amoeba.setRenderUpdate(toggleRender.isSelected()); 
-			if(amoeba.isRenderUpdate()) {
-				amoeba.updateAgentsVisualisation();
-				amoeba.nextCycleRunAllAgents();
+			ellsa.setRenderUpdate(toggleRender.isSelected());
+			if(ellsa.isRenderUpdate()) {
+				ellsa.updateAgentsVisualisation();
+				ellsa.nextCycleRunAllAgents();
 			}
 		});
-		toggleRender.setSelected(amoeba.isRenderUpdate());
+		toggleRender.setSelected(ellsa.isRenderUpdate());
 		EllsaWindow.addToolbar(toggleRender);
 		
 		// dimension selector
-		dimensionSelector = new DimensionSelector(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
+		dimensionSelector = new DimensionSelector(ellsa.getPercepts(), new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.updateAgentsVisualisation();
+				ellsa.updateAgentsVisualisation();
 			}
 		});
 		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
 		
 		// contextMenu "Request Here" on VUI
-		new ContextMenuVUI(amoeba, mainVUI); //the ContextMenu add itself to the VUI
+		new ContextMenuVUI(ellsa, mainVUI); //the ContextMenu add itself to the VUI
 		
 		// manual save button
-		EllsaWindow.addToolbar(newManualSaveButton(amoeba));
+		EllsaWindow.addToolbar(newManualSaveButton(ellsa));
 		
 		Slider slider = new Slider(0, 0.1, 0.1);
 		slider.setShowTickLabels(true);
@@ -110,7 +110,7 @@ public class EllsaWindow extends MainWindow {
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				amoeba.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+				ellsa.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
 			}
 		});
 		EllsaWindow.addToolbar(slider);
@@ -169,19 +169,19 @@ public class EllsaWindow extends MainWindow {
 	
 	/**
 	 * Create a button 'Quick Save' button, when clicked create a manual save point using an amoeba's saver.
-	 * @param amoeba
+	 * @param ellsa
 	 * @return
 	 * @see ELLSA#saver
 	 * @see SaveHelperImpl#newManualSave(String)
 	 */
-	public Button newManualSaveButton(ELLSA amoeba) {
+	public Button newManualSaveButton(ELLSA ellsa) {
 		Button button = new Button("Quick save");
 		button.setTooltip(new Tooltip("Create a new save point. You will be able to find it in 'Save Explorer' -> 'Manual Saves'"));
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(amoeba.saver != null) {
-					amoeba.saver.newManualSave("manualSaveButton");
+				if(ellsa.saver != null) {
+					ellsa.saver.newManualSave("manualSaveButton");
 				} else {
 					Log.defaultLog.error("Main Window", "Cannot make a save point of an amoeba without saver");
 				}

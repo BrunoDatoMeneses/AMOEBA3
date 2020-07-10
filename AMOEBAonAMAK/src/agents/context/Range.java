@@ -136,11 +136,11 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	// FOR TEST ONLY
-	public Range(ELLSA amoeba, double start, double end, double extendedrangeatcreation, boolean start_inclu,
-                 boolean end_inclu, Percept p) {
+	public Range(ELLSA ellsa, double start, double end, double extendedrangeatcreation, boolean start_inclu,
+				 boolean end_inclu, Percept p) {
 		super();
 
-		world = amoeba.getEnvironment();
+		world = ellsa.getEnvironment();
 
 		AVT_deceleration = world.getAVT_deceleration();
 		AVT_acceleration = world.getAVT_acceleration();

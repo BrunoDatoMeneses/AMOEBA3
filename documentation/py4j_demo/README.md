@@ -13,7 +13,7 @@ You're good to go, check that py4j is correctly working with [basic_demo.py](bas
 ```
 python3 basic_demo.py
 ```
-You should get the classic amoeba's GUI, and random context appearing.
+You should get the classic ellsa's GUI, and random context appearing.
 
 Then you can look at some actual learning, inside [learn_gym.py](learn_gym.py).
 

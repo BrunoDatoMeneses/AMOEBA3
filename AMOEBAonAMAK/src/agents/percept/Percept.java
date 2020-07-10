@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import agents.AmoebaAgent;
+import agents.EllsaAgent;
 import agents.context.Context;
 import kernel.ELLSA;
 
@@ -13,10 +13,10 @@ import kernel.ELLSA;
  * Percept agent must be connected to one data source.
  *
  */
-public class Percept extends AmoebaAgent {
+public class Percept extends EllsaAgent {
 
 	// private BlackBoxAgent sensor;
-	protected ArrayList<AmoebaAgent> targets = new ArrayList<>();
+	protected ArrayList<EllsaAgent> targets = new ArrayList<>();
 	protected ArrayList<Context> activatedContext = new ArrayList<>();
 
 	public HashMap<Context, ContextProjection> contextProjections = new HashMap<Context, ContextProjection>();
@@ -31,10 +31,10 @@ public class Percept extends AmoebaAgent {
 	/**
 	 * Instantiates a new percept.
 	 *
-	 * @param amoeba
+	 * @param ellsa
 	 */
-	public Percept(ELLSA amoeba) {
-		super(amoeba);
+	public Percept(ELLSA ellsa) {
+		super(ellsa);
 		getAmas().addPercept(this);
 	}
 	
@@ -214,7 +214,7 @@ public class Percept extends AmoebaAgent {
 	 * 
 	 * @see agents.SystemAgent#getTargets()
 	 */
-	public ArrayList<? extends AmoebaAgent> getTargets() {
+	public ArrayList<? extends EllsaAgent> getTargets() {
 		return targets;
 	}
 
@@ -223,7 +223,7 @@ public class Percept extends AmoebaAgent {
 	 *
 	 * @param targets the new targets
 	 */
-	public void setTargets(ArrayList<AmoebaAgent> targets) {
+	public void setTargets(ArrayList<EllsaAgent> targets) {
 		this.targets = targets;
 	}
 

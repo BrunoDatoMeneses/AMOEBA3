@@ -102,14 +102,14 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		public ELLSA amoebaSpatialReward;
+		public ELLSA ellsaSpatialReward;
 		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaQL() {
-			amoebaSpatialReward = setupSpatialReward();
+			ellsaSpatialReward = setupSpatialReward();
 			//amoebaControlModel = setupControlModel();
 		}
 		
@@ -156,7 +156,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 			//System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
 			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
-			amoebaSpatialReward.learn(positionAndReward);
+			ellsaSpatialReward.learn(positionAndReward);
 			//amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
@@ -173,17 +173,17 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaCoop implements LearningAgent {
-		public ELLSA amoeba;
+		public ELLSA ellsa;
 		
 		public AmoebaCoop() {
-			amoeba = setup();
-			amoeba.setLocalModel(TypeLocalModel.COOP_MILLER_REGRESSION);
-			amoeba.getEnvironment().setMappingErrorAllowed(0.009);
+			ellsa = setup();
+			ellsa.setLocalModel(TypeLocalModel.COOP_MILLER_REGRESSION);
+			ellsa.getEnvironment().setMappingErrorAllowed(0.009);
 		}
 		
 		@Override
 		public HashMap<String, Double> choose(HashMap<String, Double> state, Environment env) {
-			HashMap<String, Double> action = amoeba.maximize(state);
+			HashMap<String, Double> action = ellsa.maximize(state);
 			if(action.get("oracle") == Double.NEGATIVE_INFINITY) {
 				action = env.randomAction();
 			}
@@ -193,7 +193,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		@Override
 		public void learn(HashMap<String, Double> state, HashMap<String, Double> state2,
 				HashMap<String, Double> action, boolean done) {
-			amoeba.learn(action);
+			ellsa.learn(action);
 		}
 
 		@Override
@@ -368,13 +368,13 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 	
 
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 	
@@ -395,8 +395,8 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 //		for(Percept pct : amoeba.getPercepts()) {
@@ -404,12 +404,12 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 //			pct.setMin(-10);
 //		}
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
-		amoeba.setReinforcement(true);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setReinforcement(true);
 		
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 
@@ -430,16 +430,16 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 		
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 	/**
@@ -570,7 +570,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 * The main cause of negative reward is infinite loop (usually near the objective). In such case, the reward is -200
 	 */
 	public static void poc(boolean learnMalus) {
-		ELLSA amoeba = setup();
+		ELLSA ellsa = setup();
 		Environment env = new OneDimensionEnv(50);
 		
 		// train
@@ -582,13 +582,13 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 				action.put("p1", pos);
 				action.put("a1", -1.0);
 				action.put("oracle", reward);
-				amoeba.learn(action);
+				ellsa.learn(action);
 				
 				if(learnMalus) {
 					reward = -150 + Math.abs(pos);
 					action.put("a1", 1.0);
 					action.put("oracle", reward);
-					amoeba.learn(action);
+					ellsa.learn(action);
 				}
 				
 				pos -= 1.0;
@@ -601,13 +601,13 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 				action.put("p1", pos);
 				action.put("a1", 1.0);
 				action.put("oracle", reward);
-				amoeba.learn(action);
+				ellsa.learn(action);
 				
 				if(learnMalus) {
 					reward = -150 + Math.abs(pos);
 					action.put("a1", -1.0);
 					action.put("oracle", reward);
-					amoeba.learn(action);
+					ellsa.learn(action);
 				}
 				
 				pos += 1.0;
@@ -635,7 +635,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 					done = true;
 				}
 				state.remove("oracle");
-				action = amoeba.maximize(state);
+				action = ellsa.maximize(state);
 				// random action if no proposition from amoeba
 				if(action.get("oracle").equals(Double.NEGATIVE_INFINITY) ) {
 					action.put("a1", (r.nextBoolean() ? 1.0 : -1.0));

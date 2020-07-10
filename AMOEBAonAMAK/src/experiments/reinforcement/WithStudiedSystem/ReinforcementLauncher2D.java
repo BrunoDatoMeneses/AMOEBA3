@@ -46,7 +46,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
 	
 	public static final int nbCycle = 10000;
 	
-	ELLSA amoebaSpatialReward;
+	ELLSA ellsaSpatialReward;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaSpatialRewardVUI;
 	EllsaMultiUIWindow amoebaSpatialRewardUI;
@@ -85,7 +85,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				System.out.println("new Value "+newValue);
 				mappingErrorAllowed = (double)newValue;
-				amoebaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+				ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 			}
 		});
 		amoebaSpatialRewardUI.addToolbar(slider);
@@ -136,20 +136,20 @@ public class ReinforcementLauncher2D extends Application implements Serializable
                 @Override
                 public void run() 
                 {
-                	amoebaSpatialReward = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
+                	ellsaSpatialReward = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
             		studiedSystem = new ReinforcementManager2D(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-            		amoebaSpatialReward.setStudiedSystem(studiedSystem);
-            		IBackupSystem backupSystem = new BackupSystem(amoebaSpatialReward);
+            		ellsaSpatialReward.setStudiedSystem(studiedSystem);
+            		IBackupSystem backupSystem = new BackupSystem(ellsaSpatialReward);
             		File file = new File("resources/twoDimensionsLauncher.xml");
             		backupSystem.load(file);
             		
-            		amoebaSpatialReward.saver = new SaveHelperImpl(amoebaSpatialReward, amoebaSpatialRewardUI);
-            		amoebaSpatialReward.allowGraphicalScheduler(true);
-            		amoebaSpatialReward.setRenderUpdate(true);		
-            		amoebaSpatialReward.data.learningSpeed = learningSpeed;
-            		amoebaSpatialReward.data.numberOfPointsForRegression = regressionPoints;
-            		amoebaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-            		amoebaSpatialReward.setReinforcement(true);
+            		ellsaSpatialReward.saver = new SaveHelperImpl(ellsaSpatialReward, amoebaSpatialRewardUI);
+            		ellsaSpatialReward.allowGraphicalScheduler(true);
+            		ellsaSpatialReward.setRenderUpdate(true);
+            		ellsaSpatialReward.data.learningSpeed = learningSpeed;
+            		ellsaSpatialReward.data.numberOfPointsForRegression = regressionPoints;
+            		ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+            		ellsaSpatialReward.setReinforcement(true);
             		World.minLevel = TRACE_LEVEL.DEBUG;
                 }
             });
@@ -177,10 +177,10 @@ public class ReinforcementLauncher2D extends Application implements Serializable
                     public void run() 
                     {
                     	studiedSystem.playOneStep();
-                    	amoebaSpatialReward.learn(studiedSystem.getOutput());
-                    	if(amoebaSpatialReward.getHeadAgent().isActiveLearning()) {
+                    	ellsaSpatialReward.learn(studiedSystem.getOutput());
+                    	if(ellsaSpatialReward.getHeadAgent().isActiveLearning()) {
                     		studiedSystem.setActiveLearning(true);
-                    		studiedSystem.setSelfRequest(amoebaSpatialReward.getHeadAgent().getSelfRequest()); //TODO self active ...
+                    		studiedSystem.setSelfRequest(ellsaSpatialReward.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	//System.out.println(status);

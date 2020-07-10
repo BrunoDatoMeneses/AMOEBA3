@@ -7,19 +7,18 @@ import agents.percept.Percept;
 import kernel.ELLSA;
 
 
-
 public class Sender {
 
-	ELLSA amoeba;
+	ELLSA ellsa;
 	SocketServer server;
 	
-	public Sender(SocketServer serverInstance, ELLSA amoebaInstance) {
-		amoeba = amoebaInstance;
+	public Sender(SocketServer serverInstance, ELLSA ellsaInstance) {
+		ellsa = ellsaInstance;
 		server = serverInstance;
 	}
 	
 	public void sendContexts(ArrayList<Context> contexts) {
-		ArrayList<Percept> percepts = amoeba.getPercepts();
+		ArrayList<Percept> percepts = ellsa.getPercepts();
 		String message = initializeMessage("CTXTS");
 		
 		for(Context ctxt : contexts) {
@@ -53,7 +52,7 @@ public class Sender {
 	}
 	
 	private String initializeMessage(String prefix) {
-		return prefix + "~" + amoeba.getCycle();
+		return prefix + "~" + ellsa.getCycle();
 	}
 	
 	public boolean acq(String type, int cycle) {

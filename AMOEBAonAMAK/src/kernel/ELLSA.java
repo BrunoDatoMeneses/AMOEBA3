@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import agents.AmoebaAgent;
+import agents.EllsaAgent;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.localModel.LocalModel;
@@ -121,7 +121,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			PrintOnce.print("Warning ! Multithreading is not currently sopported !\n"
 					+ "Please use Configuration.allowedSimultaneousAgentsExecution=1");
 		}
-		getEnvironment().setAmoeba(this);
+		getEnvironment().setEllsa(this);
 		data = new EllsaData();
 		for(REQUEST rqt : REQUEST.values()){
 			data.requestCounts.put(rqt, 0);
@@ -641,8 +641,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	public void clearAgents() {
 		List<Agent<? extends Amas<World>, World>> agents = getAgents();
 		for (Agent<? extends Amas<World>, World> agent : agents) {
-			AmoebaAgent amoebaAgent = (AmoebaAgent) agent;
-			amoebaAgent.destroy();
+			EllsaAgent ellsaAgent = (EllsaAgent) agent;
+			ellsaAgent.destroy();
 		}
 		this.head = null;
 		super.removePendingAgents();

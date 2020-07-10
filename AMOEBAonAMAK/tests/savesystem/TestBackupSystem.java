@@ -44,14 +44,14 @@ public class TestBackupSystem extends TestSetup{
 		Double[] requestOriginal = new Double[SIZE];
 		Double[] requestLoaded = new Double[SIZE];
 
-		amoeba.saver.save(tempFile);
+		ellsa.saver.save(tempFile);
 		for (int i = 0; i < test.length; i++) {
-			requestOriginal[i] = Round.round(amoeba.request(test[i]), ROUNDING_DECIMAL);
+			requestOriginal[i] = Round.round(ellsa.request(test[i]), ROUNDING_DECIMAL);
 		}
 
-		amoeba.saver.load(tempFile);
+		ellsa.saver.load(tempFile);
 		for (int i = 0; i < test.length; i++) {
-			requestLoaded[i] = Round.round(amoeba.request(test[i]), ROUNDING_DECIMAL);
+			requestLoaded[i] = Round.round(ellsa.request(test[i]), ROUNDING_DECIMAL);
 		}
 
 		assertArrayEquals(requestOriginal, requestLoaded);
@@ -64,7 +64,7 @@ public class TestBackupSystem extends TestSetup{
 		Double[] requestOriginal = new Double[SIZE];
 		Double[] requestLoaded = new Double[SIZE];
 
-		amoeba.saver.save(tempFile);
+		ellsa.saver.save(tempFile);
 		/*for (int i = 0; i < test.length; i++) {
 			requestOriginal[i] = Round.round(amoeba.request(test[i]), ROUNDING_DECIMAL);
 		}

@@ -44,12 +44,12 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 	
 	public static final int nbCycle = 1000;
 	
-	ELLSA amoeba;
+	ELLSA ellsa;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	EllsaMultiUIWindow amoebaUI;
 	
-	ELLSA amoeba2;
+	ELLSA ellsa2;
 	StudiedSystem studiedSystem2;
 	VUIMulti amoebaVUI2;
 	EllsaMultiUIWindow amoebaUI2;
@@ -85,7 +85,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				System.out.println("new Value "+newValue);
 				mappingErrorAllowed = (double)newValue;
-				amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+				ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 			}
 		});
 		amoebaUI.addToolbar(slider);
@@ -105,7 +105,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				System.out.println("new Value "+newValue);
 				mappingErrorAllowed = (double)newValue;
-				amoeba2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+				ellsa2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 			}
 		});
 		amoebaUI2.addToolbar(slider2);
@@ -224,19 +224,19 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                 @Override
                 public void run() 
                 {
-                	amoeba = new ELLSA(amoebaUI,  amoebaVUI);
+                	ellsa = new ELLSA(amoebaUI,  amoebaVUI);
             		studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-            		amoeba.setStudiedSystem(studiedSystem);
-            		IBackupSystem backupSystem = new BackupSystem(amoeba);
+            		ellsa.setStudiedSystem(studiedSystem);
+            		IBackupSystem backupSystem = new BackupSystem(ellsa);
             		File file = new File("resources/twoDimensionsLauncher.xml");
             		backupSystem.load(file);
             		
-            		amoeba.saver = new SaveHelperImpl(amoeba);
-            		amoeba.allowGraphicalScheduler(true);
-            		amoeba.setRenderUpdate(true);		
-            		amoeba.data.learningSpeed = learningSpeed;
-            		amoeba.data.numberOfPointsForRegression = regressionPoints;
-            		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+            		ellsa.saver = new SaveHelperImpl(ellsa);
+            		ellsa.allowGraphicalScheduler(true);
+            		ellsa.setRenderUpdate(true);
+            		ellsa.data.learningSpeed = learningSpeed;
+            		ellsa.data.numberOfPointsForRegression = regressionPoints;
+            		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		
                 }
             });
@@ -264,10 +264,10 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                     public void run() 
                     {
                     	studiedSystem.playOneStep();
-                    	amoeba.learn(studiedSystem.getOutput());
-                    	if(amoeba.getHeadAgent().isActiveLearning()) {
+                    	ellsa.learn(studiedSystem.getOutput());
+                    	if(ellsa.getHeadAgent().isActiveLearning()) {
                     		studiedSystem.setActiveLearning(true);
-                    		studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest()); //TODO self active ...
+                    		studiedSystem.setSelfRequest(ellsa.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	System.out.println(status);
@@ -295,19 +295,19 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                 @Override
                 public void run() 
                 {
-                	amoeba2 = new ELLSA(amoebaUI2,  amoebaVUI2);
+                	ellsa2 = new ELLSA(amoebaUI2,  amoebaVUI2);
             		studiedSystem2 = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-            		amoeba2.setStudiedSystem(studiedSystem2);
-            		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);
+            		ellsa2.setStudiedSystem(studiedSystem2);
+            		IBackupSystem backupSystem2 = new BackupSystem(ellsa2);
             		File file2 = new File("resources/twoDimensionsLauncher.xml");
             		backupSystem2.load(file2);
             		
-            		amoeba2.saver = new SaveHelperImpl(amoeba2);
-            		amoeba2.allowGraphicalScheduler(true);
-            		amoeba2.setRenderUpdate(true);		
-            		amoeba2.data.learningSpeed = learningSpeed;
-            		amoeba2.data.numberOfPointsForRegression = regressionPoints;
-            		amoeba2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+            		ellsa2.saver = new SaveHelperImpl(ellsa2);
+            		ellsa2.allowGraphicalScheduler(true);
+            		ellsa2.setRenderUpdate(true);
+            		ellsa2.data.learningSpeed = learningSpeed;
+            		ellsa2.data.numberOfPointsForRegression = regressionPoints;
+            		ellsa2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		
                 }
             });
@@ -335,10 +335,10 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                     public void run() 
                     {
                     	studiedSystem2.playOneStep();
-                    	amoeba2.learn(studiedSystem2.getOutput());
-                    	if(amoeba2.getHeadAgent().isActiveLearning()) {
+                    	ellsa2.learn(studiedSystem2.getOutput());
+                    	if(ellsa2.getHeadAgent().isActiveLearning()) {
                     		studiedSystem2.setActiveLearning(true);
-                    		studiedSystem2.setSelfRequest(amoeba2.getHeadAgent().getSelfRequest()); //TODO self active ...
+                    		studiedSystem2.setSelfRequest(ellsa2.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	System.out.println(status);

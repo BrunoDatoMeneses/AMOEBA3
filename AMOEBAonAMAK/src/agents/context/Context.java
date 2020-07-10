@@ -4,7 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import agents.AmoebaAgent;
+import agents.EllsaAgent;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.head.Criticalities;
@@ -29,7 +29,7 @@ import utils.TRACE_LEVEL;
  * The core agent of AMOEBA.
  * 
  */
-public class Context extends AmoebaAgent {
+public class Context extends EllsaAgent {
 	// STATIC ---
 	public static Class<? extends RenderStrategy> defaultRenderStrategy = ContextRendererFX.class;
 	// ----------
@@ -83,8 +83,8 @@ public class Context extends AmoebaAgent {
 
 	int lastFrontierRequestTick = 0;
 	
-	public Context(ELLSA amoeba) {
-		super(amoeba);
+	public Context(ELLSA ellsa) {
+		super(ellsa);
 		buildContext();
 		criticalities = new Criticalities(5);
 		
@@ -94,8 +94,8 @@ public class Context extends AmoebaAgent {
 	}
 
 	// FOR TEST ONLY
-	public Context(ELLSA amoeba, HashMap<Percept, Range> manualRanges) {
-		super(amoeba);
+	public Context(ELLSA ellsa, HashMap<Percept, Range> manualRanges) {
+		super(ellsa);
 		buildContext(manualRanges);
 		criticalities = new Criticalities(5);
 
@@ -104,8 +104,8 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(ELLSA amoeba, Context bestNearestContext) {
-		super(amoeba);
+	public Context(ELLSA ellsa, Context bestNearestContext) {
+		super(ellsa);
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -115,8 +115,8 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(ELLSA amoeba, double endogenousPrediction) {
-		super(amoeba);
+	public Context(ELLSA ellsa, double endogenousPrediction) {
+		super(ellsa);
 		buildContextWithoutOracle(endogenousPrediction);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -126,8 +126,8 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(ELLSA amoeba, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
-		super(amoeba);
+	public Context(ELLSA ellsa, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
+		super(ellsa);
 		buildContext(fatherContext, contextDimensions);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));

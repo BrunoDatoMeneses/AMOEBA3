@@ -27,7 +27,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 
 
-	ELLSA amoeba;
+	ELLSA ellsa;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	EllsaMultiUIWindow amoebaUI;
@@ -50,56 +50,56 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		
 
 
-		amoeba = new ELLSA(null,  null);
+		ellsa = new ELLSA(null,  null);
 		studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-		amoeba.setStudiedSystem(studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		ellsa.setStudiedSystem(studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 
-		amoeba.saver = new SaveHelperImpl(amoeba);
+		ellsa.saver = new SaveHelperImpl(ellsa);
 
-		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(false);
-		amoeba.data.learningSpeed = PARAMS.learningSpeed;
-		amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-		amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
-		amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
-		amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
-		amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
-		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
-		amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-		amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+		ellsa.allowGraphicalScheduler(true);
+		ellsa.setRenderUpdate(false);
+		ellsa.data.learningSpeed = PARAMS.learningSpeed;
+		ellsa.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+		ellsa.data.isActiveLearning = PARAMS.setActiveLearning;
+		ellsa.data.isSelfLearning = PARAMS.setSelfLearning;
+		ellsa.data.isConflictDetection = PARAMS.setConflictDetection;
+		ellsa.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+		ellsa.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+		ellsa.data.isConflictResolution = PARAMS.setConflictResolution;
+		ellsa.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+		ellsa.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		ellsa.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+		ellsa.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-		amoeba.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-		amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-		amoeba.data.isDream = PARAMS.setDream;
-		amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+		ellsa.data.isDream = PARAMS.setDream;
+		ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+		ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 		World.minLevel = PARAMS.traceLevel;
 
 		for(int i=0;i<PARAMS.nbCycle;i++){
-			amoeba.cycle();
+			ellsa.cycle();
 			if(i%100 ==0){
 				System.out.print(i+",");
 			}
 
 		}
 
-		amoeba.getHeadAgent().getMappingScoresAndPrint();
+		ellsa.getHeadAgent().getMappingScoresAndPrint();
 		System.out.println("RDM REQUESTS " + studiedSystem.getRandomRequestCounts());
 		System.out.println("ACT REQUESTS " + studiedSystem.getActiveRequestCounts());
-		System.out.println("CTXT NB " + amoeba.getContexts().size());
+		System.out.println("CTXT NB " + ellsa.getContexts().size());
 		System.out.println("REQUEST TYPES");
-		System.out.println(amoeba.data.requestCounts);
+		System.out.println(ellsa.data.requestCounts);
 
-		System.out.println(amoeba.getHeadAgent().getMappingScores());
+		System.out.println(ellsa.getHeadAgent().getMappingScores());
 
 		/*double errorsMean = 0;
 		for (int i = 0; i < nbCycle/4; ++i) {
@@ -109,23 +109,23 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		System.out.println("PREDICTION MEAN ERROR " + errorsMean);*/
 
 		//amoeba.saver.newManualSave( dimension + "_" + nbCycle +"_TestManualSave", "saves/");
-		amoeba.saver.newManualSave("TestManualSave", "saves/");
+		ellsa.saver.newManualSave("TestManualSave", "saves/");
 
 		Configuration.commandLineMode = false;
 		amoebaVUI = new VUIMulti("2D");
 		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
-		ELLSA amoeba2 = new ELLSA(amoebaUI,  amoebaVUI);
+		ELLSA ellsa2 = new ELLSA(amoebaUI,  amoebaVUI);
 		StudiedSystem studiedSystem2 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-		amoeba2.setStudiedSystem(studiedSystem2);
-		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);
+		ellsa2.setStudiedSystem(studiedSystem2);
+		IBackupSystem backupSystem2 = new BackupSystem(ellsa2);
 		File file2 = new File("resources/"+PARAMS.configFile);
 		backupSystem2.load(file2);
 
-		amoeba2.saver = new SaveHelperImpl(amoeba2, amoebaUI);
+		ellsa2.saver = new SaveHelperImpl(ellsa2, amoebaUI);
 
-		amoeba2.saver.load("saves/"+PARAMS.nbCycle +"_TestManualSave.xml");
+		ellsa2.saver.load("saves/"+PARAMS.nbCycle +"_TestManualSave.xml");
 		//amoeba2.saver.load("saves/"+amoeba.getCycle()+ "_" +dimension + "_" + nbCycle +"_TestManualSave.xml");
-		amoeba2.setRenderUpdate(true);
+		ellsa2.setRenderUpdate(true);
 
 		amoebaUI.rectangle.delete();
 

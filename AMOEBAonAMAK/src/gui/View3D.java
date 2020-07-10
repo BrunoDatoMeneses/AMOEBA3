@@ -28,7 +28,7 @@ public class View3D {
 
     public String title;
 
-    public ELLSA amoeba;
+    public ELLSA ellsa;
 
     private BorderPane pane;
     private BorderPane paneLeft;
@@ -61,7 +61,7 @@ public class View3D {
     public View3D(StudiedSystem ss , ELLSA amb) {
 
         studiedSystem =ss;
-        amoeba = amb;
+        ellsa = amb;
 
         spaceSize = (float)(2*((F_N_Manager)studiedSystem).spaceSize);
 
@@ -248,17 +248,17 @@ public class View3D {
 
         HistogramBar myBar = new HistogramBar();
 
-        Percept pct1 =  amoeba.getDimensionSelector().d1();
-        Percept pct2 =  amoeba.getDimensionSelector().d2();
+        Percept pct1 =  ellsa.getDimensionSelector().d1();
+        Percept pct2 =  ellsa.getDimensionSelector().d2();
 
-        for (Context ctxt : amoeba.getContexts()){
+        for (Context ctxt : ellsa.getContexts()){
 
 
 
 
             boolean testIfDraw = true;
-            if(amoeba.getPercepts().size()>2){
-                for(Percept pct : amoeba.getPercepts()){
+            if(ellsa.getPercepts().size()>2){
+                for(Percept pct : ellsa.getPercepts()){
                     if(pct != pct1 && pct != pct2){
                         testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
                     }
@@ -272,8 +272,8 @@ public class View3D {
                 float yStart = (float) ctxt.getRanges().get(pct2).getStart();
                 float yEnd = (float) ctxt.getRanges().get(pct2).getEnd();
 
-                int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
-                int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+                int pct1Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d1());
+                int pct2Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d2());
 
 
                 float xSySPrediction = getPrediction(pct1Index, pct2Index, xStart, yStart, ctxt);
@@ -329,7 +329,7 @@ public class View3D {
     }
 
     private float getPrediction(int pct1Index, int pct2Index, double xPerception, double yPerception, Context ctxt){
-        double[] perception = new double[amoeba.getPercepts().size()];
+        double[] perception = new double[ellsa.getPercepts().size()];
         for(int i=0;i<perception.length;i++){
             if(i == pct1Index){
                 perception[i] = xPerception;
@@ -367,13 +367,13 @@ public class View3D {
         ArrayList<Coord3d> pointAAjouter = new ArrayList<>();
         ArrayList<Context> correspondingContexts = new ArrayList<>();
 
-        for (Context ctxt : amoeba.getContexts()){
+        for (Context ctxt : ellsa.getContexts()){
 
-            Percept pct1 =  amoeba.getDimensionSelector().d1();
-            Percept pct2 =  amoeba.getDimensionSelector().d2();
+            Percept pct1 =  ellsa.getDimensionSelector().d1();
+            Percept pct2 =  ellsa.getDimensionSelector().d2();
 
             boolean testIfDraw = true;
-            for(Percept pct : amoeba.getPercepts()){
+            for(Percept pct : ellsa.getPercepts()){
                 if(pct != pct1 && pct != pct2){
                     testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
                 }
@@ -393,8 +393,8 @@ public class View3D {
                 while(x<=xEnd){
                     y = yStart;
                     while(y<=yEnd){
-                        int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
-                        int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+                        int pct1Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d1());
+                        int pct2Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d2());
 
                         double[] perception = new double[((F_N_Manager)studiedSystem).dimension];
                         for(int i=0;i<perception.length;i++){
@@ -447,7 +447,7 @@ public class View3D {
         chart.getScene().add(scatter);
 
 
-        amoeba.getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("UPDATE CONTEXTS 3D MODEL VIEW")));
+        ellsa.getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("UPDATE CONTEXTS 3D MODEL VIEW")));
 
         return chart;
     }
@@ -461,8 +461,8 @@ public class View3D {
 
         }*/
 
-        int pct1Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d1());
-        int pct2Index =  amoeba.getPercepts().indexOf(amoeba.getDimensionSelector().d2());
+        int pct1Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d1());
+        int pct2Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d2());
 
         Double[] request = new Double[((F_N_Manager)studiedSystem).dimension];
         for(int i=0;i<request.length;i++){

@@ -29,5 +29,5 @@ Check [the documentation directory](documentation) for more detailed and in dept
 ### Amoeba Quick start
 ```Java
 StudiedSystem studiedSystem = new F_XY_System(50.0);
-AMOEBA amoeba = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
+AMOEBA ellsa = new AMOEBA("resources/twoDimensionsLauncher.xml", studiedSystem);
 ```

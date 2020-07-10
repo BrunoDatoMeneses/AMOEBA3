@@ -2,7 +2,7 @@ package agents.head;
 
 import java.util.*;
 
-import agents.AmoebaAgent;
+import agents.EllsaAgent;
 import agents.context.Context;
 import agents.context.CustomComparator;
 import agents.context.Experiment;
@@ -22,7 +22,7 @@ import utils.TRACE_LEVEL;
 /**
  * The Class Head.
  */
-public class Head extends AmoebaAgent {
+public class Head extends EllsaAgent {
 
 	// MEMBERS ---------------------
 	
@@ -91,8 +91,8 @@ public class Head extends AmoebaAgent {
 				0.9, 1);
 	}
 
-	public Head(ELLSA amoeba) {
-		super(amoeba);
+	public Head(ELLSA ellsa) {
+		super(ellsa);
 		
 		for(int i =0 ; i< 20;i++) {
 			getAmas().data.executionTimesSums[i]=0.0;

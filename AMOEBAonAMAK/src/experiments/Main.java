@@ -39,7 +39,7 @@ public class Main {
 		}
 		
 		System.out.println("Creating the amoeba");
-		ELLSA amoeba = new ELLSA(null,null,configFile, ss);
+		ELLSA ellsa = new ELLSA(null,null,configFile, ss);
 		
 		synchronized (Thread.currentThread()){
 			try {

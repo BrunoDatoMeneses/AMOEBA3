@@ -938,7 +938,7 @@ private double[] subZoneCenter3D(int nb) {
 	}
 
 	@Override
-	public double getErrorOnRequest(ELLSA amoeba){
+	public double getErrorOnRequest(ELLSA ellsa){
 
 		if (generator == null)	generator = new Random(29);
 		for(int i = 0 ; i < dimension ; i++) {
@@ -953,7 +953,7 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		out.put("oracle",null);
 
-		double prediction = amoeba.request(out);
+		double prediction = ellsa.request(out);
 		double error = Math.abs(oracleValue-prediction)/Math.abs(oracleValue);
 		//System.out.println("M" + cycle + "\t\t\t" + oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
 

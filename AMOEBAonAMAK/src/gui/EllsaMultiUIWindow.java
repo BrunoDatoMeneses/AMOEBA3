@@ -55,14 +55,14 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		studiedSystem = ss;
 	}
 	
-	public void initialize(ELLSA amoeba) {
+	public void initialize(ELLSA ellsa) {
 		
 
 		mainVUI.setDefaultView(200, 0, 0);
 		//addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("ELLSA", amoeba.getScheduler());
+		schedulerToolbar = new SchedulerToolbar("ELLSA", ellsa.getScheduler());
 		addToolbar(schedulerToolbar);	
 		
 		// plots
@@ -78,10 +78,10 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		rectangle.setColor(new Color(1, 1, 1, 0));
 
 		if(studiedSystem != null){
-			view3D = new View3D(studiedSystem, amoeba);
+			view3D = new View3D(studiedSystem, ellsa);
 			this.addTabbedPanel("3D Models", view3D.getPane());
 		}
-		view3DContexts = new View3DContexts(amoeba);
+		view3DContexts = new View3DContexts(ellsa);
 		this.addTabbedPanel("3D Contexts", view3DContexts.getPane());
 
 
@@ -98,31 +98,31 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		// update render button
 		toggleRender = new ToggleButton("Allow Rendering");
 		toggleRender.setOnAction(evt -> {
-			amoeba.setRenderUpdate(toggleRender.isSelected()); 
-			if(amoeba.isRenderUpdate()) {
-				amoeba.updateAgentsVisualisation();
-				amoeba.nextCycleRunAllAgents();
+			ellsa.setRenderUpdate(toggleRender.isSelected());
+			if(ellsa.isRenderUpdate()) {
+				ellsa.updateAgentsVisualisation();
+				ellsa.nextCycleRunAllAgents();
 			}
 		});
-		toggleRender.setSelected(amoeba.isRenderUpdate());
+		toggleRender.setSelected(ellsa.isRenderUpdate());
 		addToolbar(toggleRender);
 		
 
 		
 		// contextMenu "Request Here" on VUI
-		new ContextMenuVUIMulti(amoeba, mainVUI); //the ContextMenu add itself to the VUI
+		new ContextMenuVUIMulti(ellsa, mainVUI); //the ContextMenu add itself to the VUI
 		
 		// manual save button
-		addToolbar(newManualSaveButton(amoeba));
+		addToolbar(newManualSaveButton(ellsa));
 
 		Label text2D = new Label("2D");
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(text2D));
 
 		// dimension selector
-		dimensionSelector = new DimensionSelector(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
+		dimensionSelector = new DimensionSelector(ellsa.getPercepts(), new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.updateAgentsVisualisation();
+				ellsa.updateAgentsVisualisation();
 			}
 		});
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(dimensionSelector));
@@ -131,10 +131,10 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(text3D));
 
 		// dimension selector 3D
-		dimensionSelector3D = new DimensionSelector3D(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
+		dimensionSelector3D = new DimensionSelector3D(ellsa.getPercepts(), new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				amoeba.updateAgentsVisualisation();
+				ellsa.updateAgentsVisualisation();
 			}
 		});
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(dimensionSelector3D));
@@ -145,7 +145,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				amoeba.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+				ellsa.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
 			}
 		});
 		addToolbar(slider);
@@ -175,19 +175,19 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 	
 	/**
 	 * Create a button 'Quick Save' button, when clicked create a manual save point using an amoeba's saver.
-	 * @param amoeba
+	 * @param ellsa
 	 * @return
 	 * @see ELLSA#saver
 	 * @see SaveHelperImpl#newManualSave(String)
 	 */
-	public Button newManualSaveButton(ELLSA amoeba) {
+	public Button newManualSaveButton(ELLSA ellsa) {
 		Button button = new Button("Quick save");
 		button.setTooltip(new Tooltip("Create a new save point. You will be able to find it in 'Save Explorer' -> 'Manual Saves'"));
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(amoeba.saver != null) {
-					amoeba.saver.newManualSave("manualSaveButton");
+				if(ellsa.saver != null) {
+					ellsa.saver.newManualSave("manualSaveButton");
 				} else {
 					Log.defaultLog.error("Main Window", "Cannot make a save point of an amoeba without saver");
 				}

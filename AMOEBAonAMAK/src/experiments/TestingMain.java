@@ -24,8 +24,8 @@ public class TestingMain {
 		StudiedSystem studiedSystem = new NDimCube(50.0, 3);
 		// create the amoeba
 		// Make sure the path to the config file is correct.
-		ELLSA amoeba = new ELLSA(null,null,"resources/threeDimensionsLauncher.xml", studiedSystem);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null,null,"resources/threeDimensionsLauncher.xml", studiedSystem);
+		ellsa.saver = new SaveHelperDummy();
 		// a window should have appeared, allowing you to control and visualize the amoeba.
 		
 		Thread.sleep(5000);
@@ -34,7 +34,7 @@ public class TestingMain {
 		long end = System.currentTimeMillis();
 		for(int i = 0; i < 1000; i++) {
 			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
+			ellsa.learn(studiedSystem.getOutput());
 			if(i%100 == 99) {
 				end = System.currentTimeMillis();
 				System.out.println("Time for 100 learn: "+(end-start)/1000.0);
@@ -46,7 +46,7 @@ public class TestingMain {
 		end = System.currentTimeMillis();
 		for(int i = 0; i < 1000; i++) {
 			studiedSystem.playOneStep();
-			amoeba.request(studiedSystem.getOutput());
+			ellsa.request(studiedSystem.getOutput());
 			if(i%100 == 99) {
 				end = System.currentTimeMillis();
 				System.out.println("Time for 100 request: "+(end-start)/1000.0);
@@ -63,7 +63,7 @@ public class TestingMain {
 			req.remove("px2");
 			req.remove("px3");
 			req.remove("oracle");
-			amoeba.maximize(req);
+			ellsa.maximize(req);
 			if(i%100 == 99) {
 				end = System.currentTimeMillis();
 				System.out.println("Time for 100 maximize: "+(end-start)/1000.0);

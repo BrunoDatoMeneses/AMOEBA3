@@ -62,7 +62,7 @@ public interface StudiedSystem extends Serializable{
 
 
 	public Double getRandomRequestCounts() ;
-	public double getErrorOnRequest(ELLSA amoeba);
+	public double getErrorOnRequest(ELLSA ellsa);
 	
 	
 

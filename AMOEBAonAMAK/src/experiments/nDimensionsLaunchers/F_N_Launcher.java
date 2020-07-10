@@ -211,38 +211,38 @@ public class F_N_Launcher implements Serializable {
 
 
 	private static void ellsaTest(HashMap<String, ArrayList<Double>> data) {
-		ELLSA amoeba = new ELLSA(null,  null);
+		ELLSA ellsa = new ELLSA(null,  null);
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-		amoeba.setStudiedSystem(studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		ellsa.setStudiedSystem(studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 
 
-		amoeba.allowGraphicalScheduler(false);
-		amoeba.setRenderUpdate(false);
-		amoeba.data.learningSpeed = PARAMS.learningSpeed;
-		amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-		amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
-		amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
-		amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
-		amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-		amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
-		amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
-		amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-		amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+		ellsa.allowGraphicalScheduler(false);
+		ellsa.setRenderUpdate(false);
+		ellsa.data.learningSpeed = PARAMS.learningSpeed;
+		ellsa.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+		ellsa.data.isActiveLearning = PARAMS.setActiveLearning;
+		ellsa.data.isSelfLearning = PARAMS.setSelfLearning;
+		ellsa.data.isConflictDetection = PARAMS.setConflictDetection;
+		ellsa.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+		ellsa.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+		ellsa.data.isConflictResolution = PARAMS.setConflictResolution;
+		ellsa.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+		ellsa.data.isFrontierRequest = PARAMS.setFrontierRequest;
+		ellsa.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+		ellsa.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-		amoeba.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-		amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-		amoeba.data.isDream = PARAMS.setDream;
-		amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+		ellsa.data.isDream = PARAMS.setDream;
+		ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		amoeba.data.isAutonomousMode = PARAMS.setAutonomousMode;
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+		ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+		ellsa.data.isAutonomousMode = PARAMS.setAutonomousMode;
 
 
 		World.minLevel = PARAMS.traceLevel;
@@ -252,21 +252,21 @@ public class F_N_Launcher implements Serializable {
 		
 		
 		for (int i = 0; i < PARAMS.nbCycle; ++i) {
-			amoeba.cycle();
+			ellsa.cycle();
 		}
 
 		double errorsMean = 0;
 
 		for (int i = 0; i < PARAMS.nbCycleTest; ++i) {
-			double currentError = studiedSystem.getErrorOnRequest(amoeba);
+			double currentError = studiedSystem.getErrorOnRequest(ellsa);
 			errorsMean += currentError;
 
 		}
 		errorsMean = errorsMean/(PARAMS.nbCycleTest);
 
-		HashMap<String, Double> mappingScores = amoeba.getHeadAgent().getMappingScores();
+		HashMap<String, Double> mappingScores = ellsa.getHeadAgent().getMappingScores();
 		System.out.println(mappingScores);
-		HashMap<REQUEST, Integer> requestCounts = amoeba.data.requestCounts;
+		HashMap<REQUEST, Integer> requestCounts = ellsa.data.requestCounts;
 		System.out.println(requestCounts);
 		System.out.println(errorsMean*100);
 
@@ -286,7 +286,7 @@ public class F_N_Launcher implements Serializable {
 		data.get("neighborRequests").add((double)requestCounts.get(REQUEST.NEIGHBOR));
 		data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
 		data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
-		data.get("nbAgents").add((double)amoeba.getContexts().size());
+		data.get("nbAgents").add((double) ellsa.getContexts().size());
 		data.get("prediction").add(errorsMean);
 
 

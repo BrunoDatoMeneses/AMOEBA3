@@ -116,21 +116,21 @@ public class BenchmarkThreading {
 		// setup cache --- (very important to reduce impact of the 1st measure)
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		StudiedSystem learnSystem = new NDimCube(50.0, 100);
-		ELLSA amoeba = new ELLSA(null,null);
-		amoeba.setStudiedSystem(learnSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		ELLSA ellsa = new ELLSA(null,null);
+		ellsa.setStudiedSystem(learnSystem);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		backupSystem.load(file);
-		benchmark(amoeba, learnSystem, learnSystem, 100, 100, 100, null);
+		benchmark(ellsa, learnSystem, learnSystem, 100, 100, 100, null);
 		// ---------------
 		System.out.println("Starting benchmark.");
 		List<List<List<Double>>> results = new ArrayList<>();
 		for(int thd = 1; thd <= 8; thd *= 2) {
 			Configuration.allowedSimultaneousAgentsExecution = thd;
 			learnSystem = new NDimCube(50.0, 100);
-			amoeba = new ELLSA(null,null);
-			backupSystem = new BackupSystem(amoeba);
+			ellsa = new ELLSA(null,null);
+			backupSystem = new BackupSystem(ellsa);
 			backupSystem.load(file);
-			List<List<Double>> bench = benchmark(amoeba, learnSystem, learnSystem, 0, 10000, 1000, null);
+			List<List<Double>> bench = benchmark(ellsa, learnSystem, learnSystem, 0, 10000, 1000, null);
 			System.out.println("Thd "+thd+" "+bench);
 			results.add(bench);
 		}

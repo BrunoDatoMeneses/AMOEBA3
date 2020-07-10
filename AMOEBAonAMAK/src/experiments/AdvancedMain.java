@@ -58,12 +58,12 @@ public class AdvancedMain extends Application{
 		EllsaMultiUIWindow amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 		// Create an AMOEBA
-		ELLSA amoeba = new ELLSA(amoebaUI, amoebaVUI);
+		ELLSA ellsa = new ELLSA(amoebaUI, amoebaVUI);
 		// Create a studied system and add it to the amoeba.
 		// Adding a studied system to an amoeba allow you to control the learning speed (the simulation : how many cycles per second)
 		// with amoeba's scheduler, graphically or programmatically.
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
-		amoeba.setStudiedSystem(studiedSystem);
+		ellsa.setStudiedSystem(studiedSystem);
 		// A window appeared, allowing to control the simulation, but if you try to run it
 		// it will crash (there's no percepts !). We need to load a configuration :
 		
@@ -71,7 +71,7 @@ public class AdvancedMain extends Application{
 		//Context.defaultRenderStrategy = NoneRenderer.class;
 		
 		// Create a backup system for the AMOEBA
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		// Load a configuration matching the studied system
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
@@ -79,7 +79,7 @@ public class AdvancedMain extends Application{
 		
 		// We add an optional saver, allowing us to autosave the amoeba at each cycle.
 		// The SaveHelper also add graphical tools to save and load AMOEBA's state.
-		amoeba.saver = new SaveHelperImpl(amoeba);
+		ellsa.saver = new SaveHelperImpl(ellsa);
 		// Autosave slow execution, if you want fast training, set saver to null,
 		// or saver.autoSave = false.
 
@@ -87,44 +87,44 @@ public class AdvancedMain extends Application{
 		// Next we show how to control it with code :
 
 		// We deny the possibility to change simulation speed with the UI
-		amoeba.allowGraphicalScheduler(false);
+		ellsa.allowGraphicalScheduler(false);
 		// We allow rendering
-		amoeba.setRenderUpdate(true);
+		ellsa.setRenderUpdate(true);
 		long start = System.currentTimeMillis();
 		// We run some learning cycles
 		int nbCycle = 100;
 		for (int i = 0; i < nbCycle; ++i) {
 			System.out.println(i);
 			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
+			ellsa.learn(studiedSystem.getOutput());
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Done in : " + (end - start) / 1000.0);
 		
 		// We create a manual save point
-		amoeba.saver.newManualSave("TestManualSave");
+		ellsa.saver.newManualSave("TestManualSave");
 		
 		// We set the log level to INFORM, to avoid debug logs that slow down simulation
 		Log.defaultMinLevel = Log.Level.INFORM;
 		
 		// We deactivate rendering
-		amoeba.setRenderUpdate(false);
+		ellsa.setRenderUpdate(false);
 		// Do some more learning
 		start = System.currentTimeMillis();
 		for (int i = 0; i < nbCycle; ++i) {
 			studiedSystem.playOneStep();
-			amoeba.learn(studiedSystem.getOutput());
+			ellsa.learn(studiedSystem.getOutput());
 		}
 		end = System.currentTimeMillis();
 		System.out.println("Done in : " + (end - start) / 1000.0);
 		
 		
 		// Activate rendering back
-		amoeba.setRenderUpdate(true);
+		ellsa.setRenderUpdate(true);
 		// After activating rendering we need to update agent's visualization
-		amoeba.updateAgentsVisualisation();
+		ellsa.updateAgentsVisualisation();
 		// We allow simulation control with the UI
-		amoeba.allowGraphicalScheduler(true);
+		ellsa.allowGraphicalScheduler(true);
 		
 		// Exemple for adding a tool in the toolbar
 		Slider slider = new Slider(0, 10, 0);

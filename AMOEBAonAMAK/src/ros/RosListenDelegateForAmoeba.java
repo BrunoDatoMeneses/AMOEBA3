@@ -11,11 +11,11 @@ import kernel.ELLSA;
 
 public class RosListenDelegateForAmoeba implements RosListenDelegate {
 	
-	private ELLSA amoeba;
+	private ELLSA ellsa;
 	private Publisher pub;
 	
-	public RosListenDelegateForAmoeba(ELLSA amoeba, Publisher pub) {
-		this.amoeba = amoeba;
+	public RosListenDelegateForAmoeba(ELLSA ellsa, Publisher pub) {
+		this.ellsa = ellsa;
 		this.pub = pub;
 	}
 
@@ -25,10 +25,10 @@ public class RosListenDelegateForAmoeba implements RosListenDelegate {
 		double res;
 		boolean learn = data.get("msg").get("learn").asBoolean();
 		if(learn) {
-			amoeba.learn(out);
-			res = amoeba.getAction();
+			ellsa.learn(out);
+			res = ellsa.getAction();
 		} else {
-			res = amoeba.request(out);
+			res = ellsa.request(out);
 		}
 		((ObjectNode)data.get("msg")).set("oracle", JsonNodeFactory.instance.numberNode(res));
 		pub.publishJsonMsg(data.get("msg").toString());
@@ -36,7 +36,7 @@ public class RosListenDelegateForAmoeba implements RosListenDelegate {
 	
 	private HashMap<String, Double> buildOutputFromMsg(JsonNode data) {
 		HashMap<String, Double> output = new HashMap<>();
-		for(Percept p : amoeba.getPercepts()) {
+		for(Percept p : ellsa.getPercepts()) {
 			String name = p.getName();
 			Double value = data.get("msg").get(name).asDouble();
 			output.put(name, value);

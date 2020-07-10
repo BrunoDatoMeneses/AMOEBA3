@@ -556,7 +556,7 @@ public class ReinforcementManager2D implements StudiedSystem{
 	}
 
 	@Override
-	public double getErrorOnRequest(ELLSA amoeba) {
+	public double getErrorOnRequest(ELLSA ellsa) {
 		return 0;
 	}
 

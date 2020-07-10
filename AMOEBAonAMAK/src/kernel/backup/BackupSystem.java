@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import kernel.ELLSA;
 import kernel.EllsaData;
 import org.jdom2.Attribute;
 import org.jdom2.Comment;
@@ -29,7 +30,6 @@ import agents.context.localModel.LocalModel;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import kernel.ELLSA;
 import utils.XMLSerialization;
 
 /**
@@ -42,22 +42,22 @@ public class BackupSystem implements IBackupSystem {
 	private static final String CONTEXT_NODE = "Context";
 
 	// Members
-	private ELLSA amoeba;
+	private ELLSA ellsa;
 	private Map<String, Percept> perceptsByName = new HashMap<>();
 	private boolean loadPresetContext = true;
 	private boolean amoebaDataLoaded = false;
 
 	// -------------------- Constructor --------------------
 
-	public BackupSystem(ELLSA amoeba) {
-		this.amoeba = amoeba;
+	public BackupSystem(ELLSA ellsa) {
+		this.ellsa = ellsa;
 	}
 
 	// -------------------- Public Methods --------------------
 
 	@Override
 	public void load(File file) {
-		amoeba.clearAgents();
+		ellsa.clearAgents();
 		perceptsByName.clear();
 
 		SAXBuilder sxb = new SAXBuilder();
@@ -74,7 +74,7 @@ public class BackupSystem implements IBackupSystem {
 		} catch (JDOMException | IOException e) {
 			e.printStackTrace();
 		}
-		amoeba.onLoadEnded();
+		ellsa.onLoadEnded();
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class BackupSystem implements IBackupSystem {
 			boolean creationOfNewContext = learningElement.getAttribute("creationOfNewContext").getBooleanValue();
 			boolean loadPresetContext = learningElement.getAttribute("loadPresetContext").getBooleanValue();
 
-			amoeba.setCreationOfNewContext(creationOfNewContext);
+			ellsa.setCreationOfNewContext(creationOfNewContext);
 			setLoadPresetContext(loadPresetContext);
 		} catch (DataConversionException e) {
 			e.printStackTrace();
@@ -130,7 +130,7 @@ public class BackupSystem implements IBackupSystem {
 		Element dataElement = configurationElement.getChild("Data");
 		if(dataElement != null) { // the data field is optionnal. We don't ask human to write it !
 			XMLSerialization<EllsaData> decode = new XMLSerialization<>();
-			amoeba.data = decode.fromString(dataElement.getText());
+			ellsa.data = decode.fromString(dataElement.getText());
 			amoebaDataLoaded = true;
 		}
 	}
@@ -178,7 +178,7 @@ public class BackupSystem implements IBackupSystem {
 			throw new IllegalDataException("Cannot load an AMOEBA without at least 1 Percept agent.");
 		}
 		
-		amoeba.addPendingAgents();
+		ellsa.addPendingAgents();
 	}
 
 	private void loadPresetContexts(Element systemElement) {
@@ -190,7 +190,7 @@ public class BackupSystem implements IBackupSystem {
 			for (Attribute att : lastPerceptionsAndActionState.getAttributes()) {
 				perceptionAndAction.put(att.getName(), Double.valueOf(att.getValue()));
 			}
-			amoeba.setPerceptionsAndActionState(perceptionAndAction);
+			ellsa.setPerceptionsAndActionState(perceptionAndAction);
 		}
 
 		List<Element> contextsElement = presetContextsElement.getChildren("Context");
@@ -201,9 +201,9 @@ public class BackupSystem implements IBackupSystem {
 	}
 
 	private void loadController(Element controllerElement) {
-		Head head = new Head(amoeba);
+		Head head = new Head(ellsa);
 		head.setName(controllerElement.getAttributeValue("Name"));
-		head.setNoCreation(!amoeba.isCreationOfNewContext());
+		head.setNoCreation(!ellsa.isCreationOfNewContext());
 		
 		if(!amoebaDataLoaded) {
 			// If no AmoebaData was loaded, then we need to initialize the head a bit more :
@@ -221,11 +221,11 @@ public class BackupSystem implements IBackupSystem {
 					nConflictBeforeAugmentation, nSuccessBeforeDiminution);
 		}
 		
-		amoeba.setHead(head);
+		ellsa.setHead(head);
 	}
 
 	private void loadSensor(Element sensorElement) {
-		Percept percept = new Percept(amoeba);
+		Percept percept = new Percept(ellsa);
 		percept.setName(sensorElement.getAttributeValue("Name"));
 		boolean isEnum = Boolean.valueOf(sensorElement.getAttributeValue("Enum"));
 		percept.setEnum(isEnum);
@@ -238,7 +238,7 @@ public class BackupSystem implements IBackupSystem {
 	}
 
 	private void loadContext(Element contextElement) {
-		Context context = new Context(amoeba);
+		Context context = new Context(ellsa);
 		
 		// -- Load Ranges
 		Element rangesElement = contextElement.getChild("Ranges");
@@ -250,7 +250,7 @@ public class BackupSystem implements IBackupSystem {
 		// -- Load attributes
 		context.setName(contextElement.getAttributeValue("Name"));
 		context.setConfidence(Double.valueOf(contextElement.getAttributeValue("Confidence")));
-		for(Percept p : amoeba.getPercepts()) {
+		for(Percept p : ellsa.getPercepts()) {
 			p.updateContextProjectionEnd(context);
 			p.updateContextProjectionStart(context);
 		}
@@ -268,7 +268,7 @@ public class BackupSystem implements IBackupSystem {
 		// -- Load Model
 		String localModelName = localModelElement.getAttributeValue("Type");
 		TypeLocalModel type = TypeLocalModel.valueOf(localModelName);
-		LocalModel localModel = amoeba.buildLocalModel(context, type);
+		LocalModel localModel = ellsa.buildLocalModel(context, type);
 		List<Double> coefs = new ArrayList<>();
 		for(Element e : localModelElement.getChild("Coefs").getChildren()) {
 			coefs.add(Double.valueOf(e.getAttributeValue("v")));
@@ -327,7 +327,7 @@ public class BackupSystem implements IBackupSystem {
 		Element learningElement = new Element("Learning");
 		List<Attribute> learningAttributes = new ArrayList<>();
 
-		learningAttributes.add(new Attribute("creationOfNewContext", String.valueOf(amoeba.isCreationOfNewContext())));
+		learningAttributes.add(new Attribute("creationOfNewContext", String.valueOf(ellsa.isCreationOfNewContext())));
 		learningAttributes.add(new Attribute("loadPresetContext", String.valueOf(isLoadPresetContext())));
 		learningElement.setAttributes(learningAttributes);
 		configurationElement.addContent(learningElement);
@@ -335,7 +335,7 @@ public class BackupSystem implements IBackupSystem {
 		// amoeba data
 		Element dataElement = new Element("Data");
 		XMLSerialization<EllsaData> encode = new XMLSerialization<>();
-		dataElement.setText(encode.toString(amoeba.data));
+		dataElement.setText(encode.toString(ellsa.data));
 		configurationElement.addContent(dataElement);
 		
 		rootElement.addContent(configurationElement);
@@ -343,8 +343,8 @@ public class BackupSystem implements IBackupSystem {
 
 	private void saveStartingAgents(Element rootElement) {
 		Element startingAgentsElement = new Element("StartingAgents");
-		List<Head> heads = amoeba.getHeads();
-		List<Percept> percepts = amoeba.getPercepts();
+		List<Head> heads = ellsa.getHeads();
+		List<Percept> percepts = ellsa.getPercepts();
 
 		for (Head head : heads) {
 			saveController(head, startingAgentsElement);
@@ -358,11 +358,11 @@ public class BackupSystem implements IBackupSystem {
 	}
 
 	private void savePresetContexts(Element rootElement) {
-		List<Context> contexts = amoeba.getContexts();
+		List<Context> contexts = ellsa.getContexts();
 		Element presetContextsElement = new Element("PresetContexts");
 
 		Element lastPerceptionsAndActionState = new Element("LastPerceptionsAndActionState");
-		HashMap<String, Double> perceptionAndAction = amoeba.getPerceptionsAndActionState();
+		HashMap<String, Double> perceptionAndAction = ellsa.getPerceptionsAndActionState();
 		List<Attribute> attributes = new ArrayList<>();
 		for (String key : perceptionAndAction.keySet()) {
 			attributes.add(new Attribute(key, "" + perceptionAndAction.get(key)));

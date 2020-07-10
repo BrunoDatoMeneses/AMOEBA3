@@ -174,7 +174,7 @@ public class NDimCube implements StudiedSystem{
 	}
 
 	@Override
-	public double getErrorOnRequest(ELLSA amoeba) {
+	public double getErrorOnRequest(ELLSA ellsa) {
 		return 0;
 	}
 }

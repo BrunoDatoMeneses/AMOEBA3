@@ -20,7 +20,7 @@ import kernel.backup.IBackupSystem;
 
 public class Main implements Runnable {
 
-	ELLSA amoeba;
+	ELLSA ellsa;
 	StudiedSystem studiedSystem;
 	Sender sender;
 	
@@ -63,49 +63,49 @@ public class Main implements Runnable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 
-		ELLSA amoeba = new ELLSA(null,  null);
+		ELLSA ellsa = new ELLSA(null,  null);
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS_UNITY.spaceSize, PARAMS_UNITY.dimension, PARAMS_UNITY.nbOfModels, PARAMS_UNITY.normType, PARAMS_UNITY.randomExploration, PARAMS_UNITY.explorationIncrement,PARAMS_UNITY.explorationWidht,PARAMS_UNITY.limitedToSpaceZone, PARAMS_UNITY.oracleNoiseRange);
-		amoeba.setStudiedSystem(studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		ellsa.setStudiedSystem(studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS_UNITY.configFile);
 		backupSystem.load(file);
 
 
 		//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
-		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(false);
-		amoeba.data.learningSpeed = PARAMS_UNITY.learningSpeed;
-		amoeba.data.numberOfPointsForRegression = PARAMS_UNITY.regressionPoints;
-		amoeba.data.isActiveLearning = PARAMS_UNITY.setActiveLearning;
-		amoeba.data.isSelfLearning = PARAMS_UNITY.setSelfLearning;
-		amoeba.data.isConflictDetection = PARAMS_UNITY.setConflictDetection;
-		amoeba.data.isConcurrenceDetection = PARAMS_UNITY.setConcurrenceDetection;
-		amoeba.data.isVoidDetection2 = PARAMS_UNITY.setVoidDetection2;
-		amoeba.data.isConflictResolution = PARAMS_UNITY.setConflictResolution;
-		amoeba.data.isConcurrenceResolution = PARAMS_UNITY.setConcurrenceResolution;
-		amoeba.data.isFrontierRequest = PARAMS_UNITY.setFrontierRequest;
-		amoeba.data.isSelfModelRequest = PARAMS_UNITY.setSelfModelRequest;
-		amoeba.data.isCoopLearningWithoutOracle = PARAMS_UNITY.setCoopLearning;
+		ellsa.allowGraphicalScheduler(true);
+		ellsa.setRenderUpdate(false);
+		ellsa.data.learningSpeed = PARAMS_UNITY.learningSpeed;
+		ellsa.data.numberOfPointsForRegression = PARAMS_UNITY.regressionPoints;
+		ellsa.data.isActiveLearning = PARAMS_UNITY.setActiveLearning;
+		ellsa.data.isSelfLearning = PARAMS_UNITY.setSelfLearning;
+		ellsa.data.isConflictDetection = PARAMS_UNITY.setConflictDetection;
+		ellsa.data.isConcurrenceDetection = PARAMS_UNITY.setConcurrenceDetection;
+		ellsa.data.isVoidDetection2 = PARAMS_UNITY.setVoidDetection2;
+		ellsa.data.isConflictResolution = PARAMS_UNITY.setConflictResolution;
+		ellsa.data.isConcurrenceResolution = PARAMS_UNITY.setConcurrenceResolution;
+		ellsa.data.isFrontierRequest = PARAMS_UNITY.setFrontierRequest;
+		ellsa.data.isSelfModelRequest = PARAMS_UNITY.setSelfModelRequest;
+		ellsa.data.isCoopLearningWithoutOracle = PARAMS_UNITY.setCoopLearning;
 
-		amoeba.data.isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
-		amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
-		amoeba.data.isDream = PARAMS_UNITY.setDream;
-		amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
-		amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
+		ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
+		ellsa.data.isDream = PARAMS_UNITY.setDream;
+		ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
 
-		amoeba.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
-		amoeba.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
+		ellsa.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
 		World.minLevel = PARAMS_UNITY.traceLevel;
 
 
-		sender = new Sender(server, amoeba);
+		sender = new Sender(server, ellsa);
 
 
 		for (int i = 0; i < PARAMS_UNITY.nbCycle; ++i) {
-			amoeba.cycle();
+			ellsa.cycle();
 
-			updateContextsOnUnity(amoeba, sender);
+			updateContextsOnUnity(ellsa, sender);
 		}
 
 
@@ -115,15 +115,15 @@ public class Main implements Runnable {
 
 
 
-	private void updateContextsOnUnity(ELLSA amoeba, Sender sender) {
-		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
-		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
+	private void updateContextsOnUnity(ELLSA ellsa, Sender sender) {
+		ArrayList<Context> spatiallyAlteredContexts = ellsa.getSpatiallyAlteredContextForUnityUI();
+		ArrayList<Context> toKillContexts = ellsa.getToKillContextsForUnityUI();
 
 		if(spatiallyAlteredContexts.size()>0) {
 
 			sender.sendContexts(spatiallyAlteredContexts);
 
-			while (!sender.acq("CTXTS", amoeba.getCycle())) {
+			while (!sender.acq("CTXTS", ellsa.getCycle())) {
 				try
 				{
 					Thread.sleep(10);
@@ -139,7 +139,7 @@ public class Main implements Runnable {
 
 			sender.sendContextsToKill(toKillContexts);
 
-			while (!sender.acq("KILL", amoeba.getCycle())) {
+			while (!sender.acq("KILL", ellsa.getCycle())) {
 				try
 				{
 					Thread.sleep(10);

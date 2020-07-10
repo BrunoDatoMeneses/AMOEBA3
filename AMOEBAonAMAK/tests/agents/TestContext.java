@@ -15,8 +15,8 @@ public class TestContext extends TestSetup {
 	 */
 	@Test
 	public void testCoherenceProjection() {
-		for(Context c : amoeba.getContexts()) {
-			for(Percept p : amoeba.getPercepts()) {
+		for(Context c : ellsa.getContexts()) {
+			for(Percept p : ellsa.getPercepts()) {
 				assertEquals(c.getRanges().get(p).getStart(), p.contextProjections.get(c).getStart());
 				assertEquals(c.getRanges().get(p).getEnd(), p.contextProjections.get(c).getEnd());
 			}

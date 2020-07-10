@@ -35,15 +35,15 @@ public class ContextMenuVUI extends ContextMenu {
 	/**
 	 * Create a {@link ContextMenu} suited for our needs, composed of 2 items : "Request Here" and "Learn here".<br/>
 	 * Set itself as the vui canvas {@link ContextMenu}. 
-	 * @param amoeba the amoeba where {@link ELLSA#request(HashMap)} and {@link ELLSA#learn(HashMap)} will be executed.
+	 * @param ellsa the amoeba where {@link ELLSA#request(HashMap)} and {@link ELLSA#learn(HashMap)} will be executed.
 	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUI}
 	 */
-	public ContextMenuVUI(ELLSA amoeba, VUI vui) {
+	public ContextMenuVUI(ELLSA ellsa, VUI vui) {
 		// "request here" menu item
-		setupRequestHereMenuItem(amoeba, vui);
+		setupRequestHereMenuItem(ellsa, vui);
 		
 		// "learn here" menu item
-		setupLearnHereMenuItem(amoeba, vui);
+		setupLearnHereMenuItem(ellsa, vui);
 		
 		// show context menu on context menu event from VUI's canvas
 		vui.getCanvas().setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -56,15 +56,15 @@ public class ContextMenuVUI extends ContextMenu {
 		});	
 	}
 
-	private void setupRequestHereMenuItem(ELLSA amoeba, VUI vui) {
+	private void setupRequestHereMenuItem(ELLSA ellsa, VUI vui) {
 		MenuItem reqHere = new MenuItem("Request Here");
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
-					reqTwoDimension(amoeba, vui);
+				if(quick2DRequest && ellsa.getPercepts().size() == 2) {
+					reqTwoDimension(ellsa, vui);
 				} else {
-					reqNDimension(amoeba, vui);
+					reqNDimension(ellsa, vui);
 				}
 			}
 
@@ -75,27 +75,27 @@ public class ContextMenuVUI extends ContextMenu {
 	/**
 	 * The "Request Here" action performed when the amoeba is 2D.<br/>
 	 * Execute a {@link ELLSA#request(HashMap)} at the position of the click.
-	 * @param amoeba
+	 * @param ellsa
 	 * @param vui
 	 */
-	private void reqTwoDimension(ELLSA amoeba, VUI vui) {
+	private void reqTwoDimension(ELLSA ellsa, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
-		req.put(amoeba.getDimensionSelector().d1().getName(), x);
-		req.put(amoeba.getDimensionSelector().d2().getName(), y);
+		req.put(ellsa.getDimensionSelector().d1().getName(), x);
+		req.put(ellsa.getDimensionSelector().d2().getName(), y);
 		req.put("oracle", 0.0);
-		double res = amoeba.request(req);
+		double res = ellsa.request(req);
 		Log.defaultLog.inform("AMOEBA", "Request Here for x:"+x+" y:"+y+" -> "+res+".");
 	}
 	
 	/**
 	 * The "Request Here" action performed when the amoeba is not 2D.<br/>
 	 * Show a {@link Dialog} prompting the user to inputs value for the {@link ELLSA#request(HashMap)}.
-	 * @param amoeba
+	 * @param ellsa
 	 * @param vui
 	 */
-	private void reqNDimension(ELLSA amoeba, VUI vui) {
+	private void reqNDimension(ELLSA ellsa, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
@@ -110,14 +110,14 @@ public class ContextMenuVUI extends ContextMenu {
 		// inputs
 		HashMap<String, TextField> textFields = new HashMap<>();
 		VBox vbox = new VBox();
-		for(Percept p : amoeba.getPercepts()) {
+		for(Percept p : ellsa.getPercepts()) {
 			TextField tf = new TextField();
 			textFields.put(p.getName(), tf);
 			tf.setPromptText(p.getName());
-			if(p.getName().equals(amoeba.getDimensionSelector().d1().getName())) {
+			if(p.getName().equals(ellsa.getDimensionSelector().d1().getName())) {
 				tf.setText(x+"");
 			}
-			if(p.getName().equals(amoeba.getDimensionSelector().d2().getName())) {
+			if(p.getName().equals(ellsa.getDimensionSelector().d2().getName())) {
 				tf.setText(y+"");
 			}
 			vbox.getChildren().add(tf);
@@ -138,20 +138,20 @@ public class ContextMenuVUI extends ContextMenu {
 		
 		Optional<HashMap<String, Double>> result = dialog.showAndWait();
 		result.ifPresent(req -> {
-			double res = amoeba.request(req);
+			double res = ellsa.request(req);
 			Log.defaultLog.inform("AMOEBA", "Request Here for "+req+"\n-> "+res+".");
 		});
 	}
 	
-	private void setupLearnHereMenuItem(ELLSA amoeba, VUI vui) {
+	private void setupLearnHereMenuItem(ELLSA ellsa, VUI vui) {
 		MenuItem learnHere = new MenuItem("Learn Here");
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if(quick2DRequest && amoeba.getPercepts().size() == 2) {
-					learnTwoDimension(amoeba, vui);
+				if(quick2DRequest && ellsa.getPercepts().size() == 2) {
+					learnTwoDimension(ellsa, vui);
 				} else {
-					learnNDimebsion(amoeba, vui);
+					learnNDimebsion(ellsa, vui);
 				}
 			}
 
@@ -162,26 +162,26 @@ public class ContextMenuVUI extends ContextMenu {
 	/**
 	 * The "Learn Here" action performed when the amoeba is 2D.<br/>
 	 * Execute a {@link ELLSA#learn(HashMap)} at the position of the click.
-	 * @param amoeba
+	 * @param ellsa
 	 * @param vui
 	 */
-	private void learnTwoDimension(ELLSA amoeba, VUI vui) {
+	private void learnTwoDimension(ELLSA ellsa, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
-		req.put(amoeba.getDimensionSelector().d1().getName(), x);
-		req.put(amoeba.getDimensionSelector().d2().getName(), y);
-		req.put("oracle", amoeba.studiedSystem.requestOracle(req));
-		amoeba.learn(req);
+		req.put(ellsa.getDimensionSelector().d1().getName(), x);
+		req.put(ellsa.getDimensionSelector().d2().getName(), y);
+		req.put("oracle", ellsa.studiedSystem.requestOracle(req));
+		ellsa.learn(req);
 	}
 	
 	/**
 	 * The "Learn Here" action performed when the amoeba is not 2D.<br/>
 	 * Show a {@link Dialog} prompting the user to inputs value for the {@link ELLSA#learn(HashMap)}.
-	 * @param amoeba
+	 * @param ellsa
 	 * @param vui
 	 */
-	private void learnNDimebsion(ELLSA amoeba, VUI vui) {
+	private void learnNDimebsion(ELLSA ellsa, VUI vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
@@ -196,14 +196,14 @@ public class ContextMenuVUI extends ContextMenu {
 		// inputs
 		HashMap<String, TextField> textFields = new HashMap<>();
 		VBox vbox = new VBox();
-		for(Percept p : amoeba.getPercepts()) {
+		for(Percept p : ellsa.getPercepts()) {
 			TextField tf = new TextField();
 			textFields.put(p.getName(), tf);
 			tf.setPromptText(p.getName());
-			if(p.getName().equals(amoeba.getDimensionSelector().d1().getName())) {
+			if(p.getName().equals(ellsa.getDimensionSelector().d1().getName())) {
 				tf.setText(x+"");
 			}
-			if(p.getName().equals(amoeba.getDimensionSelector().d2().getName())) {
+			if(p.getName().equals(ellsa.getDimensionSelector().d2().getName())) {
 				tf.setText(y+"");
 			}
 			vbox.getChildren().add(tf);
@@ -223,7 +223,7 @@ public class ContextMenuVUI extends ContextMenu {
 						req.put(k, Double.valueOf(textFields.get(k).getText()));
 					}
 	        	}
-				oracle.setText(amoeba.studiedSystem.requestOracle(req)+"");
+				oracle.setText(ellsa.studiedSystem.requestOracle(req)+"");
 			}
 		});
 		vbox.getChildren().addAll(oracle, autoOracle);
@@ -242,7 +242,7 @@ public class ContextMenuVUI extends ContextMenu {
 		
 		Optional<HashMap<String, Double>> result = dialog.showAndWait();
 		result.ifPresent(req -> {
-			amoeba.learn(req);
+			ellsa.learn(req);
 			Log.defaultLog.inform("AMOEBA", "Learn Here for "+req+" done.");
 		});
 	}

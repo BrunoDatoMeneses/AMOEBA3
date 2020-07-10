@@ -43,18 +43,18 @@ public class Benchmark {
 	private static void execLearn(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" learning cycles.");
 		
-		ELLSA amoeba = new ELLSA(null,null);
-		BackupSystem bs = new BackupSystem(amoeba);
+		ELLSA ellsa = new ELLSA(null,null);
+		BackupSystem bs = new BackupSystem(ellsa);
 		bs.load(new File(configFile));
-		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());
+		StudiedSystem ss = new NDimCube(50, ellsa.getPercepts().size());
 		
 		ArrayList<Double> criticity = new ArrayList<Double>(1000);
 		
 		double start = System.currentTimeMillis();
 		for(int i = 0; i < nbCycle; i++) {
 			ss.playOneStep();
-			amoeba.learn(ss.getOutput());
-			criticity.add(amoeba.getHeads().get(0).getCriticity());
+			ellsa.learn(ss.getOutput());
+			criticity.add(ellsa.getHeads().get(0).getCriticity());
 		}
 		double end = System.currentTimeMillis();
 		
@@ -67,18 +67,18 @@ public class Benchmark {
 	private static void execRequest(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" request cycles.");
 		
-		ELLSA amoeba = new ELLSA(null,null);
-		BackupSystem bs = new BackupSystem(amoeba);
+		ELLSA ellsa = new ELLSA(null,null);
+		BackupSystem bs = new BackupSystem(ellsa);
 		bs.load(new File(configFile));
-		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());
+		StudiedSystem ss = new NDimCube(50, ellsa.getPercepts().size());
 		
 		ArrayList<Double> criticity = new ArrayList<Double>(1000);
 		
 		double start = System.currentTimeMillis();
 		for(int i = 0; i < nbCycle; i++) {
 			ss.playOneStep();
-			amoeba.request(ss.getOutput());
-			criticity.add(amoeba.getHeads().get(0).getCriticity());
+			ellsa.request(ss.getOutput());
+			criticity.add(ellsa.getHeads().get(0).getCriticity());
 		}
 		double end = System.currentTimeMillis();
 		

@@ -47,77 +47,77 @@ public class RobotLaunchExampleMultiUI extends Application{
         StudiedSystem studiedSystemTheta0 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
         VUIMulti amoebaVUITheta0 = new VUIMulti("2D");
         EllsaMultiUIWindow amoebaUITheta0 = new EllsaMultiUIWindow("ELLSA Theta 0", amoebaVUITheta0, studiedSystemTheta0);
-        ELLSA amoebaTheta0 = new ELLSA(amoebaUITheta0,  amoebaVUITheta0);
-        amoebaTheta0.setStudiedSystem(studiedSystemTheta0);
-        IBackupSystem backupSystem = new BackupSystem(amoebaTheta0);
+        ELLSA ellsaTheta0 = new ELLSA(amoebaUITheta0,  amoebaVUITheta0);
+        ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
+        IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
 
         //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
-        amoebaTheta0.allowGraphicalScheduler(true);
-        amoebaTheta0.setRenderUpdate(false);
-        amoebaTheta0.data.nameID = "ellsaTheta0";
-        amoebaTheta0.data.learningSpeed = PARAMS.learningSpeed;
-        amoebaTheta0.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-        amoebaTheta0.data.isActiveLearning = PARAMS.setActiveLearning;
-        amoebaTheta0.data.isSelfLearning = PARAMS.setSelfLearning;
-        amoebaTheta0.data.isAutonomousMode = PARAMS.setAutonomousMode;
-        amoebaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
-        amoebaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        amoebaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-        amoebaTheta0.data.isConflictResolution = PARAMS.setConflictResolution;
-        amoebaTheta0.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        amoebaTheta0.data.isFrontierRequest = PARAMS.setFrontierRequest;
-        amoebaTheta0.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-        amoebaTheta0.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+        ellsaTheta0.allowGraphicalScheduler(true);
+        ellsaTheta0.setRenderUpdate(false);
+        ellsaTheta0.data.nameID = "ellsaTheta0";
+        ellsaTheta0.data.learningSpeed = PARAMS.learningSpeed;
+        ellsaTheta0.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+        ellsaTheta0.data.isActiveLearning = PARAMS.setActiveLearning;
+        ellsaTheta0.data.isSelfLearning = PARAMS.setSelfLearning;
+        ellsaTheta0.data.isAutonomousMode = PARAMS.setAutonomousMode;
+        ellsaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
+        ellsaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+        ellsaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+        ellsaTheta0.data.isConflictResolution = PARAMS.setConflictResolution;
+        ellsaTheta0.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+        ellsaTheta0.data.isFrontierRequest = PARAMS.setFrontierRequest;
+        ellsaTheta0.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+        ellsaTheta0.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-        amoebaTheta0.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-        amoebaTheta0.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-        amoebaTheta0.data.isDream = PARAMS.setDream;
-        amoebaTheta0.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        amoebaTheta0.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        ellsaTheta0.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+        ellsaTheta0.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+        ellsaTheta0.data.isDream = PARAMS.setDream;
+        ellsaTheta0.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsaTheta0.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        amoebaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        amoebaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+        ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+        ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
         World.minLevel = PARAMS.traceLevel;
 
         StudiedSystem studiedSystemTheta1 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
         VUIMulti amoebaVUITheta1 = new VUIMulti("2D");
         EllsaMultiUIWindow amoebaUITheta1 = new EllsaMultiUIWindow("ELLSA Theta 1", amoebaVUITheta1, studiedSystemTheta1);
-        ELLSA amoebaTheta1 = new ELLSA(amoebaUITheta1,  amoebaVUITheta1);
-        amoebaTheta1.setStudiedSystem(studiedSystemTheta1);
-        IBackupSystem backupSystem1 = new BackupSystem(amoebaTheta1);
+        ELLSA ellsaTheta1 = new ELLSA(amoebaUITheta1,  amoebaVUITheta1);
+        ellsaTheta1.setStudiedSystem(studiedSystemTheta1);
+        IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
         File file1 = new File("resources/"+PARAMS.configFile);
         backupSystem1.load(file1);
 
         //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
-        amoebaTheta1.allowGraphicalScheduler(true);
-        amoebaTheta1.setRenderUpdate(false);
-        amoebaTheta1.data.nameID = "ellsaTheta1";
-        amoebaTheta1.data.learningSpeed = PARAMS.learningSpeed;
-        amoebaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-        amoebaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
-        amoebaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
-        amoebaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
-        amoebaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
-        amoebaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        amoebaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-        amoebaTheta1.data.isConflictResolution = PARAMS.setConflictResolution;
-        amoebaTheta1.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        amoebaTheta1.data.isFrontierRequest = PARAMS.setFrontierRequest;
-        amoebaTheta1.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-        amoebaTheta1.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+        ellsaTheta1.allowGraphicalScheduler(true);
+        ellsaTheta1.setRenderUpdate(false);
+        ellsaTheta1.data.nameID = "ellsaTheta1";
+        ellsaTheta1.data.learningSpeed = PARAMS.learningSpeed;
+        ellsaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+        ellsaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
+        ellsaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
+        ellsaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
+        ellsaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
+        ellsaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+        ellsaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+        ellsaTheta1.data.isConflictResolution = PARAMS.setConflictResolution;
+        ellsaTheta1.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+        ellsaTheta1.data.isFrontierRequest = PARAMS.setFrontierRequest;
+        ellsaTheta1.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+        ellsaTheta1.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-        amoebaTheta1.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-        amoebaTheta1.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-        amoebaTheta1.data.isDream = PARAMS.setDream;
-        amoebaTheta1.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        amoebaTheta1.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        ellsaTheta1.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+        ellsaTheta1.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+        ellsaTheta1.data.isDream = PARAMS.setDream;
+        ellsaTheta1.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsaTheta1.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        amoebaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        amoebaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+        ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+        ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
         World.minLevel = PARAMS.traceLevel;
 
 
@@ -132,11 +132,11 @@ public class RobotLaunchExampleMultiUI extends Application{
             distances[i] = PARAMS.armBaseSize - (i*20);
         }
 
-        ELLSA amoebas[] = new ELLSA[2];
-        amoebas[0] = amoebaTheta0;
-        amoebas[1] = amoebaTheta1;
+        ELLSA ellsas[] = new ELLSA[2];
+        ellsas[0] = ellsaTheta0;
+        ellsas[1] = ellsaTheta1;
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, amoebas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 

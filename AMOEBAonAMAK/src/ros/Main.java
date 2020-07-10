@@ -30,8 +30,8 @@ public class Main {
 			}
 		}
 		
-		ELLSA amoeba = new ELLSA(null,null,config, null);
-		amoeba.allowGraphicalScheduler(false);
+		ELLSA ellsa = new ELLSA(null,null,config, null);
+		ellsa.allowGraphicalScheduler(false);
 
 		RosBridge bridge = new RosBridge();
 		bridge.connect(uri, true);
@@ -45,7 +45,7 @@ public class Main {
 					.setType(msgType)
 					.setThrottleRate(1)
 					.setQueueLength(1),
-				new RosListenDelegateForAmoeba(amoeba, pub)
+				new RosListenDelegateForAmoeba(ellsa, pub)
 		);
 		
 		try {

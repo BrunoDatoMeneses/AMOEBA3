@@ -47,15 +47,15 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
 	
-	ELLSA amoebaSpatialReward;
+	ELLSA ellsaSpatialReward;
 	VUIMulti amoebaSpatialRewardVUI;
 	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	ELLSA amoebaControlModel;
+	ELLSA ellsaControlModel;
 	VUIMulti amoebaControlModelVUI;
 	EllsaMultiUIWindow amoebaControlModelUI;
 	
-	ELLSA amoeba;
+	ELLSA ellsa;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	EllsaMultiUIWindow amoebaUI;
@@ -304,14 +304,14 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		public ELLSA amoebaSpatialReward;
+		public ELLSA ellsaSpatialReward;
 		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
 		private Random rand = new Random();
 		
 		public AmoebaQL() {
-			amoebaSpatialReward = setupSpatialReward();
+			ellsaSpatialReward = setupSpatialReward();
 			//amoebaControlModel = setupControlModel();
 		}
 		
@@ -358,7 +358,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 			//System.out.println("ControlModel " + previousStateCurrentStateAction + "                  ---------------- SIMPLE REIN XP 149");
 			//System.out.println("SpatialReward " + positionAndReward + "                  ---------------- SIMPLE REIN XP 149");
 			
-			amoebaSpatialReward.learn(positionAndReward);
+			ellsaSpatialReward.learn(positionAndReward);
 			//amoebaControlModel.learn(previousStateCurrentStateAction);
 			
 		}
@@ -484,13 +484,13 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 	
 
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 	
@@ -511,18 +511,18 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
 		//amoeba.setReinforcement(true);
 		
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 
@@ -543,16 +543,16 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 		
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 	/**

@@ -16,7 +16,7 @@ public class RobotArmManager {
     public int requestCycles;
     double[] l;
     double[] joints;
-    ELLSA[] amoebas;
+    ELLSA[] ellsas;
     RobotController controller;
 
     double xPos;
@@ -40,7 +40,7 @@ public class RobotArmManager {
 
         jointsNb = jointsNumber;
         l = jointDistances;
-        amoebas = ambs;
+        ellsas = ambs;
         controller = robotController;
         poseGoal = new double[2];
         poseGoal[0] = 0.0;
@@ -128,7 +128,7 @@ public class RobotArmManager {
                 /*System.err.println(out0.get("px"));
                 System.err.println(out0.get("oracle"));
                 System.err.println(out0.get("ptheta0"));*/
-                amoebas[0].learn(out0);
+                ellsas[0].learn(out0);
 
                 result = jointsAngles[1];
                 if(PARAMS.dimension == 3 ){
@@ -148,13 +148,13 @@ public class RobotArmManager {
                 }
                 out1.put("oracle",result*100.0);
 
-                amoebas[1].learn(out1);
+                ellsas[1].learn(out1);
             }else{
                 double result = jointsAngles[0];
                 out0.put("px",position[0]);
                 out0.put("py",position[1]);
                 out0.put("oracle",result*100.0);
-                amoebas[0].learn(out0);
+                ellsas[0].learn(out0);
             }
 
 
@@ -248,13 +248,13 @@ public class RobotArmManager {
 
             ArrayList<String> otherPercepts = new ArrayList<>(Collections.singleton("ptheta0"));
 
-            HashMap<String,Double> actions1 = amoebas[0].requestWithLesserPercepts(out2, otherPercepts);
+            HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2, otherPercepts);
 
 
-            Context bestContext = amoebas[0].getHeadAgent().getBestContext();
+            Context bestContext = ellsas[0].getHeadAgent().getBestContext();
             if(bestContext!=null){
                 TRACE.print(TRACE_LEVEL.DEBUG, "B",bestContext, bestContext.getConfidence());
-                for(Percept pct : amoebas[0].getPercepts()){
+                for(Percept pct : ellsas[0].getPercepts()){
                     TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(pct.getName(),bestContext.getRanges().get(pct).getStart()+"",bestContext.getRanges().get(pct).getEnd()+"")));
                 }
 
@@ -264,18 +264,18 @@ public class RobotArmManager {
 
             }
 
-            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("A",""+bestContext, ""+amoebas[0].getHeadAgent().getActivatedContexts())));
-            for(Context ctxt: amoebas[0].getHeadAgent().getActivatedContexts()){
+            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("A",""+bestContext, ""+ ellsas[0].getHeadAgent().getActivatedContexts())));
+            for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
                 TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(ctxt.getName(),""+ctxt.getConfidence())));
             }
-            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("N",amoebas[0].getHeadAgent().getActivatedNeighborsContexts()+"")));
+            TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("N", ellsas[0].getHeadAgent().getActivatedNeighborsContexts()+"")));
 
 
-            HashMap<String,Double> actions2 = amoebas[1].requestWithLesserPercepts(out2, otherPercepts);
+            HashMap<String,Double> actions2 = ellsas[1].requestWithLesserPercepts(out2, otherPercepts);
             TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(actions2.toString())));
-            TRACE.print(TRACE_LEVEL.DEBUG,"B",amoebas[1].getHeadAgent().getBestContext());
-            TRACE.print(TRACE_LEVEL.DEBUG,"A",amoebas[1].getHeadAgent().getActivatedContexts());
-            TRACE.print(TRACE_LEVEL.DEBUG,"N", amoebas[1].getHeadAgent().getActivatedNeighborsContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG,"B", ellsas[1].getHeadAgent().getBestContext());
+            TRACE.print(TRACE_LEVEL.DEBUG,"A", ellsas[1].getHeadAgent().getActivatedContexts());
+            TRACE.print(TRACE_LEVEL.DEBUG,"N", ellsas[1].getHeadAgent().getActivatedNeighborsContexts());
 
 
             goalJoints[0] = actions1.get("action")/100.0;
@@ -306,7 +306,7 @@ public class RobotArmManager {
         }else{
             out0.put("px",goalPosition[0]);
             out0.put("py",goalPosition[1]);
-            goalJoints[0]=amoebas[0].request(out0)/100.0;
+            goalJoints[0]= ellsas[0].request(out0)/100.0;
         }
 
 

@@ -72,28 +72,28 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
         VUIMulti amoebaVUI = new VUIMulti("2D");
         EllsaMultiUIWindow amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
-        ELLSA amoeba = new ELLSA(amoebaUI,  amoebaVUI);
+        ELLSA ellsa = new ELLSA(amoebaUI,  amoebaVUI);
         StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-        amoeba.setStudiedSystem(studiedSystem);
-        IBackupSystem backupSystem = new BackupSystem(amoeba);
+        ellsa.setStudiedSystem(studiedSystem);
+        IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/twoDimensionsLauncher.xml");
         backupSystem.load(file);
 
-        amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+        ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
 
-        amoeba.allowGraphicalScheduler(true);
-        amoeba.setRenderUpdate(false);
-        amoeba.data.learningSpeed = learningSpeed;
-        amoeba.data.numberOfPointsForRegression = regressionPoints;
-        amoeba.data.isActiveLearning = setActiveLearning;
-        amoeba.data.isSelfLearning = setSelfLearning;
-        amoeba.data.isConflictDetection = setConflictDetection;
-        amoeba.data.isConcurrenceDetection = setConcurrenceDetection;
-        amoeba.data.isVoidDetection = setVoidDetection;
-        amoeba.data.isVoidDetection2 = setVoidDetection2;
-        amoeba.data.isConflictResolution = setConflictResolution;
-        amoeba.data.isConcurrenceResolution = setConcurrenceResolution;
-        amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+        ellsa.allowGraphicalScheduler(true);
+        ellsa.setRenderUpdate(false);
+        ellsa.data.learningSpeed = learningSpeed;
+        ellsa.data.numberOfPointsForRegression = regressionPoints;
+        ellsa.data.isActiveLearning = setActiveLearning;
+        ellsa.data.isSelfLearning = setSelfLearning;
+        ellsa.data.isConflictDetection = setConflictDetection;
+        ellsa.data.isConcurrenceDetection = setConcurrenceDetection;
+        ellsa.data.isVoidDetection = setVoidDetection;
+        ellsa.data.isVoidDetection2 = setVoidDetection2;
+        ellsa.data.isConflictResolution = setConflictResolution;
+        ellsa.data.isConcurrenceResolution = setConcurrenceResolution;
+        ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
         World.minLevel = TRACE_LEVEL.DEBUG;
 
 
@@ -106,16 +106,16 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         HashMap<Percept, Range> manualRanges3 = new HashMap<>();
 
 
-        for (Percept p : amoeba.getPercepts()) {
+        for (Percept p : ellsa.getPercepts()) {
             p.setMax(tailleCtxt*10);
             p.setMin(-tailleCtxt*10);
 
 
-            Range r1 = new Range(amoeba, -tailleCtxt-20, tailleCtxt-20, 0, true, true, p);
+            Range r1 = new Range(ellsa, -tailleCtxt-20, tailleCtxt-20, 0, true, true, p);
             manualRanges1.put(p,r1);
-            Range r2 = new Range(amoeba, -tailleCtxt, tailleCtxt, 0, true, true, p);
+            Range r2 = new Range(ellsa, -tailleCtxt, tailleCtxt, 0, true, true, p);
             manualRanges2.put(p,r2);
-            Range r3 = new Range(amoeba, -tailleCtxt+20, tailleCtxt+20, 0, true, true, p);
+            Range r3 = new Range(ellsa, -tailleCtxt+20, tailleCtxt+20, 0, true, true, p);
             manualRanges3.put(p,r3);
 
 
@@ -126,10 +126,10 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
 
 
-        amoeba.onSystemCycleBegin();
+        ellsa.onSystemCycleBegin();
 
         //Context ctxt1 = new Context(amoeba,manualRanges1);
-        Context ctxt2 = new Context(amoeba,manualRanges2);
+        Context ctxt2 = new Context(ellsa,manualRanges2);
         //Context ctxt3 = new Context(amoeba,manualRanges3);
 
 
@@ -139,13 +139,13 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         //contexts.add(ctxt3);
 
 
-        amoeba.getHeadAgent().activatedNeighborsContexts = contexts;
-        amoeba.getHeadAgent().NCSDetection_PotentialRequest();
-        amoeba.getHeadAgent().testIfrequest();
+        ellsa.getHeadAgent().activatedNeighborsContexts = contexts;
+        ellsa.getHeadAgent().NCSDetection_PotentialRequest();
+        ellsa.getHeadAgent().testIfrequest();
 
-        amoeba.computePendingAgents();
-        amoeba.onSystemCycleEnd();
-        amoeba.renderUI();
+        ellsa.computePendingAgents();
+        ellsa.onSystemCycleEnd();
+        ellsa.renderUI();
 
 
 
@@ -154,8 +154,8 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
     }
 
-    private Experiment getExperiment(ELLSA amoeba, Context ctxt1) {
-        ArrayList<Percept> percepts = amoeba.getPercepts();
+    private Experiment getExperiment(ELLSA ellsa, Context ctxt1) {
+        ArrayList<Percept> percepts = ellsa.getPercepts();
         Experiment exp = new Experiment(ctxt1);
         for (Percept pct : percepts) {
             exp.addDimension(pct, pct.getValue());

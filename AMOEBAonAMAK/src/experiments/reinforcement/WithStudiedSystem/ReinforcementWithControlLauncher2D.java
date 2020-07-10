@@ -55,16 +55,16 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 	
 	public static final int nbCycle = 10000;
 	
-	ELLSA amoebaSpatialReward;
+	ELLSA ellsaSpatialReward;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaSpatialRewardVUI;
 	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	ELLSA amoebaActionModel1;
+	ELLSA ellsaActionModel1;
 	VUIMulti amoebaActionModelVUI1;
 	EllsaMultiUIWindow amoebaActionModelUI1;
 	
-	ELLSA amoebaActionModel2;
+	ELLSA ellsaActionModel2;
 	VUIMulti amoebaActionModelVUI2;
 	EllsaMultiUIWindow amoebaActionModelUI2;
 	
@@ -108,7 +108,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				System.out.println("new Value "+newValue);
 				mappingErrorAllowed = (double)newValue;
-				amoebaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+				ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 			}
 		});
 		amoebaSpatialRewardUI.addToolbar(slider);
@@ -168,14 +168,14 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
                 @Override
                 public void run() 
                 {
-                	amoebaSpatialReward = setupSpatialReward();
-                	amoebaActionModel1 = setupControlModel("1", amoebaActionModelUI1, amoebaActionModelVUI1);
-                	amoebaActionModel2 = setupControlModel("2", amoebaActionModelUI2, amoebaActionModelVUI2);
+                	ellsaSpatialReward = setupSpatialReward();
+                	ellsaActionModel1 = setupControlModel("1", amoebaActionModelUI1, amoebaActionModelVUI1);
+                	ellsaActionModel2 = setupControlModel("2", amoebaActionModelUI2, amoebaActionModelVUI2);
                 	
                 	HashMap<String, ELLSA> amoebas = new HashMap<String, ELLSA>();
-                	amoebas.put("a1", amoebaActionModel1);
-                	amoebas.put("a2", amoebaActionModel2);
-                	amoebas.put("spatialReward", amoebaSpatialReward);
+                	amoebas.put("a1", ellsaActionModel1);
+                	amoebas.put("a2", ellsaActionModel2);
+                	amoebas.put("spatialReward", ellsaSpatialReward);
                 	studiedSystem.setControlModels(amoebas);
                 }
             });
@@ -206,10 +206,10 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
                     	
                     	
                     	
-                    	amoebaSpatialReward.learn(studiedSystem.getOutput());
-                    	if(amoebaSpatialReward.getHeadAgent().isActiveLearning()) {
+                    	ellsaSpatialReward.learn(studiedSystem.getOutput());
+                    	if(ellsaSpatialReward.getHeadAgent().isActiveLearning()) {
                     		studiedSystem.setActiveLearning(true);
-                    		studiedSystem.setSelfRequest(amoebaSpatialReward.getHeadAgent().getSelfRequest()); //TODO self active ...
+                    		studiedSystem.setSelfRequest(ellsaSpatialReward.getHeadAgent().getSelfRequest()); //TODO self active ...
     						 
     					}
                     	//System.out.println(status);
@@ -236,24 +236,24 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 	
 	
 	private ELLSA setupSpatialReward() {
-		ELLSA amoeba = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
+		ELLSA ellsa = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
 		studiedSystem = new ReinforcementManager2D(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-		amoeba.setStudiedSystem(studiedSystem);
-		IBackupSystem backupSystem = new BackupSystem(amoeba);
+		ellsa.setStudiedSystem(studiedSystem);
+		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/twoDimensionsLauncher.xml");
 		backupSystem.load(file);
 		
-		amoeba.saver = new SaveHelperImpl(amoeba, amoebaSpatialRewardUI);
-		amoeba.allowGraphicalScheduler(true);
-		amoeba.setRenderUpdate(true);		
-		amoeba.data.learningSpeed = learningSpeed;
-		amoeba.data.numberOfPointsForRegression = regressionPoints;
-		amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-		amoeba.setReinforcement(true);
+		ellsa.saver = new SaveHelperImpl(ellsa, amoebaSpatialRewardUI);
+		ellsa.allowGraphicalScheduler(true);
+		ellsa.setRenderUpdate(true);
+		ellsa.data.learningSpeed = learningSpeed;
+		ellsa.data.numberOfPointsForRegression = regressionPoints;
+		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+		ellsa.setReinforcement(true);
 		World.minLevel = TRACE_LEVEL.DEBUG;
 		
 		
-		return amoeba;
+		return ellsa;
 	}
 	
 
@@ -275,16 +275,16 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		ELLSA amoeba = new ELLSA(window, VUI, config.getAbsolutePath(), null);
-		amoeba.saver = new SaveHelperDummy();
+		ELLSA ellsa = new ELLSA(window, VUI, config.getAbsolutePath(), null);
+		ellsa.saver = new SaveHelperDummy();
 		
 		
 		
 		
-		amoeba.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
-		amoeba.getEnvironment().setMappingErrorAllowed(0.025);
+		ellsa.setLocalModel(TypeLocalModel.MILLER_REGRESSION);
+		ellsa.getEnvironment().setMappingErrorAllowed(0.025);
 		
-		return amoeba;
+		return ellsa;
 	}
 
 	public static void launch() throws IOException{

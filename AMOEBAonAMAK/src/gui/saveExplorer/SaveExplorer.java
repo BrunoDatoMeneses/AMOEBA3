@@ -37,7 +37,7 @@ import kernel.backup.SaveHelperImpl;
  */
 public class SaveExplorer extends VBox {
 	
-	private ELLSA amoeba;
+	private ELLSA ellsa;
 	
 	@FXML private ComboBox<String> comboBoxA;
 	@FXML private ComboBox<String> comboBoxM;
@@ -45,11 +45,11 @@ public class SaveExplorer extends VBox {
 	/**
 	 * create a SaveExplorer for an AMOEBA.
 	 * The amoeba MUST have a working {@link ELLSA#saver}.
-	 * @param amoeba
+	 * @param ellsa
 	 * @see SaveHelperImpl
 	 */
-	public SaveExplorer(ELLSA amoeba) {
-		this.amoeba = amoeba;
+	public SaveExplorer(ELLSA ellsa) {
+		this.ellsa = ellsa;
 		try {
 			//load the fxml for THIS SaveExplorer
 			URL url = getClass().getResource("SaveExplorer.fxml");
@@ -77,7 +77,7 @@ public class SaveExplorer extends VBox {
 	
 	@FXML protected void handleLaunchA(ActionEvent event) {
 		try {
-			exec(SaveExplorer.class, comboBoxA.getValue(), SerializeBase64.serialize(amoeba.studiedSystem));
+			exec(SaveExplorer.class, comboBoxA.getValue(), SerializeBase64.serialize(ellsa.studiedSystem));
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} 
@@ -85,7 +85,7 @@ public class SaveExplorer extends VBox {
 	
 	@FXML protected void handleLaunchM(ActionEvent event) {
 		try {
-			exec(SaveExplorer.class, comboBoxM.getValue(), SerializeBase64.serialize(amoeba.studiedSystem));
+			exec(SaveExplorer.class, comboBoxM.getValue(), SerializeBase64.serialize(ellsa.studiedSystem));
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} 
@@ -126,11 +126,11 @@ public class SaveExplorer extends VBox {
 	}
 	
 	@FXML protected void handleLoadA(ActionEvent event) {
-		amoeba.saver.load(comboBoxA.getValue());
+		ellsa.saver.load(comboBoxA.getValue());
 	}
 	
 	@FXML protected void handleLoadM(ActionEvent event) {
-		amoeba.saver.load(comboBoxM.getValue());
+		ellsa.saver.load(comboBoxM.getValue());
 	}
 	
 	@FXML protected void handlePreviewA(ActionEvent event) {
@@ -147,7 +147,7 @@ public class SaveExplorer extends VBox {
 	 */
 	public void update() {
 		comboBoxA.getItems().clear();
-		List<Path> la = amoeba.saver.listAutoSaves();
+		List<Path> la = ellsa.saver.listAutoSaves();
 		la.sort(new Comparator<Path>() {
 			@Override
 			public int compare(Path o1, Path o2) {
@@ -175,7 +175,7 @@ public class SaveExplorer extends VBox {
 		}
 		
 		comboBoxM.getItems().clear();
-		for(Path p : amoeba.saver.listManualSaves()) {
+		for(Path p : ellsa.saver.listManualSaves()) {
 			comboBoxM.getItems().add(p.toString());
 		}
 	}
@@ -256,11 +256,11 @@ public class SaveExplorer extends VBox {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		System.out.println("New AMOEBA launched.");
-		ELLSA amoeba = new ELLSA(null,null,args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
+		ELLSA ellsa = new ELLSA(null,null,args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
 		//amoeba.allowGraphicalScheduler(false);
-		for(Percept p : amoeba.getPercepts()) {
-			p.setValue(amoeba.getPerceptions(p.getName()));
+		for(Percept p : ellsa.getPercepts()) {
+			p.setValue(ellsa.getPerceptions(p.getName()));
 		}
-		amoeba.updateAgentsVisualisation();
+		ellsa.updateAgentsVisualisation();
 	}
 }

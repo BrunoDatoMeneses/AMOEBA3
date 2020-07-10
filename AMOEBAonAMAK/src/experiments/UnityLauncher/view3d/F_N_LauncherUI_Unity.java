@@ -30,7 +30,7 @@ import java.util.ArrayList;
  */
 public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
-	ELLSA amoeba;
+	ELLSA ellsa;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
 	EllsaMultiUIWindow amoebaUI;
@@ -119,41 +119,41 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 				public void run()
 				{
 
-					amoeba = new ELLSA(amoebaUI,  amoebaVUI);
+					ellsa = new ELLSA(amoebaUI,  amoebaVUI);
 
-					amoeba.setStudiedSystem(studiedSystem);
-					IBackupSystem backupSystem = new BackupSystem(amoeba);
+					ellsa.setStudiedSystem(studiedSystem);
+					IBackupSystem backupSystem = new BackupSystem(ellsa);
 					File file = new File("resources/"+PARAMS.configFile);
 					backupSystem.load(file);
 
 					//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
-					amoeba.allowGraphicalScheduler(true);
-					amoeba.setRenderUpdate(true);
-					amoeba.data.learningSpeed = PARAMS.learningSpeed;
-					amoeba.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-					amoeba.data.isActiveLearning = PARAMS.setActiveLearning;
-					amoeba.data.isSelfLearning = PARAMS.setSelfLearning;
-					amoeba.data.isConflictDetection = PARAMS.setConflictDetection;
-					amoeba.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-					amoeba.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-					amoeba.data.isConflictResolution = PARAMS.setConflictResolution;
-					amoeba.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-					amoeba.data.isFrontierRequest = PARAMS.setFrontierRequest;
-					amoeba.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-					amoeba.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+					ellsa.allowGraphicalScheduler(true);
+					ellsa.setRenderUpdate(true);
+					ellsa.data.learningSpeed = PARAMS.learningSpeed;
+					ellsa.data.numberOfPointsForRegression = PARAMS.regressionPoints;
+					ellsa.data.isActiveLearning = PARAMS.setActiveLearning;
+					ellsa.data.isSelfLearning = PARAMS.setSelfLearning;
+					ellsa.data.isConflictDetection = PARAMS.setConflictDetection;
+					ellsa.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+					ellsa.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+					ellsa.data.isConflictResolution = PARAMS.setConflictResolution;
+					ellsa.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+					ellsa.data.isFrontierRequest = PARAMS.setFrontierRequest;
+					ellsa.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+					ellsa.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-					amoeba.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-					amoeba.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-					amoeba.data.isDream = PARAMS.setDream;
-					amoeba.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-					amoeba.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+					ellsa.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+					ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+					ellsa.data.isDream = PARAMS.setDream;
+					ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+					ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-					amoeba.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-					amoeba.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+					ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+					ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
 					World.minLevel = PARAMS.traceLevel;
 
-					sender = new Sender(server, amoeba);
+					sender = new Sender(server, ellsa);
 
 				}
 			});
@@ -187,10 +187,10 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 					public void run()
 					{
 
-						amoeba.cycle();
+						ellsa.cycle();
 						//test = amoeba.data.normalizedCriticality < 100000;
 						//System.out.println(amoeba.data.normalizedCriticality);
-						updateContextsOnUnity(amoeba, sender);
+						updateContextsOnUnity(ellsa, sender);
 
 					}
 				});
@@ -207,23 +207,23 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 			i+=1;
 		}
 		System.out.println(i-1);
-		System.out.println(amoeba.data.normalizedCriticality);
-		System.out.println(amoeba.getHeadAgent().getBestContext().getName());
+		System.out.println(ellsa.data.normalizedCriticality);
+		System.out.println(ellsa.getHeadAgent().getBestContext().getName());
 
 
 	}
 
 
 
-	private void updateContextsOnUnity(ELLSA amoeba, Sender sender) {
-		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
-		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
+	private void updateContextsOnUnity(ELLSA ellsa, Sender sender) {
+		ArrayList<Context> spatiallyAlteredContexts = ellsa.getSpatiallyAlteredContextForUnityUI();
+		ArrayList<Context> toKillContexts = ellsa.getToKillContextsForUnityUI();
 
 		if(spatiallyAlteredContexts.size()>0) {
 
 			sender.sendContexts(spatiallyAlteredContexts);
 
-			while (!sender.acq("CTXTS", amoeba.getCycle())) {
+			while (!sender.acq("CTXTS", ellsa.getCycle())) {
 				try
 				{
 					Thread.sleep(10);
@@ -239,7 +239,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 			sender.sendContextsToKill(toKillContexts);
 
-			while (!sender.acq("KILL", amoeba.getCycle())) {
+			while (!sender.acq("KILL", ellsa.getCycle())) {
 				try
 				{
 					Thread.sleep(10);

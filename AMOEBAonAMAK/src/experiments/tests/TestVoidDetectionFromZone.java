@@ -67,23 +67,23 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-        ELLSA amoeba = new ELLSA(null,  null);
+        ELLSA ellsa = new ELLSA(null,  null);
         StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
-        amoeba.setStudiedSystem(studiedSystem);
-        IBackupSystem backupSystem = new BackupSystem(amoeba);
+        ellsa.setStudiedSystem(studiedSystem);
+        IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/threeDimensionsLauncher.xml");
         backupSystem.load(file);
 
 
-        amoeba.allowGraphicalScheduler(false);
-        amoeba.setRenderUpdate(false);
-        amoeba.data.learningSpeed = learningSpeed;
-        amoeba.data.numberOfPointsForRegression = regressionPoints;
-        amoeba.data.isActiveLearning = setActiveLearning;
-        amoeba.data.isSelfLearning = setSelfLearning;
-        amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
+        ellsa.allowGraphicalScheduler(false);
+        ellsa.setRenderUpdate(false);
+        ellsa.data.learningSpeed = learningSpeed;
+        ellsa.data.numberOfPointsForRegression = regressionPoints;
+        ellsa.data.isActiveLearning = setActiveLearning;
+        ellsa.data.isSelfLearning = setSelfLearning;
+        ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 
-        amoeba.setRenderUpdate(false);
+        ellsa.setRenderUpdate(false);
 
         World.minLevel = TRACE_LEVEL.ERROR;
 
@@ -97,27 +97,27 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
         HashMap<Percept, Range> manualRanges3 = new HashMap<>();
 
         HashMap<Percept, Pair<Double, Double>> zoneBounds =  new HashMap<>();
-        for (Percept p : amoeba.getPercepts()) {
+        for (Percept p : ellsa.getPercepts()) {
             p.setMax(tailleCtxt*10);
             p.setMin(-tailleCtxt*10);
-            Range r = new Range(amoeba, -tailleCtxt, tailleCtxt, 0, true, true, p);
+            Range r = new Range(ellsa, -tailleCtxt, tailleCtxt, 0, true, true, p);
             manualRanges.put(p,r);
 
-            Range r1 = new Range(amoeba, -tailleCtxt-20, tailleCtxt-20, 0, true, true, p);
+            Range r1 = new Range(ellsa, -tailleCtxt-20, tailleCtxt-20, 0, true, true, p);
             manualRanges1.put(p,r1);
-            Range r2 = new Range(amoeba, -tailleCtxt, tailleCtxt, 0, true, true, p);
+            Range r2 = new Range(ellsa, -tailleCtxt, tailleCtxt, 0, true, true, p);
             manualRanges2.put(p,r2);
-            Range r3 = new Range(amoeba, -tailleCtxt+20, tailleCtxt+20, 0, true, true, p);
+            Range r3 = new Range(ellsa, -tailleCtxt+20, tailleCtxt+20, 0, true, true, p);
             manualRanges3.put(p,r3);
 
             zoneBounds.put(p, new Pair<>(-3*tailleCtxt, 3*tailleCtxt));
 
         }
 
-        Context ctxt = new Context(amoeba,manualRanges);
-        Context ctxt1 = new Context(amoeba,manualRanges1);
-        Context ctxt2 = new Context(amoeba,manualRanges2);
-        Context ctxt3 = new Context(amoeba,manualRanges3);
+        Context ctxt = new Context(ellsa,manualRanges);
+        Context ctxt1 = new Context(ellsa,manualRanges1);
+        Context ctxt2 = new Context(ellsa,manualRanges2);
+        Context ctxt3 = new Context(ellsa,manualRanges3);
 
         ArrayList<Context> contexts = new ArrayList<>();
         contexts.add(ctxt1);

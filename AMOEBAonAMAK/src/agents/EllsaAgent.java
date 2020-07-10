@@ -10,7 +10,7 @@ import kernel.World;
 /**
  * The base class for all AMOEBA agents
  */
-public abstract class AmoebaAgent extends Agent<ELLSA, World> implements Loggable {
+public abstract class EllsaAgent extends Agent<ELLSA, World> implements Loggable {
 	// Attributes
 	protected String name;
 	private boolean dying;
@@ -21,7 +21,7 @@ public abstract class AmoebaAgent extends Agent<ELLSA, World> implements Loggabl
 	 * Instantiate a new agent attached to an amoeba
 	 * @param the amoeba
 	 */
-	public AmoebaAgent(ELLSA amas, Object... params) {
+	public EllsaAgent(ELLSA amas, Object... params) {
 		super(amas, params);
 		this.dying = false;
 	}
