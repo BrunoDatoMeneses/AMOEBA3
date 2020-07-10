@@ -2,7 +2,6 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import experiments.UI_PARAMS;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
@@ -42,10 +41,10 @@ public class ContextRendererFX extends RenderStrategy {
 	}
 
 	private void updateColor() {
-		if(UI_PARAMS.contextColorByCoef){
+		if(context.getAmas().multiUIWindow.guiData.contextColorByCoef){
 			setColorWithCoefs();
 		}else{
-			setColorWithPrediction(UI_PARAMS.minPrediction,UI_PARAMS.maxPrediction);
+			setColorWithPrediction(context.getAmas().multiUIWindow.guiData.minPrediction,context.getAmas().multiUIWindow.guiData.maxPrediction);
 			//setColorWithPredictionReinforcement();
 		}
 

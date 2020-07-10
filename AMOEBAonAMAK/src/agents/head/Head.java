@@ -9,7 +9,6 @@ import agents.context.Experiment;
 import agents.context.VOID;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
-import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.ELLSA;
@@ -130,6 +129,12 @@ public class Head extends EllsaAgent {
 	}
 
 	private void onActInit() {
+
+		for(int i = 0 ; i<20;i++) {
+			getAmas().data.executionTimes[i] = 0.0;
+		}
+
+
 		if(getAmas().getCycle()%1000 == 0) {
 			getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("")));
 		}
@@ -1550,7 +1555,7 @@ public class Head extends EllsaAgent {
 		
 		
 		boolean newContextCreated = false;
-		getAmas().data.executionTimes[9]=System.currentTimeMillis();
+
 		if (activatedContexts.size() == 0) {
 			
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
@@ -1560,16 +1565,22 @@ public class Head extends EllsaAgent {
 			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 			getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 
-			
-			
+
+
+			getAmas().data.executionTimes[9]=System.currentTimeMillis();
 			Context context;
 			if (nearestGoodContext.getA() != null) {
 				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
 						"************************************* NEAREST GOOD CONTEXT")));
+				getAmas().data.executionTimes[15]=System.currentTimeMillis();
 				context = createNewContext(nearestGoodContext.getA());
+				getAmas().data.executionTimes[15]=System.currentTimeMillis()- getAmas().data.executionTimes[15];
 			} else {
+				getAmas().data.executionTimes[16]=System.currentTimeMillis();
 				context = createNewContext();
+				getAmas().data.executionTimes[16]=System.currentTimeMillis()- getAmas().data.executionTimes[16];
 			}
+			getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
 			// context = createNewContext();
 
 			bestContext = context;
@@ -1585,13 +1596,15 @@ public class Head extends EllsaAgent {
 					maxCoef = Math.abs(coef);
 				}
 			}
-			
+
 
 			
 			newContext.initEndoChildRequests();
+
+
 			
 		}
-		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
+
 
 
 		
@@ -2308,11 +2321,11 @@ public class Head extends EllsaAgent {
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
 				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
-				UI_PARAMS.maxPrediction=getAmas().data.maxPrediction;
+				getAmas().multiUIWindow.guiData.maxPrediction=getAmas().data.maxPrediction;
 			}
 			if(Math.abs(getAmas().data.oracleValue)<getAmas().data.minPrediction) {
 				getAmas().data.minPrediction = Math.abs(getAmas().data.oracleValue);
-				UI_PARAMS.minPrediction= getAmas().data.minPrediction;
+				getAmas().multiUIWindow.guiData.minPrediction= getAmas().data.minPrediction;
 			}
 			
 

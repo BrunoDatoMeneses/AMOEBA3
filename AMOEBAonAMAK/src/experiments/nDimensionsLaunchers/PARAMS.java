@@ -7,11 +7,11 @@ public class PARAMS {
     public static String model = "CosSin" + "_AvecDetectionMinLocal" + "_VoisinagePredictionx4";
 
 
-    public static final String configFile = "twoDimensionsLauncher.xml";
-    public static final int dimension = 2;
+    /*public static final String configFile = "twoDimensionsLauncher.xml";
+    public static final int dimension = 2;*/
 
-    //public static final String configFile = "threeDimensionsLauncher.xml";
-    //public static final int dimension = 3;
+    public static final String configFile = "threeDimensionsLauncher.xml";
+    public static final int dimension = 3;
 
     /*public static final String configFile = "fourDimensionsLauncher.xml";
     public static final int dimension = 4;*/
@@ -79,5 +79,5 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = false;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
 }

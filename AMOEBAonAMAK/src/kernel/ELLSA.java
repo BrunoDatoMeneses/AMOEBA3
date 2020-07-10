@@ -14,7 +14,6 @@ import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
-import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
@@ -187,6 +186,10 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			timeExecution.addData("PotentialRequest", cycle, data.executionTimesSums[12], notify);
 			timeExecution.addData("EndogenousRequestOverlaps", cycle, data.executionTimesSums[13], notify);
 			timeExecution.addData("EndogenousRequestVoids", cycle, data.executionTimesSums[14], notify);
+			timeExecution.addData("CreateContextFromGodFather", cycle, data.executionTimesSums[15], notify);
+			timeExecution.addData("CreateContextAlone", cycle, data.executionTimesSums[16], notify);
+			timeExecution.addData("CreateContextAloneRanges", cycle, data.executionTimesSums[17], notify);
+			timeExecution.addData("CreateContextAloneOtherThanBuild", cycle, data.executionTimesSums[18], notify);
 			
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
@@ -823,7 +826,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		}
 
 
-		if(getCycle()>0 && cycle % UI_PARAMS.nbCycleRefresh3DView == 0){
+		if(getCycle()>0 && cycle % multiUIWindow.guiData.nbCycleRefresh3DView == 0){
 
 
 			if(multiUIWindow.view3D != null){

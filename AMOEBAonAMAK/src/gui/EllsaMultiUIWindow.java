@@ -16,6 +16,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -46,13 +48,17 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 	public DimensionSelector dimensionSelector;
 	public DimensionSelector3D dimensionSelector3D;
 	public Menu windowMenu;
+	public ToggleButton togglecontextColorByCoef;
+	public ToggleButton togglecontextColorByPrediction;
 
 	public StudiedSystem studiedSystem = null;
+	public GuiData guiData ;
 	
 	public EllsaMultiUIWindow(String title, VUIMulti vui, StudiedSystem ss) {
 		super(title);
 		mainVUI = vui;
 		studiedSystem = ss;
+		guiData = new GuiData();
 	}
 	
 	public void initialize(ELLSA ellsa) {
@@ -106,6 +112,8 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		});
 		toggleRender.setSelected(ellsa.isRenderUpdate());
 		addToolbar(toggleRender);
+
+
 		
 
 		
@@ -138,8 +146,34 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 			}
 		});
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(dimensionSelector3D));
-		
-		Slider slider = new Slider(0, 0.1, 0.1);
+
+
+
+
+		togglecontextColorByCoef = new ToggleButton("Color by\ncoef");
+		togglecontextColorByCoef.setOnAction(evt -> {
+			guiData.contextColorByCoef = togglecontextColorByCoef.isSelected();
+			togglecontextColorByPrediction.setSelected(false);
+		});
+		togglecontextColorByCoef.setSelected(guiData.contextColorByCoef);
+
+		addToolbar(togglecontextColorByCoef);
+
+		togglecontextColorByPrediction = new ToggleButton("Color by\nprediction");
+		togglecontextColorByPrediction.setOnAction(evt -> {
+			guiData.contextColorByCoef = !togglecontextColorByPrediction.isSelected();
+			togglecontextColorByCoef.setSelected(false);
+		});
+		togglecontextColorByPrediction.setSelected(guiData.contextColorByCoef);
+		addToolbar(togglecontextColorByPrediction);
+
+
+
+
+		Label mappingError = new Label("Mapping\nError");
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(mappingError));
+
+		Slider slider = new Slider(0, 0.1, ellsa.getEnvironment().mappingErrorAllowed);
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -149,6 +183,28 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 			}
 		});
 		addToolbar(slider);
+
+		Label refreshCycle = new Label("Refresh\nCycle");
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(refreshCycle));
+		Slider refreshCycleSlider = new Slider(1, 250, 50);
+		refreshCycleSlider.setShowTickLabels(true);
+		refreshCycleSlider.setShowTickMarks(true);
+		refreshCycleSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				ellsa.multiUIWindow.guiData.nbCycleRefresh3DView = (int)newValue.doubleValue();
+			}
+		});
+		addToolbar(refreshCycleSlider);
+
+		Label defaultPercetValue = new Label("Default Percept Value");
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(defaultPercetValue));
+		TextField defaultPercetValueTextField = new TextField("");
+		defaultPercetValueTextField.setOnKeyPressed(event -> {if(event.getCode()== KeyCode.ENTER){
+			ellsa.multiUIWindow.guiData.defaultValue3DViewNonSeletedPercept= Double.parseDouble(defaultPercetValueTextField.getText());
+			view3D.updateContextChart();}
+		});
+		addToolbar(defaultPercetValueTextField);
 	}
 	
 	

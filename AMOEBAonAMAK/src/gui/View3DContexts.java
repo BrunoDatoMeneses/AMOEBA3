@@ -2,7 +2,6 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import experiments.UI_PARAMS;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -141,7 +140,7 @@ public class View3DContexts {
                 z = x+y;
 
                 points[i] = new Coord3d(x, y, z);
-                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, z);
+                colors[i] = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, z);
 
 
                 i++;
@@ -186,10 +185,10 @@ public class View3DContexts {
             //addCubePoints(pointAAjouter, predictions, correspondingContexts, ctxt, xStart, xEnd, yStart, yEnd, zStart, zEnd);
 
             Color ctxtColor;
-            if(UI_PARAMS.contextColorByCoef){
+            if(ellsa.multiUIWindow.guiData.contextColorByCoef){
                 ctxtColor = getColorFromCoefs(ctxt);
             }else{
-                ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
+                ctxtColor = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
                 if(ctxt.isBest) {
                     ctxtColor = new Color(0.0f, 1.0f, 0.0f, 0.95f);
                 }else if(ctxt.isActivated) {
@@ -267,10 +266,10 @@ public class View3DContexts {
         int i =0;
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
-            if(UI_PARAMS.contextColorByCoef){
+            if(ellsa.multiUIWindow.guiData.contextColorByCoef){
                 colors[i] = getColorFromCoefs(correspondingContexts.get(i));
             }else{
-                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (predictions.get(i).doubleValue()) );
+                colors[i] = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, (float) (predictions.get(i).doubleValue()) );
             }
 
             i++;

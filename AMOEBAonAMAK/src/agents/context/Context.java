@@ -86,11 +86,14 @@ public class Context extends EllsaAgent {
 	public Context(ELLSA ellsa) {
 		super(ellsa);
 		buildContext();
+
+		getAmas().data.executionTimes[18]=System.currentTimeMillis();
 		criticalities = new Criticalities(5);
 		
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
+		getAmas().data.executionTimes[18]=System.currentTimeMillis()-getAmas().data.executionTimes[18];
 	}
 
 	// FOR TEST ONLY
@@ -147,6 +150,9 @@ public class Context extends EllsaAgent {
 
 		Experiment firstPoint = new Experiment(this);
 		ArrayList<Percept> var = getAmas().getPercepts();
+
+		getAmas().data.executionTimes[17]=System.currentTimeMillis();
+
 		for (Percept p : var) {
 			Range r = null;
 
@@ -181,6 +187,8 @@ public class Context extends EllsaAgent {
 
 			p.addContextProjection(this);
 		}
+
+		getAmas().data.executionTimes[17]=System.currentTimeMillis()- getAmas().data.executionTimes[17];
 
 		//expand();
 

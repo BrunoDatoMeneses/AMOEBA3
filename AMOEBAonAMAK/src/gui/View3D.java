@@ -4,7 +4,6 @@ import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.UI_PARAMS;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -222,7 +221,7 @@ public class View3D {
                 z = (float)model(x,y);
 
                 points[i] = new Coord3d(x, y, z);
-                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, z);
+                colors[i] = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, z);
 
 
                 i++;
@@ -260,7 +259,7 @@ public class View3D {
             if(ellsa.getPercepts().size()>2){
                 for(Percept pct : ellsa.getPercepts()){
                     if(pct != pct1 && pct != pct2){
-                        testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
+                        testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(ellsa.multiUIWindow.guiData.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
                     }
                 }
             }
@@ -282,10 +281,10 @@ public class View3D {
                 float xEyEPrediction = getPrediction(pct1Index, pct2Index, xEnd, yEnd, ctxt);
 
                 Color ctxtColor;
-                if(UI_PARAMS.contextColorByCoef){
+                if(ellsa.multiUIWindow.guiData.contextColorByCoef){
                     ctxtColor = getColorFromCoefs(ctxt);
                 }else{
-                    ctxtColor = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
+                    ctxtColor = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, (float) (ctxt.lastPrediction.doubleValue()) );
                     if(ctxt.isBest) {
                         ctxtColor = new Color(0.0f, 1.0f, 0.0f, 0.95f);
                     }else if(ctxt.isActivated) {
@@ -336,7 +335,7 @@ public class View3D {
             }else if(i == pct2Index){
                 perception[i] = yPerception;
             }else{
-                perception[i] = UI_PARAMS.defaultValue3DViewNonSeletedPercept;
+                perception[i] = ellsa.multiUIWindow.guiData.defaultValue3DViewNonSeletedPercept;
             }
         }
         return (float) ((LocalModelMillerRegression)ctxt.getLocalModel()).getPropositionFrom2DPerceptions(perception);
@@ -375,7 +374,7 @@ public class View3D {
             boolean testIfDraw = true;
             for(Percept pct : ellsa.getPercepts()){
                 if(pct != pct1 && pct != pct2){
-                    testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(UI_PARAMS.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
+                    testIfDraw = testIfDraw && ctxt.getRanges().get(pct).contains2(ellsa.multiUIWindow.guiData.defaultValue3DViewNonSeletedPercept);// TODO coupe par défaut
                 }
             }
 
@@ -429,10 +428,10 @@ public class View3D {
         for( Coord3d coord : pointAAjouter){
             points[i] = coord;
 
-            if(UI_PARAMS.contextColorByCoef){
+            if(ellsa.multiUIWindow.guiData.contextColorByCoef){
                 colors[i] = getColorFromCoefs(correspondingContexts.get(i));
             }else{
-                colors[i] = getColor((float)UI_PARAMS.minPrediction,(float)UI_PARAMS.maxPrediction, coord.z);
+                colors[i] = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, coord.z);
             }
             //System.out.println(colors[i]);
 
