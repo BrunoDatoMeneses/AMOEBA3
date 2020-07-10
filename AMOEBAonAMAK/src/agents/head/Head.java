@@ -11,6 +11,7 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.AMOEBA;
 import kernel.StudiedSystem;
 import kernel.World;
@@ -610,7 +611,7 @@ public class Head extends AmoebaAgent {
 		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
 
 		getAmas().data.executionTimes[5]=System.currentTimeMillis();
-		NCSDetection_Create_New_ContextWithouOracle();  //Finally, head agent check the need for a new context agent
+		NCSDetection_Create_New_ContextWithoutOracle();  //Finally, head agent check the need for a new context agent
 		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
 
 		getAmas().data.executionTimes[6]=System.currentTimeMillis();
@@ -1606,7 +1607,7 @@ public class Head extends AmoebaAgent {
 		resetLastEndogenousRequest();
 	}
 
-	private void NCSDetection_Create_New_ContextWithouOracle() {
+	private void NCSDetection_Create_New_ContextWithoutOracle() {
 		/* Finally, head agent check the need for a new context agent */
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -1621,34 +1622,27 @@ public class Head extends AmoebaAgent {
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
 
 			getAmas().data.executionTimes[8]=System.currentTimeMillis();
-			Context nearestContext = bestContext;
 			getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 
+			Context context = createNewContextWithoutOracle();
 
+			if(context != null){
 
-			Context context;
-			if (nearestContext != null) {
-				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestContext.getName(),
-						"************************************* NEAREST CONTEXT")));
-				context = createNewContextWithoutOracle(nearestContext);
-
-				if(context != null){
-
-					bestContext = context;
-					newContext = context;
-					newContextCreated = true;
-					newContext.initEndoChildRequests();
-					newContext.lastPrediction = newContext.getActionProposal();
-					activatedNeighborsContexts.add(newContext);
-					activatedContexts.add(newContext);
-					double maxCoef = 0.0;
-					for(Double coef : newContext.getLocalModel().getCoef()) {
-						if(Math.abs(coef)> maxCoef) {
-							maxCoef = Math.abs(coef);
-						}
+				bestContext = context;
+				newContext = context;
+				newContextCreated = true;
+				newContext.initEndoChildRequests();
+				newContext.lastPrediction = newContext.getActionProposal();
+				activatedNeighborsContexts.add(newContext);
+				activatedContexts.add(newContext);
+				double maxCoef = 0.0;
+				for(Double coef : newContext.getLocalModel().getCoef()) {
+					if(Math.abs(coef)> maxCoef) {
+						maxCoef = Math.abs(coef);
 					}
 				}
 			}
+
 
 
 
@@ -1838,8 +1832,19 @@ public class Head extends AmoebaAgent {
 
 	public void NCSDetection_Dream() {
 
+
 		//if(getAmas().getCycle() % (500 * getAmas().getPercepts().size()) ==0 && getAmas().data.isDream){
 		if(getAmas().getCycle() == 2000 && getAmas().data.isDream){
+
+
+			getAmas().data.nbOfNeighborForVoidDetectionInSelfLearning = 5;
+			getAmas().data.nbOfNeighborForContexCreationWithouOracle = 5;
+			getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
+
+			getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.nbOfNeighborForVoidDetectionInSelfLearning, getAmas().data.nbOfNeighborForContexCreationWithouOracle );
+
+
+
 			for(Context ctxt : getAmas().getContexts()){
 				HashMap<Percept,Double> request = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
@@ -2258,7 +2263,7 @@ public class Head extends AmoebaAgent {
 		return context;
 	}
 
-	private Context createNewContextWithoutOracle(Context bestNearestCtxt) {
+	private Context createNewContextWithoutOracle() {
 
 
 		Context context = null;
@@ -2266,7 +2271,8 @@ public class Head extends AmoebaAgent {
 
 			getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
 			//double endogenousPrediction = ((LocalModelMillerRegression)bestNearestCtxt.getLocalModel()).getProposition(bestNearestCtxt.getCurrentExperimentWithouOracle());
-			Experiment currentExp = bestNearestCtxt.getCurrentExperimentWithouOracle();
+			Experiment currentExp = getAmas().getCurrentExperimentWithoutProposition();
+
 			double endogenousPrediction;
 			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.nbOfNeighborForContexCreationWithouOracle){
 				double weightedSumOfPredictions = 0;
@@ -3279,7 +3285,7 @@ public class Head extends AmoebaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*2  ;
+		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*4;
 		//return getMinMaxPredictionRange()*0.25 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}

@@ -20,11 +20,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import kernel.AMOEBA;
@@ -72,7 +68,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		//addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
-		schedulerToolbar = new SchedulerToolbar("AMOEBA", amoeba.getScheduler());
+		schedulerToolbar = new SchedulerToolbar("ELLSA", amoeba.getScheduler());
 		addToolbar(schedulerToolbar);	
 		
 		// plots
@@ -117,6 +113,17 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 		toggleRender.setSelected(amoeba.isRenderUpdate());
 		addToolbar(toggleRender);
 		
+
+		
+		// contextMenu "Request Here" on VUI
+		new ContextMenuVUIMulti(amoeba, mainVUI); //the ContextMenu add itself to the VUI
+		
+		// manual save button
+		addToolbar(newManualSaveButton(amoeba));
+
+		Label text2D = new Label("2D");
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(text2D));
+
 		// dimension selector
 		dimensionSelector = new DimensionSelector(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
 			@Override
@@ -124,7 +131,10 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 				amoeba.updateAgentsVisualisation();
 			}
 		});
-		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector));
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(dimensionSelector));
+
+		Label text3D = new Label("3D");
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(text3D));
 
 		// dimension selector 3D
 		dimensionSelector3D = new DimensionSelector3D(amoeba.getPercepts(), new EventHandler<ActionEvent>() {
@@ -133,13 +143,7 @@ public class AmoebaMultiUIWindow extends AmasMultiUIWindow{
 				amoeba.updateAgentsVisualisation();
 			}
 		});
-		RunLaterHelper.runLater(()->mainVUI.toolbar.getItems().add(dimensionSelector3D));
-		
-		// contextMenu "Request Here" on VUI
-		new ContextMenuVUIMulti(amoeba, mainVUI); //the ContextMenu add itself to the VUI
-		
-		// manual save button
-		addToolbar(newManualSaveButton(amoeba));
+		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(dimensionSelector3D));
 		
 		Slider slider = new Slider(0, 0.1, 0.1);
 		slider.setShowTickLabels(true);

@@ -4,7 +4,7 @@ import utils.TRACE_LEVEL;
 
 public class PARAMS {
 
-    public static String model = "CosSin" + "_AvecVoisin" + "_TestMinLocaux";
+    public static String model = "CosSin" + "_AvecDetectionMinLocal" + "_VoisinagePredictionx4";
 
 
     public static final String configFile = "twoDimensionsLauncher.xml";
@@ -16,7 +16,7 @@ public class PARAMS {
     /*public static final String configFile = "fourDimensionsLauncher.xml";
     public static final int dimension = 4;*/
 
-    public static final int nbCycle = 1500;
+    public static final int nbCycle = 2000;
     public static final int nbCycleTest = 500;
     public static final int nbTest = 5;
     public static final double spaceSize = 50.0	;
@@ -79,5 +79,5 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = false;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 }

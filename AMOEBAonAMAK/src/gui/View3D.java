@@ -267,8 +267,8 @@ public class View3D {
 
         HistogramBar myBar = new HistogramBar();
 
-        Percept pct1 =  amoeba.getDimensionSelector3D().d1();
-        Percept pct2 =  amoeba.getDimensionSelector3D().d2();
+        Percept pct1 =  amoeba.getDimensionSelector().d1();
+        Percept pct2 =  amoeba.getDimensionSelector().d2();
 
         for (Context ctxt : amoeba.getContexts()){
 

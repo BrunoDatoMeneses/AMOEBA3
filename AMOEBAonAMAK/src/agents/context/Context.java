@@ -1759,17 +1759,21 @@ public class Context extends AmoebaAgent {
 			}
 		}
 
+		boolean isLocalMinimum = false;
 		if(endoExperiments.size()>0){
 			if(endoExperiments.size()>1) {
 				if(isLocalMinimum(endoExperiments)) {
+					isLocalMinimum = true;
 					getAmas().data.countLocalMinina ++;
-					getEnvironment().print(TRACE_LEVEL.ERROR,getAmas().data.countLocalMinina);
+					getEnvironment().print(TRACE_LEVEL.DEBUG,"LOCAL MINIMA COUNTS",getAmas().data.countLocalMinina);
 				}
 			}
+			if(!isLocalMinimum){
+				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
+				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+				confidence+=endoExperiments.size()*0.01;
+			}
 
-			((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
-			getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-			confidence+=endoExperiments.size()*0.01;
 		}
 
 		/*if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
@@ -1792,28 +1796,48 @@ public class Context extends AmoebaAgent {
 	}
 
 	private boolean isLocalMinimum(ArrayList<Experiment> endoExperiments){
-		Experiment centerExp = new Experiment(this);
-		for (Percept pct : getAmas().getPercepts()) {
-			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
+		Experiment centerExp = getCenterExperimentWithProposition();
+        boolean distributionTest = false;
+
+		if(areAllPropositionSuperiorOrInferior(endoExperiments, centerExp.getProposition())){
+            distributionTest = true;
+            for(Percept pct: getAmas().getPercepts()){
+                boolean testLeft = false;
+                boolean testRight = false;
+                int i = 0;
+                while(i<endoExperiments.size() && !(testLeft && testRight)){
+					testLeft = testLeft || (endoExperiments.get(i).getValuesAsHashMap().get(pct)< centerExp.getValuesAsHashMap().get(pct));
+					testRight = testRight || (centerExp.getValuesAsHashMap().get(pct) < endoExperiments.get(i).getValuesAsHashMap().get(pct));
+					i++;
+				}
+                distributionTest = distributionTest && testLeft && testRight;
+            }
 		}
-		double centerprediction = ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
+        if(distributionTest){
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "LOCAL MINIMUM");
+            getEnvironment().print(TRACE_LEVEL.DEBUG, centerExp);
+            getEnvironment().print(TRACE_LEVEL.DEBUG, endoExperiments);
+        }
 
-		boolean initTest = centerprediction < endoExperiments.get(0).getProposition();
+        return distributionTest;
+    }
 
+    private boolean areAllPropositionSuperiorOrInferior(ArrayList<Experiment> endoExperiments, double centerprediction) {
+        boolean initTest = centerprediction < endoExperiments.get(0).getProposition();
 
-		boolean test1 = initTest;
-		boolean test2 = initTest;
-		for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size()-1)){
-			boolean localTest = centerprediction< endoExp.getProposition();
-			test1 = test1 && localTest;
-			test2 = test2 || localTest;
+        boolean test1 = initTest;
+        boolean test2 = initTest;
+        for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size()-1)){
+            boolean localTest = centerprediction< endoExp.getProposition();
+            test1 = test1 && localTest;
+            test2 = test2 || localTest;
 
-		}
+        }
 
-		return  !(initTest!=test1  || initTest!=test2);
-	}
+        return  !(initTest!=test1  || initTest!=test2);
+    }
 
-	public double getCenterProposition(){
+    public double getCenterProposition(){
 		Experiment centerExp = new Experiment(this);
 		for (Percept pct : getAmas().getPercepts()) {
 			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
@@ -1821,17 +1845,26 @@ public class Context extends AmoebaAgent {
 		return ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
 	}
 
-	public Experiment getCenterExperiment(){
+	public Experiment getCenterExperimentWithProposition(){
 		Experiment centerExp = new Experiment(this);
 		for (Percept pct : getAmas().getPercepts()) {
 			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
 		}
+		centerExp.setProposition(getPropositionFromExperiment(centerExp));
 		return centerExp;
 	}
 
 	public double getPropositionFromExperiment(Experiment exp){
 		return ((LocalModelMillerRegression) this.getLocalModel()).getProposition(exp);
 	}
+
+    public Experiment getCenterExperiment(){
+        Experiment centerExp = new Experiment(this);
+        for (Percept pct : getAmas().getPercepts()) {
+            centerExp.addDimension(pct, getRanges().get(pct).getCenter());
+        }
+        return centerExp;
+    }
 
 
 	private boolean testIfNeighborsPredictionsMeanAreInContextPredictionRanges(ArrayList<Experiment> endoExperiments){

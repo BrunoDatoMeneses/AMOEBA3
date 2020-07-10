@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
+import agents.context.Experiment;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
@@ -992,6 +993,16 @@ public class AMOEBA extends Amas<World> implements IAMOEBA {
 	
 	public void addPercept(Percept pct) {
 		percepts = null;
+	}
+
+	public Experiment getCurrentExperimentWithoutProposition() {
+		ArrayList<Percept> percepts = getPercepts();
+		Experiment exp = new Experiment(null);
+		for (Percept pct : percepts) {
+			exp.addDimension(pct, pct.getValue());
+		}
+
+		return exp;
 	}
 	
 }
