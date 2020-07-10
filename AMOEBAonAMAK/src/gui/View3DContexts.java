@@ -1,19 +1,13 @@
 package gui;
 
 import agents.context.Context;
-import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
-import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.tests.plot3Dpolygon.ACUbe;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import kernel.AMOEBA;
-import kernel.StudiedSystem;
+import kernel.ELLSA;
 import org.jzy3d.chart.AWTChart;
 import org.jzy3d.colors.Color;
 import org.jzy3d.javafx.JavaFXChartFactory;
@@ -31,7 +25,7 @@ public class View3DContexts {
 
     public String title;
 
-    public AMOEBA amoeba;
+    public ELLSA amoeba;
 
     private BorderPane pane;
 
@@ -53,7 +47,7 @@ public class View3DContexts {
 
 
 
-    public View3DContexts(AMOEBA amb) {
+    public View3DContexts(ELLSA amb) {
 
 
         amoeba = amb;

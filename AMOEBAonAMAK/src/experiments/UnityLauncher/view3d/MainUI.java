@@ -8,27 +8,26 @@ import experiments.nDimensionsLaunchers.F_N_Manager;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 
 import java.io.File;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class MainUI extends Application{
 
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
-	AmoebaMultiUIWindow amoebaUI;
+	EllsaMultiUIWindow amoebaUI;
 	Sender sender;
 
 	private SocketServer server;
@@ -57,7 +56,7 @@ public class MainUI extends Application{
 		Configuration.plotMilliSecondsUpdate = 20000;
 
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
+		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 
 
 
@@ -68,7 +67,7 @@ public class MainUI extends Application{
 
 	}
 
-	private void updateContextsOnUnity(AMOEBA amoeba, Sender sender) {
+	private void updateContextsOnUnity(ELLSA amoeba, Sender sender) {
 		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
 		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
 
@@ -140,7 +139,7 @@ public class MainUI extends Application{
 				public void run()
 				{
 
-					amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+					amoeba = new ELLSA(amoebaUI,  amoebaVUI);
 					studiedSystem = new F_N_Manager(PARAMS_UNITY.spaceSize, PARAMS_UNITY.dimension, PARAMS_UNITY.nbOfModels, PARAMS_UNITY.normType, PARAMS_UNITY.randomExploration, PARAMS_UNITY.explorationIncrement,PARAMS_UNITY.explorationWidht,PARAMS_UNITY.limitedToSpaceZone, PARAMS_UNITY.oracleNoiseRange);
 					amoeba.setStudiedSystem(studiedSystem);
 					IBackupSystem backupSystem = new BackupSystem(amoeba);

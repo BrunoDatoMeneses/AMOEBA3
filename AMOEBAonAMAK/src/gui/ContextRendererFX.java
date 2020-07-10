@@ -3,7 +3,6 @@ package gui;
 import agents.context.Context;
 import agents.percept.Percept;
 import experiments.UI_PARAMS;
-import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
@@ -11,7 +10,7 @@ import javafx.scene.paint.Color;
 
 /**
  * A render strategy for contexts using AMAKFX tools.<br/>
- * A Context is represented by a {@link DrawableRectangle} drawn onto {@link AmoebaWindow#mainVUI}.
+ * A Context is represented by a {@link DrawableRectangle} drawn onto {@link EllsaWindow#mainVUI}.
  * 
  * @author Hugo
  *

@@ -3,11 +3,10 @@ package agents.percept;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.function.Function;
 
 import agents.AmoebaAgent;
 import agents.context.Context;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 
 /**
  * Percept agent is in charge of the communication with the environment. Each
@@ -34,7 +33,7 @@ public class Percept extends AmoebaAgent {
 	 *
 	 * @param amoeba
 	 */
-	public Percept(AMOEBA amoeba) {
+	public Percept(ELLSA amoeba) {
 		super(amoeba);
 		getAmas().addPercept(this);
 	}

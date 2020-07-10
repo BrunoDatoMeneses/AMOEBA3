@@ -7,7 +7,6 @@ import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
 import agents.context.Context;
 import agents.percept.Percept;
-import experiments.TestMain.Level;
 import ncs.NCS;
 import utils.TRACE_LEVEL;
 
@@ -38,7 +37,7 @@ public class World extends Environment {
 	
 	public static TRACE_LEVEL minLevel = TRACE_LEVEL.INFORM;
 	
-	private AMOEBA amoeba;
+	private ELLSA amoeba;
 
 	/**
 	 * Instantiates a new world.
@@ -162,7 +161,7 @@ public class World extends Environment {
 		nbActivatedAgent = 0;
 	}
 	
-	public void setAmoeba(AMOEBA amoeba) {
+	public void setAmoeba(ELLSA amoeba) {
 		this.amoeba = amoeba;
 	}
 	

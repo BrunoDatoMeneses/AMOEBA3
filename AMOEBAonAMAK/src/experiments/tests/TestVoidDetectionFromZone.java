@@ -6,26 +6,21 @@ import agents.context.VOID;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import kernel.backup.SaveHelperImpl;
 import utils.Pair;
 import utils.TRACE_LEVEL;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Queue;
 
 public class TestVoidDetectionFromZone extends Application implements Serializable {
 
@@ -72,7 +67,7 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-        AMOEBA amoeba = new AMOEBA(null,  null);
+        ELLSA amoeba = new ELLSA(null,  null);
         StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
         amoeba.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(amoeba);

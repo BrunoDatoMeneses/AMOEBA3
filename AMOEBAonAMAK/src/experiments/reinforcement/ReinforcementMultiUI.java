@@ -10,29 +10,17 @@ import java.util.Random;
 
 import agents.context.localModel.TypeLocalModel;
 import experiments.FILE;
-import experiments.reinforcement.SimpleReinforcement1DSpatialRewardAndActionMltiUI.Environment;
-import experiments.reinforcement.SimpleReinforcement1DSpatialRewardAndActionMltiUI.LearningAgent;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
-import kernel.StudiedSystem;
+import kernel.ELLSA;
 import kernel.World;
-import kernel.backup.BackupSystem;
-import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperDummy;
-import kernel.backup.SaveHelperImpl;
 import utils.Pair;
 import utils.RandomUtils;
 import utils.TRACE_LEVEL;
@@ -71,13 +59,13 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
 	
-	AMOEBA amoebaSpatialReward;
+	ELLSA amoebaSpatialReward;
 	VUIMulti amoebaSpatialRewardVUI;
-	AmoebaMultiUIWindow amoebaSpatialRewardUI;
+	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	AMOEBA amoebaControlModel;
+	ELLSA amoebaControlModel;
 	VUIMulti amoebaControlModelVUI;
-	AmoebaMultiUIWindow amoebaControlModelUI;
+	EllsaMultiUIWindow amoebaControlModelUI;
 	
 	LearningAgent agent;
 	Environment env;
@@ -108,11 +96,11 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
+		amoebaSpatialRewardUI = new EllsaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
 		
 		
 		amoebaControlModelVUI = new VUIMulti("2D");
-		amoebaControlModelUI = new AmoebaMultiUIWindow("CONTROL MODEL", amoebaControlModelVUI, null);
+		amoebaControlModelUI = new EllsaMultiUIWindow("CONTROL MODEL", amoebaControlModelVUI, null);
 		
 		startTask(100, 0);		
 	}
@@ -469,7 +457,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	
 	
 	
-	private AMOEBA setupSpatialReward() {
+	private ELLSA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		File config;
@@ -485,7 +473,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -500,7 +488,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 	}
 	
 
-	private AMOEBA setupControlModel() {
+	private ELLSA setupControlModel() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("pCurrent", false));
 		sensors.add(new Pair<String, Boolean>("pGoal", false));
@@ -517,7 +505,7 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(amoebaControlModelUI, amoebaControlModelVUI, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(amoebaControlModelUI, amoebaControlModelVUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		

@@ -8,12 +8,11 @@ import java.util.List;
 import java.util.Random;
 
 import agents.context.localModel.TypeLocalModel;
-import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.AmoebaWindow;
-import kernel.AMOEBA;
+import gui.EllsaWindow;
+import kernel.ELLSA;
 import kernel.World;
 import kernel.backup.SaveHelperDummy;
 import utils.Pair;
@@ -103,7 +102,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		public AMOEBA amoebaSpatialReward;
+		public ELLSA amoebaSpatialReward;
 		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
@@ -174,7 +173,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 *
 	 */
 	public static class AmoebaCoop implements LearningAgent {
-		public AMOEBA amoeba;
+		public ELLSA amoeba;
 		
 		public AmoebaCoop() {
 			amoeba = setup();
@@ -270,7 +269,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 			size = envSize;
 			
 			if(!Configuration.commandLineMode) {
-				AmoebaWindow instance = AmoebaWindow.instance();
+				EllsaWindow instance = EllsaWindow.instance();
 				//pos = new DrawableOval(0.5, 0.5, 1, 1);
 				//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
 				//instance.mainVUI.add(pos);
@@ -353,7 +352,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 * Setup an amoeba for the SimpleReinforcement problem
 	 * @return
 	 */
-	private static AMOEBA setup() {
+	private static ELLSA setup() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		File config;
@@ -369,7 +368,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 	
@@ -380,7 +379,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	
 	
 	
-	private static AMOEBA setupSpatialReward() {
+	private static ELLSA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		File config;
@@ -396,7 +395,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -414,7 +413,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	}
 	
 
-	private static AMOEBA setupControlModel() {
+	private static ELLSA setupControlModel() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("pCurrent", false));
 		sensors.add(new Pair<String, Boolean>("pGoal", false));
@@ -431,7 +430,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -571,7 +570,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndAction {
 	 * The main cause of negative reward is infinite loop (usually near the objective). In such case, the reward is -200
 	 */
 	public static void poc(boolean learnMalus) {
-		AMOEBA amoeba = setup();
+		ELLSA amoeba = setup();
 		Environment env = new OneDimensionEnv(50);
 		
 		// train

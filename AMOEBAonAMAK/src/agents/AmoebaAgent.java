@@ -4,13 +4,13 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.tools.Loggable;
 import gui.RenderStrategy;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.World;
 
 /**
  * The base class for all AMOEBA agents
  */
-public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggable {
+public abstract class AmoebaAgent extends Agent<ELLSA, World> implements Loggable {
 	// Attributes
 	protected String name;
 	private boolean dying;
@@ -21,7 +21,7 @@ public abstract class AmoebaAgent extends Agent<AMOEBA, World> implements Loggab
 	 * Instantiate a new agent attached to an amoeba
 	 * @param the amoeba
 	 */
-	public AmoebaAgent(AMOEBA amas, Object... params) {
+	public AmoebaAgent(ELLSA amas, Object... params) {
 		super(amas, params);
 		this.dying = false;
 	}

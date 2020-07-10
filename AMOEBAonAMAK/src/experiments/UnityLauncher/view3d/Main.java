@@ -12,7 +12,7 @@ import experiments.UnityLauncher.Sender;
 import experiments.UnityLauncher.SocketServer;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -20,7 +20,7 @@ import kernel.backup.IBackupSystem;
 
 public class Main implements Runnable {
 
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	Sender sender;
 	
@@ -63,7 +63,7 @@ public class Main implements Runnable {
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
 
-		AMOEBA amoeba = new AMOEBA(null,  null);
+		ELLSA amoeba = new ELLSA(null,  null);
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS_UNITY.spaceSize, PARAMS_UNITY.dimension, PARAMS_UNITY.nbOfModels, PARAMS_UNITY.normType, PARAMS_UNITY.randomExploration, PARAMS_UNITY.explorationIncrement,PARAMS_UNITY.explorationWidht,PARAMS_UNITY.limitedToSpaceZone, PARAMS_UNITY.oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -115,7 +115,7 @@ public class Main implements Runnable {
 
 
 
-	private void updateContextsOnUnity(AMOEBA amoeba, Sender sender) {
+	private void updateContextsOnUnity(ELLSA amoeba, Sender sender) {
 		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
 		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
 

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 /**
@@ -91,7 +91,7 @@ public class F_XY_System implements StudiedSystem {
 	}
 
 	@Override
-	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+	public void setControlModels(HashMap<String, ELLSA> controlModels) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -127,7 +127,7 @@ public class F_XY_System implements StudiedSystem {
 	}
 
 	@Override
-	public double getErrorOnRequest(AMOEBA amoeba) {
+	public double getErrorOnRequest(ELLSA amoeba) {
 		return 0;
 	}
 }

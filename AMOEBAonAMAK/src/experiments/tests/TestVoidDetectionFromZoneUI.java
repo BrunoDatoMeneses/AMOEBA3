@@ -7,10 +7,10 @@ import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -71,8 +71,8 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         Configuration.plotMilliSecondsUpdate = 20000;
 
         VUIMulti amoebaVUI = new VUIMulti("2D");
-        AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
-        AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+        EllsaMultiUIWindow amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
+        ELLSA amoeba = new ELLSA(amoebaUI,  amoebaVUI);
         StudiedSystem studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
         amoeba.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -154,7 +154,7 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
     }
 
-    private Experiment getExperiment(AMOEBA amoeba, Context ctxt1) {
+    private Experiment getExperiment(ELLSA amoeba, Context ctxt1) {
         ArrayList<Percept> percepts = amoeba.getPercepts();
         Experiment exp = new Experiment(ctxt1);
         for (Percept pct : percepts) {

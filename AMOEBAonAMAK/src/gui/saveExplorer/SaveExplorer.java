@@ -2,7 +2,6 @@ package gui.saveExplorer;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,31 +24,31 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperImpl;
 
 /**
  * Graphical element to browse and load (auto)saves for a specific amoeba. 
  * @see SaveHelperImpl
- * @see AMOEBA
+ * @see ELLSA
  * @author Hugo
  *
  */
 public class SaveExplorer extends VBox {
 	
-	private AMOEBA amoeba;
+	private ELLSA amoeba;
 	
 	@FXML private ComboBox<String> comboBoxA;
 	@FXML private ComboBox<String> comboBoxM;
 	
 	/**
 	 * create a SaveExplorer for an AMOEBA.
-	 * The amoeba MUST have a working {@link AMOEBA#saver}.
+	 * The amoeba MUST have a working {@link ELLSA#saver}.
 	 * @param amoeba
 	 * @see SaveHelperImpl
 	 */
-	public SaveExplorer(AMOEBA amoeba) {
+	public SaveExplorer(ELLSA amoeba) {
 		this.amoeba = amoeba;
 		try {
 			//load the fxml for THIS SaveExplorer
@@ -257,7 +256,7 @@ public class SaveExplorer extends VBox {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		System.out.println("New AMOEBA launched.");
-		AMOEBA amoeba = new AMOEBA(null,null,args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
+		ELLSA amoeba = new ELLSA(null,null,args[0], (StudiedSystem)SerializeBase64.deserialize(args[1]));
 		//amoeba.allowGraphicalScheduler(false);
 		for(Percept p : amoeba.getPercepts()) {
 			p.setValue(amoeba.getPerceptions(p.getName()));

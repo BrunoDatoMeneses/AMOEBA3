@@ -7,25 +7,19 @@ import java.util.ArrayList;
 
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.examples.randomantsMultiUi.AntHillExampleMultiUI;
-import fr.irit.smac.amak.examples.randomantsMultiUi.WorldExampleMultiUI;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
-import utils.TRACE_LEVEL;
 
 
 /**
@@ -50,15 +44,15 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 	
 	public static final int nbCycle = 1000;
 	
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
-	AmoebaMultiUIWindow amoebaUI;
+	EllsaMultiUIWindow amoebaUI;
 	
-	AMOEBA amoeba2;
+	ELLSA amoeba2;
 	StudiedSystem studiedSystem2;
 	VUIMulti amoebaVUI2;
-	AmoebaMultiUIWindow amoebaUI2;
+	EllsaMultiUIWindow amoebaUI2;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -78,7 +72,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
+		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 		
 		// Exemple for adding a tool in the toolbar
@@ -98,7 +92,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
 		
 		
 		amoebaVUI2 = new VUIMulti("2D");
-		amoebaUI2 = new AmoebaMultiUIWindow("ELLSA", amoebaVUI2, null);
+		amoebaUI2 = new EllsaMultiUIWindow("ELLSA", amoebaVUI2, null);
 		
 		
 		// Exemple for adding a tool in the toolbar
@@ -230,7 +224,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                 @Override
                 public void run() 
                 {
-                	amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+                	amoeba = new ELLSA(amoebaUI,  amoebaVUI);
             		studiedSystem = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
             		amoeba.setStudiedSystem(studiedSystem);
             		IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -301,7 +295,7 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
                 @Override
                 public void run() 
                 {
-                	amoeba2 = new AMOEBA(amoebaUI2,  amoebaVUI2);
+                	amoeba2 = new ELLSA(amoebaUI2,  amoebaVUI2);
             		studiedSystem2 = new F_N_Manager(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
             		amoeba2.setStudiedSystem(studiedSystem2);
             		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);

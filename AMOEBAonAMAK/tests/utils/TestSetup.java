@@ -9,13 +9,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import experiments.F_XY_System;
-import fr.irit.smac.amak.Configuration;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperImpl;
 
 public class TestSetup {
-	protected AMOEBA amoeba;
+	protected ELLSA amoeba;
 	/**
 	 * Testing sample : increasing this number lead to slower test and more chance of failure.
 	 */

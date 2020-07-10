@@ -5,11 +5,11 @@ import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -46,8 +46,8 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         StudiedSystem studiedSystemTheta0 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
         VUIMulti amoebaVUITheta0 = new VUIMulti("2D");
-        AmoebaMultiUIWindow amoebaUITheta0 = new AmoebaMultiUIWindow("ELLSA Theta 0", amoebaVUITheta0, studiedSystemTheta0);
-        AMOEBA amoebaTheta0 = new AMOEBA(amoebaUITheta0,  amoebaVUITheta0);
+        EllsaMultiUIWindow amoebaUITheta0 = new EllsaMultiUIWindow("ELLSA Theta 0", amoebaVUITheta0, studiedSystemTheta0);
+        ELLSA amoebaTheta0 = new ELLSA(amoebaUITheta0,  amoebaVUITheta0);
         amoebaTheta0.setStudiedSystem(studiedSystemTheta0);
         IBackupSystem backupSystem = new BackupSystem(amoebaTheta0);
         File file = new File("resources/"+PARAMS.configFile);
@@ -84,8 +84,8 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         StudiedSystem studiedSystemTheta1 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
         VUIMulti amoebaVUITheta1 = new VUIMulti("2D");
-        AmoebaMultiUIWindow amoebaUITheta1 = new AmoebaMultiUIWindow("ELLSA Theta 1", amoebaVUITheta1, studiedSystemTheta1);
-        AMOEBA amoebaTheta1 = new AMOEBA(amoebaUITheta1,  amoebaVUITheta1);
+        EllsaMultiUIWindow amoebaUITheta1 = new EllsaMultiUIWindow("ELLSA Theta 1", amoebaVUITheta1, studiedSystemTheta1);
+        ELLSA amoebaTheta1 = new ELLSA(amoebaUITheta1,  amoebaVUITheta1);
         amoebaTheta1.setStudiedSystem(studiedSystemTheta1);
         IBackupSystem backupSystem1 = new BackupSystem(amoebaTheta1);
         File file1 = new File("resources/"+PARAMS.configFile);
@@ -132,7 +132,7 @@ public class RobotLaunchExampleMultiUI extends Application{
             distances[i] = PARAMS.armBaseSize - (i*20);
         }
 
-        AMOEBA amoebas[] = new AMOEBA[2];
+        ELLSA amoebas[] = new ELLSA[2];
         amoebas[0] = amoebaTheta0;
         amoebas[1] = amoebaTheta1;
         RobotController robotController = new RobotController(jointsNb);

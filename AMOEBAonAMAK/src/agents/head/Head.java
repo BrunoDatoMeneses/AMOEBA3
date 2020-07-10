@@ -12,7 +12,7 @@ import agents.percept.Percept;
 import experiments.UI_PARAMS;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import ncs.NCS;
@@ -91,7 +91,7 @@ public class Head extends AmoebaAgent {
 				0.9, 1);
 	}
 
-	public Head(AMOEBA amoeba) {
+	public Head(ELLSA amoeba) {
 		super(amoeba);
 		
 		for(int i =0 ; i< 20;i++) {

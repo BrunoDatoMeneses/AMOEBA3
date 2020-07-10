@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import kernel.EllsaData;
 import org.jdom2.Attribute;
 import org.jdom2.Comment;
 import org.jdom2.DataConversionException;
@@ -28,8 +29,7 @@ import agents.context.localModel.LocalModel;
 import agents.context.localModel.TypeLocalModel;
 import agents.head.Head;
 import agents.percept.Percept;
-import kernel.AMOEBA;
-import kernel.AmoebaData;
+import kernel.ELLSA;
 import utils.XMLSerialization;
 
 /**
@@ -42,14 +42,14 @@ public class BackupSystem implements IBackupSystem {
 	private static final String CONTEXT_NODE = "Context";
 
 	// Members
-	private AMOEBA amoeba;
+	private ELLSA amoeba;
 	private Map<String, Percept> perceptsByName = new HashMap<>();
 	private boolean loadPresetContext = true;
 	private boolean amoebaDataLoaded = false;
 
 	// -------------------- Constructor --------------------
 
-	public BackupSystem(AMOEBA amoeba) {
+	public BackupSystem(ELLSA amoeba) {
 		this.amoeba = amoeba;
 	}
 
@@ -129,7 +129,7 @@ public class BackupSystem implements IBackupSystem {
 		// amoeba data
 		Element dataElement = configurationElement.getChild("Data");
 		if(dataElement != null) { // the data field is optionnal. We don't ask human to write it !
-			XMLSerialization<AmoebaData> decode = new XMLSerialization<>();
+			XMLSerialization<EllsaData> decode = new XMLSerialization<>();
 			amoeba.data = decode.fromString(dataElement.getText());
 			amoebaDataLoaded = true;
 		}
@@ -334,7 +334,7 @@ public class BackupSystem implements IBackupSystem {
 		
 		// amoeba data
 		Element dataElement = new Element("Data");
-		XMLSerialization<AmoebaData> encode = new XMLSerialization<>();
+		XMLSerialization<EllsaData> encode = new XMLSerialization<>();
 		dataElement.setText(encode.toString(amoeba.data));
 		configurationElement.addContent(dataElement);
 		

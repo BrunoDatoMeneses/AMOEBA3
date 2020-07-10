@@ -1,11 +1,10 @@
 package experiments.reinforcement.WithStudiedSystem;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 
@@ -26,7 +25,7 @@ public class ReinforcementManager2D implements StudiedSystem{
 	/** The result. */
 	double result = 0;
 	
-	HashMap<String, AMOEBA> amoebas;
+	HashMap<String, ELLSA> amoebas;
 
 	
 	/** The first step. */
@@ -496,7 +495,7 @@ public class ReinforcementManager2D implements StudiedSystem{
 	}
 
 	@Override
-	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+	public void setControlModels(HashMap<String, ELLSA> controlModels) {
 		amoebas = controlModels;
 		
 	}
@@ -557,7 +556,7 @@ public class ReinforcementManager2D implements StudiedSystem{
 	}
 
 	@Override
-	public double getErrorOnRequest(AMOEBA amoeba) {
+	public double getErrorOnRequest(ELLSA amoeba) {
 		return 0;
 	}
 

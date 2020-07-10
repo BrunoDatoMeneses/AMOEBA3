@@ -5,7 +5,7 @@ import java.util.HashMap;
 import experiments.benchmark.NDimCube;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperDummy;
 
@@ -24,7 +24,7 @@ public class TestingMain {
 		StudiedSystem studiedSystem = new NDimCube(50.0, 3);
 		// create the amoeba
 		// Make sure the path to the config file is correct.
-		AMOEBA amoeba = new AMOEBA(null,null,"resources/threeDimensionsLauncher.xml", studiedSystem);
+		ELLSA amoeba = new ELLSA(null,null,"resources/threeDimensionsLauncher.xml", studiedSystem);
 		amoeba.saver = new SaveHelperDummy();
 		// a window should have appeared, allowing you to control and visualize the amoeba.
 		

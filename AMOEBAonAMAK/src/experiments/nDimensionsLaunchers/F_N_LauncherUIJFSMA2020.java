@@ -3,17 +3,15 @@ package experiments.nDimensionsLaunchers;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
-import utils.TRACE_LEVEL;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +27,10 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 
 
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
-	AmoebaMultiUIWindow amoebaUI;
+	EllsaMultiUIWindow amoebaUI;
 	
 	public static void main(String[] args) throws IOException {
 		Application.launch(args);
@@ -52,7 +50,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		
 
 
-		amoeba = new AMOEBA(null,  null);
+		amoeba = new ELLSA(null,  null);
 		studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -115,8 +113,8 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		Configuration.commandLineMode = false;
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
-		AMOEBA amoeba2 = new AMOEBA(amoebaUI,  amoebaVUI);
+		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
+		ELLSA amoeba2 = new ELLSA(amoebaUI,  amoebaVUI);
 		StudiedSystem studiedSystem2 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba2.setStudiedSystem(studiedSystem2);
 		IBackupSystem backupSystem2 = new BackupSystem(amoeba2);

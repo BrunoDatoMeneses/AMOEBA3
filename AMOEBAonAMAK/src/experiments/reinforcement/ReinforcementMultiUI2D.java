@@ -10,29 +10,17 @@ import java.util.Random;
 
 import agents.context.localModel.TypeLocalModel;
 import experiments.FILE;
-import experiments.reinforcement.SimpleReinforcement1DSpatialRewardAndActionMltiUI.Environment;
-import experiments.reinforcement.SimpleReinforcement1DSpatialRewardAndActionMltiUI.LearningAgent;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
-import kernel.StudiedSystem;
+import kernel.ELLSA;
 import kernel.World;
-import kernel.backup.BackupSystem;
-import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperDummy;
-import kernel.backup.SaveHelperImpl;
 import utils.Pair;
 import utils.RandomUtils;
 import utils.TRACE_LEVEL;
@@ -71,17 +59,17 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
 	
-	AMOEBA amoebaSpatialReward;
+	ELLSA amoebaSpatialReward;
 	VUIMulti amoebaSpatialRewardVUI;
-	AmoebaMultiUIWindow amoebaSpatialRewardUI;
+	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	AMOEBA amoebaActionModel1;
+	ELLSA amoebaActionModel1;
 	VUIMulti amoebaActionModel1VUI;
-	AmoebaMultiUIWindow amoebaActionModel1UI;
+	EllsaMultiUIWindow amoebaActionModel1UI;
 	
-	AMOEBA amoebaActionModel2;
+	ELLSA amoebaActionModel2;
 	VUIMulti amoebaActionModel2VUI;
-	AmoebaMultiUIWindow amoebaActionModel2UI;
+	EllsaMultiUIWindow amoebaActionModel2UI;
 	
 	LearningAgent agent;
 	Environment env;
@@ -112,13 +100,13 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
+		amoebaSpatialRewardUI = new EllsaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
 		
 		amoebaActionModel1VUI = new VUIMulti("2D");
-		amoebaActionModel1UI = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModel1VUI, null);
+		amoebaActionModel1UI = new EllsaMultiUIWindow("ACTION 1 MODEL", amoebaActionModel1VUI, null);
 		
 		amoebaActionModel2VUI = new VUIMulti("2D");
-		amoebaActionModel2UI = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModel2VUI, null);
+		amoebaActionModel2UI = new EllsaMultiUIWindow("ACTION 2 MODEL", amoebaActionModel2VUI, null);
 		
 		startTask(100, 0);		
 	}
@@ -481,7 +469,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 	
 	
 	
-	private AMOEBA setupSpatialReward() {
+	private ELLSA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		sensors.add(new Pair<String, Boolean>("p2", false));
@@ -498,7 +486,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.DEBUG;
-		AMOEBA amoeba = new AMOEBA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -513,7 +501,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 	}
 	
 
-	private AMOEBA setupControlModel(String action, AmoebaMultiUIWindow window, VUIMulti VUI) {
+	private ELLSA setupControlModel(String action, EllsaMultiUIWindow window, VUIMulti VUI) {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1Current", false));
 		sensors.add(new Pair<String, Boolean>("p2Current", false));
@@ -531,7 +519,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(window, VUI, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(window, VUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		

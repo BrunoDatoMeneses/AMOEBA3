@@ -4,16 +4,16 @@ import java.util.ArrayList;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 
 
 
 public class Sender {
 
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	SocketServer server;
 	
-	public Sender(SocketServer serverInstance,AMOEBA amoebaInstance) {
+	public Sender(SocketServer serverInstance, ELLSA amoebaInstance) {
 		amoeba = amoebaInstance;
 		server = serverInstance;
 	}

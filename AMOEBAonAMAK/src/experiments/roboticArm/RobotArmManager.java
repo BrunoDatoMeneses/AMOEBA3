@@ -2,7 +2,7 @@ package experiments.roboticArm;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import utils.Pair;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
@@ -16,7 +16,7 @@ public class RobotArmManager {
     public int requestCycles;
     double[] l;
     double[] joints;
-    AMOEBA[] amoebas;
+    ELLSA[] amoebas;
     RobotController controller;
 
     double xPos;
@@ -36,7 +36,7 @@ public class RobotArmManager {
     public boolean finished = false;
 
 
-    public RobotArmManager(int jointsNumber, double[] jointDistances, AMOEBA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
+    public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
         jointsNb = jointsNumber;
         l = jointDistances;

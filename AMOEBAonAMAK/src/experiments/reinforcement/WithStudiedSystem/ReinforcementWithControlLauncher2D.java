@@ -9,29 +9,19 @@ import java.util.HashMap;
 import agents.context.localModel.TypeLocalModel;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.examples.randomantsMultiUi.AntHillExampleMultiUI;
-import fr.irit.smac.amak.examples.randomantsMultiUi.WorldExampleMultiUI;
 import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -65,18 +55,18 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 	
 	public static final int nbCycle = 10000;
 	
-	AMOEBA amoebaSpatialReward;
+	ELLSA amoebaSpatialReward;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaSpatialRewardVUI;
-	AmoebaMultiUIWindow amoebaSpatialRewardUI;
+	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	AMOEBA amoebaActionModel1;
+	ELLSA amoebaActionModel1;
 	VUIMulti amoebaActionModelVUI1;
-	AmoebaMultiUIWindow amoebaActionModelUI1;
+	EllsaMultiUIWindow amoebaActionModelUI1;
 	
-	AMOEBA amoebaActionModel2;
+	ELLSA amoebaActionModel2;
 	VUIMulti amoebaActionModelVUI2;
-	AmoebaMultiUIWindow amoebaActionModelUI2;
+	EllsaMultiUIWindow amoebaActionModelUI2;
 	
 	
 	public static void main(String[] args) throws IOException {
@@ -97,13 +87,13 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D REWARD");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
+		amoebaSpatialRewardUI = new EllsaMultiUIWindow("SPATIAL REWARD", amoebaSpatialRewardVUI, null);
 		
 		amoebaActionModelVUI1 = new VUIMulti("2D");
-		amoebaActionModelUI1 = new AmoebaMultiUIWindow("ACTION 1 MODEL", amoebaActionModelVUI1, null);
+		amoebaActionModelUI1 = new EllsaMultiUIWindow("ACTION 1 MODEL", amoebaActionModelVUI1, null);
 		
 		amoebaActionModelVUI2 = new VUIMulti("2D");
-		amoebaActionModelUI2 = new AmoebaMultiUIWindow("ACTION 2 MODEL", amoebaActionModelVUI2, null);
+		amoebaActionModelUI2 = new EllsaMultiUIWindow("ACTION 2 MODEL", amoebaActionModelVUI2, null);
 		
 
 		
@@ -182,7 +172,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
                 	amoebaActionModel1 = setupControlModel("1", amoebaActionModelUI1, amoebaActionModelVUI1);
                 	amoebaActionModel2 = setupControlModel("2", amoebaActionModelUI2, amoebaActionModelVUI2);
                 	
-                	HashMap<String, AMOEBA> amoebas = new HashMap<String, AMOEBA>();
+                	HashMap<String, ELLSA> amoebas = new HashMap<String, ELLSA>();
                 	amoebas.put("a1", amoebaActionModel1);
                 	amoebas.put("a2", amoebaActionModel2);
                 	amoebas.put("spatialReward", amoebaSpatialReward);
@@ -245,8 +235,8 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 	
 	
 	
-	private AMOEBA setupSpatialReward() {
-		AMOEBA amoeba = new AMOEBA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
+	private ELLSA setupSpatialReward() {
+		ELLSA amoeba = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
 		studiedSystem = new ReinforcementManager2D(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -267,7 +257,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 	}
 	
 
-	private AMOEBA setupControlModel(String action, AmoebaMultiUIWindow window, VUIMulti VUI) {
+	private ELLSA setupControlModel(String action, EllsaMultiUIWindow window, VUIMulti VUI) {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		sensors.add(new Pair<String, Boolean>("p2", false));
@@ -285,7 +275,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(window, VUI, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(window, VUI, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		

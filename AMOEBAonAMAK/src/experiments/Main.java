@@ -5,8 +5,8 @@ import java.io.IOException;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.tools.SerializeBase64;
-import gui.AmoebaWindow;
-import kernel.AMOEBA;
+import gui.EllsaWindow;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 public class Main {
@@ -25,7 +25,7 @@ public class Main {
 		String b64StudiedSystem = args[2];
 		
 		if(!Configuration.commandLineMode) {
-			AmoebaWindow.instance();
+			EllsaWindow.instance();
 		}
 		
 		StudiedSystem ss;
@@ -39,7 +39,7 @@ public class Main {
 		}
 		
 		System.out.println("Creating the amoeba");
-		AMOEBA amoeba = new AMOEBA(null,null,configFile, ss);
+		ELLSA amoeba = new ELLSA(null,null,configFile, ss);
 		
 		synchronized (Thread.currentThread()){
 			try {

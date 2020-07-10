@@ -1,7 +1,7 @@
 package ros;
 
 import fr.irit.smac.amak.Configuration;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 
 public class Main {
 
@@ -30,7 +30,7 @@ public class Main {
 			}
 		}
 		
-		AMOEBA amoeba = new AMOEBA(null,null,config, null);
+		ELLSA amoeba = new ELLSA(null,null,config, null);
 		amoeba.allowGraphicalScheduler(false);
 
 		RosBridge bridge = new RosBridge();

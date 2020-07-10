@@ -7,20 +7,15 @@ import java.util.ArrayList;
 
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.examples.randomantsMultiUi.AntHillExampleMultiUI;
-import fr.irit.smac.amak.examples.randomantsMultiUi.WorldExampleMultiUI;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -51,10 +46,10 @@ public class ReinforcementLauncher2D extends Application implements Serializable
 	
 	public static final int nbCycle = 10000;
 	
-	AMOEBA amoebaSpatialReward;
+	ELLSA amoebaSpatialReward;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaSpatialRewardVUI;
-	AmoebaMultiUIWindow amoebaSpatialRewardUI;
+	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
 
 	
@@ -77,7 +72,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaSpatialRewardVUI = new VUIMulti("2D");
-		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("ELLSA", amoebaSpatialRewardVUI, null);
+		amoebaSpatialRewardUI = new EllsaMultiUIWindow("ELLSA", amoebaSpatialRewardVUI, null);
 		
 		
 		// Exemple for adding a tool in the toolbar
@@ -141,7 +136,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
                 @Override
                 public void run() 
                 {
-                	amoebaSpatialReward = new AMOEBA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
+                	amoebaSpatialReward = new ELLSA(amoebaSpatialRewardUI,  amoebaSpatialRewardVUI);
             		studiedSystem = new ReinforcementManager2D(spaceSize, dimension, nbOfModels, normType, randomExploration, explorationIncrement,explorationWidht,limitedToSpaceZone, oracleNoiseRange);
             		amoebaSpatialReward.setStudiedSystem(studiedSystem);
             		IBackupSystem backupSystem = new BackupSystem(amoebaSpatialReward);

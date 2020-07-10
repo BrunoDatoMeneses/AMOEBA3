@@ -18,7 +18,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 
 /**
  * The ContextMenu that is shown when right-clicking the {@link VUI} canvas
@@ -36,10 +36,10 @@ public class ContextMenuVUIMulti extends ContextMenu {
 	/**
 	 * Create a {@link ContextMenu} suited for our needs, composed of 2 items : "Request Here" and "Learn here".<br/>
 	 * Set itself as the vui canvas {@link ContextMenu}. 
-	 * @param amoeba the amoeba where {@link AMOEBA#request(HashMap)} and {@link AMOEBA#learn(HashMap)} will be executed.
+	 * @param amoeba the amoeba where {@link ELLSA#request(HashMap)} and {@link ELLSA#learn(HashMap)} will be executed.
 	 * @param vui the {@link VUI} hosting the {@link ContextMenuVUIMulti}
 	 */
-	public ContextMenuVUIMulti(AMOEBA amoeba, VUIMulti vui) {
+	public ContextMenuVUIMulti(ELLSA amoeba, VUIMulti vui) {
 		// "request here" menu item
 		setupRequestHereMenuItem(amoeba, vui);
 		
@@ -57,7 +57,7 @@ public class ContextMenuVUIMulti extends ContextMenu {
 		});	
 	}
 
-	private void setupRequestHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
+	private void setupRequestHereMenuItem(ELLSA amoeba, VUIMulti vui) {
 		MenuItem reqHere = new MenuItem("Request Here");
 		reqHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -75,11 +75,11 @@ public class ContextMenuVUIMulti extends ContextMenu {
 	
 	/**
 	 * The "Request Here" action performed when the amoeba is 2D.<br/>
-	 * Execute a {@link AMOEBA#request(HashMap)} at the position of the click.
+	 * Execute a {@link ELLSA#request(HashMap)} at the position of the click.
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqTwoDimension(AMOEBA amoeba, VUIMulti vui) {
+	private void reqTwoDimension(ELLSA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -92,11 +92,11 @@ public class ContextMenuVUIMulti extends ContextMenu {
 	
 	/**
 	 * The "Request Here" action performed when the amoeba is not 2D.<br/>
-	 * Show a {@link Dialog} prompting the user to inputs value for the {@link AMOEBA#request(HashMap)}.
+	 * Show a {@link Dialog} prompting the user to inputs value for the {@link ELLSA#request(HashMap)}.
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void reqNDimension(AMOEBA amoeba, VUIMulti vui) {
+	private void reqNDimension(ELLSA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		
@@ -144,7 +144,7 @@ public class ContextMenuVUIMulti extends ContextMenu {
 		});
 	}
 	
-	private void setupLearnHereMenuItem(AMOEBA amoeba, VUIMulti vui) {
+	private void setupLearnHereMenuItem(ELLSA amoeba, VUIMulti vui) {
 		MenuItem learnHere = new MenuItem("Learn Here");
 		learnHere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -162,11 +162,11 @@ public class ContextMenuVUIMulti extends ContextMenu {
 	
 	/**
 	 * The "Learn Here" action performed when the amoeba is 2D.<br/>
-	 * Execute a {@link AMOEBA#learn(HashMap)} at the position of the click.
+	 * Execute a {@link ELLSA#learn(HashMap)} at the position of the click.
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnTwoDimension(AMOEBA amoeba, VUIMulti vui) {
+	private void learnTwoDimension(ELLSA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		HashMap<String, Double> req = new HashMap<String, Double>();
@@ -178,11 +178,11 @@ public class ContextMenuVUIMulti extends ContextMenu {
 	
 	/**
 	 * The "Learn Here" action performed when the amoeba is not 2D.<br/>
-	 * Show a {@link Dialog} prompting the user to inputs value for the {@link AMOEBA#learn(HashMap)}.
+	 * Show a {@link Dialog} prompting the user to inputs value for the {@link ELLSA#learn(HashMap)}.
 	 * @param amoeba
 	 * @param vui
 	 */
-	private void learnNDimebsion(AMOEBA amoeba, VUIMulti vui) {
+	private void learnNDimebsion(ELLSA amoeba, VUIMulti vui) {
 		double x = vui.screenToWorldX(reqHereX);
 		double y = vui.screenToWorldY(reqHereY);
 		

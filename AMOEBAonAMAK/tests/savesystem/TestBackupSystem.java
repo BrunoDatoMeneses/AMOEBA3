@@ -8,9 +8,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import experiments.F_XY_System;
-import kernel.AMOEBA;
-import kernel.StudiedSystem;
 import utils.Round;
 import utils.TestSetup;
 

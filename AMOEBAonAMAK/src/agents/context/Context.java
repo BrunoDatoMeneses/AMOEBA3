@@ -15,7 +15,7 @@ import agents.head.REQUEST;
 import agents.percept.Percept;
 import gui.ContextRendererFX;
 import gui.RenderStrategy;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import ncs.NCS;
 import utils.Pair;
 import utils.RAND_NUM;
@@ -83,7 +83,7 @@ public class Context extends AmoebaAgent {
 
 	int lastFrontierRequestTick = 0;
 	
-	public Context(AMOEBA amoeba) {
+	public Context(ELLSA amoeba) {
 		super(amoeba);
 		buildContext();
 		criticalities = new Criticalities(5);
@@ -94,7 +94,7 @@ public class Context extends AmoebaAgent {
 	}
 
 	// FOR TEST ONLY
-	public Context(AMOEBA amoeba, HashMap<Percept, Range> manualRanges) {
+	public Context(ELLSA amoeba, HashMap<Percept, Range> manualRanges) {
 		super(amoeba);
 		buildContext(manualRanges);
 		criticalities = new Criticalities(5);
@@ -104,7 +104,7 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(AMOEBA amoeba, Context bestNearestContext) {
+	public Context(ELLSA amoeba, Context bestNearestContext) {
 		super(amoeba);
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
@@ -115,7 +115,7 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(AMOEBA amoeba, double endogenousPrediction) {
+	public Context(ELLSA amoeba, double endogenousPrediction) {
 		super(amoeba);
 		buildContextWithoutOracle(endogenousPrediction);
 		getAmas().getEnvironment()
@@ -126,7 +126,7 @@ public class Context extends AmoebaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(AMOEBA amoeba, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
+	public Context(ELLSA amoeba, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
 		super(amoeba);
 		buildContext(fatherContext, contextDimensions);
 		getAmas().getEnvironment()

@@ -9,27 +9,19 @@ import java.util.List;
 import java.util.Random;
 
 import agents.context.localModel.TypeLocalModel;
-import agents.percept.Percept;
-import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
+import gui.EllsaWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
-import kernel.backup.BackupSystem;
-import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperDummy;
-import kernel.backup.SaveHelperImpl;
 import utils.Pair;
 import utils.RandomUtils;
 import utils.TRACE_LEVEL;
@@ -55,18 +47,18 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	public static final double EXPLO_RATE_DIMINUTION_FACTOR = 0.01;
 	public static final double EXPLO_RATE_BASE = 1;
 	
-	AMOEBA amoebaSpatialReward;
+	ELLSA amoebaSpatialReward;
 	VUIMulti amoebaSpatialRewardVUI;
-	AmoebaMultiUIWindow amoebaSpatialRewardUI;
+	EllsaMultiUIWindow amoebaSpatialRewardUI;
 	
-	AMOEBA amoebaControlModel;
+	ELLSA amoebaControlModel;
 	VUIMulti amoebaControlModelVUI;
-	AmoebaMultiUIWindow amoebaControlModelUI;
+	EllsaMultiUIWindow amoebaControlModelUI;
 	
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
-	AmoebaMultiUIWindow amoebaUI;
+	EllsaMultiUIWindow amoebaUI;
 	
 	
 	
@@ -88,7 +80,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		Configuration.plotMilliSecondsUpdate = 20000;
 		
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
+		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 //		amoebaSpatialRewardVUI = new VUIMulti("2D");
 //		amoebaSpatialRewardUI = new AmoebaMultiUIWindow("SPATIAL_REWARD", amoebaSpatialRewardVUI);
@@ -312,7 +304,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	 *
 	 */
 	public static class AmoebaQL implements LearningAgent {
-		public AMOEBA amoebaSpatialReward;
+		public ELLSA amoebaSpatialReward;
 		//public AMOEBA amoebaControlModel;
 		public double lr = 0.8;
 		public double gamma = 0.9;
@@ -393,7 +385,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 			size = envSize;
 			
 			if(!Configuration.commandLineMode) {
-				AmoebaWindow instance = AmoebaWindow.instance();
+				EllsaWindow instance = EllsaWindow.instance();
 				//pos = new DrawableOval(0.5, 0.5, 1, 1);
 				//pos.setColor(new Color(0.5, 0.0, 0.0, 0.5));
 				//instance.mainVUI.add(pos);
@@ -476,7 +468,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	 * Setup an amoeba for the SimpleReinforcement problem
 	 * @return
 	 */
-	private static AMOEBA setup() {
+	private static ELLSA setup() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		File config;
@@ -492,7 +484,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 	
@@ -503,7 +495,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	
 	
 	
-	private static AMOEBA setupSpatialReward() {
+	private static ELLSA setupSpatialReward() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("p1", false));
 		File config;
@@ -519,7 +511,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		
@@ -534,7 +526,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 	}
 	
 
-	private static AMOEBA setupControlModel() {
+	private static ELLSA setupControlModel() {
 		ArrayList<Pair<String, Boolean>> sensors = new ArrayList<>();
 		sensors.add(new Pair<String, Boolean>("pCurrent", false));
 		sensors.add(new Pair<String, Boolean>("pGoal", false));
@@ -551,7 +543,7 @@ public abstract class SimpleReinforcement1DSpatialRewardAndActionMltiUI extends 
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
 		World.minLevel = TRACE_LEVEL.ERROR;
-		AMOEBA amoeba = new AMOEBA(null, null, config.getAbsolutePath(), null);
+		ELLSA amoeba = new ELLSA(null, null, config.getAbsolutePath(), null);
 		amoeba.saver = new SaveHelperDummy();
 		
 		

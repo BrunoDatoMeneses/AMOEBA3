@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.World;
 import ncs.NCS;
 import utils.Pair;
@@ -136,8 +136,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	// FOR TEST ONLY
-	public Range(AMOEBA amoeba, double start, double end, double extendedrangeatcreation, boolean start_inclu,
-				 boolean end_inclu, Percept p) {
+	public Range(ELLSA amoeba, double start, double end, double extendedrangeatcreation, boolean start_inclu,
+                 boolean end_inclu, Percept p) {
 		super();
 
 		world = amoeba.getEnvironment();

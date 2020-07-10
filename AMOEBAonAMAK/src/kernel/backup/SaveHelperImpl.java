@@ -10,15 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.MainWindow;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
+import gui.EllsaWindow;
 import gui.saveExplorer.SaveExplorer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import utils.DeleteDirectory;
 
 /**
@@ -36,7 +35,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	public static final String manualsaveDirName = "manual";
 
 	
-	public AmoebaMultiUIWindow amoebaMultiUIWindow;
+	public EllsaMultiUIWindow amoebaMultiUIWindow;
 	
 	/**
 	 * The backup system used by the SaveHelper.
@@ -69,7 +68,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	 */
 	public Path dir;
 
-	private AMOEBA amoeba;
+	private ELLSA amoeba;
 
 	/**
 	 * Create a SaveHelper for an amoeba.<br/>
@@ -78,7 +77,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	 * By default, the save folder for this amoeba is deleted when the application is closed, this can be changed with {@link SaveHelperImpl#deleteFolderOnClose}.
 	 * @param amoeba
 	 */
-	public SaveHelperImpl(AMOEBA amoeba) {
+	public SaveHelperImpl(ELLSA amoeba) {
 		autoSave = !Configuration.commandLineMode;
 		this.amoeba = amoeba;
 		backupSystem = new BackupSystem(amoeba);
@@ -105,10 +104,10 @@ public class SaveHelperImpl implements ISaveHelper{
 		}
 
 		// add graphical element if relevant
-		if (AmoebaWindow.isInstance()) {
+		if (EllsaWindow.isInstance()) {
 			SaveExplorer se = new SaveExplorer(amoeba);
-			AmoebaWindow.addTabbedPanel("Save Explorer", se);
-			AmoebaWindow.addOnCloseAction(()-> {
+			EllsaWindow.addTabbedPanel("Save Explorer", se);
+			EllsaWindow.addOnCloseAction(()-> {
 				if(deleteFolderOnClose) {
 					try {
 						DeleteDirectory.deleteDirectoryRecursion(dir);
@@ -122,7 +121,7 @@ public class SaveHelperImpl implements ISaveHelper{
 		}
 	}
 	
-	public SaveHelperImpl(AMOEBA amoeba, AmoebaMultiUIWindow window) {
+	public SaveHelperImpl(ELLSA amoeba, EllsaMultiUIWindow window) {
 		amoebaMultiUIWindow = window;
 		autoSave = !Configuration.commandLineMode;
 		this.amoeba = amoeba;
@@ -245,7 +244,7 @@ public class SaveHelperImpl implements ISaveHelper{
 	 * Add save/load options in the main window.
 	 */
 	private void setupGraphicalTool() {
-		AmoebaMultiUIWindow mw = amoebaMultiUIWindow;
+		EllsaMultiUIWindow mw = amoebaMultiUIWindow;
 		// TODO remove if they exist items Save and Load in menu Option.
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML", "*.xml"),
@@ -276,8 +275,8 @@ public class SaveHelperImpl implements ISaveHelper{
 		MainWindow.addOptionsItem("Save", eventSave);
 	}
 	
-	private void setupGraphicalTool(AmoebaMultiUIWindow window) {
-		AmoebaMultiUIWindow mw = amoebaMultiUIWindow;
+	private void setupGraphicalTool(EllsaMultiUIWindow window) {
+		EllsaMultiUIWindow mw = amoebaMultiUIWindow;
 		// TODO remove if they exist items Save and Load in menu Option.
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML", "*.xml"),

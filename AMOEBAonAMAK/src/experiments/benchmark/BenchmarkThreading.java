@@ -8,8 +8,8 @@ import java.util.function.DoubleBinaryOperator;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
-import kernel.AMOEBA;
-import kernel.IAMOEBA;
+import kernel.ELLSA;
+import kernel.IELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
@@ -32,8 +32,8 @@ public class BenchmarkThreading {
 	 * @param error the function used to measure error, if null, will use squared differences
 	 * @return a list containing each measure, a measure is a list with this format : [numLearn, timeLearn, timeRequest, meanErrorRequest] 
 	 */
-	public static List<List<Double>> benchmark(IAMOEBA amoeba, StudiedSystem learnSystem, StudiedSystem requestSystem,
-												int nbLearn, int nbRequest, int measureEveryNLearn, DoubleBinaryOperator error) {
+	public static List<List<Double>> benchmark(IELLSA amoeba, StudiedSystem learnSystem, StudiedSystem requestSystem,
+											   int nbLearn, int nbRequest, int measureEveryNLearn, DoubleBinaryOperator error) {
 		if(error == null) {
 			error = (a,b) -> (a-b)*(a-b);
 		}
@@ -116,7 +116,7 @@ public class BenchmarkThreading {
 		// setup cache --- (very important to reduce impact of the 1st measure)
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		StudiedSystem learnSystem = new NDimCube(50.0, 100);
-		AMOEBA amoeba = new AMOEBA(null,null);
+		ELLSA amoeba = new ELLSA(null,null);
 		amoeba.setStudiedSystem(learnSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		backupSystem.load(file);
@@ -127,7 +127,7 @@ public class BenchmarkThreading {
 		for(int thd = 1; thd <= 8; thd *= 2) {
 			Configuration.allowedSimultaneousAgentsExecution = thd;
 			learnSystem = new NDimCube(50.0, 100);
-			amoeba = new AMOEBA(null,null);
+			amoeba = new ELLSA(null,null);
 			backupSystem = new BackupSystem(amoeba);
 			backupSystem.load(file);
 			List<List<Double>> bench = benchmark(amoeba, learnSystem, learnSystem, 0, 10000, 1000, null);

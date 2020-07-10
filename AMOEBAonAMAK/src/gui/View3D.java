@@ -5,35 +5,16 @@ import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.UI_PARAMS;
-import experiments.tests.JZY3D_Test;
-import fr.irit.smac.amak.ui.VuiExplorer;
-import fr.irit.smac.amak.ui.drawables.Drawable;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import org.jzy3d.chart.AWTChart;
-import org.jzy3d.chart.Chart;
 import org.jzy3d.colors.Color;
-import org.jzy3d.colors.ColorMapper;
-import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.Coord3d;
-import org.jzy3d.maths.Range;
-import org.jzy3d.plot3d.builder.Builder;
-import org.jzy3d.plot3d.builder.Mapper;
-import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
 import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import utils.TRACE_LEVEL;
@@ -47,7 +28,7 @@ public class View3D {
 
     public String title;
 
-    public AMOEBA amoeba;
+    public ELLSA amoeba;
 
     private BorderPane pane;
     private BorderPane paneLeft;
@@ -77,7 +58,7 @@ public class View3D {
     AWTChart chart2;
     ImageView imageView2;
 
-    public View3D(StudiedSystem ss , AMOEBA amb) {
+    public View3D(StudiedSystem ss , ELLSA amb) {
 
         studiedSystem =ss;
         amoeba = amb;

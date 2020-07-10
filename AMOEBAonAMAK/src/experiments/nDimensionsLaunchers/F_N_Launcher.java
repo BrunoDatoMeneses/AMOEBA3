@@ -11,7 +11,7 @@ import java.util.*;
 import agents.head.REQUEST;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -211,7 +211,7 @@ public class F_N_Launcher implements Serializable {
 
 
 	private static void ellsaTest(HashMap<String, ArrayList<Double>> data) {
-		AMOEBA amoeba = new AMOEBA(null,  null);
+		ELLSA amoeba = new ELLSA(null,  null);
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);

@@ -1,7 +1,7 @@
 package experiments;
 
 import fr.irit.smac.amak.Configuration;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 /**
@@ -19,7 +19,7 @@ public class MinimalMainCommandLineMode {
 		StudiedSystem studiedSystem = new F_XY_System(50.0);
 		// create the amoeba
 		// Make sure the path to the config file is correct.
-		AMOEBA amoeba = new AMOEBA(null,null,"resources/twoDimensionsLauncher.xml", studiedSystem);
+		ELLSA amoeba = new ELLSA(null,null,"resources/twoDimensionsLauncher.xml", studiedSystem);
 		// a window should have appeared, allowing you to control and visualize the amoeba.
 		
 		// Learning and Request example

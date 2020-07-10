@@ -8,20 +8,14 @@ import java.util.ArrayList;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import kernel.backup.SaveHelperImpl;
-import utils.TRACE_LEVEL;
 
 
 /**
@@ -55,8 +49,8 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 
 		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		VUIMulti amoebaVUI = new VUIMulti("2D");
-		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
-		AMOEBA amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+		EllsaMultiUIWindow amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
+		ELLSA amoeba = new ELLSA(amoebaUI,  amoebaVUI);
 		amoeba.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(amoeba);
 		File file = new File("resources/"+PARAMS.configFile);

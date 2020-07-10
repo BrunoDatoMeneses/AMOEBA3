@@ -134,7 +134,7 @@ if __name__ == '__main__':
     percepts = percepts_from_env(env)
     filename = gen_file(percepts_from_env(env))
 
-    amoeba = gateway.jvm.kernel.AMOEBA()
+    amoeba = gateway.jvm.kernel.ELLSA()
     backup_sys = gateway.jvm.kernel.backup.BackupSystem(amoeba)
     file = gateway.jvm.java.io.File(filename)
     backup_sys.load(file)

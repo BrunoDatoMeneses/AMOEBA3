@@ -7,14 +7,14 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 
 public class RosListenDelegateForAmoeba implements RosListenDelegate {
 	
-	private AMOEBA amoeba;
+	private ELLSA amoeba;
 	private Publisher pub;
 	
-	public RosListenDelegateForAmoeba(AMOEBA amoeba, Publisher pub) {
+	public RosListenDelegateForAmoeba(ELLSA amoeba, Publisher pub) {
 		this.amoeba = amoeba;
 		this.pub = pub;
 	}

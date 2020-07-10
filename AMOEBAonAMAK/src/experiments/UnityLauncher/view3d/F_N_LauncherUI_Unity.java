@@ -7,11 +7,11 @@ import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
@@ -30,10 +30,10 @@ import java.util.ArrayList;
  */
 public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
-	AMOEBA amoeba;
+	ELLSA amoeba;
 	StudiedSystem studiedSystem;
 	VUIMulti amoebaVUI;
-	AmoebaMultiUIWindow amoebaUI;
+	EllsaMultiUIWindow amoebaUI;
 	Sender sender;
 	boolean test = true;
 
@@ -63,7 +63,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 		studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
 		amoebaVUI = new VUIMulti("2D");
-		amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
+		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
 
 
 		startTask(100, PARAMS.nbCycle);
@@ -119,7 +119,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 				public void run()
 				{
 
-					amoeba = new AMOEBA(amoebaUI,  amoebaVUI);
+					amoeba = new ELLSA(amoebaUI,  amoebaVUI);
 
 					amoeba.setStudiedSystem(studiedSystem);
 					IBackupSystem backupSystem = new BackupSystem(amoeba);
@@ -215,7 +215,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 
 
-	private void updateContextsOnUnity(AMOEBA amoeba, Sender sender) {
+	private void updateContextsOnUnity(ELLSA amoeba, Sender sender) {
 		ArrayList<Context> spatiallyAlteredContexts = amoeba.getSpatiallyAlteredContextForUnityUI();
 		ArrayList<Context> toKillContexts = amoeba.getToKillContextsForUnityUI();
 

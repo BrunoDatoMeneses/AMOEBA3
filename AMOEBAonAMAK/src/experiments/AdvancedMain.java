@@ -6,14 +6,13 @@ import java.io.IOException;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.VUIMulti;
-import gui.AmoebaMultiUIWindow;
-import gui.AmoebaWindow;
+import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
@@ -56,10 +55,10 @@ public class AdvancedMain extends Application{
 
 		
 		VUIMulti amoebaVUI = new VUIMulti("2D");
-		AmoebaMultiUIWindow amoebaUI = new AmoebaMultiUIWindow("ELLSA", amoebaVUI, null);
+		EllsaMultiUIWindow amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 		
 		// Create an AMOEBA
-		AMOEBA amoeba = new AMOEBA(amoebaUI, amoebaVUI);
+		ELLSA amoeba = new ELLSA(amoebaUI, amoebaVUI);
 		// Create a studied system and add it to the amoeba.
 		// Adding a studied system to an amoeba allow you to control the learning speed (the simulation : how many cycles per second)
 		// with amoeba's scheduler, graphically or programmatically.

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import agents.percept.Percept;
 import fr.irit.smac.amak.tools.Log;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 /**
@@ -138,7 +138,7 @@ public class NDimCube implements StudiedSystem{
 	}
 
 	@Override
-	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+	public void setControlModels(HashMap<String, ELLSA> controlModels) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -174,7 +174,7 @@ public class NDimCube implements StudiedSystem{
 	}
 
 	@Override
-	public double getErrorOnRequest(AMOEBA amoeba) {
+	public double getErrorOnRequest(ELLSA amoeba) {
 		return 0;
 	}
 }

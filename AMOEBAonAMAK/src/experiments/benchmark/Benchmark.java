@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.tools.Log;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 
@@ -43,7 +43,7 @@ public class Benchmark {
 	private static void execLearn(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" learning cycles.");
 		
-		AMOEBA amoeba = new AMOEBA(null,null);
+		ELLSA amoeba = new ELLSA(null,null);
 		BackupSystem bs = new BackupSystem(amoeba);
 		bs.load(new File(configFile));
 		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());
@@ -67,7 +67,7 @@ public class Benchmark {
 	private static void execRequest(int nbCycle, String configFile) {
 		System.out.println("Start "+nbCycle+" request cycles.");
 		
-		AMOEBA amoeba = new AMOEBA(null,null);
+		ELLSA amoeba = new ELLSA(null,null);
 		BackupSystem bs = new BackupSystem(amoeba);
 		bs.load(new File(configFile));
 		StudiedSystem ss = new NDimCube(50, amoeba.getPercepts().size());

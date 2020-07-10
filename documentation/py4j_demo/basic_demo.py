@@ -10,7 +10,7 @@ if __name__ == '__main__':
     time.sleep(2)
 
     gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
-    amoeba = gateway.jvm.kernel.AMOEBA("/home/daavve/AMOEBA3/AMOEBAonAMAK/resources/twoDimensionsLauncher.xml", None)
+    amoeba = gateway.jvm.kernel.ELLSA("/home/daavve/AMOEBA3/AMOEBAonAMAK/resources/twoDimensionsLauncher.xml", None)
     for i in range(100):
         amoeba.learn({"px0": float(i), "px1": float(i), "oracle": float(i)})
         print(i, " ", amoeba.getAction())

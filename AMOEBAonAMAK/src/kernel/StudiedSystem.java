@@ -21,7 +21,7 @@ public interface StudiedSystem extends Serializable{
 	/**
 	 * Gets the output for the current step.
 	 * 
-	 * @return an {@link HashMap} containing a value for each {@link Percept} of an {@link AMOEBA} and a value for the oracle.
+	 * @return an {@link HashMap} containing a value for each {@link Percept} of an {@link ELLSA} and a value for the oracle.
 	 */
 	public HashMap<String, Double> getOutput();
 	public HashMap<String, Double> getIntput();
@@ -46,7 +46,7 @@ public interface StudiedSystem extends Serializable{
 
 	public HashMap<String, Double> playOneStepWithControlModel();
 	
-	public void setControlModels(HashMap<String, AMOEBA> controlModels);
+	public void setControlModels(HashMap<String, ELLSA> controlModels);
 	
 	public void setControl(boolean value);
 	
@@ -62,7 +62,7 @@ public interface StudiedSystem extends Serializable{
 
 
 	public Double getRandomRequestCounts() ;
-	public double getErrorOnRequest(AMOEBA amoeba);
+	public double getErrorOnRequest(ELLSA amoeba);
 	
 	
 

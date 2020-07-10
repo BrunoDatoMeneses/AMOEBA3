@@ -1,11 +1,10 @@
 package experiments.nDimensionsLaunchers;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
 import agents.percept.Percept;
-import kernel.AMOEBA;
+import kernel.ELLSA;
 import kernel.StudiedSystem;
 
 
@@ -926,7 +925,7 @@ private double[] subZoneCenter3D(int nb) {
 
 
 	@Override
-	public void setControlModels(HashMap<String, AMOEBA> controlModels) {
+	public void setControlModels(HashMap<String, ELLSA> controlModels) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -939,7 +938,7 @@ private double[] subZoneCenter3D(int nb) {
 	}
 
 	@Override
-	public double getErrorOnRequest(AMOEBA amoeba){
+	public double getErrorOnRequest(ELLSA amoeba){
 
 		if (generator == null)	generator = new Random(29);
 		for(int i = 0 ; i < dimension ; i++) {
