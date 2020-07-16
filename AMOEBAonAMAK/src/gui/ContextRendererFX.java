@@ -57,7 +57,9 @@ public class ContextRendererFX extends RenderStrategy {
 		}else if(context.isActivated) {
 			drawable.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
 		}else if(context.isInNeighborhood) {
-			drawable.setColor(new Color(c[0], c[1], c[2], 225d / 255d));
+			drawable.setColor(new Color(1.0, 0.0, 0.0, 225d / 255d));
+		}else if(context.isInSubNeighborhood) {
+			drawable.setColor(new Color(0.0, 0.0, 1.0, 225d / 255d));
 		}else {
 			drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
 		}

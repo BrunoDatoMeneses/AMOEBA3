@@ -47,8 +47,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static final boolean setActiveLearning = false	;
-    public static final boolean setSelfLearning = true;
+    public static final boolean setActiveLearning = true	;
+    public static final boolean setSelfLearning = false;
 
 
 
@@ -56,13 +56,14 @@ public class PARAMS {
     /*NCS*/
     public static final boolean setVoidDetection = false ; // OLD VOID
 
-    public static final boolean setConflictDetection = true ;
+    public static final boolean setConflictDetection = false ;
     public static final boolean setConflictResolution = setConflictDetection ;
-    public static final boolean setConcurrenceDetection = true ;
+    public static final boolean setConcurrenceDetection = false ;
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static final boolean setVoidDetection2 = true ;
+    public static final boolean setVoidDetection2 = false ;
+    public static final boolean setSubVoidDetection = true ;
     public static final boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
-    public static final boolean setSelfModelRequest = true ;
+    public static final boolean setSelfModelRequest = false ;
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
@@ -79,5 +80,5 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = false;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.DEBUG;
 }

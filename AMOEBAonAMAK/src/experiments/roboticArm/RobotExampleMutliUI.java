@@ -115,8 +115,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,2);
 
-			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-1000.0, 0.0,1000.0,0.0);
-			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -1000.0,0.0,1000.0);
+			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
+			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -10000.0,0.0,10000.0);
 		}
 
 
@@ -185,8 +185,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 				double[] goal = robotArmManager.getGoal();
 				goalCircle.move(goal[0], goal[1]);
-				goalLines[0].move(goal[0]-1000.0,goal[1],goal[0]+1000.0,goal[1]);
-				goalLines[1].move(goal[0],goal[1]-1000.0,goal[0],goal[1]+1000.0);
+				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
+				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
 
 			}
 		});

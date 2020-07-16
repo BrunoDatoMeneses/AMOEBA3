@@ -76,8 +76,8 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		point.setName("Cursor");
 		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
 		rectangle.setName("Neighborhood");
-		pointHorizontalLine = mainVUI.createAndAddRectangle(0,0,2000,0.1);
-		pointVerticalLine = mainVUI.createAndAddRectangle(0,0,0.1,2000);
+		pointHorizontalLine = mainVUI.createAndAddRectangle(0,0,20000,0.1);
+		pointVerticalLine = mainVUI.createAndAddRectangle(0,0,0.1,20000);
 		pointHorizontalLine.setName("pointHorizontalLine");
 		pointVerticalLine.setName("pointVerticalLine");
 

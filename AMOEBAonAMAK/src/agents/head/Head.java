@@ -36,6 +36,7 @@ public class Head extends EllsaAgent {
 
 	public ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	public ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
+	public ArrayList<Context> activatedSubNeighborsContexts = new ArrayList<Context>();
 	
 	public Double meanNeighborhoodVolume;
 	public HashMap<Percept, Double> meanNeighborhoodRaduises;
@@ -70,6 +71,12 @@ public class Head extends EllsaAgent {
 			});
 
 	public Queue<EndogenousRequest> endogenousDreamRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
+		public int compare(EndogenousRequest r1, EndogenousRequest r2) {
+			return r2.getPriority().compareTo(r1.getPriority());
+		}
+	});
+
+	public Queue<EndogenousRequest> endogenousSubRequests = new PriorityQueue<EndogenousRequest>(new Comparator<EndogenousRequest>(){
 		public int compare(EndogenousRequest r1, EndogenousRequest r2) {
 			return r2.getPriority().compareTo(r1.getPriority());
 		}
@@ -187,6 +194,10 @@ public class Head extends EllsaAgent {
 		}
 
 
+		for(Context subCtxt : activatedSubNeighborsContexts){
+			subCtxt.isInSubNeighborhood = true;
+		}
+
 		if(activatedNeighborsContexts.size()>0) {
 
 			getAmas().getEnvironment()
@@ -291,6 +302,13 @@ public class Head extends EllsaAgent {
 		boolean testIfSelfRequest = isSelfRequest();
 		boolean testIfChildSelfRequest = isSelfChildRequest();
 		boolean testIfDreamRequest = isDreamRequest();
+		boolean testIfSubRequest = isSubRequest();
+		/*if((testIfSelfRequest||testIfChildSelfRequest||testIfDreamRequest||testIfSubRequest) && getAmas().data.isSelfLearning){
+			getAmas().data.selfLearning = true;
+		}
+		if((testIfSelfRequest||testIfChildSelfRequest||testIfDreamRequest||testIfSubRequest) && getAmas().data.isActiveLearning) {
+			getAmas().data.activeLearning = true;
+		}*/
 		if((testIfSelfRequest||testIfChildSelfRequest||testIfDreamRequest) && getAmas().data.isSelfLearning){
 			getAmas().data.selfLearning = true;
 		}
@@ -553,7 +571,7 @@ public class Head extends EllsaAgent {
 		if(lastEndogenousRequest==null){
 			NCSDetection_IncompetentHead();
 		}
-		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
+		else if(lastEndogenousRequest.getType()!= REQUEST.VOID  && lastEndogenousRequest.getType()!= REQUEST.SUBVOID){
 			NCSDetection_IncompetentHead();
 		}
 		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
@@ -582,6 +600,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
+			NCSDetection_PotentialSubRequest();
 		}
 
 		NCSDetection_Dream();
@@ -893,7 +912,7 @@ public class Head extends EllsaAgent {
 	}
 
 	private int getWaitingEndogenousRequests() {
-		return endogenousChildRequests.size()+endogenousDreamRequests.size()+endogenousRequests.size();
+		return endogenousChildRequests.size()+endogenousDreamRequests.size()+endogenousRequests.size() + endogenousSubRequests.size();
 	}
 
 	private void reinforcementWithouOracle() {
@@ -1007,14 +1026,68 @@ public class Head extends EllsaAgent {
 		if (bestContext != null) {
 			getAmas().data.noBestContext = false;
 			getAmas().data.prediction = bestContext.getActionProposalWithSubPercepts();
+
+			for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
+				getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,bestContext.getRanges().get(unconsideredPct).getCenter());
+			}
+
 		} else {
 
 			getAmas().data.noBestContext = true;
 			Context nearestContext = this.getNearestContextWithoutAllPercepts(activatedNeighborsContexts);
 
 			if(nearestContext != null) {
-				getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
+
+
+
+				//getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
 				bestContext = nearestContext;
+				getAmas().data.prediction = bestContext.getActionProposalWithSubPercepts();
+
+				for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
+					getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,bestContext.getRanges().get(unconsideredPct).getCenter());
+				}
+
+				/*ArrayList<Context> activatedNeighborsContextsFilteredByPrediction = new ArrayList<>();
+
+				for(Context neighborCtxt : activatedNeighborsContexts){
+					if(Math.abs(nearestContext.lastPrediction - getAmas().data.prediction)< getPredictionNeighborhoodRange()){
+						activatedNeighborsContextsFilteredByPrediction.add(neighborCtxt);
+					}
+
+				}
+
+				if(activatedNeighborsContextsFilteredByPrediction.size()>1) {
+
+					double weightedPredictionSum = 0;
+					double normalisation = 0;
+					for (Context ctxt : activatedNeighborsContextsFilteredByPrediction) {
+						double distance = ctxt.distanceBetweenCurrentPercetionsAndBordersWithSubPercepts();
+						weightedPredictionSum += (1 / distance) * ctxt.getActionProposalWithSubPercepts();
+						normalisation += (1 / distance);
+
+
+					}
+					getAmas().data.prediction = weightedPredictionSum / normalisation;
+
+					for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
+						double weightedPerceptSum = 0;
+						double perceptNormalisationValue = 0;
+						for (Context ctxt : activatedNeighborsContextsFilteredByPrediction) {
+							double distance = ctxt.distanceBetweenCurrentPercetionsAndBordersWithSubPercepts();
+							weightedPerceptSum += (1 / distance) * ctxt.getRanges().get(unconsideredPct).getCenter();
+							perceptNormalisationValue += (1 / distance);
+						}
+						getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,weightedPerceptSum/perceptNormalisationValue);
+					}
+
+				}else{
+					getAmas().data.prediction = bestContext.getActionProposalWithSubPercepts();
+
+					for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
+						getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,bestContext.getRanges().get(unconsideredPct).getCenter());
+					}
+				}*/
 			} else {
 				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
 				// To limit performance impact, we limit our search on a random sample.
@@ -1026,35 +1099,20 @@ public class Head extends EllsaAgent {
 				if(nearestContext != null) {
 					getAmas().data.prediction = nearestContext.getActionProposalWithSubPercepts();
 					bestContext = nearestContext;
+
+					for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
+						getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,bestContext.getRanges().get(unconsideredPct).getCenter());
+					}
+
 				} else {
-					System.out.println("NO NEAREST CONTEXT"); // Sould not happend
+					getEnvironment().print(TRACE_LEVEL.ERROR,"NO NEAREST CONTEXT"); // Sould not happend
 					getAmas().data.prediction = 0.0;
 				}
 			}
 
-			/*if(activatedNeighborsContexts.size()>0) {
-
-				double weightedPredictionSum = 0;
-				double normalisation = 0;
-				for (Context ctxt : activatedNeighborsContexts) {
-					double distance = ctxt.distanceBetweenCurrentPercetionsAndBordersWithSubPercepts();
-					weightedPredictionSum += (1 / distance) * ctxt.getActionProposalWithSubPercepts();
-					normalisation += (1 / distance);
 
 
-				}
-				getAmas().data.prediction = weightedPredictionSum / normalisation;
 
-				for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
-					double weightedPerceptSum = 0;
-					double perceptNormalisationValue = 0;
-					for (Context ctxt : activatedNeighborsContexts) {
-						double distance = ctxt.distanceBetweenCurrentPercetionsAndBordersWithSubPercepts();
-						weightedPerceptSum += (1 / distance) * ctxt.getRanges().get(unconsideredPct).getCenter();
-						perceptNormalisationValue += (1 / distance);
-					}
-					getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,weightedPerceptSum/perceptNormalisationValue);
-				}*/
 
 
 
@@ -1063,11 +1121,7 @@ public class Head extends EllsaAgent {
 
 		}
 
-		if(bestContext != null){
-			for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
-				getAmas().data.nonCondireredPerceptsSyntheticValues.put(unconsideredPct,bestContext.getRanges().get(unconsideredPct).getCenter());
-			}
-		}
+
 
 		if(bestContext != null) {
 			logger().debug("HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
@@ -1588,6 +1642,7 @@ public class Head extends EllsaAgent {
 			newContextCreated = true;
 			
 			newContext.lastPrediction = newContext.getActionProposal();
+			activatedSubNeighborsContexts.add(newContext);
 			activatedNeighborsContexts.add(newContext);
 			activatedContexts.add(newContext);
 			double maxCoef = 0.0;
@@ -1646,6 +1701,7 @@ public class Head extends EllsaAgent {
 				newContextCreated = true;
 				newContext.initEndoChildRequests();
 				newContext.lastPrediction = newContext.getActionProposal();
+				activatedSubNeighborsContexts.add(newContext);
 				activatedNeighborsContexts.add(newContext);
 				activatedContexts.add(newContext);
 				double maxCoef = 0.0;
@@ -1958,8 +2014,55 @@ public class Head extends EllsaAgent {
 		
 		
 	}
-	
-	
+
+	public void NCSDetection_PotentialSubRequest() {
+
+		if(getAmas().data.isActiveLearning || getAmas().data.isSelfLearning) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION POTENTIAL SUB REQUESTS")));
+
+
+			if((getAmas().data.isSubVoidDetection) && getAmas().getCycle()> 10 && endogenousRequests.size()==0 && endogenousSubRequests.size()==0) {
+				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
+				for (Percept pct : getAmas().getSubPercepts()) {
+					neighborhoodBounds.put(pct, new Pair<>(pct.getValue() - (pct.getRadiusContextForCreation() * 2), pct.getValue() + (pct.getRadiusContextForCreation() * 2)));
+				}
+				ArrayList<VOID> detectedVoids = getSubVoidsFromContextsAndZone(neighborhoodBounds, activatedSubNeighborsContexts);
+
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DETECTED VOIDS", "" + detectedVoids.size())));
+
+				for (VOID detectedVoid : detectedVoids) {
+
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("VOID", "" + detectedVoid)));
+					HashMap<Percept, Double> request = new HashMap<>();
+					boolean isInMinMax = true;
+					boolean isNotTooSmall = true;
+
+					double centerDistance = 0.0;
+					for (Percept pct : getAmas().getSubPercepts()) {
+						double value = (detectedVoid.bounds.get(pct).getB() + detectedVoid.bounds.get(pct).getA()) / 2;
+						double range = detectedVoid.bounds.get(pct).getB() - detectedVoid.bounds.get(pct).getA();
+						request.put(pct, value);
+						centerDistance += Math.pow(value,2);
+						isInMinMax = isInMinMax && pct.isInMinMax(value);
+						isNotTooSmall = isNotTooSmall && !pct.isTooSmall(range);
+
+						/*if(pct.isTooBig(range)){
+							detectedVoid.bounds.get(pct).setA(value - pct.getRadiusContextForCreation());
+							detectedVoid.bounds.get(pct).setB(value + pct.getRadiusContextForCreation());
+						}*/
+					}
+					boolean isInOperationalSpace = 20 < Math.sqrt(centerDistance) && Math.sqrt(centerDistance)< 180 ;
+					if (isNotTooSmall && isInOperationalSpace) {
+
+						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedSubNeighborsContexts), REQUEST.SUBVOID);
+						addEndogenousRequest(potentialRequest, endogenousSubRequests);
+
+					}
+				}
+			}
+		}
+	}
 	
 
 	private void selfAnalysationOfContexts4() {
@@ -2321,11 +2424,17 @@ public class Head extends EllsaAgent {
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
 				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
-				getAmas().multiUIWindow.guiData.maxPrediction=getAmas().data.maxPrediction;
+				if(getAmas().multiUIWindow!=null){
+					getAmas().multiUIWindow.guiData.maxPrediction=getAmas().data.maxPrediction;
+				}
+
 			}
 			if(Math.abs(getAmas().data.oracleValue)<getAmas().data.minPrediction) {
 				getAmas().data.minPrediction = Math.abs(getAmas().data.oracleValue);
-				getAmas().multiUIWindow.guiData.minPrediction= getAmas().data.minPrediction;
+				if(getAmas().multiUIWindow!=null){
+					getAmas().multiUIWindow.guiData.minPrediction= getAmas().data.minPrediction;
+				}
+
 			}
 			
 
@@ -2918,9 +3027,19 @@ public class Head extends EllsaAgent {
 	public void setActivatedNeighborsContexts(ArrayList<Context> neighbors) {
 		activatedNeighborsContexts = neighbors;
 	}
+	public void setActivatedSubNeighborsContexts(ArrayList<Context> subNeighbors) {
+		activatedSubNeighborsContexts = subNeighbors;
+	}
+
+
+
 
 	public void clearAllUseableContextLists() {
 		activatedContexts.clear();
+		for (Context ctxt : activatedSubNeighborsContexts) {
+			ctxt.isInSubNeighborhood = false;
+
+		}
 		for (Context ctxt : activatedNeighborsContexts) {
 			ctxt.isInNeighborhood = false;
 			ctxt.isActivated = false;
@@ -3069,6 +3188,8 @@ public class Head extends EllsaAgent {
 		}else if(endogenousRequests.size()>0) {
 
 			futureRequest = pollRequest(endogenousRequests);
+		/*}else if(endogenousSubRequests.size()>0) {
+			futureRequest = pollRequest(endogenousSubRequests);*/
 		}else if(endogenousDreamRequests.size()>0){
 			futureRequest = endogenousDreamRequests.poll();
 		}
@@ -3092,6 +3213,8 @@ public class Head extends EllsaAgent {
 		}else if(endogenousRequests.size()>0) {
 
 			futureRequest = pollRequest(endogenousRequests);
+		/*}else if(endogenousSubRequests.size()>0) {
+			futureRequest = pollRequest(endogenousSubRequests);*/
 		}else if(endogenousDreamRequests.size()>0){
 		futureRequest = endogenousDreamRequests.poll();
 		}
@@ -3152,6 +3275,12 @@ public class Head extends EllsaAgent {
 
 		return endogenousDreamRequests.size()>0;
 	}
+
+	public boolean isSubRequest(){
+		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO SUB REQUESTS", ""+endogenousSubRequests.size())));
+
+		return endogenousSubRequests.size()>0;
+	}
 	
 	public boolean isSelfRequest(){
 		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO REQUESTS", ""+endogenousRequests.size())));
@@ -3176,7 +3305,7 @@ public class Head extends EllsaAgent {
 		
 		boolean existingRequestTest = false;
 		
-		if(request.getAskingContexts().size()>1 || request.getType() == REQUEST.VOID) {
+		if(request.getAskingContexts().size()>1 || request.getType() == REQUEST.VOID || request.getType() == REQUEST.SUBVOID) {
 			
 			Iterator<EndogenousRequest> itr = endogenousRequestsList.iterator();
 			while(!existingRequestTest && itr.hasNext()) {
@@ -3188,6 +3317,9 @@ public class Head extends EllsaAgent {
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}
 				if(currentRequest.getType() == REQUEST.VOID) {
+					existingRequestTest = existingRequestTest || currentRequest.requestInBounds(request.getRequest());
+				}
+				if(currentRequest.getType() == REQUEST.SUBVOID) {
 					existingRequestTest = existingRequestTest || currentRequest.requestInBounds(request.getRequest());
 				}
 				
@@ -3293,6 +3425,26 @@ public class Head extends EllsaAgent {
 		return currentVoids;
 	}
 
+	public ArrayList<VOID> getSubVoidsFromContextsAndZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Context> contexts) {
+		ArrayList<VOID> currentVoids = new ArrayList<>();
+		currentVoids.add(new VOID(zoneBounds));
+
+		for(Context testedCtxt : contexts){
+
+			ArrayList<VOID> newVoids = new ArrayList<>();
+			for(VOID currentVoid : currentVoids){
+
+				ArrayList<Percept> computedPerceptsInit = new ArrayList<>();
+				ArrayList<VOID> voidsToAdd = testedCtxt.getSubVoidsFromZone(currentVoid.bounds, computedPerceptsInit);
+				newVoids.addAll(voidsToAdd);
+
+			}
+			currentVoids = newVoids;
+
+		}
+		return currentVoids;
+	}
+
 	public double getMinMaxPredictionRange(){
 		return getAmas().data.maxPrediction-getAmas().data.minPrediction;
 	}
@@ -3302,5 +3454,7 @@ public class Head extends EllsaAgent {
 		//return getMinMaxPredictionRange()*0.25 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}
+
+
 	
 }

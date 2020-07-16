@@ -150,7 +150,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
             		ellsaSpatialReward.data.numberOfPointsForRegression = regressionPoints;
             		ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		ellsaSpatialReward.setReinforcement(true);
-            		World.minLevel = TRACE_LEVEL.DEBUG;
+					ellsaSpatialReward.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
                 }
             });
      

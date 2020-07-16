@@ -472,8 +472,9 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
+
 		ELLSA ellsa = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
+		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		
 		
@@ -504,8 +505,9 @@ public class ReinforcementMultiUI extends Application implements Serializable {
 		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
+
 		ELLSA ellsa = new ELLSA(amoebaControlModelUI, amoebaControlModelVUI, config.getAbsolutePath(), null);
+		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		
 		

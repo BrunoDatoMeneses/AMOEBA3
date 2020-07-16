@@ -12,6 +12,9 @@ import utils.TRACE;
 import utils.TRACE_LEVEL;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class RobotLaunchExample{
 
@@ -86,7 +89,8 @@ public class RobotLaunchExample{
 
         ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
         ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        World.minLevel = PARAMS.traceLevel;
+        ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
+
 
 
         ellsaTheta1.data.nameID = "ellsaTheta1";
@@ -112,8 +116,13 @@ public class RobotLaunchExample{
 
         ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
         ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        World.minLevel = PARAMS.traceLevel;
+        ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 
+        /*ellsaTheta1.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));
+        ellsaTheta0.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));*/
+
+        ellsaTheta1.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
+        ellsaTheta0.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
 
         int jointsNb = PARAMS.nbJoints;
         //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
@@ -122,9 +131,15 @@ public class RobotLaunchExample{
 
 
         double distances[] = new double[jointsNb];
-        for(int i = 0;i<jointsNb;i++){
-            distances[i] = PARAMS.armBaseSize - (i*20);
-        }
+        if(jointsNb==10){
+            for(int i = 0;i<jointsNb;i++){
+                    distances[i] = PARAMS.armBaseSize - (i*2);
+            }
+        }else{
+            for(int i = 0;i<jointsNb;i++){
+                    distances[i] = PARAMS.armBaseSize - (i*20);
+                }
+    }
 
         ELLSA ellsas[] = new ELLSA[2];
         ellsas[0] = ellsaTheta0;

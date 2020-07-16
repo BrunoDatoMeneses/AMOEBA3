@@ -96,7 +96,7 @@ public class Main implements Runnable {
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
 		ellsa.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
-		World.minLevel = PARAMS_UNITY.traceLevel;
+		ellsa.getEnvironment().minLevel = PARAMS_UNITY.traceLevel;
 
 
 		sender = new Sender(server, ellsa);

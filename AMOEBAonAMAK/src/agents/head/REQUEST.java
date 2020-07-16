@@ -8,6 +8,7 @@ public enum REQUEST implements Serializable {
 	CONCURRENCE,
 	FRONTIER,
 	VOID,
+	SUBVOID,
 	MODEL,
 	RDM,
 	DREAM,

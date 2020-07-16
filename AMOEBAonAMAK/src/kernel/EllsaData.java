@@ -102,6 +102,7 @@ public class EllsaData implements Serializable {
 	public boolean isConflictDetection = false;
 	public boolean isConcurrenceDetection = false;
 	public boolean isVoidDetection2 = false;
+	public boolean isSubVoidDetection = false;
 	public boolean isFrontierRequest = false;
 	public boolean isSelfModelRequest = false;
 	public boolean isCoopLearningWithoutOracle = false;

@@ -126,7 +126,7 @@ public class F_N_LauncherUI_autom extends Application implements Serializable {
 
 					ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 					ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-					World.minLevel = PARAMS.traceLevel;
+					ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
 
 				}
 			});

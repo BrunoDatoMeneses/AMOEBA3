@@ -245,7 +245,7 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.isAutonomousMode = PARAMS.setAutonomousMode;
 
 
-		World.minLevel = PARAMS.traceLevel;
+		ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
 		
 		
 

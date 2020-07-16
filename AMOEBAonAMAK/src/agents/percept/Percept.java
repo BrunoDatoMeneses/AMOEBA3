@@ -7,6 +7,7 @@ import java.util.HashSet;
 import agents.EllsaAgent;
 import agents.context.Context;
 import kernel.ELLSA;
+import utils.TRACE_LEVEL;
 
 /**
  * Percept agent is in charge of the communication with the environment. Each
@@ -49,7 +50,12 @@ public class Percept extends EllsaAgent {
 	@Override
 	public void onAct() {
 
-		value = getAmas().getPerceptions(this.name);
+		if(getAmas().getPerceptions(this.name) == null){
+			getEnvironment().print(TRACE_LEVEL.ERROR,this.getName(),"is missing","-> random value is given");
+			value = this.min + Math.random()*(this.max - this.min);
+		}else{
+			value = getAmas().getPerceptions(this.name);
+		}
 		ajustMinMax();
 		computeContextProjectionValidityOptimized();
 	}
@@ -97,8 +103,23 @@ public class Percept extends EllsaAgent {
 		}
 		neighborsContexts.removeIf(c -> !inNeighborhood(c));
 		amas.updateNeighborContexts(neighborsContexts);
+
+
+		if(getAmas().getSubPercepts().contains(this)){
+			computeContextProjectionSubNeighborsOptimized();
+		}
 		
 		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), activatedContexts.toString());
+	}
+
+	public void computeContextProjectionSubNeighborsOptimized() {
+		HashSet<Context> subNeighborsContexts = amas.getSubNeighborContexts();
+		if(subNeighborsContexts == null) {
+			// If we are one of the first percept to run, we compute validity on all contexts
+			subNeighborsContexts = new HashSet<>(amas.getContexts());
+		}
+		subNeighborsContexts.removeIf(c -> !inNeighborhood(c));
+		amas.updateSubNeighborContexts(subNeighborsContexts);
 	}
 	
 	/**
@@ -118,6 +139,8 @@ public class Percept extends EllsaAgent {
 	public boolean inNeighborhood(Context context) {
 		return contextProjections.get(context).inNeighborhood(this.value);
 	}
+
+
 	
 	/**
 	 * Return true if the context is in the neighborhood of this percept's at a value.

@@ -351,7 +351,7 @@ public class F_N_Manager implements StudiedSystem{
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
 		//return squareSimpleModel(xRequest);
 		
-		int subzone = subzone2D(xRequest);
+		//int subzone = subzone2D(xRequest);
 		
 		/* Multi */
 		//model="Multi";

@@ -71,6 +71,7 @@ public class Context extends EllsaAgent {
 	public boolean fusionned = false;
 	public boolean restructured = false;
 	public boolean isInNeighborhood = false;
+	public boolean isInSubNeighborhood = false;
 	public boolean isActivated = false;
 	public boolean isBest = false;
 	
@@ -85,6 +86,12 @@ public class Context extends EllsaAgent {
 	
 	public Context(ELLSA ellsa) {
 		super(ellsa);
+		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
+		}else{
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
+		}
+
 		buildContext();
 
 		getAmas().data.executionTimes[18]=System.currentTimeMillis();
@@ -109,6 +116,11 @@ public class Context extends EllsaAgent {
 
 	public Context(ELLSA ellsa, Context bestNearestContext) {
 		super(ellsa);
+		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
+		}else{
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
+		}
 		buildContext(bestNearestContext);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -120,6 +132,11 @@ public class Context extends EllsaAgent {
 
 	public Context(ELLSA ellsa, double endogenousPrediction) {
 		super(ellsa);
+		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
+		}else{
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
+		}
 		buildContextWithoutOracle(endogenousPrediction);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -131,6 +148,11 @@ public class Context extends EllsaAgent {
 
 	public Context(ELLSA ellsa, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
 		super(ellsa);
+		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
+		}else{
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
+		}
 		buildContext(fatherContext, contextDimensions);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
@@ -161,14 +183,17 @@ public class Context extends EllsaAgent {
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
 			
-			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && getAmas().data.isActiveLearning) {
-				
+			if(getAmas().data.isActiveLearning) {
+
+
 				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
 					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
 						r = initRangeFromVOID(p);
+					}else if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.SUBVOID){
+						r = initRangeFromSUBVOID(p,radiuses);
 					}
 				}
-				if(r==null) {
+				if(r==null && getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 ) {
 					r = initRangeFromNeighbors(p);
 				}
 			}
@@ -228,9 +253,28 @@ public class Context extends EllsaAgent {
 		double startRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getA();
 		double endRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getB();
 
+		getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName())));
+		//getAmas().getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
+		r = new Range(this, startRange, endRange, 0, true, true, p); //TODO start increment from neighbors
+		return r;
+	}
+
+	private Range initRangeFromSUBVOID(Percept p, Pair<Double, Double> radiuses) {
+		Range r;
+		double startRange ;
+		double endRange;
+		if(getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p)!=null){
+			startRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getA();
+			endRange = getAmas().getHeadAgent().lastEndogenousRequest.getBounds().get(p).getB();
+		}else{
+			startRange = p.getValue() - radiuses.getA();
+			endRange = p.getValue() + radiuses.getB();
+		}
+
+
 		getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by VOID", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
-		r = new Range(this, startRange, endRange, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
+				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by SUBVOID", this.getName(), p.getName())));
+		r = new Range(this, startRange, endRange, 0, true, true, p); //TODO start increment from neighbors
 		return r;
 	}
 
@@ -318,16 +362,18 @@ public class Context extends EllsaAgent {
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
 
-			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && (getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
+			if((getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
 
 
 
 				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
 					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
 						r = initRangeFromVOID(p);
+					}else if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.SUBVOID){
+						r = initRangeFromSUBVOID(p,radiuses);
 					}
 				}
-				if(r==null) {
+				if(r==null && getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 					r = initRangeFromNeighbors(p);
 				}
 			}
@@ -370,16 +416,18 @@ public class Context extends EllsaAgent {
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
-			if(getAmas().getHeadAgent().activatedNeighborsContexts.size()>0 && (getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
+			if( (getAmas().data.isActiveLearning ||  getAmas().data.isSelfLearning)) {
 				
 				
 				
 				if(getAmas().getHeadAgent().lastEndogenousRequest != null) {
 					if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.VOID) {
 						r = initRangeFromVOID(p);
-					}
+					}else if(getAmas().getHeadAgent().lastEndogenousRequest.getType() == REQUEST.SUBVOID){
+					r = initRangeFromSUBVOID(p,radiuses);
 				}
-				if(r==null) {
+				}
+				if(r==null && getAmas().getHeadAgent().activatedNeighborsContexts.size()>0) {
 					r = initRangeFromNeighbors(p);
 				}
 			}
@@ -1136,6 +1184,78 @@ public class Context extends EllsaAgent {
 
 	}
 
+
+    public ArrayList<VOID> getSubVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Percept> computedPercepts) {
+
+        ArrayList<VOID> voidsToReturn = new ArrayList<>();
+
+        if(computedPercepts.size() == getAmas().getSubPercepts().size()){
+            return voidsToReturn;
+        }else{
+            Percept pct = selectOneSubPerceptNotComputed(computedPercepts);
+            HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = get1DVoidsAndFilled(pct, zoneBounds);
+
+
+            for(Pair<Double,Double> void1D : voidsAndFilleds.get("1D_Voids")){
+
+                getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<>( Arrays.asList("NEW VOID")));
+                HashMap<Percept, Pair<Double, Double>> voidToAdd = new HashMap<>();
+                voidToAdd.put(pct, void1D);
+                getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(pct.getName(),""+void1D)));
+
+                ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd = new ArrayList<>();
+
+                for(Percept otherPercept : getAllOtherSubPercepts(pct)){
+
+                    Pair<Double, Double> perceptZoneBounds = zoneBounds.get(otherPercept);
+                    double perceptZoneBoundsLength =  perceptZoneBounds.getB() -  perceptZoneBounds.getA(); //TODO smaller voids ?
+
+                    addOtherPerceptZoneBounds(voidToAdd, additionnalVoidsToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
+
+                    if(additionnalVoidsToAdd.size()>0){
+
+                        for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : new ArrayList<>(additionnalVoidsToAdd)){
+                            addOtherPerceptZoneBounds(additionnalVoid, additionnalVoidsToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
+                        }
+                    }
+
+                    getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(otherPercept.getName(),""+zoneBounds.get(otherPercept))));
+                }
+
+                voidsToReturn.add(new VOID(voidToAdd));
+                if(additionnalVoidsToAdd.size()>0){
+                    for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : additionnalVoidsToAdd){
+                        voidsToReturn.add(new VOID(additionnalVoid));
+                    }
+                }
+            }
+
+
+
+            if(voidsAndFilleds.keySet().contains("1D_Filleds")){
+                HashMap<Percept, Pair<Double, Double>> filledZoneToTest = new HashMap<>();
+                filledZoneToTest.put(pct, voidsAndFilleds.get("1D_Filleds").get(0));
+                for(Percept otherPercept : getAllOtherPercepts(pct)){
+                    filledZoneToTest.put(otherPercept, zoneBounds.get(otherPercept));
+                }
+
+                ArrayList<Percept> newComputedPercepts = new ArrayList<>(computedPercepts);
+                newComputedPercepts.add(pct);
+
+                voidsToReturn.addAll(getSubVoidsFromZone(filledZoneToTest, newComputedPercepts));
+            }
+
+
+
+            return voidsToReturn;
+        }
+
+
+
+
+    }
+
+
 	private void addOtherPerceptZoneBounds(HashMap<Percept, Pair<Double, Double>> voidToAdd, ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd, Percept otherPercept, Pair<Double, Double> perceptZoneBounds, double perceptZoneBoundsLength) {
 		/*if(perceptZoneBoundsLength> otherPercept.getRadiusContextForCreation()*2){
 			HashMap<Percept, Pair<Double, Double>> aditionnalVoidToAdd = new HashMap<>();
@@ -1174,10 +1294,36 @@ public class Context extends EllsaAgent {
 		return null;
 	}
 
+	private Percept selectOneSubPerceptNotComputed(ArrayList<Percept> computedPercepts) {
+		if(computedPercepts.size()==0){
+			return getAmas().getSubPercepts().get(0);
+		}else{
+			for(Percept pct : getAmas().getSubPercepts()){
+				if(!computedPercepts.contains(pct)){
+					return pct;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	private ArrayList<Percept> getAllOtherPercepts(Percept pct) {
 		ArrayList<Percept> percepts = new ArrayList<>();
 
 		for(Percept otherPct : getAmas().getPercepts()){
+			if(otherPct != pct){
+				percepts.add(otherPct);
+			}
+		}
+
+		return percepts;
+	}
+
+	private ArrayList<Percept> getAllOtherSubPercepts(Percept pct) {
+		ArrayList<Percept> percepts = new ArrayList<>();
+
+		for(Percept otherPct : getAmas().getSubPercepts()){
 			if(otherPct != pct){
 				percepts.add(otherPct);
 			}

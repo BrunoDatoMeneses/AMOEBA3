@@ -11,6 +11,7 @@ import agents.context.Context;
 import agents.context.Experiment;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.TypeLocalModel;
+import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.head.REQUEST;
 import agents.percept.Percept;
@@ -79,6 +80,9 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	
 	private HashSet<Context> neighborContexts ;
 	private ReadWriteLock neighborContextsLock = new ReentrantReadWriteLock();
+
+	private HashSet<Context> subNeighborContexts ;
+	private ReadWriteLock subNeighborContextsLock = new ReentrantReadWriteLock();
 	
 	public EllsaData data;
 	private ArrayList<Percept> percepts;
@@ -248,6 +252,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		head.clearAllUseableContextLists();
 		validContexts = null;
 		neighborContexts = null;
+		subNeighborContexts = null;
 		environment.resetNbActivatedAgent();
 		spatiallyAlteredContext.clear();
 		toKillContexts.clear();
@@ -402,6 +407,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	private Stream<Context> runPercepts() {
 		List<Percept> synchronousPercepts;
 
+
 		if(data.isSubPercepts){
 			synchronousPercepts = getSubPercepts().stream().filter(a -> a.isSynchronous())
 					.collect(Collectors.toList());
@@ -426,6 +432,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			e.printStackTrace();
 		}
 
+
+
 		// it is sometime useful to run all context agent
 		// especially to check if they're not too small,
 		// or after reactivating rendering.
@@ -445,7 +453,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			contextStream = vcontexts.stream(); // or only valid ones
 		}
 
-		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<Context>(getNeighborContexts()));
+		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<>(getNeighborContexts()));
+		getHeadAgent().setActivatedSubNeighborsContexts(new ArrayList<>(getSubNeighborContexts()));
 		return contextStream;
 	}
 
@@ -481,6 +490,28 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		cycle();
 		studiedSystem = ss;
 
+		getEnvironment().print(TRACE_LEVEL.INFORM,"LEARN");
+		while(data.selfLearning && data.isAutonomousMode) {
+			data.selfLearning = false;
+			endogenousRequest(convertRequestPerceptToString(head.getSelfRequest()));
+		}
+
+
+
+
+		return null;
+	}
+
+	/*public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState, ArrayList<String> unconsideredPerceptsString) {
+		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
+		subPercepts = new ArrayList<>(percepts);
+		subPercepts.removeAll(unconsideredPercepts);
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
+		setPerceptionsAndActionState(perceptionsActionState);
+		cycle();
+		studiedSystem = ss;
+
 		while(data.selfLearning && data.isAutonomousMode) {
 			data.selfLearning = false;
 			request(convertRequestPerceptToString(head.getSelfRequest()));
@@ -488,9 +519,17 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 
 
-		
 		return null;
+	}*/
+
+	public void setSubPercepts(ArrayList<String> unconsideredPerceptsString){
+		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
+		subPercepts = new ArrayList<>(percepts);
+		subPercepts.removeAll(unconsideredPercepts);
 	}
+
+
+
 
 	private HashMap<String, Double> convertRequestPerceptToString(HashMap<Percept, Double> selfRequest) {
 		HashMap<String,Double> newRequest = new HashMap<String,Double>();
@@ -528,24 +567,42 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			data.useOracle = true;
 		studiedSystem = ss;
 		double action = getAction();
+
+		getEnvironment().print(TRACE_LEVEL.INFORM,"REQUEST");
+		return action;
+	}
+
+	public double endogenousRequest(HashMap<String, Double> perceptionsActionState) {
+		boolean usingOracle = isUseOracle();
+		StudiedSystem ss = studiedSystem;
+		studiedSystem = null;
+		data.useOracle = false;
+		setPerceptionsAndActionState(perceptionsActionState);
+		cycle();
+		if (usingOracle)
+			data.useOracle = true;
+		studiedSystem = ss;
+		double action = getAction();
+		getEnvironment().print(TRACE_LEVEL.INFORM,"ENDO REQUEST");
 		while(data.selfLearning && data.isAutonomousMode) {
 			data.selfLearning = false;
-			request(convertRequestPerceptToString(head.getSelfRequest()));
+			endogenousRequest(convertRequestPerceptToString(head.getSelfRequest()));
 		}
+
 
 		return action;
 	}
 
-	public HashMap<String,Double> requestWithLesserPercepts(HashMap<String, Double> perceptionsActionState, ArrayList<String> unconsideredPerceptsString) {
+	public HashMap<String,Double> requestWithLesserPercepts(HashMap<String, Double> perceptionsActionState) {
 		HashMap<String,Double> actions = new HashMap<>();
 		boolean usingOracle = isUseOracle();
 		if (usingOracle)
 			head.changeOracleConnection();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
-		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
+		/*unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
 		subPercepts = new ArrayList<>(percepts);
-		subPercepts.removeAll(unconsideredPercepts);
+		subPercepts.removeAll(unconsideredPercepts);*/
 		data.isSubPercepts = true;
 		setPerceptionsAndActionState(perceptionsActionState);
 		cycle();
@@ -559,6 +616,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		data.isSubPercepts = false;
 
 
+		getEnvironment().print(TRACE_LEVEL.INFORM,"SUB REQUEST");
 		return actions;
 	}
 	
@@ -807,8 +865,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		double d1DimensionSelector = ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1().getValue();
 		double d2DimensionSelector = ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2().getValue();
 		((EllsaMultiUIWindow)amasMultiUIWindow).point.move(d1DimensionSelector, d2DimensionSelector);
-		((EllsaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.move(d1DimensionSelector-1000,d2DimensionSelector);
-		((EllsaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.move(d1DimensionSelector,d2DimensionSelector-1000);
+		((EllsaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.move(d1DimensionSelector-10000,d2DimensionSelector);
+		((EllsaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.move(d1DimensionSelector,d2DimensionSelector-10000);
 		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
 		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
 		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.move(d1DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), d2DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
@@ -836,6 +894,15 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 
 		}
+
+		/*try
+		{
+			Thread.sleep(1000);
+		}
+		catch(InterruptedException ex)
+		{
+			Thread.currentThread().interrupt();
+		}*/
 	}
 	
 	/**
@@ -954,6 +1021,28 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		neighborContextsLock.readLock().unlock();
 		return ret;
 	}
+
+	public HashSet<Context> getSubNeighborContexts() {
+		HashSet<Context> ret;
+		subNeighborContextsLock.readLock().lock();
+		if (subNeighborContexts == null) {
+			ret = null;
+		} else {
+			ret = new HashSet<>(subNeighborContexts);
+		}
+		subNeighborContextsLock.readLock().unlock();
+		return ret;
+	}
+
+	public void updateSubNeighborContexts(HashSet<Context> subNeighborContexts) {
+		subNeighborContextsLock.writeLock().lock();
+		if (this.subNeighborContexts == null) {
+			this.subNeighborContexts = (HashSet<Context>) subNeighborContexts.clone();
+		} else {
+			this.subNeighborContexts.retainAll(subNeighborContexts);
+		}
+		subNeighborContextsLock.writeLock().unlock();
+	}
 	
 	/**
 	 * Update the set of valid context. The update is done with an intersect of the
@@ -1006,6 +1095,26 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		}
 
 		return exp;
+	}
+
+	public EndogenousRequest getSubrequest(){
+		if(!getHeadAgent().endogenousSubRequests.isEmpty()){
+			//System.out.println(getHeadAgent().endogenousSubRequests);
+			System.out.println("endogenousSubRequests " + getHeadAgent().endogenousSubRequests.size());
+			EndogenousRequest endoRequest = getHeadAgent().endogenousSubRequests.poll();
+
+			return endoRequest;
+		}else{
+			return null;
+		}
+
+	}
+
+	public void resetSubrequest(){
+		if(!getHeadAgent().endogenousSubRequests.isEmpty()) {
+			getHeadAgent().endogenousSubRequests.clear();
+		}
+
 	}
 	
 }

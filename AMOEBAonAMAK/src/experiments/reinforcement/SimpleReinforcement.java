@@ -358,8 +358,9 @@ public abstract class SimpleReinforcement {
 		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
+
 		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
+		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		return ellsa;
 	}

@@ -250,7 +250,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		ellsa.data.numberOfPointsForRegression = regressionPoints;
 		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		ellsa.setReinforcement(true);
-		World.minLevel = TRACE_LEVEL.DEBUG;
+		ellsa.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
 		
 		
 		return ellsa;
@@ -274,8 +274,9 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		//File config = new File("resources/simpleReinManualTrained.xml");
 		
 		Log.defaultMinLevel = Log.Level.INFORM;
-		World.minLevel = TRACE_LEVEL.ERROR;
+
 		ELLSA ellsa = new ELLSA(window, VUI, config.getAbsolutePath(), null);
+		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		
 		

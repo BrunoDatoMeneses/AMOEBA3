@@ -85,7 +85,7 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
 
         ellsa.setRenderUpdate(false);
 
-        World.minLevel = TRACE_LEVEL.ERROR;
+        ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
 
 
 

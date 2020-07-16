@@ -20,7 +20,7 @@ public class TestMain {
 		// TODO Auto-generated method stub
 
 
-		gaussianDistribution();
+		tableaux();
 
 	}
 	
@@ -317,6 +317,19 @@ public class TestMain {
 
 
 
+	}
+
+	private static void tableaux(){
+
+		double[] tab1 = new double[2];
+		tab1[0] = 1;
+		tab1[1] = 2;
+		System.out.println(tab1[0] + "" + tab1[1]);
+		double[] tab2 = tab1.clone();
+		tab1[0] = 3;
+		tab1[1] = 4;
+		System.out.println(tab1[0] + "" + tab1[1]);
+		System.out.println(tab2[0] + "" + tab2[1]);
 	}
 
 }

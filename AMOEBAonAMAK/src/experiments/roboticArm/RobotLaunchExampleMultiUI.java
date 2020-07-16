@@ -14,10 +14,14 @@ import kernel.StudiedSystem;
 import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class RobotLaunchExampleMultiUI extends Application{
 
@@ -53,7 +57,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
 
-        //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+        //ellsaTheta0.saver = new SaveHelperImpl(ellsaTheta0, amoebaUITheta0);
 
         ellsaTheta0.allowGraphicalScheduler(true);
         ellsaTheta0.setRenderUpdate(false);
@@ -66,6 +70,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         ellsaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
         ellsaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
         ellsaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+        ellsaTheta0.data.isSubVoidDetection = PARAMS.setSubVoidDetection;
         ellsaTheta0.data.isConflictResolution = PARAMS.setConflictResolution;
         ellsaTheta0.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
         ellsaTheta0.data.isFrontierRequest = PARAMS.setFrontierRequest;
@@ -80,7 +85,9 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
         ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        World.minLevel = PARAMS.traceLevel;
+        ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.OFF;
+
+
 
         StudiedSystem studiedSystemTheta1 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
         VUIMulti amoebaVUITheta1 = new VUIMulti("2D");
@@ -90,6 +97,8 @@ public class RobotLaunchExampleMultiUI extends Application{
         IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
         File file1 = new File("resources/"+PARAMS.configFile);
         backupSystem1.load(file1);
+
+
 
         //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
@@ -118,8 +127,17 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
         ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        World.minLevel = PARAMS.traceLevel;
+        ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.OFF;
 
+        /*ellsaTheta1.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));
+        ellsaTheta0.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));*/
+
+        ellsaTheta1.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
+        ellsaTheta0.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
+
+        /*ellsaTheta1.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9")));
+        ellsaTheta0.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9")));
+*/
 
         int jointsNb = PARAMS.nbJoints;
         AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
@@ -128,9 +146,16 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 
         double distances[] = new double[jointsNb];
-        for(int i = 0;i<jointsNb;i++){
-            distances[i] = PARAMS.armBaseSize - (i*20);
+        if(jointsNb==10){
+            for(int i = 0;i<jointsNb;i++){
+                distances[i] = PARAMS.armBaseSize - (i*2);
+            }
+        }else{
+            for(int i = 0;i<jointsNb;i++){
+                distances[i] = PARAMS.armBaseSize - (i*20);
+            }
         }
+
 
         ELLSA ellsas[] = new ELLSA[2];
         ellsas[0] = ellsaTheta0;

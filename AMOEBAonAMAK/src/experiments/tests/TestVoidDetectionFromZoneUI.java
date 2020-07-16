@@ -94,7 +94,7 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
         ellsa.data.isConflictResolution = setConflictResolution;
         ellsa.data.isConcurrenceResolution = setConcurrenceResolution;
         ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-        World.minLevel = TRACE_LEVEL.DEBUG;
+        ellsa.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
 
 
 

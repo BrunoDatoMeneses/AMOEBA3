@@ -6,13 +6,22 @@ import utils.TRACE_LEVEL;
 public class RobotController {
 
     int jointsNumber;
+    public double[] activeLearningSituation = null;
+    int pseudoRandomCounter = 0;
 
     public RobotController(int jointsNb){
         jointsNumber = jointsNb;
     }
 
     public void setJoint(int jointIndice, int cycle, double[] anglesBase, double[] angles) {
-        setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
+        if(pseudoRandomCounter>0){
+            setJointsAroundActiveLearningSituation(jointIndice, angles, activeLearningSituation[jointIndice]);
+        }else{
+            //setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
+            setRandomJoints(jointIndice, angles);
+        }
+
+
         //setRandomJoints(jointIndice, angles);
     }
 
@@ -25,10 +34,10 @@ public class RobotController {
     }
 
     private void setRandomJoints(int jointIndice, double[] angles) {
-        if(Math.random()<0.05) angles[jointIndice] = Math.random()* 2 * Math.PI;
-        else angles[jointIndice] = modulo2PI(angles[jointIndice] + ((Math.random() * Math.PI / 16) - (Math.random() *Math.PI / 5)));
+        /*if(Math.random()<0.05) angles[jointIndice] = Math.random()* 2 * Math.PI;
+        else angles[jointIndice] = modulo2PI(angles[jointIndice] + ((Math.random() * Math.PI / 16) - (Math.random() *Math.PI / 5)));*/
 
-        //angles[jointIndice] = Math.random()* 2 * Math.PI;
+        angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI,Math.PI/4);
         /*if(jointIndice == 0){
             angles[jointIndice] = Math.random()* 2 * Math.PI;
             //angles[jointIndice] = Math.random()<0.5 ? Math.random()<0.5 ? Math.PI/4 : 3*Math.PI/4 : Math.random()<0.5 ? Math.PI : 0.0 ;
@@ -49,8 +58,16 @@ public class RobotController {
         //System.out.println(jointIndice + " " + angles[jointIndice]);
     }
 
+    private void setJoints(int jointIndice, double[] angles, double value) {
+        angles[jointIndice] = maxMin2PI(value);
+    }
+
+    private void setJointsAroundActiveLearningSituation(int jointIndice, double[] angles, double value) {
+        angles[jointIndice] = maxMin2PI(value) + (Math.random()-1)*Math.PI/4 ;
+    }
+
     private double addConstrains(double angleValue, double limit){
-        /*if (Math.PI - limit < angleValue && angleValue < Math.PI){
+        if (Math.PI - limit < angleValue && angleValue < Math.PI){
             return Math.PI - limit;
         }
         else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
@@ -58,8 +75,8 @@ public class RobotController {
         }
         else{
             return angleValue;
-        }*/
-        return angleValue;
+        }
+        //return angleValue;
     }
 
     public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){
@@ -84,12 +101,13 @@ public class RobotController {
 
 
             currentAngles[i] = maxMin2PI( goalAngles[i]);
+            //System.out.println(i + " " + currentAngles[i]);
 
         }
 
     }
 
-    private double maxMin2PI(double angle){
+    public double maxMin2PI(double angle){
 
         if(angle<0.0){
             TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
@@ -103,7 +121,9 @@ public class RobotController {
 
     }
 
-    private double modulo2PI(double angle){
+
+
+    public double modulo2PI(double angle){
         double newAngle = angle;
         if(newAngle> 2* Math.PI){
             while(newAngle > 2* Math.PI){

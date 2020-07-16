@@ -151,7 +151,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 
 					ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 					ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-					World.minLevel = PARAMS.traceLevel;
+					ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
 
 					sender = new Sender(server, ellsa);
 

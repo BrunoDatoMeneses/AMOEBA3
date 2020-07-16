@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
@@ -67,6 +68,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		ellsa.data.isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
 		ellsa.data.isVoidDetection2 = PARAMS.setVoidDetection2;
+		ellsa.data.isSubVoidDetection = PARAMS.setSubVoidDetection;
 		ellsa.data.isConflictResolution = PARAMS.setConflictResolution;
 		ellsa.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 		ellsa.data.isFrontierRequest = PARAMS.setFrontierRequest;
@@ -81,7 +83,10 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		World.minLevel = PARAMS.traceLevel;
+		ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
+
+
+		ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
 		
 		/*for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			amoeba.cycle();

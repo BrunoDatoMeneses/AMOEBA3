@@ -584,6 +584,8 @@ public class View3DContexts {
             return new Color(0.0f, 0.0f, 0.0f, 0.95f);
         }else if(ctxt.isInNeighborhood) {
             return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.95f);
+        }else if(ctxt.isInSubNeighborhood) {
+            return new Color(0.0f, 0.0f, 1.0f, 0.95f);
         }else {
             return new Color((float)c[0].doubleValue(), (float)c[1].doubleValue(), (float)c[2].doubleValue(), 0.75f);
         }

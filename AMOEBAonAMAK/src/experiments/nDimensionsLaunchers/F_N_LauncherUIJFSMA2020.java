@@ -82,7 +82,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
 		ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		World.minLevel = PARAMS.traceLevel;
+		ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
 
 		for(int i=0;i<PARAMS.nbCycle;i++){
 			ellsa.cycle();
