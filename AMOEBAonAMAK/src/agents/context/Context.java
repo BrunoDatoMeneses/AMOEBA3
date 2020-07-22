@@ -1093,7 +1093,7 @@ public class Context extends EllsaAgent {
 		
 		for (HashMap.Entry<Percept,  Pair<Double, Double>> voidBound : voidBounds.entrySet()) {
 			
-			double neighborhoodRadius = voidBound.getKey().getRadiusContextForCreation()*2;
+			double neighborhoodRadius = voidBound.getKey().getNeigborhoodRadius();
 			
 			if(voidBound.getValue().getA()<voidBound.getKey().getValue()-neighborhoodRadius) {
 				voidBound.getValue().setA(voidBound.getKey().getValue()-neighborhoodRadius);
@@ -1868,7 +1868,7 @@ public class Context extends EllsaAgent {
 		//System.err.println("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 		for(Percept pct : getAmas().getPercepts()){
-			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
+			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getNeigborhoodRadius()), pct.getValue()+(pct.getNeigborhoodRadius())));
 		}
 
 		ArrayList<Experiment> endoExperiments = new ArrayList<>();

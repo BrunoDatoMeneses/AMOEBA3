@@ -172,9 +172,9 @@ public class World extends Environment implements Loggable {
 		return increment_up ;
 	}
 	
-	public double getContextCreationNeighborhood(Context ctxt, Percept pct) {
+	public double getContextNeighborhoodRadius(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return pct.getRadiusContextForCreation()*2;
+		return pct.getNeigborhoodRadius();
 	}
 	
 	public double getContextNeighborhood(Context ctxt, Percept pct) {

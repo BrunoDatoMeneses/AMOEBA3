@@ -1967,7 +1967,7 @@ public class Head extends EllsaAgent {
 			if((getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.isVoidDetection2) && testVoid){
 				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
-					neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getRadiusContextForCreation()*2), pct.getValue()+(pct.getRadiusContextForCreation()*2)));
+					neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getNeigborhoodRadius()), pct.getValue()+(pct.getNeigborhoodRadius())));
 				}
 				ArrayList<VOID> detectedVoids = getVoidsFromContextsAndZone(neighborhoodBounds, activatedNeighborsContexts);
 
@@ -2025,7 +2025,7 @@ public class Head extends EllsaAgent {
 			if((getAmas().data.isSubVoidDetection) && getAmas().getCycle()> 10 && endogenousRequests.size()==0 && endogenousSubRequests.size()==0) {
 				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 				for (Percept pct : getAmas().getSubPercepts()) {
-					neighborhoodBounds.put(pct, new Pair<>(pct.getValue() - (pct.getRadiusContextForCreation() * 2), pct.getValue() + (pct.getRadiusContextForCreation() * 2)));
+					neighborhoodBounds.put(pct, new Pair<>(pct.getValue() - (pct.getNeigborhoodRadius() ), pct.getValue() + (pct.getNeigborhoodRadius() )));
 				}
 				ArrayList<VOID> detectedVoids = getSubVoidsFromContextsAndZone(neighborhoodBounds, activatedSubNeighborsContexts);
 

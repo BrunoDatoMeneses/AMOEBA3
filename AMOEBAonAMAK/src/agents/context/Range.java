@@ -1754,8 +1754,8 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	public boolean inNeighborhood() {
-		return this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept))
-				|| this.contains(percept.getValue(), context.getEnvironment().getContextCreationNeighborhood(context, percept));
+		return this.contains(percept.getValue(), context.getEnvironment().getContextNeighborhoodRadius(context, percept))
+				|| this.contains(percept.getValue(), context.getEnvironment().getContextNeighborhoodRadius(context, percept));
 	}
 	
 	public double getStartIncrement() {

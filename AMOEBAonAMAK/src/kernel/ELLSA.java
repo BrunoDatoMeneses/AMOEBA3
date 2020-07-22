@@ -867,9 +867,9 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		((EllsaMultiUIWindow)amasMultiUIWindow).point.move(d1DimensionSelector, d2DimensionSelector);
 		((EllsaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.move(d1DimensionSelector-10000,d2DimensionSelector);
 		((EllsaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.move(d1DimensionSelector,d2DimensionSelector-10000);
-		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
-		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
-		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.move(d1DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), d2DimensionSelector - getEnvironment().getContextCreationNeighborhood(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setHeight(2*getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
+		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
+		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.move(d1DimensionSelector - getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), d2DimensionSelector - getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
 		((EllsaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
 		((EllsaMultiUIWindow)amasMultiUIWindow).point.toFront();
 		((EllsaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.toFront();

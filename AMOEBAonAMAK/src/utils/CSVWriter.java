@@ -22,6 +22,7 @@ public class CSVWriter {
         }
     }
 
+    // experimentation on calculus
     public CSVWriter(String name){
         try {
             pw = new PrintWriter("/home/daavve/Documents/XP" + name + ".csv");
