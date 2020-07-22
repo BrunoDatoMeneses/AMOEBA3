@@ -1746,7 +1746,7 @@ public class Context extends EllsaAgent {
 
 
 
-		request = getNextEtremityChildRequest();
+		request = getRandomRequestInRanges();
 
 		/*for(Percept pct : getAmas().getPercepts()) {
 			request.put(pct, getRandomValueInRangeNextToStartAndEnd(pct));
@@ -1781,7 +1781,7 @@ public class Context extends EllsaAgent {
 		while (isChild()){
 			Experiment endoExp = new Experiment(this);
 
-			endoExp = getNextEtremityChildExperiment();
+			endoExp = getRandomExperimentInRanges();
 			/*for(Percept pct : getAmas().getPercepts()) {
 				endoExp.addDimension(pct, getRandomValueInRangeNextToStartAndEnd(pct));
 			}*/
@@ -2294,6 +2294,21 @@ public class Context extends EllsaAgent {
 
 	}
 
+	private HashMap<Percept, Double> getRandomRequestInRanges() {
+
+		HashMap<Percept, Double> request = new HashMap<>();
+		for(Percept pct : getAmas().getPercepts()){
+			double rangeLength = getRanges().get(pct).getLenght();
+			double startRange = getRanges().get(pct).getStart() ;
+			request.put(pct,startRange + (Math.random()*rangeLength));
+
+
+		}
+		return request;
+
+	}
+
+
 	private Experiment getNextEtremityChildExperiment() {
 
 		if(childContextCounter == null){
@@ -2307,6 +2322,18 @@ public class Context extends EllsaAgent {
 			nextMultiDimCounterForContextRanges(childContextCounter);
 			return getexperimentFromCounter();
 		}
+
+	}
+
+	private Experiment getRandomExperimentInRanges() {
+
+		Experiment experiment = new Experiment(this);
+		for(Percept pct : getAmas().getPercepts()){
+			double rangeLength = getRanges().get(pct).getLenght();
+			double startRange = getRanges().get(pct).getStart() ;
+			experiment.addDimension(pct,startRange + (Math.random()*rangeLength));
+		}
+		return experiment;
 
 	}
 

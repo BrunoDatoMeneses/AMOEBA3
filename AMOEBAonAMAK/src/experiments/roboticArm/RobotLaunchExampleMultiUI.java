@@ -129,15 +129,8 @@ public class RobotLaunchExampleMultiUI extends Application{
         ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
         ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.OFF;
 
-        /*ellsaTheta1.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));
-        ellsaTheta0.setSubPercepts(new ArrayList<>(Collections.singleton("ptheta0")));*/
-
-        ellsaTheta1.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
-        ellsaTheta0.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2")));
-
-        /*ellsaTheta1.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9")));
-        ellsaTheta0.setSubPercepts(new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9")));
-*/
+        ellsaTheta1.setSubPercepts(PARAMS.subPercepts);
+        ellsaTheta0.setSubPercepts(PARAMS.subPercepts);
 
         int jointsNb = PARAMS.nbJoints;
         AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
@@ -146,13 +139,16 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 
         double distances[] = new double[jointsNb];
-        if(jointsNb==10){
+        double maxLength = 0;
+        if(jointsNb>=10){
             for(int i = 0;i<jointsNb;i++){
                 distances[i] = PARAMS.armBaseSize - (i*2);
+                maxLength += distances[i];
             }
         }else{
             for(int i = 0;i<jointsNb;i++){
                 distances[i] = PARAMS.armBaseSize - (i*20);
+                maxLength += distances[i];
             }
         }
 
@@ -162,6 +158,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         ellsas[1] = ellsaTheta1;
         RobotController robotController = new RobotController(jointsNb);
         RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+        robotArmManager.maxError = maxLength*2;
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 

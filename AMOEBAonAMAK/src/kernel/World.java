@@ -7,6 +7,7 @@ import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;
 import agents.context.Context;
 import agents.percept.Percept;
+import fr.irit.smac.amak.tools.Loggable;
 import ncs.NCS;
 import utils.TRACE_LEVEL;
 
@@ -14,7 +15,7 @@ import utils.TRACE_LEVEL;
  * Store some data about the world
  * 
  */
-public class World extends Environment {
+public class World extends Environment implements Loggable {
 
 	private HashMap<NCS, Integer> numberOfNCS = new HashMap<NCS, Integer>();
 	private HashMap<NCS, Integer> allTimeNCS = new HashMap<NCS, Integer>();
@@ -98,6 +99,7 @@ public class World extends Environment {
 			}else{
 				System.out.println(message);
 			}
+			//ger().debug("TRACE",message);
 
 		}
 
@@ -116,6 +118,7 @@ public class World extends Environment {
 				message += " " + info;
 			}
 			System.out.println(message);
+			//logger().debug("TRACE",message);
 		}
 
 

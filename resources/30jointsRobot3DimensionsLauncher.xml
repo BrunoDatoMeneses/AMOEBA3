@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	<StartingAgents>
+	
+		<Sensor Name="px" Enum="false" />
+		<Sensor Name="py" Enum="false" />
+		<Sensor Name="ptheta1" Enum="false" />
+		<Sensor Name="ptheta2" Enum="false" />
+		<Sensor Name="ptheta3" Enum="false" />
+		<Sensor Name="ptheta4" Enum="false" />
+		<Sensor Name="ptheta5" Enum="false" />
+		<Sensor Name="ptheta6" Enum="false" />
+		<Sensor Name="ptheta7" Enum="false" />
+		<Sensor Name="ptheta8" Enum="false" />
+		<Sensor Name="ptheta9" Enum="false" />
+		<Sensor Name="ptheta10" Enum="false" />
+		<Sensor Name="ptheta11" Enum="false" />
+		<Sensor Name="ptheta12" Enum="false" />
+		<Sensor Name="ptheta13" Enum="false" />
+		<Sensor Name="ptheta14" Enum="false" />
+		<Sensor Name="ptheta15" Enum="false" />
+		<Sensor Name="ptheta16" Enum="false" />
+		<Sensor Name="ptheta17" Enum="false" />
+		<Sensor Name="ptheta18" Enum="false" />
+		<Sensor Name="ptheta19" Enum="false" />
+		<Sensor Name="ptheta20" Enum="false" />
+		<Sensor Name="ptheta21" Enum="false" />
+		<Sensor Name="ptheta22" Enum="false" />
+		<Sensor Name="ptheta23" Enum="false" />
+		<Sensor Name="ptheta24" Enum="false" />
+		<Sensor Name="ptheta25" Enum="false" />
+		<Sensor Name="ptheta26" Enum="false" />
+		<Sensor Name="ptheta27" Enum="false" />
+		<Sensor Name="ptheta28" Enum="false" />
+		<Sensor Name="ptheta29" Enum="false" />
+	
+	  	<Controller Name="Controller">
+              <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />
+              
+        </Controller> 
+	</StartingAgents>
+	
+</System>

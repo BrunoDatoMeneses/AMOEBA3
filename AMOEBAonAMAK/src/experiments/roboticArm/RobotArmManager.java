@@ -37,7 +37,9 @@ public class RobotArmManager {
     boolean showSubrequest = false;
 
     public boolean finished = false;
+    public boolean plotRequestError = false;
 
+    public double maxError;
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
@@ -113,7 +115,22 @@ public class RobotArmManager {
             if(PARAMS.nbJoints>1){
 
 
-                if(PARAMS.nbJoints==10){
+                if(PARAMS.nbJoints==30){
+
+                    double result = jointsAngles[29];
+
+                    out0.put("px",position[0]);
+                    out0.put("py",position[1]);
+                    for(int j=1;j<29;j++){
+                        out0.put("ptheta"+j,jointsAngles[j]*100.0);
+                    }
+                    out0.put("ptheta29",jointsAngles[0]*100.0);
+
+                    out0.put("oracle",result*100.0);
+                    //System.out.println(out0);
+                    ellsas[0].learn(out0);
+
+                }else if(PARAMS.nbJoints==10){
 
                     double result = jointsAngles[9];
 
@@ -322,7 +339,21 @@ public class RobotArmManager {
         if(PARAMS.nbJoints>1){
 
 
-            if(PARAMS.nbJoints==10){
+            if(PARAMS.nbJoints==30){
+
+
+                out2.put("px",goalPosition[0]);
+                out2.put("py",goalPosition[1]);
+                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
+                goalJoints[29] = actions1.get("action")/100.0;
+
+                for(int j=1;j<29;j++){
+                    goalJoints[j] = actions1.get("ptheta"+j)/100.0;
+                }
+                goalJoints[0] = actions1.get("ptheta29")/100.0;
+                //System.out.println(actions1);
+
+            }else if(PARAMS.nbJoints==10){
 
 
                 out2.put("px",goalPosition[0]);
@@ -483,19 +514,7 @@ public class RobotArmManager {
                 if(jointsNb ==1){
                     randomRadius = PARAMS.armBaseSize;
                 }else{
-                    double maxDistance = 0.0;
-                    if(jointsNb==10){
-                        for(int i = 0;i<jointsNb;i++){
-                            maxDistance+= PARAMS.armBaseSize - (i*2);
-                        }
-                    }else{
-                        for(int i = 0;i<jointsNb;i++){
-                            maxDistance+= PARAMS.armBaseSize - (i*20);
-                        }
-                    }
-
-
-                    randomRadius = Math.random()*maxDistance;
+                    randomRadius = Math.random()*(maxError/2);
                 }
 
 
@@ -523,6 +542,7 @@ public class RobotArmManager {
 
                 goalAngles = request(angles, poseGoal, cycle);
 
+                plotRequestError = true;
                 //System.out.println("[" + cycle + "]");
                 //System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
                 controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
@@ -551,7 +571,7 @@ public class RobotArmManager {
 
                 double currentError = 0.0;
                 //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
-                if(PARAMS.dimension == 11){
+                /*if(PARAMS.dimension == 11){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/1000.0;
                 }else if(PARAMS.dimension == 4){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/500.0;
@@ -561,6 +581,11 @@ public class RobotArmManager {
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/360.0;
                 }else if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/360.0;
+                }*/
+                if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
+                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/maxError;
+                }else{
+                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/maxError;
                 }
 
 

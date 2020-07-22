@@ -11,7 +11,9 @@ import utils.Pair;
 import java.util.ArrayList;
 
 public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExampleMultiUI> {
-	
+
+
+
 	public int jointsNumber;
 
 	public double xStart;
@@ -28,11 +30,13 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public double anglesBase[];
 	public DrawableLine lines[];
 	public DrawableLine goalLines[];
+	public DrawableLine errorGoalLines[];
 	public DrawableCircle circles[];
 	public DrawableCircle goalCircle;
 
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
+
 
 	/**
 	 * Constructor of the ant
@@ -46,6 +50,9 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	 */
 	public RobotExampleMutliUI(AmasMultiUIWindow window, RobotWorlExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
 		super(window, amas, startX, startY);
+
+
+
 		xStart = startX;
 		yStart = startY;
 
@@ -68,6 +75,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 		lines = new DrawableLine[jointsNumber];
 		circles = new DrawableCircle[jointsNumber];
 		goalLines = new DrawableLine[2];
+		errorGoalLines = new DrawableLine[2];
 
 
 
@@ -117,6 +125,12 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -10000.0,0.0,10000.0);
+
+			/*errorGoalLines[0] = getAmas().getVuiErrorDispersion().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
+			errorGoalLines[1] = getAmas().getVuiErrorDispersion().createAndAddLine(0.0, -10000.0,0.0,10000.0);*/
+
+
+			getAmas().getVuiErrorDispersion().createAndAddCircle(0.0, 0.0,5.0);
 		}
 
 
@@ -167,12 +181,17 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			@Override
 			public void run()
 			{
+				double[] goal = robotArmManager.getGoal();
 				if(getAmas().getCycle()<robotArmManager.trainingCycles){
 					if(ends[jointsNumber-1].getB()>0.0 || true){
 						getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
 					}
 
 				}
+
+
+
+
 
 				circleBase.move(xStart, yStart);
 
@@ -183,10 +202,26 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 					circles[i].move(ends[i].getA(),ends[i].getB());
 				}
 
-				double[] goal = robotArmManager.getGoal();
+
 				goalCircle.move(goal[0], goal[1]);
 				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
 				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
+
+
+
+
+
+				if(robotArmManager.plotRequestError){
+					getAmas().getVuiErrorDispersion().createAndAddCircle(ends[jointsNumber-1].getA()-goal[0], ends[jointsNumber-1].getB()-goal[1],0.25);
+					robotArmManager.plotRequestError = false;
+
+
+				}
+
+				/*errorGoalLines[0].delete();
+				errorGoalLines[1].delete();
+				errorGoalLines[0] = getAmas().getVuiErrorDispersion().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
+				errorGoalLines[1] = getAmas().getVuiErrorDispersion().createAndAddLine(0.0, -10000.0,0.0,10000.0);*/
 
 			}
 		});

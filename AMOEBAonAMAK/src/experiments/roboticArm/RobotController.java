@@ -37,7 +37,22 @@ public class RobotController {
         /*if(Math.random()<0.05) angles[jointIndice] = Math.random()* 2 * Math.PI;
         else angles[jointIndice] = modulo2PI(angles[jointIndice] + ((Math.random() * Math.PI / 16) - (Math.random() *Math.PI / 5)));*/
 
-        angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI,Math.PI/4);
+        //angles[jointIndice] = addConstrains(Math.random()* 2 * Math.PI,Math.PI/4);
+        //angles[jointIndice] = modulo2PI(gaussianRandom(0.0,Math.PI/2));
+
+        double gaussianRandomWeightJoint = (jointIndice+1)*(jointIndice+1)/(jointsNumber*jointsNumber);
+        //angles[jointIndice] = addConstrains(modulo2PI(( gaussianRandomWeightJoint*gaussianRandom(0.0,Math.PI/(32))) +  ((1-gaussianRandomWeightJoint)*(Math.random()* 2 * Math.PI))), Math.PI/4)  ;
+        if(jointIndice==0){
+            angles[jointIndice] = Math.random()* 2 * Math.PI;
+        }else{
+            //double dispersion = Math.PI/2;
+            //double dispersion = -jointsNumber*Math.PI/240 + 7*Math.PI/24; //Math.PI/6 for 30 joints and Math.PI/4 for 10 joints
+            double dispersion = 2.5593*Math.pow(jointsNumber,-0.479); //Math.PI/6 for 30 joints, Math.PI/4 for 10 joints , Math.PI/2 for 3 joints
+            angles[jointIndice] = modulo2PI(gaussianRandom(0.0,dispersion));
+        }
+
+
+
         /*if(jointIndice == 0){
             angles[jointIndice] = Math.random()* 2 * Math.PI;
             //angles[jointIndice] = Math.random()<0.5 ? Math.random()<0.5 ? Math.PI/4 : 3*Math.PI/4 : Math.random()<0.5 ? Math.PI : 0.0 ;
@@ -66,8 +81,15 @@ public class RobotController {
         angles[jointIndice] = maxMin2PI(value) + (Math.random()-1)*Math.PI/4 ;
     }
 
+
+
+    private double gaussianRandom(double mean, double dispersion){
+        java.util.Random r = new java.util.Random();
+        return  (r.nextGaussian() * dispersion) + mean;
+    }
+
     private double addConstrains(double angleValue, double limit){
-        if (Math.PI - limit < angleValue && angleValue < Math.PI){
+        /*if (Math.PI - limit < angleValue && angleValue < Math.PI){
             return Math.PI - limit;
         }
         else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
@@ -75,8 +97,8 @@ public class RobotController {
         }
         else{
             return angleValue;
-        }
-        //return angleValue;
+        }*/
+        return angleValue;
     }
 
     public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){

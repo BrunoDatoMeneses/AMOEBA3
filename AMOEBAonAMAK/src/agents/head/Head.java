@@ -800,7 +800,7 @@ public class Head extends EllsaAgent {
 
 					//ctxt.isSameModel()
 
-					if(ctxt.getLocalModel().getModelDifference(otherCtxt.getLocalModel())<0.1){
+					if(ctxt.isSameModel(otherCtxt)){
 						allConcurrencesVolume += ctxt.getOverlappingVolume(otherCtxt);
 					}
 					else{
@@ -1092,7 +1092,7 @@ public class Head extends EllsaAgent {
 				//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
 				// To limit performance impact, we limit our search on a random sample.
 				// A better way would be to increase neighborhood.
-				System.err.println("Play without oracle : no nearest context in neighbors, searching in a all Contexts");
+				getEnvironment().print(TRACE_LEVEL.ERROR,"Play without oracle : no nearest context in neighbors, searching in a all Contexts");
 				//PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
 				//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
 				nearestContext = this.getNearestContextWithoutAllPercepts(getAmas().getContexts());
@@ -1654,7 +1654,7 @@ public class Head extends EllsaAgent {
 
 
 			
-			newContext.initEndoChildRequests();
+			//newContext.initEndoChildRequests();
 
 
 			
@@ -1699,7 +1699,7 @@ public class Head extends EllsaAgent {
 				bestContext = context;
 				newContext = context;
 				newContextCreated = true;
-				newContext.initEndoChildRequests();
+				//newContext.initEndoChildRequests();
 				newContext.lastPrediction = newContext.getActionProposal();
 				activatedSubNeighborsContexts.add(newContext);
 				activatedNeighborsContexts.add(newContext);
