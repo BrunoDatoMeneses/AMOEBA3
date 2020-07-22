@@ -22,6 +22,15 @@ public class CSVWriter {
         }
     }
 
+    public CSVWriter(String name){
+        try {
+            pw = new PrintWriter("/home/daavve/Documents/XP" + name + ".csv");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
 
     public void write(Double f1, Double f2){
         pw.println(f1.toString() + ";" + f2.toString());
