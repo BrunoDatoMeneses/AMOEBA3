@@ -463,7 +463,7 @@ public class RobotArmManager {
 
 
         for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
-            TRACE.print(TRACE_LEVEL.ERROR, new ArrayList<>(Arrays.asList(ctxt.getName(),""+ctxt.getConfidence())));
+            TRACE.print(TRACE_LEVEL.ERROR,ctxt.getName(),ctxt.getConfidence(),ctxt.centerDistanceFromExperiment);
         }
 
         Context bestContext = ellsas[0].getHeadAgent().getBestContext();

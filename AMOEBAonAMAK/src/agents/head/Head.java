@@ -2559,12 +2559,13 @@ public class Head extends EllsaAgent {
 			bestContext = bc;
 			if(testIfSameConfidence){
 				bc = activatedContexts.get(0);
-				double minDistance = bestContext.centerDistanceFromExperiment();
+				double minDistance = bc.centerDistanceFromExperiment();
+				bc.centerDistanceFromExperiment = minDistance;
 				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
-					double distance = context.centerDistanceFromExperiment();
-					if (distance < minDistance) {
+					context.centerDistanceFromExperiment = context.centerDistanceFromExperiment();
+					if (context.centerDistanceFromExperiment < minDistance) {
 						bc = context;
-						minDistance = distance;
+						minDistance = context.centerDistanceFromExperiment;
 					}
 				}
 				bestContext = bc;

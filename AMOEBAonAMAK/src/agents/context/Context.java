@@ -74,6 +74,9 @@ public class Context extends EllsaAgent {
 	public boolean isInSubNeighborhood = false;
 	public boolean isActivated = false;
 	public boolean isBest = false;
+
+	public double centerDistanceFromExperiment;
+	public double externalDistanceFromExperiment;
 	
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
