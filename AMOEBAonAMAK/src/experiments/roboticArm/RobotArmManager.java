@@ -462,13 +462,14 @@ public class RobotArmManager {
         }
 
 
+        TRACE.print(TRACE_LEVEL.ERROR,"--------------");
         for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
             TRACE.print(TRACE_LEVEL.ERROR,ctxt.getName(),ctxt.getConfidence(),ctxt.centerDistanceFromExperiment);
         }
 
         Context bestContext = ellsas[0].getHeadAgent().getBestContext();
         if(bestContext!=null) {
-            TRACE.print(TRACE_LEVEL.DEBUG, "B", bestContext, bestContext.getConfidence(), bestContext.centerDistanceFromExperiment());
+            TRACE.print(TRACE_LEVEL.ERROR, "B", bestContext, bestContext.getConfidence(), bestContext.centerDistanceFromExperiment());
 
         }
 

@@ -2557,7 +2557,7 @@ public class Head extends EllsaAgent {
 				testIfSameConfidence = testIfSameConfidence && (context.getConfidence() == testConfidence);
 			}
 			bestContext = bc;
-			if(testIfSameConfidence){
+			if(testIfSameConfidence && activatedContexts.size()>1){
 				bc = activatedContexts.get(0);
 				double minDistance = bc.centerDistanceFromExperiment();
 				bc.centerDistanceFromExperiment = minDistance;
