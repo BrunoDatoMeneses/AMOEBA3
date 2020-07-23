@@ -600,7 +600,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
-			NCSDetection_PotentialSubRequest();
+			//NCSDetection_PotentialSubRequest();
 		}
 
 		NCSDetection_Dream();

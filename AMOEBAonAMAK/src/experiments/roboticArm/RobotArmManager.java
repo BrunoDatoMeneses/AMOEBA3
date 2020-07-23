@@ -127,11 +127,11 @@ public class RobotArmManager {
                     out0.put("px",position[0]);
                     out0.put("py",position[1]);
                     for(int j=1;j<29;j++){
-                        out0.put("ptheta"+j,anglesToLearn[j]*100.0);
+                        out0.put("ptheta"+j,anglesToLearn[j]);
                     }
-                    out0.put("ptheta29",anglesToLearn[0]*100.0);
+                    out0.put("ptheta29",anglesToLearn[0]);
 
-                    out0.put("oracle",result*100.0);
+                    out0.put("oracle",result);
                     //System.out.println(out0);
                     ellsas[0].learn(out0);
 
@@ -141,17 +141,17 @@ public class RobotArmManager {
 
                     out0.put("px",position[0]);
                     out0.put("py",position[1]);
-                    out0.put("ptheta1",anglesToLearn[1]*100.0);
-                    out0.put("ptheta2",anglesToLearn[2]*100.0);
-                    out0.put("ptheta3",anglesToLearn[3]*100.0);
-                    out0.put("ptheta4",anglesToLearn[4]*100.0);
-                    out0.put("ptheta5",anglesToLearn[5]*100.0);
-                    out0.put("ptheta6",anglesToLearn[6]*100.0);
-                    out0.put("ptheta7",anglesToLearn[7]*100.0);
-                    out0.put("ptheta8",anglesToLearn[8]*100.0);
-                    out0.put("ptheta9",anglesToLearn[0]*100.0);
+                    out0.put("ptheta1",anglesToLearn[1]);
+                    out0.put("ptheta2",anglesToLearn[2]);
+                    out0.put("ptheta3",anglesToLearn[3]);
+                    out0.put("ptheta4",anglesToLearn[4]);
+                    out0.put("ptheta5",anglesToLearn[5]);
+                    out0.put("ptheta6",anglesToLearn[6]);
+                    out0.put("ptheta7",anglesToLearn[7]);
+                    out0.put("ptheta8",anglesToLearn[8]);
+                    out0.put("ptheta9",anglesToLearn[0]);
 
-                    out0.put("oracle",result*100.0);
+                    out0.put("oracle",result);
                     ellsas[0].learn(out0);
 
                 }else if(PARAMS.nbJoints==3){
@@ -160,9 +160,9 @@ public class RobotArmManager {
 
                     out0.put("px",position[0]);
                     out0.put("py",position[1]);
-                    out0.put("ptheta1",anglesToLearn[1]*100.0);
-                    out0.put("ptheta2",anglesToLearn[2]*100.0);
-                    out0.put("oracle",result*100.0);
+                    out0.put("ptheta1",anglesToLearn[1]);
+                    out0.put("ptheta2",anglesToLearn[2]);
+                    out0.put("oracle",result);
                     ellsas[0].learn(out0);
 
                 }else{
@@ -181,11 +181,11 @@ public class RobotArmManager {
                     int j = PARAMS.nbJoints-1;
                     int k = 0;
                     while(j>0){
-                        out0.put("ptheta"+k,anglesToLearn[j]*100.0);
+                        out0.put("ptheta"+k,anglesToLearn[j]);
                         j--;
                         k++;
                     }
-                    out0.put("oracle",result*100.0);
+                    out0.put("oracle",result);
 
 
                 /*System.err.println(out0.get("px"));
@@ -210,11 +210,11 @@ public class RobotArmManager {
                     j = 0;
                     k = 0;
                     while(j<PARAMS.nbJoints-1){
-                        out1.put("ptheta"+k,anglesToLearn[j]*100.0);
+                        out1.put("ptheta"+k,anglesToLearn[j]);
                         j++;
                         k++;
                     }
-                    out1.put("oracle",result*100.0);
+                    out1.put("oracle",result);
 
                     ellsas[1].learn(out1);
 
@@ -224,7 +224,7 @@ public class RobotArmManager {
                     EndogenousRequest subVoidRequest= ellsas[0].getSubrequest();
                     futurePoseGoal[0] = 0.0;
                     futurePoseGoal[1] = 0.0;
-                    if(subVoidRequest!= null){
+                    /*if(subVoidRequest!= null){
 
                         ellsas[0].resetSubrequest();
                         controller.pseudoRandomCounter = 5;
@@ -247,7 +247,7 @@ public class RobotArmManager {
                         controller.activeLearningSituation = requestAngles;
 
 
-                    }
+                    }*/
 
                 }
 
@@ -257,7 +257,7 @@ public class RobotArmManager {
                 double result = anglesToLearn[0];
                 out0.put("px",position[0]);
                 out0.put("py",position[1]);
-                out0.put("oracle",result*100.0);
+                out0.put("oracle",result);
                 ellsas[0].learn(out0);
             }
 
@@ -351,12 +351,12 @@ public class RobotArmManager {
                 out2.put("px",goalPosition[0]);
                 out2.put("py",goalPosition[1]);
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[29] = actions1.get("action")/100.0;
+                requestJoints[29] = actions1.get("action");
 
                 for(int j=1;j<29;j++){
-                    requestJoints[j] = actions1.get("ptheta"+j)/100.0;
+                    requestJoints[j] = actions1.get("ptheta"+j);
                 }
-                requestJoints[0] = actions1.get("ptheta29")/100.0;
+                requestJoints[0] = actions1.get("ptheta29");
                 //System.out.println(actions1);
 
             }else if(PARAMS.nbJoints==10){
@@ -365,16 +365,16 @@ public class RobotArmManager {
                 out2.put("px",goalPosition[0]);
                 out2.put("py",goalPosition[1]);
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[9] = actions1.get("action")/100.0;
-                requestJoints[1] = actions1.get("ptheta1")/100.0;
-                requestJoints[2] = actions1.get("ptheta2")/100.0;
-                requestJoints[3] = actions1.get("ptheta3")/100.0;
-                requestJoints[4] = actions1.get("ptheta4")/100.0;
-                requestJoints[5] = actions1.get("ptheta5")/100.0;
-                requestJoints[6] = actions1.get("ptheta6")/100.0;
-                requestJoints[7] = actions1.get("ptheta7")/100.0;
-                requestJoints[8] = actions1.get("ptheta8")/100.0;
-                requestJoints[0] = actions1.get("ptheta9")/100.0;
+                requestJoints[9] = actions1.get("action");
+                requestJoints[1] = actions1.get("ptheta1");
+                requestJoints[2] = actions1.get("ptheta2");
+                requestJoints[3] = actions1.get("ptheta3");
+                requestJoints[4] = actions1.get("ptheta4");
+                requestJoints[5] = actions1.get("ptheta5");
+                requestJoints[6] = actions1.get("ptheta6");
+                requestJoints[7] = actions1.get("ptheta7");
+                requestJoints[8] = actions1.get("ptheta8");
+                requestJoints[0] = actions1.get("ptheta9");
                 //System.out.println(actions1);
 
             }else if(PARAMS.nbJoints==3){
@@ -383,9 +383,9 @@ public class RobotArmManager {
                 out2.put("px",goalPosition[0]);
                 out2.put("py",goalPosition[1]);
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[0] = actions1.get("action")/100.0;
-                requestJoints[1] = actions1.get("ptheta1")/100.0;
-                requestJoints[2] = actions1.get("ptheta2")/100.0;
+                requestJoints[0] = actions1.get("action");
+                requestJoints[1] = actions1.get("ptheta1");
+                requestJoints[2] = actions1.get("ptheta2");
 
             }else{
                 if(PARAMS.dimension ==3){
@@ -427,8 +427,8 @@ public class RobotArmManager {
                 TRACE.print(TRACE_LEVEL.DEBUG,"N", ellsas[1].getHeadAgent().getActivatedNeighborsContexts());
 
 
-                requestJoints[0] = actions1.get("action")/100.0;
-                requestJoints[1] = actions1.get("ptheta0")/100.0;
+                requestJoints[0] = actions1.get("action");
+                requestJoints[1] = actions1.get("ptheta0");
 
 
 
@@ -458,7 +458,7 @@ public class RobotArmManager {
         }else{
             out0.put("px",goalPosition[0]);
             out0.put("py",goalPosition[1]);
-            requestJoints[0]= ellsas[0].request(out0)/100.0;
+            requestJoints[0]= ellsas[0].request(out0);
         }
 
 
@@ -646,18 +646,18 @@ public class RobotArmManager {
 
     private double angleConvertionForLearning(double value){
         if(value<Math.PI){
-            return 2*Math.PI + value;
+            return (2*Math.PI + value)*100;
         }else{
-            return value;
+            return value*100;
         }
 
     }
 
     private double angleConvertionForRequest(double value){
         if(value>2*Math.PI){
-            return controller.modulo2PI(value);
+            return controller.modulo2PI(value/100);
         }else{
-            return value;
+            return value/100;
         }
 
     }
