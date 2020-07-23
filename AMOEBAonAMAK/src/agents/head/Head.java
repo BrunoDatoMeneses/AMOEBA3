@@ -132,6 +132,8 @@ public class Head extends EllsaAgent {
 
 		updateStatisticalInformations(); /// regarder dans le détail, possible que ce pas trop utile
 
+
+
 		newContext = null;
 	}
 
@@ -1135,6 +1137,7 @@ public class Head extends EllsaAgent {
 		else {
 			logger().debug("HEAD without oracle", "no Best context selected ");
 		}
+
 	}
 
 	private void endogenousPlay() {
@@ -2541,6 +2544,7 @@ public class Head extends EllsaAgent {
 	}
 
 	private void selectBestContextWithConfidenceOrDistance() {
+
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {
 			Context bc;
 
@@ -2559,23 +2563,22 @@ public class Head extends EllsaAgent {
 			bestContext = bc;
 			if(testIfSameConfidence && activatedContexts.size()>1){
 				bc = activatedContexts.get(0);
-				System.out.println("----");
-				System.out.println(bc.getName());
 				double minDistance = bc.centerDistanceFromExperiment();
 				bc.centerDistanceFromExperiment = minDistance;
-				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
+				for (Context context : activatedContexts.subList(1,activatedContexts.size())) {
 					context.centerDistanceFromExperiment = context.centerDistanceFromExperiment();
 					if (context.centerDistanceFromExperiment < minDistance) {
 						bc = context;
 						minDistance = context.centerDistanceFromExperiment;
 					}
-					System.out.println(context.getName());
 				}
 				bestContext = bc;
 			}
 		} else {
 			bestContext = null;
 		}
+
+
 	}
 
 	private void selectBestContextWithDistance() {
@@ -2598,7 +2601,7 @@ public class Head extends EllsaAgent {
 
 				Context bc = activatedContexts.get(0);
 				double minDistance = distancesFromPerception.get(bc);
-				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
+				for (Context context : activatedContexts.subList(1,activatedContexts.size())) {
 					double distance = distancesFromPerception.get(context);
 					if (distance < minDistance) {
 						bc = context;

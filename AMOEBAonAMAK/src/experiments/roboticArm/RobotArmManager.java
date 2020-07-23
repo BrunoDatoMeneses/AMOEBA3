@@ -40,6 +40,7 @@ public class RobotArmManager {
     public boolean plotRequestError = false;
 
     public double maxError;
+    public int errorRequests = 0;
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
@@ -463,6 +464,7 @@ public class RobotArmManager {
 
 
         TRACE.print(TRACE_LEVEL.ERROR,"--------------");
+
         for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
             TRACE.print(TRACE_LEVEL.ERROR,ctxt.getName(),ctxt.getConfidence(),ctxt.centerDistanceFromExperiment);
         }
@@ -669,14 +671,16 @@ public class RobotArmManager {
         double multilpicator = 100*jointsNb/2;
         if(value/multilpicator>2*Math.PI){
             if(value/multilpicator>3*Math.PI){
-                System.err.println(value/multilpicator);
+                System.out.println(value/multilpicator);
+                errorRequests++;
                 return Math.PI;
             }else{
                 return controller.modulo2PI(value/multilpicator);
             }
         }else{
             if(value/multilpicator<Math.PI){
-                System.err.println(value/multilpicator);
+                System.out.println(value/multilpicator);
+                errorRequests++;
                 return  Math.PI;
             }else{
                 return value/multilpicator;

@@ -1984,7 +1984,7 @@ public class Context extends EllsaAgent {
 
         boolean test1 = initTest;
         boolean test2 = initTest;
-        for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size()-1)){
+        for(Experiment endoExp : endoExperiments.subList(1,endoExperiments.size())){
             boolean localTest = centerprediction< endoExp.getProposition();
             test1 = test1 && localTest;
             test2 = test2 || localTest;

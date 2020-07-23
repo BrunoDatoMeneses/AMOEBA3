@@ -264,6 +264,8 @@ public class RobotLaunchExampleXP {
                     robot.cycleCommandLine();
                 }
 
+            System.err.println("\nERROR REQUESTS "+robotArmManager.errorRequests);
+
                 //TRACE.print(TRACE_LEVEL.ERROR,robotArmManager.finished);
                 //TRACE.print(TRACE_LEVEL.ERROR, + " [ " + Math.sqrt(robotArmManager.errorDispersion/robotArmManager.allGoalErrors.size()) + " ]      -    " + robotArmManager.goalErrors);
                 double error = robotArmManager.averageError.getAsDouble();
