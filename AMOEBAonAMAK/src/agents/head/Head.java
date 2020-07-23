@@ -2559,6 +2559,8 @@ public class Head extends EllsaAgent {
 			bestContext = bc;
 			if(testIfSameConfidence && activatedContexts.size()>1){
 				bc = activatedContexts.get(0);
+				System.out.println("----");
+				System.out.println(bc.getName());
 				double minDistance = bc.centerDistanceFromExperiment();
 				bc.centerDistanceFromExperiment = minDistance;
 				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
@@ -2567,6 +2569,7 @@ public class Head extends EllsaAgent {
 						bc = context;
 						minDistance = context.centerDistanceFromExperiment;
 					}
+					System.out.println(context.getName());
 				}
 				bestContext = bc;
 			}
