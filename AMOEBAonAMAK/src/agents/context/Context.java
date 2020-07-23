@@ -2958,6 +2958,22 @@ public class Context extends EllsaAgent {
 		return this.ranges.get(pct).distance(value);
 	}
 
+    public double centerDistanceFromExperiment() {
+	    double distance = 0.0;
+	    for(Percept pct : getAmas().getPercepts()){
+            distance += Math.pow(this.getRanges().get(pct).centerDistance(pct.getValue()),2);
+        }
+        return Math.sqrt(distance);
+    }
+
+    public double externalDistanceFromExperiment() {
+        double distance = 0.0;
+        for(Percept pct : getAmas().getPercepts()){
+            distance += Math.pow(this.distance(pct,pct.getValue()),2);
+        }
+        return Math.sqrt(distance);
+    }
+
 	public void NCSDetection_Uselessness() {
 		for (Percept v : ranges.keySet()) {
 			if (ranges.get(v).isTooSmall()) {

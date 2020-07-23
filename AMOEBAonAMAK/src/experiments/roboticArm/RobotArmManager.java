@@ -462,6 +462,15 @@ public class RobotArmManager {
         }
 
 
+        for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
+            TRACE.print(TRACE_LEVEL.ERROR, new ArrayList<>(Arrays.asList(ctxt.getName(),""+ctxt.getConfidence())));
+        }
+
+        Context bestContext = ellsas[0].getHeadAgent().getBestContext();
+        if(bestContext!=null) {
+            TRACE.print(TRACE_LEVEL.DEBUG, "B", bestContext, bestContext.getConfidence(), bestContext.centerDistanceFromExperiment());
+
+        }
 
         //amoebas[0].getHeadAgent().getActivatedContexts().get(0).getLocalModel().getProposition()
         requestCycle++;
@@ -645,33 +654,35 @@ public class RobotArmManager {
     }
 
     private double angleConvertionForLearning(double value){
+        double multilpicator = 100*jointsNb/2;
         if(value<Math.PI){
-            return ((2*Math.PI) + value)*100;
+            return ((2*Math.PI) + value)*multilpicator;
         }else{
-            return value*100;
+            return value*multilpicator;
         }
-        //return value*100;
+        //return value*multilpicator;
 
     }
 
     private double angleConvertionForRequest(double value){
-        if(value/100>2*Math.PI){
-            if(value/100>3*Math.PI){
-                System.err.println(value/100);
+        double multilpicator = 100*jointsNb/2;
+        if(value/multilpicator>2*Math.PI){
+            if(value/multilpicator>3*Math.PI){
+                System.err.println(value/multilpicator);
                 return Math.PI;
             }else{
-                return controller.modulo2PI(value/100);
+                return controller.modulo2PI(value/multilpicator);
             }
         }else{
-            if(value/100<Math.PI){
-                System.err.println(value/100);
+            if(value/multilpicator<Math.PI){
+                System.err.println(value/multilpicator);
                 return  Math.PI;
             }else{
-                return value/100;
+                return value/multilpicator;
             }
 
         }
-        //return value/100;
+        //return value/multilpicator;
     }
 
 }

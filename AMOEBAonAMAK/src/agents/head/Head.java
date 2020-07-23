@@ -1020,7 +1020,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.nonCondireredPerceptsSyntheticValues = new HashMap<>();
 
 		//selectBestContextWithConfidenceAndVolume();
-		selectBestContextWithConfidence();
+		selectBestContextWithConfidenceOrDistance();
 		//selectBestContextWithDistance();
 
 		if (bestContext != null) {
@@ -2535,6 +2535,40 @@ public class Head extends EllsaAgent {
 				}
 			}
 			bestContext = bc;
+		} else {
+			bestContext = null;
+		}
+	}
+
+	private void selectBestContextWithConfidenceOrDistance() {
+		if(activatedContexts != null && !activatedContexts.isEmpty()) {
+			Context bc;
+
+			bc = activatedContexts.get(0);
+			double currentConfidence = bc.getConfidence();
+			boolean testIfSameConfidence = true;
+			double testConfidence = activatedContexts.get(0).getConfidence();
+			for (Context context : activatedContexts) {
+				double confidence = context.getConfidence();
+				if (confidence > currentConfidence) {
+					bc = context;
+					currentConfidence = confidence;
+				}
+				testIfSameConfidence = testIfSameConfidence && (context.getConfidence() == testConfidence);
+			}
+			bestContext = bc;
+			if(testIfSameConfidence){
+				bc = activatedContexts.get(0);
+				double minDistance = bestContext.centerDistanceFromExperiment();
+				for (Context context : activatedContexts.subList(1,activatedContexts.size()-1)) {
+					double distance = context.centerDistanceFromExperiment();
+					if (distance < minDistance) {
+						bc = context;
+						minDistance = distance;
+					}
+				}
+				bestContext = bc;
+			}
 		} else {
 			bestContext = null;
 		}
