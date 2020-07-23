@@ -9,7 +9,7 @@ public class PARAMS {
 
     public static String model = "ROBOT";
 
-    public static final int nbTrainingCycle = 500;
+    public static final int nbTrainingCycle = 1000;
     public static final int nbRequestCycle = 200;
     public static final int nbTest = 1;
     public static final double spaceSize = 50.0	;
@@ -20,28 +20,29 @@ public class PARAMS {
     public static final double setRegressionPerformance = 1;
 
 
-    /*public static final String configFile = "30jointsRobot3DimensionsLauncher.xml";
+    public static final String configFile = "30jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 31;
     public static int nbJoints = 30;
     public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
             "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15", "ptheta16", "ptheta17", "ptheta18", "ptheta19",
-            "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25", "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );*/
+            "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25", "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );
 
-   /* public static final String configFile = "10jointsRobot3DimensionsLauncher.xml";
+
+    /*public static final String configFile = "10jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 11;
     public static int nbJoints = 10;
     public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));
 */
-    /* public static final String configFile = "3jointsRobot3DimensionsLauncher.xml";
+    /*public static final String configFile = "3jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 4;
     public static int nbJoints = 3;
-    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));*/
-
-    public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
+    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));
+*/
+    /*public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 3;
     public static int nbJoints = 2;
     public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
-
+*/
     /*public static final String configFile = "2jointsRobot2DimensionsLauncher.xml";
     public static final int dimension = 2;
     public static int nbJoints = 2;

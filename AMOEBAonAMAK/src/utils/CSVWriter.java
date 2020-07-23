@@ -25,7 +25,7 @@ public class CSVWriter {
     // experimentation on calculus
     public CSVWriter(String name){
         try {
-            pw = new PrintWriter("/home/daavve/Documents/XP" + name + ".csv");
+            pw = new PrintWriter("/home/daavve/Documents/XP/" + name + ".csv");
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

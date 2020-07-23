@@ -646,20 +646,30 @@ public class RobotArmManager {
 
     private double angleConvertionForLearning(double value){
         if(value<Math.PI){
-            return (2*Math.PI + value)*100;
+            return ((2*Math.PI) + value)*100;
         }else{
             return value*100;
         }
+        //return value*100;
 
     }
 
     private double angleConvertionForRequest(double value){
-        if(value>2*Math.PI){
-            return controller.modulo2PI(value/100);
+        if(value/100>2*Math.PI){
+            if(value/100>3*Math.PI){
+                return Math.PI;
+            }else{
+                return controller.modulo2PI(value/100);
+            }
         }else{
-            return value/100;
-        }
+            if(value/100<Math.PI){
+                return  Math.PI;
+            }else{
+                return value/100;
+            }
 
+        }
+        //return value/100;
     }
 
 }
