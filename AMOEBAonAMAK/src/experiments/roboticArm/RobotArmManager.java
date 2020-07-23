@@ -657,12 +657,14 @@ public class RobotArmManager {
     private double angleConvertionForRequest(double value){
         if(value/100>2*Math.PI){
             if(value/100>3*Math.PI){
+                System.err.println(value/100);
                 return Math.PI;
             }else{
                 return controller.modulo2PI(value/100);
             }
         }else{
             if(value/100<Math.PI){
+                System.err.println(value/100);
                 return  Math.PI;
             }else{
                 return value/100;
