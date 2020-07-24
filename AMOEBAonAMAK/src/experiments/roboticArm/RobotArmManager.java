@@ -657,7 +657,7 @@ public class RobotArmManager {
     }
 
     private double angleConvertionForLearning(double value){
-        double multilpicator = 100*jointsNb/2;
+        double multilpicator = 100;//*jointsNb/2;
         if(value<Math.PI){
             return ((2*Math.PI) + value)*multilpicator;
         }else{
@@ -668,7 +668,7 @@ public class RobotArmManager {
     }
 
     private double angleConvertionForRequest(double value){
-        double multilpicator = 100*jointsNb/2;
+        double multilpicator = 100;//*jointsNb/2;
         if(value/multilpicator>2*Math.PI){
             if(value/multilpicator>3*Math.PI){
                 System.out.println(value/multilpicator);

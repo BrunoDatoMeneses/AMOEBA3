@@ -237,17 +237,10 @@ public class RobotLaunchExampleXPCalculus {
 
 
             double distances[] = new double[jointsNb];
-            double maxLength = 0;
-            if(jointsNb>=10){
-                for(int i = 0;i<jointsNb;i++){
-                    distances[i] = PARAMS.armBaseSize - (i*2);
-                    maxLength += distances[i];
-                }
-            }else{
-                for(int i = 0;i<jointsNb;i++){
-                    distances[i] = PARAMS.armBaseSize - (i*20);
-                    maxLength += distances[i];
-                }
+            double incLength = PARAMS.armBaseSize/jointsNb;
+
+            for(int i = 0;i<jointsNb;i++){
+                distances[i] = incLength;
             }
 
                 ELLSA ellsas[] = new ELLSA[2];
@@ -255,8 +248,8 @@ public class RobotLaunchExampleXPCalculus {
                 ellsas[1] = ellsaTheta1;
                 RobotController robotController = new RobotController(jointsNb);
                 RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
-                robotArmManager.maxError = maxLength*2;
-            System.out.println(maxLength*2);
+                robotArmManager.maxError = PARAMS.armBaseSize*2;
+
 
                 RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, jointsNb);
 
