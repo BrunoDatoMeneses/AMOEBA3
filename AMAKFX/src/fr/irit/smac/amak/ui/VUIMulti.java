@@ -236,7 +236,9 @@ public class VUIMulti {
 		toolbar.getItems().add(veButton);
 			
 
-		});	
+		});
+
+
 		
 	}
 

@@ -1,6 +1,7 @@
 package fr.irit.smac.amak.ui.drawables;
 
 import fr.irit.smac.amak.tools.RunLaterHelper;
+import fr.irit.smac.amak.ui.VUI;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -14,12 +15,15 @@ public class DrawableNDimRectangle extends Drawable {
 	public ArrayList<Pair<Double,Double>> ranges = new ArrayList<>();
 	public ArrayList<Pair<Double,Double>> maxima = new ArrayList<>();
 
+
 	public DrawableNDimRectangle(int dimensions) {
 		super(0, 0, 1, 1);
 		for(int i=0;i<dimensions;i++){
 			rectangles.add( new Rectangle());
 		}
 		defaultInit();
+
+
 	}
 
 	public void setRangesAndMaxima(ArrayList<Pair<Double,Double>> rges, ArrayList<Pair<Double,Double>> max){
@@ -64,7 +68,7 @@ public class DrawableNDimRectangle extends Drawable {
 				double height;
 
 				width = distanceTransformation(ranges.get(i).getValue()-ranges.get(i).getKey(), maxima.get(i),200);
-				height = 2;
+				height = 40/ranges.size();
 				left = positionTransformation(ranges.get(i).getValue(), maxima.get(i),200);
 				bottom = (50*3/ranges.size())*(double)i-1;
 

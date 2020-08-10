@@ -130,6 +130,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			data.requestCounts.put(rqt, 0);
 		}
 
+
 	}
 	
 	@Override
@@ -141,6 +142,13 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	protected void onUpdateRender() {
 		// Update statistics
 		if(amasMultiUIWindow!=null) {
+
+			if(getCycle()==1){
+				System.out.println(getPercepts().size());
+				for(int i =0;i<getPercepts().size();i++){
+					multiUIWindow.VUInDimensions.createAndAddString(10, 10 + getPercepts().size()*10 - 10*i,getPercepts().get(i).getName()).setFixed().setShowInExplorer(false);
+				}
+			}
 
 			AmakPlot loopNCS = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("This loop NCS");
 			AmakPlot allNCS = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("All time NCS");
@@ -232,6 +240,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 				Log.defaultLog.warning("AMOEBA UI", "Rendering cannot keep up with simulation, it has been deactivated. "
 						+ "To reactiavte it, slow down the simulation and toggle the \"Allow Rendering\" button.");
 			}
+
+
 		}
 		
 		if (studiedSystem != null) {

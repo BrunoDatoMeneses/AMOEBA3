@@ -1,5 +1,6 @@
 package gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import fr.irit.smac.amak.tools.Log;
@@ -11,6 +12,7 @@ import fr.irit.smac.amak.ui.SchedulerToolbar;
 import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
+import fr.irit.smac.amak.ui.drawables.DrawableString;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -59,6 +61,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		super(title);
 		mainVUI = vui;
 		VUInDimensions =  new VUIMulti("ND");
+
 		studiedSystem = ss;
 		guiData = new GuiData();
 	}
@@ -88,7 +91,9 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		rectangle.setColor(new Color(1, 1, 1, 0));
 
 
+
 		this.addTabbedPanel("ND", VUInDimensions.getPanel());
+
 
 		if(studiedSystem != null){
 			view3D = new View3D(studiedSystem, ellsa);
@@ -212,6 +217,8 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 			view3D.updateContextChart();}
 		});
 		addToolbar(defaultPercetValueTextField);
+
+
 	}
 	
 	
