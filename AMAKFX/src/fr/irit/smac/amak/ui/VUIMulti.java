@@ -1,10 +1,6 @@
 package fr.irit.smac.amak.ui;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,6 +9,7 @@ import fr.irit.smac.amak.ui.drawables.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
@@ -335,6 +332,24 @@ public class VUIMulti {
 		drawablesLock.lock();
 		drawables.add(d);
 		drawablesLock.unlock();
+		updateCanvas();
+	}
+
+
+
+
+	public void addSeveralDrawables(Drawable d) {
+
+
+		d.setVUIMulti(this);
+		ArrayList<Node> drawablesList = d.getNodes();
+		for(Node n : drawablesList){
+			RunLaterHelper.runLater(()-> canvas.getChildren().add(n));
+		}
+		drawablesLock.lock();
+		drawables.add(d);
+		drawablesLock.unlock();
+
 		updateCanvas();
 	}
 	

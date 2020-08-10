@@ -4,6 +4,8 @@ import fr.irit.smac.amak.Configuration;
 import javafx.scene.Node;
 import javafx.scene.shape.Line;
 
+import java.util.ArrayList;
+
 public class DrawableLine extends Drawable {
 	Line line;
 
@@ -55,5 +57,10 @@ public class DrawableLine extends Drawable {
 	@Override
 	public Node getNode() {
 		return line;
+	}
+
+	@Override
+	public ArrayList<Node> getNodes() {
+		return null;
 	}
 }

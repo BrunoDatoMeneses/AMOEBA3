@@ -36,6 +36,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 	 * The main {@link VUI} for AMOEBA, by default it's the 2D representation of the contexts.
 	 */
 	public VUIMulti mainVUI;
+	public VUIMulti VUInDimensions;
 	public View3D view3D;
 	public View3DContexts view3DContexts;
 	
@@ -57,6 +58,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 	public EllsaMultiUIWindow(String title, VUIMulti vui, StudiedSystem ss) {
 		super(title);
 		mainVUI = vui;
+		VUInDimensions =  new VUIMulti("ND");
 		studiedSystem = ss;
 		guiData = new GuiData();
 	}
@@ -65,6 +67,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		
 
 		mainVUI.setDefaultView(200, 0, 0);
+		VUInDimensions.setDefaultView(200, 0, 0);
 		//addTabbedPanel("2D VUI", mainVUI.getPanel());
 		
 		// scheduler toolbar
@@ -75,6 +78,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		point = mainVUI.createAndAddPoint(0, 0);
 		point.setName("Cursor");
 		rectangle = mainVUI.createAndAddRectangle(10, 10, 10, 10);
+		//VUInDimensions.createAndAddRectangle(10, 10, 10, 10);
 		rectangle.setName("Neighborhood");
 		pointHorizontalLine = mainVUI.createAndAddRectangle(0,0,20000,0.1);
 		pointVerticalLine = mainVUI.createAndAddRectangle(0,0,0.1,20000);
@@ -82,6 +86,9 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		pointVerticalLine.setName("pointVerticalLine");
 
 		rectangle.setColor(new Color(1, 1, 1, 0));
+
+
+		this.addTabbedPanel("ND", VUInDimensions.getPanel());
 
 		if(studiedSystem != null){
 			view3D = new View3D(studiedSystem, ellsa);

@@ -6,6 +6,9 @@ import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 
 /**
  * A render strategy for contexts using AMAKFX tools.<br/>
@@ -19,6 +22,7 @@ public class ContextRendererFX extends RenderStrategy {
 	private Context context;
 
 	private DrawableContext drawable;
+	private DrawableNDimContext drawableNDimensions;
 
 	public ContextRendererFX(Object o) {
 		this((Context) o);
@@ -38,6 +42,9 @@ public class ContextRendererFX extends RenderStrategy {
 		updateColor();
 		drawable.setName(context.toString());
 		drawable.setInfo(context.toStringFull());
+
+		drawableNDimensions.setName(context.toString());
+		drawableNDimensions.setInfo(context.toStringFull());
 	}
 
 	private void updateColor() {
@@ -54,14 +61,19 @@ public class ContextRendererFX extends RenderStrategy {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
 		if(context.isBest) {
 			drawable.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
 		}else if(context.isActivated) {
 			drawable.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
 		}else if(context.isInNeighborhood) {
 			drawable.setColor(new Color(1.0, 0.0, 0.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(1.0, 0.0, 0.0, 225d / 255d));
 		}else if(context.isInSubNeighborhood) {
 			drawable.setColor(new Color(0.0, 0.0, 1.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(0.0, 0.0, 1.0, 225d / 255d));
 		}else {
 			drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
+			drawableNDimensions.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
 		}
 		
 	}
@@ -104,12 +116,16 @@ public class ContextRendererFX extends RenderStrategy {
 		b = b < 0.0 ? 0.0 : b;
 		if(context.isBest) {
 			drawable.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
 		}else if(context.isActivated) {
 			drawable.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
+			drawableNDimensions.setColor(new Color(0.0, 0.0, 0.0, 225d / 255d));
 		}else if(context.isInNeighborhood) {
 			drawable.setColor(new Color(r, g, b, 225d / 255d));
+			drawableNDimensions.setColor(new Color(r, g, b, 225d / 255d));
 		}else {
 			drawable.setColor(new Color(r, g, b, 50d / 255d));
+			drawableNDimensions.setColor(new Color(r, g, b, 50d / 255d));
 		}
 	}
 
@@ -142,8 +158,10 @@ public class ContextRendererFX extends RenderStrategy {
 
 		if(context.isInNeighborhood) {
 			drawable.setColor(new Color(r, g, b, 200d / 255d));
+			drawableNDimensions.setColor(new Color(r, g, b, 200d / 255d));
 		}else {
 			drawable.setColor(new Color(r, g, b, 90d / 255d));
+			drawableNDimensions.setColor(new Color(r, g, b, 90d / 255d));
 		}
 	}
 	
@@ -162,6 +180,24 @@ public class ContextRendererFX extends RenderStrategy {
 		drawable.setWidth(context.getRanges().get(p1).getLenght());
 		drawable.setHeight(context.getRanges().get(p2).getLenght());
 		drawable.move(x, y);
+
+		/*drawableNDimensions.setWidth(context.getRanges().get(p1).getLenght());
+		drawableNDimensions.setHeight(context.getRanges().get(p2).getLenght());
+		drawableNDimensions.move(x, y);*/
+		//drawableNDimensions.move(0, 0);
+
+		ArrayList<Pair<Double,Double>> ranges = new ArrayList<>();
+		ArrayList<Pair<Double,Double>> maxima = new ArrayList<>();
+		for(int i=0; i<context.getAmas().getPercepts().size();i++){
+			double startRange = context.getRanges().get(context.getAmas().getPercepts().get(i)).getStart();
+			double endRange = context.getRanges().get(context.getAmas().getPercepts().get(i)).getEnd();
+			double minRange = context.getAmas().getPercepts().get(i).getMin();
+			double maxRange = context.getAmas().getPercepts().get(i).getMax();
+			ranges.add(new Pair<>(startRange,endRange));
+			maxima.add(new Pair<>(minRange,maxRange));
+		}
+		drawableNDimensions.setRangesAndMaxima(ranges, maxima);
+
 	}
 
 	/**
@@ -171,7 +207,8 @@ public class ContextRendererFX extends RenderStrategy {
 	@Override
 	public void initialize(VUIMulti vui) {
 		getDrawable(vui).setName(context.toString()); // create the drawable if it does not exist
-
+		//getDrawable(context.getAmas().multiUIWindow.VUInDimensions).setName(context.toString()); // create the drawable if it does not exist
+		getNDDrawable(context.getAmas().multiUIWindow.VUInDimensions).setName(context.toString()); // create the drawable if it does not exist
 	}
 
 	@Override
@@ -193,4 +230,16 @@ public class ContextRendererFX extends RenderStrategy {
 		}
 		return drawable;
 	}
+
+	public DrawableNDimContext getNDDrawable(VUIMulti vui) {
+		if (!context.isDying() && drawableNDimensions == null) {
+			drawableNDimensions = new DrawableNDimContext(context.getAmas().getPercepts().size(), context);
+
+			//drawableNDimensions.getNode();
+			vui.addSeveralDrawables(drawableNDimensions);
+		}
+		return drawableNDimensions;
+	}
+
+
 }

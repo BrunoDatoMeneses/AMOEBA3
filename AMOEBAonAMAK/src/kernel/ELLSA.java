@@ -202,6 +202,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		
 		if (isRenderUpdate()) {
 			((EllsaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
+			((EllsaMultiUIWindow)amasMultiUIWindow).VUInDimensions.updateCanvas();
 			updateAgentsVisualisation();
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
@@ -871,6 +872,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setWidth(2*getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()));
 		((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.move(d1DimensionSelector - getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d1()), d2DimensionSelector - getEnvironment().getContextNeighborhoodRadius(null, ((EllsaMultiUIWindow)amasMultiUIWindow).dimensionSelector.d2()));
 		((EllsaMultiUIWindow)amasMultiUIWindow).mainVUI.updateCanvas();
+		((EllsaMultiUIWindow)amasMultiUIWindow).VUInDimensions.updateCanvas();
 		((EllsaMultiUIWindow)amasMultiUIWindow).point.toFront();
 		((EllsaMultiUIWindow)amasMultiUIWindow).pointHorizontalLine.toFront();
 		((EllsaMultiUIWindow)amasMultiUIWindow).pointVerticalLine.toFront();
