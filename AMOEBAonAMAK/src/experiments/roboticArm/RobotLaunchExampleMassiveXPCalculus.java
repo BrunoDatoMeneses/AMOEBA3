@@ -64,10 +64,14 @@ public class RobotLaunchExampleMassiveXPCalculus {
         ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
 
         for(Double mappingError : mappingErrors){
+            System.out.print("mappingError " + mappingError + " ");
             for(Integer requestCycle : requestCycles) {
+                System.out.print("requestCycle " + requestCycle + " ");
                 for (Integer trainingCycle : trainingCycles) {
+                    System.out.print("trainingCycle " + trainingCycle + " ");
                     for (Integer jointNb : jointsNb) {
 
+                        System.out.print("jointNb " + jointNb + " ");
                         PARAMS.mappingErrorAllowed = mappingError;
                         PARAMS.nbRequestCycle = requestCycle;
                         PARAMS.nbTrainingCycle = trainingCycle;
@@ -95,6 +99,8 @@ public class RobotLaunchExampleMassiveXPCalculus {
                         }
 
                         start();
+
+                        System.out.println(" ");
                     }
                 }
             }
