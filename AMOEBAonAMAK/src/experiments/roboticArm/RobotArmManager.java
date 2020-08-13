@@ -634,7 +634,7 @@ public class RobotArmManager {
         double multilpicator = 100;//*jointsNb/2;
         if(value/multilpicator>2*Math.PI){
             if(value/multilpicator>3*Math.PI){
-                System.out.println(value/multilpicator);
+                //System.out.println(value/multilpicator);
                 errorRequests++;
                 return Math.PI;
             }else{
@@ -642,7 +642,7 @@ public class RobotArmManager {
             }
         }else{
             if(value/multilpicator<Math.PI){
-                System.out.println(value/multilpicator);
+                //System.out.println(value/multilpicator);
                 errorRequests++;
                 return  Math.PI;
             }else{
