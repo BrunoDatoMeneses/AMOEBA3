@@ -126,6 +126,7 @@ public class Head extends EllsaAgent {
 
 		if(bestContext != null){
 			bestContext.isBest = true;
+			bestContext.isInNeighborhood = true;
 		}
 
 		testIfrequest();

@@ -112,7 +112,12 @@ public class DrawableNDimRectangle extends Drawable {
 	@Override
 	protected void _hide() {
 		for(Rectangle rectangle:rectangles){
-			RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().remove(rectangle));
+			if(vui!=null){
+				RunLaterHelper.runLater(() -> vui.getCanvas().getChildren().remove(rectangle));
+			}else{
+				RunLaterHelper.runLater(() -> vuiMulti.getCanvas().getChildren().remove(rectangle));
+			}
+
 		}
 
 	}
@@ -120,10 +125,18 @@ public class DrawableNDimRectangle extends Drawable {
 	@Override
 	public void _show() {
 		for(Rectangle rectangle:rectangles){
-			RunLaterHelper.runLater(() -> {
-				if(!vui.getCanvas().getChildren().contains(rectangle))
-					vui.getCanvas().getChildren().add(rectangle);
-			});
+			if(vui!=null){
+				RunLaterHelper.runLater(() -> {
+					if(!vui.getCanvas().getChildren().contains(rectangle))
+						vui.getCanvas().getChildren().add(rectangle);
+				});
+			}else{
+				RunLaterHelper.runLater(() -> {
+					if(!vuiMulti.getCanvas().getChildren().contains(rectangle))
+						vuiMulti.getCanvas().getChildren().add(rectangle);
+				});
+			}
+
 		}
 
 	}

@@ -367,14 +367,10 @@ public class RobotArmManager {
                 out2.put("py",goalPosition[1]);
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
                 requestJoints[9] = actions1.get("action");
-                requestJoints[1] = actions1.get("ptheta1");
-                requestJoints[2] = actions1.get("ptheta2");
-                requestJoints[3] = actions1.get("ptheta3");
-                requestJoints[4] = actions1.get("ptheta4");
-                requestJoints[5] = actions1.get("ptheta5");
-                requestJoints[6] = actions1.get("ptheta6");
-                requestJoints[7] = actions1.get("ptheta7");
-                requestJoints[8] = actions1.get("ptheta8");
+
+                for(int j=1;j<9;j++){
+                    requestJoints[j] = actions1.get("ptheta"+j);
+                }
                 requestJoints[0] = actions1.get("ptheta9");
                 //System.out.println(actions1);
 

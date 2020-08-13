@@ -45,6 +45,12 @@ public class ContextRendererFX extends RenderStrategy {
 
 		drawableNDimensions.setName(context.toString());
 		drawableNDimensions.setInfo(context.toStringFull());
+
+		if(context.isInNeighborhood){
+			drawableNDimensions.setVisible(true);
+		}else{
+			drawableNDimensions.setVisible(false);
+		}
 	}
 
 	private void updateColor() {
@@ -73,7 +79,7 @@ public class ContextRendererFX extends RenderStrategy {
 			drawableNDimensions.setColor(new Color(0.0, 0.0, 1.0, 225d / 255d));
 		}else {
 			drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
-			drawableNDimensions.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
+			drawableNDimensions.setColor(new Color(c[0], c[1], c[2], 10d / 255d));
 		}
 		
 	}
@@ -125,7 +131,7 @@ public class ContextRendererFX extends RenderStrategy {
 			drawableNDimensions.setColor(new Color(r, g, b, 225d / 255d));
 		}else {
 			drawable.setColor(new Color(r, g, b, 50d / 255d));
-			drawableNDimensions.setColor(new Color(r, g, b, 50d / 255d));
+			drawableNDimensions.setColor(new Color(r, g, b, 10d / 255d));
 		}
 	}
 
