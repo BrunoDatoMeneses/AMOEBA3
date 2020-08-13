@@ -2582,6 +2582,30 @@ public class Head extends EllsaAgent {
 
 	}
 
+	private void selectBestSubContextWithDistance() {
+
+		if(activatedContexts != null && !activatedContexts.isEmpty()) {
+			Context bc;
+
+			bc = activatedContexts.get(0);
+			double minDistance = bc.centerDistanceFromExperiment();
+			bc.centerDistanceFromExperiment = minDistance;
+			for (Context context : activatedContexts.subList(1,activatedContexts.size())) {
+				context.centerDistanceFromExperiment = context.centerDistanceFromExperiment();
+				if (context.centerDistanceFromExperiment < minDistance) {
+					bc = context;
+					minDistance = context.centerDistanceFromExperiment;
+				}
+			}
+			bestContext = bc;
+
+		} else {
+			bestContext = null;
+		}
+
+
+	}
+
 	private void selectBestContextWithDistance() {
 
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {

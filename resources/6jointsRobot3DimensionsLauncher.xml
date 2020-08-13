@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	<StartingAgents>
+	
+		<Sensor Name="px" Enum="false" />
+		<Sensor Name="py" Enum="false" />
+		<Sensor Name="ptheta1" Enum="false" />
+		<Sensor Name="ptheta2" Enum="false" />
+		<Sensor Name="ptheta3" Enum="false" />
+		<Sensor Name="ptheta4" Enum="false" />
+		<Sensor Name="ptheta5" Enum="false" />
+	
+	  	<Controller Name="Controller">
+              <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />
+              
+        </Controller> 
+	</StartingAgents>
+	
+</System>

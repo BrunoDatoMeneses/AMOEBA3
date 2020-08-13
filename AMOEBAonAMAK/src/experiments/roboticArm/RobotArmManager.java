@@ -121,38 +121,19 @@ public class RobotArmManager {
             if(PARAMS.nbJoints>1){
 
 
-                if(PARAMS.nbJoints==30){
+                if(PARAMS.nbJoints>3){
 
-                    double result = anglesToLearn[29];
+                    double result = anglesToLearn[PARAMS.nbJoints-1];
 
                     out0.put("px",position[0]);
                     out0.put("py",position[1]);
-                    for(int j=1;j<29;j++){
+                    for(int j=1;j<PARAMS.nbJoints-1;j++){
                         out0.put("ptheta"+j,anglesToLearn[j]);
                     }
-                    out0.put("ptheta29",anglesToLearn[0]);
+                    out0.put("ptheta"+(PARAMS.nbJoints-1),anglesToLearn[0]);
 
                     out0.put("oracle",result);
                     //System.out.println(out0);
-                    ellsas[0].learn(out0);
-
-                }else if(PARAMS.nbJoints==10){
-
-                    double result = anglesToLearn[9];
-
-                    out0.put("px",position[0]);
-                    out0.put("py",position[1]);
-                    out0.put("ptheta1",anglesToLearn[1]);
-                    out0.put("ptheta2",anglesToLearn[2]);
-                    out0.put("ptheta3",anglesToLearn[3]);
-                    out0.put("ptheta4",anglesToLearn[4]);
-                    out0.put("ptheta5",anglesToLearn[5]);
-                    out0.put("ptheta6",anglesToLearn[6]);
-                    out0.put("ptheta7",anglesToLearn[7]);
-                    out0.put("ptheta8",anglesToLearn[8]);
-                    out0.put("ptheta9",anglesToLearn[0]);
-
-                    out0.put("oracle",result);
                     ellsas[0].learn(out0);
 
                 }else if(PARAMS.nbJoints==3){
@@ -346,32 +327,18 @@ public class RobotArmManager {
         if(PARAMS.nbJoints>1){
 
 
-            if(PARAMS.nbJoints==30){
+            if(PARAMS.nbJoints>3){
 
 
                 out2.put("px",goalPosition[0]);
                 out2.put("py",goalPosition[1]);
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[29] = actions1.get("action");
+                requestJoints[PARAMS.nbJoints-1] = actions1.get("action");
 
-                for(int j=1;j<29;j++){
+                for(int j=1;j<PARAMS.nbJoints-1;j++){
                     requestJoints[j] = actions1.get("ptheta"+j);
                 }
-                requestJoints[0] = actions1.get("ptheta29");
-                //System.out.println(actions1);
-
-            }else if(PARAMS.nbJoints==10){
-
-
-                out2.put("px",goalPosition[0]);
-                out2.put("py",goalPosition[1]);
-                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[9] = actions1.get("action");
-
-                for(int j=1;j<9;j++){
-                    requestJoints[j] = actions1.get("ptheta"+j);
-                }
-                requestJoints[0] = actions1.get("ptheta9");
+                requestJoints[0] = actions1.get("ptheta"+(PARAMS.nbJoints-1));
                 //System.out.println(actions1);
 
             }else if(PARAMS.nbJoints==3){

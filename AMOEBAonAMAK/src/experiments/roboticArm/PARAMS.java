@@ -30,17 +30,31 @@ public class PARAMS {
             "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
             "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );*/
 
+    public static final String configFile = "20jointsRobot3DimensionsLauncher.xml";
+    public static final int dimension = 21;
+    public static int nbJoints = 20;
+    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
+            "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
+            "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
+            "ptheta16", "ptheta17", "ptheta18", "ptheta19")  );
+
     /*public static final String configFile = "10jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 11;
     public static int nbJoints = 10;
     public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
     "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));*/
 
+    /*public static final String configFile = "6jointsRobot3DimensionsLauncher.xml";
+    public static final int dimension = 7;
+    public static int nbJoints = 6;
+    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
+            "ptheta5"));*/
 
-    public static final String configFile = "3jointsRobot3DimensionsLauncher.xml";
+
+    /*public static final String configFile = "3jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 4;
     public static int nbJoints = 3;
-    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));
+    public static final ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));*/
 
     /*public static final String configFile = "2jointsRobot3DimensionsLauncher.xml";
     public static final int dimension = 3;
