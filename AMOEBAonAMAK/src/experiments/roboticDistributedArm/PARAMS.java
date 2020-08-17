@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticDistributedArm;
 
 import utils.TRACE_LEVEL;
 
@@ -9,9 +9,9 @@ public class PARAMS {
 
     public static String model = "ROBOT";
 
-    public static int nbTrainingCycle = 500;
+    public static int nbTrainingCycle = 1000;
     public static int nbRequestCycle = 200;
-    public static int nbTest = 1;
+    public static int nbTest = 2;
     public static double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     public static double mappingErrorAllowed = 0.03; // OTHER
@@ -121,7 +121,7 @@ public class PARAMS {
 
     public static  boolean setDream = false ;
 
-    public static  boolean setLearnFromNeighbors = true ;
+    public static  boolean setLearnFromNeighbors = false ;
 
     public static  int nbOfNeighborForCoopLearning = 6;
 

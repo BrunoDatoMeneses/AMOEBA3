@@ -1023,8 +1023,8 @@ public class Head extends EllsaAgent {
 		getAmas().data.nonCondireredPerceptsSyntheticValues = new HashMap<>();
 
 		//selectBestContextWithConfidenceAndVolume();
-		selectBestContextWithConfidenceOrDistance();
-		//selectBestContextWithDistance();
+		//selectBestContextWithConfidenceOrDistance();
+		selectBestSubContextWithDistance();
 
 		if (bestContext != null) {
 			getAmas().data.noBestContext = false;

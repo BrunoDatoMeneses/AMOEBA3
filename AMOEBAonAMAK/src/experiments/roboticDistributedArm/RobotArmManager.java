@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticDistributedArm;
 
 import agents.context.Context;
 import agents.head.EndogenousRequest;
@@ -8,7 +8,10 @@ import utils.Pair;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.OptionalDouble;
 
 public class RobotArmManager {
 
@@ -42,11 +45,14 @@ public class RobotArmManager {
     public double maxError;
     public int errorRequests = 0;
 
-    public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] ambs, RobotController robotController, int trainingCycleNb, int requestCycleNb){
+    Pair<Double,Double>[] starts;
+    Pair<Double,Double>[]  ends;
+
+    public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
         jointsNb = jointsNumber;
         l = jointDistances;
-        ellsas = ambs;
+        ellsas = els;
         controller = robotController;
         poseGoal = new double[2];
         futurePoseGoal = new double[2];
@@ -88,6 +94,8 @@ public class RobotArmManager {
         return position;
     }
 
+
+
     public void learn(double[] jointsAngles){
 
 
@@ -110,137 +118,32 @@ public class RobotArmManager {
 
         //System.out.println("px " + position[0] + " py " + position[1]);
         if(position[1]>0.0 || true){
-            HashMap<String, Double> out0 = new HashMap<String, Double>();
-            HashMap<String, Double> out1 = new HashMap<String, Double>();
+            HashMap<String, Double> out = new HashMap<String, Double>();
 
             double[] anglesToLearn = new double[jointsAngles.length];
             for(int k = 0;k<jointsAngles.length;k++){
                 anglesToLearn[k] = angleConvertionForLearning(jointsAngles[k]);
             }
 
-            if(PARAMS.nbJoints>1){
+            for(int l=0;l<anglesToLearn.length;l++){
 
 
-                if(PARAMS.nbJoints>3){
+                double result = anglesToLearn[l];
 
-                    double result = anglesToLearn[PARAMS.nbJoints-1];
-
-                    out0.put("px",position[0]);
-                    out0.put("py",position[1]);
-                    for(int j=1;j<PARAMS.nbJoints-1;j++){
-                        out0.put("ptheta"+j,anglesToLearn[j]);
-                    }
-                    out0.put("ptheta"+(PARAMS.nbJoints-1),anglesToLearn[0]);
-
-                    out0.put("oracle",result);
-                    //System.out.println(out0);
-                    ellsas[0].learn(out0);
-
-                }else if(PARAMS.nbJoints==3){
-
-                    double result = anglesToLearn[0];
-
-                    out0.put("px",position[0]);
-                    out0.put("py",position[1]);
-                    out0.put("ptheta1",anglesToLearn[1]);
-                    out0.put("ptheta2",anglesToLearn[2]);
-                    out0.put("oracle",result);
-                    ellsas[0].learn(out0);
-
-                }else{
-
-                    double result = anglesToLearn[0];
-
-
-                    if(PARAMS.dimension == 3 ){
-                        out0.put("px",position[0]);
-                        out0.put("py",position[1]);
-                    }
-                    else if(PARAMS.dimension == 2){
-                        out0.put("px",position[0]);
-                    }
-
-                    int j = PARAMS.nbJoints-1;
-                    int k = 0;
-                    while(j>0){
-                        out0.put("ptheta"+k,anglesToLearn[j]);
-                        j--;
-                        k++;
-                    }
-                    out0.put("oracle",result);
-
-
-                /*System.err.println(out0.get("px"));
-                System.err.println(out0.get("oracle"));
-                System.err.println(out0.get("ptheta0"));*/
-                    ellsas[0].learn(out0);
-
-                    //ellsas[0].learn(out0, new ArrayList<>(Collections.singleton("ptheta0")));
-
-
-
-
-                    result = anglesToLearn[1];
-                    if(PARAMS.dimension == 3 ){
-                        out1.put("px",position[0]);
-                        out1.put("py",position[1]);
-                    }
-                    else if(PARAMS.dimension == 2){
-                        out1.put("px",position[0]);
-                    }
-
-                    j = 0;
-                    k = 0;
-                    while(j<PARAMS.nbJoints-1){
-                        out1.put("ptheta"+k,anglesToLearn[j]);
-                        j++;
-                        k++;
-                    }
-                    out1.put("oracle",result);
-
-                    ellsas[1].learn(out1);
-
-                    if(controller.pseudoRandomCounter>0){
-                        ellsas[0].resetSubrequest();
-                    }
-                    EndogenousRequest subVoidRequest= ellsas[0].getSubrequest();
-                    futurePoseGoal[0] = 0.0;
-                    futurePoseGoal[1] = 0.0;
-                    /*if(subVoidRequest!= null){
-
-                        ellsas[0].resetSubrequest();
-                        controller.pseudoRandomCounter = 5;
-                        System.err.println("------------------------------");
-                        System.err.println(subVoidRequest);
-                        System.err.println(subVoidRequest.getRequest());
-                        HashMap<String, Double> request = convertRequestPerceptToString(subVoidRequest.getRequest());
-                        futurePoseGoal[0] = request.get("px");
-                        futurePoseGoal[1] = request.get("py");
-                        //System.err.println("subVoidRequest " + subVoidRequest);
-                        HashMap<String,Double> actions = ellsas[0].requestWithLesserPercepts(request);
-
-                        request.put("ptheta0",actions.get("action"));
-                        //double action = ellsas[1].request(request);
-                        double[] requestAngles = new double[jointsNb];
-                        requestAngles[0] = actions.get("action")/100.0;
-                        //requestAngles[1] = action/100.0;
-                        requestAngles[1] = actions.get("ptheta0")/100.0;
-                        //System.err.println("requestAngles " + requestAngles[0] + " " + requestAngles[1]);
-                        controller.activeLearningSituation = requestAngles;
-
-
-                    }*/
-
+                if(l!=0){
+                    out.put("pxOrigin",starts[l].getA());
+                    out.put("pyOrigin",starts[l].getB());
                 }
+                out.put("pxGoal",position[0]);
+                out.put("pyGoal",position[1]);
 
 
 
-            }else{
-                double result = anglesToLearn[0];
-                out0.put("px",position[0]);
-                out0.put("py",position[1]);
-                out0.put("oracle",result);
-                ellsas[0].learn(out0);
+                out.put("oracle",result);
+                //System.out.println(out0);
+                ellsas[l].learn(out);
+
+                //System.out.println(l + " " + out);
             }
 
 
@@ -276,19 +179,19 @@ public class RobotArmManager {
 
     private double[][] product(double[][] m1, double[][] m2){
 
-        double[][] prodcutResult = new double[4][4];
+        double[][] productResult = new double[4][4];
 
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
-                prodcutResult[i][j]=0;
+                productResult[i][j]=0;
                 for(int k=0;k<4;k++)
                 {
-                    prodcutResult[i][j]+=m1[i][k]*m2[k][j];
+                    productResult[i][j]+=m1[i][k]*m2[k][j];
                 }
             }
         }
 
-        return prodcutResult;
+        return productResult;
 
     }
 
@@ -305,145 +208,46 @@ public class RobotArmManager {
 
         double[] goalJoints = new double[jointsNb];
         double[] requestJoints = new double[jointsNb];
+        Pair<Double,Double>[] workingStarts = new Pair[jointsNb];
+        //Pair<Double,Double>[] workingEnds = new Pair[jointsNb];
+
         joints = jointsAngles;
 
-        HashMap<String, Double> out0 = new HashMap<String, Double>();
-        HashMap<String, Double> out1 = new HashMap<String, Double>();
-        HashMap<String, Double> out2 = new HashMap<String, Double>();
 
 
-        /*out0.put("px",goalPosition[0]);
-        out0.put("py",goalPosition[1]);
-        out0.put("ptheta",jointsAngles[1]*100.0);
-        goalJoints[0]=amoebas[0].request(out0)/100.0;
+        workingStarts[0] = new Pair<>(0.0,0.0);
 
 
-        out1.put("px",goalPosition[0]);
-        out1.put("py",goalPosition[1]);
-        out1.put("ptheta",jointsAngles[0]*100.0);
-        goalJoints[1]=amoebas[1].request(out1)/100.0;*/
-
-        //goalJoints[1]=amoebas[1].request(out1)/100.0;
-        if(PARAMS.nbJoints>1){
-
-
-            if(PARAMS.nbJoints>3){
+        for(int i=0;i<requestJoints.length;i++){
+            HashMap<String, Double> out = new HashMap<String, Double>();
+            if(i!=0){
+                out.put("pxOrigin",workingStarts[i].getA());
+                out.put("pyOrigin",workingStarts[i].getB());
+            }
+            out.put("pxGoal",goalPosition[0]);
+            out.put("pyGoal",goalPosition[1]);
 
 
-                out2.put("px",goalPosition[0]);
-                out2.put("py",goalPosition[1]);
-                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[PARAMS.nbJoints-1] = actions1.get("action");
+            double angle = ellsas[i].request(out);
+            goalJoints[i] = maxMin2PI(angleConvertionForRequest(angle));
 
-                for(int j=1;j<PARAMS.nbJoints-1;j++){
-                    requestJoints[j] = actions1.get("ptheta"+j);
-                }
-                requestJoints[0] = actions1.get("ptheta"+(PARAMS.nbJoints-1));
-                //System.out.println(actions1);
+            //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
 
-            }else if(PARAMS.nbJoints==3){
-
-
-                out2.put("px",goalPosition[0]);
-                out2.put("py",goalPosition[1]);
-                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[0] = actions1.get("action");
-                requestJoints[1] = actions1.get("ptheta1");
-                requestJoints[2] = actions1.get("ptheta2");
-
-            }else{
-                if(PARAMS.dimension ==3){
-                    out2.put("px",goalPosition[0]);
-                    out2.put("py",goalPosition[1]);
-                }else if (PARAMS.dimension ==2){
-                    out2.put("px",goalPosition[0]);
-                }
-
-
-
-                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-
-
-                Context bestContext = ellsas[0].getHeadAgent().getBestContext();
-                if(bestContext!=null){
-                    TRACE.print(TRACE_LEVEL.DEBUG, "B",bestContext, bestContext.getConfidence());
-                    for(Percept pct : ellsas[0].getPercepts()){
-                        TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(pct.getName(),bestContext.getRanges().get(pct).getStart()+"",bestContext.getRanges().get(pct).getEnd()+"")));
-                    }
-
-
-                }else{
-                    TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("B",bestContext+"")));
-
-                }
-
-                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("A",""+bestContext, ""+ ellsas[0].getHeadAgent().getActivatedContexts())));
-                for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
-                    TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(ctxt.getName(),""+ctxt.getConfidence())));
-                }
-                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("N", ellsas[0].getHeadAgent().getActivatedNeighborsContexts()+"")));
-
-
-                HashMap<String,Double> actions2 = ellsas[1].requestWithLesserPercepts(out2);
-                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(actions2.toString())));
-                TRACE.print(TRACE_LEVEL.DEBUG,"B", ellsas[1].getHeadAgent().getBestContext());
-                TRACE.print(TRACE_LEVEL.DEBUG,"A", ellsas[1].getHeadAgent().getActivatedContexts());
-                TRACE.print(TRACE_LEVEL.DEBUG,"N", ellsas[1].getHeadAgent().getActivatedNeighborsContexts());
-
-
-                requestJoints[0] = actions1.get("action");
-                requestJoints[1] = actions1.get("ptheta0");
-
-
-
-                TRACE.print(TRACE_LEVEL.DEBUG,"PERCEPTIONS " + out2);
-                TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA1");
-                TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 0 " + actions1.get("action"));
-                TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions1.get("ptheta0"));
-                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + goalJoints[0]/Math.PI);
-                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + goalJoints[1]/Math.PI);
-                TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA2");
-                TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 0 " + actions2.get("ptheta0"));
-                TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions2.get("action"));
-                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + actions2.get("ptheta0")/Math.PI);
-                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + actions2.get("action")/Math.PI);
-
-
-            /*goalJoints[1] = actions2.get("action")/100.0;
-            goalJoints[0] = actions2.get("ptheta0")/100.0;*/
-
-            /*goalJoints[0] = ((actions1.get("action")/100.0) + (actions2.get("ptheta0")/100.0)) / 2;
-            goalJoints[1] = ((actions1.get("ptheta0")/100.0) + (actions2.get("action")/100.0)) / 2;*/
+            double[] position = forwardKinematics(goalJoints,i+1);
+            double endXPos = position[0];
+            double endYPos = position[1];
+            //workingEnds[i] = new Pair<>(endXPos,endYPos);
+            if(i<requestJoints.length-1){
+                workingStarts[i+1] = new Pair<>(endXPos,endYPos);
             }
 
-
-
-
-        }else{
-            out0.put("px",goalPosition[0]);
-            out0.put("py",goalPosition[1]);
-            requestJoints[0]= ellsas[0].request(out0);
         }
 
 
-        TRACE.print(TRACE_LEVEL.ERROR,"--------------");
 
-        for(Context ctxt: ellsas[0].getHeadAgent().getActivatedContexts()){
-            TRACE.print(TRACE_LEVEL.ERROR,ctxt.getName(),ctxt.getConfidence(),ctxt.centerDistanceFromExperiment);
-        }
-
-        Context bestContext = ellsas[0].getHeadAgent().getBestContext();
-        if(bestContext!=null) {
-            TRACE.print(TRACE_LEVEL.ERROR, "B", bestContext, bestContext.getConfidence(), bestContext.centerDistanceFromExperiment());
-
-        }
-
-        //amoebas[0].getHeadAgent().getActivatedContexts().get(0).getLocalModel().getProposition()
         requestCycle++;
 
-        for(int k = 0;k<jointsNb;k++){
-            goalJoints[k] = angleConvertionForRequest(requestJoints[k]);
-        }
+
 
         return goalJoints;
     }
@@ -452,8 +256,8 @@ public class RobotArmManager {
 
         xPos = 0.0;
         yPos = 0.0;
-        Pair<Double,Double>[] starts = new Pair[jointsNb];
-        Pair<Double,Double>[]  ends = new Pair[jointsNb];
+        starts = new Pair[jointsNb];
+        ends = new Pair[jointsNb];
 
         if(learningCycle <trainingCycles){
 
@@ -651,6 +455,20 @@ public class RobotArmManager {
 
         }
         //return value/multilpicator;
+    }
+
+    public double maxMin2PI(double angle){
+
+        if(angle<0.0){
+            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            return 0.0;
+        }else if(angle>Math.PI*2){
+            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            return Math.PI*2;
+        }else{
+            return angle;
+        }
+
     }
 
 }
