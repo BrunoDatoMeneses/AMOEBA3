@@ -121,7 +121,7 @@ public class RobotArmManager {
             if(PARAMS.nbJoints>1){
 
 
-                if(PARAMS.nbJoints>3){
+                if(PARAMS.nbJoints>=3){
 
                     double result = anglesToLearn[PARAMS.nbJoints-1];
 
@@ -136,20 +136,9 @@ public class RobotArmManager {
                     //System.out.println(out0);
                     ellsas[0].learn(out0);
 
-                }else if(PARAMS.nbJoints==3){
-
-                    double result = anglesToLearn[0];
-
-                    out0.put("px",position[0]);
-                    out0.put("py",position[1]);
-                    out0.put("ptheta1",anglesToLearn[1]);
-                    out0.put("ptheta2",anglesToLearn[2]);
-                    out0.put("oracle",result);
-                    ellsas[0].learn(out0);
-
                 }else{
 
-                    double result = anglesToLearn[0];
+                    double result = anglesToLearn[PARAMS.nbJoints-1];
 
 
                     if(PARAMS.dimension == 3 ){
@@ -160,45 +149,16 @@ public class RobotArmManager {
                         out0.put("px",position[0]);
                     }
 
-                    int j = PARAMS.nbJoints-1;
-                    int k = 0;
-                    while(j>0){
-                        out0.put("ptheta"+k,anglesToLearn[j]);
-                        j--;
-                        k++;
-                    }
+                    out0.put("ptheta0",anglesToLearn[0]);
+
                     out0.put("oracle",result);
 
-
-                /*System.err.println(out0.get("px"));
-                System.err.println(out0.get("oracle"));
-                System.err.println(out0.get("ptheta0"));*/
                     ellsas[0].learn(out0);
 
-                    //ellsas[0].learn(out0, new ArrayList<>(Collections.singleton("ptheta0")));
 
 
 
 
-                    result = anglesToLearn[1];
-                    if(PARAMS.dimension == 3 ){
-                        out1.put("px",position[0]);
-                        out1.put("py",position[1]);
-                    }
-                    else if(PARAMS.dimension == 2){
-                        out1.put("px",position[0]);
-                    }
-
-                    j = 0;
-                    k = 0;
-                    while(j<PARAMS.nbJoints-1){
-                        out1.put("ptheta"+k,anglesToLearn[j]);
-                        j++;
-                        k++;
-                    }
-                    out1.put("oracle",result);
-
-                    ellsas[1].learn(out1);
 
                     if(controller.pseudoRandomCounter>0){
                         ellsas[0].resetSubrequest();
@@ -327,7 +287,7 @@ public class RobotArmManager {
         if(PARAMS.nbJoints>1){
 
 
-            if(PARAMS.nbJoints>3){
+            if(PARAMS.nbJoints>=3){
 
 
                 out2.put("px",goalPosition[0]);
@@ -340,16 +300,6 @@ public class RobotArmManager {
                 }
                 requestJoints[0] = actions1.get("ptheta"+(PARAMS.nbJoints-1));
                 //System.out.println(actions1);
-
-            }else if(PARAMS.nbJoints==3){
-
-
-                out2.put("px",goalPosition[0]);
-                out2.put("py",goalPosition[1]);
-                HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
-                requestJoints[0] = actions1.get("action");
-                requestJoints[1] = actions1.get("ptheta1");
-                requestJoints[2] = actions1.get("ptheta2");
 
             }else{
                 if(PARAMS.dimension ==3){
@@ -384,15 +334,15 @@ public class RobotArmManager {
                 TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList("N", ellsas[0].getHeadAgent().getActivatedNeighborsContexts()+"")));
 
 
-                HashMap<String,Double> actions2 = ellsas[1].requestWithLesserPercepts(out2);
-                TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(actions2.toString())));
+                //HashMap<String,Double> actions2 = ellsas[1].requestWithLesserPercepts(out2);
+                /*TRACE.print(TRACE_LEVEL.DEBUG, new ArrayList<>(Arrays.asList(actions2.toString())));
                 TRACE.print(TRACE_LEVEL.DEBUG,"B", ellsas[1].getHeadAgent().getBestContext());
                 TRACE.print(TRACE_LEVEL.DEBUG,"A", ellsas[1].getHeadAgent().getActivatedContexts());
-                TRACE.print(TRACE_LEVEL.DEBUG,"N", ellsas[1].getHeadAgent().getActivatedNeighborsContexts());
+                TRACE.print(TRACE_LEVEL.DEBUG,"N", ellsas[1].getHeadAgent().getActivatedNeighborsContexts());*/
 
 
-                requestJoints[0] = actions1.get("action");
-                requestJoints[1] = actions1.get("ptheta0");
+                requestJoints[1] = actions1.get("action");
+                requestJoints[0] = actions1.get("ptheta0");
 
 
 
@@ -402,11 +352,11 @@ public class RobotArmManager {
                 TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions1.get("ptheta0"));
                 TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + goalJoints[0]/Math.PI);
                 TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + goalJoints[1]/Math.PI);
-                TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA2");
+                /*TRACE.print(TRACE_LEVEL.DEBUG,"ELLSA2");
                 TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 0 " + actions2.get("ptheta0"));
                 TRACE.print(TRACE_LEVEL.DEBUG,"ACTION 1 " + actions2.get("action"));
                 TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 0 " + actions2.get("ptheta0")/Math.PI);
-                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + actions2.get("action")/Math.PI);
+                TRACE.print(TRACE_LEVEL.DEBUG,"JOINT 1 " + actions2.get("action")/Math.PI);*/
 
 
             /*goalJoints[1] = actions2.get("action")/100.0;

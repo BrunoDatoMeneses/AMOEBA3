@@ -9,7 +9,7 @@ public class PARAMS {
 
     public static String model = "ROBOT";
 
-    public static int nbTrainingCycle = 1000;
+    public static int nbTrainingCycle = 500;
     public static int nbRequestCycle = 200;
     public static int nbTest = 2;
     public static double spaceSize = 50.0	;

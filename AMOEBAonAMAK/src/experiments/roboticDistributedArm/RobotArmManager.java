@@ -48,6 +48,11 @@ public class RobotArmManager {
     Pair<Double,Double>[] starts;
     Pair<Double,Double>[]  ends;
 
+    boolean allRequestsFinished = true;
+    int jointIndiceForRequests;
+
+    boolean newGoal = true;
+
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
         jointsNb = jointsNumber;
@@ -134,8 +139,8 @@ public class RobotArmManager {
                     out.put("pxOrigin",starts[l].getA());
                     out.put("pyOrigin",starts[l].getB());
                 }
-                out.put("pxGoal",position[0]);
-                out.put("pyGoal",position[1]);
+                out.put("pxGoal",ends[l].getA());
+                out.put("pyGoal",ends[l].getB());
 
 
 
@@ -218,7 +223,47 @@ public class RobotArmManager {
         workingStarts[0] = new Pair<>(0.0,0.0);
 
 
-        for(int i=0;i<requestJoints.length;i++){
+        for(int j = requestJoints.length-1;j>=0;j--){
+
+            HashMap<String, Double> out = new HashMap<String, Double>();
+            if(j!=0){
+                out.put("pxOrigin",starts[j].getA());
+                out.put("pyOrigin",starts[j].getB());
+            }
+            if(j==requestJoints.length-1){
+                out.put("pxGoal",goalPosition[0]);
+                out.put("pyGoal",goalPosition[1]);
+            }else{
+                out.put("pxGoal",ends[j].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA()));
+                out.put("pyGoal",ends[j].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB()));
+            }
+
+            double angle = ellsas[j].request(out);
+            goalJoints[j] = maxMin2PI(angleConvertionForRequest(angle));
+
+            joints[j] = goalJoints[j];
+
+            //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
+
+
+            for (int i = 0;i<jointsNb;i++){
+
+                starts[i] = new Pair<>(xPos,yPos);
+                double[] position = forwardKinematics(joints,i+1);
+                xPos = position[0];
+                yPos = position[1];
+                ends[i] = new Pair<>(xPos,yPos);
+
+
+
+
+            }
+
+        }
+
+
+        /*for(int i=0;i<requestJoints.length;i++){
+
             HashMap<String, Double> out = new HashMap<String, Double>();
             if(i!=0){
                 out.put("pxOrigin",workingStarts[i].getA());
@@ -241,7 +286,7 @@ public class RobotArmManager {
                 workingStarts[i+1] = new Pair<>(endXPos,endYPos);
             }
 
-        }
+        }*/
 
 
 
@@ -250,6 +295,73 @@ public class RobotArmManager {
 
 
         return goalJoints;
+    }
+
+    public double[] indiceRequest(double[] jointsAngles, double[] goalPosition, int cycle,int jointIndice){ // TODO
+
+        double[] goalJoints = new double[jointsNb];
+        double[] requestJoints = new double[jointsNb];
+
+        joints = jointsAngles;
+
+
+
+
+
+        HashMap<String, Double> out = new HashMap<String, Double>();
+        if(jointIndice!=0){
+            out.put("pxOrigin",starts[jointIndice].getA());
+            out.put("pyOrigin",starts[jointIndice].getB());
+        }
+        if(jointIndice==requestJoints.length-1){
+            out.put("pxGoal",goalPosition[0]);
+            out.put("pyGoal",goalPosition[1]);
+        }else{
+            out.put("pxGoal",ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA()));
+            out.put("pyGoal",ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB()));
+        }
+
+        double angle = ellsas[jointIndice].request(out);
+        goalJoints[jointIndice] = maxMin2PI(angleConvertionForRequest(angle));
+
+        joints[jointIndice] = goalJoints[jointIndice];
+
+        //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
+
+
+        /*for(int i=0;i<requestJoints.length;i++){
+
+            HashMap<String, Double> out = new HashMap<String, Double>();
+            if(i!=0){
+                out.put("pxOrigin",workingStarts[i].getA());
+                out.put("pyOrigin",workingStarts[i].getB());
+            }
+            out.put("pxGoal",goalPosition[0]);
+            out.put("pyGoal",goalPosition[1]);
+
+
+            double angle = ellsas[i].request(out);
+            goalJoints[i] = maxMin2PI(angleConvertionForRequest(angle));
+
+            //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
+
+            double[] position = forwardKinematics(goalJoints,i+1);
+            double endXPos = position[0];
+            double endYPos = position[1];
+            //workingEnds[i] = new Pair<>(endXPos,endYPos);
+            if(i<requestJoints.length-1){
+                workingStarts[i+1] = new Pair<>(endXPos,endYPos);
+            }
+
+        }*/
+
+
+
+
+
+
+
+        return joints;
     }
 
     public Pair<Pair<Double,Double>[],Pair<Double,Double>[]> decideAndAct(int cycle, double[] anglesBase, double[] angles){
@@ -265,7 +377,8 @@ public class RobotArmManager {
             poseGoal[0] = futurePoseGoal[0] ;
             poseGoal[1] = futurePoseGoal[1] ;
 
-
+            xPos = 0.0;
+            yPos = 0.0;
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i, cycle, anglesBase, angles);
@@ -295,8 +408,14 @@ public class RobotArmManager {
             /*amoebas[0].data.isSelfLearning = false;
             amoebas[1].data.isSelfLearning = false;*/
 
-            if(cycle%2 == 0){
+            System.out.println("ANGLES BEFORE");
+            for(int k=0;k<jointsNb;k++){
+                System.out.println(angles[k]);
+            }
 
+            if(newGoal){
+                System.out.println("NEW GOAL");
+                newGoal = false;
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius;
 
@@ -315,6 +434,8 @@ public class RobotArmManager {
                 poseGoal[1] = learnedPositions.get(j).getB();*/
 
                 //System.out.println(poseGoal[0] + " " + poseGoal[1]);
+                xPos = 0.0;
+                yPos = 0.0;
                 for (int i = 0;i<jointsNb;i++){
 
                     controller.setJoint(i, cycle, anglesBase, angles);
@@ -327,17 +448,8 @@ public class RobotArmManager {
                 }
 
             }else{
-                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
-
-                goalAngles = request(angles, poseGoal, cycle);
-
-                plotRequestError = true;
-                //System.out.println("[" + cycle + "]");
-                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
-                controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
-                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
-
-
+                xPos = 0.0;
+                yPos = 0.0;
                 for (int i = 0;i<jointsNb;i++){
 
                     starts[i] = new Pair<>(xPos,yPos);
@@ -347,19 +459,57 @@ public class RobotArmManager {
                     ends[i] = new Pair<>(xPos,yPos);
 
                 }
-                String anglesString = " ";
-                String goalanglesString = " ";
-                for (int i = 0;i<jointsNb;i++){
+                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
 
-                    anglesString += angles[i] + " ";
-                    goalanglesString += goalAngles[i] + " ";
+                if(allRequestsFinished){
+                    jointIndiceForRequests = jointsNb-1;
+                    allRequestsFinished = false;
+                }else{
+                    jointIndiceForRequests--;
                 }
 
+                System.out.println(jointIndiceForRequests);
+                goalAngles = indiceRequest(angles, poseGoal, cycle,jointIndiceForRequests);
 
-                TRACE.print(TRACE_LEVEL.DEBUG,"[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
+                plotRequestError = true;
+                //System.out.println("[" + cycle + "]");
+                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
+                controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
+                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
 
-                double currentError = 0.0;
-                //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
+                xPos = 0.0;
+                yPos = 0.0;
+                for (int i = 0;i<jointsNb;i++){
+
+                    starts[i] = new Pair<>(xPos,yPos);
+                    double[] position = forwardKinematics(angles,i+1);
+                    xPos = position[0];
+                    yPos = position[1];
+                    ends[i] = new Pair<>(xPos,yPos);
+
+                }
+
+                if(jointIndiceForRequests==0){
+                    allRequestsFinished = true;
+                    requestCycle++;
+                    newGoal = true;
+                }
+
+                if(allRequestsFinished){
+                    String anglesString = " ";
+                    String goalanglesString = " ";
+                    for (int i = 0;i<jointsNb;i++){
+
+                        anglesString += angles[i] + " ";
+                        goalanglesString += goalAngles[i] + " ";
+                    }
+
+
+
+                    TRACE.print(TRACE_LEVEL.DEBUG,"[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
+
+                    double currentError = 0.0;
+                    //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
                 /*if(PARAMS.dimension == 11){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/1000.0;
                 }else if(PARAMS.dimension == 4){
@@ -371,17 +521,20 @@ public class RobotArmManager {
                 }else if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/360.0;
                 }*/
-                if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
-                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/maxError;
-                }else{
-                    currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/maxError;
+                    if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
+                        currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/maxError;
+                    }else{
+                        currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/maxError;
+                    }
+
+
+                    TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentError + " [" + requestCycle + "]");
+                    goalErrors += currentError;
+                    allGoalErrors.add(new Double(currentError));
+                }
                 }
 
 
-                TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentError + " [" + requestCycle + "]");
-                goalErrors += currentError;
-                allGoalErrors.add(new Double(currentError));
-            }
 
             if(requestCycle == requestCycles-1){
                 goalErrors /= requestCycles;
@@ -389,9 +542,17 @@ public class RobotArmManager {
                 errorDispersion = allGoalErrors.stream().mapToDouble(a->Math.pow((a-averageError.getAsDouble()),2)).sum();
 
             }
+
+
+            System.out.println("ANGLES AFTER");
+            for(int k=0;k<jointsNb;k++){
+                System.out.println(angles[k]);
+            }
         }else{
             finished = true;
             TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
+            xPos = 0.0;
+            yPos = 0.0;
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i, cycle, anglesBase, angles);
