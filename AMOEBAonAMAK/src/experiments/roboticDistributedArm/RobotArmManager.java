@@ -479,10 +479,10 @@ public class RobotArmManager {
 
                 if(allRequestsFinished){
                     if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
-                    jointIndiceForRequests = 0;
+                    jointIndiceForRequests = jointsNb-1;
                     allRequestsFinished = false;
                 }else{
-                    jointIndiceForRequests++;
+                    jointIndiceForRequests--;
                 }
 
                 //System.out.println(jointIndiceForRequests);
@@ -505,8 +505,8 @@ public class RobotArmManager {
                     ends[i] = new Pair<>(xPos,yPos);
 
                 }
-
-                if(jointIndiceForRequests==jointsNb-1){
+                if(jointIndiceForRequests==0){
+                //if(jointIndiceForRequests==jointsNb-1){
                     requestControlCycle++;
                     allRequestsFinished = true;
 
