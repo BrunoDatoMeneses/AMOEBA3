@@ -38,7 +38,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 	public void start(Stage primaryStage) throws Exception {
 
 
-        ellsas = new ELLSA[PARAMS.nbJoints];
+        ellsas = new ELLSA[1];
         studiedSystems = new StudiedSystem[PARAMS.nbJoints];
         vuiMultis = new VUIMulti[PARAMS.nbJoints];
         ellsaMultiUIWindows = new EllsaMultiUIWindow[PARAMS.nbJoints];
@@ -52,7 +52,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         Configuration.waitForGUI = true;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-        for(int i=0;i<PARAMS.nbJoints;i++){
+        for(int i=0;i<1;i++){
 
 
             studiedSystems[i] = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
@@ -62,9 +62,10 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsas[i].setStudiedSystem(studiedSystems[i]);
             IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
             File file;
-            if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
-            else file = new File("resources/1jointRobot4DimensionsLauncher.xml");
+            /*if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
+            else file = new File("resources/1jointRobot4DimensionsLauncher.xml");*/
             //else file = new File("resources/1jointRobot3DimensionsLauncher.xml");
+            file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
 
             backupSystem.load(file);
 

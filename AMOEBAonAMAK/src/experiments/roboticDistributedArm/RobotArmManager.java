@@ -46,11 +46,17 @@ public class RobotArmManager {
     Pair<Double,Double>[]  ends;
 
     boolean allRequestsFinished = true;
-    int jointIndiceForRequests;
+    public int jointIndiceForRequests = -1;
 
     boolean newGoal = true;
     int requestControlCycles = 5;
     int requestControlCycle;
+
+    public double xSubGoal = 0.0;
+    public double ySubGoal = 0.0;
+
+    private int angleMultilpicatorForUI = 100;//*jointsNb/2;
+
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
@@ -125,11 +131,15 @@ public class RobotArmManager {
             HashMap<String, Double> out = new HashMap<String, Double>();
 
             double[] anglesToLearn = new double[jointsAngles.length];
+            double anglesSum = 0;
             for(int k = 0;k<jointsAngles.length;k++){
-                anglesToLearn[k] = angleConvertionForLearning(jointsAngles[k]);
+                anglesSum += jointsAngles[k];
+                anglesToLearn[k] = angleConvertionForLearning( controller.modulo2PI(anglesSum));
             }
 
+
             for(int l=0;l<anglesToLearn.length;l++){
+
 
 
                 double result = anglesToLearn[l];
@@ -138,14 +148,14 @@ public class RobotArmManager {
                     out.put("pxOrigin",starts[l].getA());
                     out.put("pyOrigin",starts[l].getB());
                 }
-                out.put("pxGoal",ends[l].getA());
-                out.put("pyGoal",ends[l].getB());
+                out.put("pxGoal",ends[l].getA()-starts[l].getA());
+                out.put("pyGoal",ends[l].getB()-starts[l].getB());
 
 
 
                 out.put("oracle",result);
                 //System.out.println(out0);
-                ellsas[l].learn(out);
+                ellsas[0].learn(out);
 
                 //System.out.println(l + " " + out);
             }
@@ -208,93 +218,7 @@ public class RobotArmManager {
     }
 
 
-    public double[] request(double[] jointsAngles, double[] goalPosition, int cycle){ // TODO
 
-        double[] goalJoints = new double[jointsNb];
-        double[] requestJoints = new double[jointsNb];
-        Pair<Double,Double>[] workingStarts = new Pair[jointsNb];
-        //Pair<Double,Double>[] workingEnds = new Pair[jointsNb];
-
-        joints = jointsAngles;
-
-
-
-        workingStarts[0] = new Pair<>(0.0,0.0);
-
-
-        for(int j = requestJoints.length-1;j>=0;j--){
-
-            HashMap<String, Double> out = new HashMap<String, Double>();
-            if(j!=0){
-                out.put("pxOrigin",starts[j].getA());
-                out.put("pyOrigin",starts[j].getB());
-            }
-            if(j==requestJoints.length-1){
-                out.put("pxGoal",goalPosition[0]);
-                out.put("pyGoal",goalPosition[1]);
-            }else{
-                out.put("pxGoal",ends[j].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA()));
-                out.put("pyGoal",ends[j].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB()));
-            }
-
-            double angle = ellsas[j].request(out);
-            goalJoints[j] = maxMin2PI(angleConvertionForRequest(angle));
-
-            joints[j] = goalJoints[j];
-
-            //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
-
-
-            for (int i = 0;i<jointsNb;i++){
-
-                starts[i] = new Pair<>(xPos,yPos);
-                double[] position = forwardKinematics(joints,i+1);
-                xPos = position[0];
-                yPos = position[1];
-                ends[i] = new Pair<>(xPos,yPos);
-
-
-
-
-            }
-
-        }
-
-
-        /*for(int i=0;i<requestJoints.length;i++){
-
-            HashMap<String, Double> out = new HashMap<String, Double>();
-            if(i!=0){
-                out.put("pxOrigin",workingStarts[i].getA());
-                out.put("pyOrigin",workingStarts[i].getB());
-            }
-            out.put("pxGoal",goalPosition[0]);
-            out.put("pyGoal",goalPosition[1]);
-
-
-            double angle = ellsas[i].request(out);
-            goalJoints[i] = maxMin2PI(angleConvertionForRequest(angle));
-
-            //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
-
-            double[] position = forwardKinematics(goalJoints,i+1);
-            double endXPos = position[0];
-            double endYPos = position[1];
-            //workingEnds[i] = new Pair<>(endXPos,endYPos);
-            if(i<requestJoints.length-1){
-                workingStarts[i+1] = new Pair<>(endXPos,endYPos);
-            }
-
-        }*/
-
-
-
-        requestCycle++;
-
-
-
-        return goalJoints;
-    }
 
     public double[] indiceRequest(double[] jointsAngles, double[] goalPosition, int cycle,int jointIndice){ // TODO
 
@@ -319,27 +243,37 @@ public class RobotArmManager {
             double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
             double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
 
-            out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
-            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);
+            /*out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
+            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);*/
+
+            xSubGoal = goalPosition[0];
+            ySubGoal = goalPosition[1];
+            out.put("pxGoal",xSubGoal - starts[jointIndice].getA());
+            out.put("pyGoal",ySubGoal - starts[jointIndice].getB());
+
         }else{
-            double xSubGoalPos = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
-            double ySubGoalPos = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
-            double xSubGoalVectorFromStart = xSubGoalPos - starts[jointIndice].getA();
-            double ySubGoalVectorFromStart = ySubGoalPos - starts[jointIndice].getB();
+            xSubGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
+            ySubGoal = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
+            double xSubGoalVectorFromStart = xSubGoal - starts[jointIndice].getA();
+            double ySubGoalVectorFromStart = ySubGoal - starts[jointIndice].getB();
             double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
             double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
 
-            out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
-            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);
+            /*out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
+            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);*/
+            out.put("pxGoal",xSubGoal - starts[jointIndice].getA());
+            out.put("pyGoal",ySubGoal - starts[jointIndice].getB());
 
 
 
         }
 
-        double angle = ellsas[jointIndice].request(out);
-        goalJoints[jointIndice] = maxMin2PI(angleConvertionForRequest(angle));
+        double angle = ellsas[0].request(out);
+        System.out.println(jointIndice + " " + angle);
+        goalJoints[jointIndice] = angleConvertionForRequest(angle);
+        System.out.println(jointIndice + " After Conversion " + goalJoints[jointIndice]);
 
-        joints[jointIndice] = goalJoints[jointIndice];
+
 
         //System.out.println(i + "\n" + out + "\n" + goalJoints[i]);
 
@@ -372,8 +306,11 @@ public class RobotArmManager {
 
 
 
-
-
+        double angleSum = 0;
+        for(int i=0;i<jointIndice;i++){
+            angleSum += maxMin2PI( joints[i]);
+        }
+        joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
 
 
         return joints;
@@ -479,10 +416,10 @@ public class RobotArmManager {
 
                 if(allRequestsFinished){
                     if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
-                    jointIndiceForRequests = jointsNb-1;
+                    jointIndiceForRequests = 0;
                     allRequestsFinished = false;
                 }else{
-                    jointIndiceForRequests--;
+                    jointIndiceForRequests++;
                 }
 
                 //System.out.println(jointIndiceForRequests);
@@ -505,7 +442,7 @@ public class RobotArmManager {
                     ends[i] = new Pair<>(xPos,yPos);
 
                 }
-                if(jointIndiceForRequests==0){
+                if(jointIndiceForRequests==jointsNb-1){
                 //if(jointIndiceForRequests==jointsNb-1){
                     requestControlCycle++;
                     allRequestsFinished = true;
@@ -606,34 +543,32 @@ public class RobotArmManager {
         return newRequest;
     }
 
-    private double angleConvertionForLearning(double value){
-        double multilpicator = 100;//*jointsNb/2;
+    private double angleConvertionForLearning(double value){ // Between PI and 3PI
         if(value<Math.PI){
-            return ((2*Math.PI) + value)*multilpicator;
+            return ((2*Math.PI) + value)* angleMultilpicatorForUI;
         }else{
-            return value*multilpicator;
+            return value* angleMultilpicatorForUI;
         }
         //return value*multilpicator;
 
     }
 
     private double angleConvertionForRequest(double value){
-        double multilpicator = 100;//*jointsNb/2;
-        if(value/multilpicator>2*Math.PI){
-            if(value/multilpicator>3*Math.PI){
+        if(value/ angleMultilpicatorForUI >2*Math.PI){
+            if(value/ angleMultilpicatorForUI >3*Math.PI){
                 //System.out.println(value/multilpicator);
                 errorRequests++;
                 return Math.PI;
             }else{
-                return controller.modulo2PI(value/multilpicator);
+                return controller.modulo2PI(value/ angleMultilpicatorForUI);
             }
         }else{
-            if(value/multilpicator<Math.PI){
+            if(value/ angleMultilpicatorForUI <Math.PI){
                 //System.out.println(value/multilpicator);
                 errorRequests++;
                 return  Math.PI;
             }else{
-                return value/multilpicator;
+                return value/ angleMultilpicatorForUI;
             }
 
         }

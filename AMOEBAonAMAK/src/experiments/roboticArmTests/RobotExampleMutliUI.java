@@ -1,4 +1,4 @@
-package experiments.roboticDistributedArm;
+package experiments.roboticArmTests;
 
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Configuration;
@@ -6,7 +6,6 @@ import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.drawables.DrawableCircle;
 import fr.irit.smac.amak.ui.drawables.DrawableLine;
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
 import utils.Pair;
 
 public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExampleMultiUI> {
@@ -32,7 +31,6 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public DrawableLine errorGoalLines[];
 	public DrawableCircle circles[];
 	public DrawableCircle goalCircle;
-	public DrawableCircle subGoalCircle;
 
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
@@ -119,14 +117,9 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			for (int i = 0;i<jointsNumber;i++){
 				lines[i] = getAmas().getVUIMulti().createAndAddLine(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
 				circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
-
 			}
 
-			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,3);
-			subGoalCircle  = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,3);
-
-			goalCircle.setColor(new Color(0.0,1.0,0.0,1.0));
-			subGoalCircle.setColor(new Color(0.0,0.0,1.0,1.0));
+			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,2);
 
 			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -10000.0,0.0,10000.0);
@@ -205,19 +198,10 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 				for(int i = 0; i<jointsNumber; i++){
 					lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
 					circles[i].move(ends[i].getA(),ends[i].getB());
-					if(robotArmManager.jointIndiceForRequests!=-1){
-						if(robotArmManager.jointIndiceForRequests==i){
-							circles[i].setColor(new Color(0.0,0.0,1.0,1.0));
-						}else{
-							circles[i].setColor(new Color(0.0,0.0,0.0,1.0));
-						}
-					}
 				}
 
 
 				goalCircle.move(goal[0], goal[1]);
-				subGoalCircle.move(robotArmManager.xSubGoal, robotArmManager.ySubGoal);
-
 				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
 				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
 

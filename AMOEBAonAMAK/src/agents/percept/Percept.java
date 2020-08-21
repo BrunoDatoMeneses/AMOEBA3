@@ -56,7 +56,10 @@ public class Percept extends EllsaAgent {
 		}else{
 			value = getAmas().getPerceptions(this.name);
 		}
-		ajustMinMax();
+		if(getAmas().data.useOracle){
+			ajustMinMax();
+		}
+
 		computeContextProjectionValidityOptimized();
 	}
 	
