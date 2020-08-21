@@ -987,7 +987,7 @@ public class Head extends EllsaAgent {
 					//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
 					// To limit performance impact, we limit our search on a random sample.
 					// A better way would be to increase neighborhood.
-					System.err.println("Play without oracle : no nearest context in neighbors, searching in a random sample");
+					getEnvironment().print(TRACE_LEVEL.ERROR,"Play without oracle : no nearest context in neighbors, searching in a random sample");
 					//PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
 					//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
 					nearestContext = this.getNearestContext(getAmas().getContexts());

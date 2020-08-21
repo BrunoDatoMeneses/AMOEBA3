@@ -1,7 +1,5 @@
 package experiments.roboticDistributedArm;
 
-import agents.context.Context;
-import agents.head.EndogenousRequest;
 import agents.percept.Percept;
 import kernel.ELLSA;
 import utils.Pair;
@@ -9,7 +7,6 @@ import utils.TRACE;
 import utils.TRACE_LEVEL;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.OptionalDouble;
 
@@ -52,6 +49,8 @@ public class RobotArmManager {
     int jointIndiceForRequests;
 
     boolean newGoal = true;
+    int requestControlCycles = 5;
+    int requestControlCycle;
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
@@ -314,11 +313,27 @@ public class RobotArmManager {
             out.put("pyOrigin",starts[jointIndice].getB());
         }
         if(jointIndice==requestJoints.length-1){
-            out.put("pxGoal",goalPosition[0]);
-            out.put("pyGoal",goalPosition[1]);
+
+            double xSubGoalVectorFromStart = goalPosition[0] - starts[jointIndice].getA();
+            double ySubGoalVectorFromStart = goalPosition[1] - starts[jointIndice].getB();
+            double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
+            double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
+
+            out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
+            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);
         }else{
-            out.put("pxGoal",ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA()));
-            out.put("pyGoal",ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB()));
+            double xSubGoalPos = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
+            double ySubGoalPos = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
+            double xSubGoalVectorFromStart = xSubGoalPos - starts[jointIndice].getA();
+            double ySubGoalVectorFromStart = ySubGoalPos - starts[jointIndice].getB();
+            double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
+            double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
+
+            out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
+            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);
+
+
+
         }
 
         double angle = ellsas[jointIndice].request(out);
@@ -408,14 +423,15 @@ public class RobotArmManager {
             /*amoebas[0].data.isSelfLearning = false;
             amoebas[1].data.isSelfLearning = false;*/
 
-            System.out.println("ANGLES BEFORE");
-            for(int k=0;k<jointsNb;k++){
-                System.out.println(angles[k]);
-            }
+            //System.out.println("ANGLES BEFORE");
+            /*for(int k=0;k<jointsNb;k++){
+                //System.out.println(angles[k]);
+            }*/
 
             if(newGoal){
-                System.out.println("NEW GOAL");
+                //System.out.println("NEW GOAL");
                 newGoal = false;
+                requestControlCycle = 0;
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius;
 
@@ -459,16 +475,17 @@ public class RobotArmManager {
                     ends[i] = new Pair<>(xPos,yPos);
 
                 }
-                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
+
 
                 if(allRequestsFinished){
-                    jointIndiceForRequests = jointsNb-1;
+                    if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
+                    jointIndiceForRequests = 0;
                     allRequestsFinished = false;
                 }else{
-                    jointIndiceForRequests--;
+                    jointIndiceForRequests++;
                 }
 
-                System.out.println(jointIndiceForRequests);
+                //System.out.println(jointIndiceForRequests);
                 goalAngles = indiceRequest(angles, poseGoal, cycle,jointIndiceForRequests);
 
                 plotRequestError = true;
@@ -489,10 +506,15 @@ public class RobotArmManager {
 
                 }
 
-                if(jointIndiceForRequests==0){
+                if(jointIndiceForRequests==jointsNb-1){
+                    requestControlCycle++;
                     allRequestsFinished = true;
-                    requestCycle++;
-                    newGoal = true;
+
+                    if(requestControlCycle == requestControlCycles){
+                        requestCycle++;
+                        newGoal = true;
+                    }
+
                 }
 
                 if(allRequestsFinished){
@@ -544,10 +566,10 @@ public class RobotArmManager {
             }
 
 
-            System.out.println("ANGLES AFTER");
-            for(int k=0;k<jointsNb;k++){
+            //System.out.println("ANGLES AFTER");
+            /*for(int k=0;k<jointsNb;k++){
                 System.out.println(angles[k]);
-            }
+            }*/
         }else{
             finished = true;
             TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);

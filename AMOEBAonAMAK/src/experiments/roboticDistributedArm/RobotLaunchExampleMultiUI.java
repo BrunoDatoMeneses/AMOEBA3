@@ -64,6 +64,7 @@ public class RobotLaunchExampleMultiUI extends Application{
             File file;
             if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
             else file = new File("resources/1jointRobot4DimensionsLauncher.xml");
+            //else file = new File("resources/1jointRobot3DimensionsLauncher.xml");
 
             backupSystem.load(file);
 

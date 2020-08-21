@@ -3,6 +3,8 @@ package experiments.roboticDistributedArm;
 
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.ui.VUIMulti;
+import gui.EllsaMultiUIWindow;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
@@ -29,6 +31,7 @@ public class RobotLaunchExample{
 	public static void start() {
 
 
+
         // Set AMAK configuration before creating an AMOEBA
         Configuration.multiUI=true;
         Configuration.commandLineMode = true;
@@ -36,87 +39,56 @@ public class RobotLaunchExample{
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
+        ELLSA[] ellsas;
+        StudiedSystem[] studiedSystems;
+    ellsas = new ELLSA[PARAMS.nbJoints];
+    studiedSystems = new StudiedSystem[PARAMS.nbJoints];
+
+            for(int i=0;i<PARAMS.nbJoints;i++){
 
 
-        StudiedSystem studiedSystemTheta0 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-        ELLSA ellsaTheta0 = new ELLSA(null,  null);
-        ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
-        IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
-        File file = new File("resources/"+ PARAMS.configFile);
-        backupSystem.load(file);
+                    studiedSystems[i] = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+                    ellsas[i] = new ELLSA(null,  null);
+                    ellsas[i].setStudiedSystem(studiedSystems[i]);
+                    IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
+                    File file;
+                    if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
+                    else file = new File("resources/1jointRobot4DimensionsLauncher.xml");
+                    //else file = new File("resources/1jointRobot3DimensionsLauncher.xml");
 
-        //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+                    backupSystem.load(file);
 
-        ellsaTheta0.allowGraphicalScheduler(false);
-        ellsaTheta0.setRenderUpdate(false);
+                    //ellsaTheta0.saver = new SaveHelperImpl(ellsaTheta0, amoebaUITheta0);
 
-        StudiedSystem studiedSystemTheta1 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-        ELLSA ellsaTheta1 = new ELLSA(null,  null);
-        ellsaTheta1.setStudiedSystem(studiedSystemTheta1);
-        IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
-        File file1 = new File("resources/"+ PARAMS.configFile);
-        backupSystem1.load(file1);
+                    ellsas[i].allowGraphicalScheduler(true);
+                    ellsas[i].setRenderUpdate(false);
+                    ellsas[i].data.nameID = "ellsaTheta"+i;
+                    ellsas[i].data.learningSpeed = PARAMS.learningSpeed;
+                    ellsas[i].data.numberOfPointsForRegression = PARAMS.regressionPoints;
+                    ellsas[i].data.isActiveLearning = PARAMS.setActiveLearning;
+                    ellsas[i].data.isSelfLearning = PARAMS.setSelfLearning;
+                    ellsas[i].data.isAutonomousMode = PARAMS.setAutonomousMode;
+                    ellsas[i].data.isConflictDetection = PARAMS.setConflictDetection;
+                    ellsas[i].data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+                    ellsas[i].data.isVoidDetection2 = PARAMS.setVoidDetection2;
+                    ellsas[i].data.isSubVoidDetection = PARAMS.setSubVoidDetection;
+                    ellsas[i].data.isConflictResolution = PARAMS.setConflictResolution;
+                    ellsas[i].data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+                    ellsas[i].data.isFrontierRequest = PARAMS.setFrontierRequest;
+                    ellsas[i].data.isSelfModelRequest = PARAMS.setSelfModelRequest;
+                    ellsas[i].data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
 
-        //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+                    ellsas[i].data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+                    ellsas[i].data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+                    ellsas[i].data.isDream = PARAMS.setDream;
+                    ellsas[i].data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+                    ellsas[i].data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        ellsaTheta1.allowGraphicalScheduler(false);
-        ellsaTheta1.setRenderUpdate(false);
-
-        ellsaTheta0.data.nameID = "ellsaTheta0";
-        ellsaTheta0.data.learningSpeed = PARAMS.learningSpeed;
-        ellsaTheta0.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-        ellsaTheta0.data.isActiveLearning = PARAMS.setActiveLearning;
-        ellsaTheta0.data.isSelfLearning = PARAMS.setSelfLearning;
-        ellsaTheta0.data.isAutonomousMode = PARAMS.setAutonomousMode;
-        ellsaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
-        ellsaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        ellsaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-        ellsaTheta0.data.isConflictResolution = PARAMS.setConflictResolution;
-        ellsaTheta0.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        ellsaTheta0.data.isFrontierRequest = PARAMS.setFrontierRequest;
-        ellsaTheta0.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-        ellsaTheta0.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
-
-        ellsaTheta0.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-        ellsaTheta0.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-        ellsaTheta0.data.isDream = PARAMS.setDream;
-        ellsaTheta0.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsaTheta0.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
-
-        ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
-
-
-
-        ellsaTheta1.data.nameID = "ellsaTheta1";
-        ellsaTheta1.data.learningSpeed = PARAMS.learningSpeed;
-        ellsaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-        ellsaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
-        ellsaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
-        ellsaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
-        ellsaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
-        ellsaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        ellsaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-        ellsaTheta1.data.isConflictResolution = PARAMS.setConflictResolution;
-        ellsaTheta1.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        ellsaTheta1.data.isFrontierRequest = PARAMS.setFrontierRequest;
-        ellsaTheta1.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-        ellsaTheta1.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
-
-        ellsaTheta1.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-        ellsaTheta1.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-        ellsaTheta1.data.isDream = PARAMS.setDream;
-        ellsaTheta1.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsaTheta1.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
-
-        ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-        ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
-
-
-        ellsaTheta1.setSubPercepts(PARAMS.subPercepts);
-        ellsaTheta0.setSubPercepts(PARAMS.subPercepts);
+                    ellsas[i].getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+                    ellsas[i].data.initRegressionPerformance = PARAMS.setRegressionPerformance;
+                    ellsas[i].getEnvironment().minLevel = TRACE_LEVEL.OFF;
+                    ellsas[i].setSubPercepts(PARAMS.subPercepts);
+            }
 
         int jointsNb = PARAMS.nbJoints;
         //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
@@ -133,9 +105,7 @@ public class RobotLaunchExample{
 
 
 
-        ELLSA ellsas[] = new ELLSA[2];
-        ellsas[0] = ellsaTheta0;
-        ellsas[1] = ellsaTheta1;
+
         RobotController robotController = new RobotController(jointsNb);
         RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
         robotArmManager.maxError = PARAMS.armBaseSize*2;
