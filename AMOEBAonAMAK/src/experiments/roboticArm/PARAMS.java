@@ -15,6 +15,7 @@ public class PARAMS {
     public static double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     public static double mappingErrorAllowed = 0.03; // OTHER
+    public static int neighborhoodMultiplicator = 2;
 
     /* PREDICTION */
     public static  double setRegressionPerformance = 1;

@@ -123,4 +123,6 @@ public class EllsaData implements Serializable {
 
 	public int countLocalMinina = 0;
 
+	public int neighborhoodMultiplicator = 2;
+
 }

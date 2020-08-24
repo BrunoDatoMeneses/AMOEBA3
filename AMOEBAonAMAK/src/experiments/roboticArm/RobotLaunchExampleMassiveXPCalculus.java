@@ -57,50 +57,55 @@ public class RobotLaunchExampleMassiveXPCalculus {
         PARAMS.nbTest = 15;
         PARAMS.armBaseSize = 50.0;
 
-	    ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(50,250,500,1000));
+        ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(2,4,6,8));
+	    ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(1000));
         ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(200));
-        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.01,0.03,0.06));
+        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.01,0.03));
 
         ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
 
-        for(Double mappingError : mappingErrors){
-            System.out.print("mappingError " + mappingError + " ");
-            for(Integer requestCycle : requestCycles) {
-                System.out.print("requestCycle " + requestCycle + " ");
-                for (Integer trainingCycle : trainingCycles) {
-                    System.out.print("trainingCycle " + trainingCycle + " ");
-                    for (Integer jointNb : jointsNb) {
+        for(Integer neighborhoodMultiplicator : neighborhoodMultiplicators) {
+            System.out.print("neighborhoodMultiplicator " + neighborhoodMultiplicator + " ");
+            for (Double mappingError : mappingErrors) {
+                System.out.print("mappingError " + mappingError + " ");
+                for (Integer requestCycle : requestCycles) {
+                    System.out.print("requestCycle " + requestCycle + " ");
+                    for (Integer trainingCycle : trainingCycles) {
+                        System.out.print("trainingCycle " + trainingCycle + " ");
+                        for (Integer jointNb : jointsNb) {
 
-                        System.out.print("jointNb " + jointNb + " ");
-                        PARAMS.mappingErrorAllowed = mappingError;
-                        PARAMS.nbRequestCycle = requestCycle;
-                        PARAMS.nbTrainingCycle = trainingCycle;
-                        PARAMS.nbJoints = jointNb;
-                        PARAMS.dimension = jointNb + 1;
+                            System.out.print("jointNb " + jointNb + " ");
+                            PARAMS.mappingErrorAllowed = mappingError;
+                            PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
+                            PARAMS.nbRequestCycle = requestCycle;
+                            PARAMS.nbTrainingCycle = trainingCycle;
+                            PARAMS.nbJoints = jointNb;
+                            PARAMS.dimension = jointNb + 1;
 
-                        if(jointNb == 30){
-                            PARAMS.configFile = configFile30joints;
-                            PARAMS.subPercepts = subPercepts30joints;
-                        }else if(jointNb == 20){
-                            PARAMS.configFile = configFile20joints;
-                            PARAMS.subPercepts = subPercepts20joints;
-                        }else if(jointNb == 10){
-                            PARAMS.configFile = configFile10joints;
-                            PARAMS.subPercepts = subPercepts10joints;
-                        }else if(jointNb == 6){
-                            PARAMS.configFile = configFile6joints;
-                            PARAMS.subPercepts = subPercepts6joints;
-                        }else if(jointNb == 3){
-                            PARAMS.configFile = configFile3joints;
-                            PARAMS.subPercepts = subPercepts3joints;
-                        }else if(jointNb == 2){
-                            PARAMS.configFile = configFile2joints;
-                            PARAMS.subPercepts = subPercepts2joints;
+                            if (jointNb == 30) {
+                                PARAMS.configFile = configFile30joints;
+                                PARAMS.subPercepts = subPercepts30joints;
+                            } else if (jointNb == 20) {
+                                PARAMS.configFile = configFile20joints;
+                                PARAMS.subPercepts = subPercepts20joints;
+                            } else if (jointNb == 10) {
+                                PARAMS.configFile = configFile10joints;
+                                PARAMS.subPercepts = subPercepts10joints;
+                            } else if (jointNb == 6) {
+                                PARAMS.configFile = configFile6joints;
+                                PARAMS.subPercepts = subPercepts6joints;
+                            } else if (jointNb == 3) {
+                                PARAMS.configFile = configFile3joints;
+                                PARAMS.subPercepts = subPercepts3joints;
+                            } else if (jointNb == 2) {
+                                PARAMS.configFile = configFile2joints;
+                                PARAMS.subPercepts = subPercepts2joints;
+                            }
+
+                            start();
+
+                            System.out.println(" ");
                         }
-
-                        start();
-
-                        System.out.println(" ");
                     }
                 }
             }
@@ -239,17 +244,10 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 ellsaTheta0.allowGraphicalScheduler(false);
                 ellsaTheta0.setRenderUpdate(false);
 
-                StudiedSystem studiedSystemTheta1 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
-                ELLSA ellsaTheta1 = new ELLSA(null,  null);
-                ellsaTheta1.setStudiedSystem(studiedSystemTheta1);
-                IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
-                File file1 = new File("resources/"+PARAMS.configFile);
-                backupSystem1.load(file1);
 
                 //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
-                ellsaTheta1.allowGraphicalScheduler(false);
-                ellsaTheta1.setRenderUpdate(false);
+
 
                 ellsaTheta0.data.nameID = "ellsaTheta0";
                 ellsaTheta0.data.learningSpeed = PARAMS.learningSpeed;
@@ -275,34 +273,9 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
                 ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
                 ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.OFF;
+                ellsaTheta0.data.neighborhoodMultiplicator = PARAMS.neighborhoodMultiplicator;
 
 
-                ellsaTheta1.data.nameID = "ellsaTheta1";
-                ellsaTheta1.data.learningSpeed = PARAMS.learningSpeed;
-                ellsaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-                ellsaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
-                ellsaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
-                ellsaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
-                ellsaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
-                ellsaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-                ellsaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-                ellsaTheta1.data.isConflictResolution = PARAMS.setConflictResolution;
-                ellsaTheta1.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-                ellsaTheta1.data.isFrontierRequest = PARAMS.setFrontierRequest;
-                ellsaTheta1.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-                ellsaTheta1.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
-
-                ellsaTheta1.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-                ellsaTheta1.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-                ellsaTheta1.data.isDream = PARAMS.setDream;
-                ellsaTheta1.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-                ellsaTheta1.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
-
-                ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-                ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-                ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.OFF;
-
-                ellsaTheta1.setSubPercepts(PARAMS.subPercepts);
                 ellsaTheta0.setSubPercepts(PARAMS.subPercepts);
 
                 int jointsNb = PARAMS.nbJoints;
@@ -320,7 +293,6 @@ public class RobotLaunchExampleMassiveXPCalculus {
 
                 ELLSA ellsas[] = new ELLSA[2];
                 ellsas[0] = ellsaTheta0;
-                ellsas[1] = ellsaTheta1;
                 RobotController robotController = new RobotController(jointsNb);
                 RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
                 robotArmManager.maxError = PARAMS.armBaseSize*2;
@@ -374,6 +346,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbTest+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Space size", PARAMS.spaceSize*4+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error", PARAMS.mappingErrorAllowed+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Neighborhood x", PARAMS.neighborhoodMultiplicator+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
                 xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING")));

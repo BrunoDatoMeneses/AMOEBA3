@@ -415,7 +415,7 @@ public class Percept extends EllsaAgent {
 
 	public double getNeigborhoodRadius() {
 		// return 200*world.getContextCreationPercentage();
-		return getRadiusContextForCreation()*2;
+		return getRadiusContextForCreation()*getAmas().data.neighborhoodMultiplicator;
 	}
 
 	public double getMappingErrorAllowed() {
