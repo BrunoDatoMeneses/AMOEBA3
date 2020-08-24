@@ -54,14 +54,20 @@ public class RobotLaunchExampleMassiveXPCalculus {
 	public static void main (String[] args)  {
 
 	    TRACE.minLevel = TRACE_LEVEL.OFF;
-        PARAMS.nbTest = 15;
+        PARAMS.nbTest = 1;
         PARAMS.armBaseSize = 50.0;
 
-	    ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(50,250,500,1000));
+	    /*ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(50,250,500,1000));
         ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(200));
         ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.01,0.03,0.06));
-
         ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
+*/
+        ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(1500));
+        ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(200));
+        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.005));
+        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(20));
+
+
 
         for(Double mappingError : mappingErrors){
             System.out.print("mappingError " + mappingError + " ");
@@ -105,6 +111,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 }
             }
         }
+        System.out.println("FINISHED");
 	}
 
 

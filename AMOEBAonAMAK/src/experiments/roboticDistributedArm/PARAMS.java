@@ -11,7 +11,7 @@ public class PARAMS {
 
     public static int nbTrainingCycle = 15;
     public static int nbRequestCycle = 200;
-    public static int nbTest = 15;
+    public static int nbTest = 1;
     public static double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     public static double mappingErrorAllowed = 0.03; // OTHER

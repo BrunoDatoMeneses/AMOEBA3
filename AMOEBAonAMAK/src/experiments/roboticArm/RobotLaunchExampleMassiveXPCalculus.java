@@ -65,16 +65,16 @@ public class RobotLaunchExampleMassiveXPCalculus {
         ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
 
         for(Integer neighborhoodMultiplicator : neighborhoodMultiplicators) {
-            System.out.print("neighborhoodMultiplicator " + neighborhoodMultiplicator + " ");
             for (Double mappingError : mappingErrors) {
-                System.out.print("mappingError " + mappingError + " ");
                 for (Integer requestCycle : requestCycles) {
-                    System.out.print("requestCycle " + requestCycle + " ");
                     for (Integer trainingCycle : trainingCycles) {
-                        System.out.print("trainingCycle " + trainingCycle + " ");
                         for (Integer jointNb : jointsNb) {
-
+                            System.out.print("neighborhoodMultiplicator " + neighborhoodMultiplicator + " ");
+                            System.out.print("mappingError " + mappingError + " ");
+                            System.out.print("requestCycle " + requestCycle + " ");
+                            System.out.print("trainingCycle " + trainingCycle + " ");
                             System.out.print("jointNb " + jointNb + " ");
+
                             PARAMS.mappingErrorAllowed = mappingError;
                             PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
                             PARAMS.nbRequestCycle = requestCycle;

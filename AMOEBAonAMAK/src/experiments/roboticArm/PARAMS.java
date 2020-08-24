@@ -11,7 +11,7 @@ public class PARAMS {
 
     public static int nbTrainingCycle = 500;
     public static int nbRequestCycle = 200;
-    public static int nbTest = 1;
+    public static int nbTest = 10;
     public static double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     public static double mappingErrorAllowed = 0.03; // OTHER
@@ -136,5 +136,5 @@ public class PARAMS {
 
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
-    public static double armBaseSize = 300.0;
+    public static double armBaseSize = 50.0;
 }
