@@ -140,6 +140,8 @@ public class Head extends EllsaAgent {
 
 	private void onActInit() {
 
+		getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
+
 		for(int i = 0 ; i<20;i++) {
 			getAmas().data.executionTimes[i] = 0.0;
 		}
@@ -2426,7 +2428,7 @@ public class Head extends EllsaAgent {
 	private void updateStatisticalInformations() {
 
 
-		getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
+
 
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
