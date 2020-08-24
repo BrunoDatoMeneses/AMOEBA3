@@ -136,15 +136,23 @@ public class RobotLaunchExampleMassiveXPCalculus {
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-            HashMap<String, ArrayList<Double>> data = new HashMap<>();
+        HashMap<String, ArrayList<Double>> data = new HashMap<>();
+        List<String> dataStringsVolumes = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol");
+        List<String> dataStringsPrediction = Arrays.asList("prediction", "predictionDisp");
+        List<String> dataStringsOther = Arrays.asList("nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction");
 
-            List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction", "predictionDisp", "neighborsCounts");
 
+        for (String dataName : dataStringsVolumes){
+                data.put(dataName, new ArrayList<>());
+        }
 
+        for (String dataName : dataStringsPrediction){
+            data.put(dataName, new ArrayList<>());
+        }
 
-            for (String dataName : dataStrings){
-                    data.put(dataName, new ArrayList<>());
-            }
+        for (String dataName : dataStringsOther){
+            data.put(dataName, new ArrayList<>());
+        }
 
             double start = System.currentTimeMillis();
 
@@ -162,7 +170,27 @@ public class RobotLaunchExampleMassiveXPCalculus {
             xpCSV.write(new ArrayList<>(Arrays.asList("TIME MEAN", mean + " s","TIME TOTAL",total + " s" )));
             xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
-        for (String dataName : dataStrings){
+        for (String dataName : dataStringsVolumes){
+            OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
+            Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+                //.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
+
+
+
+        }
+
+        for (String dataName : dataStringsPrediction){
+            OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
+            Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+            //.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
+
+
+
+        }
+
+        for (String dataName : dataStringsOther){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             if(averageScore.getAsDouble()<1){
@@ -185,25 +213,23 @@ public class RobotLaunchExampleMassiveXPCalculus {
         DecimalFormat df = new DecimalFormat("##.##", otherSymbols);
         //System.out.println("ROUNDED");
         xpCSV.write(new ArrayList<>(Arrays.asList("ROUNDED")));
-        for (String dataName : dataStrings){
+        for (String dataName : dataStringsVolumes){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-            if(averageScore.getAsDouble()<1){
-                //System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble()*100)+"" ,"DEVIATION","" + df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
-            }
+            //System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble()*100)+"" ,"DEVIATION","" + df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
 
 
         }
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
-        for (String dataName : dataStrings){
+        for (String dataName : dataStringsOther){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-            if(averageScore.getAsDouble()>=1){
-                //System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble())+"" ,"DEVIATION","" + df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
-            }
+
+            //System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble())+"" ,"DEVIATION","" + df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
+
 
 
         }
