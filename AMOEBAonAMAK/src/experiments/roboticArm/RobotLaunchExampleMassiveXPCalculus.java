@@ -138,7 +138,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
 
             HashMap<String, ArrayList<Double>> data = new HashMap<>();
 
-            List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction", "predictionDisp");
+            List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction", "predictionDisp", "neighborsCounts");
 
 
 
@@ -331,6 +331,8 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 data.get("nbAgents").add((double) ellsaTheta0.getContexts().size());
                 data.get("prediction").add(error);
                 data.get("predictionDisp").add(dispersion);
+                data.get("neighborsCounts").add((double)ellsaTheta0.data.neighborsCounts/ellsaTheta0.getCycle());
+
 
 	}
 

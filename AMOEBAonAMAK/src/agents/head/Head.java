@@ -2425,6 +2425,9 @@ public class Head extends EllsaAgent {
 	 */
 	private void updateStatisticalInformations() {
 
+
+		getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
+
 		if(getAmas().data.oracleValue != null) {
 			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
 				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
