@@ -428,7 +428,9 @@ public class RobotArmManager {
 
 
             learnedPositions.add(ends[jointsNb-1]);
-            if(learningCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"LEARNING [" + learningCycle + "] ");
+            if(learningCycle%50==0)  {TRACE.print(TRACE_LEVEL.SUBCYCLE,"LEARNING [" + learningCycle + "] ");
+                System.out.println(ellsas[0].data.neighborsCounts);
+            }
             if(controller.pseudoRandomCounter>0) {
                 System.out.println("PSEUDO RANDOM");
                 controller.pseudoRandomCounter --;
@@ -549,6 +551,7 @@ public class RobotArmManager {
 
             }
 
+            System.out.println(ellsas[0].data.neighborsCounts);
         }
 
 

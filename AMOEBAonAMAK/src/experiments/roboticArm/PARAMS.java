@@ -9,7 +9,7 @@ public class PARAMS {
 
     public static String model = "ROBOT";
 
-    public static int nbTrainingCycle = 500;
+    public static int nbTrainingCycle = 1000;
     public static int nbRequestCycle = 200;
     public static int nbTest = 10;
     public static double spaceSize = 50.0	;
@@ -39,17 +39,17 @@ public class PARAMS {
             "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
             "ptheta16", "ptheta17", "ptheta18", "ptheta19")  );*/
 
-    /*public static  String configFile = "10jointsRobot3DimensionsLauncher.xml";
+    public static  String configFile = "10jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 11;
     public static int nbJoints = 10;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
-    "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));*/
+    "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));
 
-    public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
+    /*public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 7;
     public static int nbJoints = 6;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
-            "ptheta5"));
+            "ptheta5"));*/
 
 
     /*public static  String configFile = "3jointsRobot3DimensionsLauncher.xml";

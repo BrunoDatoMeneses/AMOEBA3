@@ -126,5 +126,6 @@ public class EllsaData implements Serializable {
 	public int neighborhoodMultiplicator = 2;
 
 	public int neighborsCounts = 0;
+	public int lastNeihborsCount = 0;
 
 }

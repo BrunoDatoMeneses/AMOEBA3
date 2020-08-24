@@ -158,6 +158,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			AmakPlot gloabalMappingCriticality = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Global Mapping Criticality");
 			AmakPlot timeExecution = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Time Execution");
 			AmakPlot criticalities = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Criticalities");
+			AmakPlot nbNeighbors = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Number of neighbors");
 			
 			
 			boolean notify = isRenderUpdate();
@@ -206,6 +207,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
 			criticalities.addData("Confidence", cycle, data.evolutionCriticalityConfidence, notify);
+
+			nbNeighbors.addData("Neighbors", cycle, data.neighborsCounts, notify);
 		}
 		
 		if (isRenderUpdate()) {

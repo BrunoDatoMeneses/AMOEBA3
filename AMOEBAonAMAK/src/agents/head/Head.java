@@ -140,7 +140,16 @@ public class Head extends EllsaAgent {
 
 	private void onActInit() {
 
-		getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
+		if(getAmas().data.useOracle){
+			getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
+			if(activatedNeighborsContexts.size()>0){
+				getAmas().data.lastNeihborsCount = activatedNeighborsContexts.size();
+			}else{
+				getAmas().data.lastNeihborsCount=0;
+			}
+		}
+
+
 
 		for(int i = 0 ; i<20;i++) {
 			getAmas().data.executionTimes[i] = 0.0;
