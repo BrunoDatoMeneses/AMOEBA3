@@ -14,15 +14,14 @@ public class RobotController {
     }
 
     public void setJoint(int jointIndice, int cycle, double[] anglesBase, double[] angles) {
-        if(pseudoRandomCounter>0){
-            setJointsAroundActiveLearningSituation(jointIndice, angles, activeLearningSituation[jointIndice]);
-        }else{
-            //setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
-            setRandomJoints(jointIndice, angles);
-        }
+
+        //setContinuousSinusoidJoints(jointIndice, cycle, anglesBase, angles);
+        setRandomJoints(jointIndice, angles);
+
 
 
         //setRandomJoints(jointIndice, angles);
+
     }
 
     private void setContinuousSinusoidJoints(int jointIndice, double cycle, double[] anglesBase, double[] angles) {
@@ -51,7 +50,7 @@ public class RobotController {
             angles[jointIndice] = modulo2PI(gaussianRandom(0.0,dispersion));
         }
 
-
+        addConstrains(maxMin2PI( angles[jointIndice]), jointIndice);
 
         /*if(jointIndice == 0){
             angles[jointIndice] = Math.random()* 2 * Math.PI;
@@ -88,17 +87,23 @@ public class RobotController {
         return  (r.nextGaussian() * dispersion) + mean;
     }
 
-    private double addConstrains(double angleValue, double limit){
-        /*if (Math.PI - limit < angleValue && angleValue < Math.PI){
-            return Math.PI - limit;
-        }
-        else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
-            return Math.PI + limit;
-        }
-        else{
+    private double addConstrains(double angleValue, int indice){
+        double limit =  1 * Math.PI / 6;
+        if(indice == 0){
             return angleValue;
-        }*/
-        return angleValue;
+        }else{
+            if (Math.PI - limit < angleValue && angleValue < Math.PI){
+                return Math.PI - limit;
+            }
+            else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
+                return Math.PI + limit;
+            }
+            else{
+                return angleValue;
+            }
+        }
+
+        //return angleValue;
     }
 
     public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){
@@ -122,8 +127,9 @@ public class RobotController {
 
 
 
-            currentAngles[i] = maxMin2PI( goalAngles[i]);
+            currentAngles[i] = addConstrains(maxMin2PI( goalAngles[i]), i);
             //System.out.println(i + " " + currentAngles[i]);
+
 
         }
 

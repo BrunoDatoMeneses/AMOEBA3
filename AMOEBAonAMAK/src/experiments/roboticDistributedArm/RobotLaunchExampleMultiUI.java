@@ -119,7 +119,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         double incLength = PARAMS.armBaseSize/jointsNb;
 
         for(int i = 0;i<jointsNb;i++){
-            distances[i] = incLength;
+            distances[i] = incLength-(i*5);
         }
 
 

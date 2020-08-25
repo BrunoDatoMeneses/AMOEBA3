@@ -33,6 +33,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public DrawableCircle circles[];
 	public DrawableCircle goalCircle;
 	public DrawableCircle subGoalCircle;
+	public DrawableLine goalOrientationLine;
 
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
@@ -75,6 +76,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 		lines = new DrawableLine[jointsNumber];
 		circles = new DrawableCircle[jointsNumber];
 		goalLines = new DrawableLine[2];
+		goalOrientationLine = new DrawableLine(0.0,0.0,0.0,0.0);
 		errorGoalLines = new DrawableLine[2];
 
 
@@ -130,6 +132,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 			goalLines[0] =  getAmas().getVUIMulti().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 			goalLines[1] =  getAmas().getVUIMulti().createAndAddLine(0.0, -10000.0,0.0,10000.0);
+			goalOrientationLine = getAmas().getVUIMulti().createAndAddLine(0.0, 0.0,0.0,0.0);
 
 			/*errorGoalLines[0] = getAmas().getVuiErrorDispersion().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 			errorGoalLines[1] = getAmas().getVuiErrorDispersion().createAndAddLine(0.0, -10000.0,0.0,10000.0);*/
@@ -220,6 +223,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
 				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
+
+				goalOrientationLine.move(goal[0], goal[1], goal[0]+20*Math.cos(robotArmManager.angleGoal), goal[1]+20*Math.sin(robotArmManager.angleGoal));
 
 
 

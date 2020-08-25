@@ -23,6 +23,7 @@ public class RobotArmManager {
     double xPos;
     double yPos;
     double[] poseGoal;
+    double angleGoal = 0.0;
     double[] futurePoseGoal;
     double[] goalAngles;
 
@@ -49,7 +50,7 @@ public class RobotArmManager {
     public int jointIndiceForRequests = -1;
 
     boolean newGoal = true;
-    int requestControlCycles = 5;
+    int requestControlCycles = 10;
     int requestControlCycle;
 
     public double xSubGoal = 0.0;
@@ -236,37 +237,32 @@ public class RobotArmManager {
             out.put("pxOrigin",starts[jointIndice].getA());
             out.put("pyOrigin",starts[jointIndice].getB());
         }
+        double xGoalInR0 ;
+        double yGoalInR0 ;
+
         if(jointIndice==requestJoints.length-1){
-
-            double xSubGoalVectorFromStart = goalPosition[0] - starts[jointIndice].getA();
-            double ySubGoalVectorFromStart = goalPosition[1] - starts[jointIndice].getB();
-            double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
-            double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
-
-            /*out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
-            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);*/
-
             xSubGoal = goalPosition[0];
             ySubGoal = goalPosition[1];
-            out.put("pxGoal",xSubGoal - starts[jointIndice].getA());
-            out.put("pyGoal",ySubGoal - starts[jointIndice].getB());
 
+            xGoalInR0 = xSubGoal - starts[jointIndice].getA();
+            yGoalInR0 = ySubGoal - starts[jointIndice].getB();
         }else{
             xSubGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
             ySubGoal = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
-            double xSubGoalVectorFromStart = xSubGoal - starts[jointIndice].getA();
-            double ySubGoalVectorFromStart = ySubGoal - starts[jointIndice].getB();
-            double norm = Math.sqrt( Math.pow(xSubGoalVectorFromStart,2) + Math.pow(ySubGoalVectorFromStart,2));
-            double ratio = (PARAMS.armBaseSize/jointsNb)/norm;
 
-            /*out.put("pxGoal",starts[jointIndice].getA() + ratio*xSubGoalVectorFromStart);
-            out.put("pyGoal",starts[jointIndice].getB() + ratio*ySubGoalVectorFromStart);*/
-            out.put("pxGoal",xSubGoal - starts[jointIndice].getA());
-            out.put("pyGoal",ySubGoal - starts[jointIndice].getB());
-
-
-
+            xGoalInR0 = xSubGoal - starts[jointIndice].getA();
+            yGoalInR0 = ySubGoal - starts[jointIndice].getB();
         }
+
+        double ratio = (l[jointIndice])/Math.sqrt( Math.pow(xGoalInR0,2) + Math.pow(yGoalInR0,2));
+        double xReachableGoalinR0 = ratio * xGoalInR0;
+        double yReachableGoalinR0 = ratio * yGoalInR0;
+
+        out.put("pxGoal",xReachableGoalinR0);
+        out.put("pyGoal",yReachableGoalinR0);
+
+        /*xSubGoal = xReachableGoalinR0;
+        ySubGoal = yReachableGoalinR0;*/
 
         double angle = ellsas[0].request(out);
         System.out.println(jointIndice + " " + angle);
@@ -310,7 +306,14 @@ public class RobotArmManager {
         for(int i=0;i<jointIndice;i++){
             angleSum += maxMin2PI( joints[i]);
         }
-        joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
+        //joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
+
+        if(jointIndice == jointsNb-1){
+            joints[jointIndice] = controller.modulo2PI(angleGoal - angleSum);
+        }else{
+            joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
+        }
+
 
 
         return joints;
@@ -381,6 +384,7 @@ public class RobotArmManager {
 
                 poseGoal[0] = randomRadius*Math.cos(randomAngle);
                 poseGoal[1] = randomRadius*Math.sin(randomAngle);
+                angleGoal = Math.random()*Math.PI*2;
 
                 /*int j = (int)(Math.random() * learnedPositions.size());
                 poseGoal[0] = learnedPositions.get(j).getA();
