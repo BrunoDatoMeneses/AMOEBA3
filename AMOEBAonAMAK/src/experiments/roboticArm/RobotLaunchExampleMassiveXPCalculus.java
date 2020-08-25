@@ -139,7 +139,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
         HashMap<String, ArrayList<Double>> data = new HashMap<>();
         List<String> dataStringsVolumes = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol");
         List<String> dataStringsPrediction = Arrays.asList("prediction", "predictionDisp");
-        List<String> dataStringsOther = Arrays.asList("nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction","neighborsCounts");
+        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction","neighborsCounts");
 
 
         for (String dataName : dataStringsVolumes){
@@ -351,6 +351,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
                 data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
                 data.get("nbAgents").add((double) ellsaTheta0.getContexts().size());
+                data.get("localMiniam").add((double) ellsaTheta0.data.countLocalMinina);
                 data.get("prediction").add(error);
                 data.get("predictionDisp").add(dispersion);
                 data.get("neighborsCounts").add((double)ellsaTheta0.data.neighborsCounts/ellsaTheta0.getCycle());

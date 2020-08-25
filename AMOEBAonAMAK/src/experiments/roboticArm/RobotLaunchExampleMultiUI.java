@@ -84,6 +84,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         ellsaTheta0.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
         ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
+        ellsaTheta0.data.neighborhoodMultiplicator = PARAMS.neighborhoodMultiplicator;
         ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
         ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.OFF;
 
@@ -128,6 +129,8 @@ public class RobotLaunchExampleMultiUI extends Application{
         ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
         ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
         ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.OFF;
+
+
 
         ellsaTheta1.setSubPercepts(PARAMS.subPercepts);
         ellsaTheta0.setSubPercepts(PARAMS.subPercepts);

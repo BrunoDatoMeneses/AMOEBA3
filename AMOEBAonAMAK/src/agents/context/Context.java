@@ -1880,7 +1880,7 @@ public class Context extends EllsaAgent {
 
 
 			Experiment endoExp = new Experiment(this);
-			Experiment symetricalEndoExp = new Experiment(this);
+			//Experiment symetricalEndoExp = new Experiment(this);
 			if(ctxtNeighbor != this) {
 				Experiment centerExperiment = this.getCenterExperiment();
 				for (Percept pct : getAmas().getPercepts()) {
@@ -1891,7 +1891,7 @@ public class Context extends EllsaAgent {
 					endoExp.addDimension(pct, value);
 
 					double rangeCenter = this.getRanges().get(pct).getCenter();
-					symetricalEndoExp.addDimension(pct, rangeCenter-Math.abs(rangeCenter-value));
+					//symetricalEndoExp.addDimension(pct, rangeCenter-Math.abs(rangeCenter-value));
 					//endoExp.addDimension(pct, ctxtNeighbor.getRanges().get(pct).getCenter());
 				}
 
@@ -1903,8 +1903,8 @@ public class Context extends EllsaAgent {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
 
 				double centerProposition = ((LocalModelMillerRegression) getLocalModel()).getProposition(centerExperiment);
-				symetricalEndoExp.setProposition(centerProposition- Math.abs(centerProposition - neighborPrediction));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "SYM EXP", "" + symetricalEndoExp)));
+				//symetricalEndoExp.setProposition(centerProposition- Math.abs(centerProposition - neighborPrediction));
+				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "SYM EXP", "" + symetricalEndoExp)));
 
 				if(Math.abs(lastPrediction-neighborPrediction)<getAmas().getHeadAgent().getPredictionNeighborhoodRange()){
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
