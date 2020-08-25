@@ -3530,7 +3530,7 @@ public class Head extends EllsaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*4;
+		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*getAmas().data.neighborhoodMultiplicator;
 		//return getMinMaxPredictionRange()*0.25 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}

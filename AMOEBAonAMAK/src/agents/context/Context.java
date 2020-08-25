@@ -1956,7 +1956,7 @@ public class Context extends EllsaAgent {
 		Experiment centerExp = getCenterExperimentWithProposition();
         boolean distributionTest = false;
 
-		if(areAllPropositionSuperiorOrInferior(endoExperiments, centerExp.getProposition())){
+		if(areAllPropositionSuperiorOrInferiorToCenterPrediction(endoExperiments, centerExp.getProposition())){
             distributionTest = true;
             for(Percept pct: getAmas().getPercepts()){
                 boolean testLeft = false;
@@ -1979,7 +1979,36 @@ public class Context extends EllsaAgent {
         return distributionTest;
     }
 
-    private boolean areAllPropositionSuperiorOrInferior(ArrayList<Experiment> endoExperiments, double centerprediction) {
+
+	private boolean isLocalMinimum2(ArrayList<Experiment> endoExperiments){
+		Experiment centerExp = getCenterExperimentWithProposition();
+		boolean distributionTest = false;
+
+		if(areAllPropositionSuperiorOrInferiorToCenterPrediction(endoExperiments, centerExp.getProposition())){
+			distributionTest = true;
+			for(Percept pct: getAmas().getPercepts()){
+				boolean testLeft = false;
+				boolean testRight = false;
+				int i = 0;
+				while(i<endoExperiments.size() && !(testLeft && testRight)){
+					testLeft = testLeft || (endoExperiments.get(i).getValuesAsHashMap().get(pct)< centerExp.getValuesAsHashMap().get(pct));
+					testRight = testRight || (centerExp.getValuesAsHashMap().get(pct) < endoExperiments.get(i).getValuesAsHashMap().get(pct));
+					i++;
+				}
+				distributionTest = distributionTest && testLeft && testRight;
+			}
+		}
+		if(distributionTest){
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "LOCAL MINIMUM");
+			getEnvironment().print(TRACE_LEVEL.DEBUG, centerExp);
+			getEnvironment().print(TRACE_LEVEL.DEBUG, endoExperiments);
+		}
+
+		return distributionTest;
+	}
+
+
+    private boolean areAllPropositionSuperiorOrInferiorToCenterPrediction(ArrayList<Experiment> endoExperiments, double centerprediction) {
         boolean initTest = centerprediction < endoExperiments.get(0).getProposition();
 
         boolean test1 = initTest;
