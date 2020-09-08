@@ -33,7 +33,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
             "ptheta30","ptheta31", "ptheta32", "ptheta33", "ptheta34", "ptheta35",
             "ptheta36", "ptheta37", "ptheta38", "ptheta39",
             "ptheta40","ptheta41", "ptheta42", "ptheta43", "ptheta44", "ptheta45",
-            "ptheta56", "ptheta47", "ptheta48", "ptheta49")  );
+            "ptheta46", "ptheta47", "ptheta48", "ptheta49")  );
 
     private static  String configFile30joints = "30jointsRobot3DimensionsLauncher.xml";
     public static  ArrayList subPercepts30joints = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
