@@ -9,7 +9,7 @@ public class PARAMS {
 
     public static String model = "ROBOT";
 
-    public static int nbTrainingCycle = 1000;
+    public static int nbTrainingCycle = 2000;
     public static int nbRequestCycle = 200;
     public static int nbTest = 10;
     public static double spaceSize = 50.0	;
@@ -21,7 +21,23 @@ public class PARAMS {
     public static  double setRegressionPerformance = 1;
 
 
-    public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
+
+    public static  String configFile = "50jointsRobot3DimensionsLauncher.xml";
+    public static  int dimension = 51;
+    public static int nbJoints = 50;
+    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
+            "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
+            "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
+            "ptheta16", "ptheta17", "ptheta18", "ptheta19",
+            "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
+            "ptheta26", "ptheta27", "ptheta28", "ptheta29",
+            "ptheta30","ptheta31", "ptheta32", "ptheta33", "ptheta34", "ptheta35",
+            "ptheta36", "ptheta37", "ptheta38", "ptheta39",
+            "ptheta40","ptheta41", "ptheta42", "ptheta43", "ptheta44", "ptheta45",
+            "ptheta56", "ptheta47", "ptheta48", "ptheta49")  );
+
+
+    /*public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 31;
     public static int nbJoints = 30;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
@@ -29,7 +45,7 @@ public class PARAMS {
             "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
             "ptheta16", "ptheta17", "ptheta18", "ptheta19",
             "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
-            "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );
+            "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );*/
 
     /*public static  String configFile = "20jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 21;
@@ -136,5 +152,5 @@ public class PARAMS {
 
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
-    public static double armBaseSize = 300.0;
+    public static double armBaseSize = 50.0;
 }

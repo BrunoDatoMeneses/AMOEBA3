@@ -314,7 +314,7 @@ public class RobotArmManager {
             joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
         }
 
-
+        //joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
 
         return joints;
     }

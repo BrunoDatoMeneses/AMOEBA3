@@ -118,15 +118,17 @@ public class RobotLaunchExampleMultiUI extends Application{
         double distances[] = new double[jointsNb];
         double incLength = PARAMS.armBaseSize/jointsNb;
 
+        double sum = 0.0;
         for(int i = 0;i<jointsNb;i++){
-            distances[i] = incLength-(i*incLength/jointsNb);
+            distances[i] = incLength-(i*5);
+            sum += distances[i];
         }
 
 
 
         RobotController robotController = new RobotController(jointsNb);
         RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
-        robotArmManager.maxError = PARAMS.armBaseSize*2;
+        robotArmManager.maxError = sum*2;
 
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 
