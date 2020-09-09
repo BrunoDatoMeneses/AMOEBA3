@@ -23,6 +23,28 @@ public class RobotLaunchExampleMassiveXPCalculus {
 
     private static CSVWriter xpCSV;
 
+    public static  String configFile100joints = "100jointsRobot3DimensionsLauncher.xml";
+    public static  ArrayList subPercepts100joints = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
+            "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
+            "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
+            "ptheta16", "ptheta17", "ptheta18", "ptheta19",
+            "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
+            "ptheta26", "ptheta27", "ptheta28", "ptheta29",
+            "ptheta30","ptheta31", "ptheta32", "ptheta33", "ptheta34", "ptheta35",
+            "ptheta36", "ptheta37", "ptheta38", "ptheta39",
+            "ptheta40","ptheta41", "ptheta42", "ptheta43", "ptheta44", "ptheta45",
+            "ptheta46", "ptheta47", "ptheta48", "ptheta49",
+            "ptheta50","ptheta51", "ptheta52", "ptheta53", "ptheta54", "ptheta55",
+            "ptheta56", "ptheta57", "ptheta58", "ptheta59",
+            "ptheta60","ptheta61", "ptheta62", "ptheta63", "ptheta64", "ptheta65",
+            "ptheta66", "ptheta67", "ptheta68", "ptheta69",
+            "ptheta70","ptheta71", "ptheta72", "ptheta73", "ptheta74", "ptheta75",
+            "ptheta76", "ptheta77", "ptheta78", "ptheta79",
+            "ptheta80","ptheta81", "ptheta82", "ptheta83", "ptheta84", "ptheta85",
+            "ptheta86", "ptheta87", "ptheta88", "ptheta89",
+            "ptheta90","ptheta91", "ptheta92", "ptheta93", "ptheta94", "ptheta95",
+            "ptheta96", "ptheta97", "ptheta98", "ptheta99")  );
+
     public static  String configFile50joints = "50jointsRobot3DimensionsLauncher.xml";
     public static  ArrayList subPercepts50joints = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
             "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
@@ -69,12 +91,12 @@ public class RobotLaunchExampleMassiveXPCalculus {
         PARAMS.nbTest = 15;
         PARAMS.armBaseSize = 50.0;
 
-        ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(2,4,6,8));
+        ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(0));
 	    ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(1000));
         ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(200));
         ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.01,0.03));
 
-        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
+        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(100));
 
         for(Integer neighborhoodMultiplicator : neighborhoodMultiplicators) {
             for (Double mappingError : mappingErrors) {
@@ -94,7 +116,10 @@ public class RobotLaunchExampleMassiveXPCalculus {
                             PARAMS.nbJoints = jointNb;
                             PARAMS.dimension = jointNb + 1;
 
-                            if (jointNb == 50) {
+                            if (jointNb == 100) {
+                                PARAMS.configFile = configFile100joints;
+                                PARAMS.subPercepts = subPercepts100joints;
+                            } else if (jointNb == 50) {
                                 PARAMS.configFile = configFile50joints;
                                 PARAMS.subPercepts = subPercepts50joints;
                             } else if (jointNb == 30) {
