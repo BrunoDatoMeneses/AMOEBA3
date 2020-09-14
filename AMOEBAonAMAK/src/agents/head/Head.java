@@ -2106,7 +2106,7 @@ public class Head extends EllsaAgent {
 			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
 				
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.learningSpeed); //TODO update all contexts ?
 
 
 			}
