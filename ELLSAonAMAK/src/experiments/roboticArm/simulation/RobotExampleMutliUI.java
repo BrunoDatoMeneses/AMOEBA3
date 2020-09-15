@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticArm.simulation;
 
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Configuration;
@@ -7,8 +7,6 @@ import fr.irit.smac.amak.ui.drawables.DrawableCircle;
 import fr.irit.smac.amak.ui.drawables.DrawableLine;
 import javafx.application.Platform;
 import utils.Pair;
-
-import java.util.ArrayList;
 
 public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExampleMultiUI> {
 
@@ -124,9 +122,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 	}
 
-	/**
-	 * Move in a random direction
-	 */
+
 	@Override
 	protected void onDecideAndAct() {
 
@@ -149,9 +145,8 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 			{
 				double[] goal = robotArmManager.getGoal();
 				if(getAmas().getCycle()<robotArmManager.trainingCycles){
-					if(ends[jointsNumber-1].getB()>0.0 || true){
-						getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
-					}
+					getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+
 
 				}
 

@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticArm.simulation;
 
 import fr.irit.smac.amak.Environment;
 import fr.irit.smac.amak.Scheduling;

@@ -13,7 +13,7 @@ public class CSVWriter {
     PrintWriter pw;
 
 
-    public CSVWriter(String folder, String name){
+    public CSVWriter(String name){
         try {
             pw = new PrintWriter("XP/" + name + ".csv");
         } catch (FileNotFoundException e) {
@@ -22,15 +22,7 @@ public class CSVWriter {
         }
     }
 
-    // experimentation on calculus
-    public CSVWriter(String name){
-        try {
-            pw = new PrintWriter("/home/daavve/Documents/XP/" + name + ".csv");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+
 
 
     public void write(Double f1, Double f2){
@@ -65,17 +57,6 @@ public class CSVWriter {
         pw.close();
     }
 
-    public static void main(String[] args) {
-        String date = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-        CSVWriter test = new CSVWriter("08062020","test");
 
-        test.write(0.0000d, 0.0045d);
-        test.write(0.0000d, 0.0045d);
-        test.write(new ArrayList<>(Arrays.asList("sds","54654","dfdf5454")));
-
-
-
-        test.close();
-    }
 
 }

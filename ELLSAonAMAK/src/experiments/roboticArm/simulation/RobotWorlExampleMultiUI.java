@@ -1,12 +1,10 @@
-package experiments.roboticArm;
+package experiments.roboticArm.simulation;
 
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.Scheduling;
-import fr.irit.smac.amak.tools.RunLaterHelper;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUIMulti;
-import fr.irit.smac.amak.ui.drawables.DrawableString;
 
 public class RobotWorlExampleMultiUI extends Amas<WorldExampleMultiUI> {
 

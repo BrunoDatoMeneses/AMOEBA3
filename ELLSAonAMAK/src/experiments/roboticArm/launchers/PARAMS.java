@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticArm.launchers;
 
 import utils.TRACE_LEVEL;
 
@@ -7,11 +7,11 @@ import java.util.Arrays;
 
 public class PARAMS {
 
-    public static String model = "ROBOT";
+    public static String model = "ROBOT_ARM";
 
-    public static int nbTrainingCycle = 20;
-    public static int nbRequestCycle = 200;
-    public static int nbTest = 1;
+    public static int nbTrainingCycle = 100;
+    public static int nbRequestCycle = 20;
+    public static int nbEpisodes = 1;
     public static double mappingErrorAllowed = 0.03; // 0.01 or 0.03
     public static int neighborhoodMultiplicator = 2; // 2, 4, 6, 8, 10, 12, 14 and 16
     public static double extendedArmLength = 200.0;
@@ -19,7 +19,7 @@ public class PARAMS {
 
 
     // 30 JOINTS //
-    public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
+    /*public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 31;
     public static int nbJoints = 30;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
@@ -27,7 +27,7 @@ public class PARAMS {
             "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
             "ptheta16", "ptheta17", "ptheta18", "ptheta19",
             "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
-            "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );
+            "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );*/
 
     // 20 JOINTS //
     /*public static  String configFile = "20jointsRobot3DimensionsLauncher.xml";
@@ -60,10 +60,10 @@ public class PARAMS {
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));*/
 
     // 2 JOINTS //
-    /*public static  String configFile = "2jointsRobot3DimensionsLauncher.xml";
+    public static  String configFile = "2jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 3;
     public static int nbJoints = 2;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
+    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
 
 
 

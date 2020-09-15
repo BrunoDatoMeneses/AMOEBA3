@@ -1,4 +1,4 @@
-package experiments.roboticArm;
+package experiments.roboticArm.simulation;
 
 import utils.TRACE;
 import utils.TRACE_LEVEL;
@@ -19,6 +19,7 @@ public class RobotController {
     }
 
 
+
     private void setRandomJoints(int jointIndice, double[] angles) {
 
         if(jointIndice==0){
@@ -27,6 +28,11 @@ public class RobotController {
             double dispersion = 2.5593*Math.pow(jointsNumber,-0.479); //Math.PI/6 for 30 joints, Math.PI/4 for 10 joints , Math.PI/2 for 3 joints
             angles[jointIndice] = modulo2PI(gaussianRandom(0.0,dispersion));
         }
+    }
+
+    public void setJoint(int jointIndice, double[] angles, double value) {
+
+        angles[jointIndice] = value;
     }
 
 
@@ -46,10 +52,10 @@ public class RobotController {
     public double maxMin2PI(double angle){
 
         if(angle<0.0){
-            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            TRACE.print(TRACE_LEVEL.DEBUG,"----------> ERROR " + angle);
             return 0.0;
         }else if(angle>Math.PI*2){
-            TRACE.print(TRACE_LEVEL.ERROR,"----------> ERROR " + angle);
+            TRACE.print(TRACE_LEVEL.DEBUG,"----------> ERROR " + angle);
             return Math.PI*2;
         }else{
             return angle;
