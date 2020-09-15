@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>AMOEBA</groupId>
-		<artifactId>AMOEBA-parent</artifactId>
+		<groupId>ELLSA</groupId>
+		<artifactId>ELLSA-parent</artifactId>
 		<version>1.0</version>
 	</parent>
-	<artifactId>AMOEBAonAMAK</artifactId>
+	<artifactId>ELLSAonAMAK</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -35,7 +35,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>AMOEBA</groupId>
+			<groupId>ELLSA</groupId>
 			<artifactId>AMAKFX</artifactId>
 			<version>1.0</version>
 		</dependency>

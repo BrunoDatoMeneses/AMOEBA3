@@ -4,11 +4,11 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>AMOEBA</groupId>
-	<artifactId>AMOEBA-parent</artifactId>
+	<groupId>ELLSA</groupId>
+	<artifactId>ELLSA-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0</version>
-	<name>AMOEBA Parent Project</name>
+	<name>ELLSA Parent Project</name>
 
 
 	<properties>
@@ -19,7 +19,7 @@
 
 	<modules>
 		<module>AMAKFX</module>
-		<module>AMOEBAonAMAK</module>
+		<module>ELLSAonAMAK</module>
 	</modules>
 
 	<build>
