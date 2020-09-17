@@ -34,7 +34,6 @@ public class RobotLaunchExampleWithUIWithArgs extends Application{
         PARAMS.nbTrainingCycle = Integer.parseInt(args[1]);
         PARAMS.nbRequestCycle = Integer.parseInt(args[2]);
         PARAMS.mappingErrorAllowed = ((double)Integer.parseInt(args[3]))/100;
-            System.out.println(PARAMS.mappingErrorAllowed);
         PARAMS.neighborhoodMultiplicator = Integer.parseInt(args[4]);
         PARAMS.extendedArmLength = (double)Integer.parseInt(args[5]);
 

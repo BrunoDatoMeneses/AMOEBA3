@@ -36,7 +36,6 @@ public class RobotLaunchExampleOneExperimentationWithArgs {
         PARAMS.nbRequestCycle = Integer.parseInt(args[2]);
         PARAMS.nbEpisodes = Integer.parseInt(args[3]);
         PARAMS.mappingErrorAllowed = ((double)Integer.parseInt(args[4]))/100;
-        System.out.println(PARAMS.mappingErrorAllowed);
         PARAMS.neighborhoodMultiplicator = Integer.parseInt(args[5]);
         PARAMS.extendedArmLength = Integer.parseInt(args[6]);
 
@@ -108,42 +107,39 @@ public class RobotLaunchExampleOneExperimentationWithArgs {
         for (String dataName : dataStrings){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-            if(averageScore.getAsDouble()<1){
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
-            }else{
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()+"" ,"DEVIATION","" + Math.sqrt(deviationScore/data.get(dataName).size()))));
-            }
+
 
         }
 
-        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
+        OptionalDouble averageScoreEndo = data.get("endogenousLearningSituations").stream().mapToDouble(a->a).average();
+        Double deviationScoreEndo = data.get("endogenousLearningSituations").stream().mapToDouble(a->Math.pow((a-averageScoreEndo.getAsDouble()),2)).sum();
+        xpCSV.write(new ArrayList<>(Arrays.asList("endogenousLearningSituations" ,"AVERAGE" ,averageScoreEndo.getAsDouble()+"" ,"DEVIATION","" + Math.sqrt(deviationScoreEndo/data.get("endogenousLearningSituations").size()))));
+
 
         //Create the formatter for round the values of scores
         Locale currentLocale = Locale.getDefault();
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(currentLocale);
         otherSymbols.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat("##.##", otherSymbols);
-        xpCSV.write(new ArrayList<>(Arrays.asList("ROUNDED")));
-        for (String dataName : dataStrings){
-            OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
-            Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-            if(averageScore.getAsDouble()<1){
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble()*100)+"" ,"DEVIATION","" + df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
-            }
-
-
-        }
-        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         for (String dataName : dataStrings){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-            if(averageScore.getAsDouble()>=1){
-                xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble())+"" ,"DEVIATION","" + df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
-            }
+
 
 
         }
+
+
+        for (String dataName : dataStrings){
+            OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
+            Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
+
+
+
+        }
+
+
 
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
@@ -153,12 +149,12 @@ public class RobotLaunchExampleOneExperimentationWithArgs {
         Double deviationScoreDisp = data.get("predictionDisp").stream().mapToDouble(a->Math.pow((a-averageScoreDisp.getAsDouble()),2)).sum();
 
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION AVERAGE" , ""+averageScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScore/data.get("prediction").size()))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("DISPERSION AVERAGE" , ""+averageScoreDisp.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL ERROR AVERAGE" , ""+averageScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScore/data.get("prediction").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("DEVIATION AVERAGE" , ""+averageScoreDisp.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size()))));
 
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION AVERAGE %" , ""+df.format(100*averageScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("DISPERSION AVERAGE %" , ""+df.format(100*averageScoreDisp.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL ERROR AVERAGE %" , ""+df.format(100*averageScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("DEVIATION AVERAGE %" , ""+df.format(100*averageScoreDisp.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size())))));
 
         xpCSV.close();
 

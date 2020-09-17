@@ -388,7 +388,7 @@ public class RobotArmManager {
                 }
 
             }else{
-                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
+                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"EXPLOITATION [" + requestCycle + "] ");
 
                 goalAngles = request(angles, poseGoal, cycle);
 
@@ -438,7 +438,7 @@ public class RobotArmManager {
             }
         }else{
             finished = true;
-            TRACE.print(TRACE_LEVEL.SUBCYCLE,"ERROR: "+averageError.getAsDouble() + " [ DISPERSION: " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]");
+            TRACE.print(TRACE_LEVEL.SUBCYCLE,"GOAL ERROR: "+averageError.getAsDouble() + " [ STANDARD DEVIATION: " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]");
             for (int i = 0;i<jointsNb;i++){
 
                 controller.setJoint(i,angles,0.0);

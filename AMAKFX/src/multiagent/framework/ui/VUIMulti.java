@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import multiagent.framework.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.drawables.*;
+import multiagent.framework.ui.drawables.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
