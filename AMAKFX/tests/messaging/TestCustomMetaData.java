@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import fr.irit.smac.amak.messaging.IAmakEnvelope;
-import fr.irit.smac.amak.messaging.IAmakMessage;
-import fr.irit.smac.amak.messaging.IAmakMessageMetaData;
-import fr.irit.smac.amak.messaging.MessagingTechnicalException;
+import multiagent.framework.messaging.IAmakEnvelope;
+import multiagent.framework.messaging.IAmakMessage;
+import multiagent.framework.messaging.IAmakMessageMetaData;
+import multiagent.framework.messaging.MessagingTechnicalException;
 import testutils.ObjectsForMessagingTesting;
 
 public class TestCustomMetaData extends ObjectsForMessagingTesting {

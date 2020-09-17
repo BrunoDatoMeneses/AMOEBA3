@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.MainWindow;
+import multiagent.framework.Configuration;
+import multiagent.framework.ui.MainWindow;
 import gui.EllsaMultiUIWindow;
 import gui.EllsaWindow;
 import gui.saveExplorer.SaveExplorer;

@@ -18,9 +18,9 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import agents.percept.Percept;
-import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.Drawable;
-import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import multiagent.framework.ui.VUI;
+import multiagent.framework.ui.drawables.Drawable;
+import multiagent.framework.ui.drawables.DrawableRectangle;
 import gui.DimensionSelector;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;

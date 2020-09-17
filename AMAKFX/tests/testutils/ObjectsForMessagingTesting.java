@@ -4,13 +4,13 @@ package testutils;
 
 import org.junit.jupiter.api.AfterEach;
 
-import fr.irit.smac.amak.aid.AddressableAID;
-import fr.irit.smac.amak.internal.messaging.ImplMessagingServiceAgentMessaging;
-import fr.irit.smac.amak.messaging.IAmakAddress;
-import fr.irit.smac.amak.messaging.IAmakMessage;
-import fr.irit.smac.amak.messaging.IAmakMessageBox;
-import fr.irit.smac.amak.messaging.IAmakMessageMetaData;
-import fr.irit.smac.amak.messaging.SimpleAmakMessageMetaData;
+import multiagent.framework.aid.AddressableAID;
+import multiagent.framework.internal.messaging.ImplMessagingServiceAgentMessaging;
+import multiagent.framework.messaging.IAmakAddress;
+import multiagent.framework.messaging.IAmakMessage;
+import multiagent.framework.messaging.IAmakMessageBox;
+import multiagent.framework.messaging.IAmakMessageMetaData;
+import multiagent.framework.messaging.SimpleAmakMessageMetaData;
 
 public class ObjectsForMessagingTesting {
 

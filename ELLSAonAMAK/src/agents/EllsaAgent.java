@@ -1,8 +1,8 @@
 package agents;
 
 import agents.percept.Percept;
-import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.tools.Loggable;
+import multiagent.framework.Agent;
+import multiagent.framework.tools.Loggable;
 import gui.RenderStrategy;
 import kernel.ELLSA;
 import kernel.World;

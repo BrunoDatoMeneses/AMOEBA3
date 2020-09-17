@@ -4,14 +4,14 @@ import java.util.HashMap;
 
 import javax.management.InstanceAlreadyExistsException;
 
-import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.AmakPlot;
-import fr.irit.smac.amak.ui.AmakPlot.ChartType;
-import fr.irit.smac.amak.ui.MainWindow;
-import fr.irit.smac.amak.ui.SchedulerToolbar;
-import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.drawables.Drawable;
+import multiagent.framework.tools.Log;
+import multiagent.framework.tools.RunLaterHelper;
+import multiagent.framework.ui.AmakPlot;
+import multiagent.framework.ui.AmakPlot.ChartType;
+import multiagent.framework.ui.MainWindow;
+import multiagent.framework.ui.SchedulerToolbar;
+import multiagent.framework.ui.VUI;
+import multiagent.framework.ui.drawables.Drawable;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

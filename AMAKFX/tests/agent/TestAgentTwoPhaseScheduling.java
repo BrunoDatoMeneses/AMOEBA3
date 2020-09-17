@@ -11,10 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.irit.smac.amak.Amas;
-import fr.irit.smac.amak.CommunicatingAgent;
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.Scheduling;
+import multiagent.framework.Amas;
+import multiagent.framework.CommunicatingAgent;
+import multiagent.framework.Configuration;
+import multiagent.framework.Scheduling;
 import testutils.ObjectsForAgentTesting;
 import testutils.ObjectsForAgentTesting.TestEnv;
 

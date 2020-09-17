@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import fr.irit.smac.amak.messaging.IAmakEnvelope;
+import multiagent.framework.messaging.IAmakEnvelope;
 import testutils.ObjectsForAgentTesting;
 import testutils.ObjectsForMessagingTesting;
 import testutils.ObjectsForMessagingTesting.MyMsg;

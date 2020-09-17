@@ -7,7 +7,7 @@ import experiments.managers.F_N_Manager;
 import experiments.roboticArm.simulation.RobotArmManager;
 import experiments.roboticArm.simulation.RobotController;
 import experiments.roboticArm.simulation.RobotWorlExampleMultiUI;
-import fr.irit.smac.amak.Configuration;
+import multiagent.framework.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;

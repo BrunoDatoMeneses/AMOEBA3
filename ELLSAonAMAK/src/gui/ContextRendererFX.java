@@ -2,8 +2,8 @@ package gui;
 
 import agents.context.Context;
 import agents.percept.Percept;
-import fr.irit.smac.amak.ui.VUIMulti;
-import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import multiagent.framework.ui.VUIMulti;
+import multiagent.framework.ui.drawables.DrawableRectangle;
 import gui.utils.ContextColor;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;

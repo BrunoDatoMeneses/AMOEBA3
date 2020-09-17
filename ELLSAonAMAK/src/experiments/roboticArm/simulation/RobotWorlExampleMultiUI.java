@@ -1,10 +1,10 @@
 package experiments.roboticArm.simulation;
 
-import fr.irit.smac.amak.Amas;
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.Scheduling;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.VUIMulti;
+import multiagent.framework.Amas;
+import multiagent.framework.Configuration;
+import multiagent.framework.Scheduling;
+import multiagent.framework.ui.AmasMultiUIWindow;
+import multiagent.framework.ui.VUIMulti;
 
 public class RobotWorlExampleMultiUI extends Amas<WorldExampleMultiUI> {
 

@@ -1,6 +1,6 @@
 package gui;
 
-import fr.irit.smac.amak.ui.VUIMulti;
+import multiagent.framework.ui.VUIMulti;
 
 /**
  * Strategy on how to render an object.

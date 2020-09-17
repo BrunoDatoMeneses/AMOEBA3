@@ -3,11 +3,11 @@ package testutils;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import fr.irit.smac.amak.Amas;
-import fr.irit.smac.amak.CommunicatingAgent;
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.Environment;
-import fr.irit.smac.amak.Scheduling;
+import multiagent.framework.Amas;
+import multiagent.framework.CommunicatingAgent;
+import multiagent.framework.Configuration;
+import multiagent.framework.Environment;
+import multiagent.framework.Scheduling;
 
 public class ObjectsForAgentTesting {
 

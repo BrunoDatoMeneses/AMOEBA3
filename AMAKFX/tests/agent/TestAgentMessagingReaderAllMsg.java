@@ -10,8 +10,8 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import fr.irit.smac.amak.messaging.IAmakEnvelope;
-import fr.irit.smac.amak.messaging.IAmakMessage;
+import multiagent.framework.messaging.IAmakEnvelope;
+import multiagent.framework.messaging.IAmakMessage;
 import testutils.ObjectsForAgentTesting;
 import testutils.ObjectsForMessagingTesting;
 

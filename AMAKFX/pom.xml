@@ -13,7 +13,7 @@
 
 	<properties>
 		<skip.assembly>false</skip.assembly>
-		<main.class>fr.irit.smac.amak.examples.philosophers.PhilosophersLaunchExample</main.class>
+		<main.class>multiagent.framework.examples.philosophers.PhilosophersLaunchExample</main.class>
 	</properties>
 
 	<build>

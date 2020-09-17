@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>fr.irit.smac.amak.internal.messaging.ImplMessageBoxAgentMessaging</li>
+<li>multiagent.framework.internal.messaging.ImplMessageBoxAgentMessaging</li>
 </ul>
 </li>
 </ul>
@@ -142,14 +142,14 @@ implements <a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBo
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../fr/irit/smac/amak/internal/messaging/ImplMessageBoxAgentMessaging.html#sendMessage-fr.irit.smac.amak.messaging.IAmakMessage-fr.irit.smac.amak.aid.AddressableAID-">sendMessage</a></span>(<a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessage.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessage</a>&nbsp;messageToSend,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../fr/irit/smac/amak/internal/messaging/ImplMessageBoxAgentMessaging.html#sendMessage-IAmakMessage-AddressableAID-">sendMessage</a></span>(<a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessage.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessage</a>&nbsp;messageToSend,
            <a href="../../../../../../fr/irit/smac/amak/aid/AddressableAID.html" title="class in fr.irit.smac.amak.aid">AddressableAID</a>&nbsp;receiver)</code>
 <div class="block">Send a message to a receiver agent.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../fr/irit/smac/amak/internal/messaging/ImplMessageBoxAgentMessaging.html#sendMessage-fr.irit.smac.amak.messaging.IAmakMessage-fr.irit.smac.amak.aid.AddressableAID-fr.irit.smac.amak.messaging.IAmakMessageMetaData-">sendMessage</a></span>(<a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessage.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessage</a>&nbsp;messageToSend,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../fr/irit/smac/amak/internal/messaging/ImplMessageBoxAgentMessaging.html#sendMessage-IAmakMessage-AddressableAID-IAmakMessageMetaData-">sendMessage</a></span>(<a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessage.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessage</a>&nbsp;messageToSend,
            <a href="../../../../../../fr/irit/smac/amak/aid/AddressableAID.html" title="class in fr.irit.smac.amak.aid">AddressableAID</a>&nbsp;receiver,
            <a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageMetaData.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessageMetaData</a>&nbsp;metadata)</code>&nbsp;</td>
 </tr>
@@ -197,11 +197,11 @@ implements <a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBo
 <pre>public&nbsp;void&nbsp;sendMessage(<a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessage.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessage</a>&nbsp;messageToSend,
                         <a href="../../../../../../fr/irit/smac/amak/aid/AddressableAID.html" title="class in fr.irit.smac.amak.aid">AddressableAID</a>&nbsp;receiver)
                  throws <a href="../../../../../../fr/irit/smac/amak/messaging/MessagingTechnicalException.html" title="class in fr.irit.smac.amak.messaging">MessagingTechnicalException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-fr.irit.smac.amak.messaging.IAmakMessage-fr.irit.smac.amak.aid.AddressableAID-">IAmakMessageBox</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-IAmakMessage-AddressableAID-">IAmakMessageBox</a></code></span></div>
 <div class="block">Send a message to a receiver agent.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-fr.irit.smac.amak.messaging.IAmakMessage-fr.irit.smac.amak.aid.AddressableAID-">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessageBox</a></code></dd>
+<dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-IAmakMessage-AddressableAID-">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessageBox</a></code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/MessagingTechnicalException.html" title="class in fr.irit.smac.amak.messaging">MessagingTechnicalException</a></code> - if the message cannot be send this exception is throw.</dd>
 </dl>
@@ -219,7 +219,7 @@ implements <a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBo
                  throws <a href="../../../../../../fr/irit/smac/amak/messaging/MessagingTechnicalException.html" title="class in fr.irit.smac.amak.messaging">MessagingTechnicalException</a></pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-fr.irit.smac.amak.messaging.IAmakMessage-fr.irit.smac.amak.aid.AddressableAID-fr.irit.smac.amak.messaging.IAmakMessageMetaData-">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessageBox</a></code></dd>
+<dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html#sendMessage-IAmakMessage-AddressableAID-IAmakMessageMetaData-">sendMessage</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../fr/irit/smac/amak/messaging/IAmakMessageBox.html" title="interface in fr.irit.smac.amak.messaging">IAmakMessageBox</a></code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../fr/irit/smac/amak/messaging/MessagingTechnicalException.html" title="class in fr.irit.smac.amak.messaging">MessagingTechnicalException</a></code></dd>
 </dl>

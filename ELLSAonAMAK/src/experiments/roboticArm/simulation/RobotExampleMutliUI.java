@@ -1,10 +1,10 @@
 package experiments.roboticArm.simulation;
 
-import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.Configuration;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.drawables.DrawableCircle;
-import fr.irit.smac.amak.ui.drawables.DrawableLine;
+import multiagent.framework.Agent;
+import multiagent.framework.Configuration;
+import multiagent.framework.ui.AmasMultiUIWindow;
+import multiagent.framework.ui.drawables.DrawableCircle;
+import multiagent.framework.ui.drawables.DrawableLine;
 import javafx.application.Platform;
 import utils.Pair;
 

@@ -1,9 +1,9 @@
 package gui;
 
 import agents.context.Context;
-import fr.irit.smac.amak.ui.drawables.Drawable;
-import fr.irit.smac.amak.ui.drawables.DrawableDefaultMini;
-import fr.irit.smac.amak.ui.drawables.DrawableRectangle;
+import multiagent.framework.ui.drawables.Drawable;
+import multiagent.framework.ui.drawables.DrawableDefaultMini;
+import multiagent.framework.ui.drawables.DrawableRectangle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;

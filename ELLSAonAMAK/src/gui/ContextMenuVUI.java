@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import agents.percept.Percept;
-import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.ui.VUI;
+import multiagent.framework.tools.Log;
+import multiagent.framework.ui.VUI;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;

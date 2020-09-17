@@ -1,8 +1,8 @@
 package experiments.roboticArm.simulation;
 
-import fr.irit.smac.amak.Environment;
-import fr.irit.smac.amak.Scheduling;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
+import multiagent.framework.Environment;
+import multiagent.framework.Scheduling;
+import multiagent.framework.ui.AmasMultiUIWindow;
 
 public class WorldExampleMultiUI extends Environment {
 	public WorldExampleMultiUI(AmasMultiUIWindow window, Object...params) {

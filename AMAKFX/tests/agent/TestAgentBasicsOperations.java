@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.irit.smac.amak.Agent;
-import fr.irit.smac.amak.CommunicatingAgent;
+import multiagent.framework.Agent;
+import multiagent.framework.CommunicatingAgent;
 import testutils.ObjectsForAgentTesting;
 
 public class TestAgentBasicsOperations extends ObjectsForAgentTesting {

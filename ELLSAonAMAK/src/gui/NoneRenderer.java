@@ -1,6 +1,6 @@
 package gui;
 
-import fr.irit.smac.amak.ui.VUIMulti;
+import multiagent.framework.ui.VUIMulti;
 
 /**
  * A render strategy that does nothing.

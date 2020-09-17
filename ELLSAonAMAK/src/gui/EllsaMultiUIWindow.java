@@ -1,25 +1,22 @@
 package gui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import fr.irit.smac.amak.tools.Log;
-import fr.irit.smac.amak.tools.RunLaterHelper;
-import fr.irit.smac.amak.ui.AmakPlot;
-import fr.irit.smac.amak.ui.AmakPlot.ChartType;
-import fr.irit.smac.amak.ui.AmasMultiUIWindow;
-import fr.irit.smac.amak.ui.SchedulerToolbar;
-import fr.irit.smac.amak.ui.VUI;
-import fr.irit.smac.amak.ui.VUIMulti;
-import fr.irit.smac.amak.ui.drawables.Drawable;
-import fr.irit.smac.amak.ui.drawables.DrawableString;
+import multiagent.framework.tools.Log;
+import multiagent.framework.tools.RunLaterHelper;
+import multiagent.framework.ui.AmakPlot;
+import multiagent.framework.ui.AmakPlot.ChartType;
+import multiagent.framework.ui.AmasMultiUIWindow;
+import multiagent.framework.ui.SchedulerToolbar;
+import multiagent.framework.ui.VUI;
+import multiagent.framework.ui.VUIMulti;
+import multiagent.framework.ui.drawables.Drawable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import kernel.ELLSA;
 import kernel.StudiedSystem;

@@ -1,7 +1,7 @@
 package gui;
 
 import agents.percept.Percept;
-import fr.irit.smac.amak.tools.RunLaterHelper;
+import multiagent.framework.tools.RunLaterHelper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

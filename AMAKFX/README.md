@@ -13,7 +13,7 @@ These changes were made for a particular project, without much care for backward
 ### Changes :
 + Build system is now maven.
 + Use JavaFX instead of Swing. JavaFX run on a different thread than the simulation, when updating the GUI from the simulation thread you must be extra careful for :
-  + Running JavaFX code on the JavaFX thread, by only using AMAKFX methods, or by learning how to use JavaFX's RunLater (see AMAKFX's [RunLaterHelper](src/fr/irit/smac/amak/tools/RunLaterHelper.java))
+  + Running JavaFX code on the JavaFX thread, by only using AMAKFX methods, or by learning how to use JavaFX's RunLater (see AMAKFX's [RunLaterHelper](src/multiagent/framework/tools/RunLaterHelper.java))
   + Not overload JavaFX call queue with draw call, leading to unpredictable result. For that purpose a new option has been added to Configuration : waitForGui, default at true. Each simulation cycle, AMAK will wait for JavaFX call queue to be empty. But queue overload can still happen inside a cycle. Symptoms are : long freeze, part of GUI not updating, or becoming white.
 + The VUI has been overhauled, it now provide extra features :
   + Drawable can detect events, and dispatch these events to linked drawables.

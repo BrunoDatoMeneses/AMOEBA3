@@ -11,8 +11,8 @@ import java.util.ListIterator;
 import java.util.Scanner;
 
 import agents.percept.Percept;
-import fr.irit.smac.amak.tools.SerializeBase64;
-import fr.irit.smac.amak.ui.VUI;
+import multiagent.framework.tools.SerializeBase64;
+import multiagent.framework.ui.VUI;
 import gui.DimensionSelector;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

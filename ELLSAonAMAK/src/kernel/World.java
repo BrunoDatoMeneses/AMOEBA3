@@ -3,11 +3,11 @@ package kernel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import fr.irit.smac.amak.Environment;
-import fr.irit.smac.amak.Scheduling;
+import multiagent.framework.Environment;
+import multiagent.framework.Scheduling;
 import agents.context.Context;
 import agents.percept.Percept;
-import fr.irit.smac.amak.tools.Loggable;
+import multiagent.framework.tools.Loggable;
 import ncs.NCS;
 import utils.TRACE_LEVEL;
 
