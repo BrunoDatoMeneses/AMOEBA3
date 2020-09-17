@@ -12,20 +12,10 @@ public class CSVWriter {
 
     PrintWriter pw;
 
-
-    public CSVWriter(String folder, String name){
-        try {
-            pw = new PrintWriter("C:/Users/dato/Documents/THESE/XP/ELLSA/"+ folder + "/" + name + ".csv");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     // experimentation on calculus
     public CSVWriter(String name){
         try {
-            pw = new PrintWriter("/home/daavve/Documents/XP/" + name + ".csv");
+            pw = new PrintWriter("XP/" + name + ".csv");
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -65,17 +55,6 @@ public class CSVWriter {
         pw.close();
     }
 
-    public static void main(String[] args) {
-        String date = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-        CSVWriter test = new CSVWriter("08062020","test");
 
-        test.write(0.0000d, 0.0045d);
-        test.write(0.0000d, 0.0045d);
-        test.write(new ArrayList<>(Arrays.asList("sds","54654","dfdf5454")));
-
-
-
-        test.close();
-    }
 
 }

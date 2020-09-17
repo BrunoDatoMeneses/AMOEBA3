@@ -38,13 +38,12 @@ public class RobotLaunchExampleXP {
 
             String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
             String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
-            xpCSV = new CSVWriter(date,dateAndHour+"_Dim_"+ PARAMS.dimension
+            xpCSV = new CSVWriter(PARAMS.model + "_Joints_" + PARAMS.nbJoints
                     +"_LearningCycles_" + PARAMS.nbTrainingCycle
                     +"_ExplotationCycles_" + PARAMS.nbRequestCycle
-                    +"_Episodes_" + PARAMS.nbTest
-                    +"_Joints_" + PARAMS.nbJoints
+                    +"_Episodes_" + PARAMS.nbepisodes
                     +"_Dimensions_" + PARAMS.dimension
-                    +"_Notes_" + PARAMS.model
+                    + dateAndHour
 
             );
 
@@ -59,7 +58,7 @@ public class RobotLaunchExampleXP {
 
             HashMap<String, ArrayList<Double>> data = new HashMap<>();
 
-            List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","neighborRequests","fusionRequests","restructureRequests", "prediction", "predictionDisp");
+            List<String> dataStrings = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","endogenousLearningSituations","fusionRequests","restructureRequests", "goalXYError", "goalXYErrorDeviation", "goalThetaError", "goalThetaErrorDeviation");
 
 
 
@@ -68,14 +67,14 @@ public class RobotLaunchExampleXP {
             }
 
             double start = System.currentTimeMillis();
-            for (int i = 0; i < PARAMS.nbTest; ++i) {
-                    System.out.print(i + " ");
+            for (int i = 0; i < PARAMS.nbepisodes; ++i) {
+                    System.out.println("Learning episode " +i + " ");
                     learningEpisode(data);
             }
             System.out.println("");
             double total = (System.currentTimeMillis()- start)/1000;
-            double mean = total/ PARAMS.nbTest;
-            System.out.println("[TIME MEAN] " + mean + " s");
+            double mean = total/ PARAMS.nbepisodes;
+            System.out.println("[TIME MEAN ] " + mean + " s");
             System.out.println("[TIME TOTAL] " + total + " s");
 
 
@@ -86,10 +85,10 @@ public class RobotLaunchExampleXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             if(averageScore.getAsDouble()<1){
-                System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
+                //System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
                 xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
             }else{
-                System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
+                //System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
                 xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()+"" ,"DEVIATION","" + Math.sqrt(deviationScore/data.get(dataName).size()))));
             }
 
@@ -103,13 +102,13 @@ public class RobotLaunchExampleXP {
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(currentLocale);
         otherSymbols.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat("##.##", otherSymbols);
-        System.out.println("ROUNDED");
+        //System.out.println("ROUNDED");
         xpCSV.write(new ArrayList<>(Arrays.asList("ROUNDED")));
         for (String dataName : dataStrings){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             if(averageScore.getAsDouble()<1){
-                System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
+                //System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
                 xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble()*100)+"" ,"DEVIATION","" + df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
             }
 
@@ -121,7 +120,7 @@ public class RobotLaunchExampleXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             if(averageScore.getAsDouble()>=1){
-                System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
+                //System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
                 xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble())+"" ,"DEVIATION","" + df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
             }
 
@@ -130,22 +129,47 @@ public class RobotLaunchExampleXP {
 
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
-        OptionalDouble averageScore = data.get("prediction").stream().mapToDouble(a->a).average();
-        OptionalDouble averageScoreDisp = data.get("predictionDisp").stream().mapToDouble(a->a).average();
-        Double deviationScore = data.get("prediction").stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
-        Double deviationScoreDisp = data.get("predictionDisp").stream().mapToDouble(a->Math.pow((a-averageScoreDisp.getAsDouble()),2)).sum();
+        OptionalDouble averageXYScore = data.get("goalXYError").stream().mapToDouble(a->a).average();
+        OptionalDouble averageXYScoreDeviation = data.get("goalXYErrorDeviation").stream().mapToDouble(a->a).average();
+        Double deviationXYScore = data.get("goalXYError").stream().mapToDouble(a->Math.pow((a-averageXYScore.getAsDouble()),2)).sum();
+        Double deviationXYScoreDisp = data.get("goalXYErrorDeviation").stream().mapToDouble(a->Math.pow((a-averageXYScoreDeviation.getAsDouble()),2)).sum();
 
-        System.out.println("[PREDICTION AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get("prediction").size()) );
-        System.out.println("[DISPERSION AVERAGE] " + averageScoreDisp.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size()) );
+        System.out.println("[GOAL XY ERROR AVERAGE          ] " + averageXYScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationXYScore/data.get("goalXYError").size()) );
+        System.out.println("[GOAL XY ERROR DEVIATION AVERAGE] " + averageXYScoreDeviation.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size()) );
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION AVERAGE" , ""+averageScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScore/data.get("prediction").size()))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("DISPERSION AVERAGE" , ""+averageScoreDisp.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR AVERAGE" , ""+averageXYScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationXYScore/data.get("goalXYError").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR DEVIATION AVERAGE" , ""+averageXYScoreDeviation.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size()))));
 
-        System.out.println("[PREDICTION AVERAGE %] " + df.format(100*averageScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())));
-        System.out.println("[DISPERSION AVERAGE %] " + df.format(100*averageScoreDisp.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size())));
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION AVERAGE %" , ""+df.format(100*averageScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScore/data.get("prediction").size())))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("DISPERSION AVERAGE %" , ""+df.format(100*averageScoreDisp.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationScoreDisp/data.get("predictionDisp").size())))));
+        OptionalDouble averageThetaScore = data.get("goalThetaError").stream().mapToDouble(a->a).average();
+        OptionalDouble averageThetaScoreDeviation = data.get("goalThetaErrorDeviation").stream().mapToDouble(a->a).average();
+        Double deviationThetaScore = data.get("goalThetaError").stream().mapToDouble(a->Math.pow((a-averageThetaScore.getAsDouble()),2)).sum();
+        Double deviationThetaScoreDisp = data.get("goalThetaErrorDeviation").stream().mapToDouble(a->Math.pow((a-averageThetaScoreDeviation.getAsDouble()),2)).sum();
+
+        System.out.println("[GOAL Theta ERROR AVERAGE          ] " + averageThetaScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationThetaScore/data.get("goalThetaError").size()) );
+        System.out.println("[GOAL Theta ERROR DEVIATION AVERAGE] " + averageThetaScoreDeviation.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size()) );
+
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR AVERAGE" , ""+averageThetaScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationThetaScore/data.get("goalThetaError").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR DEVIATION AVERAGE" , ""+averageThetaScoreDeviation.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size()))));
+
+
+
+
+
+        System.out.println("[GOAL XY ERROR AVERAGE           %] " + df.format(100*averageXYScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationXYScore/data.get("goalXYError").size())));
+        System.out.println("[GOAL XY ERROR DEVIATION AVERAGE %] " + df.format(100*averageXYScoreDeviation.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size())));
+
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR AVERAGE %" , ""+df.format(100*averageXYScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationXYScore/data.get("goalXYError").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR DEVIATION AVERAGE %" , ""+df.format(100*averageXYScoreDeviation.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size())))));
+
+
+        System.out.println("[GOAL Theta ERROR AVERAGE           %] " + df.format(100*averageThetaScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationThetaScore/data.get("goalThetaError").size())));
+        System.out.println("[GOAL Theta ERROR DEVIATION AVERAGE %] " + df.format(100*averageThetaScoreDeviation.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size())));
+
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR AVERAGE %" , ""+df.format(100*averageThetaScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationThetaScore/data.get("goalThetaError").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR DEVIATION AVERAGE %" , ""+df.format(100*averageThetaScoreDeviation.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size())))));
+
+
 
         xpCSV.close();
 
@@ -166,9 +190,7 @@ public class RobotLaunchExampleXP {
                 ellsas[i].setStudiedSystem(studiedSystems[i]);
                 IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
                 File file;
-                if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
-                else file = new File("resources/1jointRobot4DimensionsLauncher.xml");
-                //else file = new File("resources/1jointRobot3DimensionsLauncher.xml");
+                file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");
 
                 backupSystem.load(file);
 
@@ -204,60 +226,69 @@ public class RobotLaunchExampleXP {
                 ellsas[i].setSubPercepts(PARAMS.subPercepts);
             }
 
-                int jointsNb = PARAMS.nbJoints;
-                //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
-                //WorldExampleMultiUI env = new WorldExampleMultiUI(window);
-                //VUIMulti vui = new VUIMulti("Robot");
+            int jointsNb = PARAMS.nbJoints;
+            //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
+            //WorldExampleMultiUI env = new WorldExampleMultiUI(window);
+            //VUIMulti vui = new VUIMulti("Robot");
 
 
             double distances[] = new double[jointsNb];
             double incLength = PARAMS.armBaseSize/jointsNb;
 
+            double sum = 0.0;
             for(int i = 0;i<jointsNb;i++){
-                distances[i] = incLength;
+                distances[i] = incLength-(i*(incLength/(jointsNb*2)));
+                sum += distances[i];
             }
 
 
-                RobotController robotController = new RobotController(jointsNb);
-                RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
-                robotArmManager.maxError = PARAMS.armBaseSize*2;
+            RobotController robotController = new RobotController(jointsNb);
+            RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+            robotArmManager.maxError = sum*2;
+
+            robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
+            robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
 
 
-                RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, jointsNb);
+            RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, jointsNb);
 
-                while(!robotArmManager.finished){
-                    robot.cycleCommandLine();
-                }
+            while(!robotArmManager.finished){
+                robot.cycleCommandLine();
+            }
 
-            System.err.println("\nERROR REQUESTS "+robotArmManager.errorRequests);
 
-                //TRACE.print(TRACE_LEVEL.ERROR,robotArmManager.finished);
-                //TRACE.print(TRACE_LEVEL.ERROR, + " [ " + Math.sqrt(robotArmManager.errorDispersion/robotArmManager.allGoalErrors.size()) + " ]      -    " + robotArmManager.goalErrors);
-                double error = robotArmManager.averageError.getAsDouble();
-                double dispersion = Math.sqrt(robotArmManager.errorDispersion/robotArmManager.allGoalErrors.size());
 
-                HashMap<String, Double> mappingScores = ellsas[0].getHeadAgent().getMappingScores();
-                System.out.println(mappingScores);
-                HashMap<REQUEST, Integer> requestCounts = ellsas[0].data.requestCounts;
-                System.out.println(requestCounts);
-                System.out.println(error*100 + " [ " + dispersion*100 + " ]");
+            //TRACE.print(TRACE_LEVEL.ERROR,robotArmManager.finished);
+            //TRACE.print(TRACE_LEVEL.ERROR, + " [ " + Math.sqrt(robotArmManager.errorDispersion/robotArmManager.allGoalErrors.size()) + " ]      -    " + robotArmManager.goalErrors);
+            double XYerror = robotArmManager.averageXYError.getAsDouble();
+            double XYdispersion = Math.sqrt(robotArmManager.XYErrorDispersion /robotArmManager.allXYGoalErrors.size());
 
-                data.get("mappingScore").add(mappingScores.get("CTXT"));
-                data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));
-                data.get("conflictVol").add(mappingScores.get("CONF"));
-                data.get("concurrenceVol").add(mappingScores.get("CONC"));
-                data.get("voidVol").add(mappingScores.get("VOIDS"));
-                data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
-                data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
-                data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));
-                data.get("voidRequests").add((double)requestCounts.get(REQUEST.VOID));
-                data.get("modelRequests").add((double)requestCounts.get(REQUEST.MODEL));
-                data.get("neighborRequests").add((double)requestCounts.get(REQUEST.NEIGHBOR));
-                data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
-                data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
-                data.get("nbAgents").add((double) ellsas[0].getContexts().size());
-                data.get("prediction").add(error);
-                data.get("predictionDisp").add(dispersion);
+            double Thetaerror = robotArmManager.averageThetaError.getAsDouble();
+            double Thetadispersion = Math.sqrt(robotArmManager.ThetaErrorDispersion /robotArmManager.allThetaGoalErrors.size());
+
+            HashMap<String, Double> mappingScores = ellsas[0].getHeadAgent().getMappingScores();
+
+            HashMap<REQUEST, Integer> requestCounts = ellsas[0].data.requestCounts;
+
+
+            data.get("mappingScore").add(mappingScores.get("CTXT"));
+            data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));
+            data.get("conflictVol").add(mappingScores.get("CONF"));
+            data.get("concurrenceVol").add(mappingScores.get("CONC"));
+            data.get("voidVol").add(mappingScores.get("VOIDS"));
+            data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
+            data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
+            data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));
+            data.get("voidRequests").add((double)requestCounts.get(REQUEST.VOID));
+            data.get("modelRequests").add((double)requestCounts.get(REQUEST.MODEL));
+            data.get("endogenousLearningSituations").add((double)requestCounts.get(REQUEST.NEIGHBOR));
+            data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
+            data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
+            data.get("nbAgents").add((double) ellsas[0].getContexts().size());
+            data.get("goalXYError").add(XYerror);
+            data.get("goalXYErrorDeviation").add(XYdispersion);
+            data.get("goalThetaError").add(Thetaerror);
+            data.get("goalThetaErrorDeviation").add(Thetadispersion);
 
 	}
 
@@ -270,7 +301,7 @@ public class RobotLaunchExampleXP {
                 xpCSV.write(new ArrayList<>(Arrays.asList("Model",model)));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles", PARAMS.nbTrainingCycle+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles", PARAMS.nbRequestCycle+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbTest+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbepisodes +"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Space size", PARAMS.spaceSize*4+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error", PARAMS.mappingErrorAllowed+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
@@ -280,7 +311,7 @@ public class RobotLaunchExampleXP {
                 xpCSV.write(new ArrayList<>(Arrays.asList("Self Learning", PARAMS.setSelfLearning+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
-                xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("goalXYError")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance", PARAMS.setRegressionPerformance+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 

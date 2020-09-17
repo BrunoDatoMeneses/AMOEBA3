@@ -7,19 +7,28 @@ import java.util.Arrays;
 
 public class PARAMS {
 
-    public static String model = "ROBOT";
+    public static String model = "DISTRIBUTED_ROBOT";
 
     public static int nbTrainingCycle = 200;
-    public static int nbRequestCycle = 50;
-    public static int nbTest = 1;
-    public static double spaceSize = 50.0	;
-    //public static double mappingErrorAllowed = 0.06; // USUAL
-    public static double mappingErrorAllowed = 0.02; // OTHER
+    public static int nbRequestCycle = 100;
+    public static int nbepisodes = 1;
+
+    public static double mappingErrorAllowed = 0.02;
     public static int neighborhoodMultiplicator = 2;
+    public static  int requestControlCycles = 10;
+
+    public static boolean isOrientationGoal = true;
 
     /* PREDICTION */
     public static  double setRegressionPerformance = 1;
 
+    public static double armBaseSize = 300.0;
+
+
+    public static int nbJoints = 10;
+    public static  int dimension = nbJoints +1;
+    public static  String configFile = "";
+    public static  ArrayList subPercepts = new ArrayList<>();
 
     /*public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 31;
@@ -45,12 +54,12 @@ public class PARAMS {
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
     "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));*/
 
-    public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
+    /*public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 7;
     public static int nbJoints = 6;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
             "ptheta5"));
-
+*/
 
     /*public static  String configFile = "3jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 4;
@@ -75,8 +84,7 @@ public class PARAMS {
     /*public static  String configFile = "threeDimensionsLauncher.xml";
     public static  int dimension = 3;*/
 
-
-
+    public static double spaceSize = 50.0	;
 
 
     /* REGRESSION */
@@ -117,7 +125,6 @@ public class PARAMS {
     public static  boolean setSubVoidDetection = false ;
     public static  boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
     public static  boolean setSelfModelRequest = true ;
-
     public static  boolean setCoopLearning = false ; // WITHOUT ORACLE
 
     public static  boolean setDream = false ;
@@ -136,5 +143,5 @@ public class PARAMS {
 
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
-    public static double armBaseSize = 300.0;
+
 }

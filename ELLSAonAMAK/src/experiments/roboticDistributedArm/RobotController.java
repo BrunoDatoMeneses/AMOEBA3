@@ -106,6 +106,19 @@ public class RobotController {
         //return angleValue;
     }
 
+    private double addConstrainsWithLimit(double angleValue, double limit){
+        if (Math.PI - limit < angleValue && angleValue < Math.PI){
+            return Math.PI - limit;
+        }
+        else if (Math.PI  < angleValue && angleValue < Math.PI + limit){
+            return Math.PI + limit;
+        }
+        else{
+            return angleValue;
+        }
+        //return angleValue;
+    }
+
     public void setJointsFromRequest(double[] currentAngles, double[] goalAngles, double variation){
 
         for(int i=0;i<jointsNumber;i++){

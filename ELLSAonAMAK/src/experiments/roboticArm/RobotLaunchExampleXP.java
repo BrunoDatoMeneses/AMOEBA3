@@ -38,7 +38,7 @@ public class RobotLaunchExampleXP {
 
             String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
             String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
-            xpCSV = new CSVWriter(date,dateAndHour+"_Dim_"+ PARAMS.dimension
+            xpCSV = new CSVWriter(dateAndHour+"_Dim_"+ PARAMS.dimension
                     +"_LearningCycles_" + PARAMS.nbTrainingCycle
                     +"_ExplotationCycles_" + PARAMS.nbRequestCycle
                     +"_Episodes_" + PARAMS.nbTest

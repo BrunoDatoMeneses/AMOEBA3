@@ -38,7 +38,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 	public void start(Stage primaryStage) throws Exception {
 
 
-        ellsas = new ELLSA[1];
+        ellsas = new ELLSA[PARAMS.nbJoints];
         studiedSystems = new StudiedSystem[PARAMS.nbJoints];
         vuiMultis = new VUIMulti[PARAMS.nbJoints];
         ellsaMultiUIWindows = new EllsaMultiUIWindow[PARAMS.nbJoints];
@@ -52,12 +52,12 @@ public class RobotLaunchExampleMultiUI extends Application{
         Configuration.waitForGUI = true;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-        for(int i=0;i<1;i++){
+        for(int i=0;i<PARAMS.nbJoints;i++){
 
 
             studiedSystems[i] = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
             vuiMultis[i] = new VUIMulti("2D");
-            ellsaMultiUIWindows[i] = new EllsaMultiUIWindow("ELLSA Theta "+i, vuiMultis[i], studiedSystems[i]);
+            ellsaMultiUIWindows[i] = new EllsaMultiUIWindow("ELLSA Joint "+i, vuiMultis[i], studiedSystems[i]);
             ellsas[i] = new ELLSA(ellsaMultiUIWindows[i],  vuiMultis[i]);
             ellsas[i].setStudiedSystem(studiedSystems[i]);
             IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
@@ -110,7 +110,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 
         int jointsNb = PARAMS.nbJoints;
-        AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
+        AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm Simulation");
         WorldExampleMultiUI env = new WorldExampleMultiUI(window);
         VUIMulti vui = new VUIMulti("Robot");
 
@@ -120,7 +120,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         double sum = 0.0;
         for(int i = 0;i<jointsNb;i++){
-            distances[i] = incLength-(i*5);
+            distances[i] = incLength-(i*(incLength/(jointsNb*2)));
             sum += distances[i];
         }
 
@@ -130,6 +130,8 @@ public class RobotLaunchExampleMultiUI extends Application{
         RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
         robotArmManager.maxError = sum*2;
 
+        robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
+        robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 
 
@@ -137,53 +139,9 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 	}
 
-	public void startTask(RobotWorlExampleMultiUI amas, long wait, int cycles)
-    {
-        // Create a Runnable
-        Runnable task = new Runnable()
-        {
-            public void run()
-            {
-                runTask(amas, wait, cycles);
-            }
-        };
- 
-        // Run the task in a background thread
-        Thread backgroundThread = new Thread(task);
-        // Terminate the running thread if the application exits
-        backgroundThread.setDaemon(true);
-        // Start the thread
-        backgroundThread.start();
-    }
+
 	
-	public void runTask(RobotWorlExampleMultiUI amas, long wait, int cycles)
-    {
-        for(int i = 0; i < cycles; i++) 
-        {
-            try
-            {
-                // Get the Status
-                final String status = "Processing " + i + " of " + cycles;
-                 
-                // Update the Label on the JavaFx Application Thread        
-                Platform.runLater(new Runnable() 
-                {
-                    @Override
-                    public void run() 
-                    {
-                    	amas.cycle();
-                    	System.out.println(status);
-                    }
-                });
-         
-                Thread.sleep(wait);
-            }
-            catch (InterruptedException e) 
-            {
-                e.printStackTrace();
-            }
-        }
-    }   
+
 
 	
 	@Override

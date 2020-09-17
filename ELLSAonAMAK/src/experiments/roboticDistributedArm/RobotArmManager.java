@@ -29,10 +29,17 @@ public class RobotArmManager {
 
     int learningCycle;
     int requestCycle;
-    double goalErrors;
-    ArrayList<Double> allGoalErrors ;
-    public OptionalDouble averageError;
-    Double errorDispersion;
+    //double goalErrors;
+
+    ArrayList<Double> allXYGoalErrors;
+    public OptionalDouble averageXYError;
+    Double XYErrorDispersion;
+
+    ArrayList<Double> allThetaGoalErrors;
+    public OptionalDouble averageThetaError;
+    Double ThetaErrorDispersion;
+
+
 
     ArrayList<Pair<Double,Double>> learnedPositions;
     boolean showSubrequest = false;
@@ -58,6 +65,8 @@ public class RobotArmManager {
 
     private int angleMultilpicatorForUI = 100;//*jointsNb/2;
 
+    public boolean isOrientationGoal = false;
+
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
 
@@ -76,8 +85,10 @@ public class RobotArmManager {
         learningCycle = 0;
         requestCycle = 0;
         learnedPositions = new ArrayList<>();
-        goalErrors = 0.0;
-        allGoalErrors = new ArrayList<>();
+        //goalErrors = 0.0;
+        allXYGoalErrors = new ArrayList<>();
+
+        allThetaGoalErrors = new ArrayList<>();
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
@@ -156,7 +167,7 @@ public class RobotArmManager {
 
                 out.put("oracle",result);
                 //System.out.println(out0);
-                ellsas[0].learn(out);
+                ellsas[l].learn(out);
 
                 //System.out.println(l + " " + out);
             }
@@ -228,10 +239,6 @@ public class RobotArmManager {
 
         joints = jointsAngles;
 
-
-
-
-
         HashMap<String, Double> out = new HashMap<String, Double>();
         if(jointIndice!=0){
             out.put("pxOrigin",starts[jointIndice].getA());
@@ -264,10 +271,10 @@ public class RobotArmManager {
         /*xSubGoal = xReachableGoalinR0;
         ySubGoal = yReachableGoalinR0;*/
 
-        double angle = ellsas[0].request(out);
-        System.out.println(jointIndice + " " + angle);
+        double angle = ellsas[jointIndice].request(out);
+        //System.out.println(jointIndice + " " + angle);
         goalJoints[jointIndice] = angleConvertionForRequest(angle);
-        System.out.println(jointIndice + " After Conversion " + goalJoints[jointIndice]);
+        //System.out.println(jointIndice + " After Conversion " + goalJoints[jointIndice]);
 
 
 
@@ -308,11 +315,16 @@ public class RobotArmManager {
         }
         //joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
 
-        if(jointIndice == jointsNb-1){
-            joints[jointIndice] = controller.modulo2PI(angleGoal - angleSum);
+        if(isOrientationGoal){
+            if(jointIndice == jointsNb-1){
+                joints[jointIndice] = controller.modulo2PI(angleGoal - angleSum);
+            }else{
+                joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
+            }
         }else{
             joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
         }
+
 
         //joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
 
@@ -369,6 +381,7 @@ public class RobotArmManager {
             }*/
 
             if(newGoal){
+                if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"EXPLOITATION [" + requestCycle + "] ");
                 //System.out.println("NEW GOAL");
                 newGoal = false;
                 requestControlCycle = 0;
@@ -386,11 +399,7 @@ public class RobotArmManager {
                 poseGoal[1] = randomRadius*Math.sin(randomAngle);
                 angleGoal = Math.random()*Math.PI*2;
 
-                /*int j = (int)(Math.random() * learnedPositions.size());
-                poseGoal[0] = learnedPositions.get(j).getA();
-                poseGoal[1] = learnedPositions.get(j).getB();*/
 
-                //System.out.println(poseGoal[0] + " " + poseGoal[1]);
                 xPos = 0.0;
                 yPos = 0.0;
                 for (int i = 0;i<jointsNb;i++){
@@ -419,21 +428,17 @@ public class RobotArmManager {
 
 
                 if(allRequestsFinished){
-                    if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"REQUEST [" + requestCycle + "] ");
                     jointIndiceForRequests = 0;
                     allRequestsFinished = false;
                 }else{
                     jointIndiceForRequests++;
                 }
 
-                //System.out.println(jointIndiceForRequests);
+
                 goalAngles = indiceRequest(angles, poseGoal, cycle,jointIndiceForRequests);
 
                 plotRequestError = true;
-                //System.out.println("[" + cycle + "]");
-                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " / " + angles[0] + " " + angles[1]  + " -> " + goalAngles[0] + " " + goalAngles[1]);
                 controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
-                //System.out.println(poseGoal[0] + " " + poseGoal[1] + " -> " + angles[0] + " " + angles[1] + " <- " + goalAngles[0] + " " + goalAngles[1]);
 
                 xPos = 0.0;
                 yPos = 0.0;
@@ -471,7 +476,7 @@ public class RobotArmManager {
 
                     TRACE.print(TRACE_LEVEL.DEBUG,"[" + cycle + "] " + poseGoal[0] + " " + poseGoal[1] + " -> " +  anglesString + " <- " + goalanglesString + ends[jointsNb-1]);
 
-                    double currentError = 0.0;
+
                     //double currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/ Math.sqrt( Math.pow(poseGoal[0],2) +  Math.pow(poseGoal[1],2));
                 /*if(PARAMS.dimension == 11){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/1000.0;
@@ -484,25 +489,37 @@ public class RobotArmManager {
                 }else if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
                     currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/360.0;
                 }*/
+                    double currentXYError = 0.0;
+                    double currentThetaError = 0.0;
                     if(PARAMS.dimension == 2 && PARAMS.nbJoints==2){
-                        currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/maxError;
+                        currentXYError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2))/maxError;
                     }else{
-                        currentError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/maxError;
+                        currentXYError = Math.sqrt( Math.pow(poseGoal[0]-ends[jointsNb-1].getA(),2) +  Math.pow(poseGoal[1]-ends[jointsNb-1].getB(),2))/maxError;
                     }
 
+                    double angleSum = 0;
+                    for(int i=0;i<jointsNb;i++){
+                        angleSum += maxMin2PI( joints[i]);
+                    }
 
-                    TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentError + " [" + requestCycle + "]");
-                    goalErrors += currentError;
-                    allGoalErrors.add(new Double(currentError));
+                    currentThetaError = Math.abs(controller.modulo2PI(angleSum)- angleGoal)/(2*Math.PI);
+
+                    TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentXYError + " [" + requestCycle + "]");
+
+                    allXYGoalErrors.add(new Double(currentXYError));
+                    allThetaGoalErrors.add(new Double(currentThetaError));
                 }
                 }
 
 
 
             if(requestCycle == requestCycles-1){
-                goalErrors /= requestCycles;
-                averageError = allGoalErrors.stream().mapToDouble(a->a).average();
-                errorDispersion = allGoalErrors.stream().mapToDouble(a->Math.pow((a-averageError.getAsDouble()),2)).sum();
+                //goalErrors /= requestCycles;
+                averageXYError = allXYGoalErrors.stream().mapToDouble(a->a).average();
+                XYErrorDispersion = allXYGoalErrors.stream().mapToDouble(a->Math.pow((a- averageXYError.getAsDouble()),2)).sum();
+
+                averageThetaError = allThetaGoalErrors.stream().mapToDouble(a->a).average();
+                ThetaErrorDispersion = allThetaGoalErrors.stream().mapToDouble(a->Math.pow((a- averageThetaError.getAsDouble()),2)).sum();
 
             }
 
@@ -513,7 +530,7 @@ public class RobotArmManager {
             }*/
         }else{
             finished = true;
-            TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
+            //TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
             xPos = 0.0;
             yPos = 0.0;
             for (int i = 0;i<jointsNb;i++){

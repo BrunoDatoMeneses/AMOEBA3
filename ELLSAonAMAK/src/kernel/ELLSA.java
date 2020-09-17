@@ -144,7 +144,6 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		if(amasMultiUIWindow!=null) {
 
 			if(getCycle()==1){
-				System.out.println(getPercepts().size());
 				for(int i =0;i<getPercepts().size();i++){
 					multiUIWindow.VUInDimensions.createAndAddString(10, 10 + getPercepts().size()*10 - 10*i,getPercepts().get(i).getName()).setFixed().setShowInExplorer(false);
 				}
