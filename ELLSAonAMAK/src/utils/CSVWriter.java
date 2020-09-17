@@ -15,7 +15,7 @@ public class CSVWriter {
 
     public CSVWriter(String name){
         try {
-            pw = new PrintWriter("XP/" + name + ".csv");
+            pw = new PrintWriter(  name + ".csv");
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
