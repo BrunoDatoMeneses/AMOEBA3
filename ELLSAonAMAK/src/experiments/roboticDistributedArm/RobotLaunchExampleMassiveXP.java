@@ -5,6 +5,7 @@ package experiments.roboticDistributedArm;
 
 
 import agents.head.REQUEST;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
@@ -40,51 +41,73 @@ public class RobotLaunchExampleMassiveXP {
 
         ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(2));
         ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(200));
-        ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(10));
-        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.02));
-        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30));
+        ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(50));
+        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.02,0.04,0.06));
+        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30,50,100));
+        ArrayList<Integer> episodes = new ArrayList<>(Arrays.asList(15));
+        ArrayList<Integer> controlCycles = new ArrayList<>(Arrays.asList(1,5,10,20));
+
+
+        ArrayList<Boolean> orientationGoal = new ArrayList<>(Arrays.asList(true, false));
+
 
         for(Integer neighborhoodMultiplicator : neighborhoodMultiplicators) {
             for (Double mappingError : mappingErrors) {
                 for (Integer requestCycle : requestCycles) {
                     for (Integer trainingCycle : trainingCycles) {
-                        for (Integer jointNb : jointsNb) {
-                            System.out.print("neighborhoodMultiplicator " + neighborhoodMultiplicator + " ");
-                            System.out.print("mappingError " + mappingError + " ");
-                            System.out.print("trainingCycles " + trainingCycle + " ");
-                            System.out.print("exploitationCycles " + requestCycle + " ");
-                            System.out.print("jointNb " + jointNb + " ");
+                        for (Integer eps : episodes) {
+                            for (Integer control : controlCycles) {
+                                for (Boolean goal : orientationGoal) {
+                                    for (Integer jointNb : jointsNb) {
+                                        System.out.print("neighborhoodMultiplicator " + neighborhoodMultiplicator + " ");
+                                        System.out.print("mappingError " + mappingError + " ");
+                                        System.out.print("trainingCycles " + trainingCycle + " ");
+                                        System.out.print("exploitationCycles " + requestCycle + " ");
+                                        System.out.print("jointNb " + jointNb + " ");
+                                        System.out.print("episodes " + eps + " ");
+                                        System.out.print("controlCycles " + control + " ");
+                                        System.out.print("isOrientationGoal " + goal + " ");
 
-                            PARAMS.mappingErrorAllowed = mappingError;
-                            PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
-                            PARAMS.nbRequestCycle = requestCycle;
-                            PARAMS.nbTrainingCycle = trainingCycle;
-                            PARAMS.nbJoints = jointNb;
-                            PARAMS.dimension = jointNb + 1;
+                                        PARAMS.mappingErrorAllowed = mappingError;
+                                        PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
+                                        PARAMS.nbExploitationCycle = requestCycle;
+                                        PARAMS.nbLearningCycle = trainingCycle;
+                                        PARAMS.nbJoints = jointNb;
+                                        PARAMS.dimension = jointNb + 1;
+                                        PARAMS.nbepisodes = eps;
+                                        PARAMS.isOrientationGoal = goal;
+                                        PARAMS.requestControlCycles = control;
 
-                            PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
+                                        PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
 
 
-                            start();
+                                        start();
 
-                            System.out.println(" ");
+                                        System.out.println(" ");
+                                    }
+                                }
+                            }
                         }
+
                     }
                 }
             }
         }
+        System.out.println("THE END");
     }
 
 
     public static void start() {
 
         String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+        String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
         xpCSV = new CSVWriter(PARAMS.model + "_Joints_" + PARAMS.nbJoints
-                +"_LearningCycles_" + PARAMS.nbTrainingCycle
-                +"_ExplotationCycles_" + PARAMS.nbRequestCycle
+                +"_LearningCycles_" + PARAMS.nbLearningCycle
+                +"_ExplotationCycles_" + PARAMS.nbExploitationCycle
                 +"_Episodes_" + PARAMS.nbepisodes
-                +"_Dimensions_" + PARAMS.dimension
-                + dateAndHour
+                +"_PrecisionRange_" + PARAMS.mappingErrorAllowed
+                //+ dateAndHour
+
         );
 
         writeParams(PARAMS.model);
@@ -127,14 +150,16 @@ public class RobotLaunchExampleMassiveXP {
         //System.out.println("[TIME TOTAL] " + total + " s");
 
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("TIME MEAN", mean + " s","TIME TOTAL",total + " s" )));
+        xpCSV.write(new ArrayList<>(Arrays.asList("meanTime", ""+mean)));
+        xpCSV.write(new ArrayList<>(Arrays.asList("totalTime",""+total )));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         for (String dataName : dataStringsVolumes){
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             //.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",averageScore.getAsDouble()*100+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" ,"" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
 
 
 
@@ -144,8 +169,8 @@ public class RobotLaunchExampleMassiveXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             //.println(dataName +" [AVERAGE] " + averageScore.getAsDouble()*100 + " - " + "[DEVIATION] " +100*Math.sqrt(deviationScore/data.get(dataName).size()));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()*100+"" ,"DEVIATION","" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
-
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",averageScore.getAsDouble()*100+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" ,"" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
 
 
         }
@@ -154,10 +179,8 @@ public class RobotLaunchExampleMassiveXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
 
-            //System.out.println(dataName +" [AVERAGE] " + averageScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationScore/data.get(dataName).size()));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,averageScore.getAsDouble()+"" ,"DEVIATION","" + Math.sqrt(deviationScore/data.get(dataName).size()))));
-
-
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",averageScore.getAsDouble()*100+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" ,"" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
 
         }
 
@@ -174,7 +197,8 @@ public class RobotLaunchExampleMassiveXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
             //System.out.println(dataName +" [AVERAGE] " + df.format(averageScore.getAsDouble()*100) + " - " + "[DEVIATION] " +df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble()*100)+"" ,"DEVIATION","" + df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",df.format(averageScore.getAsDouble()*100)+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" , df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
 
 
         }
@@ -184,9 +208,8 @@ public class RobotLaunchExampleMassiveXP {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
 
-            //System.out.println(dataName +" [AVERAGE] " + Math.round(averageScore.getAsDouble()) + " - " + "[DEVIATION] " +Math.round(Math.sqrt(deviationScore/data.get(dataName).size())));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName ,"AVERAGE" ,df.format(averageScore.getAsDouble())+"" ,"DEVIATION","" + df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
-
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",df.format(averageScore.getAsDouble()*100)+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" , df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
 
 
         }
@@ -201,38 +224,34 @@ public class RobotLaunchExampleMassiveXP {
         /*System.out.println("[GOAL XY ERROR AVERAGE          ] " + averageXYScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationXYScore/data.get("goalXYError").size()) );
         System.out.println("[GOAL XY ERROR DEVIATION AVERAGE] " + averageXYScoreDeviation.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size()) );
 */
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR AVERAGE" , ""+averageXYScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationXYScore/data.get("goalXYError").size()))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR DEVIATION AVERAGE" , ""+averageXYScoreDeviation.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorAverage" , ""+averageXYScore.getAsDouble())));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorDeviationAverage" , ""+averageXYScoreDeviation.getAsDouble())));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorEpisodeDeviationAverage" , ""+Math.sqrt(deviationXYScore/data.get("goalXYError").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorDeviationEpisodeDeviationAverage" ,""+Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size()))));
 
 
         OptionalDouble averageThetaScore = data.get("goalThetaError").stream().mapToDouble(a->a).average();
         OptionalDouble averageThetaScoreDeviation = data.get("goalThetaErrorDeviation").stream().mapToDouble(a->a).average();
         Double deviationThetaScore = data.get("goalThetaError").stream().mapToDouble(a->Math.pow((a-averageThetaScore.getAsDouble()),2)).sum();
         Double deviationThetaScoreDisp = data.get("goalThetaErrorDeviation").stream().mapToDouble(a->Math.pow((a-averageThetaScoreDeviation.getAsDouble()),2)).sum();
+        
+        
 
-        /*System.out.println("[GOAL Theta ERROR AVERAGE          ] " + averageThetaScore.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationThetaScore/data.get("goalThetaError").size()) );
-        System.out.println("[GOAL Theta ERROR DEVIATION AVERAGE] " + averageThetaScoreDeviation.getAsDouble() + " - " + "[DEVIATION] " +Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size()) );
-*/
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR AVERAGE" , ""+averageThetaScore.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationThetaScore/data.get("goalThetaError").size()))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR DEVIATION AVERAGE" , ""+averageThetaScoreDeviation.getAsDouble() ,"DEVIATION" ,""+Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size()))));
-
-
-
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorAverage" , ""+averageThetaScore.getAsDouble())));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorDeviationAverage" , ""+averageThetaScoreDeviation.getAsDouble())));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorEpisodeDeviationAverage" , ""+Math.sqrt(deviationThetaScore/data.get("goalThetaError").size()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorDeviationEpisodeDeviationAverage" ,""+Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size()))));
 
 
-        /*System.out.println("[GOAL XY ERROR AVERAGE           %] " + df.format(100*averageXYScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationXYScore/data.get("goalXYError").size())));
-        System.out.println("[GOAL XY ERROR DEVIATION AVERAGE %] " + df.format(100*averageXYScoreDeviation.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size())));
-*/
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR AVERAGE %" , ""+df.format(100*averageXYScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationXYScore/data.get("goalXYError").size())))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL XY ERROR DEVIATION AVERAGE %" , ""+df.format(100*averageXYScoreDeviation.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorAveragePercentage" , ""+df.format(100*averageXYScore.getAsDouble()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorDeviationAveragePercentage" , ""+df.format(100*averageXYScoreDeviation.getAsDouble()) )));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorEpisodeDeviationAveragePercentage" , ""+df.format(100*Math.sqrt(deviationXYScore/data.get("goalXYError").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("xyErrorDeviationEpisodeDeviationAveragePercentage" ,""+df.format(100*Math.sqrt(deviationXYScoreDisp/data.get("goalXYErrorDeviation").size())))));
 
-
-        /*System.out.println("[GOAL Theta ERROR AVERAGE           %] " + df.format(100*averageThetaScore.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationThetaScore/data.get("goalThetaError").size())));
-        System.out.println("[GOAL Theta ERROR DEVIATION AVERAGE %] " + df.format(100*averageThetaScoreDeviation.getAsDouble()) + " - " + "[DEVIATION %] " +df.format(100*Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size())));
-*/
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR AVERAGE %" , ""+df.format(100*averageThetaScore.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationThetaScore/data.get("goalThetaError").size())))));
-        xpCSV.write(new ArrayList<>(Arrays.asList("GOAL Theta ERROR DEVIATION AVERAGE %" , ""+df.format(100*averageThetaScoreDeviation.getAsDouble()) ,"DEVIATION %" ,""+df.format(100*Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size())))));
-
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorAveragePercentage" , ""+df.format(100*averageThetaScore.getAsDouble()))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorDeviationAveragePercentage" , ""+df.format(100*averageThetaScoreDeviation.getAsDouble()) )));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorEpisodeDeviationAveragePercentage" , ""+df.format(100*Math.sqrt(deviationThetaScore/data.get("goalThetaError").size())))));
+        xpCSV.write(new ArrayList<>(Arrays.asList("thetaErrorDeviationEpisodeDeviationAveragePercentage" ,""+df.format(100*Math.sqrt(deviationThetaScoreDisp/data.get("goalThetaErrorDeviation").size())))));
 
 
         xpCSV.close();
@@ -305,7 +324,7 @@ public class RobotLaunchExampleMassiveXP {
 
 
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
         robotArmManager.maxError = sum*2;
 
         robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
@@ -362,47 +381,53 @@ public class RobotLaunchExampleMassiveXP {
         xpCSV.write(new ArrayList<>(Arrays.asList("PARAMS")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
         xpCSV.write(new ArrayList<>(Arrays.asList("SET")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Dim", PARAMS.dimension+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Model",model)));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles", PARAMS.nbTrainingCycle+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles", PARAMS.nbRequestCycle+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbepisodes +"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Space size", PARAMS.spaceSize*4+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error", PARAMS.mappingErrorAllowed+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Neighborhood x", PARAMS.neighborhoodMultiplicator+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("joints", PARAMS.nbJoints+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("dimension", PARAMS.dimension+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("model",model)));
+        xpCSV.write(new ArrayList<>(Arrays.asList("learningCycles", PARAMS.nbLearningCycle +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("exploitatingCycles", PARAMS.nbExploitationCycle +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("episodes", PARAMS.nbepisodes +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("spaceSize", PARAMS.spaceSize*4+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("precisionRange", PARAMS.mappingErrorAllowed+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("neighborhoodSize", PARAMS.neighborhoodMultiplicator+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isOrientationGoal", PARAMS.isOrientationGoal+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("armBaseSize", PARAMS.armBaseSize+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("requestControlCycles", PARAMS.requestControlCycles+"")));
+
+
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Active Learning", PARAMS.setActiveLearning+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Self Learning", PARAMS.setSelfLearning+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isActiveLearning", PARAMS.setActiveLearning+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isSelfLearning", PARAMS.setSelfLearning+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("goalXYError")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance", PARAMS.setRegressionPerformance+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("errorMargin", PARAMS.setRegressionPerformance+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Noise", PARAMS.oracleNoiseRange+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed", PARAMS.learningSpeed+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Regression points", PARAMS.regressionPoints+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.oracleNoiseRange+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("learningSpeed", PARAMS.learningSpeed+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("regressionPoints", PARAMS.regressionPoints+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("EXPLORATION")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Random Exploration", PARAMS.randomExploration+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Continous Exploration", PARAMS.continousExploration+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Limited To SpaceZone", PARAMS.limitedToSpaceZone+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Exploration Increment", PARAMS.explorationIncrement+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Exploration Widht", PARAMS.explorationWidht+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isRandomExploration", PARAMS.randomExploration+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isContinuousExploration", PARAMS.continousExploration+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isLimitedToSpaceZone", PARAMS.limitedToSpaceZone+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("explorationIncrement", PARAMS.explorationIncrement+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("explorationWidth", PARAMS.explorationWidht+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Conflicts", PARAMS.setConflictDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Concurrences", PARAMS.setConcurrenceDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences", PARAMS.setVoidDetection2+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Ambiguities", PARAMS.setFrontierRequest+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Model", PARAMS.setSelfModelRequest+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Learn From Neighbors", PARAMS.setLearnFromNeighbors+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("Dream", PARAMS.setDream+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isConflictNCS", PARAMS.setConflictDetection+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isConcurenceNCS", PARAMS.setConcurrenceDetection+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setVoidDetection2+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setFrontierRequest+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("OTHER")));

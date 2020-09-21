@@ -9,15 +9,15 @@ public class PARAMS {
 
     public static String model = "DISTRIBUTED_ROBOT";
 
-    public static int nbTrainingCycle = 200;
-    public static int nbRequestCycle = 100;
+    public static int nbLearningCycle = 200;
+    public static int nbExploitationCycle = 10;
     public static int nbepisodes = 1;
 
     public static double mappingErrorAllowed = 0.02;
     public static int neighborhoodMultiplicator = 2;
     public static  int requestControlCycles = 10;
 
-    public static boolean isOrientationGoal = true;
+    public static boolean isOrientationGoal = false;
 
     /* PREDICTION */
     public static  double setRegressionPerformance = 1;

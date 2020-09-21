@@ -125,7 +125,7 @@ public class RobotController {
 
 
 
-            /*double difference = modulo2PI(goalAngles[i] ) -currentAngles[i];
+            /*double difference = modulo2PI(goalAngles[i] ) -modulo2PI(currentAngles[i]);
             double deltaTheta;
 
             if(Math.abs(difference)> Math.PI){
@@ -133,15 +133,14 @@ public class RobotController {
             }else{
                 deltaTheta = difference>0 ?  variation : - variation;
             }
-            //System.out.println(i + " Goal " + goalAngles[i] + " Current " + currentAngles[i] + " diff " + difference + " delta " + deltaTheta);
-            currentAngles[i] += deltaTheta;
-            //currentAngles[i] = modulo2PI(currentAngles[i] );
-            //currentAngles[i] = addConstrains(modulo2PI(currentAngles[i] ), 2 * Math.PI / 10) ;*/
+
+            currentAngles[i] += deltaTheta;*/
+
 
 
 
             currentAngles[i] = addConstrains(maxMin2PI( goalAngles[i]), i);
-            //System.out.println(i + " " + currentAngles[i]);
+
 
 
         }

@@ -438,7 +438,7 @@ public class RobotArmManager {
                 goalAngles = indiceRequest(angles, poseGoal, cycle,jointIndiceForRequests);
 
                 plotRequestError = true;
-                controller.setJointsFromRequest(angles, goalAngles, Math.PI/100);
+                controller.setJointsFromRequest(angles, goalAngles, Math.PI/10);
 
                 xPos = 0.0;
                 yPos = 0.0;

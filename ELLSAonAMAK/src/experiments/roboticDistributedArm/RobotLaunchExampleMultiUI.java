@@ -7,7 +7,6 @@ import fr.irit.smac.amak.ui.AmasMultiUIWindow;
 import fr.irit.smac.amak.ui.VUIMulti;
 import gui.EllsaMultiUIWindow;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -127,7 +126,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 
 
         RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
         robotArmManager.maxError = sum*2;
 
         robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
