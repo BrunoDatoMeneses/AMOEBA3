@@ -101,11 +101,18 @@ public class RobotLaunchExampleMassiveXP {
 
         String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
         String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
-        xpCSV = new CSVWriter(PARAMS.model + "_Joints_" + PARAMS.nbJoints
-                +"_LearningCycles_" + PARAMS.nbLearningCycle
-                +"_ExplotationCycles_" + PARAMS.nbExploitationCycle
-                +"_Episodes_" + PARAMS.nbepisodes
-                +"_PrecisionRange_" + PARAMS.mappingErrorAllowed
+        xpCSV = new CSVWriter(PARAMS.model + "_Jts_" + PARAMS.nbJoints
+                +"_Lrn_" + PARAMS.nbLearningCycle
+                +"_Exp_" + PARAMS.nbExploitationCycle
+                +"_Ctrl_" + PARAMS.requestControlCycles
+                +"_Eps_" + PARAMS.nbepisodes
+                +"_Pre_" + PARAMS.mappingErrorAllowed
+                +"_Ngh_" + PARAMS.neighborhoodMultiplicator
+                +"_Orie_" + PARAMS.isOrientationGoal
+
+
+
+
                 //+ dateAndHour
 
         );
