@@ -262,6 +262,8 @@ public class RobotLaunchExampleMassiveXP {
 
 
         xpCSV.close();
+
+        data = null;
     }
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
@@ -314,24 +316,24 @@ public class RobotLaunchExampleMassiveXP {
             ellsas[i].setSubPercepts(PARAMS.subPercepts);
         }
 
-        int jointsNb = PARAMS.nbJoints;
+
         //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
         //WorldExampleMultiUI env = new WorldExampleMultiUI(window);
         //VUIMulti vui = new VUIMulti("Robot");
 
 
-        double distances[] = new double[jointsNb];
-        double incLength = PARAMS.armBaseSize/jointsNb;
+        double distances[] = new double[PARAMS.nbJoints];
+        double incLength = PARAMS.armBaseSize/PARAMS.nbJoints;
 
         double sum = 0.0;
-        for(int i = 0;i<jointsNb;i++){
-            distances[i] = incLength-(i*(incLength/(jointsNb*2)));
+        for(int i = 0;i<PARAMS.nbJoints;i++){
+            distances[i] = incLength-(i*(incLength/(PARAMS.nbJoints*2)));
             sum += distances[i];
         }
 
 
-        RobotController robotController = new RobotController(jointsNb);
-        RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
+        RobotController robotController = new RobotController(PARAMS.nbJoints);
+        RobotArmManager robotArmManager = new RobotArmManager(PARAMS.nbJoints, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
         robotArmManager.maxError = sum*2;
 
         robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
@@ -381,6 +383,12 @@ public class RobotLaunchExampleMassiveXP {
         data.get("neighborsCounts").add((double)ellsas[0].data.neighborsCounts/ellsas[0].getCycle());
 
 
+
+        ellsas = null;
+        studiedSystems = null;
+        robotController = null;
+        robotArmManager = null;
+        robot = null;
     }
 
 
