@@ -76,7 +76,11 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 		lines = new DrawableLine[jointsNumber];
 		circles = new DrawableCircle[jointsNumber];
 		goalLines = new DrawableLine[2];
-		goalOrientationLine = new DrawableLine(0.0,0.0,0.0,0.0);
+
+		if(!Configuration.commandLineMode){
+			goalOrientationLine = new DrawableLine(0.0,0.0,0.0,0.0);
+		}
+
 		errorGoalLines = new DrawableLine[2];
 
 

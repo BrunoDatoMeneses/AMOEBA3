@@ -1,5 +1,8 @@
 package experiments.roboticDistributedArm;
 
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 import agents.percept.Percept;
 import kernel.ELLSA;
 import utils.Pair;
@@ -53,12 +56,12 @@ public class RobotArmManager {
     Pair<Double,Double>[] starts;
     Pair<Double,Double>[]  ends;
 
-    boolean allRequestsFinished = true;
+    boolean waveRequestsFinished = true;
     public int jointIndiceForRequests = -1;
 
     boolean newGoal = true;
-    int requestControlCycles = 10;
-    int requestControlCycle;
+    int propagationControlWaves = 10;
+    int wavesNumber;
 
     public double xSubGoal = 0.0;
     public double ySubGoal = 0.0;
@@ -66,6 +69,8 @@ public class RobotArmManager {
     private int angleMultilpicatorForUI = 100;//*jointsNb/2;
 
     public boolean isOrientationGoal = false;
+
+    private int[] jointsIndicesArray;
 
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
@@ -89,6 +94,11 @@ public class RobotArmManager {
         allXYGoalErrors = new ArrayList<>();
 
         allThetaGoalErrors = new ArrayList<>();
+
+        jointsIndicesArray = new int[jointsNb];
+        for(int i =0;i<jointsNb;i++){
+            jointsIndicesArray[i]=i;
+        }
     }
 
     public double[] forwardKinematics(double[] jointsAngles, int joint){
@@ -265,6 +275,7 @@ public class RobotArmManager {
         double xReachableGoalinR0 = ratio * xGoalInR0;
         double yReachableGoalinR0 = ratio * yGoalInR0;
 
+
         out.put("pxGoal",xReachableGoalinR0);
         out.put("pyGoal",yReachableGoalinR0);
 
@@ -384,7 +395,7 @@ public class RobotArmManager {
                 if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"EXPLOITATION [" + requestCycle + "] ");
                 //System.out.println("NEW GOAL");
                 newGoal = false;
-                requestControlCycle = 0;
+                wavesNumber = 0;
                 double randomAngle = Math.random()*Math.PI*2;
                 double randomRadius;
 
@@ -427,14 +438,23 @@ public class RobotArmManager {
                 }
 
 
-                if(allRequestsFinished){
+
+
+                if(waveRequestsFinished){
+                    //jointIndiceForRequests = jointsNb-1;
                     jointIndiceForRequests = 0;
-                    allRequestsFinished = false;
+
+                    waveRequestsFinished = false;
+                    shuffleArray(jointsIndicesArray);
                 }else{
                     jointIndiceForRequests++;
+                    //jointIndiceForRequests--;
                 }
 
+                //jointIndiceForRequests = (int) (Math.random()*(jointsNb-1));
 
+
+                //goalAngles = indiceRequest(angles, poseGoal, cycle,jointsIndicesArray[jointIndiceForRequests]);
                 goalAngles = indiceRequest(angles, poseGoal, cycle,jointIndiceForRequests);
 
                 plotRequestError = true;
@@ -451,19 +471,30 @@ public class RobotArmManager {
                     ends[i] = new Pair<>(xPos,yPos);
 
                 }
-                if(jointIndiceForRequests==jointsNb-1){
-                //if(jointIndiceForRequests==jointsNb-1){
-                    requestControlCycle++;
-                    allRequestsFinished = true;
 
-                    if(requestControlCycle == requestControlCycles){
+                /*wavesNumber++;
+                if(wavesNumber == propagationControlWaves){
+                    requestCycle++;
+                    newGoal = true;
+                    waveRequestsFinished = true;
+                }*/
+
+
+
+                if(jointIndiceForRequests==jointsNb-1){
+                    //if(jointIndiceForRequests==0){
+                    wavesNumber++;
+                    waveRequestsFinished = true;
+
+
+                    if(wavesNumber == propagationControlWaves){
                         requestCycle++;
                         newGoal = true;
                     }
 
                 }
 
-                if(allRequestsFinished){
+                if(newGoal){
                     String anglesString = " ";
                     String goalanglesString = " ";
                     for (int i = 0;i<jointsNb;i++){
@@ -608,6 +639,21 @@ public class RobotArmManager {
             return angle;
         }
 
+    }
+
+    // Implementing Fisher–Yates shuffle
+    static void shuffleArray(int[] ar)
+    {
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
     }
 
 }

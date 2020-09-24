@@ -10,7 +10,7 @@ public class PARAMS {
     public static String model = "DISTRIBUTED_ROBOT";
 
     public static int nbLearningCycle = 200;
-    public static int nbExploitationCycle = 10;
+    public static int nbExploitationCycle = 100;
     public static int nbepisodes = 1;
 
     public static double mappingErrorAllowed = 0.02;
@@ -25,7 +25,7 @@ public class PARAMS {
     public static double armBaseSize = 300.0;
 
 
-    public static int nbJoints = 10;
+    public static int nbJoints = 5;
     public static  int dimension = nbJoints +1;
     public static  String configFile = "";
     public static  ArrayList subPercepts = new ArrayList<>();

@@ -20,115 +20,51 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
 
-public class RobotLaunchExampleMassiveXP {
+public class RobotLaunchExampleMassiveXPWithArgs {
 
     private static CSVWriter xpCSV;
-    private static HashMap<String, ArrayList<Double>> data;
-
-    private static ELLSA[] ellsas;
-    private static StudiedSystem[] studiedSystems;
-
-    private static List<String> dataStringsVolumes = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol");
-    private static List<String> dataStringsPrediction = Arrays.asList("goalXYError", "goalXYErrorDeviation", "goalThetaError", "goalThetaErrorDeviation");
-    private static List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","endogenousLearningSituations","fusionRequests","restructureRequests","neighborsCounts");
-
 
     public static void main (String[] args)  {
 
-
-
         TRACE.minLevel = TRACE_LEVEL.OFF;
-        PARAMS.nbepisodes = 1;
         PARAMS.armBaseSize = 50.0;
 
-
-        /*ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(2));
-        ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(200));
-        ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(50));
-        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.02,0.04,0.06));
-        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(2,3,6,10,20,30,50,100));
-        ArrayList<Integer> episodes = new ArrayList<>(Arrays.asList(15));
-        ArrayList<Integer> controlCycles = new ArrayList<>(Arrays.asList(1,5,10,20));
-        ArrayList<Boolean> orientationGoal = new ArrayList<>(Arrays.asList(true, false));
-        ArrayList<Boolean> isLearnFromNeighbors = new ArrayList<>(Arrays.asList(true, false));*/
-
-        ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(2));
-        ArrayList<Integer> trainingCycles = new ArrayList<>(Arrays.asList(200));
-        ArrayList<Integer> requestCycles = new ArrayList<>(Arrays.asList(50));
-        ArrayList<Double> mappingErrors = new ArrayList<>(Arrays.asList(0.04));
-        ArrayList<Integer> jointsNb  = new ArrayList<>(Arrays.asList(5));
-        ArrayList<Integer> episodes = new ArrayList<>(Arrays.asList(5));
-        ArrayList<Integer> controlCycles = new ArrayList<>(Arrays.asList(10));
-        ArrayList<Boolean> orientationGoal = new ArrayList<>(Arrays.asList(false));
-        ArrayList<Boolean> isLearnFromNeighbors = new ArrayList<>(Arrays.asList(true));
+        PARAMS.nbJoints = Integer.parseInt(args[0]);
+        PARAMS.nbLearningCycle = Integer.parseInt(args[1]);
+        PARAMS.nbExploitationCycle = Integer.parseInt(args[2]);
+        PARAMS.requestControlCycles = Integer.parseInt(args[3]);
+        PARAMS.nbepisodes = Integer.parseInt(args[4]);
+        PARAMS.mappingErrorAllowed = ((double)Integer.parseInt(args[5]))/100;
+        PARAMS.neighborhoodMultiplicator = Integer.parseInt(args[6]);
+        PARAMS.isOrientationGoal = Boolean.parseBoolean(args[7]);
+        PARAMS.setLearnFromNeighbors = Boolean.parseBoolean(args[8]);
 
 
-        for(Integer neighborhoodMultiplicator : neighborhoodMultiplicators) {
-            for (Double mappingError : mappingErrors) {
-                for (Integer trainingCycle : trainingCycles) {
-                    for (Integer requestCycle : requestCycles) {
-                        for (Integer eps : episodes) {
-                            for (Integer control : controlCycles) {
-                                for (Integer jointNb : jointsNb){
-                                    for (Boolean goal : orientationGoal){
-                                        for (Boolean endo : isLearnFromNeighbors){
-                                            PARAMS.mappingErrorAllowed = mappingError;
-                                            PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
-                                            PARAMS.nbExploitationCycle = requestCycle;
-                                            PARAMS.nbLearningCycle = trainingCycle;
-                                            PARAMS.nbJoints = jointNb;
-                                            PARAMS.dimension = jointNb + 1;
-                                            PARAMS.nbepisodes = eps;
-                                            PARAMS.isOrientationGoal = goal;
-                                            PARAMS.requestControlCycles = control;
-                                            PARAMS.setLearnFromNeighbors = endo;
+        PARAMS.dimension = PARAMS.nbJoints+1;
 
-                                            PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
+        System.out.print("neighborhoodMultiplicator " + PARAMS.neighborhoodMultiplicator + " ");
+        System.out.print("mappingError " + PARAMS.mappingErrorAllowed + " ");
+        System.out.print("episodes " + PARAMS.nbepisodes + " ");
+        System.out.print("learningCycles " + PARAMS.nbLearningCycle + " ");
+        System.out.print("exploitationCycles " + PARAMS.nbExploitationCycle + " ");
+        System.out.print("controlCycles " + PARAMS.requestControlCycles + " ");
+        System.out.print("jointNb " + PARAMS.nbJoints + " ");
+        System.out.print("isOrientationGoal " + PARAMS.isOrientationGoal + " ");
+        System.out.print("isLearnFromNeighbors " + PARAMS.setLearnFromNeighbors + " ");
 
-                                            System.out.print("neighborhoodMultiplicator " + PARAMS.neighborhoodMultiplicator + " ");
-                                            System.out.print("mappingError " + PARAMS.mappingErrorAllowed + " ");
-                                            System.out.print("episodes " + PARAMS.nbepisodes + " ");
-                                            System.out.print("learningCycles " + PARAMS.nbLearningCycle + " ");
-                                            System.out.print("exploitationCycles " + PARAMS.nbExploitationCycle + " ");
-                                            System.out.print("controlCycles " + PARAMS.requestControlCycles + " ");
-                                            System.out.print("jointNb " + PARAMS.nbJoints + " ");
-                                            System.out.print("isOrientationGoal " + PARAMS.isOrientationGoal + " ");
-                                            System.out.print("isLearnFromNeighbors " + PARAMS.setLearnFromNeighbors + " ");
 
-                                            start();
+        PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
 
-                                            System.out.println(" DONE");
-                                        }
 
-                                    }
-                                }
-                            }
-                        }
+        start();
 
-                    }
-                }
-            }
-        }
-        System.out.println("THE END");
+        System.out.print(" DONE");
+
         System.exit(1);
     }
 
 
     public static void start() {
-
-        data = new HashMap<>();
-
-        for (String dataName : dataStringsVolumes){
-            data.put(dataName, new ArrayList<>());
-        }
-
-        for (String dataName : dataStringsPrediction){
-            data.put(dataName, new ArrayList<>());
-        }
-
-        for (String dataName : dataStringsOther){
-            data.put(dataName, new ArrayList<>());
-        }
 
         xpCSV = new CSVWriter(PARAMS.model + "_Jts_" + PARAMS.nbJoints
                 +"_Lrn_" + PARAMS.nbLearningCycle
@@ -156,10 +92,26 @@ public class RobotLaunchExampleMassiveXP {
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
+        HashMap<String, ArrayList<Double>> data = new HashMap<>();
+        List<String> dataStringsVolumes = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol");
+        List<String> dataStringsPrediction = Arrays.asList("goalXYError", "goalXYErrorDeviation", "goalThetaError", "goalThetaErrorDeviation");
+        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","endogenousLearningSituations","fusionRequests","restructureRequests","neighborsCounts");
 
 
+        for (String dataName : dataStringsVolumes){
+            data.put(dataName, new ArrayList<>());
+        }
+
+        for (String dataName : dataStringsPrediction){
+            data.put(dataName, new ArrayList<>());
+        }
+
+        for (String dataName : dataStringsOther){
+            data.put(dataName, new ArrayList<>());
+        }
 
         double start = System.currentTimeMillis();
+
         for (int i = 0; i < PARAMS.nbepisodes; ++i) {
             //System.out.print(i + " ");
             learningEpisode(data);
@@ -277,11 +229,12 @@ public class RobotLaunchExampleMassiveXP {
 
         xpCSV.close();
 
-
+        data = null;
     }
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
-
+        ELLSA[] ellsas;
+        StudiedSystem[] studiedSystems;
         ellsas = new ELLSA[PARAMS.nbJoints];
         studiedSystems = new StudiedSystem[PARAMS.nbJoints];
 

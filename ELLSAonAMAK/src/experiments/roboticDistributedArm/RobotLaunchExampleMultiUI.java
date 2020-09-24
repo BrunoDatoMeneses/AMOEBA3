@@ -129,7 +129,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
         robotArmManager.maxError = sum*2;
 
-        robotArmManager.requestControlCycles = PARAMS.requestControlCycles;
+        robotArmManager.propagationControlWaves = PARAMS.requestControlCycles;
         robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
         RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 
