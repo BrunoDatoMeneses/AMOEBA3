@@ -353,7 +353,7 @@ public class RobotLaunchExampleMassiveXP {
         robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
 
 
-        RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, PARAMS.nbJoints);
+        RobotWorldExampleMultiUI robot = new RobotWorldExampleMultiUI(null, null, null, robotController, robotArmManager, PARAMS.nbJoints);
 
         while(!robotArmManager.finished){
             robot.cycleCommandLine();

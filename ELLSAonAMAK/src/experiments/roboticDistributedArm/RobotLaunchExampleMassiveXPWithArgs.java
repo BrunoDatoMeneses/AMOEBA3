@@ -42,15 +42,15 @@ public class RobotLaunchExampleMassiveXPWithArgs {
 
         PARAMS.dimension = PARAMS.nbJoints+1;
 
-        System.out.print("neighborhoodMultiplicator " + PARAMS.neighborhoodMultiplicator + " ");
-        System.out.print("mappingError " + PARAMS.mappingErrorAllowed + " ");
-        System.out.print("episodes " + PARAMS.nbepisodes + " ");
-        System.out.print("learningCycles " + PARAMS.nbLearningCycle + " ");
-        System.out.print("exploitationCycles " + PARAMS.nbExploitationCycle + " ");
-        System.out.print("controlCycles " + PARAMS.requestControlCycles + " ");
-        System.out.print("jointNb " + PARAMS.nbJoints + " ");
-        System.out.print("isOrientationGoal " + PARAMS.isOrientationGoal + " ");
-        System.out.print("isLearnFromNeighbors " + PARAMS.setLearnFromNeighbors + " ");
+        System.out.print("neighS " + PARAMS.neighborhoodMultiplicator + " ");
+        System.out.print("rgn " + PARAMS.mappingErrorAllowed + " ");
+        System.out.print("eps " + PARAMS.nbepisodes + " ");
+        System.out.print("lrn " + PARAMS.nbLearningCycle + " ");
+        System.out.print("expl " + PARAMS.nbExploitationCycle + " ");
+        System.out.print("ctrl " + PARAMS.requestControlCycles + " ");
+        System.out.print("jts " + PARAMS.nbJoints + " ");
+        System.out.print("ori " + PARAMS.isOrientationGoal + " ");
+        System.out.print("endo " + PARAMS.setLearnFromNeighbors + " ");
 
 
         PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
@@ -306,7 +306,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
 
 
-        RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(null, null, null, robotController, robotArmManager, PARAMS.nbJoints);
+        RobotWorldExampleMultiUI robot = new RobotWorldExampleMultiUI(null, null, null, robotController, robotArmManager, PARAMS.nbJoints);
 
         while(!robotArmManager.finished){
             robot.cycleCommandLine();

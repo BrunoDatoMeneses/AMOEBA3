@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import agents.percept.Percept;
+import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.ui.AmakPlot;
+import fr.irit.smac.amak.ui.AmasMultiUIWindow;
+import fr.irit.smac.amak.ui.VUIMulti;
 import kernel.ELLSA;
 import utils.Pair;
 import utils.TRACE;
@@ -72,8 +76,10 @@ public class RobotArmManager {
 
     private int[] jointsIndicesArray;
 
+    RobotWorldExampleMultiUI robotWorldExampleMultiUI;
 
     public RobotArmManager(int jointsNumber, double[] jointDistances, ELLSA[] els, RobotController robotController, int trainingCycleNb, int requestCycleNb){
+
 
         jointsNb = jointsNumber;
         l = jointDistances;
@@ -266,6 +272,15 @@ public class RobotArmManager {
         }else{
             xSubGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
             ySubGoal = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
+            /*xSubGoal = goalPosition[0];
+            ySubGoal = goalPosition[1];*/
+            /*double xLocalGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
+            double yLocalGoal = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
+            double globalWeight = Math.max(1 - (2*jointIndice/(jointsNb-1)),0);
+            double otherWeight = 1 - globalWeight;
+
+            xSubGoal = (globalWeight*goalPosition[0] + otherWeight*xLocalGoal);
+            ySubGoal = (globalWeight*goalPosition[1] + otherWeight*yLocalGoal);*/
 
             xGoalInR0 = xSubGoal - starts[jointIndice].getA();
             yGoalInR0 = ySubGoal - starts[jointIndice].getB();
@@ -327,6 +342,14 @@ public class RobotArmManager {
         //joints[jointIndice] = controller.modulo2PI(goalJoints[jointIndice] - angleSum);
 
         if(isOrientationGoal){
+            double angleSelected;
+            double endJoint = jointsNb;
+            double midleJoint = 8*jointsNb/10;
+            double weightAngleGoal = Math.max(0,(jointIndice/(endJoint-midleJoint))-(midleJoint/(endJoint-midleJoint)));
+            double otherWeight = 1 - weightAngleGoal;
+            angleSelected = weightAngleGoal*angleGoal + goalJoints[jointIndice]*otherWeight;
+
+            //joints[jointIndice] = controller.modulo2PI(angleSelected - angleSum);
             if(jointIndice == jointsNb-1){
                 joints[jointIndice] = controller.modulo2PI(angleGoal - angleSum);
             }else{
@@ -390,6 +413,9 @@ public class RobotArmManager {
             /*for(int k=0;k<jointsNb;k++){
                 //System.out.println(angles[k]);
             }*/
+            if(requestCycle==0){
+                Configuration.plotMilliSecondsUpdate = 10;
+            }
 
             if(newGoal){
                 if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"EXPLOITATION [" + requestCycle + "] ");
@@ -494,7 +520,7 @@ public class RobotArmManager {
 
                 }
 
-                if(newGoal){
+                if(waveRequestsFinished){
                     String anglesString = " ";
                     String goalanglesString = " ";
                     for (int i = 0;i<jointsNb;i++){
@@ -537,8 +563,25 @@ public class RobotArmManager {
 
                     TRACE.print(TRACE_LEVEL.INFORM,"ERROR " + currentXYError + " [" + requestCycle + "]");
 
-                    allXYGoalErrors.add(new Double(currentXYError));
-                    allThetaGoalErrors.add(new Double(currentThetaError));
+
+                    if(!Configuration.commandLineMode){
+                        robotWorldExampleMultiUI.plotsDistanceToGoal.addData("XYError", cycle, 100*currentXYError, true);
+                        if(PARAMS.isOrientationGoal){
+                            robotWorldExampleMultiUI.plotsDistanceToGoal.addData("ThetaError", cycle, 100*currentThetaError, true);
+                        }
+                        if(newGoal){
+                            robotWorldExampleMultiUI.plotsDistanceToGoal.addData("NewGoal", cycle, 10, true);
+                        }else{
+                            robotWorldExampleMultiUI.plotsDistanceToGoal.addData("NewGoal", cycle, 0, true);
+                        }
+
+                    }
+
+                    if(newGoal){
+                        allXYGoalErrors.add(new Double(currentXYError));
+                        allThetaGoalErrors.add(new Double(currentThetaError));
+                    }
+
                 }
                 }
 
@@ -654,6 +697,10 @@ public class RobotArmManager {
             ar[index] = ar[i];
             ar[i] = a;
         }
+    }
+
+    public void setRobotWorldExampleMultiUI(RobotWorldExampleMultiUI robotWorldExample){
+        robotWorldExampleMultiUI = robotWorldExample;
     }
 
 }

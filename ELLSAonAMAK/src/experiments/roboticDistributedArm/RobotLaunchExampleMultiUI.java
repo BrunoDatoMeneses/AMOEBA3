@@ -131,7 +131,7 @@ public class RobotLaunchExampleMultiUI extends Application{
 
         robotArmManager.propagationControlWaves = PARAMS.requestControlCycles;
         robotArmManager.isOrientationGoal = PARAMS.isOrientationGoal;
-        RobotWorlExampleMultiUI robot = new RobotWorlExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
+        RobotWorldExampleMultiUI robot = new RobotWorldExampleMultiUI(window, vui, env, robotController, robotArmManager, jointsNb);
 
 
 

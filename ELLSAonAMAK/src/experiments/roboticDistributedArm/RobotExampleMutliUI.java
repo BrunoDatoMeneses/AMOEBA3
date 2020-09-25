@@ -9,7 +9,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import utils.Pair;
 
-public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExampleMultiUI> {
+public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldExampleMultiUI> {
 
 
 
@@ -49,7 +49,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	 * @param startY
 	 *            Initial Y coordinate
 	 */
-	public RobotExampleMutliUI(AmasMultiUIWindow window, RobotWorlExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
+	public RobotExampleMutliUI(AmasMultiUIWindow window, RobotWorldExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
 		super(window, amas, startX, startY);
 
 
