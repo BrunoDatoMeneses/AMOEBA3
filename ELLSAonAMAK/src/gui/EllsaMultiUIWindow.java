@@ -188,13 +188,13 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		Label mappingError = new Label("Mapping\nError");
 		RunLaterHelper.runLater(()->toolbarPanel.getItems().add(mappingError));
 
-		Slider slider = new Slider(0, 0.1, ellsa.getEnvironment().mappingErrorAllowed);
+		Slider slider = new Slider(0, 0.1, ellsa.getEnvironment().getMappingErrorAllowed());
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				ellsa.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+				ellsa.getEnvironment().setMappingErrorAllowed(newValue.doubleValue())  ;
 			}
 		});
 		addToolbar(slider);

@@ -12,7 +12,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
@@ -83,18 +82,18 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
         ellsa.allowGraphicalScheduler(true);
         ellsa.setRenderUpdate(false);
-        ellsa.data.learningSpeed = learningSpeed;
-        ellsa.data.numberOfPointsForRegression = regressionPoints;
-        ellsa.data.isActiveLearning = setActiveLearning;
-        ellsa.data.isSelfLearning = setSelfLearning;
-        ellsa.data.isConflictDetection = setConflictDetection;
-        ellsa.data.isConcurrenceDetection = setConcurrenceDetection;
-        ellsa.data.isVoidDetection = setVoidDetection;
-        ellsa.data.isVoidDetection2 = setVoidDetection2;
-        ellsa.data.isConflictResolution = setConflictResolution;
-        ellsa.data.isConcurrenceResolution = setConcurrenceResolution;
+        ellsa.data.PARAM_learningSpeed = learningSpeed;
+        ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
+        ellsa.data.PARAM_isActiveLearning = setActiveLearning;
+        ellsa.data.PARAM_isSelfLearning = setSelfLearning;
+        ellsa.data.PARAM_NCS_isConflictDetection = setConflictDetection;
+        ellsa.data.PARAM_NCS_isConcurrenceDetection = setConcurrenceDetection;
+        ellsa.data.isVoidDetection_old = setVoidDetection;
+        ellsa.data.PARAM_NCS_isVoidDetection = setVoidDetection2;
+        ellsa.data.PARAM_NCS_isConflictResolution = setConflictResolution;
+        ellsa.data.PARAM_NCS_isConcurrenceResolution = setConcurrenceResolution;
         ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-        ellsa.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
+        ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 
 
 

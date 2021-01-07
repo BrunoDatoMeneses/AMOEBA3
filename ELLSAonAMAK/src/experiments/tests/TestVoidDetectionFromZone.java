@@ -10,7 +10,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import utils.Pair;
@@ -77,15 +76,15 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);
-        ellsa.data.learningSpeed = learningSpeed;
-        ellsa.data.numberOfPointsForRegression = regressionPoints;
-        ellsa.data.isActiveLearning = setActiveLearning;
-        ellsa.data.isSelfLearning = setSelfLearning;
+        ellsa.data.PARAM_learningSpeed = learningSpeed;
+        ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
+        ellsa.data.PARAM_isActiveLearning = setActiveLearning;
+        ellsa.data.PARAM_isSelfLearning = setSelfLearning;
         ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 
         ellsa.setRenderUpdate(false);
 
-        ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
+        ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 
 
 

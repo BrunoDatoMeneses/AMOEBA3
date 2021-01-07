@@ -14,7 +14,6 @@ import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 
@@ -75,28 +74,28 @@ public class Main implements Runnable {
 
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.learningSpeed = PARAMS_UNITY.learningSpeed;
-		ellsa.data.numberOfPointsForRegression = PARAMS_UNITY.regressionPoints;
-		ellsa.data.isActiveLearning = PARAMS_UNITY.setActiveLearning;
-		ellsa.data.isSelfLearning = PARAMS_UNITY.setSelfLearning;
-		ellsa.data.isConflictDetection = PARAMS_UNITY.setConflictDetection;
-		ellsa.data.isConcurrenceDetection = PARAMS_UNITY.setConcurrenceDetection;
-		ellsa.data.isVoidDetection2 = PARAMS_UNITY.setVoidDetection2;
-		ellsa.data.isConflictResolution = PARAMS_UNITY.setConflictResolution;
-		ellsa.data.isConcurrenceResolution = PARAMS_UNITY.setConcurrenceResolution;
-		ellsa.data.isFrontierRequest = PARAMS_UNITY.setFrontierRequest;
-		ellsa.data.isSelfModelRequest = PARAMS_UNITY.setSelfModelRequest;
-		ellsa.data.isCoopLearningWithoutOracle = PARAMS_UNITY.setCoopLearning;
+		ellsa.data.PARAM_learningSpeed = PARAMS_UNITY.learningSpeed;
+		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS_UNITY.regressionPoints;
+		ellsa.data.PARAM_isActiveLearning = PARAMS_UNITY.setActiveLearning;
+		ellsa.data.PARAM_isSelfLearning = PARAMS_UNITY.setSelfLearning;
+		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS_UNITY.setConflictDetection;
+		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS_UNITY.setConcurrenceDetection;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS_UNITY.setVoidDetection2;
+		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS_UNITY.setConflictResolution;
+		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS_UNITY.setConcurrenceResolution;
+		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS_UNITY.setFrontierRequest;
+		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS_UNITY.setSelfModelRequest;
+		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS_UNITY.setCoopLearning;
 
-		ellsa.data.isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
-		ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
-		ellsa.data.isDream = PARAMS_UNITY.setDream;
-		ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
+		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
+		ellsa.data.PARAM_isDream = PARAMS_UNITY.setDream;
+		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
-		ellsa.data.initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
-		ellsa.getEnvironment().minLevel = PARAMS_UNITY.traceLevel;
+		ellsa.data.PARAM_initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
+		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS_UNITY.traceLevel;
 
 
 		sender = new Sender(server, ellsa);

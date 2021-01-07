@@ -13,7 +13,6 @@ import fr.irit.smac.amak.tools.Log;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import gui.EllsaWindow;
 import kernel.ELLSA;
-import kernel.World;
 import kernel.backup.SaveHelperDummy;
 import utils.Pair;
 import utils.RandomUtils;
@@ -394,7 +393,7 @@ public abstract class SimpleReinforcement2D {
 		Log.defaultMinLevel = Log.Level.INFORM;
 
 		ELLSA ellsa = new ELLSA(null, null, config.getAbsolutePath(), null);
-		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
+		ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		return ellsa;
 	}

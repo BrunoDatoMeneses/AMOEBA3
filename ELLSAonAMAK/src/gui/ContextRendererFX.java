@@ -65,7 +65,7 @@ public class ContextRendererFX extends RenderStrategy {
 	
 	private void setColorWithCoefs() {
 		Double[] c = ContextColor.colorFromCoefs(context.getFunction().getCoef());
-		if(context.isBest) {
+		/*if(context.isBest) {
 			drawable.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
 			drawableNDimensions.setColor(new Color(0.0, 1.0, 0.0, 225d / 255d));
 		}else if(context.isActivated) {
@@ -80,7 +80,10 @@ public class ContextRendererFX extends RenderStrategy {
 		}else {
 			drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
 			drawableNDimensions.setColor(new Color(c[0], c[1], c[2], 10d / 255d));
-		}
+		}*/
+
+		drawable.setColor(new Color(c[0], c[1], c[2], 50d / 255d));
+		drawableNDimensions.setColor(new Color(c[0], c[1], c[2], 10d / 255d));
 		
 	}
 	

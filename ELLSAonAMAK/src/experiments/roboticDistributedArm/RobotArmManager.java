@@ -46,10 +46,18 @@ public class RobotArmManager {
     public OptionalDouble averageThetaError;
     Double ThetaErrorDispersion;
 
+    ArrayList<Double> learningTimes;
+    public OptionalDouble averageLearningTimes;
+    Double learningTimesDispersion;
 
+    ArrayList<Double> exploitationTimes;
+    public OptionalDouble averageExploitationTimes;
+    Double exploitationTimesDispersion;
 
     ArrayList<Pair<Double,Double>> learnedPositions;
     boolean showSubrequest = false;
+
+    double workingTime;
 
     public boolean finished = false;
     public boolean plotRequestError = false;
@@ -100,6 +108,9 @@ public class RobotArmManager {
         allXYGoalErrors = new ArrayList<>();
 
         allThetaGoalErrors = new ArrayList<>();
+
+        learningTimes = new ArrayList<>();
+        exploitationTimes = new ArrayList<>();
 
         jointsIndicesArray = new int[jointsNb];
         for(int i =0;i<jointsNb;i++){
@@ -260,18 +271,45 @@ public class RobotArmManager {
             out.put("pxOrigin",starts[jointIndice].getA());
             out.put("pyOrigin",starts[jointIndice].getB());
         }
-        double xGoalInR0 ;
-        double yGoalInR0 ;
+        double xGoalInRi ;
+        double yGoalInRi ;
 
         if(jointIndice==requestJoints.length-1){
             xSubGoal = goalPosition[0];
             ySubGoal = goalPosition[1];
 
-            xGoalInR0 = xSubGoal - starts[jointIndice].getA();
-            yGoalInR0 = ySubGoal - starts[jointIndice].getB();
+            xGoalInRi = xSubGoal - starts[jointIndice].getA();
+            yGoalInRi = ySubGoal - starts[jointIndice].getB();
         }else{
+            // Vecteur entre extrémitée et but
             xSubGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
             ySubGoal = ends[jointIndice].getB() + (goalPosition[1] - ends[requestJoints.length-1].getB());
+
+
+
+            // Vecteur entre extrémitér et but sur cercle
+
+            // Vecteur entre centre ORi et but dans Ri sur cercle
+
+            /*double xVectorORiGoal = goalPosition[0] - starts[jointIndice].getA();
+            double yVectorORiGoal = goalPosition[1] - starts[jointIndice].getB();
+
+            double distanceGoalOriginRi = Math.sqrt(Math.pow(xVectorORiGoal,2) + Math.pow(yVectorORiGoal ,2));
+            double distanceEndOriginRi = Math.sqrt(Math.pow(ends[requestJoints.length-1].getA() - starts[jointIndice].getA(),2) + Math.pow(ends[requestJoints.length-1].getB() - starts[jointIndice].getB() ,2));
+
+            double xVectorORiGoalOnCircle = xVectorORiGoal * distanceEndOriginRi / distanceGoalOriginRi;
+            double yVectorORiGoalOnCircle = yVectorORiGoal * distanceEndOriginRi / distanceGoalOriginRi;
+
+            double xVectorEndToGoalOnCircle = xVectorORiGoalOnCircle - ends[requestJoints.length-1].getA();
+            double yVectorEndToGoalOnCircle = yVectorORiGoalOnCircle - ends[requestJoints.length-1].getB();
+
+            double ratioForGoal = l[jointIndice]/distanceEndOriginRi;
+
+            xSubGoal = ends[jointIndice].getA() + ratioForGoal*(xVectorEndToGoalOnCircle);
+            ySubGoal = ends[jointIndice].getB() + ratioForGoal*(yVectorEndToGoalOnCircle);*/
+
+
+            //////////////////////////////////////////////////////////////
             /*xSubGoal = goalPosition[0];
             ySubGoal = goalPosition[1];*/
             /*double xLocalGoal = ends[jointIndice].getA() + (goalPosition[0] - ends[requestJoints.length-1].getA());
@@ -282,13 +320,13 @@ public class RobotArmManager {
             xSubGoal = (globalWeight*goalPosition[0] + otherWeight*xLocalGoal);
             ySubGoal = (globalWeight*goalPosition[1] + otherWeight*yLocalGoal);*/
 
-            xGoalInR0 = xSubGoal - starts[jointIndice].getA();
-            yGoalInR0 = ySubGoal - starts[jointIndice].getB();
+            xGoalInRi = xSubGoal - starts[jointIndice].getA();
+            yGoalInRi = ySubGoal - starts[jointIndice].getB();
         }
 
-        double ratio = (l[jointIndice])/Math.sqrt( Math.pow(xGoalInR0,2) + Math.pow(yGoalInR0,2));
-        double xReachableGoalinR0 = ratio * xGoalInR0;
-        double yReachableGoalinR0 = ratio * yGoalInR0;
+        double ratio = (l[jointIndice])/Math.sqrt( Math.pow(xGoalInRi,2) + Math.pow(yGoalInRi,2));
+        double xReachableGoalinR0 = ratio * xGoalInRi;
+        double yReachableGoalinR0 = ratio * yGoalInRi;
 
 
         out.put("pxGoal",xReachableGoalinR0);
@@ -374,7 +412,7 @@ public class RobotArmManager {
 
         if(learningCycle <trainingCycles){
 
-
+            workingTime = System.currentTimeMillis();
             poseGoal[0] = futurePoseGoal[0] ;
             poseGoal[1] = futurePoseGoal[1] ;
 
@@ -403,6 +441,7 @@ public class RobotArmManager {
             }
             learn(angles);
 
+            learningTimes.add(new Double(System.currentTimeMillis() - workingTime));
 
 
         }else if (requestCycle < requestCycles){
@@ -418,6 +457,7 @@ public class RobotArmManager {
             }
 
             if(newGoal){
+                workingTime = System.currentTimeMillis();
                 if(requestCycle%50==0)  TRACE.print(TRACE_LEVEL.SUBCYCLE,"EXPLOITATION [" + requestCycle + "] ");
                 //System.out.println("NEW GOAL");
                 newGoal = false;
@@ -578,6 +618,8 @@ public class RobotArmManager {
                     }
 
                     if(newGoal){
+
+                        exploitationTimes.add(new Double(System.currentTimeMillis() - workingTime));
                         allXYGoalErrors.add(new Double(currentXYError));
                         allThetaGoalErrors.add(new Double(currentThetaError));
                     }
@@ -594,6 +636,12 @@ public class RobotArmManager {
 
                 averageThetaError = allThetaGoalErrors.stream().mapToDouble(a->a).average();
                 ThetaErrorDispersion = allThetaGoalErrors.stream().mapToDouble(a->Math.pow((a- averageThetaError.getAsDouble()),2)).sum();
+
+                averageLearningTimes = learningTimes.stream().mapToDouble(a->a).average();
+                learningTimesDispersion = learningTimes.stream().mapToDouble(a->Math.pow((a- averageLearningTimes.getAsDouble()),2)).sum();
+
+                averageExploitationTimes = exploitationTimes.stream().mapToDouble(a->a).average();
+                exploitationTimesDispersion = exploitationTimes.stream().mapToDouble(a->Math.pow((a- averageExploitationTimes.getAsDouble()),2)).sum();
 
             }
 

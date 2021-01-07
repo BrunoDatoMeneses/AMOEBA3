@@ -234,8 +234,8 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
             		ellsa.saver = new SaveHelperImpl(ellsa);
             		ellsa.allowGraphicalScheduler(true);
             		ellsa.setRenderUpdate(true);
-            		ellsa.data.learningSpeed = learningSpeed;
-            		ellsa.data.numberOfPointsForRegression = regressionPoints;
+            		ellsa.data.PARAM_learningSpeed = learningSpeed;
+            		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
             		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		
                 }
@@ -305,8 +305,8 @@ public class F_N_LauncherMultiUI extends Application implements Serializable {
             		ellsa2.saver = new SaveHelperImpl(ellsa2);
             		ellsa2.allowGraphicalScheduler(true);
             		ellsa2.setRenderUpdate(true);
-            		ellsa2.data.learningSpeed = learningSpeed;
-            		ellsa2.data.numberOfPointsForRegression = regressionPoints;
+            		ellsa2.data.PARAM_learningSpeed = learningSpeed;
+            		ellsa2.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
             		ellsa2.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		
                 }

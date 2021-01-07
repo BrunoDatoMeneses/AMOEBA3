@@ -17,7 +17,6 @@ import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
@@ -146,11 +145,11 @@ public class ReinforcementLauncher2D extends Application implements Serializable
             		ellsaSpatialReward.saver = new SaveHelperImpl(ellsaSpatialReward, amoebaSpatialRewardUI);
             		ellsaSpatialReward.allowGraphicalScheduler(true);
             		ellsaSpatialReward.setRenderUpdate(true);
-            		ellsaSpatialReward.data.learningSpeed = learningSpeed;
-            		ellsaSpatialReward.data.numberOfPointsForRegression = regressionPoints;
+            		ellsaSpatialReward.data.PARAM_learningSpeed = learningSpeed;
+            		ellsaSpatialReward.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
             		ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		ellsaSpatialReward.setReinforcement(true);
-					ellsaSpatialReward.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
+					ellsaSpatialReward.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
                 }
             });
      

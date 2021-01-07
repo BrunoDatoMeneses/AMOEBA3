@@ -1,14 +1,10 @@
 package agents.context.localModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
-import org.apache.commons.math3.analysis.function.Exp;
 import utils.Pair;
 import utils.TRACE_LEVEL;
 
@@ -279,7 +275,9 @@ public class LocalModelMillerRegression extends LocalModel{
 
 			}
 			else {
-				updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.numberOfPointsForRegression);
+				//updateModelWithExperimentAndWeight(newExperiment, weight, context.getAmas().data.PARAM_numberOfPointsForRegression_ASUPPRIMER);
+				updateModel(new ArrayList<>(Arrays.asList(newExperiment)), weight);
+
 
 				/*ArrayList<Experiment> experiments = new ArrayList<>();
 				experiments.add(newExperiment);
@@ -373,7 +371,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			coefs[i] = coef[i];
 		}
 
-		context.getAmas().getEnvironment().regressionPoints = newExperiments.size() + artificialExperiments.size();
+		//context.getAmas().getEnvironment().regressionPoints = newExperiments.size() + artificialExperiments.size();
 
 
 		context.getAmas().addSpatiallyAlteredContextForUnityUI(context);
@@ -467,7 +465,8 @@ public class LocalModelMillerRegression extends LocalModel{
 		
 		regression = new Regression(nParameters,true);
 
-		
+
+
 		int numberOfPointsForRegression = numberOfPoints;
 		if(numberOfPointsForRegression < (nParameters+2)) {
 			numberOfPointsForRegression += numberOfPointsForRegression*((int)((nParameters+2)/numberOfPointsForRegression));
@@ -521,7 +520,7 @@ public class LocalModelMillerRegression extends LocalModel{
 			coefs[i] = coef[i];
 		}
 		
-		context.getAmas().getEnvironment().regressionPoints = numberOfXPPoints + numberOfArtificialPoints;
+		//context.getAmas().getEnvironment().regressionPoints = numberOfXPPoints + numberOfArtificialPoints;
 		
 		
 	}
@@ -670,7 +669,7 @@ public class LocalModelMillerRegression extends LocalModel{
 				double rangeCenter = this.context.getRanges().get(pct).getCenter();
 				double rangeLength = this.context.getRanges().get(pct).getLenght();
 				java.util.Random r = new java.util.Random();
-				double ramdomGaussianPosition = (r.nextGaussian() * Math.sqrt(rangeLength/10)) + rangeCenter;
+				double ramdomGaussianPosition = (r.nextGaussian() * Math.pow((getContext().getAmas().data.PARAM_rangeLengthForArtificialPerceptions*rangeLength/(getContext().getAmas().data.PARAM_quantileForGenerationOfArtificialPerceptions)),1)) + rangeCenter;
 				exp.addDimension(pct,ramdomGaussianPosition);
 			}
 			exp.setProposition(this.getProposition(exp));

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
@@ -14,7 +13,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 
@@ -61,32 +59,38 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.learningSpeed = PARAMS.learningSpeed;
-		ellsa.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-		ellsa.data.isActiveLearning = PARAMS.setActiveLearning;
-		ellsa.data.isSelfLearning = PARAMS.setSelfLearning;
-		ellsa.data.isConflictDetection = PARAMS.setConflictDetection;
-		ellsa.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		ellsa.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-		ellsa.data.isSubVoidDetection = PARAMS.setSubVoidDetection;
-		ellsa.data.isConflictResolution = PARAMS.setConflictResolution;
-		ellsa.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		ellsa.data.isFrontierRequest = PARAMS.setFrontierRequest;
-		ellsa.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-		ellsa.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+		ellsa.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+		ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+		ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
 
-		ellsa.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-		ellsa.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-		ellsa.data.isDream = PARAMS.setDream;
-		ellsa.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+		ellsa.data.PARAM_isDream = PARAMS.setDream;
+		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		ellsa.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-		ellsa.getEnvironment().minLevel = PARAMS.traceLevel;
+		ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+		ellsa.data.PARAM_neighborhoodMultiplicator = PARAMS.setNeighborhoodMultiplicator;
+		ellsa.data.PARAM_externalContextInfluenceRatio = PARAMS.setExternalContextInfluenceRatio;
+
+		ellsa.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
+
+		ellsa.setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
 
 
-		ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
+		//ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
 		
 		/*for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			amoeba.cycle();

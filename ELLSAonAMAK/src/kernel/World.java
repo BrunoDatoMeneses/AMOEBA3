@@ -24,19 +24,8 @@ public class World extends Environment implements Loggable {
 	public double increment_up = 0.05;
 	
 	private int nbActivatedAgent;
-	private double AVT_acceleration = 2;
-	private double AVT_deceleration = 1. / 3.0;
-	private double AVT_percentAtStart = 0.2;
 
-	public double mappingErrorAllowed = 0.04;// TODO remove from here --> head agent
-	
-	public int regressionPoints = 0; // TODO remove from here
-	
-	
-	
-	
-	
-	public TRACE_LEVEL minLevel = TRACE_LEVEL.INFORM;
+	public TRACE_LEVEL PARAM_minTraceLevel = TRACE_LEVEL.INFORM;
 	
 	private ELLSA ellsa;
 
@@ -58,11 +47,11 @@ public class World extends Environment implements Loggable {
 	}
 
 	public double getMappingErrorAllowed() {
-		return mappingErrorAllowed;
+		return ellsa.data.PARAM_mappingErrorAllowed;
 	}
 	
 	public void setMappingErrorAllowed(double value) {
-		mappingErrorAllowed = value;
+		ellsa.data.PARAM_mappingErrorAllowed = value;
 	}
 
 	public synchronized void raiseNCS(NCS ncs) {
@@ -82,7 +71,7 @@ public class World extends Environment implements Loggable {
 	}
 
 	public void print(TRACE_LEVEL lvl, Object... infos) {
-		if (lvl.isGE(minLevel)) {
+		if (lvl.isGE(PARAM_minTraceLevel)) {
 			String message="";
 
 			if(ellsa.data.nameID != null){
@@ -106,7 +95,7 @@ public class World extends Environment implements Loggable {
 	}
 
 	public void trace(TRACE_LEVEL lvl, ArrayList<String> infos) {
-		if (lvl.isGE(minLevel)) {
+		if (lvl.isGE(PARAM_minTraceLevel)) {
 			String message="";
 			if(ellsa.data.nameID != null){
 				message = "[ " + ellsa.data.nameID + " " + ellsa.getCycle() + "]";
@@ -126,15 +115,15 @@ public class World extends Environment implements Loggable {
 	}
 
 	public double getAVT_acceleration() {
-		return AVT_acceleration;
+		return ellsa.data.PARAM_AVT_acceleration;
 	}
 
 	public double getAVT_deceleration() {
-		return AVT_deceleration;
+		return ellsa.data.PARAM_AVT_deceleration;
 	}
 
 	public double getAVT_percentAtStart() {
-		return AVT_percentAtStart;
+		return ellsa.data.PARAM_AVT_percentAtStart;
 	}
 
 	public void preCycleActions() {
@@ -176,9 +165,10 @@ public class World extends Environment implements Loggable {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
 		return pct.getNeigborhoodRadius();
 	}
-	
-	public double getContextNeighborhood(Context ctxt, Percept pct) {
+
+	public double getContextInfluenceExternalRadius(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return ctxt.getRanges().get(pct).getRadius();
+		return ctxt.getRanges().get(pct).getLenght()* ellsa.data.PARAM_externalContextInfluenceRatio;
 	}
+
 }

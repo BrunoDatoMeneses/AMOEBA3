@@ -177,55 +177,55 @@ public class RobotLaunchExampleXP {
                 ellsaTheta1.setRenderUpdate(false);
 
                 ellsaTheta0.data.nameID = "ellsaTheta0";
-                ellsaTheta0.data.learningSpeed = PARAMS.learningSpeed;
-                ellsaTheta0.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-                ellsaTheta0.data.isActiveLearning = PARAMS.setActiveLearning;
-                ellsaTheta0.data.isSelfLearning = PARAMS.setSelfLearning;
-                ellsaTheta0.data.isAutonomousMode = PARAMS.setAutonomousMode;
-                ellsaTheta0.data.isConflictDetection = PARAMS.setConflictDetection;
-                ellsaTheta0.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-                ellsaTheta0.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-                ellsaTheta0.data.isConflictResolution = PARAMS.setConflictResolution;
-                ellsaTheta0.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-                ellsaTheta0.data.isFrontierRequest = PARAMS.setFrontierRequest;
-                ellsaTheta0.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-                ellsaTheta0.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+                ellsaTheta0.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+                ellsaTheta0.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+                ellsaTheta0.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+                ellsaTheta0.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+                ellsaTheta0.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+                ellsaTheta0.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+                ellsaTheta0.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+                ellsaTheta0.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+                ellsaTheta0.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+                ellsaTheta0.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+                ellsaTheta0.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+                ellsaTheta0.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+                ellsaTheta0.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
 
-                ellsaTheta0.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-                ellsaTheta0.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-                ellsaTheta0.data.isDream = PARAMS.setDream;
-                ellsaTheta0.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-                ellsaTheta0.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+                ellsaTheta0.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+                ellsaTheta0.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+                ellsaTheta0.data.PARAM_isDream = PARAMS.setDream;
+                ellsaTheta0.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+                ellsaTheta0.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
                 ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-                ellsaTheta0.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-                ellsaTheta0.getEnvironment().minLevel = TRACE_LEVEL.OFF;
+                ellsaTheta0.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+                ellsaTheta0.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
 
 
                 ellsaTheta1.data.nameID = "ellsaTheta1";
-                ellsaTheta1.data.learningSpeed = PARAMS.learningSpeed;
-                ellsaTheta1.data.numberOfPointsForRegression = PARAMS.regressionPoints;
-                ellsaTheta1.data.isActiveLearning = PARAMS.setActiveLearning;
-                ellsaTheta1.data.isSelfLearning = PARAMS.setSelfLearning;
-                ellsaTheta1.data.isAutonomousMode = PARAMS.setAutonomousMode;
-                ellsaTheta1.data.isConflictDetection = PARAMS.setConflictDetection;
-                ellsaTheta1.data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-                ellsaTheta1.data.isVoidDetection2 = PARAMS.setVoidDetection2;
-                ellsaTheta1.data.isConflictResolution = PARAMS.setConflictResolution;
-                ellsaTheta1.data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-                ellsaTheta1.data.isFrontierRequest = PARAMS.setFrontierRequest;
-                ellsaTheta1.data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-                ellsaTheta1.data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+                ellsaTheta1.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+                ellsaTheta1.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+                ellsaTheta1.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+                ellsaTheta1.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+                ellsaTheta1.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+                ellsaTheta1.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+                ellsaTheta1.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+                ellsaTheta1.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+                ellsaTheta1.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+                ellsaTheta1.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+                ellsaTheta1.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+                ellsaTheta1.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+                ellsaTheta1.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
 
-                ellsaTheta1.data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-                ellsaTheta1.data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-                ellsaTheta1.data.isDream = PARAMS.setDream;
-                ellsaTheta1.data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-                ellsaTheta1.data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+                ellsaTheta1.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+                ellsaTheta1.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+                ellsaTheta1.data.PARAM_isDream = PARAMS.setDream;
+                ellsaTheta1.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+                ellsaTheta1.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
                 ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-                ellsaTheta1.data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-                ellsaTheta1.getEnvironment().minLevel = TRACE_LEVEL.OFF;
+                ellsaTheta1.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+                ellsaTheta1.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
 
                 ellsaTheta1.setSubPercepts(PARAMS.subPercepts);
                 ellsaTheta0.setSubPercepts(PARAMS.subPercepts);

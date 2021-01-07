@@ -56,7 +56,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         PARAMS.configFile = "resources/1jointRobotOrigin2DimensionsLauncher.xml";
 
 
-        start();
+        experimentation();
 
         System.out.print(" DONE");
 
@@ -64,7 +64,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
     }
 
 
-    public static void start() {
+    public static void experimentation() {
 
         xpCSV = new CSVWriter(PARAMS.model + "_Jts_" + PARAMS.nbJoints
                 +"_Lrn_" + PARAMS.nbLearningCycle
@@ -95,7 +95,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         HashMap<String, ArrayList<Double>> data = new HashMap<>();
         List<String> dataStringsVolumes = Arrays.asList("mappingScore", "imprecisionScore", "conflictVol", "concurrenceVol", "voidVol");
         List<String> dataStringsPrediction = Arrays.asList("goalXYError", "goalXYErrorDeviation", "goalThetaError", "goalThetaErrorDeviation");
-        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","endogenousLearningSituations","fusionRequests","restructureRequests","neighborsCounts");
+        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents", "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests", "modelRequests","endogenousLearningSituations","fusionRequests","restructureRequests","neighborsCounts","learningCycleExecutionTime","exploitationCycleExecutionTime", "learningCycleExecutionTimeDeviation","exploitationCycleExecutionTimeDeviation");
 
 
         for (String dataName : dataStringsVolumes){
@@ -152,8 +152,8 @@ public class RobotLaunchExampleMassiveXPWithArgs {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
 
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",averageScore.getAsDouble()*100+"")));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" ,"" + 100*Math.sqrt(deviationScore/data.get(dataName).size()))));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",averageScore.getAsDouble()+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" ,"" + Math.sqrt(deviationScore/data.get(dataName).size()))));
 
         }
 
@@ -181,8 +181,8 @@ public class RobotLaunchExampleMassiveXPWithArgs {
             OptionalDouble averageScore = data.get(dataName).stream().mapToDouble(a->a).average();
             Double deviationScore = data.get(dataName).stream().mapToDouble(a->Math.pow((a-averageScore.getAsDouble()),2)).sum();
 
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",df.format(averageScore.getAsDouble()*100)+"")));
-            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" , df.format(100*Math.sqrt(deviationScore/data.get(dataName).size())))));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Average",df.format(averageScore.getAsDouble())+"")));
+            xpCSV.write(new ArrayList<>(Arrays.asList(dataName+"Deviation" , df.format(Math.sqrt(deviationScore/data.get(dataName).size())))));
 
 
         }
@@ -255,30 +255,30 @@ public class RobotLaunchExampleMassiveXPWithArgs {
             ellsas[i].allowGraphicalScheduler(true);
             ellsas[i].setRenderUpdate(false);
             ellsas[i].data.nameID = "ellsaTheta"+i;
-            ellsas[i].data.learningSpeed = PARAMS.learningSpeed;
-            ellsas[i].data.numberOfPointsForRegression = PARAMS.regressionPoints;
-            ellsas[i].data.isActiveLearning = PARAMS.setActiveLearning;
-            ellsas[i].data.isSelfLearning = PARAMS.setSelfLearning;
-            ellsas[i].data.isAutonomousMode = PARAMS.setAutonomousMode;
-            ellsas[i].data.isConflictDetection = PARAMS.setConflictDetection;
-            ellsas[i].data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-            ellsas[i].data.isVoidDetection2 = PARAMS.setVoidDetection2;
-            ellsas[i].data.isSubVoidDetection = PARAMS.setSubVoidDetection;
-            ellsas[i].data.isConflictResolution = PARAMS.setConflictResolution;
-            ellsas[i].data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-            ellsas[i].data.isFrontierRequest = PARAMS.setFrontierRequest;
-            ellsas[i].data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-            ellsas[i].data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+            ellsas[i].data.PARAM_learningSpeed = PARAMS.learningSpeed;
+            ellsas[i].data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+            ellsas[i].data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+            ellsas[i].data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+            ellsas[i].data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+            ellsas[i].data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+            ellsas[i].data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+            ellsas[i].data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+            ellsas[i].data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+            ellsas[i].data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+            ellsas[i].data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+            ellsas[i].data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
 
-            ellsas[i].data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-            ellsas[i].data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-            ellsas[i].data.isDream = PARAMS.setDream;
-            ellsas[i].data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-            ellsas[i].data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsas[i].data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+            ellsas[i].data.PARAM_isDream = PARAMS.setDream;
+            ellsas[i].data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsas[i].data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
             ellsas[i].getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-            ellsas[i].data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-            ellsas[i].getEnvironment().minLevel = TRACE_LEVEL.OFF;
+            ellsas[i].data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+            ellsas[i].getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
             ellsas[i].setSubPercepts(PARAMS.subPercepts);
         }
 
@@ -322,6 +322,13 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         double Thetaerror = robotArmManager.averageThetaError.getAsDouble();
         double Thetadispersion = Math.sqrt(robotArmManager.ThetaErrorDispersion /robotArmManager.allThetaGoalErrors.size());
 
+        double learningTime = robotArmManager.averageLearningTimes.getAsDouble();
+        double learningTimeDispersion = Math.sqrt(robotArmManager.learningTimesDispersion /robotArmManager.learningTimes.size());
+
+        double exploitationTime = robotArmManager.averageExploitationTimes.getAsDouble();
+        double exploitationTimeDispersion = Math.sqrt(robotArmManager.exploitationTimesDispersion /robotArmManager.exploitationTimes.size());
+
+
         HashMap<String, Double> mappingScores = ellsas[0].getHeadAgent().getMappingScores();
 
         HashMap<REQUEST, Integer> requestCounts = ellsas[0].data.requestCounts;
@@ -346,6 +353,12 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         data.get("goalXYErrorDeviation").add(XYdispersion);
         data.get("goalThetaError").add(Thetaerror);
         data.get("goalThetaErrorDeviation").add(Thetadispersion);
+
+        data.get("learningCycleExecutionTime").add(learningTime);
+        data.get("exploitationCycleExecutionTime").add(exploitationTime);
+        data.get("learningCycleExecutionTimeDeviation").add(learningTimeDispersion);
+        data.get("exploitationCycleExecutionTimeDeviation").add(exploitationTimeDispersion);
+
         data.get("neighborsCounts").add((double)ellsas[0].data.neighborsCounts/ellsas[0].getCycle());
 
 

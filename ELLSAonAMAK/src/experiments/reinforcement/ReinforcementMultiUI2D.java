@@ -19,7 +19,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import kernel.ELLSA;
-import kernel.World;
 import kernel.backup.SaveHelperDummy;
 import utils.Pair;
 import utils.RandomUtils;
@@ -487,7 +486,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		Log.defaultMinLevel = Log.Level.INFORM;
 
 		ELLSA ellsa = new ELLSA(amoebaSpatialRewardUI, amoebaSpatialRewardVUI, config.getAbsolutePath(), null);
-		ellsa.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
+		ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 		ellsa.saver = new SaveHelperDummy();
 		
 		
@@ -521,7 +520,7 @@ public class ReinforcementMultiUI2D extends Application implements Serializable 
 		Log.defaultMinLevel = Log.Level.INFORM;
 
 		ELLSA ellsa = new ELLSA(window, VUI, config.getAbsolutePath(), null);
-		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
+		ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		
 		

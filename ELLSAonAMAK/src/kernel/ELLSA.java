@@ -100,6 +100,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		super(window, vui, new World(), Scheduling.HIDDEN);
 		vuiMulti = vui;
 		multiUIWindow = window;
+		subPercepts = new ArrayList<>();
+		unconsideredPercepts = new ArrayList<>();
 	}
 	
 	/**
@@ -504,7 +506,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		studiedSystem = ss;
 
 		getEnvironment().print(TRACE_LEVEL.INFORM,"LEARN");
-		while(data.selfLearning && data.isAutonomousMode) {
+		while(data.selfLearning && data.PARAM_isAutonomousMode) {
 			data.selfLearning = false;
 			endogenousRequest(convertRequestPerceptToString(head.getSelfRequest()));
 		}
@@ -597,7 +599,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		studiedSystem = ss;
 		double action = getAction();
 		getEnvironment().print(TRACE_LEVEL.INFORM,"ENDO REQUEST");
-		while(data.selfLearning && data.isAutonomousMode) {
+		while(data.selfLearning && data.PARAM_isAutonomousMode) {
 			data.selfLearning = false;
 			endogenousRequest(convertRequestPerceptToString(head.getSelfRequest()));
 		}

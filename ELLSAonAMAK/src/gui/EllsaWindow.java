@@ -110,7 +110,7 @@ public class EllsaWindow extends MainWindow {
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				ellsa.getEnvironment().mappingErrorAllowed = newValue.doubleValue();
+				ellsa.getEnvironment().setMappingErrorAllowed(newValue.doubleValue());
 			}
 		});
 		EllsaWindow.addToolbar(slider);

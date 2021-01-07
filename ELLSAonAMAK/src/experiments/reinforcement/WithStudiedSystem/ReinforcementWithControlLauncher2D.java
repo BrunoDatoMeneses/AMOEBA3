@@ -23,7 +23,6 @@ import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
-import kernel.World;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperDummy;
@@ -246,11 +245,11 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		ellsa.saver = new SaveHelperImpl(ellsa, amoebaSpatialRewardUI);
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(true);
-		ellsa.data.learningSpeed = learningSpeed;
-		ellsa.data.numberOfPointsForRegression = regressionPoints;
+		ellsa.data.PARAM_learningSpeed = learningSpeed;
+		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
 		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		ellsa.setReinforcement(true);
-		ellsa.getEnvironment().minLevel = TRACE_LEVEL.DEBUG;
+		ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 		
 		
 		return ellsa;
@@ -276,7 +275,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		Log.defaultMinLevel = Log.Level.INFORM;
 
 		ELLSA ellsa = new ELLSA(window, VUI, config.getAbsolutePath(), null);
-		ellsa.getEnvironment().minLevel = TRACE_LEVEL.ERROR;
+		ellsa.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 		ellsa.saver = new SaveHelperDummy();
 		
 		

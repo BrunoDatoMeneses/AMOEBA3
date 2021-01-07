@@ -50,8 +50,7 @@ public class EllsaData implements Serializable {
 	public boolean newContextWasCreated = false;
 	public boolean contextFromPropositionWasSelected = false;
 	
-	public boolean isActiveLearning;
-	public boolean isSelfLearning;
+
 	
 	public boolean activeLearning = false;
 	public boolean selfLearning = false;
@@ -77,12 +76,12 @@ public class EllsaData implements Serializable {
 	public int currentCriticalityMapping = 0;
 	public int currentCriticalityConfidence = 0;
 
-	public double learningSpeed = 0.25;
-	public int numberOfPointsForRegression = 50;
+
+
 
 	public boolean contextNotFinished = false;
 
-	public boolean isAutonomousMode = false;
+
 	
 	public DynamicPerformance predictionPerformance;
 	public DynamicPerformance regressionPerformance;
@@ -91,29 +90,17 @@ public class EllsaData implements Serializable {
 	public double[] executionTimes = new  double[20];
 	public double[] executionTimesSums = new double[20];
 	
-	public double initRegressionPerformance = 1.0;
+
 	
 	public double averageRegressionPerformanceIndicator;
 
-	public boolean isConflictResolution = false;
-	public boolean isConcurrenceResolution = false;
-
-	public boolean isVoidDetection = false;
-	public boolean isConflictDetection = false;
-	public boolean isConcurrenceDetection = false;
-	public boolean isVoidDetection2 = false;
-	public boolean isSubVoidDetection = false;
-	public boolean isFrontierRequest = false;
-	public boolean isSelfModelRequest = false;
-	public boolean isCoopLearningWithoutOracle = false;
-
-	public boolean isLearnFromNeighbors = false;
-	public boolean isDream = false;
 
 
-	public int nbOfNeighborForLearningFromNeighbors = 10000;
-	public int nbOfNeighborForVoidDetectionInSelfLearning = 10000;
-	public int nbOfNeighborForContexCreationWithouOracle = 10000;
+
+
+
+
+
 
 
 	public boolean isSubPercepts = false;
@@ -123,9 +110,77 @@ public class EllsaData implements Serializable {
 
 	public int countLocalMinina = 0;
 
-	public int neighborhoodMultiplicator = 2;
+
 
 	public int neighborsCounts = 0;
 	public int lastNeihborsCount = 0;
+
+
+
+
+	//* PARAMETERS *//
+
+
+
+	/* USER PARAMETERS */
+
+	public double PARAM_mappingErrorAllowed = 0.04;
+	public double PARAM_initRegressionPerformance = 1.0;
+
+	public boolean PARAM_isActiveLearning = false;
+	public boolean PARAM_isSelfLearning = false;
+	public boolean PARAM_isAutonomousMode = false;
+
+	/* DEV PARAMETERS */
+
+
+	public int PARAM_bootstrapCycle = 10;
+
+
+	// Neighborhood
+	public int PARAM_neighborhoodMultiplicator = 2;
+	public double PARAM_externalContextInfluenceRatio = 0.25; // influenceRadius = contextRadius + PARAM_externalContextInfluenceRatio * contextLength
+
+	// Local Models
+
+	public double PARAM_learningSpeed = 0.25;
+	public int PARAM_numberOfPointsForRegression_ASUPPRIMER = 50;
+	public int PARAM_quantileForGenerationOfArtificialPerceptions = 5;
+	public double PARAM_rangeLengthForArtificialPerceptions = 0.1;
+
+
+	// AVT
+
+	public double PARAM_AVT_acceleration = 2;
+	public double PARAM_AVT_deceleration = 1. / 3.0;
+	public double PARAM_AVT_percentAtStart = 0.2;
+
+
+	// NCS
+	public boolean PARAM_NCS_isConflictDetection = false;
+	public boolean PARAM_NCS_isConcurrenceDetection = false;
+	public boolean PARAM_NCS_isVoidDetection = false;
+	public boolean PARAM_NCS_isSubVoidDetection = false;
+	public boolean PARAM_NCS_isFrontierRequest = false;
+	public boolean PARAM_NCS_isSelfModelRequest = false;
+	public boolean PARAM_NCS_isConflictResolution = false;
+	public boolean PARAM_NCS_isConcurrenceResolution = false;
+
+
+	public boolean PARAM_isLearnFromNeighbors = false;
+	public boolean PARAM_isDream = false;
+
+
+	public int PARAM_nbOfNeighborForLearningFromNeighbors = 10000;
+	public int PARAM_nbOfNeighborForVoidDetectionInSelfLearning = 10000;
+	public int PARAM_nbOfNeighborForContexCreationWithouOracle = 10000;
+
+
+
+
+	// TODO A SUPPRIMER
+
+	public boolean isVoidDetection_old = false;
+	public boolean isCoopLearningWithoutOracle_ASUPPRIMER = false;
 
 }

@@ -369,7 +369,7 @@ public class F_N_Manager implements StudiedSystem{
 
 		/* Square artcile JFSMA 2020*/
 		//model="SquareJFSMA2020";
-		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
 		//model="Triangle";
@@ -397,8 +397,8 @@ public class F_N_Manager implements StudiedSystem{
 		return cosX(xRequest, 0.045) + 3;*/
 
 		/* Cos */
-		model="CosSin";
-		return cosSinX(xRequest, 0.045) + 3;
+		/*model="CosSin";
+		return cosSinX(xRequest, 0.045) + 3;*/
 
 		/* Rosenbrock */
 		//model="Rosenbrock";

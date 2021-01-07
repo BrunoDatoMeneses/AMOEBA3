@@ -73,30 +73,30 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsas[i].allowGraphicalScheduler(true);
             ellsas[i].setRenderUpdate(false);
             ellsas[i].data.nameID = "ellsaTheta"+i;
-            ellsas[i].data.learningSpeed = PARAMS.learningSpeed;
-            ellsas[i].data.numberOfPointsForRegression = PARAMS.regressionPoints;
-            ellsas[i].data.isActiveLearning = PARAMS.setActiveLearning;
-            ellsas[i].data.isSelfLearning = PARAMS.setSelfLearning;
-            ellsas[i].data.isAutonomousMode = PARAMS.setAutonomousMode;
-            ellsas[i].data.isConflictDetection = PARAMS.setConflictDetection;
-            ellsas[i].data.isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-            ellsas[i].data.isVoidDetection2 = PARAMS.setVoidDetection2;
-            ellsas[i].data.isSubVoidDetection = PARAMS.setSubVoidDetection;
-            ellsas[i].data.isConflictResolution = PARAMS.setConflictResolution;
-            ellsas[i].data.isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-            ellsas[i].data.isFrontierRequest = PARAMS.setFrontierRequest;
-            ellsas[i].data.isSelfModelRequest = PARAMS.setSelfModelRequest;
-            ellsas[i].data.isCoopLearningWithoutOracle = PARAMS.setCoopLearning;
+            ellsas[i].data.PARAM_learningSpeed = PARAMS.learningSpeed;
+            ellsas[i].data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+            ellsas[i].data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+            ellsas[i].data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+            ellsas[i].data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+            ellsas[i].data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+            ellsas[i].data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+            ellsas[i].data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+            ellsas[i].data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+            ellsas[i].data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+            ellsas[i].data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+            ellsas[i].data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
 
-            ellsas[i].data.isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-            ellsas[i].data.nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-            ellsas[i].data.isDream = PARAMS.setDream;
-            ellsas[i].data.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-            ellsas[i].data.nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsas[i].data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+            ellsas[i].data.PARAM_isDream = PARAMS.setDream;
+            ellsas[i].data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsas[i].data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
             ellsas[i].getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-            ellsas[i].data.initRegressionPerformance = PARAMS.setRegressionPerformance;
-            ellsas[i].getEnvironment().minLevel = TRACE_LEVEL.OFF;
+            ellsas[i].data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+            ellsas[i].getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
             ellsas[i].setSubPercepts(PARAMS.subPercepts);
         }
 
