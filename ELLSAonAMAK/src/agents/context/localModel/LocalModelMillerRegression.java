@@ -748,6 +748,6 @@ public class LocalModelMillerRegression extends LocalModel{
 			difference += Math.abs(coefs[i] - otherModel.getCoef()[i]);
 		}
 
-		return difference;
+		return difference/coefs.length;
 	}
 }

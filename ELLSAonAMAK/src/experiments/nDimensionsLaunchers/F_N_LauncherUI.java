@@ -15,6 +15,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 
 
 /**
@@ -54,8 +55,8 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
-		
-		//amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
+
+		//ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
 		
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
@@ -76,6 +77,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
+        ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
 		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
 		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 

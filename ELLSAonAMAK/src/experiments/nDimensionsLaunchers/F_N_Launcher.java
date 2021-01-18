@@ -11,6 +11,7 @@ import java.util.*;
 import agents.head.REQUEST;
 import experiments.FILE;
 import fr.irit.smac.amak.Configuration;
+import fr.irit.smac.amak.tools.Log;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
@@ -34,7 +35,7 @@ public class F_N_Launcher implements Serializable {
 		start();
 
 
-
+		Log.enabled = false;
 	}
 	
 
@@ -236,6 +237,7 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
+		ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
 		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
 		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
@@ -256,6 +258,20 @@ public class F_N_Launcher implements Serializable {
 		for (int i = 0; i < PARAMS.nbCycle; ++i) {
 			ellsa.cycle();
 		}
+
+		for(int k=0;k<25;k++){
+			System.out.println(k + " " + ellsa.data.executionTimesSums[k]);
+		}
+
+		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
+			ellsa.cycle();
+		}
+		System.out.println(ellsa.getCycle());*/
+
+		/*while(ellsa.data.STATE_DreamCompleted!=1){
+			ellsa.cycle();
+		}*/
+
 
 		double errorsMean = 0;
 

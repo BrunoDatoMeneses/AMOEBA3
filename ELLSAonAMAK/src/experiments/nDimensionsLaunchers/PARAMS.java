@@ -20,10 +20,10 @@ public class PARAMS {
 
     public static final int nbCycle = 2000;
     public static final int nbCycleTest = 500;
-    public static final int nbTest = 3;
+    public static final int nbTest = 1;
     public static final double spaceSize = 50.0	;
     //public static double mappingErrorAllowed = 0.06;
-    public static double mappingErrorAllowed = 0.06; // USUAL
+    public static double mappingErrorAllowed = 0.01; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.2; // BIG 3D
 
@@ -34,7 +34,10 @@ public class PARAMS {
     public static final double setExternalContextInfluenceRatio = 0.25;
 
     /* PREDICTION */
-    public static final double setRegressionPerformance = 0.1;
+    public static final double setRegressionPerformance = 1; //Multi
+    //public static final double setRegressionPerformance = 0.05; //SinCos
+    //public static final double setRegressionPerformance = 0.5; // Goutte
+    //public static final double setRegressionPerformance = 1; // Carré
 
 
     /* REGRESSION */
@@ -62,7 +65,6 @@ public class PARAMS {
 
 
     /*NCS*/
-    public static final boolean setVoidDetection = false ; // OLD VOID
 
     public static final boolean setConflictDetection = true ;
     public static final boolean setConflictResolution = setConflictDetection ;
@@ -70,12 +72,13 @@ public class PARAMS {
     public static final boolean setConcurrenceResolution = setConcurrenceDetection ;
     public static final boolean setVoidDetection2 = true ;
     public static final boolean setSubVoidDetection = true ;
-    public static final boolean setFrontierRequest = true ; // ONLY FOR LINEAR MODELS
+    public static final boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
     public static final boolean setSelfModelRequest = true ;
 
     public static final boolean setCoopLearning = false ; // WITHOUT ORACLE
 
     public static final boolean setDream = false ;
+    public static final int setDreamCycleLaunch = 1500 ;
 
     public static final boolean setLearnFromNeighbors = false ;
 
@@ -88,5 +91,7 @@ public class PARAMS {
     public static  final boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.SUBCYCLE;
+
+
 }

@@ -89,21 +89,24 @@ public class Context extends EllsaAgent {
 	
 	public Context(ELLSA ellsa) {
 		super(ellsa);
+
+
+		getAmas().data.executionTimes[21]=System.currentTimeMillis();
 		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
 		}else{
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
+		getAmas().data.executionTimes[21]=System.currentTimeMillis()- getAmas().data.executionTimes[21];
 
 		buildContext();
 
-		getAmas().data.executionTimes[18]=System.currentTimeMillis();
+		getAmas().data.executionTimes[22]=System.currentTimeMillis();
 		criticalities = new Criticalities(5);
-		
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
-		getAmas().data.executionTimes[18]=System.currentTimeMillis()-getAmas().data.executionTimes[18];
+		getAmas().data.executionTimes[22]=System.currentTimeMillis()- getAmas().data.executionTimes[22];
 	}
 
 	// FOR TEST ONLY
@@ -125,6 +128,7 @@ public class Context extends EllsaAgent {
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
 		buildContext(bestNearestContext);
+		this.confidence = bestNearestContext.confidence;
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(5);
@@ -149,7 +153,7 @@ public class Context extends EllsaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	public Context(ELLSA ellsa, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
+	/*public Context(ELLSA ellsa, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
 		super(ellsa);
 		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
@@ -159,7 +163,7 @@ public class Context extends EllsaAgent {
 		buildContext(fatherContext, contextDimensions);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
-	}
+	}*/
 
 	private void buildContextCommon() {
 		this.tickCreation = getAmas().getCycle();
@@ -170,13 +174,14 @@ public class Context extends EllsaAgent {
 	 * Builds the context.
 	 */
 	private void buildContext() {
+		getAmas().data.executionTimes[20]=System.currentTimeMillis();
 
 		buildContextCommon();
 
 		Experiment firstPoint = new Experiment(this);
 		ArrayList<Percept> var = getAmas().getPercepts();
 
-		getAmas().data.executionTimes[17]=System.currentTimeMillis();
+
 
 		for (Percept p : var) {
 			Range r = null;
@@ -216,7 +221,7 @@ public class Context extends EllsaAgent {
 			p.addContextProjection(this);
 		}
 
-		getAmas().data.executionTimes[17]=System.currentTimeMillis()- getAmas().data.executionTimes[17];
+
 
 		//expand();
 
@@ -230,6 +235,8 @@ public class Context extends EllsaAgent {
 		this.setName(String.valueOf(this.hashCode()));
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
+
+		getAmas().data.executionTimes[20]=System.currentTimeMillis()- getAmas().data.executionTimes[20];
 	}
 
 	private Range initRange(Percept p, Pair<Double, Double> radiuses) {
@@ -761,7 +768,7 @@ public class Context extends EllsaAgent {
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
-	public void analyzeResults4(Head head) {
+	/*public void analyzeResults4(Head head) {
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- ANALYSE RESULTS " + this.getName())));
@@ -780,11 +787,11 @@ public class Context extends EllsaAgent {
 			if ( getAmas().data.contextFromPropositionWasSelected ){
 				solveNCS_Overlap(head.getBestContext());
 			}else{
-				solveNCS_BadPrediction(head); // TODO always good ?
+				solveNCS_BadPrediction(head);
 			}
 
 		}
-	}
+	}*/
 
 	public void analyzeResults5(Head head) {
 
@@ -798,9 +805,9 @@ public class Context extends EllsaAgent {
 		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
 			confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
-			if ( this !=  head.getBestContext()) {
+			/*if ( this !=  head.getBestContext()) {
 				solveNCS_Overlap(head.getBestContext());
-			}
+			}*/
 		} else {
 			solveNCS_BadPrediction(head); // TODO always good ?
 			}
@@ -963,6 +970,7 @@ public class Context extends EllsaAgent {
 		//boolean differentModel=distanceDifference>averageDistanceToOraclePrediction;
 
 		boolean differentModel=!isSameModel(ctxt);
+		boolean discontinuity= Math.abs(this.lastPrediction - ctxt.lastPrediction)> getAmas().getHeadAgent().getPredictionNeighborhoodRange();
 
 		int overlapCounts = 0;
 		for (Percept pct : getAmas().getPercepts()) {
@@ -978,7 +986,7 @@ public class Context extends EllsaAgent {
 			else if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
 				addVoids(ctxt, voidDistances, bounds, currentDistance, pct);
 			}
-			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && getAmas().data.PARAM_NCS_isFrontierRequest){
+			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && RAND_NUM.oneChanceIn((int)(1/getAmas().data.PARAM_probabilityOfRangeAmbiguity)) && getAmas().data.PARAM_NCS_isFrontierRequest){
 				HashMap<Percept, Pair<Double, Double>> frontierBounds = getFrontierBounds(ctxt, pct);
 
 				if (frontierBounds.size()==getAmas().getPercepts().size()){
@@ -1025,8 +1033,8 @@ public class Context extends EllsaAgent {
 		frontierRequestRight.put(pct, frontierBounds.get(pct).getB()- (pct.getMappingErrorAllowedMin()/2));
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
 
-		int chances = (getAmas().getCycle()>1000) ? 2 : 5;
-		if(getAmas().getHeadAgent().requestIsEmpty() && RAND_NUM.oneChanceIn(10) && getAmas().data.PARAM_NCS_isFrontierRequest){
+
+		if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
 
 			potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
 			potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
@@ -1508,21 +1516,9 @@ public class Context extends EllsaAgent {
 
 			if(ctxt != this && !ctxt.isDying()) {
 
-
-
-				double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
-				double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
-
-
-				//double minDistanceToOraclePrediction = Math.min(getAmas().getHeadAgent().getDistanceToRegressionAllowed(), getAmas().getHeadAgent().getDistanceToRegressionAllowed());
-				//Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-				//Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
-
-				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(this.getName(),"currentDistanceToOraclePrediction",""+ currentDistanceToOraclePrediction,"otherContextDistanceToOraclePrediction",""+ otherContextDistanceToOraclePrediction, "distanceDifference", ""+distanceDifference, "model difference", "" + this.getLocalModel().getModelDifference(ctxt.getLocalModel()))));
-
-				//if(distanceDifference<averageDistanceToOraclePrediction) {
-				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
-				if(isSameModel(ctxt)) {
+				boolean sameModel = isSameModel(ctxt);
+				getEnvironment().print(TRACE_LEVEL.DEBUG, this.getName(),ctxt.getName(),"isSameModel",sameModel);
+				if(sameModel) {
 
 
 
@@ -1692,7 +1688,7 @@ public class Context extends EllsaAgent {
 		}
 		
 		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
-		confidence = Math.max(this.getConfidence() , fusionContext.getConfidence()); // TODO too much ?
+		confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
@@ -3056,7 +3052,7 @@ public class Context extends EllsaAgent {
 
 	public void NCSDetection_Uselessness() {
 		for (Percept v : ranges.keySet()) {
-			if (ranges.get(v).isTooSmall()) {
+			if (ranges.get(v).isTooSmall() || ranges.get(v).isAnomaly()) {
 				solveNCS_Uselessness();
 				break;
 			}
@@ -3085,9 +3081,11 @@ public class Context extends EllsaAgent {
 	
 	private void onActOpitmized() {
 		if(amas.getValidContexts().contains(this)) {
-			logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
+			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			activations++;
 			getAmas().getHeadAgent().proposition(this);
+		}else{
+			NCSDetection_Uselessness();
 		}
 	}
 

@@ -117,6 +117,11 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		saver = new SaveHelperImpl(this, window);
 		saver.load(path);
 		multiUIWindow = window;
+
+
+		for(int i =0 ; i< 25;i++) {
+			data.executionTimesSums[i]=0.0;
+		}
 	}
 
 	@Override
@@ -185,25 +190,36 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			gloabalMappingCriticality.addData("Current Value", cycle, head.getAverageSpatialCriticality(), notify);
 			gloabalMappingCriticality.addData("Zero", cycle, 0.0, notify);
 			
-			timeExecution.addData("HeadPlay", cycle, data.executionTimesSums[0], notify);
-			timeExecution.addData("EndogenousPlay", cycle, data.executionTimesSums[1], notify);
-			timeExecution.addData("ContextSelfAnalisis", cycle, data.executionTimesSums[2], notify);
-			timeExecution.addData("IncompetentNCS", cycle, data.executionTimesSums[3], notify);
-			timeExecution.addData("ConcurrenceNCS", cycle, data.executionTimesSums[4], notify);
-			timeExecution.addData("NewContextNCS", cycle, data.executionTimesSums[5], notify);
-			timeExecution.addData("OvermappingNCS", cycle, data.executionTimesSums[6], notify);
-			timeExecution.addData("Other", cycle, data.executionTimesSums[7], notify);
-			timeExecution.addData("BestContextInNeighbors", cycle, data.executionTimesSums[8], notify);
-			timeExecution.addData("CreateContext", cycle, data.executionTimesSums[9], notify);
-			timeExecution.addData("UpdateStatitics", cycle, data.executionTimesSums[10], notify);
-			timeExecution.addData("ChildContext", cycle, data.executionTimesSums[11], notify);
-			timeExecution.addData("PotentialRequest", cycle, data.executionTimesSums[12], notify);
-			timeExecution.addData("EndogenousRequestOverlaps", cycle, data.executionTimesSums[13], notify);
-			timeExecution.addData("EndogenousRequestVoids", cycle, data.executionTimesSums[14], notify);
-			timeExecution.addData("CreateContextFromGodFather", cycle, data.executionTimesSums[15], notify);
-			timeExecution.addData("CreateContextAlone", cycle, data.executionTimesSums[16], notify);
-			timeExecution.addData("CreateContextAloneRanges", cycle, data.executionTimesSums[17], notify);
-			timeExecution.addData("CreateContextAloneOtherThanBuild", cycle, data.executionTimesSums[18], notify);
+			timeExecution.addData("CycleBegin", cycle, data.executionTimesSums[0], notify);
+			timeExecution.addData("Percepts", cycle, data.executionTimesSums[1], notify);
+			timeExecution.addData("Contexts", cycle, data.executionTimesSums[2], notify);
+			timeExecution.addData("Head", cycle, data.executionTimesSums[3], notify);
+			timeExecution.addData("computePendingAgents", cycle, data.executionTimesSums[4], notify);
+			timeExecution.addData("CycleEnd", cycle, data.executionTimesSums[5], notify);
+
+			timeExecution.addData("HeadPlay", cycle, data.executionTimesSums[6], notify);
+			timeExecution.addData("HeadOther", cycle, data.executionTimesSums[7], notify);
+
+			timeExecution.addData("NCS", cycle, data.executionTimesSums[8], notify);
+
+			timeExecution.addData("NCS_Uslessness", cycle, data.executionTimesSums[9], notify);
+			timeExecution.addData("NCS_IncompetendHead", cycle, data.executionTimesSums[10], notify);
+			timeExecution.addData("NCS_ConcurrenceAndConflict", cycle, data.executionTimesSums[11], notify);
+			timeExecution.addData("NCS_Create_New_Context", cycle, data.executionTimesSums[12], notify);
+			timeExecution.addData("NCS_Overmapping", cycle, data.executionTimesSums[13], notify);
+			timeExecution.addData("NCS_ChildContext", cycle, data.executionTimesSums[14], notify);
+			timeExecution.addData("NCS_PotentialRequest", cycle, data.executionTimesSums[15], notify);
+			timeExecution.addData("NCS_Dream", cycle, data.executionTimesSums[16], notify);
+
+			timeExecution.addData("NCS_NewCtxt_getBestNeighbor", cycle, data.executionTimesSums[17], notify);
+			timeExecution.addData("NCS_NewCtxt_CreationWithNeighbor", cycle, data.executionTimesSums[18], notify);
+			timeExecution.addData("NCS_NewCtxt_CreationAlone", cycle, data.executionTimesSums[19], notify);
+
+			timeExecution.addData("NCS_NewCtxt_BuildAlone", cycle, data.executionTimesSums[20], notify);
+			timeExecution.addData("NCS_NewCtxt_BeforeBuildAlone", cycle, data.executionTimesSums[21], notify);
+			timeExecution.addData("NCS_NewCtxt_AfterBuildAlone", cycle, data.executionTimesSums[22], notify);
+			timeExecution.addData("NCS_NewCtxt_LogBuildAlone", cycle, data.executionTimesSums[23], notify);
+			timeExecution.addData("NCS_NewCtxt_RAISEAlone", cycle, data.executionTimesSums[24], notify);
 			
 			criticalities.addData("Prediction", cycle, data.evolutionCriticalityPrediction, notify);
 			criticalities.addData("Mapping", cycle, data.evolutionCriticalityMapping, notify);
@@ -222,6 +238,11 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 	@Override
 	public void onSystemCycleBegin() {
+
+
+
+		data.executionTimes[0]=System.currentTimeMillis();
+
 		cycle++;
 		if (cycle % 1000 == 0) {
 			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
@@ -274,6 +295,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		lastModifiedContext.clear();
 		alteredContexts.clear();
 		data.higherNeighborLastPredictionPercepts=null;
+
+		data.executionTimes[0]=System.currentTimeMillis()- data.executionTimes[0];
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -290,6 +313,9 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	
 	@Override
 	public void onSystemCycleEnd() {
+
+		data.executionTimes[5]=System.currentTimeMillis();
+
 		
 		if(studiedSystem != null) {
 			if(data.selfLearning) {
@@ -311,6 +337,11 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		super.onSystemCycleEnd();
 		if(saver != null)
 			saver.autosave();
+
+		data.executionTimes[5]=System.currentTimeMillis()- data.executionTimes[5];
+		for(int i = 0 ; i<25;i++) {
+			data.executionTimesSums[i] += data.executionTimes[i];
+		}
 	}
 
 	public void onSystemCycleEndWithoutSave() {
@@ -346,6 +377,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	public void cycle() {
 
 
+
 		onSystemCycleBegin();
 
 		runAgents();
@@ -360,20 +392,27 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	}
 
 	public void computePendingAgents() {
+		data.executionTimes[4]=System.currentTimeMillis();
 		removePendingAgents();
-
 		addPendingAgents();
+		data.executionTimes[4]=System.currentTimeMillis()- data.executionTimes[4];
 	}
 
 	private void runAgents() {
 		// run percepts
+		data.executionTimes[1]=System.currentTimeMillis();
 		Stream<Context> contextStream = runPercepts();
+		data.executionTimes[1]=System.currentTimeMillis()- data.executionTimes[1];
 
 		// run contexts
+		data.executionTimes[2]=System.currentTimeMillis();
 		runContexts(contextStream);
+		data.executionTimes[2]=System.currentTimeMillis()- data.executionTimes[2];
 
 		// run head
+		data.executionTimes[3]=System.currentTimeMillis();
 		runHeads();
+		data.executionTimes[3]=System.currentTimeMillis()- data.executionTimes[3];
 	}
 
 

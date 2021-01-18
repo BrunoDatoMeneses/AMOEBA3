@@ -79,8 +79,8 @@ public class F_N_Manager implements StudiedSystem{
 
 
 	/* Parameters */
-	private static final double gaussianCoef = 1000;
-	private static final double gaussianVariance = 10;
+	private static final double gaussianCoef = 10000;
+	private static final double gaussianVariance = 15;
 	
 	
 	public F_N_Manager(double size, int dim, int nbOfModels, int nrmType, boolean rndExploration, double explIncrement, double explnVariation, boolean limiteToSpace, double noise) {
@@ -351,11 +351,11 @@ public class F_N_Manager implements StudiedSystem{
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
 		//return squareSimpleModel(xRequest);
 		
-		//int subzone = subzone2D(xRequest);
+		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
-		//model="Multi";
-		//return multiModel(xRequest, subzone);
+		model="Multi";
+		return multiModel(xRequest, subzone);
 		
 
 		/* LINEAR */
@@ -369,7 +369,7 @@ public class F_N_Manager implements StudiedSystem{
 
 		/* Square artcile JFSMA 2020*/
 		//model="SquareJFSMA2020";
-		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 		
 		/* Triangle */
 		//model="Triangle";
@@ -476,13 +476,13 @@ public class F_N_Manager implements StudiedSystem{
 		}else {
 			xRequest = situation;
 		}	
-		if(xRequest[0] > 0 && xRequest[1] > 0) {
+		if(xRequest[0] >= 0 && xRequest[1] >= 0) {
 			return 1;
 		}else if(xRequest[0] < 0 && xRequest[1] < 0){
 			return 2;
-		}else if(xRequest[0] < 0 && xRequest[1] > 0){
+		}else if(xRequest[0] < 0 && xRequest[1] >= 0){
 			return 3;
-		}else if(xRequest[0] > 0 && xRequest[1] < 0){
+		}else if(xRequest[0] >= 0 && xRequest[1] < 0){
 			return 4;
 		}else {
 			return 0;
@@ -545,7 +545,7 @@ private double[] subZoneCenter3D(int nb) {
 	}
 	
 	private double gaussianMapping2D(Double[] xRequest) {
-		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/5, 2))/2) -50) ? model1() : model2();
+		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/7, 2))/2) -50) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
 
 

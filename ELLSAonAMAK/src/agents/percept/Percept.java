@@ -61,6 +61,7 @@ public class Percept extends EllsaAgent {
 		}
 
 		computeContextProjectionValidityOptimized();
+
 	}
 	
 	public void computeContextProjectionValidityOptimized() {
@@ -112,7 +113,7 @@ public class Percept extends EllsaAgent {
 			computeContextProjectionSubNeighborsOptimized();
 		}
 		
-		logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), activatedContexts.toString());
+		//logger().debug("CYCLE "+getAmas().getCycle(), "%s's valid contexts : %s", toString(), activatedContexts.toString());
 	}
 
 	public void computeContextProjectionSubNeighborsOptimized() {

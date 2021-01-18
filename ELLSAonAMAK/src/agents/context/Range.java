@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 
 import agents.percept.Percept;
 import kernel.ELLSA;
@@ -902,11 +903,20 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 */
 	public boolean isTooSmall() {
 		
-		if((end - start) < percept.getMappingErrorAllowedMin()) {
-			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "TOO SMALL DISTANCE", "" + (end - start))));
+		if(Math.abs(end - start) < percept.getMappingErrorAllowedMin()) {
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "TOO SMALL DISTANCE", "" + Math.abs(end - start))));
 		}
 
-		return ((end - start) < percept.getMappingErrorAllowedMin()) && !this.isPerceptEnum();
+		return (Math.abs(end - start) < percept.getMappingErrorAllowedMin()) && !this.isPerceptEnum();
+	}
+
+	public boolean isAnomaly() {
+
+		if(start > end) {
+			world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.context.getName(), this.percept.getName(), "Anomaly", "Start : " + start + ">" + " End" + end)));
+		}
+
+		return start > end;
 	}
 
 	/**
@@ -1028,7 +1038,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	}
 
-	public void adaptTowardsBorder(Context bestContext) {
+	/*public void adaptTowardsBorder(Context bestContext) {
 
 		Range bestContextRanges = bestContext.getRanges().get(percept);
 
@@ -1047,9 +1057,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 			}
 		}
 
-	}
+	}*/
 
-	public void adaptOnOverlap(Range overlappingContextRanges, double border) {
+	/*public void adaptOnOverlap(Range overlappingContextRanges, double border) {
 
 		world.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
 				"*********************************************************************************************************** ADAPT ON OVERLAP")));
@@ -1161,9 +1171,9 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 		// }
 
-	}
+	}*/
 
-	public void setOnConcurentOverlap(Range overlappingContextRanges, double border) {
+	/*public void setOnConcurentOverlap(Range overlappingContextRanges, double border) {
 
 		world.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList(this.context.getName(), percept.getName(),
 				"*********************************************************************************************************** SET ON OVERLAP")));
@@ -1282,7 +1292,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 		// }
 
-	}
+	}*/
 
 	public boolean containedBy(Range range) {
 		return range.getStart() <= this.getStart() && this.getEnd() <= range.getEnd();
@@ -1647,6 +1657,10 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	public double getCenter() {
 		return (end + start) / 2;
+	}
+
+	public double getRandom() {
+		return start + getLenght()*Math.random();
 	}
 
 	public double getRadius() {

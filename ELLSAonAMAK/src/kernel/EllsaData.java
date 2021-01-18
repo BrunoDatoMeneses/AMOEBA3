@@ -87,8 +87,8 @@ public class EllsaData implements Serializable {
 	public DynamicPerformance regressionPerformance;
 	public DynamicPerformance mappingPerformance;
 	
-	public double[] executionTimes = new  double[20];
-	public double[] executionTimesSums = new double[20];
+	public double[] executionTimes = new  double[30];
+	public double[] executionTimesSums = new double[30];
 	
 
 	
@@ -170,12 +170,14 @@ public class EllsaData implements Serializable {
 	public boolean PARAM_isLearnFromNeighbors = false;
 	public boolean PARAM_isDream = false;
 
+	public int PARAM_DreamCycleLaunch = 1500;
+	public int STATE_DreamCompleted = -1; // -1 : before process / 0 : processing / 1 processed
 
 	public int PARAM_nbOfNeighborForLearningFromNeighbors = 10000;
 	public int PARAM_nbOfNeighborForVoidDetectionInSelfLearning = 10000;
 	public int PARAM_nbOfNeighborForContexCreationWithouOracle = 10000;
 
-
+	public double PARAM_probabilityOfRangeAmbiguity = 0.1;
 
 
 	// TODO A SUPPRIMER

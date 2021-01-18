@@ -100,9 +100,7 @@ public class Head extends EllsaAgent {
 	public Head(ELLSA ellsa) {
 		super(ellsa);
 		
-		for(int i =0 ; i< 20;i++) {
-			getAmas().data.executionTimesSums[i]=0.0;
-		}
+
 	}
 
 	/**
@@ -113,8 +111,8 @@ public class Head extends EllsaAgent {
 	public void onAct() {
 
 
+		getAmas().data.executionTimes[6]=System.currentTimeMillis();
 		onActInit();
-
 		if(getAmas().data.isSubPercepts){
 			playWithoutOracleAndAllPercets();
 		}
@@ -128,14 +126,14 @@ public class Head extends EllsaAgent {
 			bestContext.isBest = true;
 			bestContext.isInNeighborhood = true;
 		}
+		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
+		getAmas().data.executionTimes[7]=System.currentTimeMillis();
 		testIfrequest();
-
-		updateStatisticalInformations(); /// regarder dans le détail, possible que ce pas trop utile
-
-
-
+		updateStatisticalInformations(); // regarder dans le détail, possible que ce pas trop utile
 		newContext = null;
+		getAmas().data.executionTimes[7]=System.currentTimeMillis()- getAmas().data.executionTimes[7];
+
 	}
 
 	private void onActInit() {
@@ -151,9 +149,7 @@ public class Head extends EllsaAgent {
 
 
 
-		for(int i = 0 ; i<20;i++) {
-			getAmas().data.executionTimes[i] = 0.0;
-		}
+
 
 
 		if(getAmas().getCycle()%1000 == 0) {
@@ -337,11 +333,9 @@ public class Head extends EllsaAgent {
 		if(getAmas().isReinforcement()) {
 			reinforcementWithOracle();
 		}
-		
 
-		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
-		getAmas().data.executionTimes[0]=System.currentTimeMillis();
+
 		if(getAmas().getCycle() % 50 == 0){
 			if(lastEndogenousRequest != null){
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -359,7 +353,6 @@ public class Head extends EllsaAgent {
 					+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests())));
 		}
 
-
 		updateBestContextWithOracle();
 
 		updateCriticalityWithOracle();
@@ -372,15 +365,11 @@ public class Head extends EllsaAgent {
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
-		getAmas().data.executionTimes[0]=System.currentTimeMillis()- getAmas().data.executionTimes[0];
 
-		getAmas().data.executionTimes[1]=System.currentTimeMillis();
-		// endogenousPlay();
-		getAmas().data.executionTimes[1]=System.currentTimeMillis()- getAmas().data.executionTimes[1];
 
-		getAmas().data.executionTimes[2]=System.currentTimeMillis();
+
+		updateNeighborContextLastPredictions();
 		selfAnalysationOfContexts4();
-		getAmas().data.executionTimes[2]=System.currentTimeMillis()- getAmas().data.executionTimes[2];
 
 
 		if(getAmas().getCycle()>getAmas().data.PARAM_bootstrapCycle){
@@ -391,9 +380,7 @@ public class Head extends EllsaAgent {
 
 		updatePerformanceIndicators();
 
-		for(int i = 0 ; i<20;i++) {
-			getAmas().data.executionTimesSums[i] += getAmas().data.executionTimes[i];
-		}			
+
 
 		
 		
@@ -439,7 +426,9 @@ public class Head extends EllsaAgent {
 		if (activatedContexts.size() > 0) {
 			//selectBestContextWithConfidenceAndVolume(); // using highest confidence and volume
 			//selectBestContextWithDistanceToModelAndVolume(); // using closest distance and volume
-			selectBestContextWithDistanceToModel();
+			//selectBestContextWithDistanceToModel();
+			//selectBestContextWithDistanceToModelAndConfidance();
+			selectBestContextWithDistanceToModelConfidanceAndVolume();
 
 		} else {
 			bestContext = lastUsedContext;
@@ -486,7 +475,7 @@ public class Head extends EllsaAgent {
 	}
 
 	private void updatePerformanceIndicators() {
-		getAmas().data.executionTimes[7]=System.currentTimeMillis();
+
 
 
 		criticalities.addCriticality("spatialCriticality",
@@ -574,62 +563,39 @@ public class Head extends EllsaAgent {
 				+ ((1 - lembda) * getAmas().data.currentCriticalityConfidence);
 
 
-		getAmas().data.executionTimes[7]=System.currentTimeMillis()- getAmas().data.executionTimes[7];
+
 	}
 
 	private void allNCSDetectionsWithOracle() {
+		getAmas().data.executionTimes[8]=System.currentTimeMillis();
 
 		NCSDetection_Uselessness();
-
-
-		getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		if(lastEndogenousRequest==null){
 			NCSDetection_IncompetentHead();
 		}
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID  && lastEndogenousRequest.getType()!= REQUEST.SUBVOID){
 			NCSDetection_IncompetentHead();
 		}
-		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
-
-
-		getAmas().data.executionTimes[4]=System.currentTimeMillis();
-
 		if(getAmas().data.PARAM_NCS_isConcurrenceResolution){
-			NCSDetection_Concurrence(); /* If result is good, shrink redundant context (concurrence NCS) */
+			NCSDetection_ConcurrenceAndConlict(); /* If result is good, shrink redundant context (concurrence NCS) */
 		}
-		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
-
-		getAmas().data.executionTimes[5]=System.currentTimeMillis();
 		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
-		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
-
-		getAmas().data.executionTimes[6]=System.currentTimeMillis();
 		NCSDetection_Context_Overmapping();
-		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
-
-
-		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 		NCSDetection_ChildContext();
-		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
-
-		getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
 			//NCSDetection_PotentialSubRequest();
 		}
-
 		NCSDetection_Dream();
 
-		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
+		getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 	}
 
 
 	private void allNCSDetectionsWithoutOracle() {
+		getAmas().data.executionTimes[8]=System.currentTimeMillis();
 
 		NCSDetection_Uselessness();
-
-
-		getAmas().data.executionTimes[3]=System.currentTimeMillis();
 		/*if(lastEndogenousRequest==null){
 			if(getAmas().data.isSelfLearning){
 				NCSDetection_IncompetentHeadWitoutOracle();
@@ -639,44 +605,21 @@ public class Head extends EllsaAgent {
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID){
 			NCSDetection_IncompetentHeadWitoutOracle();
 		}*/
-		getAmas().data.executionTimes[3]=System.currentTimeMillis()- getAmas().data.executionTimes[3];
-
 
 		//NCSDetection_LearnFromNeighbors();
-
-
-		getAmas().data.executionTimes[4]=System.currentTimeMillis();
 		NCSDetection_ConcurrenceAndConclictWithoutOracle(); // If result is good, shrink redundant context (concurrence NCS)
-		getAmas().data.executionTimes[4]=System.currentTimeMillis()- getAmas().data.executionTimes[4];
-
-		getAmas().data.executionTimes[5]=System.currentTimeMillis();
 		NCSDetection_Create_New_ContextWithoutOracle();  //Finally, head agent check the need for a new context agent
-		getAmas().data.executionTimes[5]=System.currentTimeMillis()- getAmas().data.executionTimes[5];
-
-		getAmas().data.executionTimes[6]=System.currentTimeMillis();
 		NCSDetection_Context_OvermappingWithouOracle();
-		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
-
-
-
-
-
-		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 		NCSDetection_ChildContext();
-		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
-
-
-
 		NCSDetection_Dream();
-		getAmas().data.executionTimes[12]=System.currentTimeMillis();
 		if(lastEndogenousRequest!= null){
 			if(getAmas().getCycle()>0 && lastEndogenousRequest.getType() == REQUEST.DREAM){
 				NCSDetection_PotentialRequest();
 			}
 		}
-		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
-
 		resetLastEndogenousRequest();
+
+		getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 	}
 
 	private void NCSDetection_LearnFromNeighbors() {
@@ -864,7 +807,8 @@ public class Head extends EllsaAgent {
 
 		updateCriticalityWithoutOracle();
 
-		updateActivatedContextLastPredictions();
+		//updateActivatedContextLastPredictions(); //TODO choisir ?
+		updateNeighborContextLastPredictions();
 
 		if(getAmas().data.PARAM_isSelfLearning && getAmas().getCycle()>getAmas().data.PARAM_bootstrapCycle){
 			allNCSDetectionsWithoutOracle();
@@ -883,6 +827,11 @@ public class Head extends EllsaAgent {
 	private void updateActivatedContextLastPredictions() {
 		for(Context activatedContext : activatedContexts){
 			activatedContext.lastPrediction = activatedContext.getActionProposal();
+		}
+	}
+	private void updateNeighborContextLastPredictions() {
+		for(Context neighborContext : activatedNeighborsContexts){
+			neighborContext.lastPrediction = neighborContext.getActionProposal();
 		}
 	}
 
@@ -1518,6 +1467,7 @@ public class Head extends EllsaAgent {
 	}
 	
 	private void NCSDetection_ChildContext() {
+		getAmas().data.executionTimes[14]=System.currentTimeMillis();
 
 		if(getAmas().data.PARAM_NCS_isSelfModelRequest){
 			if(getAmas().data.PARAM_isActiveLearning) {
@@ -1559,7 +1509,7 @@ public class Head extends EllsaAgent {
 		}
 
 
-
+		getAmas().data.executionTimes[14]=System.currentTimeMillis()- getAmas().data.executionTimes[14];
 	}
 
 	private void NCSDetection_ChildContextWithoutOracle() {
@@ -1610,6 +1560,8 @@ public class Head extends EllsaAgent {
 	}
 
 	private void NCSDetection_Create_New_Context() {
+		getAmas().data.executionTimes[12]=System.currentTimeMillis();
+
 		/* Finally, head agent check the need for a new context agent */
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -1630,28 +1582,18 @@ public class Head extends EllsaAgent {
 			
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
-			
-			getAmas().data.executionTimes[8]=System.currentTimeMillis();		
+
 			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
-			getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 
 
-
-			getAmas().data.executionTimes[9]=System.currentTimeMillis();
 			Context context;
 			if (nearestGoodContext.getA() != null) {
 				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
 						"************************************* NEAREST GOOD CONTEXT")));
-				getAmas().data.executionTimes[15]=System.currentTimeMillis();
 				context = createNewContext(nearestGoodContext.getA());
-				getAmas().data.executionTimes[15]=System.currentTimeMillis()- getAmas().data.executionTimes[15];
 			} else {
-				getAmas().data.executionTimes[16]=System.currentTimeMillis();
 				context = createNewContext();
-				getAmas().data.executionTimes[16]=System.currentTimeMillis()- getAmas().data.executionTimes[16];
 			}
-			getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
-			// context = createNewContext();
 
 			bestContext = context;
 			newContext = context;
@@ -1678,20 +1620,18 @@ public class Head extends EllsaAgent {
 
 
 
-		
-
-		
-		
-		getAmas().data.executionTimes[10]=System.currentTimeMillis();
 		if (!newContextCreated) {
 			updateStatisticalInformations();
 		}
-		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 
 		resetLastEndogenousRequest();
+
+		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 	}
 
 	private void NCSDetection_Create_New_ContextWithoutOracle() {
+		getAmas().data.executionTimes[12]=System.currentTimeMillis();
+
 		/* Finally, head agent check the need for a new context agent */
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -1699,14 +1639,11 @@ public class Head extends EllsaAgent {
 
 
 		boolean newContextCreated = false;
-		getAmas().data.executionTimes[9]=System.currentTimeMillis();
 		if (activatedContexts.size() == 0 && activatedNeighborsContexts.size()>0 && getAmas().data.PARAM_isSelfLearning) {
 
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
 
-			getAmas().data.executionTimes[8]=System.currentTimeMillis();
-			getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 
 			Context context = createNewContextWithoutOracle();
 
@@ -1729,32 +1666,18 @@ public class Head extends EllsaAgent {
 			}
 
 
-
-
-
-
-
-
-
-
 		}
-		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
 
 
-
-
-
-
-		getAmas().data.executionTimes[10]=System.currentTimeMillis();
 		if (!newContextCreated) {
 			updateStatisticalInformations();
 		}
-		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 
-
+		getAmas().data.executionTimes[12]=System.currentTimeMillis()- getAmas().data.executionTimes[12];
 	}
 
 	private void NCSDetection_Context_Overmapping() {
+		getAmas().data.executionTimes[13]=System.currentTimeMillis();
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION OVERMAPPING")));
@@ -1768,9 +1691,12 @@ public class Head extends EllsaAgent {
 			}
 
 		}
+
+		getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 	}
 
 	private void NCSDetection_Context_OvermappingWithouOracle() {
+		getAmas().data.executionTimes[13]=System.currentTimeMillis();
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION OVERMAPPING WITHOU ORACLE")));
@@ -1784,10 +1710,14 @@ public class Head extends EllsaAgent {
 			}
 
 		}
+
+		getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 	}
 
-	private void NCSDetection_Concurrence() {
-		
+	private void NCSDetection_ConcurrenceAndConlict() {
+		getAmas().data.executionTimes[11]=System.currentTimeMillis();
+
+
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION CONCURRENCE")));
 		
@@ -1805,19 +1735,27 @@ public class Head extends EllsaAgent {
 		//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 
 				for (int i = 0; i<activatedContexts.size();i++) {
-					
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("activatedContexts.get(i) != bestContext", "" + ( activatedContexts.get(i) != bestContext))));
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("", "" + ( activatedContexts.get(i).getLocalModel().distance(activatedContexts.get(i).getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()))));
 
-					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && activatedContexts.get(i).isSameModel(bestContext)) {
+					boolean testSameModel = activatedContexts.get(i).isSameModel(bestContext);
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(activatedContexts.get(i).getName(),"activatedContexts.get(i) != bestContext", "" + ( activatedContexts.get(i) != bestContext))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(activatedContexts.get(i).getName(),"!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(activatedContexts.get(i).getName(),"", "" + testSameModel)));
+
+					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
+						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+					}else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
 					}
+
+
 			}
 		}
+
+		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 	}
 
 	private void NCSDetection_ConcurrenceAndConclictWithoutOracle() {
+		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION CONCURRENCE WITHOUT ORACLE")));
@@ -1844,6 +1782,7 @@ public class Head extends EllsaAgent {
 				}
 			}
 		}
+		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 	}
 
 	private void NCSDetection_IncompetentHead() {
@@ -1851,6 +1790,7 @@ public class Head extends EllsaAgent {
 		 * If there isn't any proposition or only bad propositions, the head is
 		 * incompetent. It needs help from a context.
 		 */
+		getAmas().data.executionTimes[10]=System.currentTimeMillis();
 		
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION INCOMPETENT HEAD")));
@@ -1880,6 +1820,8 @@ public class Head extends EllsaAgent {
 			 */
 
 		}
+
+		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 	}
 
 	private void NCSDetection_IncompetentHeadWitoutOracle() {
@@ -1916,15 +1858,16 @@ public class Head extends EllsaAgent {
 	}
 
 	public void NCSDetection_Dream() {
+		getAmas().data.executionTimes[16]=System.currentTimeMillis();
 
 
 		//if(getAmas().getCycle() % (500 * getAmas().getPercepts().size()) ==0 && getAmas().data.isDream){
-		if(getAmas().getCycle() == 2000 && getAmas().data.PARAM_isDream){
+		if(getAmas().getCycle() == getAmas().data.PARAM_DreamCycleLaunch && getAmas().data.PARAM_isDream){
 
 
 			getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = 5;
 			getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle = 5;
-			getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
+			//getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 
 			getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning, getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle);
 
@@ -1933,23 +1876,24 @@ public class Head extends EllsaAgent {
 			for(Context ctxt : getAmas().getContexts()){
 				HashMap<Percept,Double> request = new HashMap<>();
 				for(Percept pct : getAmas().getPercepts()){
-					request.put(pct,ctxt.getRanges().get(pct).getCenter());
+					request.put(pct,ctxt.getRanges().get(pct).getRandom());
 				}
 				addDreamRequest(request,5,ctxt);
 
 			}
+			getAmas().data.STATE_DreamCompleted=0;
 		}
 
-
+		getAmas().data.executionTimes[16]=System.currentTimeMillis()- getAmas().data.executionTimes[16];
 	}
 
 	public void NCSDetection_PotentialRequest() {
+		getAmas().data.executionTimes[15]=System.currentTimeMillis();
 		
 		if(getAmas().data.PARAM_isActiveLearning || getAmas().data.PARAM_isSelfLearning) {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 					+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
 
-			getAmas().data.executionTimes[13]=System.currentTimeMillis();
 			if (activatedNeighborsContexts.size() > 1) {
 				int i = 1;
 				for (Context ctxt : activatedNeighborsContexts) {
@@ -1968,9 +1912,7 @@ public class Head extends EllsaAgent {
 					i++;
 				}
 			}
-			getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 
-			getAmas().data.executionTimes[14]=System.currentTimeMillis();
 			boolean testVoid = false;
 			if(getAmas().data.PARAM_isActiveLearning){
 				testVoid = true;
@@ -2022,13 +1964,12 @@ public class Head extends EllsaAgent {
 
 				}
 			}
-			getAmas().data.executionTimes[14]=System.currentTimeMillis()- getAmas().data.executionTimes[14];
 			
 			
 		}
-		
-		
-		
+
+
+		getAmas().data.executionTimes[15]=System.currentTimeMillis()- getAmas().data.executionTimes[15];
 	}
 
 	public void NCSDetection_PotentialSubRequest() {
@@ -2159,6 +2100,8 @@ public class Head extends EllsaAgent {
 	}
 
 	private void NCSDetection_Uselessness() {
+		getAmas().data.executionTimes[9]=System.currentTimeMillis();
+
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("NCS DECTECTION USELESSNESS IN SELF ANALISIS")));
 		for (Context ctxt : activatedNeighborsContexts) {
 
@@ -2167,6 +2110,8 @@ public class Head extends EllsaAgent {
 			}
 
 		}
+
+		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
 	}
 
 	private void setNearestContextAsBestContext() {
@@ -2220,6 +2165,9 @@ public class Head extends EllsaAgent {
 	}
 
 	private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
+		getAmas().data.executionTimes[17]=System.currentTimeMillis();
+
+
 		double d = Double.MAX_VALUE;
 		Context bestContextInNeighbors = null;
 		
@@ -2243,8 +2191,8 @@ public class Head extends EllsaAgent {
 			}
 			
 		}
+		getAmas().data.executionTimes[17]=System.currentTimeMillis()- getAmas().data.executionTimes[17];
 		return new Pair<Context, Double>(bestContextInNeighbors, d);
-
 	}
 
 	/**
@@ -2361,36 +2309,48 @@ public class Head extends EllsaAgent {
 	 * @return the context
 	 */
 	private Context createNewContext() {
+		getAmas().data.executionTimes[19]=System.currentTimeMillis();
+
+		getAmas().data.executionTimes[24]=System.currentTimeMillis();
 		getAmas().data.newContextWasCreated = true;
 //		if (contexts.size() != 0) {
 //			System.exit(0);
 //		}
 		getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
+		getAmas().data.executionTimes[24]=System.currentTimeMillis()- getAmas().data.executionTimes[24];
+		getAmas().data.executionTimes[23]=System.currentTimeMillis();
 		Context context;
 		if (getAmas().data.firstContext) {
-			context = new Context(getAmas());
-			logger().debug("HEAD", "new context agent");
+			//logger().debug("HEAD", "new context agent");
 		} else {
-			context = new Context(getAmas());
 			getAmas().data.firstContext = true;
 		}
+		getAmas().data.executionTimes[23]=System.currentTimeMillis()- getAmas().data.executionTimes[23];
 
+
+		context = new Context(getAmas());
+
+
+		getAmas().data.executionTimes[19]=System.currentTimeMillis()- getAmas().data.executionTimes[19];
 		return context;
 	}
 
 	private Context createNewContext(Context bestNearestCtxt) {
+		getAmas().data.executionTimes[18]=System.currentTimeMillis();
 
 		getAmas().data.newContextWasCreated = true;
 		getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
 		Context context;
 		if (getAmas().data.firstContext) {
-			context = new Context(getAmas(), bestNearestCtxt);
-			logger().debug("HEAD", "new context agent");
-		} else {
-			context = new Context(getAmas());
-			getAmas().data.firstContext = true;
-		}
 
+			//logger().debug("HEAD", "new context agent");
+		} else {
+			System.err.println("THERE SHOULD BE A FIRST CONTEXT");
+			/*context = new Context(getAmas());
+			getAmas().data.firstContext = true;*/
+		}
+		context = new Context(getAmas(), bestNearestCtxt);
+		getAmas().data.executionTimes[18]=System.currentTimeMillis()- getAmas().data.executionTimes[18];
 
 		return context;
 	}
@@ -2696,6 +2656,65 @@ public class Head extends EllsaAgent {
 			if (currentDistanceToModel < distanceToModel) {
 				bc = context;
 				distanceToModel = currentDistanceToModel;
+			}
+		}
+		bestContext = bc;
+	}
+
+	private void selectBestContextWithDistanceToModelAndConfidance() {
+
+		Context bc;
+
+		bc = activatedContexts.get(0);
+		double distanceToModel = ((LocalModelMillerRegression) bc.getLocalModel()).distance(bc.getCurrentExperiment());
+		double inverseConfidance = 1/bc.getConfidence();
+		double criticality = ( 0.5 * distanceToModel ) + ( 0.5 * inverseConfidance ) ;
+
+		double currentDistanceToModel;
+		double currentInverseConfidance;
+		double currentCricality;
+
+		for (Context context : activatedContexts) {
+
+			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			currentInverseConfidance = 1/context.getConfidence();
+			currentCricality = ( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance ) ;
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "criticality "+currentCricality)));
+
+			if (currentCricality < criticality) {
+				bc = context;
+				criticality = currentCricality;
+			}
+		}
+		bestContext = bc;
+	}
+
+	private void selectBestContextWithDistanceToModelConfidanceAndVolume() {
+
+		Context bc;
+
+		bc = activatedContexts.get(0);
+		double distanceToModel = ((LocalModelMillerRegression) bc.getLocalModel()).distance(bc.getCurrentExperiment());
+		double inverseConfidance = 1/bc.getConfidence();
+		double inverseVolume = 1/bc.getVolume();
+		double criticality = (( 0.5 * distanceToModel ) + ( 0.5 * inverseConfidance )  + ( 0.5 * inverseVolume ))/1.5;
+
+		double currentDistanceToModel;
+		double currentInverseConfidance;
+		double currentInverseVolume;
+		double currentCricality;
+
+		for (Context context : activatedContexts) {
+
+			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			currentInverseConfidance = 1/context.getConfidence();
+			currentInverseVolume = 1/context.getVolume();
+			currentCricality = (( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance )  + ( 0.5 * currentInverseVolume ))/1.5;
+			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
+
+			if (currentCricality < criticality) {
+				bc = context;
+				criticality = currentCricality;
 			}
 		}
 		bestContext = bc;
@@ -3373,6 +3392,10 @@ public class Head extends EllsaAgent {
 
 	public boolean isDreamRequest(){
 		getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("ENDO DREAM REQUESTS", ""+endogenousDreamRequests.size())));
+
+		if(getAmas().data.STATE_DreamCompleted==0 && endogenousDreamRequests.isEmpty()){
+			getAmas().data.STATE_DreamCompleted=1;
+		}
 
 		return endogenousDreamRequests.size()>0;
 	}
