@@ -1566,10 +1566,11 @@ public class Context extends EllsaAgent {
 								}
 							}
 
-							if(fusionTest) {
+							if(fusionTest && getAmas().data.PARAM_NCS_isFusionResolution) {
 								solveNCS_OverMapping(ctxt, pct);
 							}
-							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified){
+							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 &&
+									!this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified && getAmas().data.PARAM_NCS_isRetrucstureResolution){
 
 
 
@@ -1820,7 +1821,7 @@ public class Context extends EllsaAgent {
 			endoExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_learningSpeed);
-			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
+			//getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
 
 
 		}

@@ -42,16 +42,17 @@ public class ContextColor {
 
 		
 		if(coefs.size()>=3) {
-			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(0)));
+			r =  0.0;//normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(0)));
 			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(1)));
 			b =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(2)));
+
 			
 			if(r.isNaN() || g.isNaN() || b.isNaN()) {
 				r = 255.0;
 				g = 0.0;
 				b = 0.0;
 			}
-		}else if(coefs.size()==2) {
+		}else if(coefs.size()>=2) {
 			r =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(0)));
 			g =  normalizePositiveValues(upperBound, dispersion,  Math.abs(coefs.get(1)));
 			

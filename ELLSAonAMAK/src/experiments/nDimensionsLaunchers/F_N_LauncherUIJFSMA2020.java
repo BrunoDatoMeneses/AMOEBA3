@@ -66,12 +66,12 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
 		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
 		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
 		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
 		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
+		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
@@ -83,7 +83,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
-		for(int i=0;i<PARAMS.nbCycle;i++){
+		for(int i = 0; i<PARAMS.nbLearningCycle; i++){
 			ellsa.cycle();
 			if(i%100 ==0){
 				System.out.print(i+",");
@@ -122,7 +122,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		ellsa2.saver = new SaveHelperImpl(ellsa2, amoebaUI);
 
-		ellsa2.saver.load("saves/"+PARAMS.nbCycle +"_TestManualSave.xml");
+		ellsa2.saver.load("saves/"+PARAMS.nbLearningCycle +"_TestManualSave.xml");
 		//amoeba2.saver.load("saves/"+amoeba.getCycle()+ "_" +dimension + "_" + nbCycle +"_TestManualSave.xml");
 		ellsa2.setRenderUpdate(true);
 

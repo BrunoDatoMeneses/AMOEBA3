@@ -165,6 +165,8 @@ public class EllsaData implements Serializable {
 	public boolean PARAM_NCS_isSelfModelRequest = false;
 	public boolean PARAM_NCS_isConflictResolution = false;
 	public boolean PARAM_NCS_isConcurrenceResolution = false;
+	public boolean PARAM_NCS_isFusionResolution = false;
+	public boolean PARAM_NCS_isRetrucstureResolution = false;
 
 
 	public boolean PARAM_isLearnFromNeighbors = false;

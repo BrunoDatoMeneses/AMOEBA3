@@ -166,7 +166,6 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			AmakPlot criticalities = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Criticalities");
 			AmakPlot nbNeighbors = ((EllsaMultiUIWindow)amasMultiUIWindow).getPlot("Number of neighbors");
 			
-			
 			boolean notify = isRenderUpdate();
 			
 			HashMap<NCS, Integer> thisLoopNCS = environment.getThisLoopNCS();
@@ -342,6 +341,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		for(int i = 0 ; i<25;i++) {
 			data.executionTimesSums[i] += data.executionTimes[i];
 		}
+
+		getEnvironment().print(TRACE_LEVEL.INFORM, "Number of Agents : ",getContexts().size());
 	}
 
 	public void onSystemCycleEndWithoutSave() {
@@ -526,7 +527,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 				try {
 					renderingPhaseSemaphore.acquire();
 				} catch (InterruptedException e) {
-					Log.defaultLog.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					getEnvironment().print(TRACE_LEVEL.ERROR, "[AMAS GUI]", "Failed to wait for GUI update to finish.");
+					//Log.defaultLog.error("[AMAS GUI]", "Failed to wait for GUI update to finish.");
 					e.printStackTrace();
 				}
 				// now the queue should be clear

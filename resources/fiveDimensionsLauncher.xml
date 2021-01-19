@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	<StartingAgents>
+	
+		<Sensor Name="px0" Enum="false" />
+		<Sensor Name="px1" Enum="false" />
+		<Sensor Name="px2" Enum="false" />
+		<Sensor Name="px3" Enum="false" />
+		<Sensor Name="px4" Enum="false" />
+	
+	  	<Controller Name="Controller">
+              <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />
+              
+        </Controller> 
+	</StartingAgents>
+	
+</System>

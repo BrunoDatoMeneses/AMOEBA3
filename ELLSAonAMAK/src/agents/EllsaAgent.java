@@ -6,6 +6,7 @@ import fr.irit.smac.amak.tools.Loggable;
 import gui.RenderStrategy;
 import kernel.ELLSA;
 import kernel.World;
+import utils.TRACE_LEVEL;
 
 /**
  * The base class for all AMOEBA agents
@@ -29,7 +30,8 @@ public abstract class EllsaAgent extends Agent<ELLSA, World> implements Loggable
 	@Override
 	protected void onReady() {
 		super.onReady();
-		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s ready.", toString());
+		getEnvironment().print(TRACE_LEVEL.DEBUG, "CYCLE "+getAmas().getCycle(), "Agent "+ toString() +" ready.");
+		//logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s ready.", toString());
 	}
 
 	@Override
@@ -69,7 +71,8 @@ public abstract class EllsaAgent extends Agent<ELLSA, World> implements Loggable
 			renderStrategy.delete();
 		}
 		super.destroy();
-		logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s destroyed.", toString());
+		getEnvironment().print(TRACE_LEVEL.DEBUG, "CYCLE "+getAmas().getCycle(), "Agent "+ toString()  +" destroyed.");
+		//logger().debug("CYCLE "+getAmas().getCycle(), "Agent %s destroyed.", toString());
 	}
 
 	/**

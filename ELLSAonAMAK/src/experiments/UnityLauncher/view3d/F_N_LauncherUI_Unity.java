@@ -65,7 +65,7 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, studiedSystem);
 
 
-		startTask(100, PARAMS.nbCycle);
+		startTask(100, PARAMS.nbLearningCycle);
 		
 
 		
@@ -135,12 +135,12 @@ public class F_N_LauncherUI_Unity extends Application implements Serializable {
 					ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
 					ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 					ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-					ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+					ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
 					ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
 					ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 					ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
 					ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-					ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
+					ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
 					ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 					ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;

@@ -45,9 +45,9 @@ public class F_N_Launcher implements Serializable {
 		String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 		String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
 		xpCSV = new CSVWriter(dateAndHour+"_Dim_"+PARAMS.dimension
-				+"_LearningCycles_" + PARAMS.nbCycle
-				+"_ExplotationCycles_" + PARAMS.nbCycleTest
-				+"_Episodes_" + PARAMS.nbTest
+				+"_LearningCycles_" + PARAMS.nbLearningCycle
+				+"_ExplotationCycles_" + PARAMS.nbExploitationCycle
+				+"_Episodes_" + PARAMS.nbEpisodes
 				+"_ActiveLearning_" + PARAMS.setActiveLearning
 				+"_SelfLearning_" + PARAMS.setSelfLearning
 				+"_Notes_" + PARAMS.model
@@ -79,13 +79,13 @@ public class F_N_Launcher implements Serializable {
 		}
 
 		double start = System.currentTimeMillis();
-		for (int i = 0; i < PARAMS.nbTest; ++i) {
+		for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
 			System.out.print(i + " ");
 			ellsaTest(data);
 		}
 		System.out.println("");
 		double total = (System.currentTimeMillis()- start)/1000;
-		double mean = total/ PARAMS.nbTest;
+		double mean = total/ PARAMS.nbEpisodes;
 		System.out.println("[TIME MEAN] " + mean + " s");
 		System.out.println("[TIME TOTAL] " + total + " s");
 
@@ -162,9 +162,9 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList("SET")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Dim", PARAMS.dimension+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Model",model)));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles",PARAMS.nbCycle+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles",PARAMS.nbCycleTest+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes",PARAMS.nbTest+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles",PARAMS.nbLearningCycle +"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles",PARAMS.nbExploitationCycle +"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes",PARAMS.nbEpisodes +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Space size",PARAMS.spaceSize*4+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error",PARAMS.mappingErrorAllowed+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
@@ -195,7 +195,7 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Conflicts",PARAMS.setConflictDetection+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Concurrences",PARAMS.setConcurrenceDetection+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences",PARAMS.setVoidDetection2+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences",PARAMS.setVoidDetection +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Ambiguities",PARAMS.setFrontierRequest+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Model",PARAMS.setSelfModelRequest+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Learn From Neighbors",PARAMS.setLearnFromNeighbors+"")));
@@ -227,12 +227,16 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
 		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
 		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
 		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
 		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
 		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
+		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
+		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+
+
+		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
@@ -246,6 +250,9 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_neighborhoodMultiplicator = PARAMS.setNeighborhoodMultiplicator;
 		ellsa.data.PARAM_externalContextInfluenceRatio = PARAMS.setExternalContextInfluenceRatio;
 
+
+		ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+
 		ellsa.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
 
 
@@ -255,8 +262,26 @@ public class F_N_Launcher implements Serializable {
 
 		
 		
-		for (int i = 0; i < PARAMS.nbCycle; ++i) {
+		/*for (int i = 0; i < PARAMS.nbLearningCycle; ++i) {
 			ellsa.cycle();
+		}*/
+		int count = 0;
+		boolean bug = false;
+		int agents = -2;
+		int oldAgents = 0;
+		while(!bug){
+			ellsa.cycle();
+			oldAgents = agents;
+			agents = ellsa.getContexts().size();
+			if(agents == oldAgents){
+				count++;
+			}else{
+				count = 0;
+			}
+
+			if(count>50){
+				bug=true;
+			}
 		}
 
 		for(int k=0;k<25;k++){
@@ -275,12 +300,12 @@ public class F_N_Launcher implements Serializable {
 
 		double errorsMean = 0;
 
-		for (int i = 0; i < PARAMS.nbCycleTest; ++i) {
+		for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
 			double currentError = studiedSystem.getErrorOnRequest(ellsa);
 			errorsMean += currentError;
 
 		}
-		errorsMean = errorsMean/(PARAMS.nbCycleTest);
+		errorsMean = errorsMean/(PARAMS.nbExploitationCycle);
 
 		HashMap<String, Double> mappingScores = ellsa.getHeadAgent().getMappingScores();
 		System.out.println(mappingScores);

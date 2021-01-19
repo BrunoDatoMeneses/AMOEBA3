@@ -914,7 +914,8 @@ public class Head extends EllsaAgent {
 	}
 
 	private void updateBestContextAndPropositionWithoutOracle() {
-		logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
+		//logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
+		getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
 
 		//selectBestContextWithConfidenceAndVolume();
 		selectBestContextWithConfidence();
@@ -965,21 +966,28 @@ public class Head extends EllsaAgent {
 
 		}
 		if(bestContext != null) {
-			logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
+			//logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
 			// Config.print("With function : " +
 			// bestContext.getFunction().getFormula(bestContext), 0);
-			logger().debug("HEAD without oracle",
-					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle","BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+
+			//logger().debug("HEAD without oracle",	"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
 			// functionSelected = bestContext.getFunction().getFormula(bestContext);
 
 		}
 		else {
-			logger().debug("HEAD without oracle", "no Best context selected ");
+			//logger().debug("HEAD without oracle", "no Best context selected ");
+
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "no Best context selected ");
+
 		}
 	}
 
 	private void updateBestContextAndPropositionWithoutOracleFromPseudoActivatedContexts() {
-		logger().debug("HEAD without oracle and all percepts", "Nombre de contextes activés: " + activatedContexts.size());
+		//logger().debug("HEAD without oracle and all percepts", "Nombre de contextes activés: " + activatedContexts.size());
+		getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle and all percepts", "Nombre de contextes activés: " + activatedContexts.size());
+
 
 		getAmas().data.nonCondireredPerceptsSyntheticValues = new HashMap<>();
 
@@ -1088,16 +1096,23 @@ public class Head extends EllsaAgent {
 
 
 		if(bestContext != null) {
-			logger().debug("HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
+			//logger().debug("HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
+
+
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
+
 			// Config.print("With function : " +
 			// bestContext.getFunction().getFormula(bestContext), 0);
-			logger().debug("HEAD without oracle and all percepts",
-					"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+			//logger().debug("HEAD without oracle and all percepts","BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle and all percepts","BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
+
 			// functionSelected = bestContext.getFunction().getFormula(bestContext);
 
 		}
 		else {
-			logger().debug("HEAD without oracle", "no Best context selected ");
+			//logger().debug("HEAD without oracle", "no Best context selected ");
+			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "no Best context selected ");
 		}
 
 	}

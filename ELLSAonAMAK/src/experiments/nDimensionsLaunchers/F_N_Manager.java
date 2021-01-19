@@ -354,8 +354,8 @@ public class F_N_Manager implements StudiedSystem{
 		int subzone = subzone2D(xRequest);
 		
 		/* Multi */
-		model="Multi";
-		return multiModel(xRequest, subzone);
+		/*model="Multi";
+		return multiModel(xRequest, subzone);*/
 		
 
 		/* LINEAR */
@@ -368,9 +368,10 @@ public class F_N_Manager implements StudiedSystem{
 		//return squareModel(xRequest);
 
 		/* Square artcile JFSMA 2020*/
-		//model="SquareJFSMA2020";
-		//return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
-		
+		model="SquareJFSMA2020";
+		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+
+
 		/* Triangle */
 		//model="Triangle";
 		//return diagModel(xRequest);
@@ -449,21 +450,21 @@ public class F_N_Manager implements StudiedSystem{
 	private double multiModel(Double[] xRequest, int subzone) {
 		if(subzone == 1) {
 			/* Disques */
-			return modelN(xRequest) ;
+			return 20000 + modelN(xRequest) ;
 		}else if (subzone == 2) {
 			/* Gaussian model */
-			return gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
+			return 20000 +gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
 			
 		}else if (subzone == 3) {
 			/* Square */
-			return square2DModel(xRequest, subZoneCenter3D(3));
+			return 20000 +square2DModel(xRequest, subZoneCenter3D(3));
 			
 		}else if (subzone == 4) {
 			/* Exp */
-			return gaussianMapping2D(xRequest);
+			return 20000 +gaussianMapping2D(xRequest);
 		}
 		
-		return model1();
+		return 20000 +model1();
 	}
 	
 	
@@ -729,7 +730,7 @@ private double[] subZoneCenter3D(int nb) {
 		double result = 0.0;
 		result += x0*0;
 		result += x1*150;
-		result += 0;
+		result += 20000;
 		return result;
 	}
 
@@ -737,7 +738,7 @@ private double[] subZoneCenter3D(int nb) {
 		double result = 0.0;
 		result += x0*150;
 		result += x1*0;
-		result += 0;
+		result += 20000;
 		return result;
 	}
 	
