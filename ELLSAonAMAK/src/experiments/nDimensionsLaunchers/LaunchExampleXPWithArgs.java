@@ -28,40 +28,42 @@ public class LaunchExampleXPWithArgs {
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
         PARAMS.dimension = Integer.parseInt(args[0]);
-        PARAMS.nbLearningCycle = Integer.parseInt(args[1]);
-        PARAMS.nbExploitationCycle = Integer.parseInt(args[2]);
-        PARAMS.nbEpisodes = Integer.parseInt(args[3]);
+        PARAMS.configFile = args[1] +".xml";
+
+        PARAMS.nbLearningCycle = Integer.parseInt(args[2]);
+        PARAMS.nbExploitationCycle = Integer.parseInt(args[3]);
+        PARAMS.nbEpisodes = Integer.parseInt(args[4]);
 
         // Neighborhood
-        PARAMS.mappingErrorAllowed =  Double.parseDouble(args[4]);
-        PARAMS.setNeighborhoodMultiplicator = Integer.parseInt(args[5]);
-        PARAMS.setExternalContextInfluenceRatio = Double.parseDouble(args[6]);
-        PARAMS.setRegressionPerformance = Double.parseDouble(args[7]);
+        PARAMS.mappingErrorAllowed =  Double.parseDouble(args[5]);
+        PARAMS.setNeighborhoodMultiplicator = Integer.parseInt(args[6]);
+        PARAMS.setExternalContextInfluenceRatio = Double.parseDouble(args[7]);
+        PARAMS.setRegressionPerformance = Double.parseDouble(args[8]);
 
         // Learning
-        PARAMS.setActiveLearning = Boolean.parseBoolean(args[8]);
-        PARAMS.setSelfLearning = Boolean.parseBoolean(args[9]);
+        PARAMS.setActiveLearning = Boolean.parseBoolean(args[9]);
+        PARAMS.setSelfLearning = Boolean.parseBoolean(args[10]);
 
         //NCS
-        PARAMS.setConflictDetection = Boolean.parseBoolean(args[10]);
-        PARAMS.setConcurrenceDetection = Boolean.parseBoolean(args[11]);
-        PARAMS.setVoidDetection = Boolean.parseBoolean(args[12]);
-        PARAMS.setSubVoidDetection = Boolean.parseBoolean(args[13]);
-        PARAMS.setFrontierRequest = Boolean.parseBoolean(args[14]);
-        PARAMS.setSelfModelRequest = Boolean.parseBoolean(args[15]);
-        PARAMS.setFusionResolution = Boolean.parseBoolean(args[16]);
-        PARAMS.setRestructureResolution = Boolean.parseBoolean(args[17]);
+        PARAMS.setConflictDetection = Boolean.parseBoolean(args[11]);
+        PARAMS.setConcurrenceDetection = Boolean.parseBoolean(args[12]);
+        PARAMS.setVoidDetection = Boolean.parseBoolean(args[13]);
+        PARAMS.setSubVoidDetection = Boolean.parseBoolean(args[14]);
+        PARAMS.setFrontierRequest = Boolean.parseBoolean(args[15]);
+        PARAMS.setSelfModelRequest = Boolean.parseBoolean(args[16]);
+        PARAMS.setFusionResolution = Boolean.parseBoolean(args[17]);
+        PARAMS.setRestructureResolution = Boolean.parseBoolean(args[18]);
 
-        PARAMS.setDream = Boolean.parseBoolean(args[18]);
-        PARAMS.setDreamCycleLaunch = Integer.parseInt(args[19]);
+        PARAMS.setDream = Boolean.parseBoolean(args[19]);
+        PARAMS.setDreamCycleLaunch = Integer.parseInt(args[20]);
 
-        PARAMS.setLearnFromNeighbors = Boolean.parseBoolean(args[20]);
-        PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(args[21]);
-        PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(args[22]);
+        PARAMS.setLearnFromNeighbors = Boolean.parseBoolean(args[21]);
+        PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(args[22]);
+        PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(args[23]);
         PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
 
-        PARAMS.configFile = args[23] +".xml";
+
 
         PARAMS.model = args[24];
         PARAMS.setbootstrapCycle = Integer.parseInt(args[25]);
