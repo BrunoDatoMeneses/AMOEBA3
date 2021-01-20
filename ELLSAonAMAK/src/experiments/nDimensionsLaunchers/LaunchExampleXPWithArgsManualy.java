@@ -5,6 +5,7 @@ package experiments.nDimensionsLaunchers;
 
 
 import agents.head.REQUEST;
+import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -30,16 +31,19 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-        PARAMS.dimension = 2;
-        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";
+        /*PARAMS.dimension = 2;
+        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";*/
 
         /*PARAMS.dimension = 3;
         PARAMS.configFile =  "threeDimensionsLauncher" +".xml";*/
 
+        PARAMS.dimension = 10;
+        PARAMS.configFile =  "tenDimensionsLauncher" +".xml";
 
-        PARAMS.nbLearningCycle = 1000;
+
+        PARAMS.nbLearningCycle = 500;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 10;
+        PARAMS.nbEpisodes = 1;
 
         // Neighborhood
         PARAMS.mappingErrorAllowed =  0.1;
@@ -77,7 +81,7 @@ public class LaunchExampleXPWithArgsManualy {
         String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
         PARAMS.extension = dateAndHour;
 
-        PARAMS.setbootstrapCycle = 10;
+        PARAMS.setbootstrapCycle = 100;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
@@ -300,6 +304,7 @@ public class LaunchExampleXPWithArgsManualy {
             double start = System.currentTimeMillis();
             ellsa.cycle();
             allLearningCycleTimes.add(System.currentTimeMillis()- start);
+            System.out.println(ellsa.getCycle() + " " + ellsa.getContexts().size());
 
         }
 		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
@@ -343,6 +348,13 @@ public class LaunchExampleXPWithArgsManualy {
         System.out.println(requestCounts);
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
         System.out.println(ellsa.getContexts().size() + " Agents");
+
+        System.out.println(ellsa.getContexts().get(0).getVolume() + " Vol");
+        System.out.println(ellsa.getHeadAgent().getMinMaxVolume()+ " MinMaxVol");
+
+        for(Percept pct : ellsa.getPercepts()){
+            System.out.println(pct.getMin() + " " + pct.getMax());
+        }
 
         // Volumes
         data.get("mappingScore").add(mappingScores.get("CTXT"));
@@ -458,6 +470,8 @@ public class LaunchExampleXPWithArgsManualy {
         xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isFusionResolution", PARAMS.setFusionResolution+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isRetructureResolution", PARAMS.setRestructureResolution+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS PARAMS")));

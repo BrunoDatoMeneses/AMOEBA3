@@ -10,8 +10,11 @@ public class PARAMS {
     public static String extension = "";
 
     public static ArrayList subPercepts = new ArrayList<>();
-    public static  String configFile = "twoDimensionsLauncher.xml";
-    public static  int dimension = 2;
+    /*public static  String configFile = "twoDimensionsLauncher.xml";
+    public static  int dimension = 2;*/
+
+    public static  String configFile = "tenDimensionsLauncher.xml";
+    public static  int dimension = 10;
 
     /*public static  String configFile = "threeDimensionsLauncher.xml";
     public static  int dimension = 3;*/
@@ -19,7 +22,7 @@ public class PARAMS {
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-    public static  int nbLearningCycle = 2000;
+    public static  int nbLearningCycle = 500;
     public static  int nbExploitationCycle = 1;
     public static  int nbEpisodes = 1;
 
@@ -58,7 +61,7 @@ public class PARAMS {
     public static  double explorationIncrement = 2.0	;
     public static  double explorationWidht = 0.75	;
 
-    public static  int setbootstrapCycle = 10;
+    public static  int setbootstrapCycle = 200;
 
 
     /* LEARNING */

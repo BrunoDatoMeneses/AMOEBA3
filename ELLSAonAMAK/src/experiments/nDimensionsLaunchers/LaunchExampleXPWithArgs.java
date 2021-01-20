@@ -330,10 +330,10 @@ public class LaunchExampleXPWithArgs {
         double averageExploitationCycleTimeDouble = averageExploitationCycleTime.getAsDouble();
         double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion /allExploitationCycleTimes.size());
 
-        System.out.println(mappingScores);
+        /*System.out.println(mappingScores);
         System.out.println(requestCounts);
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
-        System.out.println(ellsa.getContexts().size() + " Agents");
+        System.out.println(ellsa.getContexts().size() + " Agents");*/
 
         // Volumes
         data.get("mappingScore").add(mappingScores.get("CTXT"));
@@ -449,6 +449,8 @@ public class LaunchExampleXPWithArgs {
         xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isFusionResolution", PARAMS.setFusionResolution+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isRetructureResolution", PARAMS.setRestructureResolution+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS PARAMS")));
