@@ -41,9 +41,9 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.configFile =  "tenDimensionsLauncher" +".xml";
 
 
-        PARAMS.nbLearningCycle = 500;
+        PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 10;
 
         // Neighborhood
         PARAMS.mappingErrorAllowed =  0.1;
@@ -139,6 +139,7 @@ public class LaunchExampleXPWithArgsManualy {
         for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
             //System.out.print(i + " ");
             learningEpisode(data);
+
         }
         //System.out.println(" ");
         double total = (System.currentTimeMillis()- start)/1000;
@@ -304,8 +305,21 @@ public class LaunchExampleXPWithArgsManualy {
             double start = System.currentTimeMillis();
             ellsa.cycle();
             allLearningCycleTimes.add(System.currentTimeMillis()- start);
-            System.out.println(ellsa.getCycle() + " " + ellsa.getContexts().size());
+            //System.out.println(ellsa.getCycle() + " " + ellsa.getContexts().size());
 
+            if(ellsa.getCycle()%200 == 0){
+                // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
+                long heapMaxSize = (long)Runtime.getRuntime().maxMemory();
+                System.out.println("heapMaxSize\t\t" + heapMaxSize);
+
+                // Get current size of heap in bytes
+                long heapSize = (Runtime.getRuntime().totalMemory());
+                System.out.println("heapSize\t\t" + heapSize);
+
+                // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
+                long heapFreeSize = Runtime.getRuntime().freeMemory();;
+                System.out.println("heapFreeSize\t" + heapFreeSize + "\n");
+            }
         }
 		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
 			ellsa.cycle();
