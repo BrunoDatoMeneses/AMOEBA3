@@ -10,11 +10,11 @@ public class PARAMS {
     public static String extension = "";
 
     public static ArrayList subPercepts = new ArrayList<>();
-    /*public static  String configFile = "twoDimensionsLauncher.xml";
-    public static  int dimension = 2;*/
+    public static  String configFile = "twoDimensionsLauncher.xml";
+    public static  int dimension = 2;
 
-    public static  String configFile = "tenDimensionsLauncher.xml";
-    public static  int dimension = 10;
+    /*public static  String configFile = "tenDimensionsLauncher.xml";
+    public static  int dimension = 10;*/
 
     /*public static  String configFile = "threeDimensionsLauncher.xml";
     public static  int dimension = 3;*/
@@ -23,11 +23,11 @@ public class PARAMS {
     public static  int dimension = 4;*/
 
     public static  int nbLearningCycle = 500;
-    public static  int nbExploitationCycle = 1;
+    public static  int nbExploitationCycle = 250;
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.1;
+    public static double mappingErrorAllowed = 0.08;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.1; // BIG 3D
@@ -61,7 +61,7 @@ public class PARAMS {
     public static  double explorationIncrement = 2.0	;
     public static  double explorationWidht = 0.75	;
 
-    public static  int setbootstrapCycle = 200;
+    public static  int setbootstrapCycle = 15;
 
 
     /* LEARNING */
@@ -73,22 +73,27 @@ public class PARAMS {
 
     /*NCS*/
 
-    public static  boolean setConflictDetection = true ;
-    public static  boolean setConflictResolution = setConflictDetection ;
-    public static  boolean setConcurrenceDetection = true ;
-    public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static  boolean setVoidDetection = true ;
-    public static  boolean setSubVoidDetection = false ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
     public static  boolean setSelfModelRequest = true ;
+    public static  boolean setConflictDetection = true ;
+    public static  boolean setConcurrenceDetection = true ;
+    public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
+    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+
+
+    public static  boolean setisCreationWithNeighbor = true;
+
+    public static  boolean setConflictResolution = setConflictDetection ;
+    public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
+    public static  boolean setSubVoidDetection = false ;
 
 
     public static  boolean setDream = false ;
     public static  int setDreamCycleLaunch = 1500 ;
 
     public static  boolean setLearnFromNeighbors = false ;
+
 
 
 
@@ -99,8 +104,13 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.OFF;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 
+
+
+    /* UI */
+    public static boolean STOP_UI = true;
+    public static int STOP_UI_cycle = 500;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

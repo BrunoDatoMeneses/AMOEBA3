@@ -8,6 +8,8 @@ import agents.context.Context;
 import agents.head.DynamicPerformance;
 import agents.head.REQUEST;
 import agents.percept.Percept;
+import utils.Pair;
+
 /**
  * A Plain Old Java Object for storing parameters for the Head. Keep it as simple as possible for ease of serialization.<br/>
  * Make sure that all member are : public, serializable, and with a default constructor (taking no parameters).
@@ -17,6 +19,9 @@ import agents.percept.Percept;
 public class EllsaData implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+
+
+	//* DATA *//
 	public String nameID = null;
 	
 	public int nPropositionsReceived;
@@ -115,7 +120,7 @@ public class EllsaData implements Serializable {
 	public int neighborsCounts = 0;
 	public int lastNeihborsCount = 0;
 
-
+	public HashMap<Percept, Pair<Double,Double>> minMaxPerceptsStatesAfterBoostrap;
 
 
 	//* PARAMETERS *//
@@ -157,6 +162,7 @@ public class EllsaData implements Serializable {
 
 
 	// NCS
+	public boolean PARAM_NCS_isCreationWithNeighbor = false;
 	public boolean PARAM_NCS_isConflictDetection = false;
 	public boolean PARAM_NCS_isConcurrenceDetection = false;
 	public boolean PARAM_NCS_isVoidDetection = false;
@@ -187,4 +193,6 @@ public class EllsaData implements Serializable {
 	public boolean isVoidDetection_old = false;
 	public boolean isCoopLearningWithoutOracle_ASUPPRIMER = false;
 
+	public boolean STOP_UI = false;
+	public int STOP_UI_cycle = 500;
 }

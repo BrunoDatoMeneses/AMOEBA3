@@ -138,6 +138,14 @@ public class Head extends EllsaAgent {
 
 	private void onActInit() {
 
+		if(getAmas().getCycle()==getAmas().data.PARAM_bootstrapCycle+1){
+			getAmas().data.minMaxPerceptsStatesAfterBoostrap = new HashMap<>();
+			for(Percept pct : getAmas().getPercepts()){
+				getAmas().data.minMaxPerceptsStatesAfterBoostrap.put(pct,new Pair<>(pct.getMin(),pct.getMax()));
+			}
+		}
+
+
 		if(getAmas().data.useOracle){
 			getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
 			if(activatedNeighborsContexts.size()>0){
@@ -576,12 +584,12 @@ public class Head extends EllsaAgent {
 		else if(lastEndogenousRequest.getType()!= REQUEST.VOID  && lastEndogenousRequest.getType()!= REQUEST.SUBVOID){
 			NCSDetection_IncompetentHead();
 		}
-		if(getAmas().data.PARAM_NCS_isConcurrenceResolution){
-			NCSDetection_ConcurrenceAndConlict(); /* If result is good, shrink redundant context (concurrence NCS) */
-		}
+
+		NCSDetection_ConcurrenceAndConlict(); /* If result is good, shrink redundant context (concurrence NCS) */
 		NCSDetection_Create_New_Context(); /* Finally, head agent check the need for a new context agent */
 		NCSDetection_Context_Overmapping();
 		NCSDetection_ChildContext();
+
 		if(getAmas().getCycle()>0){
 			NCSDetection_PotentialRequest();
 			//NCSDetection_PotentialSubRequest();
@@ -1485,43 +1493,47 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[14]=System.currentTimeMillis();
 
 		if(getAmas().data.PARAM_NCS_isSelfModelRequest){
-			if(getAmas().data.PARAM_isActiveLearning) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
+			if(getAmas().data.PARAM_NCS_isSelfModelRequest){
+				if(getAmas().data.PARAM_isActiveLearning) {
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+							+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
 
-				if(bestContext!=null) {
-					if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
-						bestContext.solveNCS_ChildContext();
-
-
-					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
-							bestContext.learnFromNeighbors();
-						}
-
-					}
-
-				}
-			}
-			else if (getAmas().data.PARAM_isSelfLearning){
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
-
-				if(bestContext!=null) {
-					if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
-						bestContext.solveNCS_ChildContextWithoutOracle();
+					if(bestContext!=null) {
+						if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+							bestContext.solveNCS_ChildContext();
 
 
-					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-						if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
-							bestContext.learnFromNeighbors();
+						}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+							if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
+								bestContext.learnFromNeighbors();
+							}
+
 						}
 
 					}
 				}
+				else if (getAmas().data.PARAM_isSelfLearning){
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+							+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
 
+					if(bestContext!=null) {
+						if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
+							bestContext.solveNCS_ChildContextWithoutOracle();
+
+
+						}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+							if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
+								bestContext.learnFromNeighbors();
+							}
+
+						}
+					}
+
+				}
 			}
 		}
+
+
 
 
 		getAmas().data.executionTimes[14]=System.currentTimeMillis()- getAmas().data.executionTimes[14];
@@ -1602,7 +1614,7 @@ public class Head extends EllsaAgent {
 
 
 			Context context;
-			if (nearestGoodContext.getA() != null) {
+			if (nearestGoodContext.getA() != null && getAmas().data.PARAM_NCS_isCreationWithNeighbor) {
 				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
 						"************************************* NEAREST GOOD CONTEXT")));
 				context = createNewContext(nearestGoodContext.getA());
@@ -1693,19 +1705,23 @@ public class Head extends EllsaAgent {
 
 	private void NCSDetection_Context_Overmapping() {
 		getAmas().data.executionTimes[13]=System.currentTimeMillis();
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION OVERMAPPING")));
 
-		ArrayList<Context> activatedContextsCopy = new ArrayList<Context>();
-		activatedContextsCopy.addAll(activatedContexts);
+		if(getAmas().data.PARAM_NCS_isFusionResolution || getAmas().data.PARAM_NCS_isRetrucstureResolution){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION OVERMAPPING")));
 
-		for (Context ctxt : activatedContextsCopy) {
-			if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
-				ctxt.NCSDetection_OverMapping();
+			ArrayList<Context> activatedContextsCopy = new ArrayList<Context>();
+			activatedContextsCopy.addAll(activatedContexts);
+
+			for (Context ctxt : activatedContextsCopy) {
+				if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
+					ctxt.NCSDetection_OverMapping();
+				}
+
 			}
-
 		}
+		
+
 
 		getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 	}
@@ -1713,18 +1729,22 @@ public class Head extends EllsaAgent {
 	private void NCSDetection_Context_OvermappingWithouOracle() {
 		getAmas().data.executionTimes[13]=System.currentTimeMillis();
 
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION OVERMAPPING WITHOU ORACLE")));
+		if(getAmas().data.PARAM_NCS_isFusionResolution || getAmas().data.PARAM_NCS_isRetrucstureResolution){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION OVERMAPPING WITHOU ORACLE")));
 
-		ArrayList<Context> activatedContextsCopy = new ArrayList<Context>();
-		activatedContextsCopy.addAll(activatedContexts);
+			ArrayList<Context> activatedContextsCopy = new ArrayList<Context>();
+			activatedContextsCopy.addAll(activatedContexts);
 
-		for (Context ctxt : activatedContextsCopy) {
-			if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
-				ctxt.NCSDetection_OverMappingWithouOracle();
+			for (Context ctxt : activatedContextsCopy) {
+				if(!ctxt.isDying() && ctxt.getLocalModel().finishedFirstExperiments()) {
+					ctxt.NCSDetection_OverMappingWithouOracle();
+				}
+
 			}
-
 		}
+
+
 
 		getAmas().data.executionTimes[13]=System.currentTimeMillis()- getAmas().data.executionTimes[13];
 	}
@@ -1732,22 +1752,22 @@ public class Head extends EllsaAgent {
 	private void NCSDetection_ConcurrenceAndConlict() {
 		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 
+		if(getAmas().data.PARAM_NCS_isConcurrenceResolution || getAmas().data.PARAM_NCS_isConflictResolution){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION CONCURRENCE")));
 
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION CONCURRENCE")));
-		
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
-		
-		if(bestContext != null) {
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + (bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() ))));
-			
-		}
-		
 
-		/* If result is good, shrink redundant context (concurrence NCS) */
-		if (bestContext != null && bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
-		//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
+
+			if(bestContext != null) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + (bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() ))));
+
+			}
+
+
+			/* If result is good, shrink redundant context (concurrence NCS) */
+			if (bestContext != null && bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
+				//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 
 				for (int i = 0; i<activatedContexts.size();i++) {
 
@@ -1763,8 +1783,11 @@ public class Head extends EllsaAgent {
 					}
 
 
+				}
 			}
 		}
+
+
 
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 	}
@@ -1772,31 +1795,35 @@ public class Head extends EllsaAgent {
 	private void NCSDetection_ConcurrenceAndConclictWithoutOracle() {
 		getAmas().data.executionTimes[11]=System.currentTimeMillis();
 
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- NCS DETECTION CONCURRENCE WITHOUT ORACLE")));
+		if(getAmas().data.PARAM_NCS_isConcurrenceResolution || getAmas().data.PARAM_NCS_isConflictResolution){
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+					+ "---------------------------------------- NCS DETECTION CONCURRENCE WITHOUT ORACLE")));
 
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
 
 
 
-		/* If result is good, shrink redundant context (concurrence NCS) */
-		if (bestContext != null ) {
-			//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
+			/* If result is good, shrink redundant context (concurrence NCS) */
+			if (bestContext != null ) {
+				//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 
-			for (int i = 0; i<activatedContexts.size();i++) {
+				for (int i = 0; i<activatedContexts.size();i++) {
 
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("activatedContexts.get(i) != bestContext", "" + ( activatedContexts.get(i) != bestContext))));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("activatedContexts.get(i) != bestContext", "" + ( activatedContexts.get(i) != bestContext))));
+					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("!activatedContexts.get(i).isDying()", "" + ( !activatedContexts.get(i).isDying()))));
 
-				boolean testSameModel = activatedContexts.get(i).isSameModelWithoutOracle(bestContext);
-				if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
-					activatedContexts.get(i).solveNCS_Overlap(bestContext);
-				}
-				else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
-					activatedContexts.get(i).solveNCS_Overlap(bestContext);
+					boolean testSameModel = activatedContexts.get(i).isSameModelWithoutOracle(bestContext);
+					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
+						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+					}
+					else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
+						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+					}
 				}
 			}
 		}
+
+
 		getAmas().data.executionTimes[11]=System.currentTimeMillis()- getAmas().data.executionTimes[11];
 	}
 
@@ -1904,11 +1931,86 @@ public class Head extends EllsaAgent {
 
 	public void NCSDetection_PotentialRequest() {
 		getAmas().data.executionTimes[15]=System.currentTimeMillis();
-		
-		if(getAmas().data.PARAM_isActiveLearning || getAmas().data.PARAM_isSelfLearning) {
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
 
+		if(getAmas().data.PARAM_NCS_isConflictDetection || getAmas().data.PARAM_NCS_isConcurrenceDetection
+				|| getAmas().data.PARAM_NCS_isVoidDetection
+				|| getAmas().data.PARAM_NCS_isFrontierRequest
+		){
+
+			if(getAmas().data.PARAM_isActiveLearning || getAmas().data.PARAM_isSelfLearning) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION POTENTIAL REQUESTS")));
+
+				addPotentialConflictConcurrenceOrFrontierRequests();
+				addPotentialVoidRequest();
+			}
+		}
+
+
+
+
+		getAmas().data.executionTimes[15]=System.currentTimeMillis()- getAmas().data.executionTimes[15];
+	}
+
+	private void addPotentialVoidRequest() {
+		boolean testVoid = false;
+		if(getAmas().data.PARAM_isActiveLearning){
+			testVoid = true;
+		}else{
+			if(lastEndogenousRequest!=null){
+				testVoid = lastEndogenousRequest.getType() == REQUEST.DREAM;
+			}
+		}
+
+		if((getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.PARAM_NCS_isVoidDetection) && testVoid){
+			HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
+			for(Percept pct : getAmas().getPercepts()){
+				neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getNeigborhoodRadius()), pct.getValue()+(pct.getNeigborhoodRadius())));
+			}
+			ArrayList<VOID> detectedVoids = getVoidsFromContextsAndZone(neighborhoodBounds, activatedNeighborsContexts);
+
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DETECTED VOIDS", ""+detectedVoids.size())));
+
+			for(VOID detectedVoid : detectedVoids){
+
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("VOID", ""+detectedVoid)));
+				HashMap<Percept, Double> request = new HashMap<>();
+				boolean isInMinMax = true;
+				boolean isNotTooSmall = true;
+				for(Percept pct : getAmas().getPercepts()){
+					double value = (detectedVoid.bounds.get(pct).getB() + detectedVoid.bounds.get(pct).getA())/2;
+					double range = detectedVoid.bounds.get(pct).getB() - detectedVoid.bounds.get(pct).getA();
+					request.put(pct, value);
+					isInMinMax = isInMinMax && pct.isInMinMax(value);
+					isNotTooSmall = isNotTooSmall && !pct.isTooSmall(range);
+
+				/*if(pct.isTooBig(range)){
+					detectedVoid.bounds.get(pct).setA(value - pct.getRadiusContextForCreation());
+					detectedVoid.bounds.get(pct).setB(value + pct.getRadiusContextForCreation());
+				}*/
+				}
+				if(isInMinMax && isNotTooSmall){
+					if(getAmas().data.PARAM_isSelfLearning){
+						if(activatedNeighborsContexts.size()>getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning){
+							EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
+							addEndogenousRequest(potentialRequest, endogenousRequests);
+						}
+					}else{
+						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
+						addEndogenousRequest(potentialRequest, endogenousRequests);
+					}
+
+				}
+
+			}
+		}
+	}
+
+	private void addPotentialConflictConcurrenceOrFrontierRequests() {
+
+		if(getAmas().data.PARAM_NCS_isConflictDetection || getAmas().data.PARAM_NCS_isConcurrenceDetection
+				|| getAmas().data.PARAM_NCS_isFrontierRequest
+		){
 			if (activatedNeighborsContexts.size() > 1) {
 				int i = 1;
 				for (Context ctxt : activatedNeighborsContexts) {
@@ -1916,7 +2018,7 @@ public class Head extends EllsaAgent {
 						if(!this.isDying() && !ctxt.isDying() ) {
 							ArrayList<EndogenousRequest> potentialRequests = ctxt.endogenousRequest(otherCtxt);
 							if(potentialRequests.size()>0) {
-								
+
 								for(EndogenousRequest potentialRequest : potentialRequests){
 									addEndogenousRequest(potentialRequest, endogenousRequests);
 								}
@@ -1927,64 +2029,9 @@ public class Head extends EllsaAgent {
 					i++;
 				}
 			}
-
-			boolean testVoid = false;
-			if(getAmas().data.PARAM_isActiveLearning){
-				testVoid = true;
-			}else{
-				if(lastEndogenousRequest!=null){
-					testVoid = lastEndogenousRequest.getType() == REQUEST.DREAM;
-				}
-			}
-
-			if((getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.PARAM_NCS_isVoidDetection) && testVoid){
-				HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
-				for(Percept pct : getAmas().getPercepts()){
-					neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getNeigborhoodRadius()), pct.getValue()+(pct.getNeigborhoodRadius())));
-				}
-				ArrayList<VOID> detectedVoids = getVoidsFromContextsAndZone(neighborhoodBounds, activatedNeighborsContexts);
-
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DETECTED VOIDS", ""+detectedVoids.size())));
-
-				for(VOID detectedVoid : detectedVoids){
-
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("VOID", ""+detectedVoid)));
-					HashMap<Percept, Double> request = new HashMap<>();
-					boolean isInMinMax = true;
-					boolean isNotTooSmall = true;
-					for(Percept pct : getAmas().getPercepts()){
-						double value = (detectedVoid.bounds.get(pct).getB() + detectedVoid.bounds.get(pct).getA())/2;
-						double range = detectedVoid.bounds.get(pct).getB() - detectedVoid.bounds.get(pct).getA();
-						request.put(pct, value);
-						isInMinMax = isInMinMax && pct.isInMinMax(value);
-						isNotTooSmall = isNotTooSmall && !pct.isTooSmall(range);
-
-						/*if(pct.isTooBig(range)){
-							detectedVoid.bounds.get(pct).setA(value - pct.getRadiusContextForCreation());
-							detectedVoid.bounds.get(pct).setB(value + pct.getRadiusContextForCreation());
-						}*/
-					}
-					if(isInMinMax && isNotTooSmall){
-						if(getAmas().data.PARAM_isSelfLearning){
-							if(activatedNeighborsContexts.size()>getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning){
-								EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
-								addEndogenousRequest(potentialRequest, endogenousRequests);
-							}
-						}else{
-							EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
-							addEndogenousRequest(potentialRequest, endogenousRequests);
-						}
-
-					}
-
-				}
-			}
-			
-			
 		}
 
 
-		getAmas().data.executionTimes[15]=System.currentTimeMillis()- getAmas().data.executionTimes[15];
 	}
 
 	public void NCSDetection_PotentialSubRequest() {

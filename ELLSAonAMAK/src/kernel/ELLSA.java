@@ -233,6 +233,10 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			updateAgentsVisualisation();
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
+
+		if(getCycle()==data.STOP_UI_cycle && data.STOP_UI){
+			getScheduler().stop();
+		}
 	}
 
 	@Override
@@ -341,6 +345,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		for(int i = 0 ; i<25;i++) {
 			data.executionTimesSums[i] += data.executionTimes[i];
 		}
+
+
 
 		getEnvironment().print(TRACE_LEVEL.INFORM, "Number of Agents : ",getContexts().size());
 	}

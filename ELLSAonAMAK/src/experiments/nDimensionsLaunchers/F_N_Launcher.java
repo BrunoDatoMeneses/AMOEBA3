@@ -234,6 +234,7 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
 		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
 		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+		ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
 		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
