@@ -32,8 +32,8 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-        PARAMS.dimension = 2;
-        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";
+        /*PARAMS.dimension = 2;
+        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";*/
 
         /*PARAMS.dimension = 3;
         PARAMS.configFile =  "threeDimensionsLauncher" +".xml";*/
@@ -41,10 +41,15 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 10;
         PARAMS.configFile =  "tenDimensionsLauncher" +".xml";*/
 
+        /*PARAMS.dimension = 4;
+        PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 500;
+        PARAMS.dimension = 5;
+        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";
+
+        PARAMS.nbLearningCycle = 10000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 10;
 
         // Neighborhood
         PARAMS.mappingErrorAllowed =  0.1;
@@ -58,20 +63,21 @@ public class LaunchExampleXPWithArgsManualy {
 
         //NCS
 
-        PARAMS.setConflictDetection = false;
-        PARAMS.setConcurrenceDetection = false;
-        PARAMS.setVoidDetection = false;
+        PARAMS.setConflictDetection = true;
+        PARAMS.setConcurrenceDetection = true;
+        PARAMS.setVoidDetection = true;
         PARAMS.setSubVoidDetection = false;
-        PARAMS.setFrontierRequest = false;
-        PARAMS.setSelfModelRequest = false;
-        PARAMS.setFusionResolution = false;
-        PARAMS.setRestructureResolution = false;
+        PARAMS.setFrontierRequest = true;
+        PARAMS.setSelfModelRequest = true;
+        PARAMS.setFusionResolution = true;
+        PARAMS.setRestructureResolution = true;
 
         PARAMS.setDream = false;
         PARAMS.setDreamCycleLaunch = 1500;
 
         PARAMS.setLearnFromNeighbors = false;
         PARAMS.setisCreationWithNeighbor = false;
+
         PARAMS.nbOfNeighborForLearningFromNeighbors = 1;
         PARAMS.nbOfNeighborForContexCreationWithouOracle = 5000;
         PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
