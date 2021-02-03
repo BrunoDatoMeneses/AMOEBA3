@@ -1034,8 +1034,8 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
 
 
-		if(getAmas().data.PARAM_NCS_isFrontierRequest){
-		//if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
+		//if(getAmas().data.PARAM_NCS_isFrontierRequest){
+		if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
 
 			potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
 			potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));

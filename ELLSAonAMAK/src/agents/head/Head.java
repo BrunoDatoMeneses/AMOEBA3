@@ -3496,9 +3496,8 @@ public class Head extends EllsaAgent {
 				
 				EndogenousRequest currentRequest = itr.next();
 
-				//if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
-				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE || currentRequest.getType() == REQUEST.FRONTIER) {
-						
+				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
+				//if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE || currentRequest.getType() == REQUEST.FRONTIER) {
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}
 				if(currentRequest.getType() == REQUEST.VOID) {
