@@ -349,6 +349,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 
 		getEnvironment().print(TRACE_LEVEL.INFORM, "Number of Agents : ",getContexts().size());
+
 	}
 
 	public void onSystemCycleEndWithoutSave() {

@@ -22,7 +22,7 @@ public class WRITER {
 
         List<String> dataStringsPrediction = Arrays.asList("predictionError", "predictionErrorDeviation");
 
-        List<String> dataStringsEndoRequests = Arrays.asList("conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "rdmRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
+        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "rdmRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
 
         //List<String> dataStringsNCS =
 
@@ -216,7 +216,16 @@ public class WRITER {
         data.get("predictionError").add(predictionError);
         data.get("predictionErrorDeviation").add(predictionDispersion);
 
+        int activeRequests = 0;
+        for (Map.Entry<REQUEST, Integer> entry : requestCounts.entrySet()) {
+            if(entry.getKey()!=REQUEST.RDM){
+                activeRequests +=entry.getValue();
+            }
+        }
+
+
         // Endo Requests
+        data.get("activeRequests").add((double)activeRequests);
         data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
         data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
         data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));

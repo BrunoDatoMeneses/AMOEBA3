@@ -630,7 +630,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
 	}
 
-	private void NCSDetection_LearnFromNeighbors() {
+	/*private void NCSDetection_LearnFromNeighbors() {
 		getEnvironment().trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION LEARN FROM NEIGHBORS WITHOUT ORACLE")));
 
@@ -638,7 +638,7 @@ public class Head extends EllsaAgent {
 			if(lastEndogenousRequest.getType()== REQUEST.MODEL)
 				bestContext.solveNCS_LearnFromNeighbors();
 		}
-	}
+	}*/
 
 	/*private void NCSDetection_FitWithNeighbors() {
 
@@ -1493,43 +1493,41 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[14]=System.currentTimeMillis();
 
 		if(getAmas().data.PARAM_NCS_isSelfModelRequest){
-			if(getAmas().data.PARAM_NCS_isSelfModelRequest){
-				if(getAmas().data.PARAM_isActiveLearning) {
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-							+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
+			if(getAmas().data.PARAM_isActiveLearning) {
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT")));
 
-					if(bestContext!=null) {
-						if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
-							bestContext.solveNCS_ChildContext();
+				if(bestContext!=null) {
+					if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>0 && !bestContext.isDying()) {
+						bestContext.solveNCS_ChildContext();
 
 
-						}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-							if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
-								bestContext.learnFromNeighbors();
-							}
+					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+						if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
+							bestContext.learnFromNeighbors();
+						}
 
+					}
+
+				}
+			}
+			else if (getAmas().data.PARAM_isSelfLearning){
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
+						+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
+
+				if(bestContext!=null) {
+					if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
+						bestContext.solveNCS_ChildContextWithoutOracle();
+
+
+					}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
+						if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
+							bestContext.learnFromNeighbors();
 						}
 
 					}
 				}
-				else if (getAmas().data.PARAM_isSelfLearning){
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-							+ "---------------------------------------- NCS DETECTION CHILD CONTEXT WITHOUT ORACLE")));
 
-					if(bestContext!=null) {
-						if(bestContext.isChild() && getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()) {
-							bestContext.solveNCS_ChildContextWithoutOracle();
-
-
-						}else if(getAmas().data.firstContext && getAmas().getCycle()>1 && !bestContext.isDying()){
-							if(getAmas().data.PARAM_isLearnFromNeighbors && getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
-								bestContext.learnFromNeighbors();
-							}
-
-						}
-					}
-
-				}
 			}
 		}
 
@@ -1539,7 +1537,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[14]=System.currentTimeMillis()- getAmas().data.executionTimes[14];
 	}
 
-	private void NCSDetection_ChildContextWithoutOracle() {
+	/*private void NCSDetection_ChildContextWithoutOracle() {
 
 		if(getAmas().data.PARAM_isSelfLearning) {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
@@ -1554,7 +1552,7 @@ public class Head extends EllsaAgent {
 			}
 		}
 
-	}
+	}*/
 	
 	
 		
@@ -1993,11 +1991,11 @@ public class Head extends EllsaAgent {
 					if(getAmas().data.PARAM_isSelfLearning){
 						if(activatedNeighborsContexts.size()>getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning){
 							EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
-							addEndogenousRequest(potentialRequest, endogenousRequests);
+							addEndogenousRequest(potentialRequest, endogenousRequests); //VOID
 						}
 					}else{
 						EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
-						addEndogenousRequest(potentialRequest, endogenousRequests);
+						addEndogenousRequest(potentialRequest, endogenousRequests); //VOID
 					}
 
 				}
@@ -2020,7 +2018,7 @@ public class Head extends EllsaAgent {
 							if(potentialRequests.size()>0) {
 
 								for(EndogenousRequest potentialRequest : potentialRequests){
-									addEndogenousRequest(potentialRequest, endogenousRequests);
+									addEndogenousRequest(potentialRequest, endogenousRequests); //RGE, CONFL, CONC
 								}
 
 							}
@@ -3497,8 +3495,9 @@ public class Head extends EllsaAgent {
 			while(!existingRequestTest && itr.hasNext()) {
 				
 				EndogenousRequest currentRequest = itr.next();
-				
-				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
+
+				//if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
+				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE || currentRequest.getType() == REQUEST.FRONTIER) {
 						
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}

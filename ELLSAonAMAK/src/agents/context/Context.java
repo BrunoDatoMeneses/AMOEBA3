@@ -1034,7 +1034,8 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
 
 
-		if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
+		if(getAmas().data.PARAM_NCS_isFrontierRequest){
+		//if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
 
 			potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
 			potentialRequests.add( new EndogenousRequest(frontierRequestRight, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
@@ -1726,6 +1727,10 @@ public class Context extends EllsaAgent {
 				restructured =  true;
 				otherContext.restructured = true;
 				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+				double newConfidenceRatioForShrinkingContext = this.getVolume()/shrinkingContextCurrentVolume;
+				double newconfidenceForShrinkingContext = this.confidence* newConfidenceRatioForShrinkingContext;
+				otherContext.confidence = otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
+				this.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
 			}
 
@@ -1750,6 +1755,10 @@ public class Context extends EllsaAgent {
 				restructured =  true;
 				otherContext.restructured = true;
 				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+				double newConfidenceRatioForShrinkingContext = otherContext.getVolume()/shrinkingContextCurrentVolume;
+				double newconfidenceForShrinkingContext = otherContext.confidence* newConfidenceRatioForShrinkingContext;
+				this.confidence = this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
+				otherContext.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
 			}
 
@@ -1769,29 +1778,10 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
 
-
-
 		request = getRandomRequestInRanges();
 
-		/*for(Percept pct : getAmas().getPercepts()) {
-			request.put(pct, getRandomValueInRangeNextToStartAndEnd(pct));
-		}*/
-
-		/*while(isToCloseToFirstExperimements(request,(localModel).getFirstExperiments())){
-			request = new HashMap<>();
-			for(Percept pct : getAmas().getPercepts()) {
-				request.put(pct, getRandomRangeBorder(pct));
-			}
-			System.out.println("......................................................................................................CA ARRIVE !!!!!!!!!!!!!");
-		}*/
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);
-
-		/*}else if(getAmas().data.isSelfLearning){
-			solveNCS_ChildContextWithoutOracle();
-		}*/
-
-
 
 		
 	}

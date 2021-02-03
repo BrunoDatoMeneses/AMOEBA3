@@ -32,8 +32,8 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-        /*PARAMS.dimension = 2;
-        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";*/
+        PARAMS.dimension = 2;
+        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";
 
         /*PARAMS.dimension = 3;
         PARAMS.configFile =  "threeDimensionsLauncher" +".xml";*/
@@ -44,12 +44,12 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 4;
         PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
 
-        PARAMS.dimension = 5;
-        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";
+        /*PARAMS.dimension = 5;
+        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 10000;
+        PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 10;
+        PARAMS.nbEpisodes = 5;
 
         // Neighborhood
         PARAMS.mappingErrorAllowed =  0.1;
@@ -76,7 +76,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setDreamCycleLaunch = 1500;
 
         PARAMS.setLearnFromNeighbors = false;
-        PARAMS.setisCreationWithNeighbor = false;
+        PARAMS.setisCreationWithNeighbor = true;
 
         PARAMS.nbOfNeighborForLearningFromNeighbors = 1;
         PARAMS.nbOfNeighborForContexCreationWithouOracle = 5000;
