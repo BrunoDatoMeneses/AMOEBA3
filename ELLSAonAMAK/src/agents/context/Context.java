@@ -812,7 +812,7 @@ public class Context extends EllsaAgent {
 				solveNCS_Overlap(head.getBestContext());
 			}*/
 		} else {
-			solveNCS_BadPrediction(head); // TODO always good ?
+			solveNCS_BadPrediction(head);
 			}
 	}
 
@@ -2875,25 +2875,25 @@ public class Context extends EllsaAgent {
 		return volume;
 	}
 
-	/**
-	 * Analyze results.
-	 *
-	 * @param head the head
-	 */
-	public void analyzeResults(Head head) {
-		if (head.getCriticity(this) > head.getErrorAllowed()) {
-			solveNCS_BadPrediction(head);
-			getAmas().addAlteredContext(this);
-		} else {
-//			if (head.getCriticity(this) > head.getInexactAllowed()) {
-//				solveNCS_ConflictInexact(head);
-//			}
-//			else {
-//				confidence++;
-//				//confidence = confidence * 2;
-//			}
-		}
-	}
+//	/**
+//	 * Analyze results.
+//	 *
+//	 * @param head the head
+//	 */
+//	public void analyzeResults(Head head) {
+//		if (head.getCriticity(this) > head.getErrorAllowed()) {
+//			solveNCS_BadPrediction(head);
+//			getAmas().addAlteredContext(this);
+//		} else {
+////			if (head.getCriticity(this) > head.getInexactAllowed()) {
+////				solveNCS_ConflictInexact(head);
+////			}
+////			else {
+////				confidence++;
+////				//confidence = confidence * 2;
+////			}
+//		}
+//	}
 
 	/**
 	 * Grow every ranges allowing to includes current situation.

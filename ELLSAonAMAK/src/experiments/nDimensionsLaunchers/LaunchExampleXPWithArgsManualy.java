@@ -32,8 +32,8 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-        /*PARAMS.dimension = 2;
-        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";*/
+        PARAMS.dimension = 2;
+        PARAMS.configFile =  "twoDimensionsLauncher" +".xml";
 
         /*PARAMS.dimension = 3;
         PARAMS.configFile =  "threeDimensionsLauncher" +".xml";*/
@@ -44,8 +44,8 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 4;
         PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
 
-        PARAMS.dimension = 5;
-        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";
+        /*PARAMS.dimension = 5;
+        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
         PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);

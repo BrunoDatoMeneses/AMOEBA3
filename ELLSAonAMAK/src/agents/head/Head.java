@@ -29,7 +29,7 @@ public class Head extends EllsaAgent {
 	private Context lastUsedContext;
 	private Context newContext;
 
-	HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
+	//HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
 
 	public Criticalities criticalities;
 	public Criticalities endogenousCriticalities;
@@ -181,9 +181,9 @@ public class Head extends EllsaAgent {
 		getAmas().data.currentCriticalityMapping = 0;
 		getAmas().data.currentCriticalityConfidence = 0;
 
-		for (Percept pct : getAmas().getPercepts()) {
+		/*for (Percept pct : getAmas().getPercepts()) {
 			currentSituation.put(pct, pct.getValue());
-		}
+		}*/
 
 		getAmas().data.nPropositionsReceived = activatedContexts.size();
 		getAmas().data.newContextWasCreated = false;
@@ -453,8 +453,8 @@ public class Head extends EllsaAgent {
 			setContextFromPropositionWasSelected(true);
 			getAmas().data.prediction = bestContext.getActionProposal();
 
-		} else { // happens only at the beginning
-                setPredictionToMean();
+		} else {
+                setPredictionWithoutContextAgent();
 		}
 
         /*if (activatedContexts.size() > 0) {
@@ -991,7 +991,7 @@ public class Head extends EllsaAgent {
 						getAmas().data.prediction = nearestContext.getActionProposal();
 						bestContext = nearestContext;
 					} else {
-                        setPredictionToMean();
+                        setPredictionWithoutContextAgent();
 						System.out.println("NO CONTEXT PREDICTION"); // Should not happend
 					}
 				}
@@ -1112,7 +1112,7 @@ public class Head extends EllsaAgent {
 
 				} else {
 					getEnvironment().print(TRACE_LEVEL.ERROR,"NO NEAREST CONTEXT"); // Sould not happend
-                    setPredictionToMean();
+                    setPredictionWithoutContextAgent();
 				}
 			}
 
@@ -1770,16 +1770,11 @@ public class Head extends EllsaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 					+ "---------------------------------------- NCS DETECTION CONCURRENCE")));
 
-
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
-
 			if(bestContext != null) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + (bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() ))));
-
 			}
 
-
-			/* If result is good, shrink redundant context (concurrence NCS) */
 			if (bestContext != null && bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
 				//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
 
@@ -2196,27 +2191,42 @@ public class Head extends EllsaAgent {
 		if (nearestContext != null) {
 			getAmas().data.prediction = nearestContext.getActionProposal();
 		} else {
-            setPredictionToMean();
+            setPredictionWithoutContextAgent();
 		}
 
 		bestContext = nearestContext;
 	}
 
+
+
+    private void setPredictionWithoutContextAgent() {
+		if (getAmas().getContexts().isEmpty()) {
+			if (getAmas().getCycle() <= 1) {
+				setPredictionToZero();
+			}else{
+				setPredictionToMean();
+			}
+		} else {
+			useLastBestContext();
+		}
+
+	}
+
 	private void setPredictionToZero(){
-        getAmas().data.prediction = 0.0;
-        getEnvironment().print(TRACE_LEVEL.ERROR,"Prediction set to zero");
-    }
+		getAmas().data.prediction = 0.0;
+		getEnvironment().print(TRACE_LEVEL.INFORM,"Prediction set to zero");
+	}
 
-    private void setPredictionToMean(){
-        if(getAmas().getCycle()>1){
-            getAmas().data.prediction = (getAmas().data.maxPrediction + getAmas().data.minPrediction)/2;
-            getEnvironment().print(TRACE_LEVEL.INFORM,"Prediction set to mean",getAmas().data.prediction, "Max prediction", getAmas().data.maxPrediction, "Min prediction", getAmas().data.minPrediction);
-        }else{
-            setPredictionToZero();
-        }
+	private void useLastBestContext() {
+		bestContext = lastUsedContext;
+		getAmas().data.prediction = bestContext.getActionProposal();
+		getEnvironment().print(TRACE_LEVEL.INFORM,"Use last Best Context",bestContext.getName());
+	}
 
-
-    }
+	private void setPredictionToMean() {
+		getAmas().data.prediction = (getAmas().data.maxPrediction + getAmas().data.minPrediction) / 2;
+		getEnvironment().print(TRACE_LEVEL.INFORM, "Prediction set to mean", getAmas().data.prediction, "Max prediction", getAmas().data.maxPrediction, "Min prediction", getAmas().data.minPrediction);
+	}
 
 	/**
 	 * Gets the nearest good context.
@@ -2804,8 +2814,8 @@ public class Head extends EllsaAgent {
 			currentInverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 			currentInverseVolume = 1/context.getVolume();
 			currentCricality = (( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance )  + ( 0.5 * currentInverseVolume ))/1.5;
-			getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
-			getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
+			//getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
 			if (currentCricality < criticality) {
 				bc = context;
 				criticality = currentCricality;
