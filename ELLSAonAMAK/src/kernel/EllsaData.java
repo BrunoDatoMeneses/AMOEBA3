@@ -62,8 +62,8 @@ public class EllsaData implements Serializable {
 	
 	public HashMap<String, Double> selfRequest;
 
-	public Double maxConfidence;
-	public Double minConfidence;
+	public Double maxConfidence = Double.NEGATIVE_INFINITY;
+	public Double minConfidence = Double.POSITIVE_INFINITY;
 	
 	public Double maxPrediction = Double.NEGATIVE_INFINITY;
 	public Double minPrediction = Double.POSITIVE_INFINITY;

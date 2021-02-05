@@ -436,19 +436,45 @@ public class Head extends EllsaAgent {
 			//selectBestContextWithDistanceToModelAndVolume(); // using closest distance and volume
 			//selectBestContextWithDistanceToModel();
 			//selectBestContextWithDistanceToModelAndConfidance();
-			selectBestContextWithDistanceToModelConfidanceAndVolume();
+            getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedContexts",activatedContexts.size());
+			selectBestContextWithDistanceToModelConfidanceAndVolume(activatedContexts);
 
-		} else {
-			bestContext = lastUsedContext;
-		}
+		} else if (activatedNeighborsContexts.size()>0){
+            getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedNeighborContexts",activatedNeighborsContexts.size());
+			//bestContext = getNearestContext(activatedNeighborsContexts);
+            selectBestContextWithDistanceToModelConfidanceAndVolume(activatedNeighborsContexts);
+		} else if (getAmas().getContexts().size()>0){
+            getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withAllContexts",getAmas().getContexts().size());
+            //bestContext = getNearestContext(getAmas().getContexts());
+            selectBestContextWithDistanceToModelConfidanceAndVolume(getAmas().getContexts());
+        }
 
 		if (bestContext != null) {
 			setContextFromPropositionWasSelected(true);
 			getAmas().data.prediction = bestContext.getActionProposal();
 
 		} else { // happens only at the beginning
-			setNearestContextAsBestContext();
+                setPredictionToMean();
 		}
+
+        /*if (activatedContexts.size() > 0) {
+            //selectBestContextWithConfidenceAndVolume(); // using highest confidence and volume
+            //selectBestContextWithDistanceToModelAndVolume(); // using closest distance and volume
+            //selectBestContextWithDistanceToModel();
+            //selectBestContextWithDistanceToModelAndConfidance();
+            selectBestContextWithDistanceToModelConfidanceAndVolume();
+
+        } else {
+            bestContext = lastUsedContext;
+        }
+
+        if (bestContext != null) {
+            setContextFromPropositionWasSelected(true);
+            getAmas().data.prediction = bestContext.getActionProposal();
+
+        } else { // happens only at the beginning
+            setNearestContextAsBestContext();
+        }*/
 	}
 
 	private void reinforcementWithOracle() {
@@ -493,10 +519,10 @@ public class Head extends EllsaAgent {
 
 		double globalConfidence = 0;
 
-		for (Context ctxt : getAmas().getContexts()) {
+		/*for (Context ctxt : getAmas().getContexts()) {
 			globalConfidence += ctxt.getConfidence();
 		}
-		globalConfidence = globalConfidence / getAmas().getContexts().size();
+		globalConfidence = globalConfidence / getAmas().getContexts().size();*/
 
 
 		if (activatedNeighborsContexts.size() > 1) {
@@ -965,7 +991,7 @@ public class Head extends EllsaAgent {
 						getAmas().data.prediction = nearestContext.getActionProposal();
 						bestContext = nearestContext;
 					} else {
-						getAmas().data.prediction = 0.0;
+                        setPredictionToMean();
 						System.out.println("NO CONTEXT PREDICTION"); // Should not happend
 					}
 				}
@@ -1086,18 +1112,9 @@ public class Head extends EllsaAgent {
 
 				} else {
 					getEnvironment().print(TRACE_LEVEL.ERROR,"NO NEAREST CONTEXT"); // Sould not happend
-					getAmas().data.prediction = 0.0;
+                    setPredictionToMean();
 				}
 			}
-
-
-
-
-
-
-
-
-
 
 		}
 
@@ -1105,7 +1122,6 @@ public class Head extends EllsaAgent {
 
 		if(bestContext != null) {
 			//logger().debug("HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
-
 
 			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle and all percepts", "Best context selected without oracle is : " + bestContext.getName());
 
@@ -1125,7 +1141,7 @@ public class Head extends EllsaAgent {
 
 	}
 
-	private void endogenousPlay() {
+	/*private void endogenousPlay() {
 
 		getAmas().data.endogenousPredictionActivatedContextsOverlaps = null;
 		getAmas().data.endogenousPredictionActivatedContextsOverlapsWorstDimInfluence = null;
@@ -1242,7 +1258,7 @@ public class Head extends EllsaAgent {
 		if (getAmas().data.endogenousPredictionNContextsByInfluence == null) {
 			getAmas().data.endogenousPredictionNContextsByInfluence = getAmas().data.prediction;
 		}
-	}
+	}*/
 
 	private boolean noActivatedContext() {
 		// Test if only one context is activated
@@ -1345,7 +1361,7 @@ public class Head extends EllsaAgent {
 		return ret;
 	}
 
-	private void NCS_EndogenousCompetition() {
+	/*private void NCS_EndogenousCompetition() {
 
 		// Creation of twin contexts to give the endogenous prediction
 
@@ -1435,9 +1451,9 @@ public class Head extends EllsaAgent {
 
 		getAmas().saver.newManualSave("Competition");
 
-	}
+	}*/
 
-	private void NCS_EndogenousSharedIncompetence() {
+	/*private void NCS_EndogenousSharedIncompetence() {
 		// Extrapolation of contexts by creating twin contexts that will give the
 		// prediction
 
@@ -1487,7 +1503,7 @@ public class Head extends EllsaAgent {
 		concernContexts.add(closestContexts.getR());
 		getAmas().saver.newManualSave("SharedIncompetence");
 
-	}
+	}*/
 	
 	private void NCSDetection_ChildContext() {
 		getAmas().data.executionTimes[14]=System.currentTimeMillis();
@@ -2180,11 +2196,27 @@ public class Head extends EllsaAgent {
 		if (nearestContext != null) {
 			getAmas().data.prediction = nearestContext.getActionProposal();
 		} else {
-			getAmas().data.prediction = 0.0;
+            setPredictionToMean();
 		}
 
 		bestContext = nearestContext;
 	}
+
+	private void setPredictionToZero(){
+        getAmas().data.prediction = 0.0;
+        getEnvironment().print(TRACE_LEVEL.ERROR,"Prediction set to zero");
+    }
+
+    private void setPredictionToMean(){
+        if(getAmas().getCycle()>1){
+            getAmas().data.prediction = (getAmas().data.maxPrediction + getAmas().data.minPrediction)/2;
+            getEnvironment().print(TRACE_LEVEL.INFORM,"Prediction set to mean",getAmas().data.prediction, "Max prediction", getAmas().data.maxPrediction, "Min prediction", getAmas().data.minPrediction);
+        }else{
+            setPredictionToZero();
+        }
+
+
+    }
 
 	/**
 	 * Gets the nearest good context.
@@ -2727,7 +2759,7 @@ public class Head extends EllsaAgent {
 
 		bc = activatedContexts.get(0);
 		double distanceToModel = ((LocalModelMillerRegression) bc.getLocalModel()).distance(bc.getCurrentExperiment());
-		double inverseConfidance = 1/bc.getConfidence();
+		double inverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 		double criticality = ( 0.5 * distanceToModel ) + ( 0.5 * inverseConfidance ) ;
 
 		double currentDistanceToModel;
@@ -2737,7 +2769,7 @@ public class Head extends EllsaAgent {
 		for (Context context : activatedContexts) {
 
 			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
-			currentInverseConfidance = 1/context.getConfidence();
+			currentInverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 			currentCricality = ( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance ) ;
 			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "criticality "+currentCricality)));
 
@@ -2749,29 +2781,31 @@ public class Head extends EllsaAgent {
 		bestContext = bc;
 	}
 
-	private void selectBestContextWithDistanceToModelConfidanceAndVolume() {
+	private void selectBestContextWithDistanceToModelConfidanceAndVolume(ArrayList<Context> contextsList) {
 
 		Context bc;
 
-		bc = activatedContexts.get(0);
+		bc = contextsList.get(0);
 		double distanceToModel = ((LocalModelMillerRegression) bc.getLocalModel()).distance(bc.getCurrentExperiment());
-		double inverseConfidance = 1/bc.getConfidence();
+		double inverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 		double inverseVolume = 1/bc.getVolume();
 		double criticality = (( 0.5 * distanceToModel ) + ( 0.5 * inverseConfidance )  + ( 0.5 * inverseVolume ))/1.5;
+
+
 
 		double currentDistanceToModel;
 		double currentInverseConfidance;
 		double currentInverseVolume;
 		double currentCricality;
 
-		for (Context context : activatedContexts) {
+		for (Context context : contextsList) {
 
 			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
-			currentInverseConfidance = 1/context.getConfidence();
+			currentInverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 			currentInverseVolume = 1/context.getVolume();
 			currentCricality = (( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance )  + ( 0.5 * currentInverseVolume ))/1.5;
-			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
-
+			getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
+			getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
 			if (currentCricality < criticality) {
 				bc = context;
 				criticality = currentCricality;
@@ -3497,7 +3531,6 @@ public class Head extends EllsaAgent {
 				EndogenousRequest currentRequest = itr.next();
 
 				if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE) {
-				//if(currentRequest.getType() == REQUEST.CONFLICT || currentRequest.getType() == REQUEST.CONCURRENCE || currentRequest.getType() == REQUEST.FRONTIER) {
 					existingRequestTest = existingRequestTest || currentRequest.testIfContextsAlreadyAsked(request.getAskingContexts()); 
 				}
 				if(currentRequest.getType() == REQUEST.VOID) {
@@ -3640,5 +3673,7 @@ public class Head extends EllsaAgent {
 	}
 
 
-	
+    public static double normalizeZeroOne(double dispersion, double value) {
+        return ( 1 / (1 + Math.exp(-value / dispersion)));
+    }
 }

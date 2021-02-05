@@ -12,6 +12,8 @@ import java.util.*;
 
 public class WRITER {
 
+    // TODO add mean confidence and max min
+
 
     public static Pair<ArrayList<List<String>>,HashMap<String, ArrayList<Double>>> getData() {
 

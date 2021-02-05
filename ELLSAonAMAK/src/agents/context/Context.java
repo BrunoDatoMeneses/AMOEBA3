@@ -128,7 +128,8 @@ public class Context extends EllsaAgent {
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
 		buildContext(bestNearestContext);
-		this.confidence = bestNearestContext.confidence;
+		setConfidence(bestNearestContext.confidence);
+		//this.confidence = bestNearestContext.confidence;
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(5);
@@ -324,39 +325,39 @@ public class Context extends EllsaAgent {
 
 	}
 
-	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
-
-		buildContextCommon();
-
-		ArrayList<Percept> var = getAmas().getPercepts();
-		for (Percept pct : var) {
-			Range r;
-			double center = contextDimensions.get(pct).getA();
-			double length = contextDimensions.get(pct).getB();
-			r = new Range(this, center - length / 2, center + length / 2, 0, true, true, pct);
-
-			ranges.put(pct, r);
-			ranges.get(pct).setValue(center);
-
-			pct.addContextProjection(this);
-		}
-
-		// expand();
-
-		this.confidence = fatherContext.confidence;
-	
-		this.localModel = getAmas().buildLocalModel(this);
-		// this.formulaLocalModel = ((LocalModelMillerRegression)
-		// bestNearestContext.localModel).getFormula(bestNearestContext);
-		Double[] coef = fatherContext.localModel.getCoef();
-		this.localModel.setCoef(coef);
-		this.actionProposition = fatherContext.localModel.getProposition();
-
-		getAmas().addAlteredContext(this);
-		this.setName(String.valueOf(this.hashCode()));
-
-		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-	}
+//	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
+//
+//		buildContextCommon();
+//
+//		ArrayList<Percept> var = getAmas().getPercepts();
+//		for (Percept pct : var) {
+//			Range r;
+//			double center = contextDimensions.get(pct).getA();
+//			double length = contextDimensions.get(pct).getB();
+//			r = new Range(this, center - length / 2, center + length / 2, 0, true, true, pct);
+//
+//			ranges.put(pct, r);
+//			ranges.get(pct).setValue(center);
+//
+//			pct.addContextProjection(this);
+//		}
+//
+//		// expand();
+//
+//		this.confidence = fatherContext.confidence;
+//
+//		this.localModel = getAmas().buildLocalModel(this);
+//		// this.formulaLocalModel = ((LocalModelMillerRegression)
+//		// bestNearestContext.localModel).getFormula(bestNearestContext);
+//		Double[] coef = fatherContext.localModel.getCoef();
+//		this.localModel.setCoef(coef);
+//		this.actionProposition = fatherContext.localModel.getProposition();
+//
+//		getAmas().addAlteredContext(this);
+//		this.setName(String.valueOf(this.hashCode()));
+//
+//		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
+//	}
 
 
 	private void buildContextWithoutOracle(double endogenousPredicion) {
@@ -681,7 +682,8 @@ public class Context extends EllsaAgent {
 		this.shrinkRangesToJoinBorders(bestContext);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
-		confidence-=0.5;
+		setConfidenceVariation(-0.5);
+		//confidence-=0.5;
 
 		modified = true;
 	}
@@ -702,7 +704,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-	public void analyzeResults3(Head head, Context closestContextToOracle) {
+	/*public void analyzeResults3(Head head, Context closestContextToOracle) {
 		if (head.getCriticity(this) < head.getErrorAllowed()) {
 			confidence++;
 		} else {
@@ -753,7 +755,7 @@ public class Context extends EllsaAgent {
 
 		// NCSDetection_OverMapping();
 
-	}
+	}*/
 
 
 	public boolean isSameModel(Context ctxt) {
@@ -803,7 +805,8 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
 
 		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
-			confidence++;
+			setConfidenceVariation(2);
+			//confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
 			/*if ( this !=  head.getBestContext()) {
 				solveNCS_Overlap(head.getBestContext());
@@ -1034,7 +1037,6 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("REQUEST ", ""+frontierRequestLeft, ""+frontierRequestRight)) );
 
 
-		//if(getAmas().data.PARAM_NCS_isFrontierRequest){
 		if(getAmas().getHeadAgent().requestIsEmpty() && getAmas().data.PARAM_NCS_isFrontierRequest){
 
 			potentialRequests.add( new EndogenousRequest(frontierRequestLeft, frontierBounds, 3, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.FRONTIER));
@@ -1690,7 +1692,8 @@ public class Context extends EllsaAgent {
 		}
 		
 		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
-		confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
+		setConfidence( Math.max(this.getConfidence(),fusionContext.getConfidence()));
+		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
@@ -1728,9 +1731,11 @@ public class Context extends EllsaAgent {
 				otherContext.restructured = true;
 				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 				double newConfidenceRatioForShrinkingContext = this.getVolume()/shrinkingContextCurrentVolume;
-				double newconfidenceForShrinkingContext = this.confidence* newConfidenceRatioForShrinkingContext;
-				otherContext.confidence = otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
-				this.confidence = newconfidenceForShrinkingContext;
+				double newconfidenceForShrinkingContext = this.getConfidence()* newConfidenceRatioForShrinkingContext;
+				otherContext.setConfidence(otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)));
+				//otherContext.confidence = otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
+				this.setConfidence(newconfidenceForShrinkingContext);
+				//this.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
 			}
 
@@ -1756,9 +1761,11 @@ public class Context extends EllsaAgent {
 				otherContext.restructured = true;
 				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 				double newConfidenceRatioForShrinkingContext = otherContext.getVolume()/shrinkingContextCurrentVolume;
-				double newconfidenceForShrinkingContext = otherContext.confidence* newConfidenceRatioForShrinkingContext;
-				this.confidence = this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
-				otherContext.confidence = newconfidenceForShrinkingContext;
+				double newconfidenceForShrinkingContext = otherContext.getConfidence()* newConfidenceRatioForShrinkingContext;
+				this.setConfidence(this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)));
+				//this.confidence = this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
+				otherContext.setConfidence(newconfidenceForShrinkingContext);
+				//otherContext.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
 			}
 
@@ -1949,7 +1956,8 @@ public class Context extends EllsaAgent {
 			if(!isLocalMinimum){
 				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.PARAM_learningSpeed);
 				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-				confidence+=endoExperiments.size()*0.01;
+				setConfidenceVariation(endoExperiments.size()*0.01);
+				//confidence+=endoExperiments.size()*0.01;
 			}
 
 		}
@@ -2503,9 +2511,10 @@ public class Context extends EllsaAgent {
 		if (head.getNewContext() == this) {
 			head.setNewContext(null);
 		}
-		;
 
-		confidence -= 2;
+		setConfidenceVariation(-2);
+
+		//confidence -= 2;
 		getAmas().getHeadAgent().setBadCurrentCriticalityConfidence();
 		getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
 
@@ -2735,6 +2744,18 @@ public class Context extends EllsaAgent {
 	public double getNormalizedConfidence() {
 		return 1 / (1 + Math.exp(-confidence));
 		// return getParametrizedNormalizedConfidence(20.0);
+	}
+
+	public double getNormalizedConfidenceWithParams(double max, double min) {
+
+		double maxConfidence = getAmas().data.maxConfidence;
+		double minConfidence = getAmas().data.minConfidence;
+		double CNmaxMin = Math.log((1/max)-1)/Math.log((1/min)-1);
+		double center = (maxConfidence - CNmaxMin*minConfidence)/(1 - CNmaxMin);
+		double dispersion = (center - maxConfidence)/Math.log((1/max)-1);
+
+
+		return 1 / (1 + Math.exp(-(confidence-center )/ dispersion));
 	}
 
 	public double getParametrizedNormalizedConfidence(double dispersion) {
@@ -3086,7 +3107,25 @@ public class Context extends EllsaAgent {
 	 * @param confidence the new confidence
 	 */
 	public void setConfidence(double confidence) {
+		getEnvironment().print(TRACE_LEVEL.DEBUG, getName(),"set Confidence",confidence);
 		this.confidence = confidence;
+		updateMinAndMaxConfidence();
+	}
+
+	public void setConfidenceVariation(double confidenceVariation) {
+		getEnvironment().print(TRACE_LEVEL.DEBUG, getName(),"Confidence",this.confidence,"Variation", confidenceVariation);
+		this.confidence += confidenceVariation;
+		updateMinAndMaxConfidence();
+	}
+
+	private void updateMinAndMaxConfidence() {
+		if(this.confidence>getAmas().data.maxConfidence){
+			getAmas().data.maxConfidence = this.confidence;
+		}
+		if(this.confidence<getAmas().data.minConfidence){
+			getAmas().data.minConfidence = this.confidence;
+		}
+		getEnvironment().print(TRACE_LEVEL.DEBUG,getName(), "Confidence",this.confidence,"Max",getAmas().data.maxConfidence,"Min",getAmas().data.minConfidence );
 	}
 
 	@Override
