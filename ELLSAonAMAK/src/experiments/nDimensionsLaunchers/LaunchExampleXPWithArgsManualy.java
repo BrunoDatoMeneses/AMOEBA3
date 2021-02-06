@@ -49,7 +49,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 5;
 
         // Neighborhood
         PARAMS.mappingErrorAllowed =  0.1;

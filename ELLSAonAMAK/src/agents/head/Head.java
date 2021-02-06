@@ -124,7 +124,7 @@ public class Head extends EllsaAgent {
 
 		if(bestContext != null){
 			bestContext.isBest = true;
-			bestContext.isInNeighborhood = true;
+			//bestContext.isInNeighborhood = true;
 		}
 		getAmas().data.executionTimes[6]=System.currentTimeMillis()- getAmas().data.executionTimes[6];
 
@@ -187,7 +187,7 @@ public class Head extends EllsaAgent {
 
 		getAmas().data.nPropositionsReceived = activatedContexts.size();
 		getAmas().data.newContextWasCreated = false;
-		setContextFromPropositionWasSelected(false);
+		//setContextFromPropositionWasSelected(false);
 		getAmas().data.oldOracleValue = getAmas().data.oracleValue;
 		getAmas().data.oracleValue = getAmas().getPerceptions("oracle");
 		setAverageRegressionPerformanceIndicator(); //TODO not working ? Seems to works after all
@@ -229,9 +229,9 @@ public class Head extends EllsaAgent {
 				ctxt.restructured = false;
 				ctxt.modified = false;
 				neighborhoodVolumesSum += ctxt.getVolume();
-				if(activatedContexts.contains(ctxt)){
+				/*if(activatedContexts.contains(ctxt)){
 					ctxt.isActivated = true;
-				}
+				}*/
 
 
 				for (Percept pct : ctxt.getRanges().keySet()) {
@@ -362,9 +362,7 @@ public class Head extends EllsaAgent {
 		}
 
 		updateBestContextWithOracle();
-
 		updateCriticalityWithOracle();
-
 
 		/* If we have a bestcontext, send a selection message to it */
 		if (bestContext != null) {
@@ -373,18 +371,12 @@ public class Head extends EllsaAgent {
 					"*********************************************************************************************************** BEST CONTEXT")));
 		}
 
-
-
-
 		updateNeighborContextLastPredictions();
 		selfAnalysationOfContexts4();
-
 
 		if(getAmas().getCycle()>getAmas().data.PARAM_bootstrapCycle){
 			allNCSDetectionsWithOracle();
 		}
-
-
 
 		updatePerformanceIndicators();
 
@@ -432,25 +424,25 @@ public class Head extends EllsaAgent {
 
 	private void updateBestContextWithOracle() {
 		if (activatedContexts.size() > 0) {
-			//selectBestContextWithConfidenceAndVolume(); // using highest confidence and volume
-			//selectBestContextWithDistanceToModelAndVolume(); // using closest distance and volume
-			//selectBestContextWithDistanceToModel();
-			//selectBestContextWithDistanceToModelAndConfidance();
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedContexts",activatedContexts.size());
-			selectBestContextWithDistanceToModelConfidanceAndVolume(activatedContexts);
+
+			selectBestContextWithOracleWeighted(activatedContexts, getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
+					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
 
 		} else if (activatedNeighborsContexts.size()>0){
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedNeighborContexts",activatedNeighborsContexts.size());
-			//bestContext = getNearestContext(activatedNeighborsContexts);
-            selectBestContextWithDistanceToModelConfidanceAndVolume(activatedNeighborsContexts);
-		} else if (getAmas().getContexts().size()>0){
+
+            selectBestContextWithOracleWeighted(activatedNeighborsContexts, getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
+					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+		} else if (getAmas().getContexts().size()>0 && getAmas().data.PARAM_NCS_isAllContextSearchAllowedForLearning){
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withAllContexts",getAmas().getContexts().size());
-            //bestContext = getNearestContext(getAmas().getContexts());
-            selectBestContextWithDistanceToModelConfidanceAndVolume(getAmas().getContexts());
+
+            selectBestContextWithOracleWeighted(getAmas().getContexts(), getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
+					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
         }
 
 		if (bestContext != null) {
-			setContextFromPropositionWasSelected(true);
+			//setContextFromPropositionWasSelected(true);
 			getAmas().data.prediction = bestContext.getActionProposal();
 
 		} else {
@@ -841,7 +833,6 @@ public class Head extends EllsaAgent {
 
 		updateCriticalityWithoutOracle();
 
-		//updateActivatedContextLastPredictions(); //TODO choisir ?
 		updateNeighborContextLastPredictions();
 
 		if(getAmas().data.PARAM_isSelfLearning && getAmas().getCycle()>getAmas().data.PARAM_bootstrapCycle){
@@ -948,75 +939,58 @@ public class Head extends EllsaAgent {
 	}
 
 	private void updateBestContextAndPropositionWithoutOracle() {
-		//logger().debug("HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
-		getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "Nombre de contextes activés: " + activatedContexts.size());
+		Double weightedPrediction = null;
+		if (activatedContexts.size() > 0) {
+			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withActivatedContexts",activatedContexts.size());
 
-		//selectBestContextWithConfidenceAndVolume();
-		selectBestContextWithConfidence();
+			selectBestContextWithoutOracleWeighted(activatedContexts, getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+
+		} else if (activatedNeighborsContexts.size()>0){
+			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withActivatedNeighborContexts",activatedNeighborsContexts.size());
+
+			selectBestContextWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+
+			/*weightedPrediction = getPredictionWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);*/
+		} else if (getAmas().getContexts().size()>0 && getAmas().data.PARAM_NCS_isAllContextSearchAllowedForExploitation){
+			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withAllContexts",getAmas().getContexts().size());
+
+			selectBestContextWithoutOracleWeighted(getAmas().getContexts(),  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+
+		}
+
 		if (bestContext != null) {
-			getAmas().data.noBestContext = false;
-			getAmas().data.prediction = bestContext.getActionProposal();
-		} else {
-
-			getAmas().data.noBestContext = true;
-			Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
-
-			if(activatedNeighborsContexts.size()>0){
-
-				double weightedPredictionSum=0;
-				double normalisation=0;
-				for(Context ctxt : activatedNeighborsContexts){
-					double distance = ctxt.distanceBetweenCurrentPercetionsAndBorders();
-					weightedPredictionSum += (1/distance)*ctxt.getLocalModel().getProposition();
-					normalisation += (1/distance);
-
-				}
-				getAmas().data.prediction = weightedPredictionSum/normalisation;
-
-
+			//setContextFromPropositionWasSelected(true);
+			if(weightedPrediction!=null){
+				getAmas().data.prediction = weightedPrediction.doubleValue();
 			}else{
-
-				if(nearestContext != null) {
-					getAmas().data.prediction = nearestContext.getActionProposal();
-					bestContext = nearestContext;
-				} else {
-					//TODO THIS IS VERY INEFICIENT ! amoeba should not look globally, but right now there's no other strategy.
-					// To limit performance impact, we limit our search on a random sample.
-					// A better way would be to increase neighborhood.
-					getEnvironment().print(TRACE_LEVEL.ERROR,"Play without oracle : no nearest context in neighbors, searching in a random sample");
-					//PrintOnce.print("Play without oracle : no nearest context in neighbors, searching in a random sample. (only shown once)");
-					//List<Context> searchList = RandomUtils.pickNRandomElements(getAmas().getContexts(), 100);
-					nearestContext = this.getNearestContext(getAmas().getContexts());
-					if(nearestContext != null) {
-						getAmas().data.prediction = nearestContext.getActionProposal();
-						bestContext = nearestContext;
-					} else {
-                        setPredictionWithoutContextAgent();
-						System.out.println("NO CONTEXT PREDICTION"); // Should not happend
-					}
-				}
+				getAmas().data.prediction = bestContext.getActionProposal();
 			}
 
 
+		} else {
+			setPredictionWithoutContextAgent();
 		}
-		if(bestContext != null) {
-			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
-			//logger().debug("HEAD without oracle", "Best context selected without oracle is : " + bestContext.getName());
-			// Config.print("With function : " +
-			// bestContext.getFunction().getFormula(bestContext), 0);
-			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle","BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
 
-			//logger().debug("HEAD without oracle",	"BestContext : " + bestContext.toStringFull() + " " + bestContext.getConfidence());
-			// functionSelected = bestContext.getFunction().getFormula(bestContext);
 
-		}
-		else {
-			//logger().debug("HEAD without oracle", "no Best context selected ");
 
-			getEnvironment().print(TRACE_LEVEL.DEBUG, "HEAD without oracle", "no Best context selected ");
 
-		}
 	}
+
+	/*private double getNeighborhoodWeightedPrediction() {
+		double weightedPredictionSum=0;
+		double normalisation=0;
+		for(Context ctxt : activatedNeighborsContexts){
+			double distance = ctxt.distanceBetweenCurrentPercetionsAndBorders();
+			weightedPredictionSum += (1/distance)*ctxt.getLocalModel().getProposition();
+			normalisation += (1/distance);
+
+		}
+		return weightedPredictionSum/normalisation;
+	}*/
 
 	private void updateBestContextAndPropositionWithoutOracleFromPseudoActivatedContexts() {
 		//logger().debug("HEAD without oracle and all percepts", "Nombre de contextes activés: " + activatedContexts.size());
@@ -1030,7 +1004,7 @@ public class Head extends EllsaAgent {
 		selectBestSubContextWithDistance();
 
 		if (bestContext != null) {
-			getAmas().data.noBestContext = false;
+			//getAmas().data.noBestContext = false;
 			getAmas().data.prediction = bestContext.getActionProposalWithSubPercepts();
 
 			for(Percept unconsideredPct : getAmas().getUnconsideredPercepts()){
@@ -1039,7 +1013,7 @@ public class Head extends EllsaAgent {
 
 		} else {
 
-			getAmas().data.noBestContext = true;
+			//getAmas().data.noBestContext = true;
 			Context nearestContext = this.getNearestContextWithoutAllPercepts(activatedNeighborsContexts);
 
 			if(nearestContext != null) {
@@ -1615,8 +1589,6 @@ public class Head extends EllsaAgent {
 			}
 		}
 
-		
-		
 		boolean newContextCreated = false;
 
 		if (activatedContexts.size() == 0) {
@@ -1624,17 +1596,28 @@ public class Head extends EllsaAgent {
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
 
-			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 
+			Context goodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
+					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
 
 			Context context;
+			if (goodContext != null && getAmas().data.PARAM_NCS_isCreationWithNeighbor) {
+				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(goodContext.getName(),
+						"************************************* NEAREST GOOD CONTEXT")));
+				context = createNewContext(goodContext);
+			} else {
+				context = createNewContext();
+			}
+
+			/*Context context;
+			Pair<Context, Double> nearestGoodContext = getbestContextInNeighborsWithDistanceToModel(activatedNeighborsContexts);
 			if (nearestGoodContext.getA() != null && getAmas().data.PARAM_NCS_isCreationWithNeighbor) {
 				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(nearestGoodContext.getA().getName(),
 						"************************************* NEAREST GOOD CONTEXT")));
 				context = createNewContext(nearestGoodContext.getA());
 			} else {
 				context = createNewContext();
-			}
+			}*/
 
 			bestContext = context;
 			newContext = context;
@@ -1644,12 +1627,12 @@ public class Head extends EllsaAgent {
 			activatedSubNeighborsContexts.add(newContext);
 			activatedNeighborsContexts.add(newContext);
 			activatedContexts.add(newContext);
-			double maxCoef = 0.0;
+			/*double maxCoef = 0.0;
 			for(Double coef : newContext.getLocalModel().getCoef()) {
 				if(Math.abs(coef)> maxCoef) {
 					maxCoef = Math.abs(coef);
 				}
-			}
+			}*/
 
 
 			
@@ -1658,8 +1641,6 @@ public class Head extends EllsaAgent {
 
 			
 		}
-
-
 
 		if (!newContextCreated) {
 			updateStatisticalInformations();
@@ -1772,11 +1753,10 @@ public class Head extends EllsaAgent {
 
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext != null", "" + (bestContext != null))));
 			if(bestContext != null) {
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + (bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() ))));
+				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()", "" + ((bestContext.lastDistanceToModel) < getPredicionPerformanceIndicator() ))));
 			}
 
-			if (bestContext != null && bestContext.getLocalModel().distance(bestContext.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
-				//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
+			if (bestContext != null && bestContext.lastDistanceToModel < getPredicionPerformanceIndicator() && bestContext.isInNeighborhood) {
 
 				for (int i = 0; i<activatedContexts.size();i++) {
 
@@ -1813,8 +1793,7 @@ public class Head extends EllsaAgent {
 
 
 			/* If result is good, shrink redundant context (concurrence NCS) */
-			if (bestContext != null ) {
-				//if (bestContext != null && criticity <= predictionPerformance.getPerformanceIndicator()) {
+			if (bestContext != null && bestContext.isInNeighborhood) {
 
 				for (int i = 0; i<activatedContexts.size();i++) {
 
@@ -1846,40 +1825,23 @@ public class Head extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION INCOMPETENT HEAD")));
 
-		if(activatedContexts.isEmpty()	|| ((bestContext.getLocalModel().distance(bestContext.getCurrentExperiment())) > getAverageRegressionPerformanceIndicator() && !oneOfProposedContextWasGood())) {
+		if(activatedContexts.isEmpty()) {
 
+			Context nearestGoodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,1.0,0.0,0.0,1.0);
 
-			Context c = getNearestGoodContext(activatedNeighborsContexts);
-			// Context c = getSmallestGoodContext(activatedNeighborsContexts);
-
-			
-			if (c != null) {
-				c.solveNCS_IncompetentHead(this);
+			if (nearestGoodContext != null) {
+				nearestGoodContext.solveNCS_IncompetentHead();
 			}
-
-			bestContext = c;
-
-
-			/* This allow to test for all contexts rather than the nearest */
-			/*
-			 * for (Agent a : allContexts) { Context c = (Context) a; if
-			 * (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c !=
-			 * newContext && !c.isDying() && c != bestContext && !contexts.contains(c)) {
-			 * c.growRanges(this);
-			 * 
-			 * } }
-			 */
-
 		}
 
 		getAmas().data.executionTimes[10]=System.currentTimeMillis()- getAmas().data.executionTimes[10];
 	}
 
-	private void NCSDetection_IncompetentHeadWitoutOracle() {
-		/*
+	/*private void NCSDetection_IncompetentHeadWitoutOracle() {
+		*//*
 		 * If there isn't any proposition or only bad propositions, the head is
 		 * incompetent. It needs help from a context.
-		 */
+		 *//*
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- NCS DETECTION INCOMPETENT HEAD WITHOUT ORACLE")));
@@ -1895,18 +1857,18 @@ public class Head extends EllsaAgent {
 			bestContext = c;
 
 
-			/* This allow to test for all contexts rather than the nearest */
-			/*
+			*//* This allow to test for all contexts rather than the nearest *//*
+			*//*
 			 * for (Agent a : allContexts) { Context c = (Context) a; if
 			 * (Math.abs((c.getActionProposal() - oracleValue)) <= errorAllowed && c !=
 			 * newContext && !c.isDying() && c != bestContext && !contexts.contains(c)) {
 			 * c.growRanges(this);
 			 *
 			 * } }
-			 */
+			 *//*
 
 		}
-	}
+	}*/
 
 	public void NCSDetection_Dream() {
 		getAmas().data.executionTimes[16]=System.currentTimeMillis();
@@ -2099,16 +2061,15 @@ public class Head extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- SELF ANALYSIS OF CTXT")));
 		
-		double currentDistanceToOraclePrediction;
+
+
 		double minDistanceToOraclePrediction = Double.POSITIVE_INFINITY;
 
 		for (Context activatedContext : activatedContexts) {
-			currentDistanceToOraclePrediction = activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment());
-			
 
 			getAmas().data.contextNotFinished = false;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MODEL DISTANCE", activatedContext.getName(),
-					"" + activatedContext.getLocalModel().distance(activatedContext.getCurrentExperiment()))));
+					"" + activatedContext.lastDistanceToModel)));
 
 			if (activatedContext.isChild()) {
 				
@@ -2116,7 +2077,7 @@ public class Head extends EllsaAgent {
 				getAmas().data.contextNotFinished = true;
 				
 			}
-			else if (currentDistanceToOraclePrediction < getAverageRegressionPerformanceIndicator()) {
+			else if (activatedContext.lastDistanceToModel < getPredicionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
 				
 				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.PARAM_learningSpeed); //TODO update all contexts ?
@@ -2124,27 +2085,27 @@ public class Head extends EllsaAgent {
 
 			}
 
-			if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
-				minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
+			if (activatedContext.lastDistanceToModel < minDistanceToOraclePrediction) {
+				minDistanceToOraclePrediction = activatedContext.lastDistanceToModel;
 				getAmas().data.lastMinDistanceToRegression = minDistanceToOraclePrediction;
 			}
 
 			if (!getAmas().data.contextNotFinished) {
-				criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+				criticalities.addCriticality("distanceToRegression", activatedContext.lastDistanceToModel);
 				
 			}
 			
-			activatedContext.criticalities.addCriticality("distanceToRegression", currentDistanceToOraclePrediction);
+			activatedContext.criticalities.addCriticality("distanceToRegression", activatedContext.lastDistanceToModel);
 			//getEnvironment().trace(new ArrayList<String>(Arrays.asList("ADD CRITICALITY TO CTXT", ""+activatedContext.getName(), ""+criticalities.getLastValues().get("distanceToRegression").size())));
 
 			activatedContext.lastPrediction = activatedContext.getActionProposal();
 			
-			double maxCoef = 0.0;
+			/*double maxCoef = 0.0;
 			for(Double coef : activatedContext.getLocalModel().getCoef()) {
 				if(Math.abs(coef)> maxCoef) {
 					maxCoef = Math.abs(coef);
 				}
-			}
+			}*/
 
 			
 		}
@@ -2185,7 +2146,7 @@ public class Head extends EllsaAgent {
 		getAmas().data.executionTimes[9]=System.currentTimeMillis()- getAmas().data.executionTimes[9];
 	}
 
-	private void setNearestContextAsBestContext() {
+	/*private void setNearestContextAsBestContext() {
 		Context nearestContext = this.getNearestContext(activatedNeighborsContexts);
 
 		if (nearestContext != null) {
@@ -2195,7 +2156,7 @@ public class Head extends EllsaAgent {
 		}
 
 		bestContext = nearestContext;
-	}
+	}*/
 
 
 
@@ -2235,12 +2196,20 @@ public class Head extends EllsaAgent {
 	 * @return the nearest good context
 	 */
 	public Context getNearestGoodContext(ArrayList<Context> contextNeighbors) {
+
 		Context nearest = null;
+		double distanceToNearest = Double.MAX_VALUE;
 		for (Context ctxt : contextNeighbors) {
-			if(ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator() &&  ctxt != newContext && !ctxt.isDying()){
-				if (nearest == null || getExternalDistanceToContext(ctxt) < getExternalDistanceToContext(nearest)) {
-					nearest = ctxt;
+			if (ctxt != newContext && !ctxt.isDying()) {
+				if(ctxt.lastDistanceToModel < getPredicionPerformanceIndicator()){
+					double externalDistanceToContext = getExternalDistanceToContext(ctxt);
+					if (nearest == null || externalDistanceToContext < distanceToNearest) {
+
+						nearest = ctxt;
+						distanceToNearest = externalDistanceToContext;
+					}
 				}
+
 			}
 		}
 
@@ -2248,7 +2217,7 @@ public class Head extends EllsaAgent {
 
 	}
 
-	public Context getSmallestGoodContext(ArrayList<Context> neighbors) {
+	/*public Context getSmallestGoodContext(ArrayList<Context> neighbors) {
 		Context smallest = null;
 		double minVolume = Double.POSITIVE_INFINITY;
 		double currentVolume;
@@ -2264,16 +2233,16 @@ public class Head extends EllsaAgent {
 
 		return smallest;
 
-	}
+	}*/
 
-	private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
+	/*private Pair<Context, Double> getbestContextInNeighborsWithDistanceToModel(ArrayList<Context> contextNeighbors) {
 		getAmas().data.executionTimes[17]=System.currentTimeMillis();
 
 
 		double d = Double.MAX_VALUE;
 		Context bestContextInNeighbors = null;
 		
-		Double averageDistanceToModels = getAverageRegressionPerformanceIndicator();
+		Double averageDistanceToModels = getPredicionPerformanceIndicator();
 		
 		for (Context c : contextNeighbors) {
 			
@@ -2295,14 +2264,9 @@ public class Head extends EllsaAgent {
 		}
 		getAmas().data.executionTimes[17]=System.currentTimeMillis()- getAmas().data.executionTimes[17];
 		return new Pair<Context, Double>(bestContextInNeighbors, d);
-	}
+	}*/
 
-	/**
-	 * Gets the nearest context.
-	 *
-	 * @param allContext the all context
-	 * @return the nearest context
-	 */
+
 	private Context getNearestContext(List<Context> contextNeighboors) {
 		Context nearest = null;
 		double distanceToNearest = Double.MAX_VALUE;
@@ -2396,7 +2360,7 @@ public class Head extends EllsaAgent {
 	private boolean oneOfProposedContextWasGood() {
 		boolean b = false;
 		for (Context c : activatedContexts) {
-			if (c.getLocalModel().distance(c.getCurrentExperiment()) < getAverageRegressionPerformanceIndicator()) {
+			if (c.getLocalModel().distance(c.getCurrentExperiment()) < getPredicionPerformanceIndicator()) {
 				b = true;
 			}
 		}
@@ -2469,7 +2433,7 @@ public class Head extends EllsaAgent {
 
 			double endogenousPrediction;
 			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle){
-				double weightedSumOfPredictions = 0;
+				/*double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
 
@@ -2480,7 +2444,10 @@ public class Head extends EllsaAgent {
 
 
 				}
-				endogenousPrediction = weightedSumOfPredictions/normalisation;
+				endogenousPrediction = weightedSumOfPredictions/normalisation;*/
+				endogenousPrediction = getPredictionWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
+						getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+
 				currentExp.setProposition(endogenousPrediction);
 				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
 				context = new Context(getAmas(), endogenousPrediction);
@@ -2578,28 +2545,28 @@ public class Head extends EllsaAgent {
 		this.activatedContexts = contexts;
 	}
 
-	/**
-	 * Select best context.
-	 */
-	private void selectBestContextWithConfidenceAndVolume() {
-		if(activatedContexts != null && !activatedContexts.isEmpty()) {
-			Context bc;
-	
-			bc = activatedContexts.get(0);
-			double currentConfidence = bc.getConfidence();
-
-			for (Context context : activatedContexts) {
-				double confidenceWithVolume = context.getConfidence()*context.getVolume();
-				if (confidenceWithVolume > currentConfidence) {
-					bc = context;
-					currentConfidence = confidenceWithVolume;
-				}
-			}
-			bestContext = bc;
-		} else {
-			bestContext = null;
-		}
-	}
+//	/**
+//	 * Select best context.
+//	 */
+//	private void selectBestContextWithConfidenceAndVolume() {
+//		if(activatedContexts != null && !activatedContexts.isEmpty()) {
+//			Context bc;
+//
+//			bc = activatedContexts.get(0);
+//			double currentConfidence = bc.getConfidence();
+//
+//			for (Context context : activatedContexts) {
+//				double confidenceWithVolume = context.getConfidence()*context.getVolume();
+//				if (confidenceWithVolume > currentConfidence) {
+//					bc = context;
+//					currentConfidence = confidenceWithVolume;
+//				}
+//			}
+//			bestContext = bc;
+//		} else {
+//			bestContext = null;
+//		}
+//	}
 
 	private void selectBestContextWithConfidence() {
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {
@@ -2621,7 +2588,7 @@ public class Head extends EllsaAgent {
 		}
 	}
 
-	private void selectBestContextWithConfidenceOrDistance() {
+	/*private void selectBestContextWithConfidenceOrDistance() {
 
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {
 			Context bc;
@@ -2657,7 +2624,7 @@ public class Head extends EllsaAgent {
 		}
 
 
-	}
+	}*/
 
 	private void selectBestSubContextWithDistance() {
 
@@ -2683,7 +2650,7 @@ public class Head extends EllsaAgent {
 
 	}
 
-	private void selectBestContextWithDistance() {
+	/*private void selectBestContextWithDistance() {
 
 		if(activatedContexts != null && !activatedContexts.isEmpty()) {
 
@@ -2719,11 +2686,11 @@ public class Head extends EllsaAgent {
 		}
 
 
-	}
+	}*/
 	
 	
 
-	private void selectBestContextWithDistanceToModelAndVolume() {
+	/*private void selectBestContextWithDistanceToModelAndVolume() {
 
 		Context bc;
 
@@ -2741,9 +2708,9 @@ public class Head extends EllsaAgent {
 			}
 		}
 		bestContext = bc;
-	}
+	}*/
 
-	private void selectBestContextWithDistanceToModel() {
+	/*private void selectBestContextWithDistanceToModel() {
 
 		Context bc;
 
@@ -2761,9 +2728,9 @@ public class Head extends EllsaAgent {
 			}
 		}
 		bestContext = bc;
-	}
+	}*/
 
-	private void selectBestContextWithDistanceToModelAndConfidance() {
+	/*private void selectBestContextWithDistanceToModelAndConfidance() {
 
 		Context bc;
 
@@ -2789,6 +2756,129 @@ public class Head extends EllsaAgent {
 			}
 		}
 		bestContext = bc;
+	}*/
+
+
+	private double getPredictionWithoutOracleWeighted(ArrayList<Context> contextsList, double confidenceWeigh, double volumeWeigh, double perceptionDistanceWeigh) {
+
+		double weightedPredictionSum=0.0;
+		double normalization=0.0;
+
+
+		double currentInverseConfidance;
+		double currentInverseVolume;
+		double currentCricality;
+		double currentPerceptionDistance;
+
+		for (Context context : contextsList) {
+
+			currentPerceptionDistance = getExternalDistanceToContext(context);
+			currentInverseConfidance = 1/context.getNormalizedConfidenceWithParams(0.99,0.01);
+			currentInverseVolume = 1/context.getVolume();
+			currentCricality = (( confidenceWeigh * currentInverseConfidance )  + ( volumeWeigh * currentInverseVolume ) + ( perceptionDistanceWeigh * currentPerceptionDistance ))/(confidenceWeigh+volumeWeigh+ perceptionDistanceWeigh);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "perceptionDistance "+currentPerceptionDistance, "criticality "+currentCricality)));
+
+			weightedPredictionSum += (1/currentCricality)*context.getLocalModel().getProposition();
+			normalization += (1/currentCricality);
+		}
+		return weightedPredictionSum/normalization;
+	}
+	
+	private void selectBestContextWithoutOracleWeighted(ArrayList<Context> contextsList, double confidenceWeigh, double volumeWeigh, double perceptionDistanceWeigh) {
+
+		Context bc;
+
+		bc = contextsList.get(0);
+
+		double rangeDistance = getExternalDistanceToContext(bc);
+		double inverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
+		double inverseVolume = 1/bc.getVolume();
+		double criticality = ( ( confidenceWeigh * inverseConfidance )  + ( volumeWeigh * inverseVolume ) + (perceptionDistanceWeigh*rangeDistance))/(confidenceWeigh+volumeWeigh+perceptionDistanceWeigh);
+
+
+
+		double currentInverseConfidance;
+		double currentInverseVolume;
+		double currentCricality;
+		double currentPerceptionDistance;
+
+		for (Context context : contextsList) {
+
+			currentPerceptionDistance = getExternalDistanceToContext(context);
+			currentInverseConfidance = 1/context.getNormalizedConfidenceWithParams(0.99,0.01);
+			currentInverseVolume = 1/context.getVolume();
+			currentCricality = (( confidenceWeigh * currentInverseConfidance )  + ( volumeWeigh * currentInverseVolume ) + ( perceptionDistanceWeigh * currentPerceptionDistance ))/(confidenceWeigh+volumeWeigh+ perceptionDistanceWeigh);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "perceptionDistance "+currentPerceptionDistance, "criticality "+currentCricality)));
+			//getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
+			if (currentCricality < criticality) {
+				bc = context;
+				criticality = currentCricality;
+			}
+		}
+		bestContext = bc;
+	}
+
+	private void selectBestContextWithOracleWeighted(ArrayList<Context> contextsList, double distanceToModelWeigh, double confidenceWeigh, double volumeWeigh, double perceptionDistanceWeigh) {
+
+		Context bc;
+
+		bc = contextsList.get(0);
+		double distanceToModel = (bc.getLocalModel()).distance(bc.getCurrentExperiment());
+		double rangeDistance = getExternalDistanceToContext(bc);
+		double inverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
+		double inverseVolume = 1/bc.getVolume();
+		double criticality = (( distanceToModelWeigh * distanceToModel ) + ( confidenceWeigh * inverseConfidance )  + ( volumeWeigh * inverseVolume ) + (perceptionDistanceWeigh*rangeDistance))/(distanceToModelWeigh+confidenceWeigh+volumeWeigh+perceptionDistanceWeigh);
+
+
+
+		double currentInverseConfidance;
+		double currentInverseVolume;
+		double currentCricality;
+		double currentPerceptionDistance;
+
+		for (Context context : contextsList) {
+
+			context.lastDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			currentPerceptionDistance = getExternalDistanceToContext(context);
+			currentInverseConfidance = 1/context.getNormalizedConfidenceWithParams(0.99,0.01);
+			currentInverseVolume = 1/context.getVolume();
+			currentCricality = (( distanceToModelWeigh * context.lastDistanceToModel ) + ( confidenceWeigh * currentInverseConfidance )  + ( volumeWeigh * currentInverseVolume ) + ( perceptionDistanceWeigh * currentPerceptionDistance ))/(distanceToModelWeigh+confidenceWeigh+volumeWeigh+ perceptionDistanceWeigh);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+context.lastDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "perceptionDistance "+currentPerceptionDistance, "criticality "+currentCricality)));
+			//getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
+			if (currentCricality < criticality) {
+				bc = context;
+				criticality = currentCricality;
+			}
+		}
+		bestContext = bc;
+	}
+
+	private Context getGoodContextWithOracleWeighted(ArrayList<Context> contextsList, double distanceToModelWeigh, double confidenceWeigh, double volumeWeigh, double perceptionDistanceWeigh) {
+
+		Context bc=null;
+
+		double criticality = Double.POSITIVE_INFINITY;
+
+		double currentInverseConfidance;
+		double currentInverseVolume;
+		double currentCricality;
+		double currentPerceptionDistance;
+
+		for (Context context : contextsList) {
+			getEnvironment().print(TRACE_LEVEL.DEBUG,context.getName());
+			context.lastDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			currentPerceptionDistance = getExternalDistanceToContext(context);
+			currentInverseConfidance = 1/context.getNormalizedConfidenceWithParams(0.99,0.01);
+			currentInverseVolume = 1/context.getVolume();
+			currentCricality = (( distanceToModelWeigh * context.lastDistanceToModel ) + ( confidenceWeigh * currentInverseConfidance )  + ( volumeWeigh * currentInverseVolume ) + ( perceptionDistanceWeigh * currentPerceptionDistance ))/(distanceToModelWeigh+confidenceWeigh+volumeWeigh+ perceptionDistanceWeigh);
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+context.lastDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "perceptionDistance "+currentPerceptionDistance, "criticality "+currentCricality)));
+			//getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
+			if (currentCricality < criticality && context.lastDistanceToModel<getPredicionPerformanceIndicator()) {
+				bc = context;
+				criticality = currentCricality;
+			}
+		}
+		return bc;
 	}
 
 	private void selectBestContextWithDistanceToModelConfidanceAndVolume(ArrayList<Context> contextsList) {
@@ -2796,25 +2886,24 @@ public class Head extends EllsaAgent {
 		Context bc;
 
 		bc = contextsList.get(0);
-		double distanceToModel = ((LocalModelMillerRegression) bc.getLocalModel()).distance(bc.getCurrentExperiment());
+		double distanceToModel = (bc.getLocalModel()).distance(bc.getCurrentExperiment());
 		double inverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 		double inverseVolume = 1/bc.getVolume();
 		double criticality = (( 0.5 * distanceToModel ) + ( 0.5 * inverseConfidance )  + ( 0.5 * inverseVolume ))/1.5;
 
 
 
-		double currentDistanceToModel;
 		double currentInverseConfidance;
 		double currentInverseVolume;
 		double currentCricality;
 
 		for (Context context : contextsList) {
 
-			currentDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
+			context.lastDistanceToModel = context.getLocalModel().distance(context.getCurrentExperiment());
 			currentInverseConfidance = 1/bc.getNormalizedConfidenceWithParams(0.99,0.01);
 			currentInverseVolume = 1/context.getVolume();
-			currentCricality = (( 0.5 * currentDistanceToModel ) + ( 0.5 * currentInverseConfidance )  + ( 0.5 * currentInverseVolume ))/1.5;
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+currentDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
+			currentCricality = (( 0.5 * context.lastDistanceToModel ) + ( 0.5 * currentInverseConfidance )  + ( 0.5 * currentInverseVolume ))/1.5;
+			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("DISTANCE  ", context.getName(), "distance to model "+context.lastDistanceToModel, "confidence "+context.getConfidence(), "normalized confidence "+(1/currentInverseConfidance), "volume "+1/currentInverseVolume, "criticality "+currentCricality)));
 			//getEnvironment().print(TRACE_LEVEL.ERROR, "minConfidence", getAmas().data.minConfidence,"maxConfidence", getAmas().data.maxConfidence);
 			if (currentCricality < criticality) {
 				bc = context;
@@ -3592,7 +3681,7 @@ public class Head extends EllsaAgent {
 		
 	}
 	
-	public Double getAverageRegressionPerformanceIndicator() {
+	public Double getPredicionPerformanceIndicator() {
 		
 		//return getAmas().data.averageRegressionPerformanceIndicator; //TODO solution ?
 		return getAmas().data.PARAM_initRegressionPerformance;

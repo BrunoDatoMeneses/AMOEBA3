@@ -27,7 +27,7 @@ public class Percept extends EllsaAgent {
 
 
 	private double value;
-	private boolean isEnum = false;
+	private boolean isEnum = false; //TODO delete
 
 	/**
 	 * Instantiates a new percept.

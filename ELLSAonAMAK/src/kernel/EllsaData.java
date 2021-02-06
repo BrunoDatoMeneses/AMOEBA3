@@ -62,8 +62,8 @@ public class EllsaData implements Serializable {
 	
 	public HashMap<String, Double> selfRequest;
 
-	public Double maxConfidence = Double.NEGATIVE_INFINITY;
-	public Double minConfidence = Double.POSITIVE_INFINITY;
+	public Double maxConfidence = 1.0;
+	public Double minConfidence = 0.0;
 	
 	public Double maxPrediction = Double.NEGATIVE_INFINITY;
 	public Double minPrediction = Double.POSITIVE_INFINITY;
@@ -154,6 +154,15 @@ public class EllsaData implements Serializable {
 	public double PARAM_rangeLengthForArtificialPerceptions = 0.1;
 
 
+	public double PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION = 1.0;
+	public double PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS = 0.0;
+	public double PARAM_LEARNING_WEIGHT_CONFIDENCE = 1.0;
+	public double PARAM_LEARNING_WEIGHT_VOLUME = 1.0;
+
+	public double PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS = 1.0;
+	public double PARAM_EXPLOITATION_WEIGHT_CONFIDENCE = 1.0;
+	public double PARAM_EXPLOITATION_WEIGHT_VOLUME = 1.0;
+
 	// AVT
 
 	public double PARAM_AVT_acceleration = 2;
@@ -163,6 +172,9 @@ public class EllsaData implements Serializable {
 
 	// NCS
 	public boolean PARAM_NCS_isCreationWithNeighbor = false;
+	public boolean PARAM_NCS_isAllContextSearchAllowedForLearning = true;
+	public boolean PARAM_NCS_isAllContextSearchAllowedForExploitation = true;
+
 	public boolean PARAM_NCS_isConflictDetection = false;
 	public boolean PARAM_NCS_isConcurrenceDetection = false;
 	public boolean PARAM_NCS_isVoidDetection = false;

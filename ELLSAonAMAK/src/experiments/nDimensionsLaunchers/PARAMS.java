@@ -27,7 +27,7 @@ public class PARAMS {
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.08;
+    public static double mappingErrorAllowed = 0.06;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.1; // BIG 3D
@@ -41,8 +41,8 @@ public class PARAMS {
     /* PREDICTION */
     //public static  double setRegressionPerformance = 1; //Multi
     //public static  double setRegressionPerformance = 0.05; //SinCos
-    //public static  double setRegressionPerformance = 0.5; // Goutte
-    public static  double setRegressionPerformance = 1; // Carré
+    public static  double setRegressionPerformance = 1; // Goutte
+    //public static  double setRegressionPerformance = 1; // Carré
 
 
     /* REGRESSION */
@@ -79,7 +79,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;

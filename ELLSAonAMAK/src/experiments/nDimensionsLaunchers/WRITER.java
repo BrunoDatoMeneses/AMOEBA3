@@ -33,7 +33,7 @@ public class WRITER {
                 , "NCS_UselessnessTimeExecution", "NCS_IncompetendHeadTimeExecution", "NCS_ConcurrenceAndConflictTimeExecution", "NCS_Create_New_ContextTimeExecution", "NCS_OvermappingTimeExecution", "NCS_ChildContextTimeExecution", "NCS_PotentialRequestTimeExecution", "NCS_DreamPotentialRequestTimeExecution");
 
         List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents","neighborsCounts",
-                "minExperiencedAverage","maxExperiencedAverage","minExperiencedDeviation","maxExperiencedDeviation",
+                "minPerceptionsExperiencedAverage","maxPerceptionsExperiencedAverage","minPerceptionsExperiencedDeviation","maxPerceptionsExperiencedDeviation",
                 "rangeExperienceAverage", "rangeExperienceDeviation");
 
         ArrayList<List<String>> dataStrings = new ArrayList<>(Arrays.asList(dataStringsVolumes, dataStringsEndoRequests, dataStringsTimeExecution, dataStringsOther, dataStringsPrediction ));
@@ -292,10 +292,10 @@ public class WRITER {
         double rangeAverageValue = averageRange.getAsDouble();
         double rangeDispersionValue = Math.sqrt(rangDispersion /allPerceptRangeExp.size());
 
-        data.get("minExperiencedAverage").add(minAverageValue);
-        data.get("maxExperiencedAverage").add(MaxAverageValue);
-        data.get("minExperiencedDeviation").add(minDispersionValue);
-        data.get("maxExperiencedDeviation").add(MaxDispersionValue);
+        data.get("minPerceptionsExperiencedAverage").add(minAverageValue);
+        data.get("maxPerceptionsExperiencedAverage").add(MaxAverageValue);
+        data.get("minPerceptionsExperiencedDeviation").add(minDispersionValue);
+        data.get("maxPerceptionsExperiencedDeviation").add(MaxDispersionValue);
         data.get("rangeExperienceAverage").add(rangeAverageValue);
         data.get("rangeExperienceDeviation").add(rangeDispersionValue);
 

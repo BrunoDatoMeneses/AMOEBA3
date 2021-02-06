@@ -36,7 +36,7 @@ public class Context extends EllsaAgent {
 
 	private HashMap<Percept, Range> ranges;
 	private LocalModel localModel;
-	private double confidence = 0;
+	private double confidence = 0.0;
 
 	/**
 	 * The number of time the context was activated (present in validContext). Used
@@ -100,10 +100,11 @@ public class Context extends EllsaAgent {
 		getAmas().data.executionTimes[21]=System.currentTimeMillis()- getAmas().data.executionTimes[21];
 
 		buildContext();
+		setConfidence(0.0);
 
 		getAmas().data.executionTimes[22]=System.currentTimeMillis();
 		criticalities = new Criticalities(5);
-		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getPredicionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 		getAmas().data.executionTimes[22]=System.currentTimeMillis()- getAmas().data.executionTimes[22];
@@ -115,7 +116,7 @@ public class Context extends EllsaAgent {
 		buildContext(manualRanges);
 		criticalities = new Criticalities(5);
 
-		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getPredicionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
@@ -134,7 +135,7 @@ public class Context extends EllsaAgent {
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(5);
 		
-		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getPredicionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
@@ -150,7 +151,7 @@ public class Context extends EllsaAgent {
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(5);
 
-		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
+		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getPredicionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
@@ -660,7 +661,7 @@ public class Context extends EllsaAgent {
 	 *
 	 * @param head the head
 	 */
-	public void solveNCS_IncompetentHead(Head head) {
+	public void solveNCS_IncompetentHead() {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS INCOMPETENT HEAD")));
 
@@ -761,12 +762,12 @@ public class Context extends EllsaAgent {
 	public boolean isSameModel(Context ctxt) {
 		/*return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
 				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&*/
-        return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+        return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getPredicionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
 	public boolean isSameModelWithoutOracle(Context ctxt) {
-		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getPredicionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
@@ -800,8 +801,7 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
 				+ "---------------------------------------- ANALYSE RESULTS " + this.getName())));
 
-		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
-		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
+		lastAverageRegressionPerformanceIndicator = head.getPredicionPerformanceIndicator();
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
 
 		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
@@ -812,7 +812,10 @@ public class Context extends EllsaAgent {
 				solveNCS_Overlap(head.getBestContext());
 			}*/
 		} else {
-			solveNCS_BadPrediction(head);
+			if(!isChild()){
+				solveNCS_BadPrediction(head);
+			}
+
 			}
 	}
 
@@ -1479,7 +1482,7 @@ public class Context extends EllsaAgent {
 		return minDistance;
 	}
 
-	public void NCSDetection_BetterNeighbor() {
+	/*public void NCSDetection_BetterNeighbor() {
 		Context closestContextToOracle = this;
 		double minDistanceToOraclePrediction = getLocalModel().distance(this.getCurrentExperiment());
 		double currentDistanceToOraclePrediction = 0.0;
@@ -1500,7 +1503,7 @@ public class Context extends EllsaAgent {
 			solveNCS_BetterNeighbor(closestContextToOracle);
 		}
 
-	}
+	}*/
 
 	public void solveNCS_BetterNeighbor(Context betterContext) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(),
@@ -1818,7 +1821,7 @@ public class Context extends EllsaAgent {
 			endoExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_learningSpeed);
-			//getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
+			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
 
 
 		}
@@ -2753,9 +2756,10 @@ public class Context extends EllsaAgent {
 		double CNmaxMin = Math.log((1/max)-1)/Math.log((1/min)-1);
 		double center = (maxConfidence - CNmaxMin*minConfidence)/(1 - CNmaxMin);
 		double dispersion = (center - maxConfidence)/Math.log((1/max)-1);
+		double result = 1 / (1 + Math.exp(-(confidence-center )/ dispersion));
 
-
-		return 1 / (1 + Math.exp(-(confidence-center )/ dispersion));
+		getEnvironment().print(TRACE_LEVEL.DEBUG,"normalizedConfidence",result, minConfidence, maxConfidence, CNmaxMin,center,dispersion);
+		return result;
 	}
 
 	public double getParametrizedNormalizedConfidence(double dispersion) {
@@ -3095,6 +3099,7 @@ public class Context extends EllsaAgent {
 		if(amas.getValidContexts().contains(this)) {
 			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			activations++;
+			isActivated=true;
 			getAmas().getHeadAgent().proposition(this);
 		}else{
 			NCSDetection_Uselessness();
@@ -3121,11 +3126,14 @@ public class Context extends EllsaAgent {
 	private void updateMinAndMaxConfidence() {
 		if(this.confidence>getAmas().data.maxConfidence){
 			getAmas().data.maxConfidence = this.confidence;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,getName(),"Max Confidence",getAmas().data.maxConfidence);
 		}
 		if(this.confidence<getAmas().data.minConfidence){
 			getAmas().data.minConfidence = this.confidence;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,getName(),"Min Confidence",getAmas().data.minConfidence);
 		}
-		getEnvironment().print(TRACE_LEVEL.DEBUG,getName(), "Confidence",this.confidence,"Max",getAmas().data.maxConfidence,"Min",getAmas().data.minConfidence );
+
+		getEnvironment().print(TRACE_LEVEL.DEBUG,getName(), "Confidence",this.confidence,"Min",getAmas().data.minConfidence,"Max",getAmas().data.maxConfidence );
 	}
 
 	@Override

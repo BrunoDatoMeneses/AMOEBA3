@@ -1544,7 +1544,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	 *
 	 * @return true, if is percept enum
 	 */
-	public boolean isPerceptEnum() {
+	public boolean isPerceptEnum() { // TODO delete
 		return percept.isEnum();
 	}
 
