@@ -52,7 +52,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.nbEpisodes = 5;
 
         // Neighborhood
-        PARAMS.mappingErrorAllowed =  0.1;
+        PARAMS.mappingErrorAllowed =  0.08;
         PARAMS.setNeighborhoodMultiplicator = 2;
         PARAMS.setExternalContextInfluenceRatio = 0.25;
         PARAMS.setRegressionPerformance = 1;

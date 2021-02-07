@@ -62,11 +62,14 @@ public class EllsaData implements Serializable {
 	
 	public HashMap<String, Double> selfRequest;
 
-	public Double maxConfidence = 1.0;
-	public Double minConfidence = 0.0;
+	public Double maxConfidence = null;
+	public Double minConfidence = null;
 	
 	public Double maxPrediction = Double.NEGATIVE_INFINITY;
 	public Double minPrediction = Double.POSITIVE_INFINITY;
+
+	public Double maxModelCoef = null;
+	public Double minModelCoef = null;
 	
 	public double normalizedCriticality = 0.0;
 
@@ -149,9 +152,12 @@ public class EllsaData implements Serializable {
 	// Local Models
 
 	public double PARAM_learningSpeed = 0.25;
+
 	public int PARAM_numberOfPointsForRegression_ASUPPRIMER = 50;
 	public int PARAM_quantileForGenerationOfArtificialPerceptions = 5;
 	public double PARAM_rangeLengthForArtificialPerceptions = 0.1;
+
+	public double PARAM_similarityThreshold = 0.001;
 
 
 	public double PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION = 1.0;

@@ -60,6 +60,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		coefs = new Double[context.getAmas().getPercepts().size()+1];
 		for(int j = 0; j < coefs.length; j++) {
 			coefs[j] = 0.0;
+
 		}
 	}
 
@@ -294,7 +295,7 @@ public class LocalModelMillerRegression extends LocalModel{
 
 	}
 
-	private Experiment getSymetricalExperiment(Experiment experiment) {
+	/*private Experiment getSymetricalExperiment(Experiment experiment) {
 		Experiment symetricalExperiment = new Experiment(context);
 		Experiment centerExperiment = context.getCenterExperiment();
 		for(Percept pct : context.getAmas().getPercepts()){
@@ -304,7 +305,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		double centerProposition = getProposition(centerExperiment);
 		symetricalExperiment.setProposition(centerProposition- Math.abs(centerProposition - experiment.getProposition()));
 		return symetricalExperiment;
-	}
+	}*/
 
 	public void updateModel(ArrayList<Experiment> newExperiments, double weight) {
 
@@ -364,12 +365,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		}
 
 
-
-		double[] coef = regression.regress().getParameterEstimates();
-		coefs = new Double[coef.length];
-		for(int i = 0; i < coef.length; i++) {
-			coefs[i] = coef[i];
-		}
+		updateRegressionAndCoefs();
 
 		//context.getAmas().getEnvironment().regressionPoints = newExperiments.size() + artificialExperiments.size();
 
@@ -379,13 +375,29 @@ public class LocalModelMillerRegression extends LocalModel{
 
 
 	}
-	
-	
-	
-	
-	
-	
-	
+
+	private void updateRegressionAndCoefs() {
+		double[] coef = regression.regress().getParameterEstimates();
+		coefs = new Double[coef.length];
+
+		Double maxCoef = Double.NEGATIVE_INFINITY;
+		Double minCoef = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < coef.length; i++) {
+			coefs[i] = coef[i];
+			if(Double.isNaN(coefs[i])){
+				maxCoef = Math.max(maxCoef,0.0);
+				minCoef = Math.min(minCoef,0.0);
+			}else{
+				maxCoef = Math.max(maxCoef,coefs[i]);
+				minCoef = Math.min(minCoef,coefs[i]);
+			}
+
+
+		}
+		getContext().getAmas().updateMinAndMaxRegressionCoefs(minCoef,maxCoef, getContext().getNormalizedConfidenceWithParams(0.99,0.001));
+	}
+
+
 	public void updateModelReinforcement(Experiment newExperiment, double weight) {
 		
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"REINFORCEMENT")));
@@ -412,14 +424,10 @@ public class LocalModelMillerRegression extends LocalModel{
 			regression.addObservation(newExperiment.getValuesAsArray(), weightedNewProposition);
 			i++;
 		}
-		
 
-		double[] coef = regression.regress().getParameterEstimates();
-		coefs = new Double[coef.length];
-		for(int j = 0; j < coef.length; j++) {
-			coefs[j] = coef[j];
-		}
-		
+
+		updateRegressionAndCoefs();
+
 	}
 	
 	
@@ -448,18 +456,14 @@ public class LocalModelMillerRegression extends LocalModel{
 			regression.addObservation(firstExperiments.get(i%firstExperiments.size()).getValuesAsArray(), firstExperiments.get(i%firstExperiments.size()).getOracleProposition());
 			i++;
 		}*/
-		
 
-		double[] coef = regression.regress().getParameterEstimates();
-		coefs = new Double[coef.length];
-		for(int j = 0; j < coef.length; j++) {
-			coefs[j] = coef[j];
-		}
-		
+
+		updateRegressionAndCoefs();
+
 	}
 	
 	
-	public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPoints) {
+	/*public void updateModelWithExperimentAndWeight(Experiment newExperiment, double weight, int numberOfPoints) {
 		
 		context.getAmas().getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(context.getName(),"EXPERIMENTS WITH WEIGHT")));
 		
@@ -523,9 +527,9 @@ public class LocalModelMillerRegression extends LocalModel{
 		//context.getAmas().getEnvironment().regressionPoints = numberOfXPPoints + numberOfArtificialPoints;
 		
 		
-	}
+	}*/
 	
-	private Pair<double[][], double[]> getEquallyDistributedArtificialExperiments(int amount){
+	/*private Pair<double[][], double[]> getEquallyDistributedArtificialExperiments(int amount){
 		
 		
 		int nbPercept = context.getAmas().getPercepts().size();
@@ -584,9 +588,9 @@ public class LocalModelMillerRegression extends LocalModel{
 		
 		
 		return new Pair<double[][], double[]>(artificalExperiments, artificalResults);
-	}
+	}*/
 	
-	private boolean nextMultiDimCounter(int[] indices, int[] bounds){
+	/*private boolean nextMultiDimCounter(int[] indices, int[] bounds){
 		
 		
 		
@@ -655,7 +659,7 @@ public class LocalModelMillerRegression extends LocalModel{
 		}
 
 		return artificialExperiments;
-	}
+	}*/
 
 	private ArrayList<Experiment> getNormalyDistributedArtificialExperimentsAsArray(int amount){
 
@@ -742,12 +746,25 @@ public class LocalModelMillerRegression extends LocalModel{
 
 	@Override
 	public double getModelDifference(LocalModel otherModel) { //TODO différente max ?
-		double difference = 0;
+		Double difference = Double.NEGATIVE_INFINITY;
+		double currentDifference;
 
 		for(int i=0;i<coefs.length;i++){
-			difference += Math.abs(coefs[i] - otherModel.getCoef()[i]);
+			//getContext().getEnvironment().print(TRACE_LEVEL.DEBUG,context.getName(),coefs[i], otherModel.getContext().getName(),otherModel.getCoef()[i]);
+			/*double coef1 = (Math.abs(coefs[i]) < 0.0001) ? 0.0001 : coefs[i];
+			double coef2 = (Math.abs(otherModel.getCoef()[i]) < 0.0001) ? 0.0001 : otherModel.getCoef()[i];*/
+			double coef1 =  coefs[i];
+			double coef2 =  otherModel.getCoef()[i];
+
+			currentDifference = Math.abs(coef1 - coef2)/getContext().getAmas().data.maxModelCoef;
+			//difference += currentDifference;
+			difference = Math.max(currentDifference,difference);
+
+
+			getContext().getEnvironment().print(TRACE_LEVEL.DEBUG,context.getName(),coef1, otherModel.getContext().getName(),coef2, "Diff",currentDifference, "maxCoef",getContext().getAmas().data.maxModelCoef);
 		}
 
-		return difference/coefs.length;
+		return difference;
+		//return difference/coefs.length;
 	}
 }

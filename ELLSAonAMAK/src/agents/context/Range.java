@@ -503,7 +503,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 
 	}
 
-	private void adaptEndWithSplitting(double oracleValue, double increment) {
+/*	private void adaptEndWithSplitting(double oracleValue, double increment) {
 		world.trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
 
 		ArrayList<Context> bordererContexts = new ArrayList<Context>();
@@ -567,7 +567,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 			// this.setEnd(end - getIncrementDependingOnNeighboorDistances("end"));
 		}
 
-	}
+	}*/
 
 	private void growWithBorderContext() {
 //		Context newContext = new Context(world, world.getScheduler().getHeadAgent(), this.context);
@@ -704,7 +704,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		// this.adaptStartUsingAVT(oracleValue);
 	}
 
-	private void adaptStartWithSplitting(double oracleValue, double increment) {
+	/*private void adaptStartWithSplitting(double oracleValue, double increment) {
 		world.trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("" + increment, "INCREMENT")));
 		ArrayList<Context> bordererContexts = new ArrayList<Context>();
 
@@ -764,7 +764,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		// this.setStart(start + getIncrementDependingOnNeighboorDistances("start"));
 
 		// this.adaptStartUsingAVT(oracleValue);
-	}
+	}*/
 
 	public double getIncrement() {
 		double increment = 0.25 * world.getMappingErrorAllowed() * percept.getMinMaxDistance();
@@ -809,7 +809,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		return increment;
 	}
 
-	private double getMaxIncrement(String rangeSide) {
+	/*private double getMaxIncrement(String rangeSide) {
 		double increment = world.getIncrements() * percept.getMinMaxDistance();
 		double possibleIncrement;
 
@@ -846,7 +846,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.context.getName(),
 		// this.percept.getName(), rangeSide +" INCREMENT ", ""+increment)));
 		return increment;
-	}
+	}*/
 
 	/**
 	 * Simulate negative AVT feedback start.

@@ -228,6 +228,7 @@ public class Head extends EllsaAgent {
 				ctxt.isInNeighborhood = true;
 				ctxt.restructured = false;
 				ctxt.modified = false;
+				ctxt.fusionned = false;
 				neighborhoodVolumesSum += ctxt.getVolume();
 				/*if(activatedContexts.contains(ctxt)){
 					ctxt.isActivated = true;
@@ -1767,8 +1768,10 @@ public class Head extends EllsaAgent {
 
 					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+						activatedContexts.get(i).setConfidenceVariation(-0.5);
 					}else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+						activatedContexts.get(i).setConfidenceVariation(-4.0);
 					}
 
 
@@ -1803,9 +1806,11 @@ public class Head extends EllsaAgent {
 					boolean testSameModel = activatedContexts.get(i).isSameModelWithoutOracle(bestContext);
 					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+						activatedContexts.get(i).setConfidenceVariation(-0.5);
 					}
 					else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
+						activatedContexts.get(i).setConfidenceVariation(-4.0);
 					}
 				}
 			}
@@ -3356,6 +3361,7 @@ public class Head extends EllsaAgent {
 		for (Context ctxt : activatedNeighborsContexts) {
 			ctxt.isInNeighborhood = false;
 			ctxt.isActivated = false;
+
 		}
 		if(bestContext!=null){
 			bestContext.isBest = false;
@@ -3714,8 +3720,6 @@ public class Head extends EllsaAgent {
 	@Override
 	protected void onInitialization() {
 		super.onInitialization();
-		getAmas().data.maxConfidence = Double.NEGATIVE_INFINITY;
-		getAmas().data.minConfidence = Double.POSITIVE_INFINITY;
 
 		criticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverage);
 		endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);

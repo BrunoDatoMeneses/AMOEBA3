@@ -1180,5 +1180,34 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		}
 
 	}
+
+	public void updateMinAndMaxRegressionCoefs(double minCoef, double maxCoef,double confidence){
+
+		if(!(data.maxModelCoef == null || data.minModelCoef == null)){
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"UPDATE min and max coefs before","min",data.minModelCoef,"max", data.maxModelCoef);
+		}
+
+
+		if(data.maxModelCoef == null || data.minModelCoef == null){
+
+			data.maxModelCoef = maxCoef;
+			data.minModelCoef = minCoef;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"UPDATE min and max coefs new","min",minCoef,"max", maxCoef);
+		}else{
+			double halfConfidence = 0.5 *confidence;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"UPDATE min and max coefs new","min",minCoef,"max", maxCoef,"halfConfidence",halfConfidence);
+			data.maxModelCoef = halfConfidence*maxCoef + ((1-halfConfidence)*data.maxModelCoef);
+			data.minModelCoef = halfConfidence*minCoef + ((1-halfConfidence)*data.minModelCoef);
+		}
+		getEnvironment().print(TRACE_LEVEL.DEBUG,"UPDATE min and max coefs after","min",data.minModelCoef,"max", data.maxModelCoef);
+		/*if(value>data.maxModelCoef){
+			data.maxModelCoef = value;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"minRegressionCoef",data.minModelCoef,"maxRegressionCoef",data.maxModelCoef);
+		}
+		if(value<data.minModelCoef){
+			data.minModelCoef = value;
+			getEnvironment().print(TRACE_LEVEL.DEBUG,"minRegressionCoef",data.minModelCoef,"maxRegressionCoef",data.maxModelCoef);
+		}*/
+	}
 	
 }

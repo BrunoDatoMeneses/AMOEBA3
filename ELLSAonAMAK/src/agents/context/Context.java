@@ -129,7 +129,8 @@ public class Context extends EllsaAgent {
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
 		buildContext(bestNearestContext);
-		setConfidence(bestNearestContext.confidence);
+		//setConfidence(bestNearestContext.confidence/2);
+		setConfidence(1.0);
 		//this.confidence = bestNearestContext.confidence;
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -519,7 +520,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
+	/*public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
 			Percept pctDirection) {
 		ArrayList<Context> contexts = new ArrayList<Context>();
 
@@ -535,7 +536,7 @@ public class Context extends EllsaAgent {
 			}
 		}
 		return contexts;
-	}
+	}*/
 
 	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
 			Percept pctDirection, SpatialContext expandingContext) {
@@ -558,7 +559,7 @@ public class Context extends EllsaAgent {
 		return contexts;
 	}
 
-	public void expand() {
+	/*public void expand() {
 		ArrayList<Context> neighborsOnOneDirection;
 		HashMap<Percept, SpatialContext> alternativeContexts = new HashMap<Percept, SpatialContext>();
 		double maxVolume = this.getVolume();
@@ -594,7 +595,7 @@ public class Context extends EllsaAgent {
 		if (maxVolumeSpatialContext != null) {
 			matchSpatialContextRanges(maxVolumeSpatialContext);
 		}
-	}
+	}*/
 
 	public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
 		for (Percept pct : ranges.keySet()) {
@@ -603,7 +604,7 @@ public class Context extends EllsaAgent {
 		}
 	}
 
-	public Pair<Double, Double> getMaxExpansionsForContextExpansionAfterCreation(
+	/*public Pair<Double, Double> getMaxExpansionsForContextExpansionAfterCreation(
 			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
 		
 		
@@ -651,7 +652,7 @@ public class Context extends EllsaAgent {
 		}
 
 		return maxExpansions;
-	}
+	}*/
 
 	// --------------------------------NCS
 	// Resolutions-----------------------------------------
@@ -683,7 +684,7 @@ public class Context extends EllsaAgent {
 		this.shrinkRangesToJoinBorders(bestContext);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
-		setConfidenceVariation(-0.5);
+
 		//confidence-=0.5;
 
 		modified = true;
@@ -762,12 +763,15 @@ public class Context extends EllsaAgent {
 	public boolean isSameModel(Context ctxt) {
 		/*return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
 				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&*/
-        return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getPredicionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+		double distanceBetweenModels =  this.getLocalModel().getModelDifference(ctxt.getLocalModel());
+		double modelSimilarityThreshold = getAmas().data.PARAM_similarityThreshold;
+		getEnvironment().print(TRACE_LEVEL.DEBUG,getName(),ctxt.getName(),"modelSimilarityDistance",distanceBetweenModels,"SimilatityThreshold",modelSimilarityThreshold);
+        return distanceBetweenModels<modelSimilarityThreshold;
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
 	public boolean isSameModelWithoutOracle(Context ctxt) {
-		return this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getPredicionPerformanceIndicator()/ this.getLocalModel().getCoef().length);
+		return isSameModel(ctxt);
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
@@ -805,17 +809,14 @@ public class Context extends EllsaAgent {
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
 
 		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
-			setConfidenceVariation(2);
+			setConfidenceVariation(1);
 			//confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
 			/*if ( this !=  head.getBestContext()) {
 				solveNCS_Overlap(head.getBestContext());
 			}*/
-		} else {
-			if(!isChild()){
+		} else if(!isChild()){
 				solveNCS_BadPrediction(head);
-			}
-
 			}
 	}
 
@@ -1575,8 +1576,7 @@ public class Context extends EllsaAgent {
 							if(fusionTest && getAmas().data.PARAM_NCS_isFusionResolution) {
 								solveNCS_OverMapping(ctxt, pct);
 							}
-							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 &&
-									!this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified && getAmas().data.PARAM_NCS_isRetrucstureResolution){
+							else if(sameRanges == (getAmas().getPercepts().size()-2) && sameBorders == 1 && !this.restructured && !ctxt.restructured && !this.modified && !ctxt.modified && getAmas().data.PARAM_NCS_isRetrucstureResolution){
 
 
 
@@ -1695,8 +1695,9 @@ public class Context extends EllsaAgent {
 		}
 		
 		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
-		setConfidence( Math.max(this.getConfidence(),fusionContext.getConfidence()));
-		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
+		//setConfidence( Math.max(this.getConfidence(),fusionContext.getConfidence()));
+		setConfidence( this.getConfidence()+fusionContext.getConfidence());
+
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
 		
 		
@@ -2532,6 +2533,7 @@ public class Context extends EllsaAgent {
 
 		if(getAmas().data.PARAM_NCS_isConflictResolution){
 			if(overlapingContext != null){
+				setConfidenceVariation(-2);
 				ranges.get(p).adapt(p.getValue(), true, overlapingContext);
 			}else{
 				ranges.get(p).adapt(p.getValue(), false, null);
@@ -2751,6 +2753,10 @@ public class Context extends EllsaAgent {
 
 	public double getNormalizedConfidenceWithParams(double max, double min) {
 
+		if(getAmas().data.maxConfidence == null || getAmas().data.minConfidence == null){
+			getAmas().data.maxConfidence=1.0;
+			getAmas().data.minConfidence=0.0;
+		}
 		double maxConfidence = getAmas().data.maxConfidence;
 		double minConfidence = getAmas().data.minConfidence;
 		double CNmaxMin = Math.log((1/max)-1)/Math.log((1/min)-1);
@@ -2758,7 +2764,7 @@ public class Context extends EllsaAgent {
 		double dispersion = (center - maxConfidence)/Math.log((1/max)-1);
 		double result = 1 / (1 + Math.exp(-(confidence-center )/ dispersion));
 
-		getEnvironment().print(TRACE_LEVEL.DEBUG,"normalizedConfidence",result, minConfidence, maxConfidence, CNmaxMin,center,dispersion);
+		getEnvironment().print(TRACE_LEVEL.DEBUG,"normalizedConfidence","result",result,"minConfidence", minConfidence, "maxConfidence",maxConfidence, CNmaxMin,center,dispersion);
 		return result;
 	}
 
@@ -2910,7 +2916,8 @@ public class Context extends EllsaAgent {
 		for (Percept pct : allPercepts) {
 			boolean contain = ranges.get(pct).contains(pct.getValue()) == 0 ;
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), "CONTAINED", ""+contain)));
-			if (!contain && !fusionned) {
+			//if (!contain && !fusionned) {
+			if (!contain) {
 				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
 					ranges.get(pct).adapt(pct.getValue(), false, null);
 				}
