@@ -775,7 +775,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		return increment;
 	}
 
-	private double getIncrementDependingOnNeighboorDistances(String rangeSide) {
+	/*private double getIncrementDependingOnNeighboorDistances(String rangeSide) {
 		double increment = this.getRadius() / 2;
 		double incrementSum = 0.0;
 		ArrayList<Context> neighbors = new ArrayList<Context>();
@@ -807,7 +807,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 		}
 
 		return increment;
-	}
+	}*/
 
 	/*private double getMaxIncrement(String rangeSide) {
 		double increment = world.getIncrements() * percept.getMinMaxDistance();

@@ -32,7 +32,7 @@ public class Head extends EllsaAgent {
 	//HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
 
 	public Criticalities criticalities;
-	public Criticalities endogenousCriticalities;
+	//public Criticalities endogenousCriticalities;
 
 	public ArrayList<Context> activatedContexts = new ArrayList<Context>();
 	public ArrayList<Context> activatedNeighborsContexts = new ArrayList<Context>();
@@ -145,7 +145,6 @@ public class Head extends EllsaAgent {
 			}
 		}
 
-
 		if(getAmas().data.useOracle){
 			getAmas().data.neighborsCounts += activatedNeighborsContexts.size();
 			if(activatedNeighborsContexts.size()>0){
@@ -154,11 +153,6 @@ public class Head extends EllsaAgent {
 				getAmas().data.lastNeihborsCount=0;
 			}
 		}
-
-
-
-
-
 
 		if(getAmas().getCycle()%1000 == 0) {
 			getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("")));
@@ -199,6 +193,23 @@ public class Head extends EllsaAgent {
 		/* Neighbors */
 
 
+
+
+
+		for(Context subCtxt : activatedSubNeighborsContexts){
+			subCtxt.isInSubNeighborhood = true;
+		}
+
+		if(activatedNeighborsContexts.size()>0) {
+
+			updateNeighborhoodMeanValues();
+		}
+	}
+
+	private void updateNeighborhoodMeanValues() {
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", ""+activatedNeighborsContexts)));
+
 		double neighborhoodVolumesSum = 0;
 		HashMap<Percept,Double> neighborhoodRangesSums = new HashMap<Percept,Double>();
 		HashMap<Percept,Double> neighborhoodStartIncrementSums = new HashMap<Percept,Double>();
@@ -211,57 +222,45 @@ public class Head extends EllsaAgent {
 			neighborhoodEndIncrementSums.put(pct, 0.0);
 		}
 
+		for (Context ctxt : activatedNeighborsContexts) {
 
-		for(Context subCtxt : activatedSubNeighborsContexts){
-			subCtxt.isInSubNeighborhood = true;
-		}
-
-		if(activatedNeighborsContexts.size()>0) {
-
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", ""+activatedNeighborsContexts)));
-
-
-
-			for (Context ctxt : activatedNeighborsContexts) {
-
-				ctxt.isInNeighborhood = true;
-				ctxt.restructured = false;
-				ctxt.modified = false;
-				ctxt.fusionned = false;
-				neighborhoodVolumesSum += ctxt.getVolume();
-				/*if(activatedContexts.contains(ctxt)){
-					ctxt.isActivated = true;
-				}*/
+			ctxt.isInNeighborhood = true;
+			ctxt.restructured = false;
+			ctxt.modified = false;
+			ctxt.fusionned = false;
+			neighborhoodVolumesSum += ctxt.getVolume();
+			/*if(activatedContexts.contains(ctxt)){
+				ctxt.isActivated = true;
+			}*/
 
 
-				for (Percept pct : ctxt.getRanges().keySet()) {
-					Double oldRadiusSum = neighborhoodRangesSums.get(pct);
-					Double oldStartIncrSum = neighborhoodStartIncrementSums.get(pct);
-					Double oldEndIncrSum = neighborhoodEndIncrementSums.get(pct);
+			for (Percept pct : ctxt.getRanges().keySet()) {
+				Double oldRadiusSum = neighborhoodRangesSums.get(pct);
+				Double oldStartIncrSum = neighborhoodStartIncrementSums.get(pct);
+				Double oldEndIncrSum = neighborhoodEndIncrementSums.get(pct);
 
-					if( ctxt.getRanges().get(pct).getRadius() < minNeighborhoodRadius) {
-						minNeighborhoodRadius = ctxt.getRanges().get(pct).getRadius();
-					}
+				if( ctxt.getRanges().get(pct).getRadius() < minNeighborhoodRadius) {
+					minNeighborhoodRadius = ctxt.getRanges().get(pct).getRadius();
+				}
 
-					if( ctxt.getRanges().get(pct).getStartIncrement() < minNeighborhoodStartIncrement) {
-						minNeighborhoodStartIncrement = ctxt.getRanges().get(pct).getStartIncrement();
-					}
+				if( ctxt.getRanges().get(pct).getStartIncrement() < minNeighborhoodStartIncrement) {
+					minNeighborhoodStartIncrement = ctxt.getRanges().get(pct).getStartIncrement();
+				}
 
-					if( ctxt.getRanges().get(pct).getEndIncrement() < minNeighborhoodEndIncrement) {
-						minNeighborhoodEndIncrement = ctxt.getRanges().get(pct).getEndIncrement();
-					}
-
-
-
-
-					neighborhoodRangesSums.put(pct, oldRadiusSum + ctxt.getRanges().get(pct).getRadius());
-					neighborhoodStartIncrementSums.put(pct, oldStartIncrSum + ctxt.getRanges().get(pct).getStartIncrement());
-					neighborhoodEndIncrementSums.put(pct, oldEndIncrSum + ctxt.getRanges().get(pct).getEndIncrement());
+				if( ctxt.getRanges().get(pct).getEndIncrement() < minNeighborhoodEndIncrement) {
+					minNeighborhoodEndIncrement = ctxt.getRanges().get(pct).getEndIncrement();
 				}
 
 
+
+
+				neighborhoodRangesSums.put(pct, oldRadiusSum + ctxt.getRanges().get(pct).getRadius());
+				neighborhoodStartIncrementSums.put(pct, oldStartIncrSum + ctxt.getRanges().get(pct).getStartIncrement());
+				neighborhoodEndIncrementSums.put(pct, oldEndIncrSum + ctxt.getRanges().get(pct).getEndIncrement());
 			}
+
+
+		}
 
 		meanNeighborhoodVolume = neighborhoodVolumesSum / activatedNeighborsContexts.size();
 
@@ -295,25 +294,22 @@ public class Head extends EllsaAgent {
 		}
 
 
-
-
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "size", ""+activatedNeighborsContexts.size())));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", ""+meanNeighborhoodVolume)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", ""+meanNeighborhoodRaduises)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", ""+meanNeighborhoodStartIncrements)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", ""+meanNeighborhoodEndIncrements)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodRaduises", ""+minMeanNeighborhoodRaduises)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodStartIncrements", ""+minMeanNeighborhoodStartIncrements)));
-			getAmas().getEnvironment()
-			.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodEndIncrements", ""+minMeanNeighborhoodEndIncrements)));
-		}
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "size", ""+activatedNeighborsContexts.size())));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodVolume", ""+meanNeighborhoodVolume)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodRaduises", ""+meanNeighborhoodRaduises)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodStartIncrements", ""+meanNeighborhoodStartIncrements)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "meanNeighborhoodEndIncrements", ""+meanNeighborhoodEndIncrements)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodRaduises", ""+minMeanNeighborhoodRaduises)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodStartIncrements", ""+minMeanNeighborhoodStartIncrements)));
+		getAmas().getEnvironment()
+		.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("NEIGHBORDBOOD", "minMeanNeighborhoodEndIncrements", ""+minMeanNeighborhoodEndIncrements)));
 	}
 
 	public void testIfrequest() {
@@ -339,9 +335,9 @@ public class Head extends EllsaAgent {
 	private void playWithOracle() {
 		
 		
-		if(getAmas().isReinforcement()) {
+		/*if(getAmas().isReinforcement()) {
 			reinforcementWithOracle();
-		}
+		}*/
 
 		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("\n\n")));
 
@@ -470,7 +466,7 @@ public class Head extends EllsaAgent {
         }*/
 	}
 
-	private void reinforcementWithOracle() {
+	/*private void reinforcementWithOracle() {
 		int nb=0;
 		Double meanNeighborsLastPredictions = null;
 
@@ -499,18 +495,18 @@ public class Head extends EllsaAgent {
 		if(meanNeighborsLastPredictions != null) {
 			getAmas().data.oracleValue = (getAmas().data.oracleValue + meanNeighborsLastPredictions)/2;
 		}
-	}
+	}*/
 
 	private void updatePerformanceIndicators() {
 
 
-
+		double volumeOfAllContexts=getVolumeOfAllContexts();
 		criticalities.addCriticality("spatialCriticality",
-				(getMinMaxVolume() - getVolumeOfAllContexts()) / getMinMaxVolume());
+				(getMinMaxVolume() - volumeOfAllContexts) / getMinMaxVolume());
 
-		getAmas().data.spatialGeneralizationScore = getVolumeOfAllContexts() / getAmas().getContexts().size();
+		getAmas().data.spatialGeneralizationScore = volumeOfAllContexts / getAmas().getContexts().size();
 
-		double globalConfidence = 0;
+		//double globalConfidence = 0;
 
 		/*for (Context ctxt : getAmas().getContexts()) {
 			globalConfidence += ctxt.getConfidence();
@@ -518,66 +514,66 @@ public class Head extends EllsaAgent {
 		globalConfidence = globalConfidence / getAmas().getContexts().size();*/
 
 
-		if (activatedNeighborsContexts.size() > 1) {
-
-
-			double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
-			Context bestNeighbor = null;
-
-			int i = 1;
-			for (Context ctxt : activatedNeighborsContexts) {
-
-//				if(getAmas().isReinforcement()) {
-//					System.out.println("####################### NEIGHBORS #############################");
-//					System.out.println(ctxt.getName()  + " " + ctxt.lastPrediction);
-//					if(ctxt.lastPrediction> bestNeighborLastPrediction) {
+//		if (activatedNeighborsContexts.size() > 1) {
 //
 //
-//						bestNeighborLastPrediction = ctxt.lastPrediction;
-//						bestNeighbor = ctxt;
+//			double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
+//			Context bestNeighbor = null;
+//
+//			int i = 1;
+//			for (Context ctxt : activatedNeighborsContexts) {
+//
+////				if(getAmas().isReinforcement()) {
+////					System.out.println("####################### NEIGHBORS #############################");
+////					System.out.println(ctxt.getName()  + " " + ctxt.lastPrediction);
+////					if(ctxt.lastPrediction> bestNeighborLastPrediction) {
+////
+////
+////						bestNeighborLastPrediction = ctxt.lastPrediction;
+////						bestNeighbor = ctxt;
+////					}
+////				}
+//
+//
+//
+//
+//				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
+//
+//					// if(nearestLocalNeighbor(ctxt, otherCtxt)) {
+//
+//					Pair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
+//					// distanceAndPercept.getB());
+//					if (distanceAndPercept.getA() < 0) {
+//						criticalities.addCriticality("localOverlapMappingCriticality",
+//								Math.abs(distanceAndPercept.getA()));
+//					} else if (distanceAndPercept.getA() > 0 && distanceAndPercept.getB() != null) {
+//						criticalities.addCriticality("localVoidMappingCriticality", distanceAndPercept.getA());
+//					} else {
+//						criticalities.addCriticality("localOpenVoidMappingCriticality", distanceAndPercept.getA());
 //					}
+//
+//					// }
+//
 //				}
-
-
-
-
-				for (Context otherCtxt : activatedNeighborsContexts.subList(i, activatedNeighborsContexts.size())) {
-
-					// if(nearestLocalNeighbor(ctxt, otherCtxt)) {
-
-					Pair<Double, Percept> distanceAndPercept = ctxt.distance(otherCtxt);
-					// distanceAndPercept.getB());
-					if (distanceAndPercept.getA() < 0) {
-						criticalities.addCriticality("localOverlapMappingCriticality",
-								Math.abs(distanceAndPercept.getA()));
-					} else if (distanceAndPercept.getA() > 0 && distanceAndPercept.getB() != null) {
-						criticalities.addCriticality("localVoidMappingCriticality", distanceAndPercept.getA());
-					} else {
-						criticalities.addCriticality("localOpenVoidMappingCriticality", distanceAndPercept.getA());
-					}
-
-					// }
-
-				}
-				i++;
-
-
-
-
-			}
-
-//			if(getAmas().isReinforcement()) {
-//				System.out.println(bestNeighbor.getName() );
-//				getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
-//				for(Percept pct : getAmas().getPercepts()) {
-//					getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
-//				}
-//				System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
+//				i++;
+//
+//
+//
+//
 //			}
-
-
-
-		}
+//
+////			if(getAmas().isReinforcement()) {
+////				System.out.println(bestNeighbor.getName() );
+////				getAmas().data.higherNeighborLastPredictionPercepts = new HashMap<String, Double>();
+////				for(Percept pct : getAmas().getPercepts()) {
+////					getAmas().data.higherNeighborLastPredictionPercepts.put(pct.getName(),bestNeighbor.getRanges().get(pct).getCenter());
+////				}
+////				System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
+////			}
+//
+//
+//
+//		}
 
 		getAmas().data.mappingPerformance.setPerformanceIndicator(getEnvironment().getMappingErrorAllowed());// Math.pow(world.getMappingErrorAllowed(),
 		// world.getScheduler().getPercepts().size());
@@ -801,9 +797,9 @@ public class Head extends EllsaAgent {
 		return new Pair<Double,Double>(allConflictsVolume, allConcurrencesVolume);
 	}
 
-	public double getSpatialCriticality() {
+	/*public double getSpatialCriticality() {
 		return criticalities.getCriticality("spatialCriticality");
-	}
+	}*/
 
 	/**
 	 * Play without oracle.
@@ -842,9 +838,9 @@ public class Head extends EllsaAgent {
 
 
 
-		if(getAmas().isReinforcement()) {
+		/*if(getAmas().isReinforcement()) {
 			reinforcementWithouOracle();
-		}
+		}*/
 		
 		
 
@@ -905,7 +901,7 @@ public class Head extends EllsaAgent {
 		return endogenousChildRequests.size()+endogenousDreamRequests.size()+endogenousRequests.size() + endogenousSubRequests.size();
 	}
 
-	private void reinforcementWithouOracle() {
+	/*private void reinforcementWithouOracle() {
 		if (activatedNeighborsContexts.size() > 1) {
 
 			double bestNeighborLastPrediction = Double.NEGATIVE_INFINITY;
@@ -937,7 +933,7 @@ public class Head extends EllsaAgent {
 			System.out.println(getAmas().data.higherNeighborLastPredictionPercepts );
 
 		}
-	}
+	}*/
 
 	private void updateBestContextAndPropositionWithoutOracle() {
 		Double weightedPrediction = null;
@@ -2496,7 +2492,7 @@ public class Head extends EllsaAgent {
 			
 			criticalities.updateMeans();
 
-			if (severalActivatedContexts()) {
+			/*if (severalActivatedContexts()) {
 
 				endogenousCriticalities.addCriticality("predictionCriticality", getAmas().data.criticity);
 				endogenousCriticalities.addCriticality("endogenousPredictionActivatedContextsOverlapspredictionCriticality",
@@ -2520,7 +2516,7 @@ public class Head extends EllsaAgent {
 
 				endogenousCriticalities.updateMeans();
 
-			}
+			}*/
 
 			getAmas().data.predictionPerformance.update(criticalities.getCriticalityMean("predictionCriticality"));
 			if (criticalities.getCriticalityMean("distanceToRegression") != null) {
@@ -3144,7 +3140,7 @@ public class Head extends EllsaAgent {
 		
 	}
 
-	public double getAveragePredictionCriticityCopy() {
+	/*public double getAveragePredictionCriticityCopy() {
 		return endogenousCriticalities.getCriticalityMean("predictionCriticality");
 	}
 
@@ -3176,7 +3172,7 @@ public class Head extends EllsaAgent {
 	public double getAveragePredictionCriticityEndoActivatedContextsSharedIncompetence() {
 		return endogenousCriticalities
 				.getCriticalityMean("endogenousPredictionActivatedContextsSharedIncompetencepredictionCriticality");
-	}
+	}*/
 
 	/**
 	 * Sets the average prediction criticity.
@@ -3369,7 +3365,7 @@ public class Head extends EllsaAgent {
 		activatedNeighborsContexts.clear();
 	}
 
-	public Double getMaxRadiusForContextCreation(Percept pct) {
+	/*public Double getMaxRadiusForContextCreation(Percept pct) {
 		double maxRadius = pct.getRadiusContextForCreation();
 		double currentRadius;
 
@@ -3385,7 +3381,7 @@ public class Head extends EllsaAgent {
 
 		return maxRadius;
 
-	}
+	}*/
 
 	
 	public Pair<Double, Double> getRadiusesForContextCreation(Percept pct) {
@@ -3395,7 +3391,7 @@ public class Head extends EllsaAgent {
 	}
 	
 	
-	public Pair<Double, Double> getMaxRadiusesForContextCreation(Percept pct) {
+	/*public Pair<Double, Double> getMaxRadiusesForContextCreation(Percept pct) {
 //		Pair<Double, Double> maxRadiuses = new Pair<Double, Double>(
 //				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMin() - pct.getValue())),
 //				Math.min(pct.getRadiusContextForCreation(), Math.abs(pct.getMax() - pct.getValue())));
@@ -3438,7 +3434,7 @@ public class Head extends EllsaAgent {
 
 		return maxRadiuses;
 
-	}
+	}*/
 
 	public double getAverageSpatialCriticality() {
 		Double mean = criticalities.getCriticalityMean("spatialCriticality");
@@ -3663,7 +3659,7 @@ public class Head extends EllsaAgent {
 		
 	}
 	
-	public boolean isRealVoid(HashMap<Percept, Double> request) {
+	/*public boolean isRealVoid(HashMap<Percept, Double> request) {
 		boolean test;
 		
 		for(Context ctxt : activatedNeighborsContexts) {
@@ -3685,7 +3681,7 @@ public class Head extends EllsaAgent {
 		return true;
 		
 		
-	}
+	}*/
 	
 	public Double getPredicionPerformanceIndicator() {
 		
@@ -3716,13 +3712,17 @@ public class Head extends EllsaAgent {
 	public void proposition(Context c) {
 		activatedContexts.add(c);
 	}
+
+	public void neigborhoodProposition(Context c) {
+		activatedNeighborsContexts.add(c);
+	}
 	
 	@Override
 	protected void onInitialization() {
 		super.onInitialization();
 
 		criticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverage);
-		endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);
+		//endogenousCriticalities = new Criticalities(getAmas().data.numberOfCriticityValuesForAverageforVizualisation);
 	}
 
 	public ArrayList<VOID> getVoidsFromContextsAndZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Context> contexts) {

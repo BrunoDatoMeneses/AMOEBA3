@@ -508,15 +508,17 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			contextStream = getContexts().stream(); // update all context
 			runAll = false;
 		} else {
-			HashSet<Context> vcontexts = getValidContexts();
-			if (vcontexts == null) {
-				vcontexts = new HashSet<>();
+			//HashSet<Context> contextsToBeAwaken = getValidContexts();
+			HashSet<Context> contextsToBeAwaken = getNeighborContexts();
+			if (contextsToBeAwaken == null) {
+				contextsToBeAwaken = new HashSet<>();
 			}
-			contextStream = vcontexts.stream(); // or only valid ones
+			contextStream = contextsToBeAwaken.stream(); // or only valid ones
 		}
 
-		getHeadAgent().setActivatedNeighborsContexts(new ArrayList<>(getNeighborContexts()));
+		//getHeadAgent().setActivatedNeighborsContexts(new ArrayList<>(getNeighborContexts()));
 		getHeadAgent().setActivatedSubNeighborsContexts(new ArrayList<>(getSubNeighborContexts()));
+
 		return contextStream;
 	}
 

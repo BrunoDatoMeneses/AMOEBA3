@@ -2160,11 +2160,11 @@ public class Context extends EllsaAgent {
 		return (this.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < ctxtNeighbor.getRanges().get(pct).getCenter() ) || (ctxtNeighbor.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < this.getRanges().get(pct).getCenter());
 	}
 
-	public void solveNCS_FitWithNeighbors(){
+	/*public void solveNCS_FitWithNeighbors(){
 
 		Context otherCtxt = getNearestContextFromNeighbors();
 
-		if (otherCtxt != this && !this.isDying() && !otherCtxt.isDying() /*&& this.isNearby(otherCtxt)*/ ) {
+		if (otherCtxt != this && !this.isDying() && !otherCtxt.isDying() *//*&& this.isNearby(otherCtxt)*//* ) {
 
 			Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> closestExperimentsAndPivots = getClosestExperimentsPairs(otherCtxt, 1);
 
@@ -2191,7 +2191,7 @@ public class Context extends EllsaAgent {
 					otherCtxt.getLocalModel().updateModel(pivot.getB(), getAmas().data.PARAM_learningSpeed);
 				}
 
-				/*for(Pair<Experiment, Experiment> pairExp : closestExperiments){
+				*//*for(Pair<Experiment, Experiment> pairExp : closestExperiments){
 
 					double prediction = ((LocalModelMillerRegression)this.getLocalModel()).getProposition(pairExp.getA());
 					double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(pairExp.getB());
@@ -2202,7 +2202,7 @@ public class Context extends EllsaAgent {
 					pairExp.getB().setOracleProposition(meanPrediction);
 					this.getLocalModel().updateModel(pairExp.getA(), getAmas().data.learningSpeed);
 					//otherCtxt.getLocalModel().updateModel(pairExp.getB(), getAmas().data.learningSpeed);
-				}*/
+				}*//*
 
 
 
@@ -2218,13 +2218,13 @@ public class Context extends EllsaAgent {
 
 		}
 
-	}
+	}*/
 
 
 
 
 
-	private Context getNearestContextFromNeighbors() {
+	/*private Context getNearestContextFromNeighbors() {
 		Context nearestContext = null;
 		double nearestDistance = -1;
 		for (Context otherCtxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
@@ -2245,7 +2245,7 @@ public class Context extends EllsaAgent {
 			}
 		}
 		return nearestContext;
-	}
+	}*/
 
 	private Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> getClosestExperimentsPairs(Context otherCtxt, int nbPairs){
 
@@ -3103,13 +3103,22 @@ public class Context extends EllsaAgent {
 	}
 	
 	private void onActOpitmized() {
+		if(amas.getNeighborContexts().contains(this)) {
+			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
+			isInNeighborhood=true;
+			restructured = false;
+			modified = false;
+			fusionned = false;
+			lastDistanceToModel = 0.0;
+			getAmas().getHeadAgent().neigborhoodProposition(this);
+		}else{
+			NCSDetection_Uselessness();
+		}
 		if(amas.getValidContexts().contains(this)) {
 			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			activations++;
 			isActivated=true;
 			getAmas().getHeadAgent().proposition(this);
-		}else{
-			NCSDetection_Uselessness();
 		}
 	}
 

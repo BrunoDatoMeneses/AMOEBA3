@@ -104,7 +104,7 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.DEBUG;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
 
 
