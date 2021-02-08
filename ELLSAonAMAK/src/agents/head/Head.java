@@ -25,8 +25,8 @@ public class Head extends EllsaAgent {
 
 	// MEMBERS ---------------------
 	
-	private Context bestContext;
-	private Context lastUsedContext;
+	private Context bestContext = null;
+	private Context lastUsedContext = null;
 	private Context newContext;
 
 	//HashMap<Percept, Double> currentSituation = new HashMap<Percept, Double>();
@@ -2162,7 +2162,7 @@ public class Head extends EllsaAgent {
 
 
     private void setPredictionWithoutContextAgent() {
-		if (getAmas().getContexts().isEmpty()) {
+		if (getAmas().getContexts().isEmpty() || lastUsedContext==null) {
 			if (getAmas().getCycle() <= 1) {
 				setPredictionToZero();
 			}else{
@@ -2471,15 +2471,15 @@ public class Head extends EllsaAgent {
 
 
 		if(getAmas().data.oracleValue != null) {
-			if(Math.abs(getAmas().data.oracleValue)>getAmas().data.maxPrediction) {
-				getAmas().data.maxPrediction = Math.abs(getAmas().data.oracleValue);
+			if(getAmas().data.oracleValue>getAmas().data.maxPrediction) {
+				getAmas().data.maxPrediction = getAmas().data.oracleValue;
 				if(getAmas().multiUIWindow!=null){
 					getAmas().multiUIWindow.guiData.maxPrediction=getAmas().data.maxPrediction;
 				}
 
 			}
-			if(Math.abs(getAmas().data.oracleValue)<getAmas().data.minPrediction) {
-				getAmas().data.minPrediction = Math.abs(getAmas().data.oracleValue);
+			if(getAmas().data.oracleValue<getAmas().data.minPrediction) {
+				getAmas().data.minPrediction = getAmas().data.oracleValue;
 				if(getAmas().multiUIWindow!=null){
 					getAmas().multiUIWindow.guiData.minPrediction= getAmas().data.minPrediction;
 				}
@@ -3482,7 +3482,8 @@ public class Head extends EllsaAgent {
 	}
 
 	public double getDistanceToRegressionAllowed() {
-		return getAmas().data.regressionPerformance.getPerformanceIndicator();
+		//return getAmas().data.regressionPerformance.getPerformanceIndicator();
+		return getPredicionPerformanceIndicator();
 	}
 	
 	

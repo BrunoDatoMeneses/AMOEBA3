@@ -27,7 +27,7 @@ public class PARAMS {
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.1;
+    public static double mappingErrorAllowed = 0.05;
     //public static double mappingErrorAllowed = 0.06; // USUAL
     //public static double mappingErrorAllowed = 0.08; // OTHER
     //public static double mappingErrorAllowed = 0.1; // BIG 3D

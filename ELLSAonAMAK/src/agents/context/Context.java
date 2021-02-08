@@ -2555,7 +2555,7 @@ public class Context extends EllsaAgent {
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 
-	public void updateAVT() {
+	/*public void updateAVT() {
 		for (Percept p : ranges.keySet()) {
 			if (ranges.get(p).getLastEndTickModification() != getAmas().getCycle()) {
 				ranges.get(p).endogenousAdaptEndUsingAVT();
@@ -2564,10 +2564,10 @@ public class Context extends EllsaAgent {
 				ranges.get(p).endogenousAdaptStartUsingAVT();
 			}
 		}
-	}
+	}*/
 	
 	
-	private Percept getPerceptWithLesserImpactOnContext(ArrayList<Percept> percepts) {
+	private Percept getPerceptWithLesserImpactOnContextWithPerception(ArrayList<Percept> percepts) {
 		
 		Percept perceptForAdapation = null;
 		double minDistanceToFrontier = Double.MAX_VALUE;
@@ -2587,6 +2587,32 @@ public class Context extends EllsaAgent {
 
 				if (distanceToFrontier < minDistanceToFrontier) {
 					minDistanceToFrontier = distanceToFrontier;
+					perceptForAdapation = pct;
+				}
+			}
+		}
+		return perceptForAdapation;
+	}
+
+	private Percept getPerceptWithLesserImpactOnContextWithOverlap(ArrayList<Percept> percepts, Context overlapingContext) {
+
+		Percept perceptForAdapation = null;
+		double minDistanceToFrontier = Double.MAX_VALUE;
+		double overlapToFrontier;
+
+		for (Percept pct : percepts) {
+			if (!ranges.get(pct).isPerceptEnum()) {
+
+				overlapToFrontier = this.getRanges().get(pct).overlapDistance(overlapingContext.getRanges().get(pct));
+
+				for(Percept otherPct : percepts) {
+					if(otherPct != pct) {
+						overlapToFrontier*= this.getRanges().get(otherPct).getLenght();
+					}
+				}
+
+				if (overlapToFrontier < minDistanceToFrontier) {
+					minDistanceToFrontier = overlapToFrontier;
 					perceptForAdapation = pct;
 				}
 			}
@@ -2650,7 +2676,7 @@ public class Context extends EllsaAgent {
 	}
 
 	private Pair<Percept, Context> getPerceptForAdaptationWithOverlapingContext(ArrayList<Percept> percepts) {
-		Percept perceptForBigerImpactOnOverlap = null;
+		Percept perceptForLesserImpactOnCtxtWithOverlap = null;
 		Percept perceptWithLesserImpactOnContext = null;
 		Context overlapingContext = null;
 		double minDistanceToFrontier = Double.MAX_VALUE;
@@ -2675,22 +2701,30 @@ public class Context extends EllsaAgent {
 			}
 			
 			if(overlapingContext != null) {
-				perceptForBigerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(percepts, overlapingContext);
+				//perceptForBigerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(percepts, overlapingContext);
+				perceptForLesserImpactOnCtxtWithOverlap = getPerceptWithLesserImpactOnContextWithOverlap(percepts, overlapingContext);
 				
 			}
 			
 		}
 		
-		perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(percepts);
+		/*perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithPerception(percepts);
 		if(perceptForBigerImpactOnOverlap != null) {
 			
 			if(perceptForBigerImpactOnOverlap == perceptWithLesserImpactOnContext) {
 				return new Pair<Percept, Context>(perceptForBigerImpactOnOverlap, overlapingContext);
 			}
 			
+		}*/
+
+		if(perceptForLesserImpactOnCtxtWithOverlap != null) {
+			return new Pair<>(perceptForLesserImpactOnCtxtWithOverlap, overlapingContext);
+		}else{
+			perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithPerception(percepts);
+			return new Pair<>(perceptWithLesserImpactOnContext, overlapingContext);
 		}
 		
-		return new Pair<Percept, Context>(perceptWithLesserImpactOnContext, overlapingContext);
+
 		
 		
 
@@ -2935,7 +2969,7 @@ public class Context extends EllsaAgent {
 	 * @param c    the c
 	 */
 	public void shrinkRangesToJoinBorders(Context bestContext) {
-		Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
+		/*Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
 				bestContext);
 		
 		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(getAmas().getPercepts());
@@ -2953,7 +2987,10 @@ public class Context extends EllsaAgent {
 
 			
 
-		}
+		}*/
+
+		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithOverlap(getAmas().getPercepts(),bestContext);
+		ranges.get(perceptWithLesserImpactOnContext).adapt(perceptWithLesserImpactOnContext.getValue(), true, bestContext);
 	}
 
 	public double distance(Context ctxt, Percept pct) {
