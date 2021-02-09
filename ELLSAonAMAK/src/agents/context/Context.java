@@ -130,7 +130,7 @@ public class Context extends EllsaAgent {
 		}
 		buildContext(bestNearestContext);
 		//setConfidence(bestNearestContext.confidence/2);
-		setConfidence(1.0);
+		setConfidence(0.5);
 		//this.confidence = bestNearestContext.confidence;
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
@@ -148,6 +148,7 @@ public class Context extends EllsaAgent {
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
 		buildContextWithoutOracle(endogenousPrediction);
+		setConfidence(0.01);
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER", this.getName())));
 		criticalities = new Criticalities(5);

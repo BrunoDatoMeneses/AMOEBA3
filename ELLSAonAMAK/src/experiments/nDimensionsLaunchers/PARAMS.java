@@ -68,6 +68,9 @@ public class PARAMS {
     public static  boolean setActiveLearning = true	;
     public static  boolean setSelfLearning = false;
 
+/*    public static  boolean setActiveLearning = false	;
+    public static  boolean setSelfLearning = true;*/
+
 
 
 
