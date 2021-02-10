@@ -10,6 +10,7 @@ public class PARAMS {
     public static String extension = "";
 
     public static ArrayList subPercepts = new ArrayList<>();
+
     public static  String configFile = "twoDimensionsLauncher.xml";
     public static  int dimension = 2;
 
@@ -82,7 +83,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;

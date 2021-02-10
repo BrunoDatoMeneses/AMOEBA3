@@ -671,9 +671,9 @@ public class LocalModelMillerRegression extends LocalModel{
 			for(Percept pct : context.getAmas().getPercepts()) {
 
 				double rangeCenter = this.context.getRanges().get(pct).getCenter();
-				double rangeLength = this.context.getRanges().get(pct).getLenght();
+				double rangeRadius = this.context.getRanges().get(pct).getRadius();
 				java.util.Random r = new java.util.Random();
-				double ramdomGaussianPosition = (r.nextGaussian() * Math.pow((getContext().getAmas().data.PARAM_rangeLengthForArtificialPerceptions*rangeLength/(getContext().getAmas().data.PARAM_quantileForGenerationOfArtificialPerceptions)),1)) + rangeCenter;
+				double ramdomGaussianPosition = (r.nextGaussian() * Math.pow((getContext().getAmas().data.PARAM_rangeLengthForArtificialPerceptions*rangeRadius/(getContext().getAmas().data.PARAM_quantileForGenerationOfArtificialPerceptions)),1)) + rangeCenter;
 				exp.addDimension(pct,ramdomGaussianPosition);
 			}
 			exp.setProposition(this.getProposition(exp));

@@ -154,7 +154,7 @@ public class EllsaData implements Serializable {
 	public double PARAM_learningSpeed = 0.25;
 
 	public int PARAM_numberOfPointsForRegression_ASUPPRIMER = 50;
-	public int PARAM_quantileForGenerationOfArtificialPerceptions = 5;
+	public int PARAM_quantileForGenerationOfArtificialPerceptions = 3;
 	public double PARAM_rangeLengthForArtificialPerceptions = 0.1;
 
 	public double PARAM_similarityThreshold = 0.001;
