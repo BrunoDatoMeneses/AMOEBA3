@@ -73,7 +73,7 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsas[i].allowGraphicalScheduler(true);
             ellsas[i].setRenderUpdate(false);
             ellsas[i].data.nameID = "ellsaTheta"+i;
-            ellsas[i].data.PARAM_learningSpeed = PARAMS.learningSpeed;
+            ellsas[i].data.PARAM_exogenousLearningWeight = PARAMS.learningSpeed;
             ellsas[i].data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
             ellsas[i].data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
             ellsas[i].data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -91,11 +91,11 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsas[i].data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
             ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
             ellsas[i].data.PARAM_isDream = PARAMS.setDream;
-            ellsas[i].data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-            ellsas[i].data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsas[i].data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsas[i].data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
             ellsas[i].getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-            ellsas[i].data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+            ellsas[i].data.PARAM_modelErrorMargin = PARAMS.setRegressionPerformance;
             ellsas[i].getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
             ellsas[i].setSubPercepts(PARAMS.subPercepts);
         }

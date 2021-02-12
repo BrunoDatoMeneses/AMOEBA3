@@ -145,7 +145,7 @@ public class ReinforcementLauncher2D extends Application implements Serializable
             		ellsaSpatialReward.saver = new SaveHelperImpl(ellsaSpatialReward, amoebaSpatialRewardUI);
             		ellsaSpatialReward.allowGraphicalScheduler(true);
             		ellsaSpatialReward.setRenderUpdate(true);
-            		ellsaSpatialReward.data.PARAM_learningSpeed = learningSpeed;
+            		ellsaSpatialReward.data.PARAM_exogenousLearningWeight = learningSpeed;
             		ellsaSpatialReward.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
             		ellsaSpatialReward.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
             		ellsaSpatialReward.setReinforcement(true);

@@ -76,7 +76,7 @@ public class TestVoidDetectionFromZone extends Application implements Serializab
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);
-        ellsa.data.PARAM_learningSpeed = learningSpeed;
+        ellsa.data.PARAM_exogenousLearningWeight = learningSpeed;
         ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
         ellsa.data.PARAM_isActiveLearning = setActiveLearning;
         ellsa.data.PARAM_isSelfLearning = setSelfLearning;

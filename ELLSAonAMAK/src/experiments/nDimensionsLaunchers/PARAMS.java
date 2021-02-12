@@ -28,28 +28,50 @@ public class PARAMS {
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double mappingErrorAllowed = 0.05;
-    //public static double mappingErrorAllowed = 0.06; // USUAL
-    //public static double mappingErrorAllowed = 0.08; // OTHER
-    //public static double mappingErrorAllowed = 0.1; // BIG 3D
+    public static double validityRangesPrecision = 0.05;
+
+    /* LEARNING */
+
+    public static double LEARNING_WEIGHT_ACCURACY = 1.0;
+    public static double LEARNING_WEIGHT_PROXIMITY = 0.0;
+    public static double LEARNING_WEIGHT_EXPERIENCE = 1.0;
+    public static double LEARNING_WEIGHT_GENERALIZATION = 1.0;
+
+    /* EXPLOITATION */
+
+    public static double EXPLOITATION_WEIGHT_PROXIMITY = 1.0;
+    public static double EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
+    public static double EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
 
 
     /* NEIGHBORHOOD */
 
-    public static  int setNeighborhoodMultiplicator = 2;
-    public static  double setExternalContextInfluenceRatio = 0.25;
+    public static  double neighborhoodRadiusCoefficient = 2;
+    public static  double influenceRadiusCoefficient = 0.5;
+    //public static double neighborhoodRadiusCoefficient = 2;
+    //public static double influenceRadiusCoefficient = 0.5;
+    public static double maxRangeRadiusCoefficient = 2.0;
+    public static double rangeSimilarityCoefficient = 0.375;
+    public static double minimumRangeCoefficient = 0.25;
 
     /* PREDICTION */
-    //public static  double setRegressionPerformance = 1; //Multi
-    //public static  double setRegressionPerformance = 0.05; //SinCos
-    public static  double setRegressionPerformance = 1; // Goutte
-    //public static  double setRegressionPerformance = 1; // Carré
+    //public static  double modelErrorMargin = 1; //Multi
+    //public static  double modelErrorMargin = 0.05; //SinCos
+    public static  double modelErrorMargin = 1; // Goutte
+    //public static  double modelErrorMargin = 1; // Carré
 
 
     /* REGRESSION */
     public static  double oracleNoiseRange = 0.0;
-    public static  double learningSpeed = 0.1;
-    public static  int regressionPoints = (int)(1/learningSpeed);
+    public static  double exogenousLearningWeight = 0.1;
+    public static  double endogenousLearningWeight = 0.1;
+
+    public static double perceptionsGenerationCoefficient = 0.1;
+
+    public static double modelSimilarityThreshold = 0.001;
+
+
+    public static  int regressionPoints = (int)(1/ exogenousLearningWeight);
 
     /* XP */
     public static  int nbOfModels = 2	;
@@ -88,6 +110,9 @@ public class PARAMS {
 
     public static  boolean setisCreationWithNeighbor = true;
 
+    public static boolean isAllContextSearchAllowedForLearning = true;
+    public static boolean isAllContextSearchAllowedForExploitation = true;
+
     public static  boolean setConflictResolution = setConflictDetection ;
     public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
     public static  boolean setSubVoidDetection = false ;
@@ -108,7 +133,7 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.OFF;
 
 
 

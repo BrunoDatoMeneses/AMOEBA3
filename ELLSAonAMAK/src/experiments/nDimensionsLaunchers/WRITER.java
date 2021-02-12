@@ -151,10 +151,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("exploitatingCycles", PARAMS.nbExploitationCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("episodes", PARAMS.nbEpisodes +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("spaceSize", PARAMS.spaceSize*4+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("precisionRange", PARAMS.mappingErrorAllowed+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("neighborhoodSize", PARAMS.setNeighborhoodMultiplicator+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("influenceRatio", PARAMS.setExternalContextInfluenceRatio+"")));
-
+        xpCSV.write(new ArrayList<>(Arrays.asList("validityRangesPrecision", PARAMS.validityRangesPrecision +"")));
 
 
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
@@ -164,14 +161,30 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("isSelfLearning", PARAMS.setSelfLearning+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
+        xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING_WEIGHT_ACCURACY", PARAMS.LEARNING_WEIGHT_ACCURACY+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING_WEIGHT_PROXIMITY", PARAMS.LEARNING_WEIGHT_PROXIMITY+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING_WEIGHT_EXPERIENCE", PARAMS.LEARNING_WEIGHT_EXPERIENCE+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING_WEIGHT_GENERALIZATION", PARAMS.LEARNING_WEIGHT_GENERALIZATION+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
+
+        xpCSV.write(new ArrayList<>(Arrays.asList("EXPLOITATION_WEIGHT_PROXIMITY", PARAMS.EXPLOITATION_WEIGHT_PROXIMITY+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("EXPLOITATION_WEIGHT_EXPERIENCE", PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("EXPLOITATION_WEIGHT_GENERALIZATION", PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
+
         xpCSV.write(new ArrayList<>(Arrays.asList("goalXYError")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("errorMargin", PARAMS.setRegressionPerformance+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("errorMargin", PARAMS.modelErrorMargin +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
         xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.oracleNoiseRange+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("learningSpeed", PARAMS.learningSpeed+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("exogenousLearningWeight", PARAMS.exogenousLearningWeight +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("endogenousLearningWeight", PARAMS.endogenousLearningWeight +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("perceptionsGenerationCoefficient", PARAMS.perceptionsGenerationCoefficient+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("regressionPoints", PARAMS.regressionPoints+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("modelSimilarityThreshold", PARAMS.modelSimilarityThreshold+"")));
+
+
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("EXPLORATION")));
@@ -181,6 +194,14 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("explorationIncrement", PARAMS.explorationIncrement+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("explorationWidth", PARAMS.explorationWidht+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("bootstrapCycle", PARAMS.setbootstrapCycle+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
+
+        xpCSV.write(new ArrayList<>(Arrays.asList("RANGES")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("neighborhoodRadiusCoefficient", PARAMS.neighborhoodRadiusCoefficient+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("influenceRadiusCoefficient", PARAMS.influenceRadiusCoefficient+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("maxRangeRadiusCoefficient", PARAMS.maxRangeRadiusCoefficient+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("rangeSimilarityCoefficient", PARAMS.rangeSimilarityCoefficient+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("minimumRangeCoefficient", PARAMS.minimumRangeCoefficient+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
@@ -203,6 +224,8 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("nbOfNeighborForContexCreationWithouOracle", PARAMS.nbOfNeighborForContexCreationWithouOracle+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("nbOfNeighborForVoidDetectionInSelfLearning", PARAMS.nbOfNeighborForVoidDetectionInSelfLearning+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isCreationFromNeighbor", PARAMS.setisCreationWithNeighbor+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isAllContextSearchAllowedForLearning", PARAMS.isAllContextSearchAllowedForLearning+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isAllContextSearchAllowedForExploitation", PARAMS.isAllContextSearchAllowedForExploitation+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
     }
 

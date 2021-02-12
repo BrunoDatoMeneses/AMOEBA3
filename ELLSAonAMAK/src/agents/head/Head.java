@@ -7,7 +7,6 @@ import agents.context.Context;
 import agents.context.CustomComparator;
 import agents.context.Experiment;
 import agents.context.VOID;
-import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
@@ -423,19 +422,19 @@ public class Head extends EllsaAgent {
 		if (activatedContexts.size() > 0) {
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedContexts",activatedContexts.size());
 
-			selectBestContextWithOracleWeighted(activatedContexts, getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
-					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+			selectBestContextWithOracleWeighted(activatedContexts, getAmas().data.PARAM_LEARNING_WEIGHT_ACCURACY,
+					getAmas().data.PARAM_LEARNING_WEIGHT_EXPERIENCE,getAmas().data.PARAM_LEARNING_WEIGHT_GENERALIZATION,getAmas().data.PARAM_LEARNING_WEIGHT_PROXIMITY);
 
 		} else if (activatedNeighborsContexts.size()>0){
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withActivatedNeighborContexts",activatedNeighborsContexts.size());
 
-            selectBestContextWithOracleWeighted(activatedNeighborsContexts, getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
-					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+            selectBestContextWithOracleWeighted(activatedNeighborsContexts, getAmas().data.PARAM_LEARNING_WEIGHT_ACCURACY,
+					getAmas().data.PARAM_LEARNING_WEIGHT_EXPERIENCE,getAmas().data.PARAM_LEARNING_WEIGHT_GENERALIZATION,getAmas().data.PARAM_LEARNING_WEIGHT_PROXIMITY);
 		} else if (getAmas().getContexts().size()>0 && getAmas().data.PARAM_NCS_isAllContextSearchAllowedForLearning){
             getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithOracle","withAllContexts",getAmas().getContexts().size());
 
-            selectBestContextWithOracleWeighted(getAmas().getContexts(), getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
-					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+            selectBestContextWithOracleWeighted(getAmas().getContexts(), getAmas().data.PARAM_LEARNING_WEIGHT_ACCURACY,
+					getAmas().data.PARAM_LEARNING_WEIGHT_EXPERIENCE,getAmas().data.PARAM_LEARNING_WEIGHT_GENERALIZATION,getAmas().data.PARAM_LEARNING_WEIGHT_PROXIMITY);
         }
 
 		if (bestContext != null) {
@@ -940,22 +939,22 @@ public class Head extends EllsaAgent {
 		if (activatedContexts.size() > 0) {
 			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withActivatedContexts",activatedContexts.size());
 
-			selectBestContextWithoutOracleWeighted(activatedContexts, getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
-					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+			selectBestContextWithoutOracleWeighted(activatedContexts, getAmas().data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION,getAmas().data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY);
 
 		} else if (activatedNeighborsContexts.size()>0){
 			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withActivatedNeighborContexts",activatedNeighborsContexts.size());
 
-			selectBestContextWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
-					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+			selectBestContextWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION,getAmas().data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY);
 
 			/*weightedPrediction = getPredictionWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
 					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);*/
 		} else if (getAmas().getContexts().size()>0 && getAmas().data.PARAM_NCS_isAllContextSearchAllowedForExploitation){
 			getEnvironment().print(TRACE_LEVEL.INFORM,"----------- updateBestContextWithoutOracle","withAllContexts",getAmas().getContexts().size());
 
-			selectBestContextWithoutOracleWeighted(getAmas().getContexts(),  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
-					getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+			selectBestContextWithoutOracleWeighted(getAmas().getContexts(),  getAmas().data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE,
+					getAmas().data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION,getAmas().data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY);
 
 		}
 
@@ -1594,8 +1593,8 @@ public class Head extends EllsaAgent {
 					"*********************************************************************************************************** SOLVE NCS CREATE NEW CONTEXT")));
 
 
-			Context goodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION,
-					getAmas().data.PARAM_LEARNING_WEIGHT_CONFIDENCE,getAmas().data.PARAM_LEARNING_WEIGHT_VOLUME,getAmas().data.PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+			Context goodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,getAmas().data.PARAM_LEARNING_WEIGHT_ACCURACY,
+					getAmas().data.PARAM_LEARNING_WEIGHT_EXPERIENCE,getAmas().data.PARAM_LEARNING_WEIGHT_GENERALIZATION,getAmas().data.PARAM_LEARNING_WEIGHT_PROXIMITY);
 
 			Context context;
 			if (goodContext != null && getAmas().data.PARAM_NCS_isCreationWithNeighbor) {
@@ -1879,11 +1878,11 @@ public class Head extends EllsaAgent {
 		if(getAmas().getCycle() == getAmas().data.PARAM_DreamCycleLaunch && getAmas().data.PARAM_isDream){
 
 
-			getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = 5;
-			getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle = 5;
+			getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = 5;
+			getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle = 5;
 			//getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 
-			getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning, getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle);
+			getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning, getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle);
 
 
 
@@ -1963,7 +1962,7 @@ public class Head extends EllsaAgent {
 				}
 				if(isInMinMax && isNotTooSmall){
 					if(getAmas().data.PARAM_isSelfLearning){
-						if(activatedNeighborsContexts.size()>getAmas().data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning){
+						if(activatedNeighborsContexts.size()>getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning){
 							EndogenousRequest potentialRequest = new EndogenousRequest(request, detectedVoid.bounds, 5, new ArrayList<Context>(activatedNeighborsContexts), REQUEST.VOID);
 							addEndogenousRequest(potentialRequest, endogenousRequests); //VOID
 						}
@@ -2074,14 +2073,14 @@ public class Head extends EllsaAgent {
 
 			if (activatedContext.isChild()) {
 				
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.PARAM_learningSpeed);
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.PARAM_exogenousLearningWeight);
 				getAmas().data.contextNotFinished = true;
 				
 			}
 			else if (activatedContext.lastDistanceToModel < getPredicionPerformanceIndicator()) {
 			//else if (currentDistanceToOraclePrediction < regressionPerformance.getPerformanceIndicator()) {
 				
-				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.PARAM_learningSpeed); //TODO update all contexts ?
+				activatedContext.getLocalModel().updateModel(activatedContext.getCurrentExperiment(), getAmas().data.PARAM_exogenousLearningWeight); //TODO update all contexts ?
 
 
 			}
@@ -2433,7 +2432,7 @@ public class Head extends EllsaAgent {
 			Experiment currentExp = getAmas().getCurrentExperimentWithoutProposition();
 
 			double endogenousPrediction;
-			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.PARAM_nbOfNeighborForContexCreationWithouOracle){
+			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle){
 				/*double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){
@@ -2446,8 +2445,8 @@ public class Head extends EllsaAgent {
 
 				}
 				endogenousPrediction = weightedSumOfPredictions/normalisation;*/
-				endogenousPrediction = getPredictionWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_CONFIDENCE,
-						getAmas().data.PARAM_EXPLOITATION_WEIGHT_VOLUME,getAmas().data.PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS);
+				endogenousPrediction = getPredictionWithoutOracleWeighted(activatedNeighborsContexts,  getAmas().data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE,
+						getAmas().data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION,getAmas().data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY);
 
 				currentExp.setProposition(endogenousPrediction);
 				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
@@ -3687,7 +3686,7 @@ public class Head extends EllsaAgent {
 	public Double getPredicionPerformanceIndicator() {
 		
 		//return getAmas().data.averageRegressionPerformanceIndicator; //TODO solution ?
-		return getAmas().data.PARAM_initRegressionPerformance;
+		return getAmas().data.PARAM_modelErrorMargin;
 		
 	}
 	
@@ -3701,10 +3700,10 @@ public class Head extends EllsaAgent {
 					numberOfRegressions+=1;
 			}
 			assert numberOfRegressions != 0;
-			getAmas().data.averageRegressionPerformanceIndicator =  (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.PARAM_initRegressionPerformance) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.PARAM_initRegressionPerformance;
+			getAmas().data.averageRegressionPerformanceIndicator =  (meanRegressionPerformanceIndicator/numberOfRegressions > getAmas().data.PARAM_modelErrorMargin) ? meanRegressionPerformanceIndicator/numberOfRegressions :  getAmas().data.PARAM_modelErrorMargin;
 		}
 		else{
-			getAmas().data.averageRegressionPerformanceIndicator = getAmas().data.PARAM_initRegressionPerformance;
+			getAmas().data.averageRegressionPerformanceIndicator = getAmas().data.PARAM_modelErrorMargin;
 		}
 		
 	}
@@ -3771,7 +3770,7 @@ public class Head extends EllsaAgent {
 	}
 
 	public double getPredictionNeighborhoodRange(){
-		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*getAmas().data.PARAM_neighborhoodMultiplicator;
+		return getMinMaxPredictionRange()*getEnvironment().getMappingErrorAllowed()*getAmas().data.PARAM_neighborhoodRadiusCoefficient;
 		//return getMinMaxPredictionRange()*0.25 ;
 		//return getMinMaxPredictionRange()*0.25 ;
 	}

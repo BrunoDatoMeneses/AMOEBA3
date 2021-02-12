@@ -41,7 +41,7 @@ public class EllsaData implements Serializable {
 	public Double endogenousPredictionNContexts = 0.0;
 	public Double endogenousPredictionNContextsByInfluence = 0.0;
 
-	public Double oracleValue = null; //TODO à changer !!!!!!!!!!
+	public Double oracleValue = null;
 	public Double oldOracleValue;
 	public double criticity = 0.0;
 	public double lastMinDistanceToRegression;
@@ -54,13 +54,9 @@ public class EllsaData implements Serializable {
 	public boolean firstContext = false;
 	public boolean newContextWasCreated = false;
 	public boolean contextFromPropositionWasSelected = false;
-	
 
-	
 	public boolean activeLearning = false;
 	public boolean selfLearning = false;
-	
-	public HashMap<String, Double> selfRequest;
 
 	public Double maxConfidence = null;
 	public Double minConfidence = null;
@@ -83,8 +79,6 @@ public class EllsaData implements Serializable {
 	public int currentCriticalityPrediction = 0;
 	public int currentCriticalityMapping = 0;
 	public int currentCriticalityConfidence = 0;
-
-
 
 
 	public boolean contextNotFinished = false;
@@ -132,42 +126,46 @@ public class EllsaData implements Serializable {
 
 	/* USER PARAMETERS */
 
-	public double PARAM_mappingErrorAllowed = 0.04;
-	public double PARAM_initRegressionPerformance = 1.0;
+	public double PARAM_validityRangesPrecision = 0.04;
+	public double PARAM_modelErrorMargin = 1.0;
+	public int PARAM_bootstrapCycle = 10;
+	public double PARAM_exogenousLearningWeight = 0.25;
+	public double PARAM_endogenousLearningWeight = 0.25;
+
 
 	public boolean PARAM_isActiveLearning = false;
 	public boolean PARAM_isSelfLearning = false;
 	public boolean PARAM_isAutonomousMode = false;
 
-	/* DEV PARAMETERS */
-
-
-	public int PARAM_bootstrapCycle = 10;
-
+	/* DESIGNER PARAMETERS */
 
 	// Neighborhood
-	public int PARAM_neighborhoodMultiplicator = 2;
-	public double PARAM_externalContextInfluenceRatio = 0.25; // influenceRadius = contextRadius + PARAM_externalContextInfluenceRatio * contextLength
+	public double PARAM_neighborhoodRadiusCoefficient = 2;
+	public double PARAM_influenceRadiusCoefficient = 0.5;
+	public double PARAM_maxRangeRadiusCoefficient = 2.0;
+	public double PARAM_rangeSimilarityCoefficient = 0.375;
+	public double PARAM_minimumRangeCoefficient = 0.25;
+
+	public int PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = 10000;
+	public int PARAM_creationNeighborNumberForContexCreationWithouOracle = 10000;
+
+	public double PARAM_perceptionsGenerationCoefficient = 0.1;
+
+	public double PARAM_modelSimilarityThreshold = 0.001;
+
+	public double PARAM_LEARNING_WEIGHT_ACCURACY = 1.0;
+	public double PARAM_LEARNING_WEIGHT_PROXIMITY = 0.0;
+	public double PARAM_LEARNING_WEIGHT_EXPERIENCE = 1.0;
+	public double PARAM_LEARNING_WEIGHT_GENERALIZATION = 1.0;
+
+	public double PARAM_EXPLOITATION_WEIGHT_PROXIMITY = 1.0;
+	public double PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
+	public double PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
 
 	// Local Models
 
-	public double PARAM_learningSpeed = 0.25;
-
-	public int PARAM_numberOfPointsForRegression_ASUPPRIMER = 50;
 	public int PARAM_quantileForGenerationOfArtificialPerceptions = 3;
-	public double PARAM_rangeLengthForArtificialPerceptions = 0.1;
 
-	public double PARAM_similarityThreshold = 0.001;
-
-
-	public double PARAM_LEARNING_WEIGHT_DISTANCE_TO_PREDICTION = 1.0;
-	public double PARAM_LEARNING_WEIGHT_DISTANCE_TO_PERCEPTIONS = 0.0;
-	public double PARAM_LEARNING_WEIGHT_CONFIDENCE = 1.0;
-	public double PARAM_LEARNING_WEIGHT_VOLUME = 1.0;
-
-	public double PARAM_EXPLOITATION_WEIGHT_DISTANCE_TO_PERCEPTIONS = 1.0;
-	public double PARAM_EXPLOITATION_WEIGHT_CONFIDENCE = 1.0;
-	public double PARAM_EXPLOITATION_WEIGHT_VOLUME = 1.0;
 
 	// AVT
 
@@ -200,14 +198,14 @@ public class EllsaData implements Serializable {
 	public int STATE_DreamCompleted = -1; // -1 : before process / 0 : processing / 1 processed
 
 	public int PARAM_nbOfNeighborForLearningFromNeighbors = 10000;
-	public int PARAM_nbOfNeighborForVoidDetectionInSelfLearning = 10000;
-	public int PARAM_nbOfNeighborForContexCreationWithouOracle = 10000;
+
 
 	public double PARAM_probabilityOfRangeAmbiguity = 0.1;
 
 
 	// TODO A SUPPRIMER
 
+	public int PARAM_numberOfPointsForRegression_ASUPPRIMER = 50;
 	public boolean isVoidDetection_old = false;
 	public boolean isCoopLearningWithoutOracle_ASUPPRIMER = false;
 

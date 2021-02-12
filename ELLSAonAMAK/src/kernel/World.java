@@ -47,11 +47,11 @@ public class World extends Environment implements Loggable {
 	}
 
 	public double getMappingErrorAllowed() {
-		return ellsa.data.PARAM_mappingErrorAllowed;
+		return ellsa.data.PARAM_validityRangesPrecision;
 	}
 	
 	public void setMappingErrorAllowed(double value) {
-		ellsa.data.PARAM_mappingErrorAllowed = value;
+		ellsa.data.PARAM_validityRangesPrecision = value;
 	}
 
 	public synchronized void raiseNCS(NCS ncs) {
@@ -168,7 +168,7 @@ public class World extends Environment implements Loggable {
 
 	public double getContextInfluenceExternalRadius(Context ctxt, Percept pct) {
 		//return 2*ctxt.getRanges().get(pct).getRadius();
-		return ctxt.getRanges().get(pct).getLenght()* ellsa.data.PARAM_externalContextInfluenceRatio;
+		return ctxt.getRanges().get(pct).getRadius()* ellsa.data.PARAM_influenceRadiusCoefficient;
 	}
 
 }

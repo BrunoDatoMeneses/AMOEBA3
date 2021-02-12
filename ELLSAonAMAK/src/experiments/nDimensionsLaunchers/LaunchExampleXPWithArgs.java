@@ -5,7 +5,6 @@ package experiments.nDimensionsLaunchers;
 
 
 import agents.head.REQUEST;
-import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -17,8 +16,6 @@ import utils.TRACE;
 import utils.TRACE_LEVEL;
 
 import java.io.File;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 public class LaunchExampleXPWithArgs {
@@ -37,10 +34,10 @@ public class LaunchExampleXPWithArgs {
         PARAMS.nbEpisodes = Integer.parseInt(args[4]);
 
         // Neighborhood
-        PARAMS.mappingErrorAllowed =  Double.parseDouble(args[5]);
-        PARAMS.setNeighborhoodMultiplicator = Integer.parseInt(args[6]);
-        PARAMS.setExternalContextInfluenceRatio = Double.parseDouble(args[7]);
-        PARAMS.setRegressionPerformance = Double.parseDouble(args[8]);
+        PARAMS.validityRangesPrecision =  Double.parseDouble(args[5]);
+        PARAMS.neighborhoodRadiusCoefficient = Integer.parseInt(args[6]);
+        PARAMS.influenceRadiusCoefficient = Double.parseDouble(args[7]);
+        PARAMS.modelErrorMargin = Double.parseDouble(args[8]);
 
         // Learning
         PARAMS.setActiveLearning = Boolean.parseBoolean(args[9]);
@@ -136,13 +133,13 @@ public class LaunchExampleXPWithArgs {
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);
-        ellsa.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+        ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
         ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
 
-        ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
-        ellsa.data.PARAM_neighborhoodMultiplicator = PARAMS.setNeighborhoodMultiplicator;
-        ellsa.data.PARAM_externalContextInfluenceRatio = PARAMS.setExternalContextInfluenceRatio;
+        ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
+        ellsa.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
+        ellsa.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodRadiusCoefficient;
+        ellsa.data.PARAM_influenceRadiusCoefficient = PARAMS.influenceRadiusCoefficient;
 
         ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
         ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -167,8 +164,8 @@ public class LaunchExampleXPWithArgs {
 
         ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
-        ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
         ellsa.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
 

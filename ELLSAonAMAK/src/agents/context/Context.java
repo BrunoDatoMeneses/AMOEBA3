@@ -234,7 +234,7 @@ public class Context extends EllsaAgent {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
 		// firstPoint.toString())));
 
-		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.PARAM_learningSpeed);
+		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.PARAM_exogenousLearningWeight);
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 
@@ -411,7 +411,7 @@ public class Context extends EllsaAgent {
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
 		// firstPoint.toString())));
 
-		localModel.updateModel(firstPoint, getAmas().data.PARAM_learningSpeed);
+		localModel.updateModel(firstPoint, getAmas().data.PARAM_exogenousLearningWeight);
 		getAmas().addAlteredContext(this);
 		this.setName(String.valueOf(this.hashCode()));
 
@@ -472,7 +472,7 @@ public class Context extends EllsaAgent {
 
 		Experiment currentExperiment = this.getCurrentExperiment();
 		if(currentExperiment != null){
-			localModel.updateModel(currentExperiment, getAmas().data.PARAM_learningSpeed);
+			localModel.updateModel(currentExperiment, getAmas().data.PARAM_exogenousLearningWeight);
 		}
 
 
@@ -765,7 +765,7 @@ public class Context extends EllsaAgent {
 		/*return this.getLocalModel().distance(this.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&
 				ctxt.getLocalModel().distance(ctxt.getCurrentExperiment()) < getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator() &&*/
 		double distanceBetweenModels =  this.getLocalModel().getModelDifference(ctxt.getLocalModel());
-		double modelSimilarityThreshold = getAmas().data.PARAM_similarityThreshold;
+		double modelSimilarityThreshold = getAmas().data.PARAM_modelSimilarityThreshold;
 		getEnvironment().print(TRACE_LEVEL.DEBUG,getName(),ctxt.getName(),"modelSimilarityDistance",distanceBetweenModels,"SimilatityThreshold",modelSimilarityThreshold);
         return distanceBetweenModels<modelSimilarityThreshold;
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
@@ -1822,7 +1822,7 @@ public class Context extends EllsaAgent {
 
 			endoExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
-			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_learningSpeed);
+			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_exogenousLearningWeight);
 			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
 
 
@@ -1959,7 +1959,7 @@ public class Context extends EllsaAgent {
 				}
 			}
 			if(!isLocalMinimum){
-				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.PARAM_learningSpeed);
+				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.PARAM_endogenousLearningWeight);
 				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 				setConfidenceVariation(endoExperiments.size()*0.01);
 				//confidence+=endoExperiments.size()*0.01;
@@ -2154,7 +2154,7 @@ public class Context extends EllsaAgent {
 		/*currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );*/
 		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("LEARNED EXP", ""+currentExp)) );
-		this.getLocalModel().updateModel(currentExp, getAmas().data.PARAM_learningSpeed);
+		this.getLocalModel().updateModel(currentExp, getAmas().data.PARAM_exogenousLearningWeight);
 	}
 
 	private boolean perceptIsContainedBetweentContextsCenter(Context ctxtNeighbor, Percept pct) {

@@ -416,7 +416,7 @@ public class Percept extends EllsaAgent {
 
 	public double getNeigborhoodRadius() {
 		// return 200*world.getContextCreationPercentage();
-		return getRadiusContextForCreation()*getAmas().data.PARAM_neighborhoodMultiplicator;
+		return getRadiusContextForCreation()*getAmas().data.PARAM_neighborhoodRadiusCoefficient;
 	}
 
 	public double getMappingErrorAllowed() {
@@ -424,7 +424,7 @@ public class Percept extends EllsaAgent {
 	}
 	
 	public double getMappingErrorAllowedMin() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 0.25;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * getAmas().data.PARAM_minimumRangeCoefficient;
 	}
 
 	public double getMinDistanceFromCenterForNewRegressionPoint() {
@@ -433,20 +433,20 @@ public class Percept extends EllsaAgent {
 	
 	public double getMappingErrorAllowedOverMapping() {
 		//return getMappingErrorAllowedMin();
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 0.375;//TODO why ????????? Il y a des cycles avec 0.5
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * getAmas().data.PARAM_rangeSimilarityCoefficient;// Attention il y a des cycles avec 0.5
 	}
 	
 	public double getMappingErrorAllowedMax() {
-		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * 2.0;
+		return getMinMaxDistance() * getEnvironment().getMappingErrorAllowed() * getAmas().data.PARAM_maxRangeRadiusCoefficient;
 	}
 
 	public boolean isTooSmall(double range){
 		return range < getMappingErrorAllowedMin();
 	}
 
-	public boolean isTooBig(double range){
+	/*public boolean isTooBig(double range){
 		return range > getRadiusContextForCreation()*2;
-	}
+	}*/
 
 	// -----------------------
 	// AMOEBAonAMAK code ----

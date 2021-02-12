@@ -82,7 +82,7 @@ public class TestVoidDetectionFromZoneUI extends Application implements Serializ
 
         ellsa.allowGraphicalScheduler(true);
         ellsa.setRenderUpdate(false);
-        ellsa.data.PARAM_learningSpeed = learningSpeed;
+        ellsa.data.PARAM_exogenousLearningWeight = learningSpeed;
         ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
         ellsa.data.PARAM_isActiveLearning = setActiveLearning;
         ellsa.data.PARAM_isSelfLearning = setSelfLearning;

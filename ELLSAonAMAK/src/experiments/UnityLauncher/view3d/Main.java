@@ -74,7 +74,7 @@ public class Main implements Runnable {
 
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.PARAM_learningSpeed = PARAMS_UNITY.learningSpeed;
+		ellsa.data.PARAM_exogenousLearningWeight = PARAMS_UNITY.learningSpeed;
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS_UNITY.regressionPoints;
 		ellsa.data.PARAM_isActiveLearning = PARAMS_UNITY.setActiveLearning;
 		ellsa.data.PARAM_isSelfLearning = PARAMS_UNITY.setSelfLearning;
@@ -90,11 +90,11 @@ public class Main implements Runnable {
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS_UNITY.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS_UNITY.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS_UNITY.setDream;
-		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS_UNITY.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS_UNITY.nbOfNeighborForContexCreationWithouOracle;
 
 		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS_UNITY.mappingErrorAllowed);
-		ellsa.data.PARAM_initRegressionPerformance = PARAMS_UNITY.setRegressionPerformance;
+		ellsa.data.PARAM_modelErrorMargin = PARAMS_UNITY.setRegressionPerformance;
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS_UNITY.traceLevel;
 
 

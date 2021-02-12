@@ -166,7 +166,7 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles",PARAMS.nbExploitationCycle +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes",PARAMS.nbEpisodes +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Space size",PARAMS.spaceSize*4+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error",PARAMS.mappingErrorAllowed+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error",PARAMS.validityRangesPrecision +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
 		xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING")));
@@ -175,12 +175,12 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
 		xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance",PARAMS.setRegressionPerformance+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance",PARAMS.modelErrorMargin +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
 		xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Noise",PARAMS.oracleNoiseRange+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed",PARAMS.learningSpeed+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed",PARAMS.exogenousLearningWeight +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Regression points",PARAMS.regressionPoints+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
@@ -221,7 +221,7 @@ public class F_N_Launcher implements Serializable {
 
 		ellsa.allowGraphicalScheduler(false);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+		ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
 		ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -243,13 +243,13 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
 		ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
-		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
-		ellsa.data.PARAM_neighborhoodMultiplicator = PARAMS.setNeighborhoodMultiplicator;
-		ellsa.data.PARAM_externalContextInfluenceRatio = PARAMS.setExternalContextInfluenceRatio;
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
+		ellsa.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
+		ellsa.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodRadiusCoefficient;
+		ellsa.data.PARAM_influenceRadiusCoefficient = PARAMS.influenceRadiusCoefficient;
 
 
 		ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;

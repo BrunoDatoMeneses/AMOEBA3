@@ -245,7 +245,7 @@ public class ReinforcementWithControlLauncher2D extends Application implements S
 		ellsa.saver = new SaveHelperImpl(ellsa, amoebaSpatialRewardUI);
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(true);
-		ellsa.data.PARAM_learningSpeed = learningSpeed;
+		ellsa.data.PARAM_exogenousLearningWeight = learningSpeed;
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = regressionPoints;
 		ellsa.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
 		ellsa.setReinforcement(true);

@@ -63,7 +63,7 @@ public class RobotLaunchExample{
         ellsaTheta1.setRenderUpdate(false);
 
         ellsaTheta0.data.nameID = "ellsaTheta0";
-        ellsaTheta0.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+        ellsaTheta0.data.PARAM_exogenousLearningWeight = PARAMS.learningSpeed;
         ellsaTheta0.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
         ellsaTheta0.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
         ellsaTheta0.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -80,17 +80,17 @@ public class RobotLaunchExample{
         ellsaTheta0.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
         ellsaTheta0.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
         ellsaTheta0.data.PARAM_isDream = PARAMS.setDream;
-        ellsaTheta0.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsaTheta0.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        ellsaTheta0.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsaTheta0.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
         ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        ellsaTheta0.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+        ellsaTheta0.data.PARAM_modelErrorMargin = PARAMS.setRegressionPerformance;
         ellsaTheta0.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 
 
 
         ellsaTheta1.data.nameID = "ellsaTheta1";
-        ellsaTheta1.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+        ellsaTheta1.data.PARAM_exogenousLearningWeight = PARAMS.learningSpeed;
         ellsaTheta1.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
         ellsaTheta1.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
         ellsaTheta1.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -107,11 +107,11 @@ public class RobotLaunchExample{
         ellsaTheta1.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
         ellsaTheta1.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
         ellsaTheta1.data.PARAM_isDream = PARAMS.setDream;
-        ellsaTheta1.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsaTheta1.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        ellsaTheta1.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsaTheta1.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
         ellsaTheta1.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-        ellsaTheta1.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+        ellsaTheta1.data.PARAM_modelErrorMargin = PARAMS.setRegressionPerformance;
         ellsaTheta1.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.ERROR;
 
 

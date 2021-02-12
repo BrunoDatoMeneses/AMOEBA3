@@ -60,7 +60,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.PARAM_learningSpeed = PARAMS.learningSpeed;
+		ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
 		ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
@@ -76,11 +76,11 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
-		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+		ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
+		ellsa.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 		for(int i = 0; i<PARAMS.nbLearningCycle; i++){

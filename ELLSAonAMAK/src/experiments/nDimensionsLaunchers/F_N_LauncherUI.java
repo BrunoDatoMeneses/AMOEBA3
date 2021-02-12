@@ -15,7 +15,6 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import kernel.backup.SaveHelperImpl;
 
 
 /**
@@ -60,10 +59,39 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
-		ellsa.data.PARAM_learningSpeed = PARAMS.learningSpeed;
-		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+
+		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
+		ellsa.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
+		ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+		ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
+		ellsa.data.PARAM_endogenousLearningWeight = PARAMS.endogenousLearningWeight;
+
+		ellsa.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodRadiusCoefficient;
+		ellsa.data.PARAM_influenceRadiusCoefficient = PARAMS.influenceRadiusCoefficient;
+		ellsa.data.PARAM_maxRangeRadiusCoefficient = PARAMS.maxRangeRadiusCoefficient;
+		ellsa.data.PARAM_rangeSimilarityCoefficient = PARAMS.rangeSimilarityCoefficient;
+		ellsa.data.PARAM_minimumRangeCoefficient = PARAMS.minimumRangeCoefficient;
+
+		ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+		ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
+		ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient
+		;
+		ellsa.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
+
+		ellsa.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
+		ellsa.data.PARAM_LEARNING_WEIGHT_PROXIMITY = PARAMS.LEARNING_WEIGHT_PROXIMITY;
+		ellsa.data.PARAM_LEARNING_WEIGHT_EXPERIENCE = PARAMS.LEARNING_WEIGHT_EXPERIENCE;
+		ellsa.data.PARAM_LEARNING_WEIGHT_GENERALIZATION = PARAMS.LEARNING_WEIGHT_GENERALIZATION;
+
+		ellsa.data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
+		ellsa.data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
+		ellsa.data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
+
+
 		ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+
 		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
 		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
@@ -74,34 +102,34 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
 		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
 		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+
 		ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
-
-		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
 		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
-		ellsa.data.PARAM_nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-		ellsa.data.PARAM_nbOfNeighborForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-		ellsa.data.PARAM_initRegressionPerformance = PARAMS.setRegressionPerformance;
-		ellsa.data.PARAM_neighborhoodMultiplicator = PARAMS.setNeighborhoodMultiplicator;
-		ellsa.data.PARAM_externalContextInfluenceRatio = PARAMS.setExternalContextInfluenceRatio;
 
 		ellsa.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+
+		ellsa.data.PARAM_NCS_isAllContextSearchAllowedForLearning = PARAMS.isAllContextSearchAllowedForLearning;
+		ellsa.data.PARAM_NCS_isAllContextSearchAllowedForExploitation = PARAMS.isAllContextSearchAllowedForExploitation;
+
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 
 
 		ellsa.setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
 
-		ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+
 
 		ellsa.data.STOP_UI = PARAMS.STOP_UI;
 		ellsa.data.STOP_UI_cycle = PARAMS.nbLearningCycle;
+
+		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
 		//ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
 		
