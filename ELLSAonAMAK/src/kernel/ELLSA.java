@@ -325,12 +325,14 @@ public class ELLSA extends Amas<World> implements IELLSA {
 				data.selfLearning = false;
 				studiedSystem.setSelfLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
+				data.requestCounts.put(REQUEST.SELF,data.requestCounts.get(REQUEST.SELF)+1);
 				 
 			}
 			else if(data.activeLearning) {
 				data.activeLearning = false;
 				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getActiveRequest());
+				data.requestCounts.put(REQUEST.ACTIVE,data.requestCounts.get(REQUEST.ACTIVE)+1);
 			}else{
 
 				data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);

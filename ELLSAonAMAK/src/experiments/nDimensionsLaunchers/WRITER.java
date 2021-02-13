@@ -24,7 +24,7 @@ public class WRITER {
 
         List<String> dataStringsPrediction = Arrays.asList("predictionError", "predictionErrorDeviation");
 
-        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "rdmRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
+        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests","selfRequests", "rdmRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
 
         //List<String> dataStringsNCS =
 
@@ -226,6 +226,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("isCreationFromNeighbor", PARAMS.setisCreationWithNeighbor+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isAllContextSearchAllowedForLearning", PARAMS.isAllContextSearchAllowedForLearning+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isAllContextSearchAllowedForExploitation", PARAMS.isAllContextSearchAllowedForExploitation+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("probabilityOfRangeAmbiguity", PARAMS.probabilityOfRangeAmbiguity+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
     }
 
@@ -241,23 +242,20 @@ public class WRITER {
         data.get("predictionError").add(predictionError);
         data.get("predictionErrorDeviation").add(predictionDispersion);
 
-        int activeRequests = 0;
-        for (Map.Entry<REQUEST, Integer> entry : requestCounts.entrySet()) {
-            if(entry.getKey()!=REQUEST.RDM){
-                activeRequests +=entry.getValue();
-            }
-        }
+
 
 
         // Endo Requests
-        data.get("activeRequests").add((double)activeRequests);
+        data.get("activeRequests").add((double)requestCounts.get(REQUEST.ACTIVE));
+        data.get("rdmRequests").add((double)requestCounts.get(REQUEST.RDM));
+        data.get("selfRequests").add((double)requestCounts.get(REQUEST.SELF));
+
         data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
         data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
         data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));
         data.get("voidRequests").add((double)requestCounts.get(REQUEST.VOID));
         data.get("subvoidRequests").add((double)requestCounts.get(REQUEST.SUBVOID));
         data.get("modelRequests").add((double)requestCounts.get(REQUEST.MODEL));
-        data.get("rdmRequests").add((double)requestCounts.get(REQUEST.RDM));
         data.get("dreamRequests").add((double)requestCounts.get(REQUEST.DREAM));
         data.get("endogenousLearningSituations").add((double)requestCounts.get(REQUEST.NEIGHBOR));
         data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));

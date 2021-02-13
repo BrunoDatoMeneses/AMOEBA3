@@ -46,7 +46,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 2;
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  0.08;
@@ -80,9 +80,20 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
 
+//        PARAMS.model = "multi";
+//        PARAMS.model = "disc";
+//        PARAMS.model = "square";
+        PARAMS.model = "squareFixed";
+//        PARAMS.model = "triangle";
+//        PARAMS.model = "gaussian";
+//        PARAMS.model = "polynomial";
+//        PARAMS.model = "gaussianCos2";
+//        PARAMS.model = "cosX";
+//        PARAMS.model = "cosSinX";
+//        PARAMS.model = "rosenbrock";
+//        PARAMS.model = "squareSplitTriangle";
+//        PARAMS.model = "squareSplitFixed";
 
-
-        PARAMS.model = "SquareFixed";
 
         String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
         PARAMS.extension = dateAndHour;
@@ -111,6 +122,8 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.isAllContextSearchAllowedForLearning = true;
         PARAMS.isAllContextSearchAllowedForExploitation = true;
+
+        PARAMS.probabilityOfRangeAmbiguity = 0.1;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
@@ -235,6 +248,8 @@ public class LaunchExampleXPWithArgsManualy {
 
         ellsa.data.PARAM_NCS_isAllContextSearchAllowedForLearning = PARAMS.isAllContextSearchAllowedForLearning;
         ellsa.data.PARAM_NCS_isAllContextSearchAllowedForExploitation = PARAMS.isAllContextSearchAllowedForExploitation;
+
+        ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 

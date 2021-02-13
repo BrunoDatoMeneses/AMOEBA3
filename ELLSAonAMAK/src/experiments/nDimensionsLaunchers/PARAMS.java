@@ -6,7 +6,24 @@ import java.util.ArrayList;
 
 public class PARAMS {
 
-    public static String model = "CosSin" + "_AvecDetectionMinLocal" + "_VoisinagePredictionx4";
+//    public static String model = "multi";
+//    public static String model = "disc";
+//    public static String model = "square";
+    public static String model = "squareFixed";
+//    public static String model = "triangle";
+//    public static String model = "gaussian";
+//    public static String model = "polynomial";
+//    public static String model = "gaussianCos2";
+//    public static String model = "cosX";
+//    public static String model = "cosSinX";
+//    public static String model = "rosenbrock";
+//    public static String model = "squareSplitTriangle";
+//    public static String model = "squareSplitFixed";
+
+
+
+
+
     public static String extension = "";
 
     public static ArrayList subPercepts = new ArrayList<>();
@@ -124,11 +141,11 @@ public class PARAMS {
     public static  boolean setLearnFromNeighbors = false ;
 
 
-
-
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
     public static  int nbOfNeighborForContexCreationWithouOracle = 5000;
     public static  int nbOfNeighborForVoidDetectionInSelfLearning = 5000;
+
+    public static double probabilityOfRangeAmbiguity = 0.1;
 
     public static   boolean setAutonomousMode = true;
 

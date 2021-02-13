@@ -68,9 +68,33 @@ public class LaunchExampleXPWithArgs {
 
         PARAMS.model = args[25];
         PARAMS.setbootstrapCycle = Integer.parseInt(args[26]);
-        PARAMS.extension = args[27];
 
+        PARAMS.exogenousLearningWeight = Double.parseDouble(args[27]);
+        PARAMS.endogenousLearningWeight = Double.parseDouble(args[28]);
 
+        PARAMS.LEARNING_WEIGHT_ACCURACY = Double.parseDouble(args[29]);
+        PARAMS.LEARNING_WEIGHT_PROXIMITY = Double.parseDouble(args[30]);
+        PARAMS.LEARNING_WEIGHT_EXPERIENCE = Double.parseDouble(args[31]);
+        PARAMS.LEARNING_WEIGHT_GENERALIZATION = Double.parseDouble(args[32]);
+
+        PARAMS.EXPLOITATION_WEIGHT_PROXIMITY = Double.parseDouble(args[33]);
+        PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = Double.parseDouble(args[34]);
+        PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = Double.parseDouble(args[35]);
+
+        PARAMS.perceptionsGenerationCoefficient = Double.parseDouble(args[36]);
+
+        PARAMS.modelSimilarityThreshold = Double.parseDouble(args[37]);
+
+        PARAMS.maxRangeRadiusCoefficient = Double.parseDouble(args[38]);
+        PARAMS.rangeSimilarityCoefficient = Double.parseDouble(args[39]);
+        PARAMS.minimumRangeCoefficient = Double.parseDouble(args[40]);
+
+        PARAMS.isAllContextSearchAllowedForLearning = Boolean.parseBoolean(args[41]);
+        PARAMS.isAllContextSearchAllowedForExploitation = Boolean.parseBoolean(args[42]);
+
+        PARAMS.probabilityOfRangeAmbiguity = Double.parseDouble(args[43]);
+
+        PARAMS.extension = args[44];
 
 
         experimentation();
@@ -133,48 +157,72 @@ public class LaunchExampleXPWithArgs {
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);
-        ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
-        ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
+
 
         ellsa.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
         ellsa.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
+        ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+        ellsa.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
+        ellsa.data.PARAM_endogenousLearningWeight = PARAMS.endogenousLearningWeight;
+
         ellsa.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodRadiusCoefficient;
         ellsa.data.PARAM_influenceRadiusCoefficient = PARAMS.influenceRadiusCoefficient;
+        ellsa.data.PARAM_maxRangeRadiusCoefficient = PARAMS.maxRangeRadiusCoefficient;
+        ellsa.data.PARAM_rangeSimilarityCoefficient = PARAMS.rangeSimilarityCoefficient;
+        ellsa.data.PARAM_minimumRangeCoefficient = PARAMS.minimumRangeCoefficient;
+
+        ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+        ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
+        ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient
+        ;
+        ellsa.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
+
+        ellsa.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
+        ellsa.data.PARAM_LEARNING_WEIGHT_PROXIMITY = PARAMS.LEARNING_WEIGHT_PROXIMITY;
+        ellsa.data.PARAM_LEARNING_WEIGHT_EXPERIENCE = PARAMS.LEARNING_WEIGHT_EXPERIENCE;
+        ellsa.data.PARAM_LEARNING_WEIGHT_GENERALIZATION = PARAMS.LEARNING_WEIGHT_GENERALIZATION;
+
+        ellsa.data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
+        ellsa.data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
+        ellsa.data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
+
 
         ellsa.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
         ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
 
-
         ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
         ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
-        ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
         ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
         ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+        ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+        ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
         ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
         ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-        ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
-        ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
         ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
 
-        ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
+        ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
+        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
         ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+        ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
-        ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-        ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
 
         ellsa.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
 
+        ellsa.data.PARAM_NCS_isAllContextSearchAllowedForLearning = PARAMS.isAllContextSearchAllowedForLearning;
+        ellsa.data.PARAM_NCS_isAllContextSearchAllowedForExploitation = PARAMS.isAllContextSearchAllowedForExploitation;
+
+        ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
-        ellsa.setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
 
-        ellsa.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+
+        ellsa.setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
 
 
         ArrayList<Double> allLearningCycleTimes = new ArrayList<>();

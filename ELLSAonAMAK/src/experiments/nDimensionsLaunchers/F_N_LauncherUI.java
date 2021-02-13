@@ -117,6 +117,8 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		ellsa.data.PARAM_NCS_isAllContextSearchAllowedForLearning = PARAMS.isAllContextSearchAllowedForLearning;
 		ellsa.data.PARAM_NCS_isAllContextSearchAllowedForExploitation = PARAMS.isAllContextSearchAllowedForExploitation;
 
+		ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
+
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 

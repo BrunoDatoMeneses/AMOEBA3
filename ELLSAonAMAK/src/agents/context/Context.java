@@ -994,7 +994,9 @@ public class Context extends EllsaAgent {
 			else if (currentDistance > pct.getMappingErrorAllowedMin() && getAmas().getCycle()>VOID_CYCLE_START) {
 				addVoids(ctxt, voidDistances, bounds, currentDistance, pct);
 			}
-			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && RAND_NUM.oneChanceIn((int)(1/getAmas().data.PARAM_probabilityOfRangeAmbiguity)) && getAmas().data.PARAM_NCS_isFrontierRequest){
+
+			//else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && (RAND_NUM.oneChanceIn((int)(1/getAmas().data.PARAM_probabilityOfRangeAmbiguity)) ) && getAmas().data.PARAM_NCS_isFrontierRequest){
+			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && (Math.random()<getAmas().data.PARAM_probabilityOfRangeAmbiguity ) && getAmas().data.PARAM_NCS_isFrontierRequest){
 				HashMap<Percept, Pair<Double, Double>> frontierBounds = getFrontierBounds(ctxt, pct);
 
 				if (frontierBounds.size()==getAmas().getPercepts().size()){
@@ -1706,6 +1708,8 @@ public class Context extends EllsaAgent {
 		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 		getAmas().data.requestCounts.put(REQUEST.FUSION,getAmas().data.requestCounts.get(REQUEST.FUSION)+1);
+		getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
+		getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 	}
 
 	private void solveNCS_Restructure(Context otherContext, Percept sameBorderPercept, String range, Percept frontierPercept) {
@@ -1742,6 +1746,8 @@ public class Context extends EllsaAgent {
 				this.setConfidence(newconfidenceForShrinkingContext);
 				//this.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
+				getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
+				getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 			}
 
 
@@ -1772,6 +1778,8 @@ public class Context extends EllsaAgent {
 				otherContext.setConfidence(newconfidenceForShrinkingContext);
 				//otherContext.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
+				getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
+				getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 			}
 
 
@@ -1824,6 +1832,7 @@ public class Context extends EllsaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_exogenousLearningWeight);
 			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
+			getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 
 
 		}

@@ -352,67 +352,82 @@ public class F_N_Manager implements StudiedSystem{
 		//return squareSimpleModel(xRequest);
 		
 		int subzone = subzone2D(xRequest);
-		
+
+		model=PARAMS.model;
 		/* Multi */
-		/*model="Multi";
-		return multiModel(xRequest, subzone);*/
-		
+		if(PARAMS.model.equals("multi")){
+			return multiModel(xRequest, subzone);
+		}
 
 		/* LINEAR */
 		/* Disc */
-		//model="Disc";
-		//return discModel(xRequest);
-		
+		if(PARAMS.model.equals("disc")){
+			return discModel(xRequest);
+		}
+
 		/* Square */
-		//model="Square";
-		//return squareModel(xRequest);
+		if(PARAMS.model.equals("square")){
+			return squareModel(xRequest);
+		}
 
 		/* Square artcile JFSMA 2020*/
-		model="SquareJFSMA2020";
-		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+		if(PARAMS.model.equals("squareFixed")){
+			return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
 
+		}
 
 		/* Triangle */
-		//model="Triangle";
-		//return diagModel(xRequest);
+		if(PARAMS.model.equals("triangle")){
+			return diagModel(xRequest);
+		}
 		
 		/* Split */
-		//model="Split";
-		//return splitModel(xRequest);
+		if(PARAMS.model.equals("split")){
+			return splitModel(xRequest);
+		}
 
 		/* NON LINEAR */
 		/* Gaussian */
-		//model="Gaussian";
-		//return gaussianModel(xRequest, center, 500, 60);
+		if(PARAMS.model.equals("gaussian")){
+			return gaussianModel(xRequest, center, 500, 60);
+		}
 
 		/* Poly 2 */
-		//model="Polynomial";
-		//return polynomialModel(xRequest, 2, 50);
+		if(PARAMS.model.equals("polynomial")){
+			return polynomialModel(xRequest, 2, 50);
+		}
 
 		/* Goutte */
-		/*model="Goutte";
-		return goutteModel(xRequest, center);*/
+		if(PARAMS.model.equals("gaussianCos2")){
+			return goutteModel(xRequest, center);
+		}
 
 		/* Cos */
-		/*model="Cos";
-		return cosX(xRequest, 0.045) + 3;*/
+		if(PARAMS.model.equals("cosX")){
+			return cosX(xRequest, 0.045) + 3;
+		}
 
-		/* Cos */
-		/*model="CosSin";
-		return cosSinX(xRequest, 0.045) + 3;*/
+		/* CosSin */
+		if(PARAMS.model.equals("cosSinX")){
+			return cosSinX(xRequest, 0.045) + 3;
+		}
 
 		/* Rosenbrock */
-		//model="Rosenbrock";
-		//return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
+		if(PARAMS.model.equals("rosenbrock")){
+			return rosenbrock2DModel(xRequest, 1, 100, -50, 0.15, 0.0001);
+		}
 
+		/* DYNAMICAL */
 
-		//////////// DYNAMICAL ///////////////////////
+		if(PARAMS.model.equals("squareSplitTriangle")){
+			return squareSplitDiagModel(xRequest, 1000);
+		}
 
+		if(PARAMS.model.equals("squareSplitFixed")){
+			return jfsmaDynamicalModel(xRequest, 1000);
+		}
 
-
-		//return squareSplitDiagModel(xRequest, 1000);
-
-		//return jfsmaDynamicalModel(xRequest, 1000);
+		return model1(xRequest[0],xRequest[1]);
 
 
 	}
