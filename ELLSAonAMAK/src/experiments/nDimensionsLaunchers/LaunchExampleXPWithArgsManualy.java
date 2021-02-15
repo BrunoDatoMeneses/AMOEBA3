@@ -137,12 +137,9 @@ public class LaunchExampleXPWithArgsManualy {
 
     public static void experimentation() {
 
-        xpCSV = new CSVWriter(PARAMS.model
-                +"_Dim_" + PARAMS.dimension
-                +"_Lrn_" + PARAMS.nbLearningCycle
-                +"_Exp_" + PARAMS.nbExploitationCycle
-                +"_Eps_" + PARAMS.nbEpisodes
-                +"_PARAMS_" + PARAMS.extension
+        xpCSV = new CSVWriter(
+                PARAMS.model
+                        +"_PARAMS_" + PARAMS.extension
 
         );
 

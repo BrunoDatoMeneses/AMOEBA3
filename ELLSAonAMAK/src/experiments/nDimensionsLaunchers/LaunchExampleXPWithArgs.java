@@ -69,6 +69,8 @@ public class LaunchExampleXPWithArgs {
         PARAMS.model = args[25];
         PARAMS.setbootstrapCycle = Integer.parseInt(args[26]);
 
+
+
         PARAMS.exogenousLearningWeight = Double.parseDouble(args[27]);
         PARAMS.endogenousLearningWeight = Double.parseDouble(args[28]);
 
@@ -107,11 +109,8 @@ public class LaunchExampleXPWithArgs {
 
     public static void experimentation() {
 
-        xpCSV = new CSVWriter(PARAMS.model
-                +"_Dim_" + PARAMS.dimension
-                +"_Lrn_" + PARAMS.nbLearningCycle
-                +"_Exp_" + PARAMS.nbExploitationCycle
-                +"_Eps_" + PARAMS.nbEpisodes
+        xpCSV = new CSVWriter(
+                PARAMS.model
                 +"_PARAMS_" + PARAMS.extension
 
         );
