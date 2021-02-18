@@ -109,11 +109,7 @@ public class LaunchExampleXPWithArgs {
 
     public static void experimentation() {
 
-        xpCSV = new CSVWriter(
-                PARAMS.model
-                +"_PARAMS_" + PARAMS.extension
-
-        );
+        xpCSV = new CSVWriter( PARAMS.extension );
 
         // Set AMAK configuration before creating an AMOEBA
         Configuration.multiUI=true;

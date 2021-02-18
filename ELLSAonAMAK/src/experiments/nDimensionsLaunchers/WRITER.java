@@ -32,9 +32,10 @@ public class WRITER {
                 "perceptsTimeExecution", "contextsTimeExecution" , "headTimeExecution", "NCSTimeExecution"
                 , "NCS_UselessnessTimeExecution", "NCS_IncompetendHeadTimeExecution", "NCS_ConcurrenceAndConflictTimeExecution", "NCS_Create_New_ContextTimeExecution", "NCS_OvermappingTimeExecution", "NCS_ChildContextTimeExecution", "NCS_PotentialRequestTimeExecution", "NCS_DreamPotentialRequestTimeExecution");
 
-        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents","neighborsCounts",
+        List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents","generalizationScore","neighborsCounts",
                 "minPerceptionsExperiencedAverage","maxPerceptionsExperiencedAverage","minPerceptionsExperiencedDeviation","maxPerceptionsExperiencedDeviation",
                 "rangeExperienceAverage", "rangeExperienceDeviation");
+
 
         ArrayList<List<String>> dataStrings = new ArrayList<>(Arrays.asList(dataStringsVolumes, dataStringsEndoRequests, dataStringsTimeExecution, dataStringsOther, dataStringsPrediction ));
 
@@ -284,6 +285,7 @@ public class WRITER {
 
         // Other
         data.get("nbAgents").add((double) ellsa.getContexts().size());
+        data.get("generalizationScore").add((double) (mappingScores.get("CTXT") / ellsa.getContexts().size()));
         data.get("localMinima").add((double) ellsa.data.countLocalMinina);
         data.get("neighborsCounts").add((double)ellsa.data.neighborsCounts/ellsa.getCycle());
 

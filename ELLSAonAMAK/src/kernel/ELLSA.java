@@ -236,6 +236,8 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 		if(getCycle()==data.STOP_UI_cycle && data.STOP_UI){
 			getScheduler().stop();
+			System.out.println(getHeadAgent().getMappingScores());
+			System.out.println(data.requestCounts);
 		}
 	}
 

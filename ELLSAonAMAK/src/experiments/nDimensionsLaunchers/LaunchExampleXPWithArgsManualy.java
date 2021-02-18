@@ -44,12 +44,12 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 1000;
-        PARAMS.nbExploitationCycle = (int)(PARAMS.nbLearningCycle * 0.25);
-        PARAMS.nbEpisodes = 2;
+        PARAMS.nbLearningCycle = 500;
+        PARAMS.nbExploitationCycle = 250;
+        PARAMS.nbEpisodes = 15;
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  0.08;
+        PARAMS.validityRangesPrecision =  0.1;
         PARAMS.neighborhoodRadiusCoefficient = 2;
         PARAMS.influenceRadiusCoefficient = 0.50;
         PARAMS.modelErrorMargin = 1;
@@ -60,14 +60,15 @@ public class LaunchExampleXPWithArgsManualy {
 
         //NCS
 
-        PARAMS.setConflictDetection = true;
-        PARAMS.setConcurrenceDetection = true;
-        PARAMS.setVoidDetection = true;
+        PARAMS.setSelfModelRequest = false;
+        PARAMS.setConflictDetection = false;
+        PARAMS.setConcurrenceDetection = false;
+        PARAMS.setVoidDetection = false;
+        PARAMS.setFusionResolution = false;
+        PARAMS.setRestructureResolution = false;
+        PARAMS.setFrontierRequest = false;
+
         PARAMS.setSubVoidDetection = false;
-        PARAMS.setFrontierRequest = true;
-        PARAMS.setSelfModelRequest = true;
-        PARAMS.setFusionResolution = true;
-        PARAMS.setRestructureResolution = true;
 
         PARAMS.setDream = false;
         PARAMS.setDreamCycleLaunch = 1500;

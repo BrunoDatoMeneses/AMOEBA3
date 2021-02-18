@@ -45,7 +45,7 @@ public class PARAMS {
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.05;
+    public static double validityRangesPrecision = 0.1;
 
     /* LEARNING */
 
@@ -69,7 +69,7 @@ public class PARAMS {
     //public static double influenceRadiusCoefficient = 0.5;
     public static double maxRangeRadiusCoefficient = 2.0;
     public static double rangeSimilarityCoefficient = 0.375;
-    public static double minimumRangeCoefficient = 0.25;
+    public static double minimumRangeCoefficient = 0.35;
 
     /* PREDICTION */
     //public static  double modelErrorMargin = 1; //Multi
@@ -101,7 +101,7 @@ public class PARAMS {
     public static  double explorationIncrement = 2.0	;
     public static  double explorationWidht = 0.75	;
 
-    public static  int setbootstrapCycle = 15;
+    public static  int setbootstrapCycle = 10;
 
 
     /* LEARNING */
@@ -122,7 +122,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;
