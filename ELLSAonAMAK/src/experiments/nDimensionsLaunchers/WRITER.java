@@ -24,7 +24,7 @@ public class WRITER {
 
         List<String> dataStringsPrediction = Arrays.asList("predictionError", "predictionErrorDeviation");
 
-        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests","selfRequests", "rdmRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
+        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests", "rdmRequests","selfRequests", "exoRequests","endoRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
 
         //List<String> dataStringsNCS =
 
@@ -247,9 +247,12 @@ public class WRITER {
 
 
         // Endo Requests
-        data.get("activeRequests").add((double)requestCounts.get(REQUEST.ACTIVE));
         data.get("rdmRequests").add((double)requestCounts.get(REQUEST.RDM));
+        data.get("activeRequests").add((double)requestCounts.get(REQUEST.ACTIVE));
         data.get("selfRequests").add((double)requestCounts.get(REQUEST.SELF));
+
+        data.get("exoRequests").add((double)requestCounts.get(REQUEST.EXOGENOUS));
+        data.get("endoRequests").add((double)requestCounts.get(REQUEST.ENDOGENOUS));
 
         data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
         data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));

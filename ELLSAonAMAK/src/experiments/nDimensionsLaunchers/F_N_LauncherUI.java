@@ -128,7 +128,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 
 
 		ellsa.data.STOP_UI = PARAMS.STOP_UI;
-		ellsa.data.STOP_UI_cycle = PARAMS.nbLearningCycle;
+		ellsa.data.STOP_UI_cycle = PARAMS.STOP_UI_cycle;
 
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
 		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;

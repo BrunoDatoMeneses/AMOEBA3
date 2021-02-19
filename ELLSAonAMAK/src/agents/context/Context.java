@@ -1707,9 +1707,13 @@ public class Context extends EllsaAgent {
 		fusionContext.destroy();
 		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
+
+
+		//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+
 		getAmas().data.requestCounts.put(REQUEST.FUSION,getAmas().data.requestCounts.get(REQUEST.FUSION)+1);
-		getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
-		getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+
+
 	}
 
 	private void solveNCS_Restructure(Context otherContext, Percept sameBorderPercept, String range, Percept frontierPercept) {
@@ -1746,8 +1750,8 @@ public class Context extends EllsaAgent {
 				this.setConfidence(newconfidenceForShrinkingContext);
 				//this.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
-				getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
-				getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+				//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+
 			}
 
 
@@ -1778,8 +1782,7 @@ public class Context extends EllsaAgent {
 				otherContext.setConfidence(newconfidenceForShrinkingContext);
 				//otherContext.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
-				getAmas().data.requestCounts.put(REQUEST.ACTIVE,getAmas().data.requestCounts.get(REQUEST.ACTIVE)+1);
-				getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+				//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 			}
 
 
@@ -1832,7 +1835,8 @@ public class Context extends EllsaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_exogenousLearningWeight);
 			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
-			getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+			getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+1);
+			//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 
 
 		}
@@ -1970,6 +1974,7 @@ public class Context extends EllsaAgent {
 			if(!isLocalMinimum){
 				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.PARAM_endogenousLearningWeight);
 				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
+				getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+endoExperiments.size());
 				setConfidenceVariation(endoExperiments.size()*0.01);
 				//confidence+=endoExperiments.size()*0.01;
 			}

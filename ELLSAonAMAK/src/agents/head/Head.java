@@ -1924,14 +1924,16 @@ public class Head extends EllsaAgent {
 	}
 
 	private void addPotentialVoidRequest() {
-		boolean testVoid = false;
-		if(getAmas().data.PARAM_isActiveLearning){
-			testVoid = true;
-		}else{
-			if(lastEndogenousRequest!=null){
-				testVoid = lastEndogenousRequest.getType() == REQUEST.DREAM;
-			}
-		}
+		boolean testVoid = true;
+//		if(getAmas().data.PARAM_isActiveLearning){
+//			testVoid = true;
+//		}else{
+//			if(lastEndogenousRequest!=null){
+//				testVoid = lastEndogenousRequest.getType() == REQUEST.DREAM;
+//			}else{
+//
+//			}
+//		}
 
 		if((getAmas().getCycle()> NEIGH_VOID_CYCLE_START && endogenousRequests.size()==0 && getAmas().data.PARAM_NCS_isVoidDetection) && testVoid){
 			HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
@@ -2403,6 +2405,7 @@ public class Head extends EllsaAgent {
 
 	private Context createNewContext(Context bestNearestCtxt) {
 		getAmas().data.executionTimes[18]=System.currentTimeMillis();
+		getAmas().data.requestCounts.put(REQUEST.CREATION_WITH_NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.CREATION_WITH_NEIGHBOR)+1);
 
 		getAmas().data.newContextWasCreated = true;
 		getEnvironment().raiseNCS(NCS.CREATE_NEW_CONTEXT);
@@ -2451,6 +2454,7 @@ public class Head extends EllsaAgent {
 				currentExp.setProposition(endogenousPrediction);
 				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
 				context = new Context(getAmas(), endogenousPrediction);
+				getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+1);
 				getAmas().data.newContextWasCreated = true;
 			}
 

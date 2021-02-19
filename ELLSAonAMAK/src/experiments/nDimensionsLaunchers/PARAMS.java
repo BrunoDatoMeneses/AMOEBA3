@@ -9,11 +9,11 @@ public class PARAMS {
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
-    public static String model = "squareFixed";
+//    public static String model = "squareFixed";
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-//    public static String model = "gaussianCos2";
+    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
 //    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
@@ -45,7 +45,7 @@ public class PARAMS {
     public static  int nbEpisodes = 1;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.1;
+    public static double validityRangesPrecision = 0.04;
 
     /* LEARNING */
 
@@ -69,7 +69,7 @@ public class PARAMS {
     //public static double influenceRadiusCoefficient = 0.5;
     public static double maxRangeRadiusCoefficient = 2.0;
     public static double rangeSimilarityCoefficient = 0.375;
-    public static double minimumRangeCoefficient = 0.35;
+    public static double minimumRangeCoefficient = 0.25;
 
     /* PREDICTION */
     //public static  double modelErrorMargin = 1; //Multi
@@ -105,8 +105,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static  boolean setActiveLearning = true	;
-    public static  boolean setSelfLearning = false;
+    public static  boolean setActiveLearning = false	;
+    public static  boolean setSelfLearning = true;
 
 /*    public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;*/
@@ -122,7 +122,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;
@@ -138,12 +138,12 @@ public class PARAMS {
     public static  boolean setDream = false ;
     public static  int setDreamCycleLaunch = 1500 ;
 
-    public static  boolean setLearnFromNeighbors = false ;
+    public static  boolean setLearnFromNeighbors = true ;
 
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
-    public static  int nbOfNeighborForContexCreationWithouOracle = 5000;
-    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 5000;
+    public static  int nbOfNeighborForContexCreationWithouOracle = 7;
+    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 7;
 
     public static double probabilityOfRangeAmbiguity = 0.1;
 
@@ -156,7 +156,7 @@ public class PARAMS {
 
     /* UI */
     public static boolean STOP_UI = true;
-    public static int STOP_UI_cycle = 500;
+    public static int STOP_UI_cycle = 1000;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

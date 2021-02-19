@@ -17,6 +17,9 @@ public enum REQUEST implements Serializable {
 	NEIGHBOR,
 	FUSION,
 	RESTRUCTURE,
+	CREATION_WITH_NEIGHBOR,
+	EXOGENOUS,
+	ENDOGENOUS
 	
 }
 

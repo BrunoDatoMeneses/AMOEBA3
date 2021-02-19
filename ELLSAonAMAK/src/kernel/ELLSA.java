@@ -234,7 +234,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			RunLaterHelper.runLater(() -> {resetCycleWithoutRender();});
 		}
 
-		if(getCycle()==data.STOP_UI_cycle && data.STOP_UI){
+		if(getCycle()%data.STOP_UI_cycle==0 && data.STOP_UI){
 			getScheduler().stop();
 			System.out.println(getHeadAgent().getMappingScores());
 			System.out.println(data.requestCounts);
@@ -335,9 +335,11 @@ public class ELLSA extends Amas<World> implements IELLSA {
 				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getActiveRequest());
 				data.requestCounts.put(REQUEST.ACTIVE,data.requestCounts.get(REQUEST.ACTIVE)+1);
+				data.requestCounts.put(REQUEST.EXOGENOUS,data.requestCounts.get(REQUEST.EXOGENOUS)+1);
 			}else{
 
 				data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);
+				data.requestCounts.put(REQUEST.EXOGENOUS,data.requestCounts.get(REQUEST.EXOGENOUS)+1);
 			}
 		}
 		
