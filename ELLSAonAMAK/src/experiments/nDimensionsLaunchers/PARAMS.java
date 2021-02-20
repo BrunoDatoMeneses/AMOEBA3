@@ -105,8 +105,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static  boolean setActiveLearning = false	;
-    public static  boolean setSelfLearning = true;
+    public static  boolean setActiveLearning = true	;
+    public static  boolean setSelfLearning = false;
 
 /*    public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;*/
@@ -122,7 +122,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;
@@ -138,7 +138,7 @@ public class PARAMS {
     public static  boolean setDream = false ;
     public static  int setDreamCycleLaunch = 1500 ;
 
-    public static  boolean setLearnFromNeighbors = true ;
+    public static  boolean setLearnFromNeighbors = false ;
 
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
@@ -150,13 +150,13 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.OFF;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
 
 
     /* UI */
     public static boolean STOP_UI = true;
-    public static int STOP_UI_cycle = 1000;
+    public static int STOP_UI_cycle = 2000;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

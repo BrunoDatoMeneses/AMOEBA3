@@ -1001,6 +1001,7 @@ public class Context extends EllsaAgent {
 
 				if (frontierBounds.size()==getAmas().getPercepts().size()){
 					addFrontierRequests(ctxt, potentialRequests, pct, frontierBounds);
+					getEnvironment().print(TRACE_LEVEL.DEBUG, this.lastPrediction, ctxt.lastPrediction,getAmas().getHeadAgent().getPredictionNeighborhoodRange());
 				}
 			}
 		}
