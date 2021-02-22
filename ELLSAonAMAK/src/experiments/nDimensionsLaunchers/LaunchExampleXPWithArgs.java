@@ -35,7 +35,7 @@ public class LaunchExampleXPWithArgs {
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  Double.parseDouble(args[5]);
-        PARAMS.neighborhoodRadiusCoefficient = Integer.parseInt(args[6]);
+        PARAMS.neighborhoodRadiusCoefficient = Double.parseDouble(args[6]);
         PARAMS.influenceRadiusCoefficient = Double.parseDouble(args[7]);
         PARAMS.modelErrorMargin = Double.parseDouble(args[8]);
 

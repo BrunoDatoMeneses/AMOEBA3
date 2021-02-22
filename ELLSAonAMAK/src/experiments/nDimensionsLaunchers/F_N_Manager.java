@@ -106,7 +106,8 @@ public class F_N_Manager implements StudiedSystem{
 				xEploration[i] = 0.0;
 				
 				modelCoefs[nb][i] = (int) (Math.random() * 500 - 255);
-				modelCenterZones[nb][i] = spaceSize +  (Math.random() - 0.5) * spaceSize * 2;
+//				modelCenterZones[nb][i] = spaceSize +  (Math.random() - 0.5) * spaceSize * 2;
+				modelCenterZones[nb][i] = 75;
 			}
 			modelCoefs[nb][dimension] = (int) (Math.random() * 500 - 255);
 
@@ -356,13 +357,19 @@ public class F_N_Manager implements StudiedSystem{
 		model=PARAMS.model;
 		/* Multi */
 		if(PARAMS.model.equals("multi")){
-			return multiModel(xRequest, subzone);
+			return multiModelFixed(xRequest, subzone);
 		}
 
 		/* LINEAR */
+
+		/* Losange */
+		if(PARAMS.model.equals("los")){
+			return distanceToCenterbyNormFixedModel(xRequest,1);
+		}
+
 		/* Disc */
 		if(PARAMS.model.equals("disc")){
-			return discModel(xRequest);
+			return circleFixedModel(xRequest);
 		}
 
 		/* Square */
@@ -372,18 +379,24 @@ public class F_N_Manager implements StudiedSystem{
 
 		/* Square artcile JFSMA 2020*/
 		if(PARAMS.model.equals("squareFixed")){
-			return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]) ;
+			return squareFixedJFSMA(xRequest);
 
 		}
 
 		/* Triangle */
 		if(PARAMS.model.equals("triangle")){
-			return diagModel(xRequest);
+			return diagFixedModel(xRequest);
 		}
 		
 		/* Split */
 		if(PARAMS.model.equals("split")){
 			return splitModel(xRequest);
+		}
+
+
+		/* Disk */
+		if(PARAMS.model.equals("disk")){
+			return circleFixedModel(xRequest);
 		}
 
 		/* NON LINEAR */
@@ -423,6 +436,20 @@ public class F_N_Manager implements StudiedSystem{
 			return squareSplitDiagModel(xRequest, 1000);
 		}
 
+		if(PARAMS.model.equals("squareDiagCircle")){
+			return squareDiagCirclModel(xRequest, 1000);
+		}
+
+		if(PARAMS.model.equals("squareCircleLos")){
+			return squareCirclLosModel(xRequest, 1000);
+		}
+
+
+		if(PARAMS.model.equals("squareDiag")){
+			return squareDiagModel(xRequest, 1000);
+		}
+
+
 		if(PARAMS.model.equals("squareSplitFixed")){
 			return jfsmaDynamicalModel(xRequest, 1000);
 		}
@@ -432,9 +459,13 @@ public class F_N_Manager implements StudiedSystem{
 
 	}
 
+	private double squareFixedJFSMA(Double[] xRequest) {
+		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0], xRequest[1]) : model2JFSMA2020(xRequest[0], xRequest[1]);
+	}
+
 	private double jfsmaDynamicalModel(Double[] xRequest, int cycleChange) {
 		if(cycle<cycleChange) {
-			return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
+			return squareFixedJFSMA(xRequest);
 		}
 		else return (xRequest[0] > xRequest[1]) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
 	}
@@ -445,20 +476,51 @@ public class F_N_Manager implements StudiedSystem{
 		else return diagModel(xRequest);
 	}
 
+	private double squareDiagCirclModel(Double[] xRequest, int cycleChange) {
+		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
+		else if(cycle<2*cycleChange) return diagFixedModel(xRequest);
+		else return circleFixedModel(xRequest);
+	}
+
+	private double squareCirclLosModel(Double[] xRequest, int cycleChange) {
+		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
+		else if(cycle<2*cycleChange) return circleFixedModel(xRequest);
+		else return distanceToCenterbyNormFixedModel(xRequest,1);
+	}
+
+	private double squareDiagModel(Double[] xRequest, int cycleChange) {
+		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
+		else return diagFixedModel(xRequest);
+	}
+
 	private double splitModel(Double[] xRequest) {
 		return ( xRequest[0] <= 0 ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
 
+	private double circleFixedModel(Double[] xRequest) {
+		return ( distanceToCenter(xRequest) < spaceSize*1.25 ) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
+	}
+
+	private double distanceToCenterbyNormFixedModel(Double[] xRequest, int normeCycle) {
+		return ( distanceToCenterByNorm(xRequest,normeCycle) < spaceSize*1.25 ) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
+	}
+
+
+
 	private double diagModel(Double[] xRequest) {
 		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+	}
+
+	private double diagFixedModel(Double[] xRequest) {
+		return (xRequest[0] > xRequest[1]) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
 	}
 
 	private double squareModel(Double[] xRequest) {
 		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
 
-	private double discModel(Double[] xRequest) {
-		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
+	private double discFixedModel(Double[] xRequest) {
+		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model2JFSMA2020(xRequest[0],xRequest[1]) : model1JFSMA2020(xRequest[0],xRequest[1]);
 	}
 
 
@@ -479,6 +541,26 @@ public class F_N_Manager implements StudiedSystem{
 			return 20000 +gaussianMapping2D(xRequest);
 		}
 		
+		return 20000 +model1();
+	}
+
+	private double multiModelFixed(Double[] xRequest, int subzone) {
+		if(subzone == 1) {
+			/* Disques */
+			return 20000 + modelNFixed(xRequest) ;
+		}else if (subzone == 2) {
+			/* Gaussian model */
+			return 40000 +gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
+
+		}else if (subzone == 3) {
+			/* Square */
+			return 20000 +square2DModelFixed(xRequest, subZoneCenter3D(3));
+
+		}else if (subzone == 4) {
+			/* Exp */
+			return 20000 +gaussianMapping2DFixed(xRequest);
+		}
+
 		return 20000 +model1();
 	}
 	
@@ -564,6 +646,10 @@ private double[] subZoneCenter3D(int nb) {
 		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/7, 2))/2) -50) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
 
+	private double gaussianMapping2DFixed(Double[] xRequest) {
+		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/7, 2))/2) -50) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
+	}
+
 
 	
 	private double square2DModel(Double[] xRequest, double[] center) {
@@ -571,6 +657,13 @@ private double[] subZoneCenter3D(int nb) {
 				xRequest[0] < (center[0]+spaceSize/2) &&
 				(center[1]-spaceSize/2)  < xRequest[1]  && 
 				xRequest[1] < (center[1]+spaceSize/2)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
+	}
+
+	private double square2DModelFixed(Double[] xRequest, double[] center) {
+		return ((center[0]-spaceSize/2)  < xRequest[0]  &&
+				xRequest[0] < (center[0]+spaceSize/2) &&
+				(center[1]-spaceSize/2)  < xRequest[1]  &&
+				xRequest[1] < (center[1]+spaceSize/2)) ? model2JFSMA2020(xRequest[0],xRequest[1]) : model1JFSMA2020(xRequest[0],xRequest[1]) ;
 	}
 	
 	private double squareSimpleModel(Double[] xRequest) {
@@ -658,9 +751,31 @@ private double[] subZoneCenter3D(int nb) {
 		return modeli(numberOfModels-1, xRequest);
 		
 	}
+
+	private double modelNFixed(Double[] xRequest) {
+
+		for(int nb = 0; nb<numberOfModels-1; nb++) {
+
+			if(distance(xRequest,modelCenterZones[nb]) < spaceSize*0.75) {
+				return model1JFSMA2020(xRequest[0],xRequest[1]);
+			}
+
+		}
+		return model2JFSMA2020(xRequest[0],xRequest[1]);
+
+	}
 	
 	private double distance(Double[] x1, double[] x2) {
 		return normeP(x1,x2,normType);
+	}
+
+	private double distanceToCenter(Double[] x1) {
+		return normePToCenter(x1,normType);
+	}
+
+
+	private double distanceToCenterByNorm(Double[] x1, int normIndice) {
+		return normePToCenter(x1,normIndice);
 	}
 	
 	private double norme1(double[] x1, double[] x2) {
@@ -677,6 +792,14 @@ private double[] subZoneCenter3D(int nb) {
 		double distance = 0;
 		for(int i = 0; i < x1.length; i ++) {
 			distance += Math.pow(Math.abs(x2[i] - x1[i]), p) ;
+		}
+		return Math.pow(distance, 1.0/p);
+	}
+
+	private double normePToCenter(Double[] x1, int p) {
+		double distance = 0;
+		for(int i = 0; i < x1.length; i ++) {
+			distance += Math.pow(Math.abs(x1[i]), p) ;
 		}
 		return Math.pow(distance, 1.0/p);
 	}

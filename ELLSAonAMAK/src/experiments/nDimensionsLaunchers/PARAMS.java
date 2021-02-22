@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 public class PARAMS {
 
+
+    public static String model = "los";
+//    public static String model = "squareCircleLos";
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
@@ -13,7 +16,7 @@ public class PARAMS {
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-    public static String model = "gaussianCos2";
+//    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
 //    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
@@ -40,7 +43,7 @@ public class PARAMS {
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-    public static  int nbLearningCycle = 500;
+    public static  int nbLearningCycle = 1000;
     public static  int nbExploitationCycle = 250;
     public static  int nbEpisodes = 1;
 
@@ -72,9 +75,9 @@ public class PARAMS {
     public static double minimumRangeCoefficient = 0.25;
 
     /* PREDICTION */
-    //public static  double modelErrorMargin = 1; //Multi
-    //public static  double modelErrorMargin = 0.05; //SinCos
-    public static  double modelErrorMargin = 1; // Goutte
+    public static  double modelErrorMargin = 1; //Multi
+//    public static  double modelErrorMargin = 0.05; //SinCos
+    //public static  double modelErrorMargin = 1; // Goutte
     //public static  double modelErrorMargin = 1; // Carré
 
 
