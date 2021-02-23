@@ -7,6 +7,7 @@ import agents.context.Context;
 import agents.context.CustomComparator;
 import agents.context.Experiment;
 import agents.context.VOID;
+import agents.percept.INPUT;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import experiments.nDimensionsLaunchers.PARAMS;
@@ -343,18 +344,18 @@ public class Head extends EllsaAgent {
 		if(getAmas().getCycle() % 50 == 0){
 			if(lastEndogenousRequest != null){
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+						+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests() + "\t\t\t\t\t" + getAmas().data.currentINPUT)));
 			}else{
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests())));
+						+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests() + "\t\t\t\t\t" + getAmas().data.currentINPUT)));
 			}
 		}
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+					+ "---------------------------------------- PLAY WITH ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests() + "\t\t\t\t\t" + getAmas().data.currentINPUT)));
 		}else{
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests())));
+					+ "---------------------------------------- PLAY WITH ORACLE" + " " + getWaitingEndogenousRequests() + "\t\t\t\t\t" + getAmas().data.currentINPUT)));
 		}
 
 		updateBestContextWithOracle();
@@ -639,6 +640,9 @@ public class Head extends EllsaAgent {
 				NCSDetection_PotentialRequest();
 			}
 		}
+		if(getAmas().data.PARAM_isExploitationActive && getAmas().data.currentINPUT == INPUT.EXOGENOUS_EXPLOITATION){
+			NCSDetection_PotentialRequest();
+		}
 		resetLastEndogenousRequest();
 
 		getAmas().data.executionTimes[8]=System.currentTimeMillis()- getAmas().data.executionTimes[8];
@@ -810,19 +814,19 @@ public class Head extends EllsaAgent {
 		if(getAmas().getCycle() % 50 == 0){
 			if(lastEndogenousRequest != null){
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+						+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests()+ "\t\t" + getAmas().data.currentINPUT)));
 			}else{
 				getEnvironment().trace(TRACE_LEVEL.SUBCYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-						+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests())));
+						+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests()+ "\t\t" + getAmas().data.currentINPUT)));
 			}
 		}
 
 		if(lastEndogenousRequest != null){
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests())));
+					+ "---------------------------------------- PLAY WITHOUT ORACLE \t" + lastEndogenousRequest.getType() + " " + getWaitingEndogenousRequests()+ "\t\t" + getAmas().data.currentINPUT)));
 		}else{
 			getEnvironment().trace(TRACE_LEVEL.CYCLE, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-					+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests())));
+					+ "---------------------------------------- PLAY WITHOUT ORACLE" + " " + getWaitingEndogenousRequests()+ "\t\t" + getAmas().data.currentINPUT)));
 		}
 
 		updateBestContextAndPropositionWithoutOracle();
@@ -1596,6 +1600,7 @@ public class Head extends EllsaAgent {
 			Context goodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,getAmas().data.PARAM_LEARNING_WEIGHT_ACCURACY,
 					getAmas().data.PARAM_LEARNING_WEIGHT_EXPERIENCE,getAmas().data.PARAM_LEARNING_WEIGHT_GENERALIZATION,getAmas().data.PARAM_LEARNING_WEIGHT_PROXIMITY);
 
+			getAmas().data.requestCounts.put(REQUEST.NCS_CREATION,getAmas().data.requestCounts.get(REQUEST.NCS_CREATION)+1);
 			Context context;
 			if (goodContext != null && getAmas().data.PARAM_NCS_isCreationWithNeighbor) {
 				getEnvironment().trace(TRACE_LEVEL.STATE, new ArrayList<String>(Arrays.asList(goodContext.getName(),
@@ -1764,9 +1769,11 @@ public class Head extends EllsaAgent {
 					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
 						activatedContexts.get(i).setConfidenceVariation(-0.5);
+						getAmas().data.requestCounts.put(REQUEST.NCS_CONCURRENCY,getAmas().data.requestCounts.get(REQUEST.NCS_CONCURRENCY)+1);
 					}else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
 						activatedContexts.get(i).setConfidenceVariation(-4.0);
+						getAmas().data.requestCounts.put(REQUEST.NCS_CONFLICT,getAmas().data.requestCounts.get(REQUEST.NCS_CONFLICT)+1);
 					}
 
 
@@ -1802,10 +1809,12 @@ public class Head extends EllsaAgent {
 					if (activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && testSameModel && getAmas().data.PARAM_NCS_isConcurrenceResolution) {
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
 						activatedContexts.get(i).setConfidenceVariation(-0.5);
+						getAmas().data.requestCounts.put(REQUEST.NCS_CONCURRENCY,getAmas().data.requestCounts.get(REQUEST.NCS_CONCURRENCY)+1);
 					}
 					else if(activatedContexts.get(i) != bestContext && !activatedContexts.get(i).isDying() && !testSameModel && getAmas().data.PARAM_NCS_isConflictResolution){
 						activatedContexts.get(i).solveNCS_Overlap(bestContext);
 						activatedContexts.get(i).setConfidenceVariation(-4.0);
+						getAmas().data.requestCounts.put(REQUEST.NCS_CONFLICT,getAmas().data.requestCounts.get(REQUEST.NCS_CONFLICT)+1);
 					}
 				}
 			}
@@ -1826,6 +1835,7 @@ public class Head extends EllsaAgent {
 				+ "---------------------------------------- NCS DETECTION INCOMPETENT HEAD")));
 
 		if(activatedContexts.isEmpty()) {
+			getAmas().data.requestCounts.put(REQUEST.NCS_UNPRODUCTIVITY,getAmas().data.requestCounts.get(REQUEST.NCS_UNPRODUCTIVITY)+1);
 
 			Context nearestGoodContext = getGoodContextWithOracleWeighted(activatedNeighborsContexts,1.0,0.0,0.0,1.0);
 
@@ -1878,11 +1888,11 @@ public class Head extends EllsaAgent {
 		if(getAmas().getCycle() == getAmas().data.PARAM_DreamCycleLaunch && getAmas().data.PARAM_isDream){
 
 
-			getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = 5;
-			getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle = 5;
+			/*getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = 5;
+			getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle = 5;*/
 			//getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.DEBUG;
 
-			getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning, getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle);
+			//getEnvironment().print(TRACE_LEVEL.ERROR, PARAMS.traceLevel, getAmas().data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning, getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle);
 
 
 
@@ -2436,6 +2446,7 @@ public class Head extends EllsaAgent {
 
 			double endogenousPrediction;
 			if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>= getAmas().data.PARAM_creationNeighborNumberForContexCreationWithouOracle){
+				getAmas().data.requestCounts.put(REQUEST.NCS_CREATION,getAmas().data.requestCounts.get(REQUEST.NCS_CREATION)+1);
 				/*double weightedSumOfPredictions = 0;
 				double normalisation = 0;
 				for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()){

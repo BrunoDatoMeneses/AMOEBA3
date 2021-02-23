@@ -700,6 +700,7 @@ public class Context extends EllsaAgent {
 		if (!isDying()) {
 			getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 					"*********************************************************************************************************** SOLVE NCS USELESSNESS")));
+			getAmas().data.requestCounts.put(REQUEST.NCS_USELESSNESS,getAmas().data.requestCounts.get(REQUEST.NCS_USELESSNESS)+1);
 			getEnvironment().raiseNCS(NCS.CONTEXT_USELESSNESS);
 			this.destroy();
 			getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
@@ -938,7 +939,8 @@ public class Context extends EllsaAgent {
 			
 			if(bounds.get(pct) != null) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
-				request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
+				//request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
+				request.put(pct, (bounds.get(pct).getA() + Math.random()* (bounds.get(pct).getB() - bounds.get(pct).getA()))   );
 			}else {
 				getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}
@@ -2566,7 +2568,7 @@ public class Context extends EllsaAgent {
 
 
 
-
+		getAmas().data.requestCounts.put(REQUEST.NCS_BAD_PREDICTION,getAmas().data.requestCounts.get(REQUEST.NCS_BAD_PREDICTION)+1);
 
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
@@ -2969,6 +2971,7 @@ public class Context extends EllsaAgent {
 			//if (!contain && !fusionned) {
 			if (!contain) {
 				if(ranges.get(pct).getLenght()<pct.getMappingErrorAllowedMax()) {
+					getAmas().data.requestCounts.put(REQUEST.NCS_EXPANSION,getAmas().data.requestCounts.get(REQUEST.NCS_EXPANSION)+1);
 					ranges.get(pct).adapt(pct.getValue(), false, null);
 				}
 				

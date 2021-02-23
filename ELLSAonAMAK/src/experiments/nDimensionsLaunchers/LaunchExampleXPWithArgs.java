@@ -96,7 +96,16 @@ public class LaunchExampleXPWithArgs {
 
         PARAMS.probabilityOfRangeAmbiguity = Double.parseDouble(args[43]);
 
-        PARAMS.extension = args[44];
+        PARAMS.transferCyclesRatio = Double.parseDouble(args[44]);
+
+        PARAMS.nbEndoExploitationCycle = Integer.parseInt(args[45]);
+        PARAMS.setActiveExploitation = Boolean.parseBoolean(args[46]);
+
+
+
+        PARAMS.extension = args[47];
+
+
 
 
         experimentation();
@@ -244,12 +253,33 @@ public class LaunchExampleXPWithArgs {
 
         ArrayList<Double> allPredictionErrors = new ArrayList<>();
 
-        for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-            double start = System.currentTimeMillis();
-            allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-            allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+        if(PARAMS.setActiveExploitation){
 
+            ellsa.data.PARAM_isExploitationActive = true;
+
+            for (int i = 0; i < PARAMS.nbEndoExploitationCycle; ++i) {
+                studiedSystem.getErrorOnRequest(ellsa);
+            }
+
+            ellsa.data.PARAM_isExploitationActive = false;
+
+            for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
+                double start = System.currentTimeMillis();
+                allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
+                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+
+            }
+
+        }else{
+            for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
+                double start = System.currentTimeMillis();
+                allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
+                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+
+            }
         }
+
+
 
         OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a->a).average();
         Double errorDispersion = allPredictionErrors.stream().mapToDouble(a->Math.pow((a- averageError.getAsDouble()),2)).sum();

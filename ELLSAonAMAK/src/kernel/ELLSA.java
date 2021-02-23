@@ -14,6 +14,7 @@ import agents.context.localModel.TypeLocalModel;
 import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.head.REQUEST;
+import agents.percept.INPUT;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
 import fr.irit.smac.amak.Agent;
@@ -283,8 +284,11 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			
 			if(perceptions.get("oracle")==null) {
 				data.useOracle = false;
+				data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
+
 			}else {
 				data.useOracle = true;
+				data.currentINPUT = INPUT.EXOGENOUS_LEARNING_SITUATION;
 			}
 			
 		}
@@ -555,6 +559,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 	@Override
 	public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState) {
+		data.currentINPUT = INPUT.EXOGENOUS_LEARNING_SITUATION;
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
 		setPerceptionsAndActionState(perceptionsActionState);
@@ -628,6 +633,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 	@Override
 	public double request(HashMap<String, Double> perceptionsActionState) {
+		data.currentINPUT = INPUT.EXOGENOUS_EXPLOITATION;
 		boolean usingOracle = isUseOracle();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;
@@ -640,10 +646,17 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		double action = getAction();
 
 		getEnvironment().print(TRACE_LEVEL.INFORM,"REQUEST");
+
+		while(data.selfLearning && data.PARAM_isAutonomousMode && data.PARAM_isExploitationActive) {
+			data.selfLearning = false;
+			endogenousRequest(convertRequestPerceptToString(head.getSelfRequest()));
+		}
+
 		return action;
 	}
 
 	public double endogenousRequest(HashMap<String, Double> perceptionsActionState) {
+		data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
 		boolean usingOracle = isUseOracle();
 		StudiedSystem ss = studiedSystem;
 		studiedSystem = null;

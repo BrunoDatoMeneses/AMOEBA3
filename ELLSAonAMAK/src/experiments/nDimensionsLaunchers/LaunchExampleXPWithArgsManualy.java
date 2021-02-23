@@ -44,53 +44,53 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 500;
+        PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 15;
+        PARAMS.nbEpisodes = 1;
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  0.1;
+        PARAMS.validityRangesPrecision =  0.05;
         PARAMS.neighborhoodRadiusCoefficient = 2;
         PARAMS.influenceRadiusCoefficient = 0.50;
-        PARAMS.modelErrorMargin = 1;
+        PARAMS.modelErrorMargin = 0.05;
 
         // Learning
-        PARAMS.setActiveLearning = true;
-        PARAMS.setSelfLearning = false;
+        PARAMS.setActiveLearning = false;
+        PARAMS.setSelfLearning = true;
 
         //NCS
 
-        PARAMS.setSelfModelRequest = false;
-        PARAMS.setConflictDetection = false;
-        PARAMS.setConcurrenceDetection = false;
-        PARAMS.setVoidDetection = false;
-        PARAMS.setFusionResolution = false;
-        PARAMS.setRestructureResolution = false;
-        PARAMS.setFrontierRequest = false;
+        PARAMS.setSelfModelRequest = true;
+        PARAMS.setConflictDetection = true;
+        PARAMS.setConcurrenceDetection = true;
+        PARAMS.setVoidDetection = true;
+        PARAMS.setFusionResolution = true;
+        PARAMS.setRestructureResolution = true;
+        PARAMS.setFrontierRequest = true;
 
         PARAMS.setSubVoidDetection = false;
 
         PARAMS.setDream = false;
         PARAMS.setDreamCycleLaunch = 1500;
 
-        PARAMS.setLearnFromNeighbors = false;
+        PARAMS.setLearnFromNeighbors = true;
         PARAMS.setisCreationWithNeighbor = true;
 
         PARAMS.nbOfNeighborForLearningFromNeighbors = 1;
-        PARAMS.nbOfNeighborForContexCreationWithouOracle = 5000;
+        PARAMS.nbOfNeighborForContexCreationWithouOracle = 7;
         PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
 
 //        PARAMS.model = "multi";
 //        PARAMS.model = "disc";
 //        PARAMS.model = "square";
-        PARAMS.model = "squareFixed";
+//        PARAMS.model = "squareFixed";
 //        PARAMS.model = "triangle";
 //        PARAMS.model = "gaussian";
 //        PARAMS.model = "polynomial";
 //        PARAMS.model = "gaussianCos2";
 //        PARAMS.model = "cosX";
-//        PARAMS.model = "cosSinX";
+        PARAMS.model = "cosSinX";
 //        PARAMS.model = "rosenbrock";
 //        PARAMS.model = "squareSplitTriangle";
 //        PARAMS.model = "squareSplitFixed";
@@ -125,6 +125,11 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.isAllContextSearchAllowedForExploitation = true;
 
         PARAMS.probabilityOfRangeAmbiguity = 0.1;
+
+        PARAMS.transferCyclesRatio = 0.333;
+
+        PARAMS.nbEndoExploitationCycle = 250;
+        PARAMS.setActiveExploitation = false;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
@@ -294,11 +299,30 @@ public class LaunchExampleXPWithArgsManualy {
 
         ArrayList<Double> allPredictionErrors = new ArrayList<>();
 
-        for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-            double start = System.currentTimeMillis();
-            allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-            allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+        if(PARAMS.setActiveExploitation){
 
+            ellsa.data.PARAM_isExploitationActive = true;
+
+            for (int i = 0; i < PARAMS.nbEndoExploitationCycle; ++i) {
+                studiedSystem.getErrorOnRequest(ellsa);
+            }
+
+            ellsa.data.PARAM_isExploitationActive = false;
+
+            for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
+                double start = System.currentTimeMillis();
+                allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
+                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+
+            }
+
+        }else{
+            for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
+                double start = System.currentTimeMillis();
+                allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
+                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+
+            }
         }
 
         OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a->a).average();

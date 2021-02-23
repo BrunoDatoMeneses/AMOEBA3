@@ -7,8 +7,9 @@ import java.util.ArrayList;
 public class PARAMS {
 
 
-    public static String model = "los";
-//    public static String model = "squareCircleLos";
+//    public static String model = "los";
+//    public static String model = "squareDisc";
+//    public static String model = "squareDiscLos";
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
@@ -18,7 +19,7 @@ public class PARAMS {
 //    public static String model = "polynomial";
 //    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
-//    public static String model = "cosSinX";
+    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
 //    public static String model = "squareSplitTriangle";
 //    public static String model = "squareSplitFixed";
@@ -43,9 +44,11 @@ public class PARAMS {
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-    public static  int nbLearningCycle = 1000;
+    public static  int nbLearningCycle = 5000;
+    public static  int nbEndoExploitationCycle = 250;
     public static  int nbExploitationCycle = 250;
     public static  int nbEpisodes = 1;
+    public static  double transferCyclesRatio = 0.3;
 
     public static  double spaceSize = 50.0	;
     public static double validityRangesPrecision = 0.04;
@@ -75,8 +78,8 @@ public class PARAMS {
     public static double minimumRangeCoefficient = 0.25;
 
     /* PREDICTION */
-    public static  double modelErrorMargin = 1; //Multi
-//    public static  double modelErrorMargin = 0.05; //SinCos
+//    public static  double modelErrorMargin = 1; //Multi
+    public static  double modelErrorMargin = 0.05; //SinCos
     //public static  double modelErrorMargin = 1; // Goutte
     //public static  double modelErrorMargin = 1; // Carré
 
@@ -108,8 +111,8 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static  boolean setActiveLearning = true	;
-    public static  boolean setSelfLearning = false;
+    public static  boolean setActiveLearning = false	;
+    public static  boolean setSelfLearning = true;
 
 /*    public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;*/
@@ -138,10 +141,12 @@ public class PARAMS {
     public static  boolean setSubVoidDetection = false ;
 
 
-    public static  boolean setDream = false ;
-    public static  int setDreamCycleLaunch = 1500 ;
+    public static  boolean setDream = true ;
+    public static  int setDreamCycleLaunch = 2000 ;
 
-    public static  boolean setLearnFromNeighbors = false ;
+    public static  boolean setActiveExploitation = true ;
+
+    public static  boolean setLearnFromNeighbors = true ;
 
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
@@ -153,13 +158,14 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
 
 
 
     /* UI */
     public static boolean STOP_UI = true;
-    public static int STOP_UI_cycle = 2000;
+//    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
+    public static int STOP_UI_cycle = setDreamCycleLaunch;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

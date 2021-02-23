@@ -433,25 +433,29 @@ public class F_N_Manager implements StudiedSystem{
 		/* DYNAMICAL */
 
 		if(PARAMS.model.equals("squareSplitTriangle")){
-			return squareSplitDiagModel(xRequest, 1000);
+			return squareSplitDiagModel(xRequest, PARAMS.transferCyclesRatio);
 		}
 
 		if(PARAMS.model.equals("squareDiagCircle")){
-			return squareDiagCirclModel(xRequest, 1000);
+			return squareDiagCirclModel(xRequest, PARAMS.transferCyclesRatio);
 		}
 
-		if(PARAMS.model.equals("squareCircleLos")){
-			return squareCirclLosModel(xRequest, 1000);
+		if(PARAMS.model.equals("squareDiscLos")){
+			return squareDisclLosModel(xRequest, PARAMS.transferCyclesRatio);
 		}
 
 
 		if(PARAMS.model.equals("squareDiag")){
-			return squareDiagModel(xRequest, 1000);
+			return squareDiagModel(xRequest, PARAMS.transferCyclesRatio);
+		}
+
+		if(PARAMS.model.equals("squareDisc")){
+			return squareDiscModel(xRequest, PARAMS.transferCyclesRatio);
 		}
 
 
 		if(PARAMS.model.equals("squareSplitFixed")){
-			return jfsmaDynamicalModel(xRequest, 1000);
+			return jfsmaDynamicalModel(xRequest, PARAMS.transferCyclesRatio);
 		}
 
 		return model1(xRequest[0],xRequest[1]);
@@ -463,34 +467,40 @@ public class F_N_Manager implements StudiedSystem{
 		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1JFSMA2020(xRequest[0], xRequest[1]) : model2JFSMA2020(xRequest[0], xRequest[1]);
 	}
 
-	private double jfsmaDynamicalModel(Double[] xRequest, int cycleChange) {
-		if(cycle<cycleChange) {
+	private double jfsmaDynamicalModel(Double[] xRequest, double cycleChange) {
+		if(cycle<(PARAMS.nbLearningCycle-(2*PARAMS.nbLearningCycle*cycleChange))) {
 			return squareFixedJFSMA(xRequest);
 		}
 		else return (xRequest[0] > xRequest[1]) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
 	}
 
-	private double squareSplitDiagModel(Double[] xRequest, int cycleChange) {
-		if(cycle<cycleChange) return squareModel(xRequest);
-		else if(cycle<2*cycleChange) return splitModel(xRequest);
+	private double squareSplitDiagModel(Double[] xRequest, double cycleChange) {
+		if(cycle<(PARAMS.nbLearningCycle-(2*PARAMS.nbLearningCycle*cycleChange))) return squareModel(xRequest);
+		else if(cycle<(PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange))) return splitModel(xRequest);
 		else return diagModel(xRequest);
 	}
 
-	private double squareDiagCirclModel(Double[] xRequest, int cycleChange) {
-		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
-		else if(cycle<2*cycleChange) return diagFixedModel(xRequest);
+	private double squareDiagCirclModel(Double[] xRequest, double cycleChange) {
+		if(cycle<(PARAMS.nbLearningCycle-(2*PARAMS.nbLearningCycle*cycleChange))) return squareFixedJFSMA(xRequest);
+		else if(cycle<(PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange))) return diagFixedModel(xRequest);
 		else return circleFixedModel(xRequest);
 	}
 
-	private double squareCirclLosModel(Double[] xRequest, int cycleChange) {
-		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
-		else if(cycle<2*cycleChange) return circleFixedModel(xRequest);
+	private double squareDisclLosModel(Double[] xRequest, double cycleChange) {
+		//System.out.println(cycle + " " + (PARAMS.nbLearningCycle) + " " + (cycleChange) + " " + (PARAMS.nbLearningCycle-(2*PARAMS.nbLearningCycle*cycleChange)) +" "+ (PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange)));
+		if(cycle<(PARAMS.nbLearningCycle-(2*PARAMS.nbLearningCycle*cycleChange))) return squareFixedJFSMA(xRequest);
+		else if(cycle<(PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange))) return circleFixedModel(xRequest);
 		else return distanceToCenterbyNormFixedModel(xRequest,1);
 	}
 
-	private double squareDiagModel(Double[] xRequest, int cycleChange) {
-		if(cycle<cycleChange) return squareFixedJFSMA(xRequest);
+	private double squareDiagModel(Double[] xRequest, double cycleChange) {
+		if(cycle<(PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange))) return squareFixedJFSMA(xRequest);
 		else return diagFixedModel(xRequest);
+	}
+
+	private double squareDiscModel(Double[] xRequest, double cycleChange) {
+		if(cycle<(PARAMS.nbLearningCycle-(PARAMS.nbLearningCycle*cycleChange))) return squareFixedJFSMA(xRequest);
+		else return circleFixedModel(xRequest);
 	}
 
 	private double splitModel(Double[] xRequest) {

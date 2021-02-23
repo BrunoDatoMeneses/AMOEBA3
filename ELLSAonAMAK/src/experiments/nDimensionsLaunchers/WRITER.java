@@ -24,7 +24,11 @@ public class WRITER {
 
         List<String> dataStringsPrediction = Arrays.asList("predictionError", "predictionErrorDeviation");
 
-        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests", "rdmRequests","selfRequests", "exoRequests","endoRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests");
+        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests", "rdmRequests","selfRequests", "exoRequests","endoRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests",
+
+                "NCS_BAD_PREDICTION","NCS_USELESSNESS","NCS_CONFLICT","NCS_CONCURRENCY","NCS_UNPRODUCTIVITY","NCS_EXPANSION","NCS_CREATION");
+
+
 
         //List<String> dataStringsNCS =
 
@@ -34,7 +38,7 @@ public class WRITER {
 
         List<String> dataStringsOther = Arrays.asList("localMinima","nbAgents","generalizationScore","neighborsCounts",
                 "minPerceptionsExperiencedAverage","maxPerceptionsExperiencedAverage","minPerceptionsExperiencedDeviation","maxPerceptionsExperiencedDeviation",
-                "rangeExperienceAverage", "rangeExperienceDeviation");
+                "rangeExperienceAverage", "rangeExperienceDeviation","creationsWithNeighbor");
 
 
         ArrayList<List<String>> dataStrings = new ArrayList<>(Arrays.asList(dataStringsVolumes, dataStringsEndoRequests, dataStringsTimeExecution, dataStringsOther, dataStringsPrediction ));
@@ -151,6 +155,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("learningCycles", PARAMS.nbLearningCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("exploitatingCycles", PARAMS.nbExploitationCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("episodes", PARAMS.nbEpisodes +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("transferCycles", PARAMS.transferCyclesRatio +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("spaceSize", PARAMS.spaceSize*4+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("validityRangesPrecision", PARAMS.validityRangesPrecision +"")));
 
@@ -265,6 +270,17 @@ public class WRITER {
         data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
         data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
 
+        data.get("NCS_BAD_PREDICTION").add((double)requestCounts.get(REQUEST.NCS_BAD_PREDICTION));
+        data.get("NCS_USELESSNESS").add((double)requestCounts.get(REQUEST.NCS_USELESSNESS));
+        data.get("NCS_CONFLICT").add((double)requestCounts.get(REQUEST.NCS_CONFLICT));
+        data.get("NCS_CONCURRENCY").add((double)requestCounts.get(REQUEST.NCS_CONCURRENCY));
+        data.get("NCS_UNPRODUCTIVITY").add((double)requestCounts.get(REQUEST.NCS_UNPRODUCTIVITY));
+        data.get("NCS_EXPANSION").add((double)requestCounts.get(REQUEST.NCS_EXPANSION));
+        data.get("NCS_CREATION").add((double)requestCounts.get(REQUEST.NCS_CREATION));
+
+
+
+
 
         // Executions times
         data.get("learningCycleExecutionTime").add(averageLearningCycleTimeDouble);
@@ -291,6 +307,8 @@ public class WRITER {
         data.get("generalizationScore").add((double) (mappingScores.get("CTXT") / ellsa.getContexts().size()));
         data.get("localMinima").add((double) ellsa.data.countLocalMinina);
         data.get("neighborsCounts").add((double)ellsa.data.neighborsCounts/ellsa.getCycle());
+        data.get("creationsWithNeighbor").add((double)ellsa.data.requestCounts.get(REQUEST.CREATION_WITH_NEIGHBOR));
+
 
         ArrayList<Double> allPerceptMin = new ArrayList<>();
         ArrayList<Double> allPerceptMax = new ArrayList<>();

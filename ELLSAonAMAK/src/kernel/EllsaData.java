@@ -7,6 +7,7 @@ import java.util.HashMap;
 import agents.context.Context;
 import agents.head.DynamicPerformance;
 import agents.head.REQUEST;
+import agents.percept.INPUT;
 import agents.percept.Percept;
 import utils.Pair;
 
@@ -23,6 +24,7 @@ public class EllsaData implements Serializable {
 
 	//* DATA *//
 	public String nameID = null;
+	public INPUT currentINPUT = null;
 	
 	public int nPropositionsReceived;
 	public int averagePredictionCriticityWeight = 0;
@@ -193,6 +195,8 @@ public class EllsaData implements Serializable {
 
 	public boolean PARAM_isLearnFromNeighbors = false;
 	public boolean PARAM_isDream = false;
+
+	public boolean PARAM_isExploitationActive = false;
 
 	public int PARAM_DreamCycleLaunch = 1500;
 	public int STATE_DreamCompleted = -1; // -1 : before process / 0 : processing / 1 processed
