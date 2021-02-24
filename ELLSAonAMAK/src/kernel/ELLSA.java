@@ -14,9 +14,11 @@ import agents.context.localModel.TypeLocalModel;
 import agents.head.EndogenousRequest;
 import agents.head.Head;
 import agents.head.REQUEST;
+import agents.head.SITUATION;
 import agents.percept.INPUT;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.nDimensionsLaunchers.PARAMS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -137,6 +139,10 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		for(REQUEST rqt : REQUEST.values()){
 			data.requestCounts.put(rqt, 0);
 		}
+		for(SITUATION rqt : SITUATION.values()){
+			data.situationsCounts.put(rqt, 0);
+		}
+
 
 
 	}
@@ -239,6 +245,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			getScheduler().stop();
 			System.out.println(getHeadAgent().getMappingScores());
 			System.out.println(data.requestCounts);
+			System.out.println(data.situationsCounts);
 		}
 	}
 
@@ -281,15 +288,41 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			
 			perceptions = studiedSystem.getOutput();
 			
-			
-			if(perceptions.get("oracle")==null) {
-				data.useOracle = false;
-				data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
 
-			}else {
-				data.useOracle = true;
-				data.currentINPUT = INPUT.EXOGENOUS_LEARNING_SITUATION;
+			if(PARAMS.setActiveExploitation){
+				if(cycle< PARAMS.nbLearningCycle){
+					if(perceptions.get("oracle")==null) {
+						data.useOracle = false;
+						data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
+
+					}else {
+						data.useOracle = true;
+						data.currentINPUT = INPUT.EXOGENOUS_LEARNING_SITUATION;
+					}
+				}else {
+					if (perceptions.get("oracle") == null) {
+						data.useOracle = false;
+						data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
+
+					} else {
+						data.useOracle = false;
+						data.currentINPUT = INPUT.EXOGENOUS_EXPLOITATION;
+
+					}
+				}
+			}else{
+				if(perceptions.get("oracle")==null) {
+					data.useOracle = false;
+					data.currentINPUT = INPUT.ENDOGENOUS_EXPLOITATION;
+
+				}else {
+					data.useOracle = true;
+					data.currentINPUT = INPUT.EXOGENOUS_LEARNING_SITUATION;
+				}
 			}
+
+
+
 			
 		}
 		
@@ -331,19 +364,27 @@ public class ELLSA extends Amas<World> implements IELLSA {
 				data.selfLearning = false;
 				studiedSystem.setSelfLearning(true);
 				studiedSystem.setSelfRequest(head.getSelfRequest());
-				data.requestCounts.put(REQUEST.SELF,data.requestCounts.get(REQUEST.SELF)+1);
+				data.situationsCounts.put(SITUATION.ACTIVE_EXPLOITATION,data.situationsCounts.get(SITUATION.ACTIVE_EXPLOITATION)+1);
+				data.situationsCounts.put(SITUATION.ENDOGENOUS_EXPLOITATION,data.situationsCounts.get(SITUATION.ENDOGENOUS_EXPLOITATION)+1);
 				 
 			}
 			else if(data.activeLearning) {
 				data.activeLearning = false;
 				studiedSystem.setActiveLearning(true);
 				studiedSystem.setSelfRequest(head.getActiveRequest());
-				data.requestCounts.put(REQUEST.ACTIVE,data.requestCounts.get(REQUEST.ACTIVE)+1);
-				data.requestCounts.put(REQUEST.EXOGENOUS,data.requestCounts.get(REQUEST.EXOGENOUS)+1);
+				data.situationsCounts.put(SITUATION.ACTIVE_LEARNING,data.situationsCounts.get(SITUATION.ACTIVE_LEARNING)+1);
+				data.situationsCounts.put(SITUATION.EXOGENOUS_LEARNING,data.situationsCounts.get(SITUATION.EXOGENOUS_LEARNING)+1);
 			}else{
 
-				data.requestCounts.put(REQUEST.RDM,data.requestCounts.get(REQUEST.RDM)+1);
-				data.requestCounts.put(REQUEST.EXOGENOUS,data.requestCounts.get(REQUEST.EXOGENOUS)+1);
+
+				if(cycle<PARAMS.nbLearningCycle){
+					data.situationsCounts.put(SITUATION.RDM_LEARNING,data.situationsCounts.get(SITUATION.RDM_LEARNING)+1);
+					data.situationsCounts.put(SITUATION.EXOGENOUS_LEARNING,data.situationsCounts.get(SITUATION.EXOGENOUS_LEARNING)+1);
+				}else{
+					data.situationsCounts.put(SITUATION.RDM_EXPLOITATION,data.situationsCounts.get(SITUATION.RDM_EXPLOITATION)+1);
+					data.situationsCounts.put(SITUATION.EXOGENOUS_EXPLOITATION,data.situationsCounts.get(SITUATION.EXOGENOUS_EXPLOITATION)+1);
+				}
+
 			}
 		}
 		
@@ -964,7 +1005,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			if(getHeadAgent().currentEndogenousRequest != null){
 				((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setInfo(""+getHeadAgent().currentEndogenousRequest.getType());
 			}else{
-				((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setInfo(""+REQUEST.RDM);
+				((EllsaMultiUIWindow)amasMultiUIWindow).rectangle.setInfo(""+SITUATION.RDM_LEARNING);
 			}
 		}
 

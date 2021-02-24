@@ -10,7 +10,6 @@ import agents.context.VOID;
 import agents.percept.INPUT;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
@@ -2465,7 +2464,7 @@ public class Head extends EllsaAgent {
 				currentExp.setProposition(endogenousPrediction);
 				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CREATE CTXT WITHOUT ORACLE WITH NEIGHBORS", ""+this.getName())) );
 				context = new Context(getAmas(), endogenousPrediction);
-				getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+1);
+				getAmas().data.situationsCounts.put(SITUATION.ENDOGENOUS_LEARNING,getAmas().data.situationsCounts.get(SITUATION.ENDOGENOUS_LEARNING)+1);
 				getAmas().data.newContextWasCreated = true;
 			}
 

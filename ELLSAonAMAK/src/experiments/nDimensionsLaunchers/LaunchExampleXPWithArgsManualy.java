@@ -128,7 +128,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.transferCyclesRatio = 0.333;
 
-        PARAMS.nbEndoExploitationCycle = 250;
+        PARAMS.nbEndoExploitationCycle = 1000;
         PARAMS.setActiveExploitation = false;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
@@ -254,6 +254,8 @@ public class LaunchExampleXPWithArgsManualy {
 
         ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
+
+
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 
@@ -304,7 +306,8 @@ public class LaunchExampleXPWithArgsManualy {
             ellsa.data.PARAM_isExploitationActive = true;
 
             for (int i = 0; i < PARAMS.nbEndoExploitationCycle; ++i) {
-                studiedSystem.getErrorOnRequest(ellsa);
+                //studiedSystem.getErrorOnRequest(ellsa);
+                ellsa.cycle();
             }
 
             ellsa.data.PARAM_isExploitationActive = false;
@@ -351,7 +354,7 @@ public class LaunchExampleXPWithArgsManualy {
         System.out.println(ellsa.data.minMaxPerceptsStatesAfterBoostrap);
 
 
-        WRITER.setData(data, ellsa, mappingScores, requestCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
+        WRITER.setData(data, ellsa, mappingScores, requestCounts, ellsa.data.situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
 
 

@@ -119,6 +119,8 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 
 		ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
+		ellsa.data.PARAM_isExploitationActive = PARAMS.setActiveExploitation;
+
 		ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 

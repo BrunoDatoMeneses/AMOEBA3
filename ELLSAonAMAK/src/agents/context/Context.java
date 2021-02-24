@@ -7,18 +7,13 @@ import java.util.*;
 import agents.EllsaAgent;
 import agents.context.localModel.LocalModel;
 import agents.context.localModel.LocalModelMillerRegression;
-import agents.head.Criticalities;
-import agents.head.DynamicPerformance;
-import agents.head.EndogenousRequest;
-import agents.head.Head;
-import agents.head.REQUEST;
+import agents.head.*;
 import agents.percept.Percept;
 import gui.ContextRendererFX;
 import gui.RenderStrategy;
 import kernel.ELLSA;
 import ncs.NCS;
 import utils.Pair;
-import utils.RAND_NUM;
 import utils.TRACE_LEVEL;
 
 
@@ -1838,7 +1833,7 @@ public class Context extends EllsaAgent {
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_exogenousLearningWeight);
 			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
-			getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+1);
+			getAmas().data.situationsCounts.put(SITUATION.ENDOGENOUS_LEARNING,getAmas().data.situationsCounts.get(SITUATION.ENDOGENOUS_LEARNING)+1);
 			//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 
 
@@ -1977,7 +1972,7 @@ public class Context extends EllsaAgent {
 			if(!isLocalMinimum){
 				((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.PARAM_endogenousLearningWeight);
 				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-				getAmas().data.requestCounts.put(REQUEST.ENDOGENOUS,getAmas().data.requestCounts.get(REQUEST.ENDOGENOUS)+endoExperiments.size());
+				getAmas().data.situationsCounts.put(SITUATION.ENDOGENOUS_LEARNING,getAmas().data.situationsCounts.get(SITUATION.ENDOGENOUS_LEARNING)+endoExperiments.size());
 				setConfidenceVariation(endoExperiments.size()*0.01);
 				//confidence+=endoExperiments.size()*0.01;
 			}

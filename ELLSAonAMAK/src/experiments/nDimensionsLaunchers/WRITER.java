@@ -1,6 +1,7 @@
 package experiments.nDimensionsLaunchers;
 
 import agents.head.REQUEST;
+import agents.head.SITUATION;
 import agents.percept.Percept;
 import kernel.ELLSA;
 import utils.CSVWriter;
@@ -155,6 +156,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList("learningCycles", PARAMS.nbLearningCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("exploitatingCycles", PARAMS.nbExploitationCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("episodes", PARAMS.nbEpisodes +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("activeExploitationCycles", PARAMS.nbEndoExploitationCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("transferCycles", PARAMS.transferCyclesRatio +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("spaceSize", PARAMS.spaceSize*4+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("validityRangesPrecision", PARAMS.validityRangesPrecision +"")));
@@ -211,16 +213,19 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConflictNCS", PARAMS.setConflictDetection+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConcurenceNCS", PARAMS.setConcurrenceDetection+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setVoidDetection +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isSubVoidDetection", PARAMS.setSubVoidDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setFrontierRequest+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isFusionResolution", PARAMS.setFusionResolution+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isRetructureResolution", PARAMS.setRestructureResolution+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setFrontierRequest+"")));
+
+        xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isActiveExploitation", PARAMS.setActiveExploitation+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS PARAMS")));
@@ -236,7 +241,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
     }
 
-    public static void setData(HashMap<String, ArrayList<Double>> data, ELLSA ellsa, HashMap<String, Double> mappingScores, HashMap<REQUEST, Integer> requestCounts, double[] executionTimes, double predictionError, double predictionDispersion, double averageLearningCycleTimeDouble, double learningcycleTimeDispersionDouble, double averageExploitationCycleTimeDouble, double exploitationcycleTimeDispersionDouble) {
+    public static void setData(HashMap<String, ArrayList<Double>> data, ELLSA ellsa, HashMap<String, Double> mappingScores, HashMap<REQUEST, Integer> requestCounts, HashMap<SITUATION, Integer> situationCounts, double[] executionTimes, double predictionError, double predictionDispersion, double averageLearningCycleTimeDouble, double learningcycleTimeDispersionDouble, double averageExploitationCycleTimeDouble, double exploitationcycleTimeDispersionDouble) {
         // Volumes
         data.get("mappingScore").add(mappingScores.get("CTXT"));
         data.get("imprecisionScore").add(mappingScores.get("CONF") + mappingScores.get("CONC") + mappingScores.get("VOIDS"));
@@ -251,14 +256,20 @@ public class WRITER {
 
 
 
+        // Situations
+        data.get("rdmLearning").add((double)situationCounts.get(SITUATION.RDM_LEARNING));
+        data.get("rdmExploitation").add((double)situationCounts.get(SITUATION.RDM_EXPLOITATION));
+
+        data.get("activeLearning").add((double)situationCounts.get(SITUATION.ACTIVE_LEARNING));
+        data.get("activeExploitation").add((double)situationCounts.get(SITUATION.ACTIVE_EXPLOITATION));
+
+        data.get("exogenousExploitation").add((double)situationCounts.get(SITUATION.EXOGENOUS_EXPLOITATION));
+        data.get("endogenousExploitation").add((double)situationCounts.get(SITUATION.ENDOGENOUS_EXPLOITATION));
+
+        data.get("exogenousLearning").add((double)situationCounts.get(SITUATION.EXOGENOUS_LEARNING));
+        data.get("endogenousLearning").add((double)situationCounts.get(SITUATION.ENDOGENOUS_LEARNING));
+
         // Endo Requests
-        data.get("rdmRequests").add((double)requestCounts.get(REQUEST.RDM));
-        data.get("activeRequests").add((double)requestCounts.get(REQUEST.ACTIVE));
-        data.get("selfRequests").add((double)requestCounts.get(REQUEST.SELF));
-
-        data.get("exoRequests").add((double)requestCounts.get(REQUEST.EXOGENOUS));
-        data.get("endoRequests").add((double)requestCounts.get(REQUEST.ENDOGENOUS));
-
         data.get("conflictRequests").add((double)requestCounts.get(REQUEST.CONFLICT));
         data.get("concurrenceRequests").add((double)requestCounts.get(REQUEST.CONCURRENCE));
         data.get("frontierRequests").add((double)requestCounts.get(REQUEST.FRONTIER));

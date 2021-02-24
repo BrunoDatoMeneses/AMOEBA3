@@ -1,0 +1,25 @@
+package agents.head;
+
+import java.io.Serializable;
+
+public enum SITUATION implements Serializable {
+
+	RDM_LEARNING,
+	RDM_EXPLOITATION,
+
+	ACTIVE_LEARNING,
+	ACTIVE_EXPLOITATION,
+
+	EXOGENOUS_LEARNING,
+	EXOGENOUS_EXPLOITATION,
+	
+	ENDOGENOUS_LEARNING,
+	ENDOGENOUS_EXPLOITATION,
+
+	
+}
+
+	
+
+	
+

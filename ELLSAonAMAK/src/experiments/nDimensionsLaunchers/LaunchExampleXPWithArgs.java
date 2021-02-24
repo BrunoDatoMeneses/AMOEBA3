@@ -222,6 +222,8 @@ public class LaunchExampleXPWithArgs {
 
         ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
+
+
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
 
 
@@ -258,7 +260,8 @@ public class LaunchExampleXPWithArgs {
             ellsa.data.PARAM_isExploitationActive = true;
 
             for (int i = 0; i < PARAMS.nbEndoExploitationCycle; ++i) {
-                studiedSystem.getErrorOnRequest(ellsa);
+                //studiedSystem.getErrorOnRequest(ellsa);
+                ellsa.cycle();
             }
 
             ellsa.data.PARAM_isExploitationActive = false;
@@ -301,7 +304,7 @@ public class LaunchExampleXPWithArgs {
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
         System.out.println(ellsa.getContexts().size() + " Agents");*/
 
-        WRITER.setData(data, ellsa, mappingScores, requestCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
+        WRITER.setData(data, ellsa, mappingScores, requestCounts, ellsa.data.situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
 
         ellsa = null;

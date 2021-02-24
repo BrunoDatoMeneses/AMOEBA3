@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public enum REQUEST implements Serializable {
 
-	ACTIVE,
-	RDM,
-	SELF,
 	CONFLICT,
 	CONCURRENCE,
 	FRONTIER,
@@ -18,8 +15,7 @@ public enum REQUEST implements Serializable {
 	FUSION,
 	RESTRUCTURE,
 	CREATION_WITH_NEIGHBOR,
-	EXOGENOUS,
-	ENDOGENOUS,
+
 
 	NCS_BAD_PREDICTION,
 	NCS_USELESSNESS,

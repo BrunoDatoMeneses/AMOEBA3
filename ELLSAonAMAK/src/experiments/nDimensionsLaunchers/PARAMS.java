@@ -44,9 +44,10 @@ public class PARAMS {
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-    public static  int nbLearningCycle = 5000;
-    public static  int nbEndoExploitationCycle = 250;
+    public static  int nbLearningCycle = 1000;
+    public static  int nbEndoExploitationCycle = 1000;
     public static  int nbExploitationCycle = 250;
+    public static  boolean setActiveExploitation = true ;
     public static  int nbEpisodes = 1;
     public static  double transferCyclesRatio = 0.3;
 
@@ -113,9 +114,11 @@ public class PARAMS {
     /* LEARNING */
     public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;
+    public static  boolean setLearnFromNeighbors = true ;
 
-/*    public static  boolean setActiveLearning = false	;
-    public static  boolean setSelfLearning = true;*/
+    /*public static  boolean setActiveLearning = true	;
+    public static  boolean setSelfLearning = false;
+    public static  boolean setLearnFromNeighbors = false ;*/
 
 
 
@@ -144,9 +147,9 @@ public class PARAMS {
     public static  boolean setDream = true ;
     public static  int setDreamCycleLaunch = 2000 ;
 
-    public static  boolean setActiveExploitation = true ;
 
-    public static  boolean setLearnFromNeighbors = true ;
+
+
 
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
@@ -158,14 +161,15 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.CYCLE;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
 
 
     /* UI */
     public static boolean STOP_UI = true;
 //    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
-    public static int STOP_UI_cycle = setDreamCycleLaunch;
+//    public static int STOP_UI_cycle = setDreamCycleLaunch;
+    public static int STOP_UI_cycle = 1000;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

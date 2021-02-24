@@ -7,6 +7,7 @@ import java.util.HashMap;
 import agents.context.Context;
 import agents.head.DynamicPerformance;
 import agents.head.REQUEST;
+import agents.head.SITUATION;
 import agents.percept.INPUT;
 import agents.percept.Percept;
 import utils.Pair;
@@ -111,6 +112,7 @@ public class EllsaData implements Serializable {
 
 
 	public HashMap<REQUEST,Integer> requestCounts = new HashMap<>();
+	public HashMap<SITUATION,Integer> situationsCounts = new HashMap<>();
 
 	public int countLocalMinina = 0;
 
