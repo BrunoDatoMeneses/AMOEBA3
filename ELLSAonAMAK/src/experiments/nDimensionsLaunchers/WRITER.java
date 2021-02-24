@@ -25,7 +25,12 @@ public class WRITER {
 
         List<String> dataStringsPrediction = Arrays.asList("predictionError", "predictionErrorDeviation");
 
-        List<String> dataStringsEndoRequests = Arrays.asList("activeRequests", "rdmRequests","selfRequests", "exoRequests","endoRequests","conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests", "endogenousLearningSituations","fusionRequests","restructureRequests",
+        List<String> dataStringsEndoRequests = Arrays.asList("rdmLearning", "rdmExploitation",
+                "activeLearning", "activeExploitation",
+                "exogenousExploitation","endogenousExploitation",
+                "exogenousLearning","endogenousLearning",
+                "conflictRequests", "concurrenceRequests", "frontierRequests", "voidRequests","subvoidRequests", "modelRequests", "dreamRequests",
+                "neighborsRequest","fusionRequests","restructureRequests",
 
                 "NCS_BAD_PREDICTION","NCS_USELESSNESS","NCS_CONFLICT","NCS_CONCURRENCY","NCS_UNPRODUCTIVITY","NCS_EXPANSION","NCS_CREATION");
 
@@ -277,7 +282,7 @@ public class WRITER {
         data.get("subvoidRequests").add((double)requestCounts.get(REQUEST.SUBVOID));
         data.get("modelRequests").add((double)requestCounts.get(REQUEST.MODEL));
         data.get("dreamRequests").add((double)requestCounts.get(REQUEST.DREAM));
-        data.get("endogenousLearningSituations").add((double)requestCounts.get(REQUEST.NEIGHBOR));
+        data.get("neighborsRequest").add((double)requestCounts.get(REQUEST.NEIGHBOR));
         data.get("fusionRequests").add((double)requestCounts.get(REQUEST.FUSION));
         data.get("restructureRequests").add((double)requestCounts.get(REQUEST.RESTRUCTURE));
 

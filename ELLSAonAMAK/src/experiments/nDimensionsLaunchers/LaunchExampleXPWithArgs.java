@@ -5,6 +5,7 @@ package experiments.nDimensionsLaunchers;
 
 
 import agents.head.REQUEST;
+import agents.head.SITUATION;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -249,11 +250,12 @@ public class LaunchExampleXPWithArgs {
 			ellsa.cycle();
 		}*/
 
-        HashMap<String, Double> mappingScores = ellsa.getHeadAgent().getMappingScores();
-        HashMap<REQUEST, Integer> requestCounts = ellsa.data.requestCounts;
-        double[] executionTimes = ellsa.data.executionTimesSums;
+        HashMap<String, Double> mappingScores;
+        HashMap<REQUEST, Integer> requestCounts;
+        HashMap<SITUATION, Integer> situationsCounts;
+        double[] executionTimes;
 
-        ArrayList<Double> allPredictionErrors = new ArrayList<>();
+        ArrayList<Double> allPredictionErrors;
 
         if(PARAMS.setActiveExploitation){
 
@@ -266,6 +268,12 @@ public class LaunchExampleXPWithArgs {
 
             ellsa.data.PARAM_isExploitationActive = false;
 
+            mappingScores = ellsa.getHeadAgent().getMappingScores();
+            requestCounts = ellsa.data.requestCounts;
+            situationsCounts = ellsa.data.situationsCounts;
+            executionTimes = ellsa.data.executionTimesSums;
+            allPredictionErrors = new ArrayList<>();
+
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.currentTimeMillis();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
@@ -274,6 +282,13 @@ public class LaunchExampleXPWithArgs {
             }
 
         }else{
+
+            mappingScores = ellsa.getHeadAgent().getMappingScores();
+            requestCounts = ellsa.data.requestCounts;
+            situationsCounts = ellsa.data.situationsCounts;
+            executionTimes = ellsa.data.executionTimesSums;
+            allPredictionErrors = new ArrayList<>();
+
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.currentTimeMillis();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
@@ -304,7 +319,7 @@ public class LaunchExampleXPWithArgs {
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
         System.out.println(ellsa.getContexts().size() + " Agents");*/
 
-        WRITER.setData(data, ellsa, mappingScores, requestCounts, ellsa.data.situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
+        WRITER.setData(data, ellsa, mappingScores, requestCounts, situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
 
         ellsa = null;

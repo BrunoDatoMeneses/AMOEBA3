@@ -45,14 +45,14 @@ public class PARAMS {
     public static  int dimension = 4;*/
 
     public static  int nbLearningCycle = 1000;
-    public static  int nbEndoExploitationCycle = 1000;
+    public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
     public static  boolean setActiveExploitation = true ;
     public static  int nbEpisodes = 1;
     public static  double transferCyclesRatio = 0.3;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.04;
+    public static double validityRangesPrecision = 0.02;
 
     /* LEARNING */
 
@@ -131,7 +131,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;

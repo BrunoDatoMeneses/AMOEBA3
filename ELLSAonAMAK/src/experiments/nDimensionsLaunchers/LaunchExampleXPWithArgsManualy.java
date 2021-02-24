@@ -5,6 +5,7 @@ package experiments.nDimensionsLaunchers;
 
 
 import agents.head.REQUEST;
+import agents.head.SITUATION;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
@@ -297,6 +298,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         HashMap<String, Double> mappingScores = ellsa.getHeadAgent().getMappingScores();
         HashMap<REQUEST, Integer> requestCounts = ellsa.data.requestCounts;
+        HashMap<SITUATION, Integer> situationsCounts = ellsa.data.situationsCounts;
         double[] executionTimes = ellsa.data.executionTimesSums;
 
         ArrayList<Double> allPredictionErrors = new ArrayList<>();
@@ -345,6 +347,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         System.out.println(mappingScores);
         System.out.println(requestCounts);
+        System.out.println(situationsCounts);
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
         System.out.println(ellsa.getContexts().size() + " Agents");
 
@@ -354,7 +357,7 @@ public class LaunchExampleXPWithArgsManualy {
         System.out.println(ellsa.data.minMaxPerceptsStatesAfterBoostrap);
 
 
-        WRITER.setData(data, ellsa, mappingScores, requestCounts, ellsa.data.situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
+        WRITER.setData(data, ellsa, mappingScores, requestCounts, situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
 
 
