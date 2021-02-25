@@ -384,7 +384,18 @@ public class Head extends EllsaAgent {
 
 	private void updateCriticalityWithOracle() {
 		/* Compute the criticity. Will be used by context agents. */
-		getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+
+        if(getAmas().studiedSystem!=null){
+            Double[] request = new Double[getAmas().getPercepts().size()];
+            for(int i=0;i<getAmas().getPercepts().size();i++){
+                request[i]=getAmas().getPercepts().get(i).getValue();
+            }
+            double oracleValueWithoutVoid = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
+            getAmas().data.criticity = Math.abs(oracleValueWithoutVoid - getAmas().data.prediction)/ Math.abs(oracleValueWithoutVoid);
+        }else{
+            getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+        }
+
 		if(bestContext != null){
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),
 					"Best Context Cricicality",""+getAmas().data.criticity)));
@@ -401,7 +412,7 @@ public class Head extends EllsaAgent {
 				request[i]=getAmas().getPercepts().get(i).getValue();
 			}
 
-			getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).model(request);
+			getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
 			getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
 			//System.out.println("A " + getAmas().getCycle() + "\t\t\t" + getAmas().data.oracleValue + "\t\t\t" + getAmas().data.prediction + "\t\t\t" + getAmas().data.criticity);
 			if(bestContext != null){

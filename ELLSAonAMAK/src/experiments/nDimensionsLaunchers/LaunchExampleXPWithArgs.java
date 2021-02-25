@@ -102,9 +102,9 @@ public class LaunchExampleXPWithArgs {
         PARAMS.nbEndoExploitationCycle = Integer.parseInt(args[45]);
         PARAMS.setActiveExploitation = Boolean.parseBoolean(args[46]);
 
+        PARAMS.oracleNoiseRange = Double.parseDouble(args[47]);
 
-
-        PARAMS.extension = args[47];
+        PARAMS.extension = args[48];
 
 
 

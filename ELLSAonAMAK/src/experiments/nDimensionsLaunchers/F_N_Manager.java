@@ -198,6 +198,12 @@ public class F_N_Manager implements StudiedSystem{
 				x[i] = selfRequest.get("px" + i);
 			}
 			activeRequestCounts ++;
+			if(PARAMS.oracleNoiseRange>0.0){
+				for(int i = 0 ; i < dimension ; i++) {
+
+					x[i] = x[i] + addGaussianNoise();
+				}
+			}
 		}
 		else if(!randomExploration) {
 
@@ -214,8 +220,17 @@ public class F_N_Manager implements StudiedSystem{
 				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
 			randomRequestCounts++;
+
+			if(PARAMS.oracleNoiseRange>0.0){
+				for(int i = 0 ; i < dimension ; i++) {
+
+					x[i] = x[i] + addGaussianNoise();
+				}
+			}
 		}
-		
+
+
+
 		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
 		
 		return null;
@@ -333,9 +348,29 @@ public class F_N_Manager implements StudiedSystem{
 
 	
 	public double model(Double[] situation) {
-		
+
+		if(PARAMS.oracleNoiseRange>0.0){
+			return getModelOutput(situation) + addGaussianNoise();
+		}else{
+			return getModelOutput(situation);
+		}
+
+	}
+
+	private double addGaussianNoise() {
+		java.util.Random r = new java.util.Random();
+		return PARAMS.oracleNoiseRange * ((r.nextGaussian() * Math.pow(1, 1)));
+	}
+
+	public double modelWithoutNoise(Double[] situation) {
+
+			return getModelOutput(situation);
+
+	}
+
+	private double getModelOutput(Double[] situation) {
 		Double[] xRequest = new Double[dimension];
-		
+
 		if(situation == null) {
 			xRequest = x;
 		}else {
@@ -345,16 +380,16 @@ public class F_N_Manager implements StudiedSystem{
 			}
 			//xRequest = situation;
 		}
-		
+
 		double[] center =  new double[dimension];
 		center[0]=0.0;
 		center[1]=0.0;
 		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
 		//return squareSimpleModel(xRequest);
-		
+
 		int subzone = subzone2D(xRequest);
 
-		model=PARAMS.model;
+		model= PARAMS.model;
 		/* Multi */
 		if(PARAMS.model.equals("multi")){
 			return multiModelFixed(xRequest, subzone);
@@ -387,7 +422,7 @@ public class F_N_Manager implements StudiedSystem{
 		if(PARAMS.model.equals("triangle")){
 			return diagFixedModel(xRequest);
 		}
-		
+
 		/* Split */
 		if(PARAMS.model.equals("split")){
 			return splitModel(xRequest);
@@ -459,8 +494,6 @@ public class F_N_Manager implements StudiedSystem{
 		}
 
 		return model1(xRequest[0],xRequest[1]);
-
-
 	}
 
 	private double squareFixedJFSMA(Double[] xRequest) {

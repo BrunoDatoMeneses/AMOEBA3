@@ -17,9 +17,9 @@ public class PARAMS {
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-//    public static String model = "gaussianCos2";
+    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
-    public static String model = "cosSinX";
+//    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
 //    public static String model = "squareSplitTriangle";
 //    public static String model = "squareSplitFixed";
@@ -47,7 +47,7 @@ public class PARAMS {
     public static  int nbLearningCycle = 1000;
     public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
-    public static  boolean setActiveExploitation = true ;
+    public static  boolean setActiveExploitation = false ;
     public static  int nbEpisodes = 1;
     public static  double transferCyclesRatio = 0.3;
 
@@ -80,13 +80,13 @@ public class PARAMS {
 
     /* PREDICTION */
 //    public static  double modelErrorMargin = 1; //Multi
-    public static  double modelErrorMargin = 0.05; //SinCos
-    //public static  double modelErrorMargin = 1; // Goutte
+//    public static  double modelErrorMargin = 0.05; //SinCos
+    public static  double modelErrorMargin = 1; // Goutte
     //public static  double modelErrorMargin = 1; // Carré
 
 
     /* REGRESSION */
-    public static  double oracleNoiseRange = 0.0;
+    public static  double oracleNoiseRange = 10.0;
     public static  double exogenousLearningWeight = 0.1;
     public static  double endogenousLearningWeight = 0.1;
 
@@ -131,7 +131,7 @@ public class PARAMS {
     public static  boolean setVoidDetection = true ;
     public static  boolean setFusionResolution = true ;
     public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = false ; // ONLY ACTIVE LEARNING
+    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;
@@ -169,7 +169,7 @@ public class PARAMS {
     public static boolean STOP_UI = true;
 //    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
 //    public static int STOP_UI_cycle = setDreamCycleLaunch;
-    public static int STOP_UI_cycle = 1000;
+    public static int STOP_UI_cycle = 2000;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

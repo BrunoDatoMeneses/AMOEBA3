@@ -1,5 +1,7 @@
 package experiments.tests;
 
+import experiments.nDimensionsLaunchers.PARAMS;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
@@ -29,8 +31,7 @@ public class test {
         System.out.println(counterAsString);
     }
 
-    public static void main(String[] args) {
-
+    private static void testNestedLoop() {
         int depth = 3;
         int[] length = new int[depth];
         int[] counters = new int[depth];
@@ -38,6 +39,20 @@ public class test {
         Arrays.fill(length,2);
 
         nestedLoopOperation(counters, length, 0);
+    }
+
+    private static double addGaussianNoise() {
+        java.util.Random r = new java.util.Random();
+        return 10.0 * ((r.nextGaussian() * Math.pow(1, 1)) );
+    }
+
+    public static void main(String[] args) {
+
+        for(int i =0;i<10;i++){
+            System.out.println(addGaussianNoise());
+        }
 
     }
+
+
 }

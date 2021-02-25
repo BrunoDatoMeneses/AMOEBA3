@@ -45,19 +45,24 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 1000;
+        PARAMS.nbLearningCycle = 2000;
         PARAMS.nbExploitationCycle = 250;
         PARAMS.nbEpisodes = 1;
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  0.05;
+        PARAMS.validityRangesPrecision =  0.02;
         PARAMS.neighborhoodRadiusCoefficient = 2;
         PARAMS.influenceRadiusCoefficient = 0.50;
-        PARAMS.modelErrorMargin = 0.05;
+        PARAMS.modelErrorMargin = 1.0;
 
         // Learning
         PARAMS.setActiveLearning = false;
         PARAMS.setSelfLearning = true;
+        PARAMS.setLearnFromNeighbors = true;
+
+/*        PARAMS.setActiveLearning = true;
+        PARAMS.setSelfLearning = false;
+        PARAMS.setLearnFromNeighbors = false;*/
 
         //NCS
 
@@ -74,7 +79,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setDream = false;
         PARAMS.setDreamCycleLaunch = 1500;
 
-        PARAMS.setLearnFromNeighbors = true;
+
         PARAMS.setisCreationWithNeighbor = true;
 
         PARAMS.nbOfNeighborForLearningFromNeighbors = 1;
@@ -89,9 +94,9 @@ public class LaunchExampleXPWithArgsManualy {
 //        PARAMS.model = "triangle";
 //        PARAMS.model = "gaussian";
 //        PARAMS.model = "polynomial";
-//        PARAMS.model = "gaussianCos2";
+        PARAMS.model = "gaussianCos2";
 //        PARAMS.model = "cosX";
-        PARAMS.model = "cosSinX";
+//        PARAMS.model = "cosSinX";
 //        PARAMS.model = "rosenbrock";
 //        PARAMS.model = "squareSplitTriangle";
 //        PARAMS.model = "squareSplitFixed";
@@ -131,6 +136,8 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbEndoExploitationCycle = 1000;
         PARAMS.setActiveExploitation = false;
+
+        PARAMS.oracleNoiseRange = 10.0;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 

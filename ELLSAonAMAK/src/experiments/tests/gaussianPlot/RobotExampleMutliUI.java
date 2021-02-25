@@ -80,7 +80,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 				double ramdomGaussianPosition;
 				for(int i=1;i<=20;i++){
 					rangeLength = Math.pow((double)i/5,4);
-					ramdomGaussianPosition = (r.nextGaussian() * Math.pow((rangeLength/(2*30)),1)) + rangeCenter;
+					ramdomGaussianPosition = (r.nextGaussian() * Math.pow((0.1*rangeLength/(2*3)),1)) + rangeCenter;
 
 					//ramdomGaussianPosition = Math.pow(r.nextGaussian() , Math.pow((rangeLength/10),2));
 					getAmas().getVuiErrorDispersion().createAndAddCircle(ramdomGaussianPosition, -(2*i)*2,0.001);
