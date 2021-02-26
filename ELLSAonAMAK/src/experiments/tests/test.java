@@ -43,7 +43,7 @@ public class test {
 
     private static double addGaussianNoise() {
         java.util.Random r = new java.util.Random();
-        return 10.0 * ((r.nextGaussian() * Math.pow(1, 1)) );
+        return ((r.nextGaussian() * Math.pow(5, 1)) );
     }
 
     public static void main(String[] args) {

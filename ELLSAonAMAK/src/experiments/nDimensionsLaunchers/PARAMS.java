@@ -44,10 +44,10 @@ public class PARAMS {
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-    public static  int nbLearningCycle = 1000;
+    public static  int nbLearningCycle = 2000;
     public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
-    public static  boolean setActiveExploitation = false ;
+    public static  boolean setActiveExploitation = true ;
     public static  int nbEpisodes = 1;
     public static  double transferCyclesRatio = 0.3;
 
@@ -86,7 +86,7 @@ public class PARAMS {
 
 
     /* REGRESSION */
-    public static  double oracleNoiseRange = 10.0;
+    public static  double noiseRange = 0.0;
     public static  double exogenousLearningWeight = 0.1;
     public static  double endogenousLearningWeight = 0.1;
 
@@ -112,14 +112,13 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static  boolean setActiveLearning = false	;
+    /*public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;
-    public static  boolean setLearnFromNeighbors = true ;
+    public static  boolean setLearnFromNeighbors = true ;*/
 
-    /*public static  boolean setActiveLearning = true	;
+    public static  boolean setActiveLearning = true	;
     public static  boolean setSelfLearning = false;
-    public static  boolean setLearnFromNeighbors = false ;*/
-
+    public static  boolean setLearnFromNeighbors = false ;
 
 
 

@@ -198,12 +198,7 @@ public class F_N_Manager implements StudiedSystem{
 				x[i] = selfRequest.get("px" + i);
 			}
 			activeRequestCounts ++;
-			if(PARAMS.oracleNoiseRange>0.0){
-				for(int i = 0 ; i < dimension ; i++) {
 
-					x[i] = x[i] + addGaussianNoise();
-				}
-			}
 		}
 		else if(!randomExploration) {
 
@@ -221,12 +216,7 @@ public class F_N_Manager implements StudiedSystem{
 			}
 			randomRequestCounts++;
 
-			if(PARAMS.oracleNoiseRange>0.0){
-				for(int i = 0 ; i < dimension ; i++) {
 
-					x[i] = x[i] + addGaussianNoise();
-				}
-			}
 		}
 
 
@@ -349,7 +339,7 @@ public class F_N_Manager implements StudiedSystem{
 	
 	public double model(Double[] situation) {
 
-		if(PARAMS.oracleNoiseRange>0.0){
+		if(PARAMS.noiseRange >0.0){
 			return getModelOutput(situation) + addGaussianNoise();
 		}else{
 			return getModelOutput(situation);
@@ -357,9 +347,9 @@ public class F_N_Manager implements StudiedSystem{
 
 	}
 
-	private double addGaussianNoise() {
+	public double addGaussianNoise() {
 		java.util.Random r = new java.util.Random();
-		return PARAMS.oracleNoiseRange * ((r.nextGaussian() * Math.pow(1, 1)));
+		return ((r.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
 	}
 
 	public double modelWithoutNoise(Double[] situation) {
@@ -939,6 +929,16 @@ private double[] subZoneCenter3D(int nb) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
 		result = model(null);
+
+		if(PARAMS.noiseRange >0.0){
+			for(int i = 0 ; i < dimension ; i++) {
+
+				if(!selfLearning){
+					x[i] = x[i] + addGaussianNoise();
+				}
+
+			}
+		}
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -1127,7 +1127,7 @@ private double[] subZoneCenter3D(int nb) {
 			x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
 		}
 		HashMap<String, Double> out = new HashMap<String, Double>();
-		double oracleValue = model(null);
+		double oracleValue = modelWithoutNoise(null);
 		for(int i = 0; i<dimension; i++) {
 
 			out.put("px" + i,x[i]);

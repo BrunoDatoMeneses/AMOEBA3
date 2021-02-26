@@ -119,7 +119,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
         PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
 
-        PARAMS.perceptionsGenerationCoefficient = 0.1;
+        PARAMS.perceptionsGenerationCoefficient = 0.005;
 
         PARAMS.modelSimilarityThreshold = 0.001;
 
@@ -134,10 +134,10 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.transferCyclesRatio = 0.333;
 
-        PARAMS.nbEndoExploitationCycle = 1000;
+        PARAMS.nbEndoExploitationCycle = 0;
         PARAMS.setActiveExploitation = false;
 
-        PARAMS.oracleNoiseRange = 10.0;
+        PARAMS.noiseRange = 20.0;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
@@ -192,7 +192,7 @@ public class LaunchExampleXPWithArgsManualy {
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
         ELLSA ellsa = new ELLSA(null,  null);
-        StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+        StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/"+PARAMS.configFile);

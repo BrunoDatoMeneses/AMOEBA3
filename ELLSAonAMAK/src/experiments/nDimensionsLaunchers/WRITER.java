@@ -190,7 +190,7 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.oracleNoiseRange+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.noiseRange +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("exogenousLearningWeight", PARAMS.exogenousLearningWeight +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("endogenousLearningWeight", PARAMS.endogenousLearningWeight +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("perceptionsGenerationCoefficient", PARAMS.perceptionsGenerationCoefficient+"")));

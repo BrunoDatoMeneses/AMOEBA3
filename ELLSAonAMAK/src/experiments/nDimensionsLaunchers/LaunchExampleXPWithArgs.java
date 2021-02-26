@@ -102,7 +102,7 @@ public class LaunchExampleXPWithArgs {
         PARAMS.nbEndoExploitationCycle = Integer.parseInt(args[45]);
         PARAMS.setActiveExploitation = Boolean.parseBoolean(args[46]);
 
-        PARAMS.oracleNoiseRange = Double.parseDouble(args[47]);
+        PARAMS.noiseRange = Double.parseDouble(args[47]);
 
         PARAMS.extension = args[48];
 
@@ -153,7 +153,7 @@ public class LaunchExampleXPWithArgs {
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
         ELLSA ellsa = new ELLSA(null,  null);
-        StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+        StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/"+PARAMS.configFile);

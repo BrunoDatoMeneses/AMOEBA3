@@ -50,7 +50,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 
 
 		ellsa = new ELLSA(null,  null);
-		studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+		studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
 		ellsa.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
@@ -114,7 +114,7 @@ public class F_N_LauncherUIJFSMA2020 extends Application implements Serializable
 		amoebaVUI = new VUIMulti("2D");
 		amoebaUI = new EllsaMultiUIWindow("ELLSA", amoebaVUI, null);
 		ELLSA ellsa2 = new ELLSA(amoebaUI,  amoebaVUI);
-		StudiedSystem studiedSystem2 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+		StudiedSystem studiedSystem2 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
 		ellsa2.setStudiedSystem(studiedSystem2);
 		IBackupSystem backupSystem2 = new BackupSystem(ellsa2);
 		File file2 = new File("resources/"+PARAMS.configFile);

@@ -4,6 +4,7 @@ import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
 import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.nDimensionsLaunchers.PARAMS;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -220,7 +221,14 @@ public class View3D {
             while(y<=yEnd){
                 z = (float)model(x,y);
 
-                points[i] = new Coord3d(x, y, z);
+
+                if(PARAMS.noiseRange >0.0){
+                    points[i] = new Coord3d(x +addGaussianNoise(), y + addGaussianNoise(), z);
+                }else{
+                    points[i] = new Coord3d(x, y, z);
+                }
+
+
                 colors[i] = getColor((float)ellsa.multiUIWindow.guiData.minPrediction,(float)ellsa.multiUIWindow.guiData.maxPrediction, z);
 
 
@@ -240,6 +248,11 @@ public class View3D {
         chart.getScene().add(scatter);
 
         return chart;
+    }
+
+    public float addGaussianNoise() {
+        java.util.Random r = new java.util.Random();
+        return (float)((r.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
     }
 
     public AWTChart getContextModelWithsPolygonsPlotChart(JavaFXChartFactory factory, String toolkit){

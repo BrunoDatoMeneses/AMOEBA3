@@ -179,7 +179,7 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
 		xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Noise",PARAMS.oracleNoiseRange+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Noise",PARAMS.noiseRange +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed",PARAMS.exogenousLearningWeight +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Regression points",PARAMS.regressionPoints+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
@@ -212,7 +212,7 @@ public class F_N_Launcher implements Serializable {
 
 	private static void ellsaTest(HashMap<String, ArrayList<Double>> data) {
 		ELLSA ellsa = new ELLSA(null,  null);
-		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+		StudiedSystem studiedSystem = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
 		ellsa.setStudiedSystem(studiedSystem);
 		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
