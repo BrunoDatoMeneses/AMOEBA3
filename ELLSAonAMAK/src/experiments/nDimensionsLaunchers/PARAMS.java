@@ -47,12 +47,12 @@ public class PARAMS {
     public static  int nbLearningCycle = 2000;
     public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
-    public static  boolean setActiveExploitation = true ;
+    public static  boolean setActiveExploitation = false ;
     public static  int nbEpisodes = 1;
     public static  double transferCyclesRatio = 0.3;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.02;
+    public static double validityRangesPrecision = 0.04;
 
     /* LEARNING */
 

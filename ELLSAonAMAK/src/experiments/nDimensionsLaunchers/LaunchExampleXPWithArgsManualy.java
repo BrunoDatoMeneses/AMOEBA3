@@ -47,22 +47,22 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbLearningCycle = 2000;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 10;
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  0.02;
+        PARAMS.validityRangesPrecision =  0.04;
         PARAMS.neighborhoodRadiusCoefficient = 2;
         PARAMS.influenceRadiusCoefficient = 0.50;
         PARAMS.modelErrorMargin = 1.0;
 
         // Learning
-        PARAMS.setActiveLearning = false;
+ /*       PARAMS.setActiveLearning = false;
         PARAMS.setSelfLearning = true;
-        PARAMS.setLearnFromNeighbors = true;
+        PARAMS.setLearnFromNeighbors = true;*/
 
-/*        PARAMS.setActiveLearning = true;
+        PARAMS.setActiveLearning = true;
         PARAMS.setSelfLearning = false;
-        PARAMS.setLearnFromNeighbors = false;*/
+        PARAMS.setLearnFromNeighbors = false;
 
         //NCS
 
@@ -72,7 +72,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setVoidDetection = true;
         PARAMS.setFusionResolution = true;
         PARAMS.setRestructureResolution = true;
-        PARAMS.setFrontierRequest = true;
+        PARAMS.setFrontierRequest = false;
 
         PARAMS.setSubVoidDetection = false;
 
@@ -119,7 +119,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
         PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
 
-        PARAMS.perceptionsGenerationCoefficient = 0.005;
+        PARAMS.perceptionsGenerationCoefficient = 0.1;
 
         PARAMS.modelSimilarityThreshold = 0.001;
 
@@ -137,7 +137,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.nbEndoExploitationCycle = 0;
         PARAMS.setActiveExploitation = false;
 
-        PARAMS.noiseRange = 20.0;
+        PARAMS.noiseRange = 0.0;
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
