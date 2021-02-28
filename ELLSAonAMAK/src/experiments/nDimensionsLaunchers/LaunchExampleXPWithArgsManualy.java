@@ -42,8 +42,8 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 4;
         PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
 
-        /*PARAMS.dimension = 5;
-        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
+        PARAMS.dimension = 5;
+        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";
 
         PARAMS.nbLearningCycle = 2000;
         PARAMS.nbExploitationCycle = 250;
@@ -72,7 +72,7 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setVoidDetection = true;
         PARAMS.setFusionResolution = true;
         PARAMS.setRestructureResolution = true;
-        PARAMS.setFrontierRequest = false;
+        PARAMS.setFrontierRequest = true;
 
         PARAMS.setSubVoidDetection = false;
 
