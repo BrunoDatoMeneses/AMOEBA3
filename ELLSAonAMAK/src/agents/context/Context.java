@@ -934,8 +934,8 @@ public class Context extends EllsaAgent {
 			
 			if(bounds.get(pct) != null) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
-				//request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
-				request.put(pct, (bounds.get(pct).getA() + Math.random()* (bounds.get(pct).getB() - bounds.get(pct).getA()))   );
+				request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
+//				request.put(pct, (bounds.get(pct).getA() + Math.random()* (bounds.get(pct).getB() - bounds.get(pct).getA()))   );
 			}else {
 				getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}

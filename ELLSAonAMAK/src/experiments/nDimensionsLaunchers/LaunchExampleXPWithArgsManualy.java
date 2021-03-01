@@ -42,15 +42,15 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 4;
         PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
 
-        PARAMS.dimension = 5;
-        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";
+        /*PARAMS.dimension = 5;
+        PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 2000;
+        PARAMS.nbLearningCycle = 500;
         PARAMS.nbExploitationCycle = 250;
         PARAMS.nbEpisodes = 10;
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  0.04;
+        PARAMS.validityRangesPrecision =  0.1;
         PARAMS.neighborhoodRadiusCoefficient = 2;
         PARAMS.influenceRadiusCoefficient = 0.50;
         PARAMS.modelErrorMargin = 1.0;
@@ -71,8 +71,8 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setConcurrenceDetection = true;
         PARAMS.setVoidDetection = true;
         PARAMS.setFusionResolution = true;
-        PARAMS.setRestructureResolution = true;
-        PARAMS.setFrontierRequest = true;
+        PARAMS.setRestructureResolution = false;
+        PARAMS.setFrontierRequest = false;
 
         PARAMS.setSubVoidDetection = false;
 
@@ -90,11 +90,11 @@ public class LaunchExampleXPWithArgsManualy {
 //        PARAMS.model = "multi";
 //        PARAMS.model = "disc";
 //        PARAMS.model = "square";
-//        PARAMS.model = "squareFixed";
+        PARAMS.model = "squareFixed";
 //        PARAMS.model = "triangle";
 //        PARAMS.model = "gaussian";
 //        PARAMS.model = "polynomial";
-        PARAMS.model = "gaussianCos2";
+//        PARAMS.model = "gaussianCos2";
 //        PARAMS.model = "cosX";
 //        PARAMS.model = "cosSinX";
 //        PARAMS.model = "rosenbrock";
