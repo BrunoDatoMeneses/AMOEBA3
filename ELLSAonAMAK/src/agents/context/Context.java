@@ -86,23 +86,23 @@ public class Context extends EllsaAgent {
 		super(ellsa);
 
 
-		getAmas().data.executionTimes[21]=System.currentTimeMillis();
+		getAmas().data.executionTimes[21]=System.nanoTime();
 		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
 		}else{
 			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
 		}
-		getAmas().data.executionTimes[21]=System.currentTimeMillis()- getAmas().data.executionTimes[21];
+		getAmas().data.executionTimes[21]=System.nanoTime()- getAmas().data.executionTimes[21];
 
 		buildContext();
 		setConfidence(0.0);
 
-		getAmas().data.executionTimes[22]=System.currentTimeMillis();
+		getAmas().data.executionTimes[22]=System.nanoTime();
 		criticalities = new Criticalities(5);
 		regressionPerformance = new DynamicPerformance(successesBeforeDiminution, errorsBeforeAugmentation, getAmas().getHeadAgent().getPredicionPerformanceIndicator(), augmentationFactorError, diminutionFactorError, minError);
 		getAmas().getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("CTXT CREATION", this.getName())));
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
-		getAmas().data.executionTimes[22]=System.currentTimeMillis()- getAmas().data.executionTimes[22];
+		getAmas().data.executionTimes[22]=System.nanoTime()- getAmas().data.executionTimes[22];
 	}
 
 	// FOR TEST ONLY
@@ -173,7 +173,7 @@ public class Context extends EllsaAgent {
 	 * Builds the context.
 	 */
 	private void buildContext() {
-		getAmas().data.executionTimes[20]=System.currentTimeMillis();
+		getAmas().data.executionTimes[20]=System.nanoTime();
 
 		buildContextCommon();
 
@@ -235,7 +235,7 @@ public class Context extends EllsaAgent {
 
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
 
-		getAmas().data.executionTimes[20]=System.currentTimeMillis()- getAmas().data.executionTimes[20];
+		getAmas().data.executionTimes[20]=System.nanoTime()- getAmas().data.executionTimes[20];
 	}
 
 	private Range initRange(Percept p, Pair<Double, Double> radiuses) {

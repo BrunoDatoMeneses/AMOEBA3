@@ -3,94 +3,70 @@ package experiments.roboticDistributedArm;
 import utils.TRACE_LEVEL;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class PARAMS {
 
-    public static String model = "DISTRIBUTED_ROBOT";
-
-    public static int nbLearningCycle = 50;
-    public static int nbExploitationCycle = 10000;
-    public static int nbepisodes = 1;
-
-    public static double mappingErrorAllowed = 0.02;
-    public static int neighborhoodMultiplicator = 2;
-    public static  int requestControlCycles = 10;
-
-    public static boolean isOrientationGoal = true;
-
-    /* PREDICTION */
-    public static  double setRegressionPerformance = 1;
-
-    public static double armBaseSize = 300.0;
-
+    public static String model = "robotArmDist";
 
     public static int nbJoints = 5;
     public static  int dimension = nbJoints +1;
     public static  String configFile = "";
     public static  ArrayList subPercepts = new ArrayList<>();
 
-    /*public static  String configFile = "30jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 31;
-    public static int nbJoints = 30;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
-            "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
-            "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
-            "ptheta16", "ptheta17", "ptheta18", "ptheta19",
-            "ptheta20","ptheta21", "ptheta22", "ptheta23", "ptheta24", "ptheta25",
-            "ptheta26", "ptheta27", "ptheta28", "ptheta29")  );*/
+    public static int nbLearningCycle = 50;
+    public static int nbExploitationCycle = 100;
+    public static int nbepisodes = 1;
+    public static  int requestControlCycles = 10;
 
-    /*public static  String configFile = "20jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 21;
-    public static int nbJoints = 20;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3",
-            "ptheta4", "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9",
-            "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
-            "ptheta16", "ptheta17", "ptheta18", "ptheta19")  );*/
-
-    /*public static  String configFile = "10jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 11;
-    public static int nbJoints = 10;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
-    "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));*/
-
-    /*public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 7;
-    public static int nbJoints = 6;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
-            "ptheta5"));
-*/
-
-    /*public static  String configFile = "3jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 4;
-    public static int nbJoints = 3;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));*/
-
-    /*public static  String configFile = "2jointsRobot3DimensionsLauncher.xml";
-    public static  int dimension = 3;
-    public static int nbJoints = 2;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
-
-    /*public static  String configFile = "2jointsRobot2DimensionsLauncher.xml";
-    public static  int dimension = 2;
-    public static int nbJoints = 2;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
-
-    /*public static  String configFile = "1jointRobot2DimensionsLauncher.xml";
-    public static  int dimension = 2;
-    public static int nbJoints = 1;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
-
-    /*public static  String configFile = "threeDimensionsLauncher.xml";
-    public static  int dimension = 3;*/
+    public static boolean isOrientationGoal = true;
 
     public static double spaceSize = 50.0	;
+    public static double validityRangesPrecision = 0.02;
+
+    /* LEARNING */
+
+    public static double LEARNING_WEIGHT_ACCURACY = 1.0;
+    public static double LEARNING_WEIGHT_PROXIMITY = 0.0;
+    public static double LEARNING_WEIGHT_EXPERIENCE = 1.0;
+    public static double LEARNING_WEIGHT_GENERALIZATION = 1.0;
+
+    /* EXPLOITATION */
+
+    public static double EXPLOITATION_WEIGHT_PROXIMITY = 1.0;
+    public static double EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
+    public static double EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
+
+
+    /* NEIGHBORHOOD */
+
+    public static int neighborhoodRadiusCoefficient = 2;
+    public static  double influenceRadiusCoefficient = 0.5;
+    public static double maxRangeRadiusCoefficient = 2.0;
+    public static double rangeSimilarityCoefficient = 0.375;
+    public static double minimumRangeCoefficient = 0.25;
+
+    /* PREDICTION */
+    public static  double modelErrorMargin = 1;
+    public static double armBaseSize = 300.0;
+
+
+
+
+
+
+
 
 
     /* REGRESSION */
-    public static  double oracleNoiseRange = 0.5;
-    public static  double learningSpeed = 0.1;
-    public static  int regressionPoints = (int)(1/learningSpeed);
+    public static  double noiseRange = 0.0;
+    public static  double exogenousLearningWeight = 0.1;
+    public static  double endogenousLearningWeight = 0.1;
+    public static double perceptionsGenerationCoefficient = 0.1;
+
+    public static double modelSimilarityThreshold = 0.001;
+
+
+    public static  int regressionPoints = (int)(1/ exogenousLearningWeight);
 
     /* XP */
     public static  int nbOfModels = 2	;
@@ -103,10 +79,12 @@ public class PARAMS {
     public static  double explorationIncrement = 2.0	;
     public static  double explorationWidht = 0.75	;
 
+    public static  int setbootstrapCycle = 10;
 
     /* LEARNING */
     public static  boolean setActiveLearning = false	;
-    public static  boolean setSelfLearning = true ;//!setActiveLearning;
+    public static  boolean setSelfLearning = true;
+    public static  boolean setLearnFromNeighbors = true ;
 
     public static  boolean setAutonomousMode = true ;
 
@@ -115,27 +93,35 @@ public class PARAMS {
 
 
     /*NCS*/
-    public static  boolean setVoidDetection = false ; // OLD VOID
+//    public static  boolean setVoidDetection = false ; // OLD VOID
 
+    public static  boolean setSelfModelRequest = true ;
     public static  boolean setConflictDetection = true ;
     public static  boolean setConflictResolution = setConflictDetection ;
+
     public static  boolean setConcurrenceDetection = true ;
     public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static  boolean setVoidDetection2 = false ;
+
+    public static  boolean setVoidDetection = false ;
+
+
     public static  boolean setSubVoidDetection = false ;
     public static  boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
-    public static  boolean setSelfModelRequest = true ;
-    public static  boolean setCoopLearning = false ; // WITHOUT ORACLE
+
+    public static  boolean setisCreationWithNeighbor = true;
+
+    public static boolean isAllContextSearchAllowedForLearning = true;
+    public static boolean isAllContextSearchAllowedForExploitation = true;
 
     public static  boolean setDream = false ;
+    public static  int setDreamCycleLaunch = 5000 ;
 
-    public static  boolean setLearnFromNeighbors = false ;
 
     public static  int nbOfNeighborForCoopLearning = 6;
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
-    public static  int nbOfNeighborForContexCreationWithouOracle = 100;
-    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 500;
+    public static  int nbOfNeighborForContexCreationWithouOracle = 7;
+    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 7;
 
 
     /*UI*/
@@ -143,5 +129,7 @@ public class PARAMS {
 
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
+    //TODO à supprimer
+    public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE
 
 }

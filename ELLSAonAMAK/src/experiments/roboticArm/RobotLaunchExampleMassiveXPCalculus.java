@@ -88,7 +88,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
 	public static void main (String[] args)  {
 
 	    TRACE.minLevel = TRACE_LEVEL.OFF;
-        PARAMS.nbTest = 15;
+        PARAMS.nbEpisodes = 15;
         PARAMS.armBaseSize = 50.0;
 
         ArrayList<Integer> neighborhoodMultiplicators = new ArrayList<>(Arrays.asList(0));
@@ -109,10 +109,10 @@ public class RobotLaunchExampleMassiveXPCalculus {
                             System.out.print("trainingCycle " + trainingCycle + " ");
                             System.out.print("jointNb " + jointNb + " ");
 
-                            PARAMS.mappingErrorAllowed = mappingError;
-                            PARAMS.neighborhoodMultiplicator = neighborhoodMultiplicator;
-                            PARAMS.nbRequestCycle = requestCycle;
-                            PARAMS.nbTrainingCycle = trainingCycle;
+                            PARAMS.validityRangesPrecision = mappingError;
+                            PARAMS.neighborhoodRadiusCoefficient = neighborhoodMultiplicator;
+                            PARAMS.nbExploitationCycle = requestCycle;
+                            PARAMS.nbLearningCycle = trainingCycle;
                             PARAMS.nbJoints = jointNb;
                             PARAMS.dimension = jointNb + 1;
 
@@ -158,9 +158,9 @@ public class RobotLaunchExampleMassiveXPCalculus {
             String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 
             xpCSV = new CSVWriter(dateAndHour+"_Dim_"+ PARAMS.dimension
-                    +"_LearningCycles_" + PARAMS.nbTrainingCycle
-                    +"_ExplotationCycles_" + PARAMS.nbRequestCycle
-                    +"_Episodes_" + PARAMS.nbTest
+                    +"_LearningCycles_" + PARAMS.nbLearningCycle
+                    +"_ExplotationCycles_" + PARAMS.nbExploitationCycle
+                    +"_Episodes_" + PARAMS.nbEpisodes
                     +"_Joints_" + PARAMS.nbJoints
                     +"_Dimensions_" + PARAMS.dimension
                     +"_Notes_" + PARAMS.model
@@ -196,13 +196,13 @@ public class RobotLaunchExampleMassiveXPCalculus {
 
             double start = System.currentTimeMillis();
 
-            for (int i = 0; i < PARAMS.nbTest; ++i) {
+            for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
                     //System.out.print(i + " ");
                     learningEpisode(data);
             }
             //System.out.println(" ");
             double total = (System.currentTimeMillis()- start)/1000;
-            double mean = total/ PARAMS.nbTest;
+            double mean = total/ PARAMS.nbEpisodes;
             //System.out.println("[TIME MEAN] " + mean + " s");
             //System.out.println("[TIME TOTAL] " + total + " s");
 
@@ -294,11 +294,11 @@ public class RobotLaunchExampleMassiveXPCalculus {
     }
 
         private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
-                StudiedSystem studiedSystemTheta0 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+                StudiedSystem studiedSystemTheta0 = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
                 ELLSA ellsaTheta0 = new ELLSA(null,  null);
                 ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
                 IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
-                File file = new File("resources/"+PARAMS.configFile);
+                File file = new File("resources/"+ PARAMS.configFile);
                 backupSystem.load(file);
 
                 //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
@@ -312,33 +312,71 @@ public class RobotLaunchExampleMassiveXPCalculus {
 
 
                 ellsaTheta0.data.nameID = "ellsaTheta0";
-                ellsaTheta0.data.PARAM_exogenousLearningWeight = PARAMS.learningSpeed;
-                ellsaTheta0.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
-                ellsaTheta0.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
-                ellsaTheta0.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
-                ellsaTheta0.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
-                ellsaTheta0.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
-                ellsaTheta0.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-                ellsaTheta0.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
-                ellsaTheta0.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
-                ellsaTheta0.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-                ellsaTheta0.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-                ellsaTheta0.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-                ellsaTheta0.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
+            ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.validityRangesPrecision);
+            ellsaTheta0.data.PARAM_modelErrorMargin = PARAMS.modelErrorMargin;
+            ellsaTheta0.data.PARAM_bootstrapCycle = PARAMS.setbootstrapCycle;
+            ellsaTheta0.data.PARAM_exogenousLearningWeight = PARAMS.exogenousLearningWeight;
+            ellsaTheta0.data.PARAM_endogenousLearningWeight = PARAMS.endogenousLearningWeight;
 
-                ellsaTheta0.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-                ellsaTheta0.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-                ellsaTheta0.data.PARAM_isDream = PARAMS.setDream;
-                ellsaTheta0.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-                ellsaTheta0.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsaTheta0.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodRadiusCoefficient;
+            ellsaTheta0.data.PARAM_influenceRadiusCoefficient = PARAMS.influenceRadiusCoefficient;
+            ellsaTheta0.data.PARAM_maxRangeRadiusCoefficient = PARAMS.maxRangeRadiusCoefficient;
+            ellsaTheta0.data.PARAM_rangeSimilarityCoefficient = PARAMS.rangeSimilarityCoefficient;
+            ellsaTheta0.data.PARAM_minimumRangeCoefficient = PARAMS.minimumRangeCoefficient;
 
-                ellsaTheta0.getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-                ellsaTheta0.data.PARAM_modelErrorMargin = PARAMS.setRegressionPerformance;
-                ellsaTheta0.getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
-                ellsaTheta0.data.PARAM_neighborhoodRadiusCoefficient = PARAMS.neighborhoodMultiplicator;
+            ellsaTheta0.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsaTheta0.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
+            ellsaTheta0.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient;
+            ellsaTheta0.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
+
+            ellsaTheta0.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
+            ellsaTheta0.data.PARAM_LEARNING_WEIGHT_PROXIMITY = PARAMS.LEARNING_WEIGHT_PROXIMITY;
+            ellsaTheta0.data.PARAM_LEARNING_WEIGHT_EXPERIENCE = PARAMS.LEARNING_WEIGHT_EXPERIENCE;
+            ellsaTheta0.data.PARAM_LEARNING_WEIGHT_GENERALIZATION = PARAMS.LEARNING_WEIGHT_GENERALIZATION;
+
+            ellsaTheta0.data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
+            ellsaTheta0.data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
+            ellsaTheta0.data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
 
 
-                ellsaTheta0.setSubPercepts(PARAMS.subPercepts);
+            ellsaTheta0.data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
+            ellsaTheta0.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
+
+            ellsaTheta0.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
+            ellsaTheta0.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
+            ellsaTheta0.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
+            ellsaTheta0.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+            ellsaTheta0.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
+            ellsaTheta0.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
+            ellsaTheta0.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
+            ellsaTheta0.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
+            ellsaTheta0.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
+            ellsaTheta0.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+
+            ellsaTheta0.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
+
+
+            ellsaTheta0.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+            ellsaTheta0.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
+            ellsaTheta0.data.PARAM_isDream = PARAMS.setDream;
+            ellsaTheta0.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
+
+
+            ellsaTheta0.data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
+
+            ellsaTheta0.data.PARAM_NCS_isAllContextSearchAllowedForLearning = PARAMS.isAllContextSearchAllowedForLearning;
+            ellsaTheta0.data.PARAM_NCS_isAllContextSearchAllowedForExploitation = PARAMS.isAllContextSearchAllowedForExploitation;
+
+            ellsaTheta0.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
+
+
+
+            ellsaTheta0.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
+
+
+
+            ellsaTheta0.setSubPercepts(PARAMS.subPercepts);
 
                 int jointsNb = PARAMS.nbJoints;
                 //AmasMultiUIWindow window = new AmasMultiUIWindow("Robot Arm");
@@ -356,7 +394,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 ELLSA ellsas[] = new ELLSA[2];
                 ellsas[0] = ellsaTheta0;
                 RobotController robotController = new RobotController(jointsNb);
-                RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbTrainingCycle, PARAMS.nbRequestCycle);
+                RobotArmManager robotArmManager = new RobotArmManager(jointsNb, distances, ellsas, robotController, PARAMS.nbLearningCycle, PARAMS.nbExploitationCycle);
                 robotArmManager.maxError = PARAMS.armBaseSize*2;
 
 
@@ -406,12 +444,12 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 xpCSV.write(new ArrayList<>(Arrays.asList("SET")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Dim", PARAMS.dimension+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Model",model)));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles", PARAMS.nbTrainingCycle+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles", PARAMS.nbRequestCycle+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbTest+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Learning cycles", PARAMS.nbLearningCycle+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Testting cycles", PARAMS.nbExploitationCycle+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Learning episodes", PARAMS.nbEpisodes+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Space size", PARAMS.spaceSize*4+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error", PARAMS.mappingErrorAllowed+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Neighborhood x", PARAMS.neighborhoodMultiplicator+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Mapping error", PARAMS.validityRangesPrecision+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Neighborhood x", PARAMS.neighborhoodRadiusCoefficient+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
                 xpCSV.write(new ArrayList<>(Arrays.asList("LEARNING")));
@@ -420,12 +458,12 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
                 xpCSV.write(new ArrayList<>(Arrays.asList("PREDICTION")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance", PARAMS.setRegressionPerformance+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Init regression performance", PARAMS.modelErrorMargin+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
                 xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Noise", PARAMS.oracleNoiseRange+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed", PARAMS.learningSpeed+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Noise", PARAMS.noiseRange+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Learning speed", PARAMS.exogenousLearningWeight+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Regression points", PARAMS.regressionPoints+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
@@ -440,7 +478,7 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Conflicts", PARAMS.setConflictDetection+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Concurrences", PARAMS.setConcurrenceDetection+"")));
-                xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences", PARAMS.setVoidDetection2+"")));
+                xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences", PARAMS.setVoidDetection+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Ambiguities", PARAMS.setFrontierRequest+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Model", PARAMS.setSelfModelRequest+"")));
                 xpCSV.write(new ArrayList<>(Arrays.asList("Learn From Neighbors", PARAMS.setLearnFromNeighbors+"")));

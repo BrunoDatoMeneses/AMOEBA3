@@ -36,8 +36,8 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 3;
         PARAMS.configFile =  "threeDimensionsLauncher" +".xml";*/
 
-        /*PARAMS.dimension = 10;
-        PARAMS.configFile =  "tenDimensionsLauncher" +".xml";*/
+//        PARAMS.dimension = 10;
+//        PARAMS.configFile =  "tenDimensionsLauncher" +".xml";
 
         /*PARAMS.dimension = 4;
         PARAMS.configFile =  "fourDimensionsLauncher" +".xml";*/
@@ -45,7 +45,7 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 500;
+        PARAMS.nbLearningCycle = 2000;
         PARAMS.nbExploitationCycle = 250;
         PARAMS.nbEpisodes = 10;
 
@@ -56,13 +56,13 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.modelErrorMargin = 1.0;
 
         // Learning
- /*       PARAMS.setActiveLearning = false;
+        PARAMS.setActiveLearning = false;
         PARAMS.setSelfLearning = true;
-        PARAMS.setLearnFromNeighbors = true;*/
+        PARAMS.setLearnFromNeighbors = true;
 
-        PARAMS.setActiveLearning = true;
-        PARAMS.setSelfLearning = false;
-        PARAMS.setLearnFromNeighbors = false;
+//        PARAMS.setActiveLearning = true;
+//        PARAMS.setSelfLearning = false;
+//        PARAMS.setLearnFromNeighbors = false;
 
         //NCS
 
@@ -71,8 +71,8 @@ public class LaunchExampleXPWithArgsManualy {
         PARAMS.setConcurrenceDetection = true;
         PARAMS.setVoidDetection = true;
         PARAMS.setFusionResolution = true;
-        PARAMS.setRestructureResolution = false;
-        PARAMS.setFrontierRequest = false;
+        PARAMS.setRestructureResolution = true;
+        PARAMS.setFrontierRequest = true;
 
         PARAMS.setSubVoidDetection = false;
 
@@ -100,6 +100,7 @@ public class LaunchExampleXPWithArgsManualy {
 //        PARAMS.model = "rosenbrock";
 //        PARAMS.model = "squareSplitTriangle";
 //        PARAMS.model = "squareSplitFixed";
+//        PARAMS.model = "squareDiscLos";
 
 
         String dateAndHour = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
@@ -132,7 +133,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.probabilityOfRangeAmbiguity = 0.1;
 
-        PARAMS.transferCyclesRatio = 0.333;
+        PARAMS.transferCyclesRatio = 0.3;//0.429;
 
         PARAMS.nbEndoExploitationCycle = 0;
         PARAMS.setActiveExploitation = false;
@@ -169,7 +170,7 @@ public class LaunchExampleXPWithArgsManualy {
         ArrayList<List<String>> dataStrings = dataPair.getA();
         HashMap<String, ArrayList<Double>> data = dataPair.getB();
 
-        double start = System.currentTimeMillis();
+        double start = System.nanoTime();
 
         for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
             //System.out.print(i + " ");
@@ -177,7 +178,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         }
         //System.out.println(" ");
-        double total = (System.currentTimeMillis()- start)/1000;
+        double total = (System.nanoTime()- start)/1000000000;
         double mean = total/ PARAMS.nbEpisodes;
         System.out.println("[TIME MEAN] " + mean + " s");
         System.out.println("[TIME TOTAL] " + total + " s");
@@ -268,16 +269,20 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-        ellsa.setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
+        ellsa.setSubPercepts(PARAMS.subPercepts);
 
 
         ArrayList<Double> allLearningCycleTimes = new ArrayList<>();
         ArrayList<Double> allExploitationCycleTimes = new ArrayList<>();
 
         for (int i = 0; i < PARAMS.nbLearningCycle; ++i) {
-            double start = System.currentTimeMillis();
+            double start = System.nanoTime();
+//            System.out.println(start);
             ellsa.cycle();
-            allLearningCycleTimes.add(System.currentTimeMillis()- start);
+            double end = System.nanoTime()- start;
+//            System.out.println(end);
+            allLearningCycleTimes.add(end/1000000);
+
             //System.out.println(ellsa.getCycle() + " " + ellsa.getContexts().size());
 
             if(ellsa.getCycle()%200 == 0){
@@ -322,17 +327,17 @@ public class LaunchExampleXPWithArgsManualy {
             ellsa.data.PARAM_isExploitationActive = false;
 
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-                double start = System.currentTimeMillis();
+                double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
 
         }else{
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-                double start = System.currentTimeMillis();
+                double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
         }

@@ -34,8 +34,8 @@ public class RobotArmManager {
     double[] futurePoseGoal;
     double[] goalAngles;
 
-    int learningCycle;
-    int requestCycle;
+    public int learningCycle;
+    public int requestCycle;
     //double goalErrors;
 
     ArrayList<Double> allXYGoalErrors;
@@ -652,7 +652,8 @@ public class RobotArmManager {
             }*/
         }else{
             finished = true;
-            //TRACE.print(TRACE_LEVEL.ERROR,averageError.getAsDouble() + " [ " + Math.sqrt(errorDispersion/allGoalErrors.size()) + " ]      -    " + goalErrors);
+            TRACE.print(TRACE_LEVEL.ERROR,"XY",averageXYError.getAsDouble() + " [ " + Math.sqrt(XYErrorDispersion/allXYGoalErrors.size()) + " ]   " );
+            TRACE.print(TRACE_LEVEL.ERROR,"THETA",averageThetaError.getAsDouble() + " [ " + Math.sqrt(ThetaErrorDispersion/allThetaGoalErrors.size()) + " ]   " );
             xPos = 0.0;
             yPos = 0.0;
             for (int i = 0;i<jointsNb;i++){

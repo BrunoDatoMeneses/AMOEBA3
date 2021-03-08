@@ -254,7 +254,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 
 
 
-		data.executionTimes[0]=System.currentTimeMillis();
+		data.executionTimes[0]=System.nanoTime();
 
 		cycle++;
 		if (cycle % 1000 == 0) {
@@ -338,7 +338,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		alteredContexts.clear();
 		data.higherNeighborLastPredictionPercepts=null;
 
-		data.executionTimes[0]=System.currentTimeMillis()- data.executionTimes[0];
+		data.executionTimes[0]=System.nanoTime()- data.executionTimes[0];
 	}
 	
 	synchronized private void incrementCycleWithoutRender() {
@@ -356,7 +356,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	@Override
 	public void onSystemCycleEnd() {
 
-		data.executionTimes[5]=System.currentTimeMillis();
+		data.executionTimes[5]=System.nanoTime();
 
 		
 		if(studiedSystem != null) {
@@ -392,9 +392,9 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		if(saver != null)
 			saver.autosave();
 
-		data.executionTimes[5]=System.currentTimeMillis()- data.executionTimes[5];
+		data.executionTimes[5]=System.nanoTime()- data.executionTimes[5];
 		for(int i = 0 ; i<25;i++) {
-			data.executionTimesSums[i] += data.executionTimes[i];
+			data.executionTimesSums[i] += data.executionTimes[i]/1000000;
 		}
 
 
@@ -451,27 +451,27 @@ public class ELLSA extends Amas<World> implements IELLSA {
 	}
 
 	public void computePendingAgents() {
-		data.executionTimes[4]=System.currentTimeMillis();
+		data.executionTimes[4]=System.nanoTime();
 		removePendingAgents();
 		addPendingAgents();
-		data.executionTimes[4]=System.currentTimeMillis()- data.executionTimes[4];
+		data.executionTimes[4]=System.nanoTime()- data.executionTimes[4];
 	}
 
 	private void runAgents() {
 		// run percepts
-		data.executionTimes[1]=System.currentTimeMillis();
+		data.executionTimes[1]=System.nanoTime();
 		Stream<Context> contextStream = runPercepts();
-		data.executionTimes[1]=System.currentTimeMillis()- data.executionTimes[1];
+		data.executionTimes[1]=System.nanoTime()- data.executionTimes[1];
 
 		// run contexts
-		data.executionTimes[2]=System.currentTimeMillis();
+		data.executionTimes[2]=System.nanoTime();
 		runContexts(contextStream);
-		data.executionTimes[2]=System.currentTimeMillis()- data.executionTimes[2];
+		data.executionTimes[2]=System.nanoTime()- data.executionTimes[2];
 
 		// run head
-		data.executionTimes[3]=System.currentTimeMillis();
+		data.executionTimes[3]=System.nanoTime();
 		runHeads();
-		data.executionTimes[3]=System.currentTimeMillis()- data.executionTimes[3];
+		data.executionTimes[3]=System.nanoTime()- data.executionTimes[3];
 	}
 
 

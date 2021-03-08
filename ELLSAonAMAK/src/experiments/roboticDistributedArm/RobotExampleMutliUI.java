@@ -1,5 +1,7 @@
 package experiments.roboticDistributedArm;
 
+
+
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Configuration;
 import fr.irit.smac.amak.ui.AmasMultiUIWindow;
@@ -18,7 +20,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 	public double xStart;
 	public double yStart;
 
-
+	public boolean isUIStopped;
 
 	private DrawableCircle circleBase;
 
@@ -38,6 +40,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
 
+	RobotWorldExampleMultiUI robotWorldExampleMultiUI;
 
 	/**
 	 * Constructor of the ant
@@ -52,12 +55,12 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 	public RobotExampleMutliUI(AmasMultiUIWindow window, RobotWorldExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
 		super(window, amas, startX, startY);
 
-
+		robotWorldExampleMultiUI = amas;
 
 		xStart = startX;
 		yStart = startY;
 
-
+		isUIStopped = false;
 
 		jointsNumber = joints;
 		double distances[] = new double[jointsNumber];
@@ -177,7 +180,14 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 		ends = startEndEnds.getB();
 
 
+		if (robotArmManager.learningCycle == PARAMS.nbLearningCycle && !isUIStopped){
+			robotWorldExampleMultiUI.getScheduler().stop();
+			isUIStopped = true;
+		}
 
+		if (robotArmManager.finished){
+			robotWorldExampleMultiUI.getScheduler().stop();
+		}
 
 
 
@@ -188,66 +198,70 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 	@Override
 	public void onUpdateRender() {
 
-		Platform.runLater(new Runnable()
-		{
-			@Override
-			public void run()
+		if(amas.isRenderUpdate){
+
+			Platform.runLater(new Runnable()
 			{
-				double[] goal = robotArmManager.getGoal();
-				if(getAmas().getCycle()<robotArmManager.trainingCycles){
-					if(ends[jointsNumber-1].getB()>0.0 || true){
-						getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+				@Override
+				public void run()
+				{
+					double[] goal = robotArmManager.getGoal();
+					if(getAmas().getCycle()<robotArmManager.trainingCycles){
+						if(ends[jointsNumber-1].getB()>0.0 || true){
+							getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+						}
+
 					}
 
-				}
 
 
 
 
-
-				circleBase.move(xStart, yStart);
-
+					circleBase.move(xStart, yStart);
 
 
-				for(int i = 0; i<jointsNumber; i++){
-					lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
-					circles[i].move(ends[i].getA(),ends[i].getB());
-					if(robotArmManager.jointIndiceForRequests!=-1){
-						if(robotArmManager.jointIndiceForRequests==i){
-							circles[i].setColor(new Color(0.0,0.0,1.0,1.0));
-						}else{
-							circles[i].setColor(new Color(0.0,0.0,0.0,1.0));
+
+					for(int i = 0; i<jointsNumber; i++){
+						lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
+						circles[i].move(ends[i].getA(),ends[i].getB());
+						if(robotArmManager.jointIndiceForRequests!=-1){
+							if(robotArmManager.jointIndiceForRequests==i){
+								circles[i].setColor(new Color(0.0,0.0,1.0,1.0));
+							}else{
+								circles[i].setColor(new Color(0.0,0.0,0.0,1.0));
+							}
 						}
 					}
-				}
 
 
-				goalCircle.move(goal[0], goal[1]);
-				subGoalCircle.move(robotArmManager.xSubGoal, robotArmManager.ySubGoal);
+					goalCircle.move(goal[0], goal[1]);
+					subGoalCircle.move(robotArmManager.xSubGoal, robotArmManager.ySubGoal);
 
-				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
-				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
+					goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
+					goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
 
-				goalOrientationLine.move(goal[0], goal[1], goal[0]+20*Math.cos(robotArmManager.angleGoal), goal[1]+20*Math.sin(robotArmManager.angleGoal));
-
-
+					goalOrientationLine.move(goal[0], goal[1], goal[0]+20*Math.cos(robotArmManager.angleGoal), goal[1]+20*Math.sin(robotArmManager.angleGoal));
 
 
 
-				if(robotArmManager.plotRequestError){
-					getAmas().getVuiErrorDispersion().createAndAddCircle(ends[jointsNumber-1].getA()-goal[0], ends[jointsNumber-1].getB()-goal[1],0.25);
-					robotArmManager.plotRequestError = false;
 
 
-				}
+					if(robotArmManager.plotRequestError){
+						getAmas().getVuiErrorDispersion().createAndAddCircle(ends[jointsNumber-1].getA()-goal[0], ends[jointsNumber-1].getB()-goal[1],0.25);
+						robotArmManager.plotRequestError = false;
+
+
+					}
 
 				/*errorGoalLines[0].delete();
 				errorGoalLines[1].delete();
 				errorGoalLines[0] = getAmas().getVuiErrorDispersion().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 				errorGoalLines[1] = getAmas().getVuiErrorDispersion().createAndAddLine(0.0, -10000.0,0.0,10000.0);*/
 
-			}
-		});
+				}
+			});
+
+		}
 
 
 

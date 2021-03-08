@@ -5,13 +5,20 @@ import utils.TRACE_LEVEL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PARAMS {
+public class OLD_PARAMS {
 
-    public static double armBaseSize = 50.0;
+    public static String model = "ROBOT";
 
-    public static String model = "robotArm";
+    public static int nbTrainingCycle = 2000;
+    public static int nbRequestCycle = 200;
+    public static int nbTest = 10;
+    public static double spaceSize = 50.0	;
+    //public static double mappingErrorAllowed = 0.06; // USUAL
+    public static double mappingErrorAllowed = 0.03; // OTHER
+    public static int neighborhoodMultiplicator = 16;
 
-    public static String extension = "";
+    /* PREDICTION */
+    public static  double setRegressionPerformance = 1;
 
     /*public static  String configFile = "100jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 101;
@@ -94,10 +101,10 @@ public class PARAMS {
     public static int nbJoints = 2;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
 
-//    public static  String configFile = "2jointsRobot2DimensionsLauncher.xml";
-//    public static  int dimension = 2;
-//    public static int nbJoints = 2;
-//    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
+    /*public static  String configFile = "2jointsRobot2DimensionsLauncher.xml";
+    public static  int dimension = 2;
+    public static int nbJoints = 2;
+    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
 
     /*public static  String configFile = "1jointRobot2DimensionsLauncher.xml";
     public static  int dimension = 2;
@@ -107,56 +114,14 @@ public class PARAMS {
     /*public static  String configFile = "threeDimensionsLauncher.xml";
     public static  int dimension = 3;*/
 
-    public static  int nbLearningCycle = 1000;
-    public static  int nbEndoExploitationCycle = 200;
-    public static  int nbExploitationCycle = 250;
-    public static  boolean setActiveExploitation = false ;
-    public static  int nbEpisodes = 15;
-    public static  double transferCyclesRatio = 0.3;//0.429;
-
-    public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.02;
-
-    /* LEARNING */
-
-    public static double LEARNING_WEIGHT_ACCURACY = 1.0;
-    public static double LEARNING_WEIGHT_PROXIMITY = 0.0;
-    public static double LEARNING_WEIGHT_EXPERIENCE = 1.0;
-    public static double LEARNING_WEIGHT_GENERALIZATION = 1.0;
-
-    /* EXPLOITATION */
-
-    public static double EXPLOITATION_WEIGHT_PROXIMITY = 1.0;
-    public static double EXPLOITATION_WEIGHT_EXPERIENCE = 1.0;
-    public static double EXPLOITATION_WEIGHT_GENERALIZATION = 1.0;
 
 
-    /* NEIGHBORHOOD */
-
-    public static  double neighborhoodRadiusCoefficient = 4;
-    public static  double influenceRadiusCoefficient = 0.5;
-    public static double maxRangeRadiusCoefficient = 2.0;
-    public static double rangeSimilarityCoefficient = 0.375;
-    public static double minimumRangeCoefficient = 0.25;
-
-    /* PREDICTION */
-    public static  double modelErrorMargin = 1; //Multi
-//    public static  double modelErrorMargin = 0.05; //SinCos
-//    public static  double modelErrorMargin = 1; // Goutte
-    //public static  double modelErrorMargin = 1; // Carré
 
 
     /* REGRESSION */
-    public static  double noiseRange = 0.0;
-    public static  double exogenousLearningWeight = 0.1;
-    public static  double endogenousLearningWeight = 0.1;
-
-    public static double perceptionsGenerationCoefficient = 0.1;
-
-    public static double modelSimilarityThreshold = 0.001;
-
-
-    public static  int regressionPoints = (int)(1/ exogenousLearningWeight);
+    public static  double oracleNoiseRange = 0.5;
+    public static  double learningSpeed = 0.1;
+    public static  int regressionPoints = (int)(1/learningSpeed);
 
     /* XP */
     public static  int nbOfModels = 2	;
@@ -169,68 +134,46 @@ public class PARAMS {
     public static  double explorationIncrement = 2.0	;
     public static  double explorationWidht = 0.75	;
 
-    public static  int setbootstrapCycle = 10;
-
 
     /* LEARNING */
     public static  boolean setActiveLearning = false	;
-    public static  boolean setSelfLearning = true;
-    public static  boolean setLearnFromNeighbors = true ;
+    public static  boolean setSelfLearning = true ;//!setActiveLearning;
 
-    /*public static  boolean setActiveLearning = true	;
-    public static  boolean setSelfLearning = false;
-    public static  boolean setLearnFromNeighbors = false ;*/
+    public static  boolean setAutonomousMode = true ;
+
+
 
 
 
     /*NCS*/
+    public static  boolean setVoidDetection = false ; // OLD VOID
 
-    public static  boolean setSelfModelRequest = true ;
     public static  boolean setConflictDetection = true ;
-    public static  boolean setConcurrenceDetection = true ;
-    public static  boolean setVoidDetection = false ;
-    public static  boolean setFusionResolution = true ;
-    public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = false ;
-
-
-    public static  boolean setisCreationWithNeighbor = true;
-
-    public static boolean isAllContextSearchAllowedForLearning = true;
-    public static boolean isAllContextSearchAllowedForExploitation = true;
-
     public static  boolean setConflictResolution = setConflictDetection ;
+    public static  boolean setConcurrenceDetection = true ;
     public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
+    public static  boolean setVoidDetection2 = false ;
     public static  boolean setSubVoidDetection = false ;
+    public static  boolean setFrontierRequest = false ; // ONLY FOR LINEAR MODELS
+    public static  boolean setSelfModelRequest = true ;
 
+    public static  boolean setCoopLearning = false ; // WITHOUT ORACLE
 
-    public static  boolean setDream = true ;
-    public static  int setDreamCycleLaunch = 5000 ;
+    public static  boolean setDream = false ;
 
+    public static  boolean setLearnFromNeighbors = true ;
 
-
-
-
+    public static  int nbOfNeighborForCoopLearning = 6;
 
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
-    public static  int nbOfNeighborForContexCreationWithouOracle = 7;
-    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 7;
+    public static  int nbOfNeighborForContexCreationWithouOracle = 100;
+    public static  int nbOfNeighborForVoidDetectionInSelfLearning = 500;
 
-    public static double probabilityOfRangeAmbiguity = 0.1;
 
-    public static   boolean setAutonomousMode = true;
+    /*UI*/
 
 
     public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
 
-
-
-    /* UI */
-    public static boolean STOP_UI = true;
-//    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
-//    public static int STOP_UI_cycle = setDreamCycleLaunch;
-    public static int STOP_UI_cycle = nbLearningCycle;
-
-    //TODO à supprimer
-    public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE
+    public static double armBaseSize = 50.0;
 }

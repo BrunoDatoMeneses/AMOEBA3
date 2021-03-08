@@ -34,16 +34,16 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         PARAMS.nbExploitationCycle = Integer.parseInt(args[2]);
         PARAMS.requestControlCycles = Integer.parseInt(args[3]);
         PARAMS.nbepisodes = Integer.parseInt(args[4]);
-        PARAMS.mappingErrorAllowed = ((double)Integer.parseInt(args[5]))/100;
-        PARAMS.neighborhoodMultiplicator = Integer.parseInt(args[6]);
+        PARAMS.validityRangesPrecision = ((double)Integer.parseInt(args[5]))/100;
+        PARAMS.neighborhoodRadiusCoefficient = Integer.parseInt(args[6]);
         PARAMS.isOrientationGoal = Boolean.parseBoolean(args[7]);
         PARAMS.setLearnFromNeighbors = Boolean.parseBoolean(args[8]);
 
 
         PARAMS.dimension = PARAMS.nbJoints+1;
 
-        System.out.print("neighS " + PARAMS.neighborhoodMultiplicator + " ");
-        System.out.print("rgn " + PARAMS.mappingErrorAllowed + " ");
+        System.out.print("neighS " + PARAMS.neighborhoodRadiusCoefficient + " ");
+        System.out.print("rgn " + PARAMS.validityRangesPrecision + " ");
         System.out.print("eps " + PARAMS.nbepisodes + " ");
         System.out.print("lrn " + PARAMS.nbLearningCycle + " ");
         System.out.print("expl " + PARAMS.nbExploitationCycle + " ");
@@ -71,8 +71,8 @@ public class RobotLaunchExampleMassiveXPWithArgs {
                 +"_Exp_" + PARAMS.nbExploitationCycle
                 +"_Eps_" + PARAMS.nbepisodes
                 +"_Ctrl_" + PARAMS.requestControlCycles
-                +"_Pre_" + PARAMS.mappingErrorAllowed
-                +"_NghS_" + PARAMS.neighborhoodMultiplicator
+                +"_Pre_" + PARAMS.validityRangesPrecision
+                +"_NghS_" + PARAMS.neighborhoodRadiusCoefficient
                 +"_Orie_" + PARAMS.isOrientationGoal
                 +"_Endo_" + PARAMS.setLearnFromNeighbors
 
@@ -241,7 +241,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         for(int i=0;i<PARAMS.nbJoints;i++){
 
 
-            studiedSystems[i] = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.oracleNoiseRange);
+            studiedSystems[i] = new F_N_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
             ellsas[i] = new ELLSA(null,  null);
             ellsas[i].setStudiedSystem(studiedSystems[i]);
             IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
@@ -255,31 +255,71 @@ public class RobotLaunchExampleMassiveXPWithArgs {
             ellsas[i].allowGraphicalScheduler(true);
             ellsas[i].setRenderUpdate(false);
             ellsas[i].data.nameID = "ellsaTheta"+i;
-            ellsas[i].data.PARAM_exogenousLearningWeight = PARAMS.learningSpeed;
-            ellsas[i].data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
-            ellsas[i].data.PARAM_isActiveLearning = PARAMS.setActiveLearning;
-            ellsas[i].data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
-            ellsas[i].data.PARAM_isAutonomousMode = PARAMS.setAutonomousMode;
-            ellsas[i].data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
-            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-            ellsas[i].data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection2;
-            ellsas[i].data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
-            ellsas[i].data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
-            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-            ellsas[i].data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-            ellsas[i].data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-            ellsas[i].data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearning;
+            ellsas[i].getEnvironment().setMappingErrorAllowed(experiments.roboticArm.PARAMS.validityRangesPrecision);
+            ellsas[i].data.PARAM_modelErrorMargin = experiments.roboticArm.PARAMS.modelErrorMargin;
+            ellsas[i].data.PARAM_bootstrapCycle = experiments.roboticArm.PARAMS.setbootstrapCycle;
+            ellsas[i].data.PARAM_exogenousLearningWeight = experiments.roboticArm.PARAMS.exogenousLearningWeight;
+            ellsas[i].data.PARAM_endogenousLearningWeight = experiments.roboticArm.PARAMS.endogenousLearningWeight;
 
-            ellsas[i].data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
-            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
-            ellsas[i].data.PARAM_isDream = PARAMS.setDream;
-            ellsas[i].data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-            ellsas[i].data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsas[i].data.PARAM_neighborhoodRadiusCoefficient = experiments.roboticArm.PARAMS.neighborhoodRadiusCoefficient;
+            ellsas[i].data.PARAM_influenceRadiusCoefficient = experiments.roboticArm.PARAMS.influenceRadiusCoefficient;
+            ellsas[i].data.PARAM_maxRangeRadiusCoefficient = experiments.roboticArm.PARAMS.maxRangeRadiusCoefficient;
+            ellsas[i].data.PARAM_rangeSimilarityCoefficient = experiments.roboticArm.PARAMS.rangeSimilarityCoefficient;
+            ellsas[i].data.PARAM_minimumRangeCoefficient = experiments.roboticArm.PARAMS.minimumRangeCoefficient;
 
-            ellsas[i].getEnvironment().setMappingErrorAllowed(PARAMS.mappingErrorAllowed);
-            ellsas[i].data.PARAM_modelErrorMargin = PARAMS.setRegressionPerformance;
-            ellsas[i].getEnvironment().PARAM_minTraceLevel = TRACE_LEVEL.OFF;
-            ellsas[i].setSubPercepts(PARAMS.subPercepts);
+            ellsas[i].data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = experiments.roboticArm.PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsas[i].data.PARAM_creationNeighborNumberForContexCreationWithouOracle = experiments.roboticArm.PARAMS.nbOfNeighborForContexCreationWithouOracle;
+
+            ellsas[i].data.PARAM_perceptionsGenerationCoefficient = experiments.roboticArm.PARAMS.perceptionsGenerationCoefficient;
+            ellsas[i].data.PARAM_modelSimilarityThreshold = experiments.roboticArm.PARAMS.modelSimilarityThreshold;
+
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_ACCURACY = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_ACCURACY;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_PROXIMITY = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_PROXIMITY;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_EXPERIENCE = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_EXPERIENCE;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_GENERALIZATION = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_GENERALIZATION;
+
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
+
+
+            ellsas[i].data.PARAM_isActiveLearning = experiments.roboticArm.PARAMS.setActiveLearning;
+            ellsas[i].data.PARAM_isSelfLearning = experiments.roboticArm.PARAMS.setSelfLearning;
+
+            ellsas[i].data.PARAM_NCS_isConflictDetection = experiments.roboticArm.PARAMS.setConflictDetection;
+            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = experiments.roboticArm.PARAMS.setConcurrenceDetection;
+            ellsas[i].data.PARAM_NCS_isVoidDetection = experiments.roboticArm.PARAMS.setVoidDetection;
+            ellsas[i].data.PARAM_NCS_isSubVoidDetection = experiments.roboticArm.PARAMS.setSubVoidDetection;
+            ellsas[i].data.PARAM_NCS_isConflictResolution = experiments.roboticArm.PARAMS.setConflictResolution;
+            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = experiments.roboticArm.PARAMS.setConcurrenceResolution;
+            ellsas[i].data.PARAM_NCS_isFrontierRequest = experiments.roboticArm.PARAMS.setFrontierRequest;
+            ellsas[i].data.PARAM_NCS_isSelfModelRequest = experiments.roboticArm.PARAMS.setSelfModelRequest;
+            ellsas[i].data.PARAM_NCS_isFusionResolution = experiments.roboticArm.PARAMS.setFusionResolution;
+            ellsas[i].data.PARAM_NCS_isRetrucstureResolution = experiments.roboticArm.PARAMS.setRestructureResolution;
+
+            ellsas[i].data.PARAM_NCS_isCreationWithNeighbor = experiments.roboticArm.PARAMS.setisCreationWithNeighbor;
+
+
+            ellsas[i].data.PARAM_isLearnFromNeighbors = experiments.roboticArm.PARAMS.setLearnFromNeighbors;
+            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = experiments.roboticArm.PARAMS.nbOfNeighborForLearningFromNeighbors;
+            ellsas[i].data.PARAM_isDream = experiments.roboticArm.PARAMS.setDream;
+            ellsas[i].data.PARAM_DreamCycleLaunch = experiments.roboticArm.PARAMS.setDreamCycleLaunch;
+
+
+            ellsas[i].data.PARAM_isAutonomousMode = experiments.roboticArm.PARAMS.setAutonomousMode;
+
+            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForLearning = experiments.roboticArm.PARAMS.isAllContextSearchAllowedForLearning;
+            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForExploitation = experiments.roboticArm.PARAMS.isAllContextSearchAllowedForExploitation;
+
+            ellsas[i].data.PARAM_probabilityOfRangeAmbiguity = experiments.roboticArm.PARAMS.probabilityOfRangeAmbiguity;
+
+
+
+            ellsas[i].getEnvironment().PARAM_minTraceLevel = experiments.roboticArm.PARAMS.traceLevel;
+
+
+
+            ellsas[i].setSubPercepts(experiments.roboticArm.PARAMS.subPercepts);
         }
 
 
@@ -382,8 +422,8 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         xpCSV.write(new ArrayList<>(Arrays.asList("exploitatingCycles", PARAMS.nbExploitationCycle +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("episodes", PARAMS.nbepisodes +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("spaceSize", PARAMS.spaceSize*4+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("precisionRange", PARAMS.mappingErrorAllowed+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("neighborhoodSize", PARAMS.neighborhoodMultiplicator+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("precisionRange", PARAMS.validityRangesPrecision +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("neighborhoodSize", PARAMS.neighborhoodRadiusCoefficient +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isOrientationGoal", PARAMS.isOrientationGoal+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("armBaseSize", PARAMS.armBaseSize+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("requestControlCycles", PARAMS.requestControlCycles+"")));
@@ -397,12 +437,12 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("goalXYError")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("errorMargin", PARAMS.setRegressionPerformance+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("errorMargin", PARAMS.modelErrorMargin +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("REGRESSION")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.oracleNoiseRange+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("learningSpeed", PARAMS.learningSpeed+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("noise", PARAMS.noiseRange +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("learningSpeed", PARAMS.exogenousLearningWeight +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("regressionPoints", PARAMS.regressionPoints+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
@@ -417,7 +457,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConflictNCS", PARAMS.setConflictDetection+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConcurenceNCS", PARAMS.setConcurrenceDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setVoidDetection2+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setVoidDetection +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setFrontierRequest+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));

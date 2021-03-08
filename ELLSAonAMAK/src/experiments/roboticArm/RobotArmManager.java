@@ -26,8 +26,8 @@ public class RobotArmManager {
     double[] futurePoseGoal;
     double[] goalAngles;
 
-    int learningCycle;
-    int requestCycle;
+    public int learningCycle;
+    public int requestCycle;
     double goalErrors;
     ArrayList<Double> allGoalErrors ;
     public OptionalDouble averageError;
@@ -127,7 +127,7 @@ public class RobotArmManager {
 
                     out0.put("px",position[0]);
                     out0.put("py",position[1]);
-                    for(int j=1;j<PARAMS.nbJoints-1;j++){
+                    for(int j = 1; j< PARAMS.nbJoints-1; j++){
                         out0.put("ptheta"+j,anglesToLearn[j]);
                     }
                     out0.put("ptheta"+(PARAMS.nbJoints-1),anglesToLearn[0]);
@@ -295,7 +295,7 @@ public class RobotArmManager {
                 HashMap<String,Double> actions1 = ellsas[0].requestWithLesserPercepts(out2);
                 requestJoints[PARAMS.nbJoints-1] = actions1.get("action");
 
-                for(int j=1;j<PARAMS.nbJoints-1;j++){
+                for(int j = 1; j< PARAMS.nbJoints-1; j++){
                     requestJoints[j] = actions1.get("ptheta"+j);
                 }
                 requestJoints[0] = actions1.get("ptheta"+(PARAMS.nbJoints-1));
@@ -405,6 +405,8 @@ public class RobotArmManager {
         Pair<Double,Double>[] starts = new Pair[jointsNb];
         Pair<Double,Double>[]  ends = new Pair[jointsNb];
 
+
+
         if(learningCycle <trainingCycles){
 
 
@@ -428,7 +430,7 @@ public class RobotArmManager {
 
 
             learnedPositions.add(ends[jointsNb-1]);
-            if(learningCycle%50==0)  {TRACE.print(TRACE_LEVEL.SUBCYCLE,"LEARNING [" + learningCycle + "] ");
+            if(learningCycle%100==0)  {TRACE.print(TRACE_LEVEL.SUBCYCLE,"LEARNING [" + learningCycle + "] ");
 
             }
             if(controller.pseudoRandomCounter>0) {

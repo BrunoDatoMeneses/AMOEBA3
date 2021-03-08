@@ -19,7 +19,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public double xStart;
 	public double yStart;
 
-
+	public boolean isUIStopped;
 
 	private DrawableCircle circleBase;
 
@@ -37,7 +37,9 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	public RobotArmManager robotArmManager;
 	public RobotController robotController;
 
+	AmasMultiUIWindow window;
 
+	RobotWorlExampleMultiUI robotWorlExampleMultiUI;
 	/**
 	 * Constructor of the ant
 	 * 
@@ -48,15 +50,15 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	 * @param startY
 	 *            Initial Y coordinate
 	 */
-	public RobotExampleMutliUI(AmasMultiUIWindow window, RobotWorlExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
-		super(window, amas, startX, startY);
+	public RobotExampleMutliUI(AmasMultiUIWindow wdw, RobotWorlExampleMultiUI amas, double startX, double startY, int joints, RobotController robotCtrl, RobotArmManager robotArmMgr) {
+		super(wdw, amas, startX, startY);
 
-
+		robotWorlExampleMultiUI = amas;
 
 		xStart = startX;
 		yStart = startY;
 
-
+		isUIStopped = false;
 
 		jointsNumber = joints;
 		double distances[] = new double[jointsNumber];
@@ -166,6 +168,14 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 
 
 
+		if (robotArmManager.learningCycle == PARAMS.nbLearningCycle && !isUIStopped){
+			robotWorlExampleMultiUI.getScheduler().stop();
+			isUIStopped = true;
+		}
+
+		if (robotArmManager.finished){
+			robotWorlExampleMultiUI.getScheduler().stop();
+		}
 
 
 
@@ -176,55 +186,59 @@ public class RobotExampleMutliUI extends Agent<RobotWorlExampleMultiUI, WorldExa
 	@Override
 	public void onUpdateRender() {
 
-		Platform.runLater(new Runnable()
-		{
-			@Override
-			public void run()
+		if(amas.isRenderUpdate){
+			Platform.runLater(new Runnable()
 			{
-				double[] goal = robotArmManager.getGoal();
-				if(getAmas().getCycle()<robotArmManager.trainingCycles){
-					if(ends[jointsNumber-1].getB()>0.0 || true){
-						getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+				@Override
+				public void run()
+				{
+					double[] goal = robotArmManager.getGoal();
+					if(getAmas().getCycle()<robotArmManager.trainingCycles){
+						if(ends[jointsNumber-1].getB()>0.0 || true){
+							getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+						}
+
 					}
 
-				}
+
+
+
+
+					circleBase.move(xStart, yStart);
+
+
+
+					for(int i = 0; i<jointsNumber; i++){
+						lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
+						circles[i].move(ends[i].getA(),ends[i].getB());
+					}
+
+
+					goalCircle.move(goal[0], goal[1]);
+					goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
+					goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
 
 
 
 
 
-				circleBase.move(xStart, yStart);
+					if(robotArmManager.plotRequestError){
+						getAmas().getVuiErrorDispersion().createAndAddCircle(ends[jointsNumber-1].getA()-goal[0], ends[jointsNumber-1].getB()-goal[1],0.25);
+						robotArmManager.plotRequestError = false;
 
 
-
-				for(int i = 0; i<jointsNumber; i++){
-					lines[i].move(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
-					circles[i].move(ends[i].getA(),ends[i].getB());
-				}
-
-
-				goalCircle.move(goal[0], goal[1]);
-				goalLines[0].move(goal[0]-10000.0,goal[1],goal[0]+10000.0,goal[1]);
-				goalLines[1].move(goal[0],goal[1]-10000.0,goal[0],goal[1]+10000.0);
-
-
-
-
-
-				if(robotArmManager.plotRequestError){
-					getAmas().getVuiErrorDispersion().createAndAddCircle(ends[jointsNumber-1].getA()-goal[0], ends[jointsNumber-1].getB()-goal[1],0.25);
-					robotArmManager.plotRequestError = false;
-
-
-				}
+					}
 
 				/*errorGoalLines[0].delete();
 				errorGoalLines[1].delete();
 				errorGoalLines[0] = getAmas().getVuiErrorDispersion().createAndAddLine(-10000.0, 0.0,10000.0,0.0);
 				errorGoalLines[1] = getAmas().getVuiErrorDispersion().createAndAddLine(0.0, -10000.0,0.0,10000.0);*/
 
-			}
-		});
+				}
+			});
+		}
+
+
 
 
 

@@ -132,14 +132,14 @@ public class LaunchExampleXPWithArgs {
         ArrayList<List<String>> dataStrings = dataPair.getA();
         HashMap<String, ArrayList<Double>> data = dataPair.getB();
 
-        double start = System.currentTimeMillis();
+        double start = System.nanoTime();
 
         for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
             //System.out.print(i + " ");
             learningEpisode(data);
         }
         //System.out.println(" ");
-        double total = (System.currentTimeMillis()- start)/1000;
+        double total = (System.nanoTime()- start)/1000;
         double mean = total/ PARAMS.nbEpisodes;
         System.out.println("[TIME MEAN] " + mean + " s");
         System.out.println("[TIME TOTAL] " + total + " s");
@@ -236,9 +236,9 @@ public class LaunchExampleXPWithArgs {
         ArrayList<Double> allExploitationCycleTimes = new ArrayList<>();
 
         for (int i = 0; i < PARAMS.nbLearningCycle; ++i) {
-            double start = System.currentTimeMillis();
+            double start = System.nanoTime();
             ellsa.cycle();
-            allLearningCycleTimes.add(System.currentTimeMillis()- start);
+            allLearningCycleTimes.add((System.nanoTime()- start)/1000000);
 
         }
 		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
@@ -275,9 +275,9 @@ public class LaunchExampleXPWithArgs {
             allPredictionErrors = new ArrayList<>();
 
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-                double start = System.currentTimeMillis();
+                double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
 
@@ -290,9 +290,9 @@ public class LaunchExampleXPWithArgs {
             allPredictionErrors = new ArrayList<>();
 
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
-                double start = System.currentTimeMillis();
+                double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add(System.currentTimeMillis()- start);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
         }
