@@ -3154,6 +3154,7 @@ public class Context extends EllsaAgent {
 	}
 	
 	private void onActOpitmized() {
+		getAmas().data.executionTimes[25]=System.nanoTime();
 		if(amas.getNeighborContexts().contains(this)) {
 			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			isInNeighborhood=true;
@@ -3163,14 +3164,19 @@ public class Context extends EllsaAgent {
 			lastDistanceToModel = 0.0;
 			getAmas().getHeadAgent().neigborhoodProposition(this);
 		}else{
+			getAmas().data.executionTimes[26]=System.nanoTime();
 			NCSDetection_Uselessness();
+			getAmas().data.executionTimesSums[26]+= (System.nanoTime() - getAmas().data.executionTimes[26])/1000000;
 		}
+		getAmas().data.executionTimesSums[25]+= (System.nanoTime() - getAmas().data.executionTimes[25])/1000000;
+		getAmas().data.executionTimes[27]=System.nanoTime();
 		if(amas.getValidContexts().contains(this)) {
 			//logger().debug("CYCLE "+getAmas().getCycle(), "Context %s sent proposition %f", getName(), getActionProposal());
 			activations++;
 			isActivated=true;
 			getAmas().getHeadAgent().proposition(this);
 		}
+		getAmas().data.executionTimesSums[27]+= (System.nanoTime() - getAmas().data.executionTimes[27])/1000000;
 	}
 
 	/**

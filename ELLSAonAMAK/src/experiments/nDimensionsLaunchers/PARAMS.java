@@ -13,11 +13,11 @@ public class PARAMS {
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
-    public static String model = "squareFixed";
+//    public static String model = "squareFixed";
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-//    public static String model = "gaussianCos2";
+    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
 //    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
@@ -32,20 +32,20 @@ public class PARAMS {
 
     public static ArrayList subPercepts = new ArrayList<>();
 
-    /*public static  String configFile = "twoDimensionsLauncher.xml";
-    public static  int dimension = 2;*/
+    public static  String configFile = "twoDimensionsLauncher.xml";
+    public static  int dimension = 2;
 
     /*public static  String configFile = "tenDimensionsLauncher.xml";
     public static  int dimension = 10;*/
 
-    public static  String configFile = "threeDimensionsLauncher.xml";
-    public static  int dimension = 3;
+    /*public static  String configFile = "threeDimensionsLauncher.xml";
+    public static  int dimension = 3;*/
 
     /*public static  String configFile = "fourDimensionsLauncher.xml";
     public static  int dimension = 4;*/
 
-//    public static  String configFile = "fiveDimensionsLauncher.xml";
-//    public static  int dimension = 5;
+    /*public static  String configFile = "fiveDimensionsLauncher.xml";
+    public static  int dimension = 5;*/
 
     public static  int nbLearningCycle = 5000;
     public static  int nbEndoExploitationCycle = 2000;
@@ -55,7 +55,7 @@ public class PARAMS {
     public static  double transferCyclesRatio = 0.3;//0.429;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.1;
+    public static double validityRangesPrecision = 0.05;
 
     /* LEARNING */
 
@@ -115,13 +115,13 @@ public class PARAMS {
 
 
     /* LEARNING */
-    public static  boolean setActiveLearning = false	;
+    /*public static  boolean setActiveLearning = false	;
     public static  boolean setSelfLearning = true;
-    public static  boolean setLearnFromNeighbors = true ;
+    public static  boolean setLearnFromNeighbors = true ;*/
 
-    /*public static  boolean setActiveLearning = true	;
+    public static  boolean setActiveLearning = true	;
     public static  boolean setSelfLearning = false;
-    public static  boolean setLearnFromNeighbors = false ;*/
+    public static  boolean setLearnFromNeighbors = false ;
 
 
 
@@ -171,7 +171,7 @@ public class PARAMS {
     public static boolean STOP_UI = true;
 //    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
 //    public static int STOP_UI_cycle = setDreamCycleLaunch;
-    public static int STOP_UI_cycle = 10000;
+    public static int STOP_UI_cycle = 3000;
 
     //TODO à supprimer
     public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE

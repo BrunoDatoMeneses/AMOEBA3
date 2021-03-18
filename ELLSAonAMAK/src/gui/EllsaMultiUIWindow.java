@@ -111,6 +111,7 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 		plots.put("Distances to models", new AmakPlot(this, "Distances to models", ChartType.LINE, "Cycle", "Distances"));
 		plots.put("Global Mapping Criticality", new AmakPlot(this, "Global Mapping Criticality", ChartType.LINE, "Cycle", "Criticalities"));
 		plots.put("Time Execution", new AmakPlot(this, "Time Execution", ChartType.LINE, "Cycle", "Times"));
+		plots.put("Time Execution All", new AmakPlot(this, "Time Execution All", ChartType.LINE, "Cycle", "Times"));
 		plots.put("Criticalities", new AmakPlot(this, "Criticalities", ChartType.LINE, "Cycle", "Criticalities"));
 		plots.put("Number of neighbors", new AmakPlot(this, "Number of neighbors", ChartType.LINE, "Cycle", "Number of neighbors"));
 

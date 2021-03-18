@@ -92,8 +92,8 @@ public class EllsaData implements Serializable {
 	public DynamicPerformance regressionPerformance;
 	public DynamicPerformance mappingPerformance;
 	
-	public double[] executionTimes = new  double[30];
-	public double[] executionTimesSums = new double[30];
+	public double[] executionTimes = new  double[40];
+	public double[] executionTimesSums = new double[40];
 	
 
 	

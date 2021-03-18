@@ -390,8 +390,16 @@ public class Head extends EllsaAgent {
             for(int i=0;i<getAmas().getPercepts().size();i++){
                 request[i]=getAmas().getPercepts().get(i).getValue();
             }
-            double oracleValueWithoutVoid = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
-            getAmas().data.criticity = Math.abs(oracleValueWithoutVoid - getAmas().data.prediction)/ Math.abs(oracleValueWithoutVoid);
+            double oracleValueWithoutNoise = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
+
+            if(getAmas().data.maxPrediction != Double.NEGATIVE_INFINITY && getAmas().data.minPrediction!=Double.POSITIVE_INFINITY && getAmas().data.minPrediction!=getAmas().data.maxPrediction ){
+				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ (getAmas().data.maxPrediction-getAmas().data.minPrediction);
+				//getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ Math.abs(oracleValueWithoutNoise);
+			}else{
+				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ Math.abs(oracleValueWithoutNoise);
+			}
+
+
         }else{
             getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
         }
