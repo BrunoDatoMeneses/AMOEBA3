@@ -17,8 +17,8 @@ import agents.head.REQUEST;
 import agents.head.SITUATION;
 import agents.percept.INPUT;
 import agents.percept.Percept;
-import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
+import experiments.mathematicalModels.Model_Manager;
+import experiments.mathematicalModels.PARAMS;
 import fr.irit.smac.amak.Agent;
 import fr.irit.smac.amak.Amas;
 import fr.irit.smac.amak.Configuration;
@@ -279,7 +279,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			//Log.defaultLog.inform("AMOEBA", "Cycle " + cycle + ". Nb agents: "+getAgents().size());
 		}
 		if(studiedSystem != null){
-			((F_N_Manager)studiedSystem).cycle = cycle;
+			((Model_Manager)studiedSystem).cycle = cycle;
 		}
 		
 		if(isRenderUpdate()) {

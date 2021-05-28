@@ -9,7 +9,7 @@ import agents.context.Experiment;
 import agents.context.VOID;
 import agents.percept.INPUT;
 import agents.percept.Percept;
-import experiments.nDimensionsLaunchers.F_N_Manager;
+import experiments.mathematicalModels.Model_Manager;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.World;
@@ -390,7 +390,7 @@ public class Head extends EllsaAgent {
             for(int i=0;i<getAmas().getPercepts().size();i++){
                 request[i]=getAmas().getPercepts().get(i).getValue();
             }
-            double oracleValueWithoutNoise = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
+            double oracleValueWithoutNoise = ((Model_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
 
             if(getAmas().data.maxPrediction != Double.NEGATIVE_INFINITY && getAmas().data.minPrediction!=Double.POSITIVE_INFINITY && getAmas().data.minPrediction!=getAmas().data.maxPrediction ){
 				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ (getAmas().data.maxPrediction-getAmas().data.minPrediction);
@@ -426,7 +426,7 @@ public class Head extends EllsaAgent {
 				request[i]=getAmas().getPercepts().get(i).getValue();
 			}
 
-			double oracleValueWithoutNoise = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
+			double oracleValueWithoutNoise = ((Model_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
 
 			if(getAmas().data.maxPrediction != Double.NEGATIVE_INFINITY && getAmas().data.minPrediction!=Double.POSITIVE_INFINITY && getAmas().data.minPrediction!=getAmas().data.maxPrediction ){
 				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ (getAmas().data.maxPrediction-getAmas().data.minPrediction);

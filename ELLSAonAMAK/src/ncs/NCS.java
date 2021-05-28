@@ -13,8 +13,7 @@ public enum NCS implements Serializable {
 	
 
 	/*Context NCS*/
-	CONTEXT_CONFLICT_FALSE, 
-	CONTEXT_CONFLICT_INEXACT, 
+	CONTEXT_CONFLICT,
 	CONTEXT_USELESSNESS, 
 	CONTEXT_CONCURRENCE,
 	CONTEXT_OVERLAP_CONFLICT,
@@ -39,7 +38,7 @@ public enum NCS implements Serializable {
 	public void raiseNCS(World world) {
 		world.changeNCSNumber(1, this);
 		//System.out.println(this);
-		if (this.equals(NCS.CONTEXT_CONFLICT_FALSE)) {
+		if (this.equals(NCS.CONTEXT_CONFLICT)) {
 			a = true;
 		}
 	}

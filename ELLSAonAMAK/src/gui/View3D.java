@@ -3,8 +3,8 @@ package gui;
 import agents.context.Context;
 import agents.context.localModel.LocalModelMillerRegression;
 import agents.percept.Percept;
-import experiments.nDimensionsLaunchers.F_N_Manager;
-import experiments.nDimensionsLaunchers.PARAMS;
+import experiments.mathematicalModels.Model_Manager;
+import experiments.mathematicalModels.PARAMS;
 import gui.utils.ContextColor;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -63,7 +63,7 @@ public class View3D {
         studiedSystem =ss;
         ellsa = amb;
 
-        spaceSize = (float)(2*((F_N_Manager)studiedSystem).spaceSize);
+        spaceSize = (float)(2*((Model_Manager)studiedSystem).spaceSize);
 
         pane = new BorderPane();
         paneLeft = new BorderPane();
@@ -408,7 +408,7 @@ public class View3D {
                         int pct1Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d1());
                         int pct2Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d2());
 
-                        double[] perception = new double[((F_N_Manager)studiedSystem).dimension];
+                        double[] perception = new double[((Model_Manager)studiedSystem).dimension];
                         for(int i=0;i<perception.length;i++){
                             if(i == pct1Index){
                                 perception[i] = x;
@@ -476,7 +476,7 @@ public class View3D {
         int pct1Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d1());
         int pct2Index =  ellsa.getPercepts().indexOf(ellsa.getDimensionSelector().d2());
 
-        Double[] request = new Double[((F_N_Manager)studiedSystem).dimension];
+        Double[] request = new Double[((Model_Manager)studiedSystem).dimension];
         for(int i=0;i<request.length;i++){
             if(i == pct1Index){
                 request[i] = x;
@@ -488,7 +488,7 @@ public class View3D {
         }
         /*request[pct1Index]=x;
         request[pct2Index]=y;*/
-        return ((F_N_Manager)(studiedSystem)).model(request);
+        return ((Model_Manager)(studiedSystem)).model(request);
     }
 
     private Color getColor(float min, float max, float prediction) {

@@ -534,7 +534,7 @@ public class Context extends EllsaAgent {
 		return contexts;
 	}*/
 
-	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
+	/*public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
 			Percept pctDirection, SpatialContext expandingContext) {
 		ArrayList<Context> contexts = new ArrayList<Context>();
 
@@ -553,7 +553,7 @@ public class Context extends EllsaAgent {
 			test = true;
 		}
 		return contexts;
-	}
+	}*/
 
 	/*public void expand() {
 		ArrayList<Context> neighborsOnOneDirection;
@@ -593,12 +593,12 @@ public class Context extends EllsaAgent {
 		}
 	}*/
 
-	public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
+	/*public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
 		for (Percept pct : ranges.keySet()) {
 			ranges.get(pct).setStart(biggerContextForCreation.getStart(pct));
 			ranges.get(pct).setEnd(biggerContextForCreation.getEnd(pct));
 		}
-	}
+	}*/
 
 	/*public Pair<Double, Double> getMaxExpansionsForContextExpansionAfterCreation(
 			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
@@ -2523,7 +2523,7 @@ public class Context extends EllsaAgent {
 	public void solveNCS_BadPrediction(Head head) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS BAD PREDICTION")));
-		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT_FALSE);
+		getEnvironment().raiseNCS(NCS.CONTEXT_CONFLICT);
 
 		if (head.getNewContext() == this) {
 			head.setNewContext(null);

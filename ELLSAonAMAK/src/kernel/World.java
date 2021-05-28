@@ -57,7 +57,7 @@ public class World extends Environment implements Loggable {
 	public synchronized void raiseNCS(NCS ncs) {
 		thisLoopNCS.put(ncs, thisLoopNCS.get(ncs) + 1);
 
-		if (ncs.equals(NCS.CONTEXT_CONFLICT_FALSE) || ncs.equals(NCS.HEAD_INCOMPETENT)) {
+		if (ncs.equals(NCS.CONTEXT_CONFLICT) || ncs.equals(NCS.HEAD_INCOMPETENT)) {
 			NCS.a = true;
 		}
 	}
