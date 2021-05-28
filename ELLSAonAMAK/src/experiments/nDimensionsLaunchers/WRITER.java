@@ -63,8 +63,8 @@ public class WRITER {
     public static void writeData(CSVWriter xpCSV,HashMap<String, ArrayList<Double>> data, ArrayList<List<String>> dataStrings, double total, double mean) {
         writeParams(xpCSV);
 
-        xpCSV.write(new ArrayList<>(Arrays.asList("meanTime", ""+mean)));
-        xpCSV.write(new ArrayList<>(Arrays.asList("totalTime",""+total )));
+        xpCSV.write(new ArrayList<>(Arrays.asList("meanTime", ""+mean/1000000)));
+        xpCSV.write(new ArrayList<>(Arrays.asList("totalTime",""+total/1000000 )));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         for(List<String> dataString : dataStrings){
@@ -218,17 +218,17 @@ public class WRITER {
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setSelfModelRequest+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isModelNCS", PARAMS.setModelAmbiguityDetection +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConflictNCS", PARAMS.setConflictDetection+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isConcurenceNCS", PARAMS.setConcurrenceDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setVoidDetection +"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isSubVoidDetection", PARAMS.setSubVoidDetection+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isFusionResolution", PARAMS.setFusionResolution+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isRetructureResolution", PARAMS.setRestructureResolution+"")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setFrontierRequest+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isIncompetenceNCS", PARAMS.setIncompetenceDetection +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isSubVoidDetection", PARAMS.setSubIncompetencedDetection +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isFusionResolution", PARAMS.setCompleteRedundancyDetection +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isRetructureResolution", PARAMS.setPartialRedundancyDetection +"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isAmbiguityNCS", PARAMS.setRangeAmbiguityDetection +"")));
 
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
-        xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setLearnFromNeighbors+"")));
+        xpCSV.write(new ArrayList<>(Arrays.asList("isLearnFromNeighbors", PARAMS.setCooperativeNeighborhoodLearning +"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isDream", PARAMS.setDream+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList("isActiveExploitation", PARAMS.setActiveExploitation+"")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));

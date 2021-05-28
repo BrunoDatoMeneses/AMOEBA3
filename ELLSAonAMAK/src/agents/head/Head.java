@@ -401,7 +401,13 @@ public class Head extends EllsaAgent {
 
 
         }else{
-            getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+
+			if(getAmas().data.maxPrediction != Double.NEGATIVE_INFINITY && getAmas().data.minPrediction!=Double.POSITIVE_INFINITY && getAmas().data.minPrediction!=getAmas().data.maxPrediction ){
+				getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ (getAmas().data.maxPrediction-getAmas().data.minPrediction);
+				//getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ Math.abs(oracleValueWithoutNoise);
+			}else{
+				getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+			}
         }
 
 		if(bestContext != null){
@@ -420,8 +426,14 @@ public class Head extends EllsaAgent {
 				request[i]=getAmas().getPercepts().get(i).getValue();
 			}
 
-			getAmas().data.oracleValue = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
-			getAmas().data.criticity = Math.abs(getAmas().data.oracleValue - getAmas().data.prediction)/ Math.abs(getAmas().data.oracleValue);
+			double oracleValueWithoutNoise = ((F_N_Manager)(getAmas().studiedSystem)).modelWithoutNoise(request);
+
+			if(getAmas().data.maxPrediction != Double.NEGATIVE_INFINITY && getAmas().data.minPrediction!=Double.POSITIVE_INFINITY && getAmas().data.minPrediction!=getAmas().data.maxPrediction ){
+				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ (getAmas().data.maxPrediction-getAmas().data.minPrediction);
+				//getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ Math.abs(oracleValueWithoutNoise);
+			}else{
+				getAmas().data.criticity = Math.abs(oracleValueWithoutNoise - getAmas().data.prediction)/ Math.abs(oracleValueWithoutNoise);
+			}
 			//System.out.println("A " + getAmas().getCycle() + "\t\t\t" + getAmas().data.oracleValue + "\t\t\t" + getAmas().data.prediction + "\t\t\t" + getAmas().data.criticity);
 			if(bestContext != null){
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(bestContext.getName(),

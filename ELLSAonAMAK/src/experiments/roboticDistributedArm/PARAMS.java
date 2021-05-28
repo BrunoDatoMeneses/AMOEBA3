@@ -13,7 +13,7 @@ public class PARAMS {
     public static  String configFile = "";
     public static  ArrayList subPercepts = new ArrayList<>();
 
-    public static int nbLearningCycle = 50;
+    public static int nbLearningCycle = 100;
     public static int nbExploitationCycle = 100;
     public static int nbepisodes = 1;
     public static  int requestControlCycles = 10;
@@ -21,7 +21,7 @@ public class PARAMS {
     public static boolean isOrientationGoal = true;
 
     public static double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.02;
+    public static double validityRangesPrecision = 0.04;
 
     /* LEARNING */
 
@@ -122,6 +122,11 @@ public class PARAMS {
     public static  int nbOfNeighborForLearningFromNeighbors = 1;
     public static  int nbOfNeighborForContexCreationWithouOracle = 7;
     public static  int nbOfNeighborForVoidDetectionInSelfLearning = 7;
+
+    public static  boolean setFusionResolution = true ;
+    public static  boolean setRestructureResolution = true ;
+
+    public static double probabilityOfRangeAmbiguity = 0.1;
 
 
     /*UI*/

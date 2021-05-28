@@ -94,19 +94,19 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 
 		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
-		ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setIncompetenceDetection;
+		ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubIncompetencedDetection;
 		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
 		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
-		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setRangeAmbiguityDetection;
+		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setModelAmbiguityDetection;
+		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setCompleteRedundancyDetection;
+		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setPartialRedundancyDetection;
 
 		ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
-		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setCooperativeNeighborhoodLearning;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;
@@ -133,7 +133,7 @@ public class F_N_LauncherUI  extends Application implements Serializable {
 		ellsa.data.STOP_UI_cycle = PARAMS.STOP_UI_cycle;
 
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
-		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
+
 
 		//ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
 		

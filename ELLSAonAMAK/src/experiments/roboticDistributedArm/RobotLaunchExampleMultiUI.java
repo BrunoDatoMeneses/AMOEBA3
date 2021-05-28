@@ -73,71 +73,71 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsas[i].allowGraphicalScheduler(true);
             ellsas[i].setRenderUpdate(false);
             ellsas[i].data.nameID = "ellsaTheta"+i;
-            ellsas[i].getEnvironment().setMappingErrorAllowed(experiments.roboticArm.PARAMS.validityRangesPrecision);
-            ellsas[i].data.PARAM_modelErrorMargin = experiments.roboticArm.PARAMS.modelErrorMargin;
-            ellsas[i].data.PARAM_bootstrapCycle = experiments.roboticArm.PARAMS.setbootstrapCycle;
-            ellsas[i].data.PARAM_exogenousLearningWeight = experiments.roboticArm.PARAMS.exogenousLearningWeight;
-            ellsas[i].data.PARAM_endogenousLearningWeight = experiments.roboticArm.PARAMS.endogenousLearningWeight;
+            ellsas[i].getEnvironment().setMappingErrorAllowed(experiments.roboticDistributedArm.PARAMS.validityRangesPrecision);
+            ellsas[i].data.PARAM_modelErrorMargin = experiments.roboticDistributedArm.PARAMS.modelErrorMargin;
+            ellsas[i].data.PARAM_bootstrapCycle = experiments.roboticDistributedArm.PARAMS.setbootstrapCycle;
+            ellsas[i].data.PARAM_exogenousLearningWeight = experiments.roboticDistributedArm.PARAMS.exogenousLearningWeight;
+            ellsas[i].data.PARAM_endogenousLearningWeight = experiments.roboticDistributedArm.PARAMS.endogenousLearningWeight;
 
-            ellsas[i].data.PARAM_neighborhoodRadiusCoefficient = experiments.roboticArm.PARAMS.neighborhoodRadiusCoefficient;
-            ellsas[i].data.PARAM_influenceRadiusCoefficient = experiments.roboticArm.PARAMS.influenceRadiusCoefficient;
-            ellsas[i].data.PARAM_maxRangeRadiusCoefficient = experiments.roboticArm.PARAMS.maxRangeRadiusCoefficient;
-            ellsas[i].data.PARAM_rangeSimilarityCoefficient = experiments.roboticArm.PARAMS.rangeSimilarityCoefficient;
-            ellsas[i].data.PARAM_minimumRangeCoefficient = experiments.roboticArm.PARAMS.minimumRangeCoefficient;
+            ellsas[i].data.PARAM_neighborhoodRadiusCoefficient = experiments.roboticDistributedArm.PARAMS.neighborhoodRadiusCoefficient;
+            ellsas[i].data.PARAM_influenceRadiusCoefficient = experiments.roboticDistributedArm.PARAMS.influenceRadiusCoefficient;
+            ellsas[i].data.PARAM_maxRangeRadiusCoefficient = experiments.roboticDistributedArm.PARAMS.maxRangeRadiusCoefficient;
+            ellsas[i].data.PARAM_rangeSimilarityCoefficient = experiments.roboticDistributedArm.PARAMS.rangeSimilarityCoefficient;
+            ellsas[i].data.PARAM_minimumRangeCoefficient = experiments.roboticDistributedArm.PARAMS.minimumRangeCoefficient;
 
-            ellsas[i].data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = experiments.roboticArm.PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
-            ellsas[i].data.PARAM_creationNeighborNumberForContexCreationWithouOracle = experiments.roboticArm.PARAMS.nbOfNeighborForContexCreationWithouOracle;
+            ellsas[i].data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = experiments.roboticDistributedArm.PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
+            ellsas[i].data.PARAM_creationNeighborNumberForContexCreationWithouOracle = experiments.roboticDistributedArm.PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-            ellsas[i].data.PARAM_perceptionsGenerationCoefficient = experiments.roboticArm.PARAMS.perceptionsGenerationCoefficient;
-            ellsas[i].data.PARAM_modelSimilarityThreshold = experiments.roboticArm.PARAMS.modelSimilarityThreshold;
+            ellsas[i].data.PARAM_perceptionsGenerationCoefficient = experiments.roboticDistributedArm.PARAMS.perceptionsGenerationCoefficient;
+            ellsas[i].data.PARAM_modelSimilarityThreshold = experiments.roboticDistributedArm.PARAMS.modelSimilarityThreshold;
 
-            ellsas[i].data.PARAM_LEARNING_WEIGHT_ACCURACY = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_ACCURACY;
-            ellsas[i].data.PARAM_LEARNING_WEIGHT_PROXIMITY = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_PROXIMITY;
-            ellsas[i].data.PARAM_LEARNING_WEIGHT_EXPERIENCE = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_EXPERIENCE;
-            ellsas[i].data.PARAM_LEARNING_WEIGHT_GENERALIZATION = experiments.roboticArm.PARAMS.LEARNING_WEIGHT_GENERALIZATION;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_ACCURACY = experiments.roboticDistributedArm.PARAMS.LEARNING_WEIGHT_ACCURACY;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_PROXIMITY = experiments.roboticDistributedArm.PARAMS.LEARNING_WEIGHT_PROXIMITY;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_EXPERIENCE = experiments.roboticDistributedArm.PARAMS.LEARNING_WEIGHT_EXPERIENCE;
+            ellsas[i].data.PARAM_LEARNING_WEIGHT_GENERALIZATION = experiments.roboticDistributedArm.PARAMS.LEARNING_WEIGHT_GENERALIZATION;
 
-            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
-            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
-            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = experiments.roboticArm.PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
-
-
-            ellsas[i].data.PARAM_isActiveLearning = experiments.roboticArm.PARAMS.setActiveLearning;
-            ellsas[i].data.PARAM_isSelfLearning = experiments.roboticArm.PARAMS.setSelfLearning;
-
-            ellsas[i].data.PARAM_NCS_isConflictDetection = experiments.roboticArm.PARAMS.setConflictDetection;
-            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = experiments.roboticArm.PARAMS.setConcurrenceDetection;
-            ellsas[i].data.PARAM_NCS_isVoidDetection = experiments.roboticArm.PARAMS.setVoidDetection;
-            ellsas[i].data.PARAM_NCS_isSubVoidDetection = experiments.roboticArm.PARAMS.setSubVoidDetection;
-            ellsas[i].data.PARAM_NCS_isConflictResolution = experiments.roboticArm.PARAMS.setConflictResolution;
-            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = experiments.roboticArm.PARAMS.setConcurrenceResolution;
-            ellsas[i].data.PARAM_NCS_isFrontierRequest = experiments.roboticArm.PARAMS.setFrontierRequest;
-            ellsas[i].data.PARAM_NCS_isSelfModelRequest = experiments.roboticArm.PARAMS.setSelfModelRequest;
-            ellsas[i].data.PARAM_NCS_isFusionResolution = experiments.roboticArm.PARAMS.setFusionResolution;
-            ellsas[i].data.PARAM_NCS_isRetrucstureResolution = experiments.roboticArm.PARAMS.setRestructureResolution;
-
-            ellsas[i].data.PARAM_NCS_isCreationWithNeighbor = experiments.roboticArm.PARAMS.setisCreationWithNeighbor;
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_PROXIMITY = experiments.roboticDistributedArm.PARAMS.EXPLOITATION_WEIGHT_PROXIMITY;
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_EXPERIENCE = experiments.roboticDistributedArm.PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE;
+            ellsas[i].data.PARAM_EXPLOITATION_WEIGHT_GENERALIZATION = experiments.roboticDistributedArm.PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION;
 
 
-            ellsas[i].data.PARAM_isLearnFromNeighbors = experiments.roboticArm.PARAMS.setLearnFromNeighbors;
-            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = experiments.roboticArm.PARAMS.nbOfNeighborForLearningFromNeighbors;
-            ellsas[i].data.PARAM_isDream = experiments.roboticArm.PARAMS.setDream;
-            ellsas[i].data.PARAM_DreamCycleLaunch = experiments.roboticArm.PARAMS.setDreamCycleLaunch;
+            ellsas[i].data.PARAM_isActiveLearning = experiments.roboticDistributedArm.PARAMS.setActiveLearning;
+            ellsas[i].data.PARAM_isSelfLearning = experiments.roboticDistributedArm.PARAMS.setSelfLearning;
+
+            ellsas[i].data.PARAM_NCS_isConflictDetection = experiments.roboticDistributedArm.PARAMS.setConflictDetection;
+            ellsas[i].data.PARAM_NCS_isConcurrenceDetection = experiments.roboticDistributedArm.PARAMS.setConcurrenceDetection;
+            ellsas[i].data.PARAM_NCS_isVoidDetection = experiments.roboticDistributedArm.PARAMS.setVoidDetection;
+            ellsas[i].data.PARAM_NCS_isSubVoidDetection = experiments.roboticDistributedArm.PARAMS.setSubVoidDetection;
+            ellsas[i].data.PARAM_NCS_isConflictResolution = experiments.roboticDistributedArm.PARAMS.setConflictResolution;
+            ellsas[i].data.PARAM_NCS_isConcurrenceResolution = experiments.roboticDistributedArm.PARAMS.setConcurrenceResolution;
+            ellsas[i].data.PARAM_NCS_isFrontierRequest = experiments.roboticDistributedArm.PARAMS.setFrontierRequest;
+            ellsas[i].data.PARAM_NCS_isSelfModelRequest = experiments.roboticDistributedArm.PARAMS.setSelfModelRequest;
+            ellsas[i].data.PARAM_NCS_isFusionResolution = experiments.roboticDistributedArm.PARAMS.setFusionResolution;
+            ellsas[i].data.PARAM_NCS_isRetrucstureResolution = experiments.roboticDistributedArm.PARAMS.setRestructureResolution;
+
+            ellsas[i].data.PARAM_NCS_isCreationWithNeighbor = experiments.roboticDistributedArm.PARAMS.setisCreationWithNeighbor;
 
 
-            ellsas[i].data.PARAM_isAutonomousMode = experiments.roboticArm.PARAMS.setAutonomousMode;
-
-            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForLearning = experiments.roboticArm.PARAMS.isAllContextSearchAllowedForLearning;
-            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForExploitation = experiments.roboticArm.PARAMS.isAllContextSearchAllowedForExploitation;
-
-            ellsas[i].data.PARAM_probabilityOfRangeAmbiguity = experiments.roboticArm.PARAMS.probabilityOfRangeAmbiguity;
+            ellsas[i].data.PARAM_isLearnFromNeighbors = experiments.roboticDistributedArm.PARAMS.setLearnFromNeighbors;
+            ellsas[i].data.PARAM_nbOfNeighborForLearningFromNeighbors = experiments.roboticDistributedArm.PARAMS.nbOfNeighborForLearningFromNeighbors;
+            ellsas[i].data.PARAM_isDream = experiments.roboticDistributedArm.PARAMS.setDream;
+            ellsas[i].data.PARAM_DreamCycleLaunch = experiments.roboticDistributedArm.PARAMS.setDreamCycleLaunch;
 
 
+            ellsas[i].data.PARAM_isAutonomousMode = experiments.roboticDistributedArm.PARAMS.setAutonomousMode;
 
-            ellsas[i].getEnvironment().PARAM_minTraceLevel = experiments.roboticArm.PARAMS.traceLevel;
+            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForLearning = experiments.roboticDistributedArm.PARAMS.isAllContextSearchAllowedForLearning;
+            ellsas[i].data.PARAM_NCS_isAllContextSearchAllowedForExploitation = experiments.roboticDistributedArm.PARAMS.isAllContextSearchAllowedForExploitation;
+
+            ellsas[i].data.PARAM_probabilityOfRangeAmbiguity = experiments.roboticDistributedArm.PARAMS.probabilityOfRangeAmbiguity;
 
 
 
-            ellsas[i].setSubPercepts(experiments.roboticArm.PARAMS.subPercepts);
+            ellsas[i].getEnvironment().PARAM_minTraceLevel = experiments.roboticDistributedArm.PARAMS.traceLevel;
+
+
+
+            ellsas[i].setSubPercepts(experiments.roboticDistributedArm.PARAMS.subPercepts);
         }
 
 

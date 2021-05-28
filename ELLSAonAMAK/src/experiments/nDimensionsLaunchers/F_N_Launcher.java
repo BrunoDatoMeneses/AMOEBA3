@@ -195,10 +195,10 @@ public class F_N_Launcher implements Serializable {
 		xpCSV.write(new ArrayList<>(Arrays.asList("NCS")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Conflicts",PARAMS.setConflictDetection+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Concurrences",PARAMS.setConcurrenceDetection+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences",PARAMS.setVoidDetection +"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Ambiguities",PARAMS.setFrontierRequest+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Model",PARAMS.setSelfModelRequest+"")));
-		xpCSV.write(new ArrayList<>(Arrays.asList("Learn From Neighbors",PARAMS.setLearnFromNeighbors+"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Incompetences",PARAMS.setIncompetenceDetection +"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Ambiguities",PARAMS.setRangeAmbiguityDetection +"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Model",PARAMS.setModelAmbiguityDetection +"")));
+		xpCSV.write(new ArrayList<>(Arrays.asList("Learn From Neighbors",PARAMS.setCooperativeNeighborhoodLearning +"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList("Dream",PARAMS.setDream+"")));
 		xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
 
@@ -227,19 +227,19 @@ public class F_N_Launcher implements Serializable {
 		ellsa.data.PARAM_isSelfLearning = PARAMS.setSelfLearning;
 		ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
 		ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
+		ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setIncompetenceDetection;
 		ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
 		ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
-		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+		ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setRangeAmbiguityDetection;
+		ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setModelAmbiguityDetection;
+		ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setCompleteRedundancyDetection;
+		ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setPartialRedundancyDetection;
 		ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
-		ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
+		//ellsa.data.isCoopLearningWithoutOracle_ASUPPRIMER = PARAMS.setCoopLearningASUPPRIMER;
 
-		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+		ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setCooperativeNeighborhoodLearning;
 		ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
 		ellsa.data.PARAM_isDream = PARAMS.setDream;
 		ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;

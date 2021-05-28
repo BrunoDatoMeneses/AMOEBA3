@@ -71,11 +71,11 @@ public class PARAMS {
             "ptheta10","ptheta11", "ptheta12", "ptheta13", "ptheta14", "ptheta15",
             "ptheta16", "ptheta17", "ptheta18", "ptheta19")  );*/
 
-    /*public static  String configFile = "10jointsRobot3DimensionsLauncher.xml";
+    public static  String configFile = "10jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 11;
     public static int nbJoints = 10;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2", "ptheta3", "ptheta4",
-    "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));*/
+    "ptheta5", "ptheta6", "ptheta7", "ptheta8", "ptheta9"));
 
     /*public static  String configFile = "6jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 7;
@@ -89,15 +89,15 @@ public class PARAMS {
     public static int nbJoints = 3;
     public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta1", "ptheta2"));*/
 
-    public static  String configFile = "2jointsRobot3DimensionsLauncher.xml";
+    /*public static  String configFile = "2jointsRobot3DimensionsLauncher.xml";
     public static  int dimension = 3;
     public static int nbJoints = 2;
-    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
+    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
 
-//    public static  String configFile = "2jointsRobot2DimensionsLauncher.xml";
-//    public static  int dimension = 2;
-//    public static int nbJoints = 2;
-//    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));
+/*    public static  String configFile = "2jointsRobot2DimensionsLauncher.xml";
+    public static  int dimension = 2;
+    public static int nbJoints = 2;
+    public static  ArrayList subPercepts = new ArrayList<>(Arrays.asList("ptheta0"));*/
 
     /*public static  String configFile = "1jointRobot2DimensionsLauncher.xml";
     public static  int dimension = 2;
@@ -115,7 +115,7 @@ public class PARAMS {
     public static  double transferCyclesRatio = 0.3;//0.429;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.02;
+    public static double validityRangesPrecision = 0.01;
 
     /* LEARNING */
 
@@ -231,6 +231,5 @@ public class PARAMS {
 //    public static int STOP_UI_cycle = setDreamCycleLaunch;
     public static int STOP_UI_cycle = nbLearningCycle;
 
-    //TODO à supprimer
-    public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE
+
 }

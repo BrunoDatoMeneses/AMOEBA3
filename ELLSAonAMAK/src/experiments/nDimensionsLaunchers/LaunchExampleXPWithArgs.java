@@ -47,17 +47,17 @@ public class LaunchExampleXPWithArgs {
         //NCS
         PARAMS.setConflictDetection = Boolean.parseBoolean(args[11]);
         PARAMS.setConcurrenceDetection = Boolean.parseBoolean(args[12]);
-        PARAMS.setVoidDetection = Boolean.parseBoolean(args[13]);
-        PARAMS.setSubVoidDetection = Boolean.parseBoolean(args[14]);
-        PARAMS.setFrontierRequest = Boolean.parseBoolean(args[15]);
-        PARAMS.setSelfModelRequest = Boolean.parseBoolean(args[16]);
-        PARAMS.setFusionResolution = Boolean.parseBoolean(args[17]);
-        PARAMS.setRestructureResolution = Boolean.parseBoolean(args[18]);
+        PARAMS.setIncompetenceDetection = Boolean.parseBoolean(args[13]);
+        PARAMS.setSubIncompetencedDetection = Boolean.parseBoolean(args[14]);
+        PARAMS.setRangeAmbiguityDetection = Boolean.parseBoolean(args[15]);
+        PARAMS.setModelAmbiguityDetection = Boolean.parseBoolean(args[16]);
+        PARAMS.setCompleteRedundancyDetection = Boolean.parseBoolean(args[17]);
+        PARAMS.setPartialRedundancyDetection = Boolean.parseBoolean(args[18]);
 
         PARAMS.setDream = Boolean.parseBoolean(args[19]);
         PARAMS.setDreamCycleLaunch = Integer.parseInt(args[20]);
 
-        PARAMS.setLearnFromNeighbors = Boolean.parseBoolean(args[21]);
+        PARAMS.setCooperativeNeighborhoodLearning = Boolean.parseBoolean(args[21]);
         PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(args[22]);
         PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(args[23]);
         PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
@@ -198,19 +198,19 @@ public class LaunchExampleXPWithArgs {
 
         ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
         ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
-        ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+        ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setIncompetenceDetection;
+        ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubIncompetencedDetection;
         ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
         ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-        ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-        ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
-        ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+        ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setRangeAmbiguityDetection;
+        ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setModelAmbiguityDetection;
+        ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setCompleteRedundancyDetection;
+        ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setPartialRedundancyDetection;
 
         ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
-        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setCooperativeNeighborhoodLearning;
         ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
         ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;

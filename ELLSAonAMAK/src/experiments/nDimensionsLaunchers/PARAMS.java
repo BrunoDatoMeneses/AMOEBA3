@@ -13,11 +13,11 @@ public class PARAMS {
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
-//    public static String model = "squareFixed";
+    public static String model = "squareFixed";
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-    public static String model = "gaussianCos2";
+//    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
 //    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
@@ -38,7 +38,7 @@ public class PARAMS {
     /*public static  String configFile = "tenDimensionsLauncher.xml";
     public static  int dimension = 10;*/
 
-    /*public static  String configFile = "threeDimensionsLauncher.xml";
+/*    public static  String configFile = "threeDimensionsLauncher.xml";
     public static  int dimension = 3;*/
 
     /*public static  String configFile = "fourDimensionsLauncher.xml";
@@ -47,7 +47,7 @@ public class PARAMS {
     /*public static  String configFile = "fiveDimensionsLauncher.xml";
     public static  int dimension = 5;*/
 
-    public static  int nbLearningCycle = 5000;
+    public static  int nbLearningCycle = 2000;
     public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
     public static  boolean setActiveExploitation = false ;
@@ -121,19 +121,19 @@ public class PARAMS {
 
     public static  boolean setActiveLearning = true	;
     public static  boolean setSelfLearning = false;
-    public static  boolean setLearnFromNeighbors = false ;
+    public static  boolean setCooperativeNeighborhoodLearning = false ;
 
 
 
     /*NCS*/
 
-    public static  boolean setSelfModelRequest = true ;
+    public static  boolean setModelAmbiguityDetection = true ;
     public static  boolean setConflictDetection = true ;
     public static  boolean setConcurrenceDetection = true ;
-    public static  boolean setVoidDetection = true ;
-    public static  boolean setFusionResolution = true ;
-    public static  boolean setRestructureResolution = true ;
-    public static  boolean setFrontierRequest = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setIncompetenceDetection = true ;
+    public static  boolean setCompleteRedundancyDetection = true ;
+    public static  boolean setPartialRedundancyDetection = true ;
+    public static  boolean setRangeAmbiguityDetection = true ; // ONLY ACTIVE LEARNING
 
 
     public static  boolean setisCreationWithNeighbor = true;
@@ -143,7 +143,7 @@ public class PARAMS {
 
     public static  boolean setConflictResolution = setConflictDetection ;
     public static  boolean setConcurrenceResolution = setConcurrenceDetection ;
-    public static  boolean setSubVoidDetection = false ;
+    public static  boolean setSubIncompetencedDetection = false ;
 
 
     public static  boolean setDream = true ;
@@ -171,8 +171,7 @@ public class PARAMS {
     public static boolean STOP_UI = true;
 //    public static int STOP_UI_cycle = (int) (nbLearningCycle -  (nbLearningCycle*transferCyclesRatio));
 //    public static int STOP_UI_cycle = setDreamCycleLaunch;
-    public static int STOP_UI_cycle = 3000;
+    public static int STOP_UI_cycle = nbLearningCycle;
 
-    //TODO à supprimer
-    public static  boolean setCoopLearningASUPPRIMER = false ; // WITHOUT ORACLE
+
 }

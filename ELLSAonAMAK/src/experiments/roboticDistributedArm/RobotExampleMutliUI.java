@@ -123,16 +123,16 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 
 
 		if(!Configuration.commandLineMode){
-			circleBase = getAmas().getVUIMulti().createAndAddCircle(xStart, yStart,4);
+			circleBase = getAmas().getVUIMulti().createAndAddCircle(xStart, yStart,6);
 
 			for (int i = 0;i<jointsNumber;i++){
 				lines[i] = getAmas().getVUIMulti().createAndAddLine(starts[i].getA(), starts[i].getB(),ends[i].getA(),ends[i].getB());
-				circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),2);
+				circles[i] = getAmas().getVUIMulti().createAndAddCircle(ends[i].getA(),ends[i].getB(),4);
 
 			}
 
-			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,3);
-			subGoalCircle  = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,3);
+			goalCircle = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,5);
+			subGoalCircle  = getAmas().getVUIMulti().createAndAddCircle(0.0,0.0,5);
 
 			goalCircle.setColor(new Color(0.0,1.0,0.0,1.0));
 			subGoalCircle.setColor(new Color(0.0,0.0,1.0,1.0));
@@ -208,7 +208,7 @@ public class RobotExampleMutliUI extends Agent<RobotWorldExampleMultiUI, WorldEx
 					double[] goal = robotArmManager.getGoal();
 					if(getAmas().getCycle()<robotArmManager.trainingCycles){
 						if(ends[jointsNumber-1].getB()>0.0 || true){
-							getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.25);
+							getAmas().getVUIMulti().createAndAddCircle(ends[jointsNumber-1].getA(), ends[jointsNumber-1].getB(),0.75);
 						}
 
 					}

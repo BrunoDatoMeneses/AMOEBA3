@@ -58,7 +58,7 @@ public class LaunchExampleXPWithArgsManualy {
         // Learning
         PARAMS.setActiveLearning = false;
         PARAMS.setSelfLearning = true;
-        PARAMS.setLearnFromNeighbors = true;
+        PARAMS.setCooperativeNeighborhoodLearning = true;
 
 //        PARAMS.setActiveLearning = true;
 //        PARAMS.setSelfLearning = false;
@@ -66,15 +66,15 @@ public class LaunchExampleXPWithArgsManualy {
 
         //NCS
 
-        PARAMS.setSelfModelRequest = true;
+        PARAMS.setModelAmbiguityDetection = true;
         PARAMS.setConflictDetection = true;
         PARAMS.setConcurrenceDetection = true;
-        PARAMS.setVoidDetection = true;
-        PARAMS.setFusionResolution = true;
-        PARAMS.setRestructureResolution = true;
-        PARAMS.setFrontierRequest = true;
+        PARAMS.setIncompetenceDetection = true;
+        PARAMS.setCompleteRedundancyDetection = true;
+        PARAMS.setPartialRedundancyDetection = true;
+        PARAMS.setRangeAmbiguityDetection = true;
 
-        PARAMS.setSubVoidDetection = false;
+        PARAMS.setSubIncompetencedDetection = false;
 
         PARAMS.setDream = false;
         PARAMS.setDreamCycleLaunch = 1500;
@@ -238,19 +238,19 @@ public class LaunchExampleXPWithArgsManualy {
 
         ellsa.data.PARAM_NCS_isConflictDetection = PARAMS.setConflictDetection;
         ellsa.data.PARAM_NCS_isConcurrenceDetection = PARAMS.setConcurrenceDetection;
-        ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setVoidDetection;
-        ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubVoidDetection;
+        ellsa.data.PARAM_NCS_isVoidDetection = PARAMS.setIncompetenceDetection;
+        ellsa.data.PARAM_NCS_isSubVoidDetection = PARAMS.setSubIncompetencedDetection;
         ellsa.data.PARAM_NCS_isConflictResolution = PARAMS.setConflictResolution;
         ellsa.data.PARAM_NCS_isConcurrenceResolution = PARAMS.setConcurrenceResolution;
-        ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setFrontierRequest;
-        ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setSelfModelRequest;
-        ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setFusionResolution;
-        ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setRestructureResolution;
+        ellsa.data.PARAM_NCS_isFrontierRequest = PARAMS.setRangeAmbiguityDetection;
+        ellsa.data.PARAM_NCS_isSelfModelRequest = PARAMS.setModelAmbiguityDetection;
+        ellsa.data.PARAM_NCS_isFusionResolution = PARAMS.setCompleteRedundancyDetection;
+        ellsa.data.PARAM_NCS_isRetrucstureResolution = PARAMS.setPartialRedundancyDetection;
 
         ellsa.data.PARAM_NCS_isCreationWithNeighbor = PARAMS.setisCreationWithNeighbor;
 
 
-        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setLearnFromNeighbors;
+        ellsa.data.PARAM_isLearnFromNeighbors = PARAMS.setCooperativeNeighborhoodLearning;
         ellsa.data.PARAM_nbOfNeighborForLearningFromNeighbors = PARAMS.nbOfNeighborForLearningFromNeighbors;
         ellsa.data.PARAM_isDream = PARAMS.setDream;
         ellsa.data.PARAM_DreamCycleLaunch = PARAMS.setDreamCycleLaunch;

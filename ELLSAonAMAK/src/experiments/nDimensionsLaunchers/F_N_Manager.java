@@ -1136,7 +1136,7 @@ private double[] subZoneCenter3D(int nb) {
 		out.put("oracle",null);
 
 		double prediction = ellsa.request(out);
-		double error = Math.abs(oracleValue-prediction)/Math.abs(oracleValue);
+		double error = Math.abs(oracleValue-prediction)/Math.abs(ellsa.data.maxPrediction- ellsa.data.minPrediction);
 		//System.out.println("M" + cycle + "\t\t\t" + oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
 
 		return error;
