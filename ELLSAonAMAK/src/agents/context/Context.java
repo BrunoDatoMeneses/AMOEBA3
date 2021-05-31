@@ -323,39 +323,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-//	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
-//
-//		buildContextCommon();
-//
-//		ArrayList<Percept> var = getAmas().getPercepts();
-//		for (Percept pct : var) {
-//			Range r;
-//			double center = contextDimensions.get(pct).getA();
-//			double length = contextDimensions.get(pct).getB();
-//			r = new Range(this, center - length / 2, center + length / 2, 0, true, true, pct);
-//
-//			ranges.put(pct, r);
-//			ranges.get(pct).setValue(center);
-//
-//			pct.addContextProjection(this);
-//		}
-//
-//		// expand();
-//
-//		this.confidence = fatherContext.confidence;
-//
-//		this.localModel = getAmas().buildLocalModel(this);
-//		// this.formulaLocalModel = ((LocalModelMillerRegression)
-//		// bestNearestContext.localModel).getFormula(bestNearestContext);
-//		Double[] coef = fatherContext.localModel.getCoef();
-//		this.localModel.setCoef(coef);
-//		this.actionProposition = fatherContext.localModel.getProposition();
-//
-//		getAmas().addAlteredContext(this);
-//		this.setName(String.valueOf(this.hashCode()));
-//
-//		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-//	}
+
 
 
 	private void buildContextWithoutOracle(double endogenousPredicion) {
@@ -516,23 +484,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-	/*public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
-			Percept pctDirection) {
-		ArrayList<Context> contexts = new ArrayList<Context>();
 
-		boolean test = true;
-		for (Context ctxtNeigbor : contextNeighbors) {
-			for (Percept pct : ranges.keySet()) {
-				if (pct != pctDirection) {
-					test = test && (this.ranges.get(pct).distance(ctxtNeigbor.getRanges().get(pct)) < 0);
-				}
-			}
-			if (test) {
-				contexts.add(ctxtNeigbor);
-			}
-		}
-		return contexts;
-	}*/
 
 	public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
 			Percept pctDirection, SpatialContext expandingContext) {
@@ -555,43 +507,7 @@ public class Context extends EllsaAgent {
 		return contexts;
 	}
 
-	/*public void expand() {
-		ArrayList<Context> neighborsOnOneDirection;
-		HashMap<Percept, SpatialContext> alternativeContexts = new HashMap<Percept, SpatialContext>();
-		double maxVolume = this.getVolume();
-		double currentVolume;
-		SpatialContext maxVolumeSpatialContext = null;
 
-		for (Percept fixedPct : ranges.keySet()) {
-
-			alternativeContexts.put(fixedPct, new SpatialContext(this));
-
-			for (Percept pctDirectionForExpanding : ranges.keySet()) {
-
-				if (pctDirectionForExpanding != fixedPct) {
-
-					neighborsOnOneDirection = getContextsOnAPerceptDirectionFromContextsNeighbors(
-							getAmas().getHeadAgent().getActivatedNeighborsContexts(), pctDirectionForExpanding,
-							alternativeContexts.get(fixedPct));
-
-					Pair<Double, Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(
-							neighborsOnOneDirection, pctDirectionForExpanding);
-					alternativeContexts.get(fixedPct).expandEnd(pctDirectionForExpanding, expandingRadiuses.getB());
-					alternativeContexts.get(fixedPct).expandStart(pctDirectionForExpanding, expandingRadiuses.getA());
-				}
-			}
-
-			currentVolume = alternativeContexts.get(fixedPct).getVolume();
-			if (currentVolume > maxVolume) {
-				maxVolume = currentVolume;
-				maxVolumeSpatialContext = alternativeContexts.get(fixedPct);
-			}
-
-		}
-		if (maxVolumeSpatialContext != null) {
-			matchSpatialContextRanges(maxVolumeSpatialContext);
-		}
-	}*/
 
 	public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
 		for (Percept pct : ranges.keySet()) {
