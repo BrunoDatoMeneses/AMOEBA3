@@ -1,21 +1,21 @@
-# How to use AMOEBA
+# How to use ELLSA
 
-## What AMOEBA can do :
-AMOEBA is a learning function, and it does that by building a model of the function.
+## What ELLSA can do :
+ELLSA is a learning function, and it does that by building several local models that represent the learned function.
 
 The inputs of that function can be any amount of numerical variables (usually continuous, like the x and y coordinate in an Euclidian space), we call these variables Percepts. The output (result) of our function is a single, numerical variable (like whether or not that point in our Euclidian space has the colour red), we call this result Prediction, and the correct prediction is called Oracle.
 
- Amoeba can be asked to learn, or to provide a prediction, at any time. Making it suitable for real time usage and lifelong learning.
+ ELLSA can be asked to learn, or to provide a prediction, at any time. Making it suitable for real time usage and lifelong learning.
 
 # Preparations
-First, make sure that you properly [installed AMOEBAonAMAK](installing.md), preferably with eclipse. 
+First, make sure that you properly [installed ELLSAonAMAK](installing.md). 
 
-Depending on your problem, determine what AMOEBA should learn, and from what. But keep in mind that an ellsa predict one variable, if you have multiple variables to predict, you'll need multiple ellsas.
+Depending on your problem, determine what ELLSA should learn, and from what. But keep in mind that an ellsa predict one variable, if you have multiple variables to predict, you'll need multiple ellsas.
 
 ## Create a config file
 A config file is a xml file used to initialize your ellsa. Most importantly it contain the list of percepts.
 
-You can use `utils/genFiles.py` to generate your xml file based on a list of percept. `python genFiles.py MySystem false px py` will create `MySystem.xml` (and `MySystem.msg`, but ignore it if you don't use [AMOEBA and ROS](rosbridge.md)) containing something looking like the following example :
+You can use `utils/genFiles.py` to generate your xml file based on a list of percept. `python genFiles.py MySystem false px py` will create `MySystem.xml` (and `MySystem.msg`, but ignore it if you don't use [ELLSA and ROS](rosbridge.md)) containing something looking like the following example :
 (if you don't want to use python, a java class doing the same job is available at `utils.XmlConfigGenerator`)
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -40,13 +40,13 @@ You can use `utils/genFiles.py` to generate your xml file based on a list of per
 ```
 With :
 - **Configuration** make sure `Learning` and `creationOfNewContext` are at `true` if you want to train your model.
-- **Sensor** represent one percept, make sure to remember the name, we will use it later. `Enum` tell AMOEBA whether or not the variable linked to this percept is continuous, or discrete. 
-- **Controller** these are hyperparameter for the AMOEBA, they affect how fast and how well an ellsa learn. They can be dynamically adjusted during training, AMOEBA even does it automatically ! You still might want to adjust `MinErrorAllowed` and `MinInexactAllowed`, as they're dependent on your problem.
+- **Sensor** represent one percept, make sure to remember the name, we will use it later. `Enum` tell ELLSA whether or not the variable linked to this percept is continuous, or discrete. 
+- **Controller** these are hyperparameter for the ELLSA, they affect how fast and how well an ellsa learn. They can be dynamically adjusted during training, ELLSA even does it automatically ! You still might want to adjust `MinErrorAllowed` and `MinInexactAllowed`, as they're dependent on your problem.
 
-If you want to use AMOEBA with ROS, continue [here](rosbridge.md).
+If you want to use ELLSA with ROS, continue [here](rosbridge.md).
 
 ## Create your studied system java class
-We have to tell AMOEBA what we want it to learn. Although we can hand-feed an ellsa with our data, providing a studied system allow to make full use of the graphical user interface.
+We have to tell ELLSA what we want it to learn. Although we can hand-feed an ellsa with our data, providing a studied system allow to make full use of the graphical user interface.
 
 Your studied system must implement the `StudiedSystem` interface. Most importantly :
 - `public void playOneStep()` advance the simulation of the studied system by one step (for example, read the next data point in a file).
@@ -112,7 +112,7 @@ public static void main(String[] args) {
 
     //intantiate an ellsa
     StudiedSystem studiedSystem = new myStudiedSystem();
-    AMOEBA ellsa = new AMOEBA("path/to/my/configFile.xml", studiedSystem);
+    ELLSA ellsa = new ELLSA("path/to/my/configFile.xml", studiedSystem);
 }
 ```
 With that you get a perfectly functioning ellsa, but it can only be [controlled with the GUI](gui.md), which can be very limiting.
@@ -127,7 +127,7 @@ public static void main(String[] args) {
 
     //intantiate an ellsa
     StudiedSystem studiedSystem = new myStudiedSystem();
-    AMOEBA ellsa = new AMOEBA("path/to/my/configFile.xml", studiedSystem);
+    ELLSA ellsa = new ELLSA("path/to/my/configFile.xml", studiedSystem);
 
     //learn 1000 points
     for(int i = 0; i < 1000; i++){

@@ -13,6 +13,7 @@ import fr.irit.smac.amak.ui.VUI;
 import fr.irit.smac.amak.ui.VUIMulti;
 import fr.irit.smac.amak.ui.drawables.Drawable;
 import fr.irit.smac.amak.ui.drawables.DrawableString;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -21,6 +22,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.WindowEvent;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.SaveHelperImpl;
@@ -90,7 +92,12 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 
 		rectangle.setColor(new Color(1, 1, 1, 0));
 
-
+		this.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				System.exit(0);
+			}
+		});
 
 		this.addTabbedPanel("ND", VUInDimensions.getPanel());
 
@@ -221,6 +228,8 @@ public class EllsaMultiUIWindow extends AmasMultiUIWindow{
 			view3D.updateContextChart();}
 		});
 		addToolbar(defaultPercetValueTextField);
+
+
 
 
 	}

@@ -14,6 +14,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import kernel.backup.SaveHelperImpl;
 
 
 /**
@@ -54,7 +55,7 @@ public class LauncherUI extends Application implements Serializable {
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 
-		//ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
+		ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
 		
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);
@@ -74,8 +75,7 @@ public class LauncherUI extends Application implements Serializable {
 		ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
 		ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-		ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient
-		;
+		ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient;
 		ellsa.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
 
 		ellsa.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
@@ -134,85 +134,7 @@ public class LauncherUI extends Application implements Serializable {
 		ellsa.data.PARAM_numberOfPointsForRegression_ASUPPRIMER = PARAMS.regressionPoints;
 
 
-		//ellsa.setSubPercepts(new ArrayList<>(Collections.singleton("px2")));
-		
-		/*for (int i = 0; i < PARAMS.nbCycle; ++i) {
-			amoeba.cycle();
-		}*/
-		
-		
-		// Exemple for adding a tool in the toolbar
-//		Slider slider = new Slider(0.01, 0.1, mappingErrorAllowed);
-//		slider.setShowTickLabels(true);
-//		slider.setShowTickMarks(true);
-//		
-//		slider.valueProperty().addListener(new ChangeListener<Number>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//				System.out.println("new Value "+newValue);
-//				mappingErrorAllowed = (double)newValue;
-//				amoeba.getEnvironment().setMappingErrorAllowed(mappingErrorAllowed);
-//			}
-//		});
-//		amoebaUI.addToolbar(slider);
-		
-		//studiedSystem.playOneStep();
-		//amoeba.learn(studiedSystem.getOutput());
-		
-		
-		
-		
-		/* AUTOMATIC */
-//				long start = System.currentTimeMillis();
-//				for (int i = 0; i < nbCycle; ++i) {
-//					studiedSystem.playOneStep();
-//					amoeba.learn(studiedSystem.getOutput());
-//				}
-//				long end = System.currentTimeMillis();
-//				System.out.println("Done in : " + (end - start) );
-//				
-//				start = System.currentTimeMillis();
-//				for (int i = 0; i < nbCycle; ++i) {
-//					studiedSystem.playOneStep();
-//					amoeba.request(studiedSystem.getOutput());
-//				}
-//				end = System.currentTimeMillis();
-//				System.out.println("Done in : " + (end - start) );
-		
-		
-//				/* XP PIERRE */
-//				
-//				String fileName = fileName(new ArrayList<String>(Arrays.asList("GaussiennePierre")));
-//				
-//				FILE Pierrefile = new FILE("Pierre",fileName);
-//				for (int i = 0; i < nbCycle; ++i) {
-//					studiedSystem.playOneStep();
-//					amoeba.learn(studiedSystem.getOutput());
-//					if(amoeba.getHeadAgent().isActiveLearning()) {
-//						studiedSystem.setActiveLearning(true);
-//						studiedSystem.setSelfRequest(amoeba.getHeadAgent().getSelfRequest());
-//						 
-//					}
-//				}
-//				
-//				for (int i = 0; i < 10; ++i) {
-//					studiedSystem.playOneStep();
-//					System.out.println(studiedSystem.getOutput());
-//					System.out.println(amoeba.request(studiedSystem.getOutput()));
-//					
-//					
-//				}
-//				
-//				Pierrefile.write(new ArrayList<String>(Arrays.asList("ID contexte","Coeff Cte","Coeff X0","Coeff X1","Min Value","Max Value")));
-//				
-//				for(Context ctxt : amoeba.getContexts()) {
-//					
-//					writeMessage(Pierrefile, ctxt.toStringArrayPierre());
-//
-//				}
-//				
-//				
-//				Pierrefile.close();
+
 		
 	}
 
