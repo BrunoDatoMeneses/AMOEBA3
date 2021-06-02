@@ -55,7 +55,7 @@ public class LauncherUI extends Application implements Serializable {
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
 
-		ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
+		//ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
 		
 		ellsa.allowGraphicalScheduler(true);
 		ellsa.setRenderUpdate(false);

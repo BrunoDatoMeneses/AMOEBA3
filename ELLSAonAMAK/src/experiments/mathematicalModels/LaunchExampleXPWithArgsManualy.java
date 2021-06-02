@@ -45,9 +45,9 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 2000;
+        PARAMS.nbLearningCycle = 1000;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 10;
+        PARAMS.nbEpisodes = 2;
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  0.1;
@@ -158,7 +158,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         );
 
-        // Set AMAK configuration before creating an AMOEBA
+        // Set AMAK configuration before creating an ELLSA
         Configuration.multiUI=true;
         Configuration.commandLineMode = true;
         Configuration.allowedSimultaneousAgentsExecution = 1;

@@ -16,7 +16,7 @@ import utils.TRACE_LEVEL;
  */
 public class Percept extends EllsaAgent {
 
-	// private BlackBoxAgent sensor;
+
 	protected ArrayList<EllsaAgent> targets = new ArrayList<>();
 	protected ArrayList<Context> activatedContext = new ArrayList<>();
 
@@ -288,18 +288,9 @@ public class Percept extends EllsaAgent {
 
 	public void deleteContextProjection(Context context) {
 		contextProjections.remove(context);
-		//////// System.out.println("DELETION
-		//////// ------------------------------------------------------------------------------------------------------"
-		//////// + world.getScheduler().getTick());
-		//////// System.out.println(context.getName());
-		//////// System.out.println("----------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void updateContextProjectionStart(Context context) {
-		//////// System.out.println(context.getName());
-		//////// System.out.println(contextProjections.get(context));
-		//////// System.out.println(contextProjections.size() + " " +
-		//////// world.getScheduler().getContextsAsContext().size());
 		if (!context.isDying()) {
 			contextProjections.get(context).updateStart();
 		}
@@ -313,21 +304,7 @@ public class Percept extends EllsaAgent {
 
 	}
 
-	public boolean overlapBetweenContexts(Context context1, Context context2) {
 
-		double contextStart1 = getStartRangeProjection(context1);
-		double contextStart2 = getStartRangeProjection(context2);
-		double contextEnd1 = getEndRangeProjection(context1);
-		double contextEnd2 = getEndRangeProjection(context2);
-		////////// System.out.println(context1.getName() + " " + contextStart1 + " " +
-		////////// contextEnd1 + " " + context2.getName() + " " + contextStart2 + " " +
-		////////// contextEnd2);
-		return ((contextStart1 < contextStart2 && contextStart2 < contextEnd1)
-				|| ((contextStart1 < contextEnd2 && contextEnd2 < contextEnd1)))
-				|| ((contextStart2 < contextStart1 && contextStart1 < contextEnd2)
-						|| ((contextStart2 < contextEnd1 && contextEnd1 < contextEnd2)));
-
-	}
 
 	public double getRangeProjection(Context context, String range) {
 		if (range.equals("start")) {
@@ -365,11 +342,7 @@ public class Percept extends EllsaAgent {
 			overlapRanges.put("start", getStartRangeProjection(context1));
 			overlapRanges.put("end", getEndRangeProjection(context2));
 		} else {
-			////////// System.out.println("PROBLEM !!!!!!!!!!!!!!!!! " + context1.getName()
-			////////// + " " + getStartRangeProjection(context1) + " " +
-			////////// getEndRangeProjection(context1) + " " + context2.getName() + " " +
-			////////// getStartRangeProjection(context2) + " " +
-			////////// getEndRangeProjection(context2));
+
 			overlapRanges.put("start", -1.0);
 			overlapRanges.put("end", 1.0);
 			// return null;
@@ -444,9 +417,7 @@ public class Percept extends EllsaAgent {
 		return range < getMappingErrorAllowedMin();
 	}
 
-	/*public boolean isTooBig(double range){
-		return range > getRadiusContextForCreation()*2;
-	}*/
+
 
 	// -----------------------
 	// AMOEBAonAMAK code ----

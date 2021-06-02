@@ -45,9 +45,7 @@ public class Context extends EllsaAgent {
 
 	private Double actionProposition = null;
 	public Double lastPrediction = null;
-	//public Double smoothedPrediction = null;
 
-	//private boolean valid;
 
 	private ArrayList<EndogenousRequest> waitingRequests = new ArrayList<EndogenousRequest>();
 	
@@ -71,7 +69,7 @@ public class Context extends EllsaAgent {
 	public boolean isBest = false;
 
 	public double centerDistanceFromExperiment;
-	public double externalDistanceFromExperiment;
+
 	
 	static final int VOID_CYCLE_START = 0;
 	static final int OVERLAP_CYCLE_START = 0;
@@ -80,7 +78,6 @@ public class Context extends EllsaAgent {
 
 	private int[] childContextCounter = null;
 
-	int lastFrontierRequestTick = 0;
 	
 	public Context(ELLSA ellsa) {
 		super(ellsa);
@@ -152,17 +149,6 @@ public class Context extends EllsaAgent {
 		getAmas().addSpatiallyAlteredContextForUnityUI(this);
 	}
 
-	/*public Context(ELLSA ellsa, Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
-		super(ellsa);
-		if(getAmas().getHeadAgent().lastEndogenousRequest!=null){
-			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request",getAmas().getHeadAgent().lastEndogenousRequest);
-		}else{
-			getEnvironment().print(TRACE_LEVEL.DEBUG,"Last endogenous request","null");
-		}
-		buildContext(fatherContext, contextDimensions);
-		getAmas().getEnvironment()
-				.trace(TRACE_LEVEL.EVENT, new ArrayList<String>(Arrays.asList("CTXT CREATION WITH GODFATHER AND DIM", this.getName())));
-	}*/
 
 	private void buildContextCommon() {
 		this.tickCreation = getAmas().getCycle();
@@ -185,11 +171,8 @@ public class Context extends EllsaAgent {
 		for (Percept p : var) {
 			Range r = null;
 
-			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(p);
-			//TODO use neihbors sizes to define radiuses for creation !!!!!!!!!!!
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
-			
 			if(getAmas().data.PARAM_isActiveLearning) {
 
 
@@ -208,26 +191,19 @@ public class Context extends EllsaAgent {
 			if(r==null ){
 				r = initRange(p, radiuses);
 			}
-			
 
-			// r = new Range(this, v.getValue() - radius, v.getValue() + radius, 0, true,
-			// true, v, world);
 			ranges.put(p, r);
 			ranges.get(p).setValue(p.getValue());
-
 			firstPoint.addDimension(p, p.getValue());
-
 			p.addContextProjection(this);
 		}
 
 
 
-		//expand();
 
 		localModel = getAmas().buildLocalModel(this);
 		firstPoint.setProposition(getAmas().getHeadAgent().getOracleValue());
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
-		// firstPoint.toString())));
 
 		localModel.updateModel(this.getCurrentExperiment(), getAmas().data.PARAM_exogenousLearningWeight);
 		getAmas().addAlteredContext(this);
@@ -248,9 +224,7 @@ public class Context extends EllsaAgent {
 
 	private Range initRangeFromNeighbors(Percept p) {
 		Range r;
-		//double radiusCreation = getAmas().getHeadAgent().minNeighborhoodRadius;
 		double radiusCreation = getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p);
-		//double radiusCreation = getAmas().getHeadAgent().minMeanNeighborhoodRaduises;
 		getAmas().getEnvironment()
 				.trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("Range creation by mean", this.getName(), p.getName(), getAmas().getHeadAgent().meanNeighborhoodRaduises.get(p).toString())));
 		r = new Range(this, p.getValue() - radiusCreation, p.getValue() + radiusCreation, 0, true, true, p, getAmas().getHeadAgent().minMeanNeighborhoodStartIncrements, getAmas().getHeadAgent().minMeanNeighborhoodEndIncrements);
@@ -323,39 +297,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-//	private void buildContext(Context fatherContext, HashMap<Percept, Pair<Double, Double>> contextDimensions) {
-//
-//		buildContextCommon();
-//
-//		ArrayList<Percept> var = getAmas().getPercepts();
-//		for (Percept pct : var) {
-//			Range r;
-//			double center = contextDimensions.get(pct).getA();
-//			double length = contextDimensions.get(pct).getB();
-//			r = new Range(this, center - length / 2, center + length / 2, 0, true, true, pct);
-//
-//			ranges.put(pct, r);
-//			ranges.get(pct).setValue(center);
-//
-//			pct.addContextProjection(this);
-//		}
-//
-//		// expand();
-//
-//		this.confidence = fatherContext.confidence;
-//
-//		this.localModel = getAmas().buildLocalModel(this);
-//		// this.formulaLocalModel = ((LocalModelMillerRegression)
-//		// bestNearestContext.localModel).getFormula(bestNearestContext);
-//		Double[] coef = fatherContext.localModel.getCoef();
-//		this.localModel.setCoef(coef);
-//		this.actionProposition = fatherContext.localModel.getProposition();
-//
-//		getAmas().addAlteredContext(this);
-//		this.setName(String.valueOf(this.hashCode()));
-//
-//		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(), "EXPS")));
-//	}
+
 
 
 	private void buildContextWithoutOracle(double endogenousPredicion) {
@@ -366,8 +308,6 @@ public class Context extends EllsaAgent {
 		ArrayList<Percept> var = getAmas().getPercepts();
 		for (Percept p : var) {
 			Range r = null;
-			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
-			//TODO use neihbors sizes to define radiuses for creation !??? pas sûr ? 12/03/2020
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 
 
@@ -404,7 +344,6 @@ public class Context extends EllsaAgent {
 		localModel = getAmas().buildLocalModel(this);
 		firstPoint.setProposition(endogenousPredicion);
 		// world.trace(new ArrayList<String>(Arrays.asList(this.getName(),"NEW EXP",
-		// firstPoint.toString())));
 
 		localModel.updateModel(firstPoint, getAmas().data.PARAM_exogenousLearningWeight);
 		getAmas().addAlteredContext(this);
@@ -420,8 +359,6 @@ public class Context extends EllsaAgent {
 		ArrayList<Percept> var = getAmas().getPercepts();
 		for (Percept p : var) {
 			Range r = null;
-			//Pair<Double, Double> radiuses = getAmas().getHeadAgent().getMaxRadiusesForContextCreation(v);
-			//TODO use neihbors sizes to define radiuses for creation !??? pas sûr ? 12/03/2020
 			Pair<Double, Double> radiuses = getAmas().getHeadAgent().getRadiusesForContextCreation(p);
 			
 
@@ -453,12 +390,9 @@ public class Context extends EllsaAgent {
 			p.addContextProjection(this);;
 		}
 
-		//expand();
-
 		//this.confidence = bestNearestContext.confidence;
 		this.localModel = getAmas().buildLocalModel(this);
-		// this.formulaLocalModel = ((LocalModelMillerRegression)
-		// bestNearestContext.localModel).getFormula(bestNearestContext);
+
 		Double[] coef = bestNearestContext.localModel.getCoef();
 		this.localModel.setCoef(coef);
 		this.actionProposition = bestNearestContext.localModel.getProposition();
@@ -503,152 +437,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-	public void initEndoChildRequests(){
 
-		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),"INIT ENDO CHILD REQUESTS")));
-		int depth = getAmas().getPercepts().size();
-		int[] length = new int[depth];
-		int[] counters = new int[depth];
-		Arrays.fill(counters,0);
-		Arrays.fill(length,2);
-
-		nestedLoopOperation(counters, length, 0);
-
-	}
-
-	/*public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
-			Percept pctDirection) {
-		ArrayList<Context> contexts = new ArrayList<Context>();
-
-		boolean test = true;
-		for (Context ctxtNeigbor : contextNeighbors) {
-			for (Percept pct : ranges.keySet()) {
-				if (pct != pctDirection) {
-					test = test && (this.ranges.get(pct).distance(ctxtNeigbor.getRanges().get(pct)) < 0);
-				}
-			}
-			if (test) {
-				contexts.add(ctxtNeigbor);
-			}
-		}
-		return contexts;
-	}*/
-
-	/*public ArrayList<Context> getContextsOnAPerceptDirectionFromContextsNeighbors(ArrayList<Context> contextNeighbors,
-			Percept pctDirection, SpatialContext expandingContext) {
-		ArrayList<Context> contexts = new ArrayList<Context>();
-
-		boolean test = true;
-		for (Context ctxtNeigbor : contextNeighbors) {
-			for (Percept pct : ranges.keySet()) {
-				if (pct != pctDirection) {
-
-					test = test && (expandingContext.distance(pct, ctxtNeigbor.getRanges().get(pct)) < -0.0001);
-				}
-			}
-			if (test) {
-				contexts.add(ctxtNeigbor);
-			}
-
-			test = true;
-		}
-		return contexts;
-	}*/
-
-	/*public void expand() {
-		ArrayList<Context> neighborsOnOneDirection;
-		HashMap<Percept, SpatialContext> alternativeContexts = new HashMap<Percept, SpatialContext>();
-		double maxVolume = this.getVolume();
-		double currentVolume;
-		SpatialContext maxVolumeSpatialContext = null;
-
-		for (Percept fixedPct : ranges.keySet()) {
-
-			alternativeContexts.put(fixedPct, new SpatialContext(this));
-
-			for (Percept pctDirectionForExpanding : ranges.keySet()) {
-
-				if (pctDirectionForExpanding != fixedPct) {
-
-					neighborsOnOneDirection = getContextsOnAPerceptDirectionFromContextsNeighbors(
-							getAmas().getHeadAgent().getActivatedNeighborsContexts(), pctDirectionForExpanding,
-							alternativeContexts.get(fixedPct));
-
-					Pair<Double, Double> expandingRadiuses = getMaxExpansionsForContextExpansionAfterCreation(
-							neighborsOnOneDirection, pctDirectionForExpanding);
-					alternativeContexts.get(fixedPct).expandEnd(pctDirectionForExpanding, expandingRadiuses.getB());
-					alternativeContexts.get(fixedPct).expandStart(pctDirectionForExpanding, expandingRadiuses.getA());
-				}
-			}
-
-			currentVolume = alternativeContexts.get(fixedPct).getVolume();
-			if (currentVolume > maxVolume) {
-				maxVolume = currentVolume;
-				maxVolumeSpatialContext = alternativeContexts.get(fixedPct);
-			}
-
-		}
-		if (maxVolumeSpatialContext != null) {
-			matchSpatialContextRanges(maxVolumeSpatialContext);
-		}
-	}*/
-
-	/*public void matchSpatialContextRanges(SpatialContext biggerContextForCreation) {
-		for (Percept pct : ranges.keySet()) {
-			ranges.get(pct).setStart(biggerContextForCreation.getStart(pct));
-			ranges.get(pct).setEnd(biggerContextForCreation.getEnd(pct));
-		}
-	}*/
-
-	/*public Pair<Double, Double> getMaxExpansionsForContextExpansionAfterCreation(
-			ArrayList<Context> contextNeighborsInOneDirection, Percept pct) {
-		
-		
-		double startRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getStart());
-		double endRadiusFromCreation = Math.abs(pct.getValue() - this.getRanges().get(pct).getEnd());
-//		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
-//				Math.min(pct.getRadiusContextForCreation() - startRadiusFromCreation,
-//						Math.abs(pct.getMin() - ranges.get(pct).getStart())),
-//				Math.min(pct.getRadiusContextForCreation() - endRadiusFromCreation,
-//						Math.abs(pct.getMax() - ranges.get(pct).getEnd())));
-		
-		Pair<Double, Double> maxExpansions = new Pair<Double, Double>(
-				pct.getRadiusContextForCreation() - startRadiusFromCreation,
-				pct.getRadiusContextForCreation() - endRadiusFromCreation);
-
-		double currentStartExpansion;
-		double currentEndExpansion;
-
-		// for(Context ctxt:partialNeighborContexts.get(pct)) {
-		for (Context ctxt : contextNeighborsInOneDirection) {
-
-			if (ctxt.getRanges().get(pct).centerDistance(pct.getValue()) < 0) {
-				// End radius
-				currentEndExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
-
-				if (currentEndExpansion < maxExpansions.getB() && currentEndExpansion >= -0.00001) {
-					if (Math.abs(currentEndExpansion) < 0.0001) {
-						currentEndExpansion = 0.0;
-					}
-					maxExpansions.setB(currentEndExpansion);
-				}
-			}
-
-			if (ctxt.getRanges().get(pct).centerDistance(pct.getValue()) > 0) {
-				// Start radius
-				currentStartExpansion = ctxt.getRanges().get(pct).distance(ranges.get(pct));
-
-				if (currentStartExpansion < maxExpansions.getA() && currentStartExpansion >= -0.00001) {
-					if (Math.abs(currentStartExpansion) < 0.0001) {
-						currentEndExpansion = 0.0;
-					}
-					maxExpansions.setA(currentStartExpansion);
-				}
-			}
-		}
-
-		return maxExpansions;
-	}*/
 
 	// --------------------------------NCS
 	// Resolutions-----------------------------------------
@@ -703,58 +492,7 @@ public class Context extends EllsaAgent {
 
 	}
 
-	/*public void analyzeResults3(Head head, Context closestContextToOracle) {
-		if (head.getCriticity(this) < head.getErrorAllowed()) {
-			confidence++;
-		} else {
-			if (this != closestContextToOracle) {
-				this.solveNCS_BadPrediction(head);
-			}
-		}
-
-//		if (head.getCriticity(this) > head.getErrorAllowed()) {
-//			
-//			
-//			Context betterContext = null;//head.getBetterContext(this,head.getActivatedNeighborsContexts(), getErrorOnAllExperiments());
-//			
-//			if(betterContext != null) {
-//				System.out.println(this.getName() + "<---" + betterContext.getName());
-//				this.setModelFromBetterContext(betterContext);				
-//				world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
-//			}
-//			else {
-//				System.out.println("OLD COEFS " + localModel.coefsToString());
-//				LocalModelAgent newBetterModel = tryNewExperiment();
-//				
-//				if(tryNewExperiment2()) {
-//					System.out.println("NEW COEFS " + localModel.coefsToString());
-//					world.getScheduler().getHeadAgent().setBadCurrentCriticalityPrediction();
-//				}
-//				else {
-//					solveNCS_Conflict(head);
-//					this.world.getScheduler().addAlteredContext(this);
-//				}
-//			}
-//			
-//		}else {
-//			System.out.println("OLD COEFS " + localModel.coefsToString());
-//			localModel.updateModelWithExperimentAndWeight(getCurrentExperiment(),0.5);
-//			System.out.println("NEW COEFS " + localModel.coefsToString());
-//			confidence++;
-//			
-//		}
-
-//		mappingCriticality = 0.0;
-//		if(head.getActivatedNeighborsContexts().size()>0) {
-//			for(Context ctxt : head.getActivatedNeighborsContexts()) {
-//				mappingCriticality += this.distance(ctxt);
-//			}
-//			mappingCriticality /= head.getActivatedNeighborsContexts().size();
-//		}
-
-		// NCSDetection_OverMapping();
-
-	}*/
+	////////////////////////////////////////////////////
 
 
 	public boolean isSameModel(Context ctxt) {
@@ -772,30 +510,7 @@ public class Context extends EllsaAgent {
 		//return  this.getLocalModel().getModelDifference(ctxt.getLocalModel())<(getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator());
 	}
 
-	/*public void analyzeResults4(Head head) {
-		
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("------------------------------------------------------------------------------------"
-				+ "---------------------------------------- ANALYSE RESULTS " + this.getName())));
-		
-		lastDistanceToModel = getLocalModel().distance(this.getCurrentExperiment());
-		lastAverageRegressionPerformanceIndicator = head.getAverageRegressionPerformanceIndicator();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "distance to model",""+lastDistanceToModel, "regression performance", "" + lastAverageRegressionPerformanceIndicator)));
-		if(head.getBestContext() == this){
-			confidence++;
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
-		}
-		else if(isSameModel(head.getBestContext())) {
-			confidence++;
-			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
-		} else {
-			if ( getAmas().data.contextFromPropositionWasSelected ){
-				solveNCS_Overlap(head.getBestContext());
-			}else{
-				solveNCS_BadPrediction(head);
-			}
 
-		}
-	}*/
 
 	public void analyzeResults5(Head head) {
 
@@ -807,43 +522,13 @@ public class Context extends EllsaAgent {
 
 		if(lastDistanceToModel < lastAverageRegressionPerformanceIndicator){
 			setConfidenceVariation(1);
-			//confidence++;
 			getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "CONFIDENCE ++")));
-			/*if ( this !=  head.getBestContext()) {
-				solveNCS_Overlap(head.getBestContext());
-			}*/
 		} else if(!isChild()){
 				solveNCS_BadPrediction(head);
 			}
 	}
 
 
-
-//	public double distance(Context ctxt) {
-//		double totalDistance = 1.0;
-//		double currentDistance = 0.0;
-//		int overlaps = 0;
-//		int voids = 0;
-//		
-//		for(Percept pct : world.getScheduler().getPercepts()) {
-//			currentDistance = this.distance(ctxt, pct);
-//			
-//			overlaps += ((currentDistance < 0) ? 1 : 0);
-//			voids += ((currentDistance > 0) ? 1 : 0);
-//			
-//			totalDistance *= currentDistance;
-//		}
-//		
-//		if(overlaps == world.getScheduler().getPercepts().size()) {
-//			return - Math.abs(totalDistance);
-//		}
-//		else if((voids == 1) && (overlaps == world.getScheduler().getPercepts().size()-1)) {
-//			
-//		}
-//		else {
-//			return 0;
-//		}
-//	}
 
 	public Pair<Double, Percept> distance(Context ctxt) {
 		double minDistance = Double.POSITIVE_INFINITY;
@@ -881,16 +566,7 @@ public class Context extends EllsaAgent {
 
 	}
 	
-	public double distanceBetweenCurrentPercetionsAndCenter(){
-		double distance = 0;
-		for(Percept pct : getAmas().getPercepts()){
 
-			distance += Math.pow(ranges.get(pct).getCenter() - pct.getValue() ,2);
-
-		}
-
-		return Math.sqrt(distance);
-	}
 
 	public double distanceBetweenCurrentPercetionsAndBorders(){
 		double distance = 0;
@@ -903,16 +579,7 @@ public class Context extends EllsaAgent {
 		return Math.sqrt(distance);
 	}
 
-	public double distanceBetweenCurrentPercetionsAndBordersWithSubPercepts(){
-		double distance = 0;
-		for(Percept pct : getAmas().getSubPercepts()){
 
-			distance += Math.min(Math.pow(ranges.get(pct).getStart() - pct.getValue() ,2),Math.pow(ranges.get(pct).getEnd() - pct.getValue() ,2));
-
-		}
-
-		return Math.sqrt(distance);
-	}
 
 	public boolean currentPerceptionsFarEnoughOfCenter(){
 		boolean test = true;
@@ -946,17 +613,7 @@ public class Context extends EllsaAgent {
 		return request;
 	}
 
-	public boolean isOverlaping(Context otherCtxt){
-		boolean test = true;
-		int indicePercept = 0;
-		while(test && indicePercept<getAmas().getPercepts().size()){
-			Percept currentPct = getAmas().getPercepts().get(indicePercept);
-			test = test && this.distance(otherCtxt, currentPct) < -currentPct.getMappingErrorAllowedMin();
-			indicePercept++;
-		}
 
-		return test;
-	}
 
 	public ArrayList<EndogenousRequest> endogenousRequest(Context ctxt) {
 		
@@ -967,12 +624,6 @@ public class Context extends EllsaAgent {
 		ArrayList<EndogenousRequest> potentialRequests = new ArrayList<>();
 		
 		double currentDistance = 0.0;
-
-		//double currentDistanceToOraclePrediction = this.getLocalModel().distance(this.getCurrentExperiment());
-		//double otherContextDistanceToOraclePrediction = ctxt.getLocalModel().distance(ctxt.getCurrentExperiment());
-		//Double averageDistanceToOraclePrediction = getAmas().getHeadAgent().getAverageRegressionPerformanceIndicator();
-		//Double distanceDifference = Math.abs(currentDistanceToOraclePrediction-otherContextDistanceToOraclePrediction);
-		//boolean differentModel=distanceDifference>averageDistanceToOraclePrediction;
 
 		boolean differentModel=!isSameModel(ctxt);
 		boolean discontinuity= Math.abs(this.lastPrediction - ctxt.lastPrediction)> getAmas().getHeadAgent().getPredictionNeighborhoodRange();
@@ -1004,23 +655,6 @@ public class Context extends EllsaAgent {
 		}
 
 		addPotentialConcurrencesAndConflictsRequests(ctxt, bounds, potentialRequests, differentModel, overlapCounts);
-
-		/*else if(overlapCounts == getAmas().getPercepts().size()-1 && voidDistances.size() == 1 && getAmas().getCycle() > VOID_CYCLE_START) {
-			
-			getEnvironment().trace(TRACE_LEVEL.INFORM, new ArrayList<String>(Arrays.asList("VOID", ""+this,""+ctxt)) );
-			
-			updateBoundsWithNeighborhood(bounds);
-			
-			HashMap<Percept, Double> request = boundsToRequest(bounds);
-
-			
-			if(request != null) {
-				
-				if(getAmas().getHeadAgent().isRealVoid(request) && getAmas().data.isVoidDetection) {
-					potentialRequests.add( new EndogenousRequest(request, bounds, 5, new ArrayList<Context>(Arrays.asList(this,ctxt)), REQUEST.VOID));
-				}		
-			}
-		}*/
 
 
 		return potentialRequests;
@@ -1106,32 +740,6 @@ public class Context extends EllsaAgent {
 	}
 
 
-	private void updateBoundsWithNeighborhood(HashMap<Percept, Pair<Double, Double>> voidBounds) {
-
-		
-		
-		for (HashMap.Entry<Percept,  Pair<Double, Double>> voidBound : voidBounds.entrySet()) {
-			
-			double neighborhoodRadius = voidBound.getKey().getNeigborhoodRadius();
-			
-			if(voidBound.getValue().getA()<voidBound.getKey().getValue()-neighborhoodRadius) {
-				voidBound.getValue().setA(voidBound.getKey().getValue()-neighborhoodRadius);
-			}
-			if(voidBound.getKey().getValue()+neighborhoodRadius < voidBound.getValue().getB()) {
-				voidBound.getValue().setB(voidBound.getKey().getValue()+neighborhoodRadius);
-			}
-			
-		    
-		    
-		}
-		
-
-		
-	}
-
-
-
-
 
 	public ArrayList<VOID> getVoidsFromZone(HashMap<Percept, Pair<Double, Double>> zoneBounds, ArrayList<Percept> computedPercepts) {
 
@@ -1151,8 +759,6 @@ public class Context extends EllsaAgent {
 				voidToAdd.put(pct, void1D);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(pct.getName(),""+void1D)));
 
-				//ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd = new ArrayList<>();
-
 				for(Percept otherPercept : getAllOtherPercepts(pct)){
 
 					Pair<Double, Double> perceptZoneBounds = zoneBounds.get(otherPercept);
@@ -1160,22 +766,13 @@ public class Context extends EllsaAgent {
 
 					addOtherPerceptZoneBounds(voidToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
 
-					/*if(additionnalVoidsToAdd.size()>0){
 
-						for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : new ArrayList<>(additionnalVoidsToAdd)){
-							addOtherPerceptZoneBounds(additionnalVoid, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
-						}
-					}*/
 
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(otherPercept.getName(),""+zoneBounds.get(otherPercept))));
 				}
 
 				voidsToReturn.add(new VOID(voidToAdd));
-				/*if(additionnalVoidsToAdd.size()>0){
-					for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : additionnalVoidsToAdd){
-						voidsToReturn.add(new VOID(additionnalVoid));
-					}
-				}*/
+
 			}
 
 
@@ -1222,8 +819,6 @@ public class Context extends EllsaAgent {
                 voidToAdd.put(pct, void1D);
                 getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(pct.getName(),""+void1D)));
 
-                //ArrayList<HashMap<Percept, Pair<Double, Double>>> additionnalVoidsToAdd = new ArrayList<>();
-
                 for(Percept otherPercept : getAllOtherSubPercepts(pct)){
 
                     Pair<Double, Double> perceptZoneBounds = zoneBounds.get(otherPercept);
@@ -1231,22 +826,12 @@ public class Context extends EllsaAgent {
 
                     addOtherPerceptZoneBounds(voidToAdd, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
 
-                    /*if(additionnalVoidsToAdd.size()>0){
-
-                        for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : new ArrayList<>(additionnalVoidsToAdd)){
-                            addOtherPerceptZoneBounds(additionnalVoid, otherPercept, perceptZoneBounds, perceptZoneBoundsLength);
-                        }
-                    }*/
 
                     getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>( Arrays.asList(otherPercept.getName(),""+zoneBounds.get(otherPercept))));
                 }
 
                 voidsToReturn.add(new VOID(voidToAdd));
-                /*if(additionnalVoidsToAdd.size()>0){
-                    for(HashMap<Percept, Pair<Double, Double>> additionnalVoid : additionnalVoidsToAdd){
-                        voidsToReturn.add(new VOID(additionnalVoid));
-                    }
-                }*/
+
             }
 
 
@@ -1276,24 +861,6 @@ public class Context extends EllsaAgent {
 
 
 	private void addOtherPerceptZoneBounds(HashMap<Percept, Pair<Double, Double>> voidToAdd, Percept otherPercept, Pair<Double, Double> perceptZoneBounds, double perceptZoneBoundsLength) {
-		/*if(perceptZoneBoundsLength> otherPercept.getRadiusContextForCreation()*2){
-			HashMap<Percept, Pair<Double, Double>> aditionnalVoidToAdd = new HashMap<>();
-
-			for (Map.Entry<Percept, Pair<Double, Double>> entry : voidToAdd.entrySet()) {
-				aditionnalVoidToAdd.put(entry.getKey(), entry.getValue());
-			}
-			double middleBound = (perceptZoneBounds.getA() + perceptZoneBounds.getB())  / 2 ;
-			Pair<Double, Double> perceptZoneBounds1 = new Pair<>(perceptZoneBounds.getA(), middleBound);
-			Pair<Double, Double> perceptZoneBounds2 = new Pair<>(middleBound, perceptZoneBounds.getB());
-
-			aditionnalVoidToAdd.put(otherPercept, perceptZoneBounds1);
-			voidToAdd.put(otherPercept, perceptZoneBounds2);
-
-			additionnalVoidsToAdd.add(aditionnalVoidToAdd);
-		}else{
-			voidToAdd.put(otherPercept, perceptZoneBounds);
-		}*/
-		//TODO ??
 
 		voidToAdd.put(otherPercept, perceptZoneBounds);
 	}
@@ -1352,8 +919,6 @@ public class Context extends EllsaAgent {
 	}
 
 
-
-	//TODO
 	public HashMap<String,ArrayList<Pair<Double,Double>>> get1DVoidsAndFilled(Percept pct, HashMap<Percept, Pair<Double, Double>> zoneBounds){
 		HashMap<String,ArrayList<Pair<Double,Double>>> voidsAndFilleds = new HashMap<>();
 		voidsAndFilleds.put("1D_Voids", new ArrayList<>());
@@ -1392,132 +957,13 @@ public class Context extends EllsaAgent {
 
 		return voidsAndFilleds;
 	}
-	
-
-	public double distanceAsVolume(Context ctxt) {
-		double totalDistanceAsVolume = 1.0;
-
-		for (Percept pct : getAmas().getPercepts()) {
-			double currentDistance = this.distanceForVolume(ctxt, pct);
-			totalDistanceAsVolume *= currentDistance;
-
-
-		}
-
-		return Math.abs(totalDistanceAsVolume);
-	}
-
-	public double externalDistance(Context otherContext){
-
-		double distance = 0;
-
-		for (Percept pct : getAmas().getPercepts()){
-			double pctDistance = this.distance(otherContext,pct);
-			if(pctDistance > 0){
-				distance += Math.pow(pctDistance,2);
-			}
-
-
-		}
-
-		return Math.sqrt(distance);
-	}
-
-	public double centerDistance(Context otherContext){
-
-		double distance = 0;
-
-		for (Percept pct : getAmas().getPercepts()){
-			double pctDistance = centerDistance(otherContext, pct);
-			distance += Math.pow(pctDistance,2);
-
-
-
-		}
-
-		return Math.sqrt(distance);
-	}
 
 	private double centerDistance(Context otherContext, Percept pct) {
 		return this.getRanges().get(pct).centerDistance(otherContext.getRanges().get(pct));
 	}
 
 
-	public boolean isNearby(Context otherCtxt){
-		boolean test = true;
-		int indicePercept = 0;
-		while(test && indicePercept<getAmas().getPercepts().size()){
-
-			Percept currentPct = getAmas().getPercepts().get(indicePercept);
-			double pctDistance = this.distance(otherCtxt,currentPct);
-			test = test && Math.abs(pctDistance) < currentPct.getMappingErrorAllowedMin() ;
-			indicePercept++;
-		}
-
-		return test;
-	}
-
-
-
-	public double maxDistance(Context ctxt) {
-		double maxDistance = Double.NEGATIVE_INFINITY;
-
-		for (Percept pct : getAmas().getPercepts()) {
-			double currentDistance = this.distanceForMaxOrMin(ctxt, pct) / pct.getMinMaxDistance();
-			if (currentDistance > maxDistance) {
-				maxDistance = currentDistance;
-			}
-
-
-		}
-
-		return maxDistance;
-	}
-
-	public double minDistance(Context ctxt) {
-		double minDistance = Double.POSITIVE_INFINITY;
-
-		for (Percept pct : getAmas().getPercepts()) {
-			minDistance = Math.min(minDistance, this.distanceForMaxOrMin(ctxt, pct) / pct.getMinMaxDistance());
-
-		}
-		return minDistance;
-	}
-
-	/*public void NCSDetection_BetterNeighbor() {
-		Context closestContextToOracle = this;
-		double minDistanceToOraclePrediction = getLocalModel().distance(this.getCurrentExperiment());
-		double currentDistanceToOraclePrediction = 0.0;
-
-		for (Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
-
-			if (ctxt != this) {
-				currentDistanceToOraclePrediction = ctxt.getLocalModel().distance(this.getCurrentExperiment());
-				if (currentDistanceToOraclePrediction < minDistanceToOraclePrediction) {
-					minDistanceToOraclePrediction = currentDistanceToOraclePrediction;
-					closestContextToOracle = ctxt;
-				}
-			}
-
-		}
-
-		if (closestContextToOracle != this) {
-			solveNCS_BetterNeighbor(closestContextToOracle);
-		}
-
-	}*/
-
-	public void solveNCS_BetterNeighbor(Context betterContext) {
-		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(), betterContext.getName(),
-				"*********************************************************************************************************** SOLVE NCS BETTER NEIGHBOR")));
-		localModel = new LocalModelMillerRegression(this, betterContext.getLocalModel().getCoef(),
-				betterContext.getLocalModel().getFirstExperiments());
-	}
-
 	public void NCSDetection_OverMapping() {
-
-
-
 
 		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
 
@@ -1527,8 +973,6 @@ public class Context extends EllsaAgent {
 				boolean sameModel = isSameModel(ctxt);
 				getEnvironment().print(TRACE_LEVEL.DEBUG, this.getName(),ctxt.getName(),"isSameModel",sameModel);
 				if(sameModel) {
-
-
 
 
 					for(Percept pct : ranges.keySet()) {
@@ -1597,16 +1041,11 @@ public class Context extends EllsaAgent {
 	public void NCSDetection_OverMappingWithouOracle() {
 
 
-
-
 		for(Context ctxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
 
 
 			if(ctxt != this && !ctxt.isDying()) {
 
-
-				//if(distanceDifference<averageDistanceToOraclePrediction) {
-				//if(distanceDifference<getAmas().data.initRegressionPerformance) { //TODO améliorer ?
 				if(isSameModelWithoutOracle(ctxt)) {
 
 
@@ -1685,18 +1124,10 @@ public class Context extends EllsaAgent {
 			this.getRanges().get(pct).setEnd(Math.max(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
 			this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
 
-			/*if(pct ==  frontierPercept){
-				this.getRanges().get(pct).setEnd(Math.max(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
-				this.getRanges().get(pct).setStart(Math.min(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
-			}else{
-				this.getRanges().get(pct).setEnd(Math.min(this.getRanges().get(pct).getEnd(), fusionContext.getRanges().get(pct).getEnd()));
-				this.getRanges().get(pct).setStart(Math.max(this.getRanges().get(pct).getStart(), fusionContext.getRanges().get(pct).getStart()));
-			}*/
+
 
 		}
-		
-		//confidence = this.getConfidence() + fusionContext.getConfidence(); // TODO too much ?
-		//setConfidence( Math.max(this.getConfidence(),fusionContext.getConfidence()));
+
 		setConfidence( this.getConfidence()+fusionContext.getConfidence());
 
 		regressionPerformance.setPerformanceIndicator(Math.max(this.regressionPerformance.getPerformanceIndicator(), fusionContext.regressionPerformance.getPerformanceIndicator()));
@@ -1705,9 +1136,6 @@ public class Context extends EllsaAgent {
 		fusionContext.destroy();
 		fusionned =  true;
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
-
-
-		//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 
 		getAmas().data.requestCounts.put(REQUEST.FUSION,getAmas().data.requestCounts.get(REQUEST.FUSION)+1);
 
@@ -1740,15 +1168,13 @@ public class Context extends EllsaAgent {
 				}
 				restructured =  true;
 				otherContext.restructured = true;
-				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 				double newConfidenceRatioForShrinkingContext = this.getVolume()/shrinkingContextCurrentVolume;
 				double newconfidenceForShrinkingContext = this.getConfidence()* newConfidenceRatioForShrinkingContext;
 				otherContext.setConfidence(otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)));
-				//otherContext.confidence = otherContext.getConfidence() + (this.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
 				this.setConfidence(newconfidenceForShrinkingContext);
-				//this.confidence = newconfidenceForShrinkingContext;
+
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
-				//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
+
 
 			}
 
@@ -1772,15 +1198,11 @@ public class Context extends EllsaAgent {
 				}
 				restructured =  true;
 				otherContext.restructured = true;
-				//getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 				double newConfidenceRatioForShrinkingContext = otherContext.getVolume()/shrinkingContextCurrentVolume;
 				double newconfidenceForShrinkingContext = otherContext.getConfidence()* newConfidenceRatioForShrinkingContext;
 				this.setConfidence(this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)));
-				//this.confidence = this.getConfidence() + (otherContext.getConfidence()*(1-newConfidenceRatioForShrinkingContext)); // TODO too much ?
 				otherContext.setConfidence(newconfidenceForShrinkingContext);
-				//otherContext.confidence = newconfidenceForShrinkingContext;
 				getAmas().data.requestCounts.put(REQUEST.RESTRUCTURE,getAmas().data.requestCounts.get(REQUEST.RESTRUCTURE)+1);
-				//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 			}
 
 
@@ -1795,7 +1217,6 @@ public class Context extends EllsaAgent {
 	
 	public void solveNCS_ChildContext() {
 		HashMap<Percept, Double> request = new HashMap<Percept, Double>();
-		//if(getAmas().data.isActiveLearning){
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
 				"*********************************************************************************************************** SOLVE NCS CHILD WITH ORACLE", this.getName())));
 
@@ -1818,76 +1239,27 @@ public class Context extends EllsaAgent {
 			Experiment endoExp = new Experiment(this);
 
 			endoExp = getRandomExperimentInRanges();
-			/*for(Percept pct : getAmas().getPercepts()) {
-				endoExp.addDimension(pct, getRandomValueInRangeNextToStartAndEnd(pct));
-			}*/
-			/*while(isToCloseToFirstExperimements(endoExp,((LocalModelMillerRegression)localModel).getFirstExperiments())){
-				endoExp = new Experiment(this);
-				for(Percept pct : getAmas().getPercepts()) {
-					endoExp.addDimension(pct, getRandomRangeBorder(pct));
-				}
-				System.out.println("......................................................................................................CA ARRIVE !!!!!!!!!!!!!");
-			}*/
 
 			endoExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
 			getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF WITHOUT NEIGHBORS", ""+endoExp)));
 			getLocalModel().updateModel(endoExp, getAmas().data.PARAM_exogenousLearningWeight);
 			getAmas().data.requestCounts.put(REQUEST.MODEL,getAmas().data.requestCounts.get(REQUEST.MODEL)+1);
 			getAmas().data.situationsCounts.put(SITUATION.ENDOGENOUS_LEARNING,getAmas().data.situationsCounts.get(SITUATION.ENDOGENOUS_LEARNING)+1);
-			//getAmas().data.requestCounts.put(REQUEST.SELF,getAmas().data.requestCounts.get(REQUEST.SELF)+1);
 
 
 		}
 
 		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()>getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
 
-
-			/*while (getLocalModel().getFirstExperiments().size()< (getAmas().getPercepts().size() + 3 - getAmas().getHeadAgent().getActivatedNeighborsContexts().size())){
-				Experiment endoExp = new Experiment(this);
-				for(Percept pct : getAmas().getPercepts()) {
-					endoExp.addDimension(pct, getRandomValueInRange(pct));
-				}
-				endoExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(endoExp));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList(this.getName(),"NEW ENDO EXP FROM ITSELF BEFORE NEIGHBORS", ""+endoExp)));
-				getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
-
-			}*/
-
 			if(getAmas().data.PARAM_isLearnFromNeighbors){
 				learnFromNeighbors();
 			}
-
-
-
 		}
-
-
-
-
-
 
 
 		/*getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW ENDO REQUEST","10", ""+request, ""+this.getName())));
 		getAmas().getHeadAgent().addChildRequest(request, 10,this);*/
 
-	}
-
-	public boolean isToCloseToFirstExperimements(Experiment newExperiment, ArrayList<Experiment> firstExperiements){
-		for(Experiment firstExp : firstExperiements){
-			if(newExperiment.distance(firstExp)<(getMinRangeLenght()/2)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean isToCloseToFirstExperimements(HashMap<Percept, Double> request, ArrayList<Experiment> firstExperiements){
-		for(Experiment firstExp : firstExperiements){
-			if(firstExp.distance(request)<(getMinRangeLenght()/2)){
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public double getMinRangeLenght(){
@@ -1903,7 +1275,6 @@ public class Context extends EllsaAgent {
 	}
 
 	public void learnFromNeighbors() {
-		//System.err.println("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		HashMap<Percept, Pair<Double, Double>> neighborhoodBounds = new HashMap<>();
 		for(Percept pct : getAmas().getPercepts()){
 			neighborhoodBounds.put(pct, new Pair<>( pct.getValue()-(pct.getNeigborhoodRadius()), pct.getValue()+(pct.getNeigborhoodRadius())));
@@ -1915,7 +1286,6 @@ public class Context extends EllsaAgent {
 
 
 			Experiment endoExp = new Experiment(this);
-			//Experiment symetricalEndoExp = new Experiment(this);
 			if(ctxtNeighbor != this) {
 				Experiment centerExperiment = this.getCenterExperiment();
 				for (Percept pct : getAmas().getPercepts()) {
@@ -1923,7 +1293,7 @@ public class Context extends EllsaAgent {
 					double length = Math.min(neighborhoodBounds.get(pct).getB(), ctxtNeighbor.getRanges().get(pct).getEnd()) - start;
 					double value;
 					if(length<0){
-						//System.err.println("INLUENCE");
+
 						double externalInfluence = this.getEnvironment().getContextInfluenceExternalRadius(this, pct);
 						double influenceStart = Math.max(neighborhoodBounds.get(pct).getA(), ctxtNeighbor.getRanges().get(pct).getStart() - externalInfluence);
 						double influenceLength = Math.min(neighborhoodBounds.get(pct).getB(), ctxtNeighbor.getRanges().get(pct).getEnd() + externalInfluence) - influenceStart;
@@ -1933,10 +1303,6 @@ public class Context extends EllsaAgent {
 					}
 
 					endoExp.addDimension(pct, value);
-
-					double rangeCenter = this.getRanges().get(pct).getCenter();
-					//symetricalEndoExp.addDimension(pct, rangeCenter-Math.abs(rangeCenter-value));
-					//endoExp.addDimension(pct, ctxtNeighbor.getRanges().get(pct).getCenter());
 				}
 
 
@@ -1946,17 +1312,11 @@ public class Context extends EllsaAgent {
 				endoExp.setProposition(neighborPrediction);
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "EXP", "" + endoExp)));
 
-				double centerProposition = ((LocalModelMillerRegression) getLocalModel()).getProposition(centerExperiment);
-				//symetricalEndoExp.setProposition(centerProposition- Math.abs(centerProposition - neighborPrediction));
-				//getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "SYM EXP", "" + symetricalEndoExp)));
-
 				if(Math.abs(lastPrediction-neighborPrediction)<getAmas().getHeadAgent().getPredictionNeighborhoodRange()){
 					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList(this.getName(), "NEW ENDO EXP FROM", ctxtNeighbor.getName(), "" + endoExp)));
 					endoExperiments.add(endoExp);
-					//endoExperiments.add(symetricalEndoExp);
+
 				}
-				//getLocalModel().updateModel(endoExp, getAmas().data.learningSpeed);
-				//getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+1);
 			}
 		}
 
@@ -1974,28 +1334,8 @@ public class Context extends EllsaAgent {
 				getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
 				getAmas().data.situationsCounts.put(SITUATION.ENDOGENOUS_LEARNING,getAmas().data.situationsCounts.get(SITUATION.ENDOGENOUS_LEARNING)+endoExperiments.size());
 				setConfidenceVariation(endoExperiments.size()*0.01);
-				//confidence+=endoExperiments.size()*0.01;
 			}
-
 		}
-
-		/*if(endoExperiments.size()>=getAmas().data.nbOfNeighborForLearningFromNeighbors){
-			if(endoExperiments.size()>1){
-				if(testIfNeighborsPredictionsAreAllSuperiorOrInferiorToContextCenterPrediction(endoExperiments)){ //TODO ???
-				//if(testIfNeighborsPredictionsMeanAreInContextPredictionRanges(endoExperiments)){
-
-
-					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
-					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-
-				}
-			}else{
-				if(endoExperiments.size()>0){
-					((LocalModelMillerRegression)getLocalModel()).updateModel(endoExperiments, getAmas().data.learningSpeed);
-					getAmas().data.requestCounts.put(REQUEST.NEIGHBOR,getAmas().data.requestCounts.get(REQUEST.NEIGHBOR)+endoExperiments.size());
-				}
-			}
-		}*/
 	}
 
 	private boolean isLocalMinimum(ArrayList<Experiment> endoExperiments){
@@ -2026,34 +1366,6 @@ public class Context extends EllsaAgent {
     }
 
 
-	private boolean isLocalMinimum2(ArrayList<Experiment> endoExperiments){
-		Experiment centerExp = getCenterExperimentWithProposition();
-		boolean distributionTest = false;
-
-		if(areAllPropositionSuperiorOrInferiorToCenterPrediction(endoExperiments, centerExp.getProposition())){
-			distributionTest = true;
-			for(Percept pct: getAmas().getPercepts()){
-				boolean testLeft = false;
-				boolean testRight = false;
-				int i = 0;
-				while(i<endoExperiments.size() && !(testLeft && testRight)){
-					testLeft = testLeft || (endoExperiments.get(i).getValuesAsHashMap().get(pct)< centerExp.getValuesAsHashMap().get(pct));
-					testRight = testRight || (centerExp.getValuesAsHashMap().get(pct) < endoExperiments.get(i).getValuesAsHashMap().get(pct));
-					i++;
-				}
-				distributionTest = distributionTest && testLeft && testRight;
-			}
-		}
-		if(distributionTest){
-			getEnvironment().print(TRACE_LEVEL.DEBUG, "LOCAL MINIMUM");
-			getEnvironment().print(TRACE_LEVEL.DEBUG, centerExp);
-			getEnvironment().print(TRACE_LEVEL.DEBUG, endoExperiments);
-		}
-
-		return distributionTest;
-	}
-
-
     private boolean areAllPropositionSuperiorOrInferiorToCenterPrediction(ArrayList<Experiment> endoExperiments, double centerprediction) {
         boolean initTest = centerprediction < endoExperiments.get(0).getProposition();
 
@@ -2069,13 +1381,6 @@ public class Context extends EllsaAgent {
         return  !(initTest!=test1  || initTest!=test2);
     }
 
-    public double getCenterProposition(){
-		Experiment centerExp = new Experiment(this);
-		for (Percept pct : getAmas().getPercepts()) {
-			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
-		}
-		return ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
-	}
 
 	public Experiment getCenterExperimentWithProposition(){
 		Experiment centerExp = new Experiment(this);
@@ -2099,232 +1404,14 @@ public class Context extends EllsaAgent {
     }
 
 
-	private boolean testIfNeighborsPredictionsMeanAreInContextPredictionRanges(ArrayList<Experiment> endoExperiments){
-		Experiment centerExp = new Experiment(this);
-		for (Percept pct : getAmas().getPercepts()) {
-			centerExp.addDimension(pct, getRanges().get(pct).getCenter());
-		}
-		double centerprediction = ((LocalModelMillerRegression) this.getLocalModel()).getProposition(centerExp);
-
-		double meanPrediction = 0.0;
-		for(Experiment endoExp : endoExperiments){
-			meanPrediction += endoExp.getProposition();
-		}
-		meanPrediction /= endoExperiments.size();
-
-		return  Math.abs(meanPrediction - centerprediction) < (getAmas().getHeadAgent().getPredictionNeighborhoodRange()/2);
-	}
-
-	public void solveNCS_LearnFromNeighbors(){
-
-		Experiment currentExp = getCurrentExperimentWithouOracle();
-		getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("CHILD EXPERIMENT",""+currentExp)));
-		if(getAmas().getHeadAgent().getActivatedNeighborsContexts().size()> getAmas().data.PARAM_nbOfNeighborForLearningFromNeighbors){
-
-			ArrayList<Context> neighborsToKeep = new ArrayList<>();
-			for (Context ctxtNeighbor : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
-				if (ctxtNeighbor != this) {
-
-					boolean test = true;
-					for(Percept pct : getAmas().getPercepts()){
-						if(!this.getRanges().get(pct).contains2(ctxtNeighbor.getRanges().get(pct).getCenter())){
-
-							test = test && perceptIsContainedBetweentContextsCenter(ctxtNeighbor, pct);
-						}
-					}
-					if(test){
-						neighborsToKeep.add(ctxtNeighbor);
-					}
-				}
-			}
-
-			if(neighborsToKeep.size()>0){
-				neighborsToKeep.add(this);
-				getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBORS", ""+neighborsToKeep.size())) );
-				double weightedSumOfPredictions = 0;
-				double normalisation = 0;
-				for (Context ctxtNeighbor : neighborsToKeep){
-					getEnvironment().trace(TRACE_LEVEL.DEBUG,new ArrayList<String>(Arrays.asList("KEPT NEIGHBOR", ""+ctxtNeighbor.getName())) );
-					double neighborDistance = ctxtNeighbor.distanceBetweenCurrentPercetionsAndBorders();
-					weightedSumOfPredictions += ((LocalModelMillerRegression)ctxtNeighbor.getLocalModel()).getProposition(currentExp)/neighborDistance;
-					normalisation += 1/neighborDistance;
-
-				}
-
-				currentExp.setProposition(weightedSumOfPredictions/normalisation);
-				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITH NEIGHBORS", ""+this.getName())) );
-			}else{
-				currentExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
-				getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
-			}
-
-		}else{
-			currentExp.setProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
-			getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );
-		}
-
-		/*currentExp.setOracleProposition(((LocalModelMillerRegression)this.getLocalModel()).getProposition(currentExp));
-		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("NEW CHILD ENDO LEARNING WITHOUT NEIGHBORS", ""+this.getName())) );*/
-		getEnvironment().trace(TRACE_LEVEL.EVENT,new ArrayList<String>(Arrays.asList("LEARNED EXP", ""+currentExp)) );
-		this.getLocalModel().updateModel(currentExp, getAmas().data.PARAM_exogenousLearningWeight);
-	}
-
-	private boolean perceptIsContainedBetweentContextsCenter(Context ctxtNeighbor, Percept pct) {
-		return (this.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < ctxtNeighbor.getRanges().get(pct).getCenter() ) || (ctxtNeighbor.getRanges().get(pct).getCenter() < pct.getValue() && pct.getValue() < this.getRanges().get(pct).getCenter());
-	}
-
-	/*public void solveNCS_FitWithNeighbors(){
-
-		Context otherCtxt = getNearestContextFromNeighbors();
-
-		if (otherCtxt != this && !this.isDying() && !otherCtxt.isDying() *//*&& this.isNearby(otherCtxt)*//* ) {
-
-			Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> closestExperimentsAndPivots = getClosestExperimentsPairs(otherCtxt, 1);
 
 
 
-			//if(otherCtxt.isChild()){
-			if(closestExperimentsAndPivots != null){
-
-				ArrayList<Pair<Experiment, Experiment>> closestExperiments = closestExperimentsAndPivots.getA();
-				ArrayList<Pair<Experiment, Experiment>> pivots = closestExperimentsAndPivots.getB();
-
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("EXPS " + closestExperiments.size(), "\n"+closestExperiments+"")));
-				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("CTXTS", this.getName(), otherCtxt.getName())));
-
-				for(Pair<Experiment, Experiment> pivot : pivots){
-
-					double prediction = ((LocalModelMillerRegression)this.getLocalModel()).getProposition(pivot.getA());
-					double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(pivot.getB());
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("PREDICTIONS PIVOTS", prediction+"", otherPrediction+"")));
-
-					pivot.getA().setProposition(prediction);
-					pivot.getB().setProposition(otherPrediction);
-					this.getLocalModel().updateModel(pivot.getA(), getAmas().data.PARAM_learningSpeed);
-					otherCtxt.getLocalModel().updateModel(pivot.getB(), getAmas().data.PARAM_learningSpeed);
-				}
-
-				*//*for(Pair<Experiment, Experiment> pairExp : closestExperiments){
-
-					double prediction = ((LocalModelMillerRegression)this.getLocalModel()).getProposition(pairExp.getA());
-					double otherPrediction = ((LocalModelMillerRegression)otherCtxt.getLocalModel()).getProposition(pairExp.getB());
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("PREDICTIONS", prediction+"", otherPrediction+"")));
-					double meanPrediction = (prediction + otherPrediction)/2;
-					getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("MEAN PREDICTION TO LEARN", meanPrediction+"")));
-					pairExp.getA().setOracleProposition(otherPrediction);
-					pairExp.getB().setOracleProposition(meanPrediction);
-					this.getLocalModel().updateModel(pairExp.getA(), getAmas().data.learningSpeed);
-					//otherCtxt.getLocalModel().updateModel(pairExp.getB(), getAmas().data.learningSpeed);
-				}*//*
-
-
-
-
-
-
-
-
-
-
-
-			}
-
-		}
-
-	}*/
-
-
-
-
-
-	/*private Context getNearestContextFromNeighbors() {
-		Context nearestContext = null;
-		double nearestDistance = -1;
-		for (Context otherCtxt : getAmas().getHeadAgent().getActivatedNeighborsContexts()) {
-			if (otherCtxt != this) {
-				if (nearestContext == null) {
-					nearestContext = otherCtxt;
-					nearestDistance = this.externalDistance(nearestContext);
-				} else {
-					double currentExternalDistance = this.externalDistance(otherCtxt);
-					if (currentExternalDistance < nearestDistance) {
-						nearestContext = otherCtxt;
-						nearestDistance = currentExternalDistance;
-					}
-
-				}
-
-
-			}
-		}
-		return nearestContext;
-	}*/
-
-	private Pair<ArrayList<Pair<Experiment, Experiment>>, ArrayList<Pair<Experiment, Experiment>>> getClosestExperimentsPairs(Context otherCtxt, int nbPairs){
-
-		ArrayList<Pair<Experiment, Experiment>> experimentsPairs = new ArrayList<>();
-		ArrayList<Pair<Experiment, Experiment>> experimentsPairsPivots = new ArrayList<>();
-		int overlapsCounts = 0;
-
-		for(int i=0;i<nbPairs;i++){
-			Experiment exp1 = new Experiment(this);
-			Experiment exp2 = new Experiment(otherCtxt);
-			Experiment pivotExp1 = new Experiment(this);
-			Experiment pivotExp2 = new Experiment(this);
-
-			for (Percept pct : getAmas().getPercepts()){
-
-				if(this.distance(otherCtxt,pct) < 0){
-					overlapsCounts++;
-					Pair<Double,Double> bounds = this.overlapBounds(otherCtxt, pct);
-					double valueBetweenBounds = getRandomValueInRange(bounds.getA(), bounds.getB() - bounds.getA());
-					exp1.addDimension(pct, valueBetweenBounds);
-					exp2.addDimension(pct, valueBetweenBounds);
-					pivotExp1.addDimension(pct, valueBetweenBounds);
-					pivotExp2.addDimension(pct, valueBetweenBounds);
-				}else if (this.getRanges().get(pct).getCenter() < otherCtxt.getRanges().get(pct).getCenter()){
-					double valueExp1 = getRandomValueInRange(this.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin(), pct.getMappingErrorAllowedMin());
-					double valueExp2 = getRandomValueInRange( otherCtxt.getRanges().get(pct).getStart(), pct.getMappingErrorAllowedMin());
-					exp1.addDimension(pct, valueExp1);
-					exp2.addDimension(pct, valueExp2);
-					pivotExp1.addDimension(pct, this.getRanges().get(pct).getCenter());
-					pivotExp2.addDimension(pct, otherCtxt.getRanges().get(pct).getCenter());
-				}else{
-					double valueExp1 = getRandomValueInRange( this.getRanges().get(pct).getStart(), pct.getMappingErrorAllowedMin());
-					double valueExp2 = getRandomValueInRange(otherCtxt.getRanges().get(pct).getEnd() - pct.getMappingErrorAllowedMin(), pct.getMappingErrorAllowedMin());
-					exp1.addDimension(pct, valueExp1);
-					exp2.addDimension(pct, valueExp2);
-					pivotExp1.addDimension(pct, this.getRanges().get(pct).getCenter());
-					pivotExp2.addDimension(pct, otherCtxt.getRanges().get(pct).getCenter());
-				}
-
-			}
-			experimentsPairs.add(new Pair<>(exp1, exp2));
-			experimentsPairsPivots.add(new Pair<>(pivotExp1, pivotExp2));
-		}
-
-		return new Pair<>(experimentsPairs, experimentsPairsPivots);
-		/*if(overlapsCounts==1){
-			return new Pair<>(experimentsPairs, experimentsPairsPivots);
-		}else{
-			return null;
-		}*/
-
-
-	}
 
 	private double getRandomValueInRange(double start, double length) {
 		return start + length*Math.random();
 	}
 	
-	private Double getRandomValueInRangeNextToStartAndEnd(Percept pct) {
-		if(Math.random()<0.5){
-			return ranges.get(pct).getStart() + pct.getMappingErrorAllowedMin()*Math.random();
-		}else{
-			return ranges.get(pct).getEnd() - pct.getMappingErrorAllowedMin()*Math.random();
-		}
-
-	}
 
 	private HashMap<Percept, Double> getRequestFromCounter(){
 		HashMap<Percept, Double> request = new HashMap<>();
@@ -2356,22 +1443,6 @@ public class Context extends EllsaAgent {
 
 
 
-	private HashMap<Percept, Double> getNextEtremityChildRequest() {
-
-		if(childContextCounter == null){
-			childContextCounter = new int[getAmas().getPercepts().size()];
-			for(int i = 0;i<childContextCounter.length;i++){
-				childContextCounter[i]=0;
-			}
-			return getRequestFromCounter();
-
-		}else{
-			nextMultiDimCounterForContextRanges(childContextCounter);
-			return getRequestFromCounter();
-		}
-
-	}
-
 	private HashMap<Percept, Double> getRandomRequestInRanges() {
 
 		HashMap<Percept, Double> request = new HashMap<>();
@@ -2387,21 +1458,6 @@ public class Context extends EllsaAgent {
 	}
 
 
-	private Experiment getNextEtremityChildExperiment() {
-
-		if(childContextCounter == null){
-			childContextCounter = new int[getAmas().getPercepts().size()];
-			for(int i = 0;i<childContextCounter.length;i++){
-				childContextCounter[i]=0;
-			}
-			return getexperimentFromCounter();
-
-		}else{
-			nextMultiDimCounterForContextRanges(childContextCounter);
-			return getexperimentFromCounter();
-		}
-
-	}
 
 	private Experiment getRandomExperimentInRanges() {
 
@@ -2415,45 +1471,6 @@ public class Context extends EllsaAgent {
 
 	}
 
-
-
-
-
-	private static boolean nextMultiDimCounterForContextRanges(int[] indices){
-
-
-
-		for(int i = 0; i<indices.length;i++) {
-
-			if(indices[i]==1) {
-				if(i==indices.length-1) {
-					indices[i]=0;
-					return false;
-				}
-				else {
-					indices[i]=0;
-				}
-			}
-			else {
-				indices[i] += 1;
-				return true;
-			}
-
-		}
-
-		return false;
-
-
-	}
-
-	private Double getRandomRangeBorder(Percept pct) {
-		if(Math.random()<0.5){
-			return ranges.get(pct).getStart();
-		}else{
-			return ranges.get(pct).getEnd();
-		}
-
-	}
 
 	public Experiment getCurrentExperiment() {
 		if(getAmas().getHeadAgent().getOracleValue() == null) return null;
@@ -2488,37 +1505,9 @@ public class Context extends EllsaAgent {
 		return exp;
 	}
 	
-	public Experiment getArtificialExperiment() {
-		ArrayList<Percept> percepts = getAmas().getPercepts();
-		Experiment exp = new Experiment(this);
-		for (Percept pct : percepts) {
-			exp.addDimension(pct, this.getRanges().get(pct).getCenter());
-		}
-		
 
-		return exp;
-	}
 
-	public double sumOfRangesLengths() {
-		double sum = 0;
 
-		for (Percept pct : getAmas().getPercepts()) {
-			sum += this.getRanges().get(pct).getLenght();
-		}
-
-		return sum;
-	}
-
-	public double rangeLengthRatio(Percept pct) {
-		return this.getRanges().get(pct).getLenght() / sumOfRangesLengths();
-	}
-
-	public Pair<Boolean, Double> tryAlternativeModel(LocalModel alternativeModel) {
-		boolean betterModelTest = true;
-		double sumError = 0.0;
-
-		return new Pair<Boolean, Double>(betterModelTest, sumError);
-	}
 
 	public void solveNCS_BadPrediction(Head head) {
 		getEnvironment().trace(TRACE_LEVEL.NCS, new ArrayList<String>(Arrays.asList(this.getName(),
@@ -2531,7 +1520,6 @@ public class Context extends EllsaAgent {
 
 		setConfidenceVariation(-2);
 
-		//confidence -= 2;
 		getAmas().getHeadAgent().setBadCurrentCriticalityConfidence();
 		getAmas().getHeadAgent().setBadCurrentCriticalityPrediction();
 
@@ -2568,16 +1556,7 @@ public class Context extends EllsaAgent {
 		getAmas().getHeadAgent().setBadCurrentCriticalityMapping();
 	}
 
-	/*public void updateAVT() {
-		for (Percept p : ranges.keySet()) {
-			if (ranges.get(p).getLastEndTickModification() != getAmas().getCycle()) {
-				ranges.get(p).endogenousAdaptEndUsingAVT();
-			}
-			if (ranges.get(p).getLastStartTickModification() != getAmas().getCycle()) {
-				ranges.get(p).endogenousAdaptStartUsingAVT();
-			}
-		}
-	}*/
+
 	
 	
 	private Percept getPerceptWithLesserImpactOnContextWithPerception(ArrayList<Percept> percepts) {
@@ -2633,52 +1612,7 @@ public class Context extends EllsaAgent {
 		return perceptForAdapation;
 	}
 
-	private Percept getPerceptWithBiggerImpactOnOverlap(ArrayList<Percept> percepts, Context bestContext) {
-		Percept perceptWithBiggerImpact = null;
-		double volumeLost = Double.MAX_VALUE;
-		double vol = 1.0;
 
-		for (Percept percept : percepts) {
-
-			if (!ranges.get(percept).isPerceptEnum()) {
-				Range bestContextRanges = bestContext.getRanges().get(percept);
-
-				if (!(bestContextRanges.getStart() <= ranges.get(percept).getStart()
-						&& ranges.get(percept).getEnd() <= bestContextRanges.getEnd())) {
-
-					if (percept.contextOrder(this, bestContext)) {
-						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
-								Arrays.asList("ORDER :", percept.getName(), this.getName(), bestContext.getName())));
-						vol = Math.abs(
-								percept.getEndRangeProjection(this) - percept.getStartRangeProjection(bestContext));
-						if (vol < volumeLost) {
-							volumeLost = vol;
-							perceptWithBiggerImpact = percept;
-						}
-					} else if (percept.contextOrder(bestContext, this)) {
-						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(
-								Arrays.asList("ORDER :", percept.getName(), bestContext.getName(), this.getName())));
-						vol = Math.abs(
-								percept.getEndRangeProjection(bestContext) - percept.getStartRangeProjection(this));
-						if (vol < volumeLost) {
-							volumeLost = vol;
-							perceptWithBiggerImpact = percept;
-						}
-					} else if (percept.contextIncludedIn(bestContext, this)) {
-						getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("INCLUSION :", percept.getName(),
-								bestContext.getName(), this.getName())));
-						vol = Math.abs(percept.getEndRangeProjection(bestContext)
-								- percept.getStartRangeProjection(bestContext));
-						if (vol < volumeLost) {
-							volumeLost = vol;
-							perceptWithBiggerImpact = percept;
-						}
-					}
-				}
-			}
-		}
-		return perceptWithBiggerImpact;
-	}
 
 	public double getOverlappingVolume(Context overlappingCtxt) {
 		double volume = 1.0;
@@ -2720,15 +1654,6 @@ public class Context extends EllsaAgent {
 			}
 			
 		}
-		
-		/*perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithPerception(percepts);
-		if(perceptForBigerImpactOnOverlap != null) {
-			
-			if(perceptForBigerImpactOnOverlap == perceptWithLesserImpactOnContext) {
-				return new Pair<Percept, Context>(perceptForBigerImpactOnOverlap, overlapingContext);
-			}
-			
-		}*/
 
 		if(perceptForLesserImpactOnCtxtWithOverlap != null) {
 			return new Pair<>(perceptForLesserImpactOnCtxtWithOverlap, overlapingContext);
@@ -2736,12 +1661,6 @@ public class Context extends EllsaAgent {
 			perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithPerception(percepts);
 			return new Pair<>(perceptWithLesserImpactOnContext, overlapingContext);
 		}
-		
-
-		
-		
-
-		
 	}
 
 	public boolean containedBy(Context ctxt) {
@@ -2932,25 +1851,6 @@ public class Context extends EllsaAgent {
 		return volume;
 	}
 
-//	/**
-//	 * Analyze results.
-//	 *
-//	 * @param head the head
-//	 */
-//	public void analyzeResults(Head head) {
-//		if (head.getCriticity(this) > head.getErrorAllowed()) {
-//			solveNCS_BadPrediction(head);
-//			getAmas().addAlteredContext(this);
-//		} else {
-////			if (head.getCriticity(this) > head.getInexactAllowed()) {
-////				solveNCS_ConflictInexact(head);
-////			}
-////			else {
-////				confidence++;
-////				//confidence = confidence * 2;
-////			}
-//		}
-//	}
 
 	/**
 	 * Grow every ranges allowing to includes current situation.
@@ -2983,25 +1883,7 @@ public class Context extends EllsaAgent {
 	 * @param c    the c
 	 */
 	public void shrinkRangesToJoinBorders(Context bestContext) {
-		/*Percept perceptWithBiggerImpactOnOverlap = getPerceptWithBiggerImpactOnOverlap(getAmas().getPercepts(),
-				bestContext);
-		
-		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContext(getAmas().getPercepts());
 
-
-		if (perceptWithBiggerImpactOnOverlap == null) {
-			this.destroy();
-		} else {
-
-				if(perceptWithBiggerImpactOnOverlap == perceptWithLesserImpactOnContext) {
-					ranges.get(perceptWithBiggerImpactOnOverlap).adapt(perceptWithBiggerImpactOnOverlap.getValue(), true, bestContext);
-				}else {
-					ranges.get(perceptWithLesserImpactOnContext).adapt(perceptWithLesserImpactOnContext.getValue(), true, bestContext);
-				}
-
-			
-
-		}*/
 
 		Percept perceptWithLesserImpactOnContext = getPerceptWithLesserImpactOnContextWithOverlap(getAmas().getPercepts(),bestContext);
 		ranges.get(perceptWithLesserImpactOnContext).adapt(perceptWithLesserImpactOnContext.getValue(), true, bestContext);
@@ -3054,55 +1936,7 @@ public class Context extends EllsaAgent {
 		
 	}
 
-	private double distanceForVolume(Context ctxt, Percept pct) {
-		return this.getRanges().get(pct).distanceForVolume(ctxt.getRanges().get(pct));
-	}
 
-	private double distanceForMaxOrMin(Context ctxt, Percept pct) {
-		return Math.abs(this.getRanges().get(pct).distanceForMaxOrMin(ctxt.getRanges().get(pct)));
-	}
-
-	public Context getNearestContextBySortedPerceptAndRange(HashMap<String, ArrayList<Context>> sortedPossibleNeigbours,
-			Percept percept, String range) {
-		int indexOfCurrentContext = sortedPossibleNeigbours.get(range).indexOf(this);
-
-		if (sortedPossibleNeigbours.get(range).size() > 1) {
-
-			if ((indexOfCurrentContext > 0)
-					&& (indexOfCurrentContext < sortedPossibleNeigbours.get(range).size() - 1)) {
-				if (range.equals("start")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext + 1);
-				} else if (range.equals("end")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext - 1);
-				} else {
-					return null;
-				}
-			}
-
-			else if (indexOfCurrentContext == 0) {
-				if (range.equals("start")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext + 1);
-				} else {
-					return null;
-				}
-			}
-
-			else if (indexOfCurrentContext == sortedPossibleNeigbours.get(range).size() - 1) {
-				if (range.equals("end")) {
-					return sortedPossibleNeigbours.get(range).get(indexOfCurrentContext - 1);
-				} else {
-					return null;
-				}
-			}
-
-			else {
-				return null;
-			}
-
-		} else {
-			return null;
-		}
-	}
 
 	public double distance(Percept pct, double value) {
 		return this.ranges.get(pct).distance(value);
@@ -3131,26 +1965,12 @@ public class Context extends EllsaAgent {
 				break;
 			}
 		}
-//		if(!isDying) {
-//			for(Context ctxt : world.getScheduler().getHeadAgent().getActivatedNeighborsContexts()) {
-//				if(ctxt != this) {
-//					if(this.getConfidence()<=ctxt.getConfidence()) {
-//						if(this.containedBy(ctxt)) {
-//							solveNCS_Uselessness();
-//							break;
-//						}
-//					}
-//				}
-//			}
-//		}
+
 	}
 
 	@Override
 	protected void onAct() {
-		
 		onActOpitmized();
-		//onActOld();
-
 	}
 	
 	private void onActOpitmized() {

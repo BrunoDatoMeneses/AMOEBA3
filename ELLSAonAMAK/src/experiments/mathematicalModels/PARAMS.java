@@ -13,11 +13,11 @@ public class PARAMS {
 //    public static String model = "multi";
 //    public static String model = "disc";
 //    public static String model = "square";
-    public static String model = "squareFixed";
+//    public static String model = "squareFixed";
 //    public static String model = "triangle";
 //    public static String model = "gaussian";
 //    public static String model = "polynomial";
-//    public static String model = "gaussianCos2";
+    public static String model = "gaussianCos2";
 //    public static String model = "cosX";
 //    public static String model = "cosSinX";
 //    public static String model = "rosenbrock";
@@ -55,7 +55,7 @@ public class PARAMS {
     public static  double transferCyclesRatio = 0.3;//0.429;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.05;
+    public static double validityRangesPrecision = 0.03 ;
 
     /* LEARNING */
 

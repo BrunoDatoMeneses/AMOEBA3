@@ -646,25 +646,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		return null;
 	}
 
-	/*public HashMap<String, Double> learn(HashMap<String, Double> perceptionsActionState, ArrayList<String> unconsideredPerceptsString) {
-		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
-		subPercepts = new ArrayList<>(percepts);
-		subPercepts.removeAll(unconsideredPercepts);
-		StudiedSystem ss = studiedSystem;
-		studiedSystem = null;
-		setPerceptionsAndActionState(perceptionsActionState);
-		cycle();
-		studiedSystem = ss;
 
-		while(data.selfLearning && data.isAutonomousMode) {
-			data.selfLearning = false;
-			request(convertRequestPerceptToString(head.getSelfRequest()));
-		}
-
-
-
-		return null;
-	}*/
 
 	public void setSubPercepts(ArrayList<String> unconsideredPerceptsString){
 		unconsideredPercepts = convertStringToPercept(unconsideredPerceptsString);
@@ -772,28 +754,13 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		return actions;
 	}
 	
-	
-	public HashMap<String, Double> reinforcementRequest(HashMap<String, Double> perceptionsActionState) {
-		boolean usingOracle = isUseOracle();
-		if (usingOracle)
-			head.changeOracleConnection();
-		StudiedSystem ss = studiedSystem;
-		studiedSystem = null;
-		setPerceptionsAndActionState(perceptionsActionState);
-		cycle();
-		if (usingOracle)
-			head.changeOracleConnection();
-		studiedSystem = ss;
-		return getHigherNeighborLastPredictionPercepts();
-	}
+
 	
 	@Override
 	public HashMap<String, Double> maximize(HashMap<String, Double> fixedPercepts){
 		ArrayList<Percept> percepts = getPercepts();
 		ArrayList<Percept> freePercepts = new ArrayList<>(percepts);
 		freePercepts.removeIf(p ->fixedPercepts.containsKey(p.getName()));
-		//System.out.println("known : "+known.keySet());
-		//System.out.println("unknow : "+unknown);
 		if(freePercepts.isEmpty()) {
 			return null;
 		}
