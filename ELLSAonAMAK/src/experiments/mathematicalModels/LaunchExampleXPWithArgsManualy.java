@@ -45,9 +45,9 @@ public class LaunchExampleXPWithArgsManualy {
         /*PARAMS.dimension = 5;
         PARAMS.configFile =  "fiveDimensionsLauncher" +".xml";*/
 
-        PARAMS.nbLearningCycle = 1000;
+        PARAMS.nbLearningCycle = 500;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 2;
+        PARAMS.nbEpisodes = 1;
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  0.1;

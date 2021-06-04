@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+
+	<!-- General config options -->
+	<Configuration>	
+		<Learning allowed = "true" creationOfNewContext = "true" loadPresetContext = "false"></Learning>	
+	</Configuration>
+	
+	<StartingAgents>
+	
+		<Sensor Name="px0" Enum="false" />
+		<Sensor Name="px1" Enum="false" />
+	
+	  	<Controller Name="Controller">
+              <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5" MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50" />
+              
+        </Controller> 
+	</StartingAgents>
+
+	<PARAMS>
+		<Experiment dimension = "2"
+					model = "squareFixed"
+					nbLearningCycle  = "500"
+					nbExploitationCycle = "250"
+					nbEpisodes = "2"
+
+					isActiveLearning = "true"
+					isSelfLearning = "false"
+					isLearnFromNeighbors = "false"
+
+					isConflictNCS = "true"
+					isConcurenceNCS = "true"
+					isIncompetenceNCS = "true"
+					isSubVoidDetection = "false"
+					isAmbiguityNCS = "true"
+					isModelNCS = "true"
+					isFusionResolution = "true"
+					isRetructureResolution = "true"
+
+					transferCyclesRatio = "0.0"
+
+					isActiveExploitation = "false"
+					nbEndoExploitationCycle = "1000"
+
+					noise = "0.0"
+		>
+
+		</Experiment>
+
+		<User validityRangesPrecision = "0.1"
+			  modelErrorMargin = "1.0"
+			  exogenousLearningWeight = "0.1"
+			  endogenousLearningWeight = "0.1"
+			  bootstrapCycle = "10"
+		>
+
+		</User>
+
+		<Designer LEARNING_WEIGHT_ACCURACY = "1.0"
+				  LEARNING_WEIGHT_PROXIMITY = "0.0"
+				  LEARNING_WEIGHT_EXPERIENCE = "1.0"
+				  LEARNING_WEIGHT_GENERALIZATION = "1.0"
+
+				  EXPLOITATION_WEIGHT_PROXIMITY = "1.0"
+				  EXPLOITATION_WEIGHT_EXPERIENCE = "1.0"
+				  EXPLOITATION_WEIGHT_GENERALIZATION = "1.0"
+
+				  perceptionsGenerationCoefficient = "0.1"
+
+				  modelSimilarityThreshold = "0.001"
+
+				  neighborhoodRadiusCoefficient = "2.0"
+				  influenceRadiusCoefficient = "0.5"
+				  maxRangeRadiusCoefficient = "2.0"
+				  rangeSimilarityCoefficient = "0.375"
+				  minimumRangeCoefficient = "0.25"
+
+				  probabilityOfRangeAmbiguity = "0.1"
+
+		>
+
+		</Designer>
+
+		<Other dreamLaunch = "1500"
+			   nbOfNeighborForLearningFromNeighbors = "1"
+			   nbOfNeighborForContexCreationWithouOracle = "7"
+			   isCreationFromNeighbor = "true"
+			   isAllContextSearchAllowedForLearning = "true"
+			   isAllContextSearchAllowedForExploitation = "true"
+
+		>
+
+		</Other>
+	</PARAMS>
+	
+</System>
