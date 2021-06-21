@@ -14,6 +14,7 @@ import gui.RenderStrategy;
 import kernel.ELLSA;
 import ncs.NCS;
 import utils.Pair;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 
@@ -602,7 +603,7 @@ public class Context extends EllsaAgent {
 			if(bounds.get(pct) != null) {
 				getEnvironment().trace(TRACE_LEVEL.DEBUG, new ArrayList<String>(Arrays.asList("ENDO REQUESTS BOUNDS", pct.getName(),""+ bounds.get(pct).getA(),""+ bounds.get(pct).getB(), ""+((bounds.get(pct).getB() + bounds.get(pct).getA())/2)) ));
 				request.put(pct, (bounds.get(pct).getB() + bounds.get(pct).getA())/2);
-//				request.put(pct, (bounds.get(pct).getA() + Math.random()* (bounds.get(pct).getB() - bounds.get(pct).getA()))   );
+//				request.put(pct, (bounds.get(pct).getA() + RAND_REPETABLE.random()* (bounds.get(pct).getB() - bounds.get(pct).getA()))   );
 			}else {
 				getEnvironment().trace(TRACE_LEVEL.ERROR, new ArrayList<String>(Arrays.asList("ENDO REQUESTS ERROR missing percept bounds")));
 			}
@@ -644,7 +645,7 @@ public class Context extends EllsaAgent {
 			}
 
 			//else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && (RAND_NUM.oneChanceIn((int)(1/getAmas().data.PARAM_probabilityOfRangeAmbiguity)) ) && getAmas().data.PARAM_NCS_isFrontierRequest){
-			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && (Math.random()<getAmas().data.PARAM_probabilityOfRangeAmbiguity ) && getAmas().data.PARAM_NCS_isFrontierRequest){
+			else if ( Math.abs(currentDistance)< pct.getMappingErrorAllowedMin() && differentModel && discontinuity && (RAND_REPEATABLE.random()<getAmas().data.PARAM_probabilityOfRangeAmbiguity ) && getAmas().data.PARAM_NCS_isFrontierRequest){
 				HashMap<Percept, Pair<Double, Double>> frontierBounds = getFrontierBounds(ctxt, pct);
 
 				if (frontierBounds.size()==getAmas().getPercepts().size()){
@@ -1409,7 +1410,7 @@ public class Context extends EllsaAgent {
 
 
 	private double getRandomValueInRange(double start, double length) {
-		return start + length*Math.random();
+		return start + length* RAND_REPEATABLE.random();
 	}
 	
 
@@ -1449,7 +1450,7 @@ public class Context extends EllsaAgent {
 		for(Percept pct : getAmas().getPercepts()){
 			double rangeLength = getRanges().get(pct).getLenght();
 			double startRange = getRanges().get(pct).getStart() ;
-			request.put(pct,startRange + (Math.random()*rangeLength));
+			request.put(pct,startRange + (RAND_REPEATABLE.random()*rangeLength));
 
 
 		}
@@ -1465,7 +1466,7 @@ public class Context extends EllsaAgent {
 		for(Percept pct : getAmas().getPercepts()){
 			double rangeLength = getRanges().get(pct).getLenght();
 			double startRange = getRanges().get(pct).getStart() ;
-			experiment.addDimension(pct,startRange + (Math.random()*rangeLength));
+			experiment.addDimension(pct,startRange + (RAND_REPEATABLE.random()*rangeLength));
 		}
 		return experiment;
 

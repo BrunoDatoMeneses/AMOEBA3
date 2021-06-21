@@ -5,6 +5,7 @@ import agents.head.EndogenousRequest;
 import agents.percept.Percept;
 import kernel.ELLSA;
 import utils.Pair;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -447,13 +448,13 @@ public class RobotArmManager {
 
             if(cycle%2 == 0){
 
-                double randomAngle = Math.random()*Math.PI*2;
+                double randomAngle = RAND_REPEATABLE.random()*Math.PI*2;
                 double randomRadius;
 
                 if(jointsNb ==1){
                     randomRadius = PARAMS.armBaseSize;
                 }else{
-                    randomRadius = Math.random()*(maxError/2);
+                    randomRadius = RAND_REPEATABLE.random()*(maxError/2);
                 }
 
 

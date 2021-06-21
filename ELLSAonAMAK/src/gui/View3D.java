@@ -17,6 +17,7 @@ import org.jzy3d.javafx.JavaFXChartFactory;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.*;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 import java.util.ArrayList;
@@ -251,7 +252,8 @@ public class View3D {
     }
 
     public float addGaussianNoise() {
-        java.util.Random r = new java.util.Random();
+        // Only for visualization, not necessary to make it repeatable
+        java.util.Random r = RAND_REPEATABLE.getNewGenerator();
         return (float)((r.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
     }
 

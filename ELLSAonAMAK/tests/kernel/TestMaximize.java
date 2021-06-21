@@ -8,6 +8,7 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import utils.RAND_REPEATABLE;
 import utils.Round;
 
 /**
@@ -46,7 +47,7 @@ public class TestMaximize {
 	@Test
 	public void testCoherenceRandom() {
 		// test coherence of result from request/maximize
-		Random rand = new Random();
+		Random rand = RAND_REPEATABLE.getGeneratorWithoutSeed();
 		for(int i = 0; i < 100; i++) {
 			HashMap<String, Double> req = new HashMap<String, Double>();
 			double px0 = rand.nextDouble();

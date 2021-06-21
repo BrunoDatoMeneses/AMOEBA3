@@ -11,10 +11,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import utils.CSVWriter;
-import utils.Pair;
-import utils.TRACE;
-import utils.TRACE_LEVEL;
+import utils.*;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -47,7 +44,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbLearningCycle = 500;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 1;
+        PARAMS.nbEpisodes = 2;
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  0.1;
@@ -142,6 +139,10 @@ public class LaunchExampleXPWithArgsManualy {
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
 
+
+
+
+
         experimentation();
 
         System.out.print(" DONE");
@@ -174,7 +175,8 @@ public class LaunchExampleXPWithArgsManualy {
 
         for (int i = 0; i < PARAMS.nbEpisodes; ++i) {
             //System.out.print(i + " ");
-            learningEpisode(data);
+
+            learningEpisode(data, i);
 
         }
         //System.out.println(" ");
@@ -191,14 +193,16 @@ public class LaunchExampleXPWithArgsManualy {
 
 
 
-    private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
+    private static void learningEpisode(HashMap<String, ArrayList<Double>> data, int episodeIndice) {
+        RAND_REPEATABLE.setSeed(episodeIndice);
+
         ELLSA ellsa = new ELLSA(null,  null);
         StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
-
+        ellsa.getEnvironment().setSeed(episodeIndice);
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);

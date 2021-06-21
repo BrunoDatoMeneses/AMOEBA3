@@ -1,5 +1,6 @@
 package experiments.roboticArmCentralizedControl;
 
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -43,7 +44,7 @@ public class RobotController {
         double gaussianRandomWeightJoint = (jointIndice+1)*(jointIndice+1)/(jointsNumber*jointsNumber);
         //angles[jointIndice] = addConstrains(modulo2PI(( gaussianRandomWeightJoint*gaussianRandom(0.0,Math.PI/(32))) +  ((1-gaussianRandomWeightJoint)*(Math.random()* 2 * Math.PI))), Math.PI/4)  ;
         if(jointIndice==0){
-            angles[jointIndice] = Math.random()* 2 * Math.PI;
+            angles[jointIndice] = RAND_REPEATABLE.random()* 2 * Math.PI;
         }else{
             //double dispersion = Math.PI/2;
             //double dispersion = -jointsNumber*Math.PI/240 + 7*Math.PI/24; //Math.PI/6 for 30 joints and Math.PI/4 for 10 joints
@@ -78,14 +79,14 @@ public class RobotController {
     }
 
     private void setJointsAroundActiveLearningSituation(int jointIndice, double[] angles, double value) {
-        angles[jointIndice] = maxMin2PI(value) + (Math.random()-1)*Math.PI/4 ;
+        angles[jointIndice] = maxMin2PI(value) + (RAND_REPEATABLE.random()-1)*Math.PI/4 ;
     }
 
 
 
     private double gaussianRandom(double mean, double dispersion){
-        java.util.Random r = new java.util.Random();
-        return  (r.nextGaussian() * dispersion) + mean;
+        //java.util.Random r = RAND_REPETABLE.getGeneratorWithoutSeed();
+        return  (RAND_REPEATABLE.generator.nextGaussian() * dispersion) + mean;
     }
 
     private double addConstrains(double angleValue, double limit){

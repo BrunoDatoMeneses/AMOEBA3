@@ -4,7 +4,6 @@ import java.util.*;
 
 import agents.EllsaAgent;
 import agents.context.Context;
-import agents.context.CustomComparator;
 import agents.context.Experiment;
 import agents.context.VOID;
 import agents.percept.INPUT;
@@ -15,6 +14,7 @@ import kernel.StudiedSystem;
 import kernel.World;
 import ncs.NCS;
 import utils.Pair;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 /**
@@ -2382,8 +2382,7 @@ public class Head extends EllsaAgent {
 
 		if(endogenousRequests.element().getType() == REQUEST.VOID){
 			ArrayList<EndogenousRequest> endogenousRequestList = new ArrayList<>(endogenousRequests);
-			Random rdn = new Random();
-			int i = rdn.nextInt(endogenousRequestList.size());
+			int i = RAND_REPEATABLE.generator.nextInt(endogenousRequestList.size());
 			endogenousRequests.remove(endogenousRequestList.get(i));
 			return endogenousRequestList.get(i);
 		}else{

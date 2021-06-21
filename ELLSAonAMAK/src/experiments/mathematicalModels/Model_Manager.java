@@ -1,16 +1,14 @@
 package experiments.mathematicalModels;
 
 import java.util.HashMap;
-import java.util.Random;
+
 
 import agents.percept.Percept;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
+import utils.RAND_REPEATABLE;
 
 
-/**
- * The Class BadContextManager.
- */
 public class Model_Manager implements StudiedSystem{
 
 	/** The x. */
@@ -48,7 +46,7 @@ public class Model_Manager implements StudiedSystem{
 	double noiseRange;
 	
 	/** The world. */
-	Random generator;
+	//Random generator;
 	
 	double explorationIncrement;
 	double explorationMaxVariation;
@@ -93,8 +91,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		noiseRange = noise;
 		spaceLimited = limiteToSpace;
-		
-		//gaussianCoef = Math.random()*2000;
+
 		
 		modelCoefs = new int[nbOfModels][dim+1];
 		modelCenterZones = new double[nbOfModels][dim];
@@ -105,11 +102,10 @@ public class Model_Manager implements StudiedSystem{
 				x[i] = 0.0;
 				xEploration[i] = 0.0;
 				
-				modelCoefs[nb][i] = (int) (Math.random() * 500 - 255);
-//				modelCenterZones[nb][i] = spaceSize +  (Math.random() - 0.5) * spaceSize * 2;
+				modelCoefs[nb][i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 				modelCenterZones[nb][i] = 75;
 			}
-			modelCoefs[nb][dimension] = (int) (Math.random() * 500 - 255);
+			modelCoefs[nb][dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 
 
 		}
@@ -120,11 +116,11 @@ public class Model_Manager implements StudiedSystem{
 			x[i] = 0.0;
 			xEploration[i] = 0.0;
 			
-			modelCoefs1[i] = (int) (Math.random() * 500 - 255);
-			modelCoefs2[i] = (int) (Math.random() * 500 - 255);
+			modelCoefs1[i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
+			modelCoefs2[i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 		}
-		modelCoefs1[dimension] = (int) (Math.random() * 500 - 255);
-		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
+		modelCoefs1[dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
+		modelCoefs2[dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 		
 		
 		//printModels(nbOfModels);
@@ -135,7 +131,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		explorationVector = new double[dimension];	
 		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] = Math.random() - 0.5;
+			explorationVector[i] = RAND_REPEATABLE.random() - 0.5;
 		}
 		double vectorNorm = normeP(explorationVector, 2);
 		for(int i = 0 ; i < dimension ; i++) {
@@ -209,10 +205,10 @@ public class Model_Manager implements StudiedSystem{
 
 		else {
 			//if (generator == null)	generator = new Random(29);
-			if (generator == null)	generator = new Random();
+			//if (generator == null)	generator = RAND_REPETABLE.getGenerator(29);
 			
 			for(int i = 0 ; i < dimension ; i++) {
-				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+				x[i] = (RAND_REPEATABLE.generator.nextDouble() - 0.5) * spaceSize * 4;
 			}
 			randomRequestCounts++;
 
@@ -232,7 +228,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		for(int i = 0 ; i < dimension ; i++) {
 			//explorationVector[i] += explorationMaxVariation;
-			explorationVector[i] += Math.random()*explorationMaxVariation - (explorationMaxVariation/2);
+			explorationVector[i] += RAND_REPEATABLE.random()*explorationMaxVariation - (explorationMaxVariation/2);
 		}
 		double vectorNorm = normeP(explorationVector, 2);
 		for(int i = 0 ; i < dimension ; i++) {
@@ -282,7 +278,7 @@ public class Model_Manager implements StudiedSystem{
 	public void playOneStepConstrained(double[][] constrains) {		
 		
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = constrains[i][0] + (Math.random()*(constrains[i][1] - constrains[i][0]));
+			x[i] = constrains[i][0] + (RAND_REPEATABLE.random()*(constrains[i][1] - constrains[i][0]));
 		}
 	}
 	
@@ -290,7 +286,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = constrains[i][0] + (Math.random()*(constrains[i][1] - constrains[i][0])) - noiseRange/2 + Math.random()*noiseRange;
+			x[i] = constrains[i][0] + (RAND_REPEATABLE.random()*(constrains[i][1] - constrains[i][0])) - noiseRange/2 + RAND_REPEATABLE.random()*noiseRange;
 		}
 
 	}
@@ -348,8 +344,8 @@ public class Model_Manager implements StudiedSystem{
 	}
 
 	public double addGaussianNoise() {
-		java.util.Random r = new java.util.Random();
-		return ((r.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
+		//java.util.Random r = RAND_REPETABLE.getGeneratorWithoutSeed();
+		return ((RAND_REPEATABLE.generator.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
 	}
 
 	public double modelWithoutNoise(Double[] situation) {
@@ -975,7 +971,7 @@ private double[] subZoneCenter3D(int nb) {
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = model(null) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model(null) - noiseRange/2 + RAND_REPEATABLE.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -995,7 +991,7 @@ private double[] subZoneCenter3D(int nb) {
 			
 		}
 		
-		result = model(null) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model(null) - noiseRange/2 + RAND_REPEATABLE.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -1122,9 +1118,9 @@ private double[] subZoneCenter3D(int nb) {
 	@Override
 	public double getErrorOnRequest(ELLSA ellsa){
 
-		if (generator == null)	generator = new Random(29);
+		//if (generator == null)	generator = RAND_REPETABLE.getGenerator(29);
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+			x[i] = (RAND_REPEATABLE.generator.nextDouble() - 0.5) * spaceSize * 4;
 		}
 		HashMap<String, Double> out = new HashMap<String, Double>();
 		double oracleValue = modelWithoutNoise(null);
