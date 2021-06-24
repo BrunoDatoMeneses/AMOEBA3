@@ -1,9 +1,5 @@
 package experiments.mathematicalModels;
 
-
-
-
-
 import agents.head.REQUEST;
 import agents.head.SITUATION;
 import fr.irit.smac.amak.Configuration;
@@ -11,31 +7,89 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import utils.CSVWriter;
 import utils.Pair;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class LaunchExampleXPWithArgs {
 
     private static CSVWriter xpCSV;
+    private static String SETTING_FILE_NAME;
 
-    public static void main (String[] args)  {
+    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+
+        SETTING_FILE_NAME = args[0];
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document setting_file = db.parse(new File(SETTING_FILE_NAME));
+
+        /*ArrayList<NodeList> nodeListsArray = new ArrayList<NodeList>();*/
+
+        NodeList nodeListGeneral = setting_file.getElementsByTagName("General");
+        NodeList nodeListLearning = setting_file.getElementsByTagName("Learning");
+        NodeList nodeListExploitation = setting_file.getElementsByTagName("Exploitation");
+        NodeList nodeListNeighborhood = setting_file.getElementsByTagName("Neighborhood");
+        NodeList nodeListPrediction = setting_file.getElementsByTagName("Prediction");
+        NodeList nodeListRegression = setting_file.getElementsByTagName("Regression");
+        NodeList nodeListXp = setting_file.getElementsByTagName("Xp");
+        NodeList nodeListExploration = setting_file.getElementsByTagName("Exploration");
+        NodeList nodeListNCS = setting_file.getElementsByTagName("NCS");
+        NodeList nodeListUi = setting_file.getElementsByTagName("Ui");
+        NodeList nodeListModelManagerSettings = setting_file.getElementsByTagName("ModelManagerSettings");
+
+        /*nodeListsArray.add(nodeListGeneral);
+        nodeListsArray.add(nodeListLearning);
+        nodeListsArray.add(nodeListExploitation);
+        nodeListsArray.add(nodeListNeighborhood);
+        nodeListsArray.add(nodeListPrediction);
+        nodeListsArray.add(nodeListRegression);
+        nodeListsArray.add(nodeListXp);
+        nodeListsArray.add(nodeListExploration);
+        nodeListsArray.add(nodeListNCS);
+        nodeListsArray.add(nodeListUi);
+        nodeListsArray.add(nodeListModelManagerSettings);*/
+
+
+        for (int i = 0; i < nodeListGeneral.getLength(); i++) {
+            Node node = nodeListGeneral.item(i);
+            Element element = (Element) node;
+            PARAMS.model=element.getAttribute("model");
+            PARAMS.extension=element.getAttribute("extension");
+            PARAMS.subPercepts=element.getAttribute("subPercepts"));
+            PARAMS.dimension=element.getAttribute("dimension"));
+            PARAMS.nbLearningCycle=element.getAttribute("nbLearningCycle"));
+            PARAMS.nbEndoExploitationCycle=element.getAttribute("nbEndoExploitationCycle"));
+            PARAMS.nbExploitationCycle=element.getAttribute("nbExploitationCycle"));
+            PARAMS.setActiveExploitation=element.getAttribute("setActiveExploitation"));
+            PARAMS.nbEpisodes=element.getAttribute("nbEpisodes"));
+            PARAMS.transferCyclesRatio=element.getAttribute("transferCyclesRatio"));
+            PARAMS.spaceSize=element.getAttribute("spaceSize"));
+            PARAMS.validityRangesPrecision=element.getAttribute("validityRangesPrecision"));
+        }
 
         TRACE.minLevel = TRACE_LEVEL.OFF;
-
-        PARAMS.dimension = Integer.parseInt(args[0]);
-        PARAMS.configFile = args[1] +".xml";
+        PARAMS.dimension = 2;
+        PARAMS.configFile = args[1] + ".xml";
 
         PARAMS.nbLearningCycle = Integer.parseInt(args[2]);
         PARAMS.nbExploitationCycle = Integer.parseInt(args[3]);
         PARAMS.nbEpisodes = Integer.parseInt(args[4]);
 
         // Neighborhood
-        PARAMS.validityRangesPrecision =  Double.parseDouble(args[5]);
+        PARAMS.validityRangesPrecision = Double.parseDouble(args[5]);
         PARAMS.neighborhoodRadiusCoefficient = Double.parseDouble(args[6]);
         PARAMS.influenceRadiusCoefficient = Double.parseDouble(args[7]);
         PARAMS.modelErrorMargin = Double.parseDouble(args[8]);
@@ -60,16 +114,13 @@ public class LaunchExampleXPWithArgs {
         PARAMS.setCooperativeNeighborhoodLearning = Boolean.parseBoolean(args[21]);
         PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(args[22]);
         PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(args[23]);
-        PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
+        PARAMS.nbOfNeighborForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
         PARAMS.setisCreationWithNeighbor = Boolean.parseBoolean(args[24]);
 
 
-
-
         PARAMS.model = args[25];
         PARAMS.setbootstrapCycle = Integer.parseInt(args[26]);
-
 
 
         PARAMS.exogenousLearningWeight = Double.parseDouble(args[27]);
@@ -107,8 +158,6 @@ public class LaunchExampleXPWithArgs {
         PARAMS.extension = args[48];
 
 
-
-
         experimentation();
 
         System.out.print(" DONE");
@@ -119,16 +168,16 @@ public class LaunchExampleXPWithArgs {
 
     public static void experimentation() {
 
-        xpCSV = new CSVWriter( PARAMS.extension );
+        xpCSV = new CSVWriter(PARAMS.extension);
 
         // Set AMAK configuration before creating an AMOEBA
-        Configuration.multiUI=true;
+        Configuration.multiUI = true;
         Configuration.commandLineMode = true;
         Configuration.allowedSimultaneousAgentsExecution = 1;
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
 
-        Pair<ArrayList<List<String>>,HashMap<String, ArrayList<Double>>> dataPair = WRITER.getData();
+        Pair<ArrayList<List<String>>, HashMap<String, ArrayList<Double>>> dataPair = WRITER.getData();
         ArrayList<List<String>> dataStrings = dataPair.getA();
         HashMap<String, ArrayList<Double>> data = dataPair.getB();
 
@@ -139,8 +188,8 @@ public class LaunchExampleXPWithArgs {
             learningEpisode(data);
         }
         //System.out.println(" ");
-        double total = (System.nanoTime()- start)/1000;
-        double mean = total/ PARAMS.nbEpisodes;
+        double total = (System.nanoTime() - start) / 1000;
+        double mean = total / PARAMS.nbEpisodes;
         System.out.println("[TIME MEAN] " + mean + " s");
         System.out.println("[TIME TOTAL] " + total + " s");
 
@@ -150,13 +199,12 @@ public class LaunchExampleXPWithArgs {
     }
 
 
-
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
-        ELLSA ellsa = new ELLSA(null,  null);
-        StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
+        ELLSA ellsa = new ELLSA(null, null);
+        StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
-        File file = new File("resources/"+PARAMS.configFile);
+        File file = new File("resources/" + PARAMS.configFile);
         backupSystem.load(file);
 
 
@@ -179,8 +227,7 @@ public class LaunchExampleXPWithArgs {
         ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
         ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient
-        ;
+        ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient;
         ellsa.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
 
         ellsa.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
@@ -224,9 +271,7 @@ public class LaunchExampleXPWithArgs {
         ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
 
-
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
-
 
 
         ellsa.setSubPercepts(experiments.roboticArmDistributedControl.PARAMS.subPercepts);
@@ -238,7 +283,7 @@ public class LaunchExampleXPWithArgs {
         for (int i = 0; i < PARAMS.nbLearningCycle; ++i) {
             double start = System.nanoTime();
             ellsa.cycle();
-            allLearningCycleTimes.add((System.nanoTime()- start)/1000000);
+            allLearningCycleTimes.add((System.nanoTime() - start) / 1000000);
 
         }
 		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
@@ -257,7 +302,7 @@ public class LaunchExampleXPWithArgs {
 
         ArrayList<Double> allPredictionErrors;
 
-        if(PARAMS.setActiveExploitation){
+        if (PARAMS.setActiveExploitation) {
 
             ellsa.data.PARAM_isExploitationActive = true;
 
@@ -277,11 +322,11 @@ public class LaunchExampleXPWithArgs {
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
+                allExploitationCycleTimes.add((System.nanoTime() - start) / 1000000);
 
             }
 
-        }else{
+        } else {
 
             mappingScores = ellsa.getHeadAgent().getMappingScores();
             requestCounts = ellsa.data.requestCounts;
@@ -292,27 +337,26 @@ public class LaunchExampleXPWithArgs {
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
+                allExploitationCycleTimes.add((System.nanoTime() - start) / 1000000);
 
             }
         }
 
 
-
-        OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a->a).average();
-        Double errorDispersion = allPredictionErrors.stream().mapToDouble(a->Math.pow((a- averageError.getAsDouble()),2)).sum();
+        OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a -> a).average();
+        Double errorDispersion = allPredictionErrors.stream().mapToDouble(a -> Math.pow((a - averageError.getAsDouble()), 2)).sum();
         double predictionError = averageError.getAsDouble();
-        double predictionDispersion = Math.sqrt(errorDispersion /allPredictionErrors.size());
+        double predictionDispersion = Math.sqrt(errorDispersion / allPredictionErrors.size());
 
-        OptionalDouble averageLearningCycleTime = allLearningCycleTimes.stream().mapToDouble(a->a).average();
-        Double learningcycleTimeDispersion = allLearningCycleTimes.stream().mapToDouble(a->Math.pow((a- averageLearningCycleTime.getAsDouble()),2)).sum();
+        OptionalDouble averageLearningCycleTime = allLearningCycleTimes.stream().mapToDouble(a -> a).average();
+        Double learningcycleTimeDispersion = allLearningCycleTimes.stream().mapToDouble(a -> Math.pow((a - averageLearningCycleTime.getAsDouble()), 2)).sum();
         double averageLearningCycleTimeDouble = averageLearningCycleTime.getAsDouble();
-        double learningcycleTimeDispersionDouble = Math.sqrt(learningcycleTimeDispersion /allLearningCycleTimes.size());
+        double learningcycleTimeDispersionDouble = Math.sqrt(learningcycleTimeDispersion / allLearningCycleTimes.size());
 
-        OptionalDouble averageExploitationCycleTime = allExploitationCycleTimes.stream().mapToDouble(a->a).average();
-        Double ExploitationcycleTimeDispersion = allExploitationCycleTimes.stream().mapToDouble(a->Math.pow((a- averageExploitationCycleTime.getAsDouble()),2)).sum();
+        OptionalDouble averageExploitationCycleTime = allExploitationCycleTimes.stream().mapToDouble(a -> a).average();
+        Double ExploitationcycleTimeDispersion = allExploitationCycleTimes.stream().mapToDouble(a -> Math.pow((a - averageExploitationCycleTime.getAsDouble()), 2)).sum();
         double averageExploitationCycleTimeDouble = averageExploitationCycleTime.getAsDouble();
-        double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion /allExploitationCycleTimes.size());
+        double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion / allExploitationCycleTimes.size());
 
         /*System.out.println(mappingScores);
         System.out.println(requestCounts);
@@ -326,8 +370,6 @@ public class LaunchExampleXPWithArgs {
         studiedSystem = null;
 
     }
-
-
 
 
 }

@@ -618,9 +618,6 @@ public class Model_Manager implements StudiedSystem{
 		}else {
 			return 0;
 		}
-			
-		
-		
 	}
 	
 	private double[] subZoneCenter2D(int nb) {

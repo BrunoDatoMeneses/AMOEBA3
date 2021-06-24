@@ -371,13 +371,6 @@ public class LaunchExampleXPWithArgsManualy {
 
         WRITER.setData(data, ellsa, mappingScores, requestCounts, situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
-
-
-
-
-
-
-
         ellsa = null;
         studiedSystem = null;
 
