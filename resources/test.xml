@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Definitions de tout les paramètres nécessaires au fonctionnement de l'expérience
+Ce fichier utilise et est lié à l'implémentation du fichier PARAMS.java, Configuration.java
+ainsi que Model_Manager.java
+-->
+
+<System>
+
+    <!-- General config options -->
+    <Configuration>
+        <Learning allowed="true" creationOfNewContext="true" loadPresetContext="false"></Learning>
+    </Configuration>
+
+    <StartingAgents>
+
+        <Sensor Name="px" Enum="false"/>
+        <Sensor Name="py" Enum="false"/>
+
+        <Controller Name="Controller">
+            <ErrorMargin ErrorAllowed="1.0" AugmentationFactorError="0.5" DiminutionFactorError="0.5"
+                         MinErrorAllowed="0.01" NConflictBeforeAugmentation="50" NSuccessBeforeDiminution="50"/>
+
+        </Controller>
+    </StartingAgents>
+
+    <Parameters>
+        <General
+                model="gaussianCos2"
+                extension=""
+                subPercepts=""
+                dimension="2"
+                nbLearningCycle="2000"
+                nbEndoExploitationCycle="2000"
+                nbExploitationCycle="250"
+                setActiveExploitation="false"
+                nbEpisodes="1"
+                transferCyclesRatio="0.3"
+                spaceSize="50.0"
+                validityRangesPrecision="0.03"
+        ></General>
+
+        <LearningWeights
+                LEARNING_WEIGHT_ACCURACY="1.0"
+                LEARNING_WEIGHT_PROXIMITY="0.0"
+                LEARNING_WEIGHT_EXPERIENCE="1.0"
+                LEARNING_WEIGHT_GENERALIZATION="1.0"
+        ></LearningWeights>
+
+        <Strategies
+                setActiveLearning="true"
+                setSelfLearning="false"
+                setCooperativeNeighborhoodLearning="false"
+        ></Strategies>
+
+        <ExploitationWeights
+                EXPLOITATION_WEIGHT_PROXIMITY="1.0"
+                EXPLOITATION_WEIGHT_EXPERIENCE="1.0"
+                EXPLOITATION_WEIGHT_GENERALIZATION="1.0"
+        ></ExploitationWeights>
+
+        <Neighborhood
+                neighborhoodRadiusCoefficient="2"
+                influenceRadiusCoefficient="0.5"
+                maxRangeRadiusCoefficient="2.0"
+                rangeSimilarityCoefficient="0.375"
+                minimumRangeCoefficient="0.25"
+        ></Neighborhood>
+
+        <Prediction modelErrorMargin="1"></Prediction>
+
+        <Regression
+                noiseRange="0.0"
+                exogenousLearningWeight="0.1"
+                endogenousLearningWeight="0.1"
+                perceptionsGenerationCoefficient="0.1"
+                modelSimilarityThreshold="0.001"
+        ></Regression>
+        <!--Setting regressionPoints always relies on exogenousLearningWeight param-->
+
+        <Xp nbOfModels="2" normType="2"></Xp>
+
+        <Exploration
+                continousExploration="false"
+                limitedToSpaceZone="true"
+                explorationIncrement="2.0"
+                explorationWidht="0.75"
+                setbootstrapCycle="10"
+        ></Exploration>
+        <!--Setting randomExploration always relies on continousExploration param-->
+
+
+
+        <NCS
+                setModelAmbiguityDetection="true"
+                setConflictDetection="true"
+                setConcurrenceDetection="true"
+                setIncompetenceDetection="true"
+                setCompleteRedundancyDetection="true"
+                setPartialRedundancyDetection="true"
+                setRangeAmbiguityDetection="true"
+                setisCreationWithNeighbor="true"
+                isAllContextSearchAllowedForLearning="true"
+                isAllContextSearchAllowedForExploitation="true"
+
+                setSubIncompetencedDetection="false"
+                setDream="false"
+                setDreamCycleLaunch="5000"
+                nbOfNeighborForLearningFromNeighbors="1"
+                nbOfNeighborForContexCreationWithouOracle="7"
+                nbOfNeighborForVoidDetectionInSelfLearning="7"
+                probabilityOfRangeAmbiguity="0.1"
+                setAutonomousMode="true"
+                traceLevel="OFF"
+        ></NCS>
+        <!--Setting setConflictResolution always relies on setConflictDetection param-->
+        <!--Setting setConcurrenceResolution always relies on setConcurrenceDetection param-->
+
+
+        <Ui STOP_UI="true" STOP_UI_cycle="nbLearningCycle"></Ui>
+
+        <AmakConfiguration
+                multiUI="true"
+                commandLineMode="true"
+                allowedSimultaneousAgentsExecution="1"
+                waitForGUI="false"
+                plotMilliSecondsUpdate="20000"
+        ></AmakConfiguration>
+
+    </Parameters>
+</System>
