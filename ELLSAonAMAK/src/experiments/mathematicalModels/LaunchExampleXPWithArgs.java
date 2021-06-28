@@ -149,6 +149,7 @@ public class LaunchExampleXPWithArgs {
 
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
+        RAND_REPEATABLE.setSeed(0);
         ELLSA ellsa = new ELLSA(null,  null);
         StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
@@ -156,7 +157,7 @@ public class LaunchExampleXPWithArgs {
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
         ellsa.getEnvironment().setSeed(0);
-        RAND_REPEATABLE.setSeed(0);
+
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);

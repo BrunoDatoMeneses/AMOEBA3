@@ -44,7 +44,7 @@ public class LaunchExampleXPWithArgsManualy {
 
         PARAMS.nbLearningCycle = 500;
         PARAMS.nbExploitationCycle = 250;
-        PARAMS.nbEpisodes = 10;
+        PARAMS.nbEpisodes = 1;
 
         // Neighborhood
         PARAMS.validityRangesPrecision =  0.1;
@@ -195,7 +195,7 @@ public class LaunchExampleXPWithArgsManualy {
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data, int episodeIndice) {
 
-
+        RAND_REPEATABLE.setSeed(0);
         ELLSA ellsa = new ELLSA(null,  null);
         StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
@@ -203,7 +203,7 @@ public class LaunchExampleXPWithArgsManualy {
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
         ellsa.getEnvironment().setSeed(0);
-        RAND_REPEATABLE.setSeed(0);
+
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);
