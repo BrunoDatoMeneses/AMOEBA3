@@ -208,7 +208,7 @@ public class Model_Manager implements StudiedSystem{
 			//if (generator == null)	generator = RAND_REPETABLE.getGenerator(29);
 			
 			for(int i = 0 ; i < dimension ; i++) {
-				x[i] = (RAND_REPEATABLE.generator.nextDouble() - 0.5) * spaceSize * 4;
+				x[i] = (RAND_REPEATABLE.random() - 0.5) * spaceSize * 4;
 			}
 			randomRequestCounts++;
 
@@ -345,7 +345,7 @@ public class Model_Manager implements StudiedSystem{
 
 	public double addGaussianNoise() {
 		//java.util.Random r = RAND_REPETABLE.getGeneratorWithoutSeed();
-		return ((RAND_REPEATABLE.generator.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
+		return ((RAND_REPEATABLE.randomGauss() * Math.pow(PARAMS.noiseRange/2, 1)));
 	}
 
 	public double modelWithoutNoise(Double[] situation) {
@@ -1120,7 +1120,7 @@ private double[] subZoneCenter3D(int nb) {
 
 		//if (generator == null)	generator = RAND_REPETABLE.getGenerator(29);
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = (RAND_REPEATABLE.generator.nextDouble() - 0.5) * spaceSize * 4;
+			x[i] = (RAND_REPEATABLE.random() - 0.5) * spaceSize * 4;
 		}
 		HashMap<String, Double> out = new HashMap<String, Double>();
 		double oracleValue = modelWithoutNoise(null);

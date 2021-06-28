@@ -12,6 +12,7 @@ import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import utils.CSVWriter;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -237,6 +238,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
         StudiedSystem[] studiedSystems;
         ellsas = new ELLSA[PARAMS.nbJoints];
         studiedSystems = new StudiedSystem[PARAMS.nbJoints];
+        RAND_REPEATABLE.setSeed(0);
 
         for(int i=0;i<PARAMS.nbJoints;i++){
 
@@ -244,6 +246,7 @@ public class RobotLaunchExampleMassiveXPWithArgs {
             studiedSystems[i] = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
             ellsas[i] = new ELLSA(null,  null);
             ellsas[i].setStudiedSystem(studiedSystems[i]);
+            ellsas[i].getEnvironment().setSeed(0);
             IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
             File file;
             file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");

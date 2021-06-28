@@ -12,6 +12,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -51,6 +52,8 @@ public class RobotLaunchExampleMultiUI extends Application{
         Configuration.waitForGUI = true;
         Configuration.plotMilliSecondsUpdate = 20000;
 
+        RAND_REPEATABLE.setSeed(0);
+
         for(int i=0;i<PARAMS.nbJoints;i++){
 
 
@@ -59,6 +62,7 @@ public class RobotLaunchExampleMultiUI extends Application{
             ellsaMultiUIWindows[i] = new EllsaMultiUIWindow("ELLSA Joint "+i, vuiMultis[i], studiedSystems[i]);
             ellsas[i] = new ELLSA(ellsaMultiUIWindows[i],  vuiMultis[i]);
             ellsas[i].setStudiedSystem(studiedSystems[i]);
+            ellsas[i].getEnvironment().setSeed(0);
             IBackupSystem backupSystem = new BackupSystem(ellsas[i]);
             File file;
             /*if(i==0) file = new File("resources/1jointRobotOrigin2DimensionsLauncher.xml");

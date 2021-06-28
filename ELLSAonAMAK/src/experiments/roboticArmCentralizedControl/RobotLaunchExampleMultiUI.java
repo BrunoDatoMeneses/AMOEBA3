@@ -13,6 +13,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -40,6 +41,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         Configuration.allowedSimultaneousAgentsExecution = 1;
         Configuration.waitForGUI = true;
         Configuration.plotMilliSecondsUpdate = 20000;
+        RAND_REPEATABLE.setSeed(0);
 
 
 
@@ -47,6 +49,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         VUIMulti amoebaVUITheta0 = new VUIMulti("2D");
         EllsaMultiUIWindow amoebaUITheta0 = new EllsaMultiUIWindow("ELLSA Theta 0", amoebaVUITheta0, studiedSystemTheta0);
         ELLSA ellsaTheta0 = new ELLSA(amoebaUITheta0,  amoebaVUITheta0);
+        ellsaTheta0.getEnvironment().setSeed(0);
         ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
         IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
         File file = new File("resources/"+ PARAMS.configFile);
@@ -130,6 +133,7 @@ public class RobotLaunchExampleMultiUI extends Application{
         VUIMulti amoebaVUITheta1 = new VUIMulti("2D");
         EllsaMultiUIWindow amoebaUITheta1 = new EllsaMultiUIWindow("ELLSA Theta 1", amoebaVUITheta1, studiedSystemTheta1);
         ELLSA ellsaTheta1 = new ELLSA(amoebaUITheta1,  amoebaVUITheta1);
+        ellsaTheta1.getEnvironment().setSeed(0);
         ellsaTheta1.setStudiedSystem(studiedSystemTheta1);
         IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
         File file1 = new File("resources/"+ PARAMS.configFile);

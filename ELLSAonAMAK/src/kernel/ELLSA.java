@@ -36,6 +36,7 @@ import kernel.backup.SaveHelperDummy;
 import kernel.backup.SaveHelperImpl;
 import ncs.NCS;
 import utils.PrintOnce;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 /**
@@ -105,6 +106,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 		multiUIWindow = window;
 		subPercepts = new ArrayList<>();
 		unconsideredPercepts = new ArrayList<>();
+
 	}
 	
 	/**
@@ -395,7 +397,7 @@ public class ELLSA extends Amas<World> implements IELLSA {
 			}else{
 
 
-				if(cycle<PARAMS.nbLearningCycle){
+				if(cycle<=PARAMS.nbLearningCycle){
 					data.situationsCounts.put(SITUATION.RDM_LEARNING,data.situationsCounts.get(SITUATION.RDM_LEARNING)+1);
 					data.situationsCounts.put(SITUATION.EXOGENOUS_LEARNING,data.situationsCounts.get(SITUATION.EXOGENOUS_LEARNING)+1);
 				}else{

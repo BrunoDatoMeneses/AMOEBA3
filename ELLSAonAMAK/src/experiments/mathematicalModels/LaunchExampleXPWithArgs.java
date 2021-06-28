@@ -11,10 +11,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import utils.CSVWriter;
-import utils.Pair;
-import utils.TRACE;
-import utils.TRACE_LEVEL;
+import utils.*;
 
 import java.io.File;
 import java.util.*;
@@ -158,7 +155,8 @@ public class LaunchExampleXPWithArgs {
         IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
-
+        ellsa.getEnvironment().setSeed(0);
+        RAND_REPEATABLE.setSeed(0);
 
         ellsa.allowGraphicalScheduler(false);
         ellsa.setRenderUpdate(false);

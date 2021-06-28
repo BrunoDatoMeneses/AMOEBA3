@@ -47,7 +47,7 @@ public class PARAMS {
     /*public static  String configFile = "fiveDimensionsLauncher.xml";
     public static  int dimension = 5;*/
 
-    public static  int nbLearningCycle = 2000;
+    public static  int nbLearningCycle = 500;
     public static  int nbEndoExploitationCycle = 2000;
     public static  int nbExploitationCycle = 250;
     public static  boolean setActiveExploitation = false ;
@@ -55,7 +55,7 @@ public class PARAMS {
     public static  double transferCyclesRatio = 0.3;//0.429;
 
     public static  double spaceSize = 50.0	;
-    public static double validityRangesPrecision = 0.03 ;
+    public static double validityRangesPrecision = 0.06 ;
 
     /* LEARNING */
 
@@ -119,7 +119,7 @@ public class PARAMS {
     public static  boolean setSelfLearning = true;
     public static  boolean setLearnFromNeighbors = true ;*/
 
-    public static  boolean setActiveLearning = true	;
+    public static  boolean setActiveLearning = true;
     public static  boolean setSelfLearning = false;
     public static  boolean setCooperativeNeighborhoodLearning = false ;
 
@@ -127,16 +127,16 @@ public class PARAMS {
 
     /*NCS*/
 
-    public static  boolean setModelAmbiguityDetection = true ;
-    public static  boolean setConflictDetection = true ;
-    public static  boolean setConcurrenceDetection = true ;
-    public static  boolean setIncompetenceDetection = true ;
-    public static  boolean setCompleteRedundancyDetection = true ;
-    public static  boolean setPartialRedundancyDetection = true ;
-    public static  boolean setRangeAmbiguityDetection = true ; // ONLY ACTIVE LEARNING
+    public static  boolean setModelAmbiguityDetection = false ;
+    public static  boolean setConflictDetection = false ;
+    public static  boolean setConcurrenceDetection = false ;
+    public static  boolean setIncompetenceDetection = false ;
+    public static  boolean setCompleteRedundancyDetection = false ;
+    public static  boolean setPartialRedundancyDetection = false ;
+    public static  boolean setRangeAmbiguityDetection = false ; // ONLY ACTIVE LEARNING
 
 
-    public static  boolean setisCreationWithNeighbor = true;
+    public static  boolean setisCreationWithNeighbor = false;
 
     public static boolean isAllContextSearchAllowedForLearning = true;
     public static boolean isAllContextSearchAllowedForExploitation = true;
@@ -163,7 +163,7 @@ public class PARAMS {
     public static   boolean setAutonomousMode = true;
 
 
-    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.ERROR;
+    public static TRACE_LEVEL traceLevel = TRACE_LEVEL.OFF;
 
 
 

@@ -2382,7 +2382,7 @@ public class Head extends EllsaAgent {
 
 		if(endogenousRequests.element().getType() == REQUEST.VOID){
 			ArrayList<EndogenousRequest> endogenousRequestList = new ArrayList<>(endogenousRequests);
-			int i = RAND_REPEATABLE.generator.nextInt(endogenousRequestList.size());
+			int i = RAND_REPEATABLE.randomInt(endogenousRequestList.size());
 			endogenousRequests.remove(endogenousRequestList.get(i));
 			return endogenousRequestList.get(i);
 		}else{

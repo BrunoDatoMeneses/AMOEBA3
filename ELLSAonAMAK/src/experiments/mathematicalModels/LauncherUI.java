@@ -15,6 +15,7 @@ import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import kernel.backup.SaveHelperImpl;
+import utils.RAND_REPEATABLE;
 
 
 /**
@@ -43,7 +44,8 @@ public class LauncherUI extends Application implements Serializable {
 		Configuration.allowedSimultaneousAgentsExecution = 1;
 		Configuration.waitForGUI = true;
 		Configuration.plotMilliSecondsUpdate = 20000;
-		
+		RAND_REPEATABLE.setSeed(0);
+
 
 
 		StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
@@ -54,6 +56,8 @@ public class LauncherUI extends Application implements Serializable {
 		IBackupSystem backupSystem = new BackupSystem(ellsa);
 		File file = new File("resources/"+PARAMS.configFile);
 		backupSystem.load(file);
+		ellsa.getEnvironment().setSeed(0);
+
 
 		//ellsa.saver = new SaveHelperImpl(ellsa, amoebaUI);
 		

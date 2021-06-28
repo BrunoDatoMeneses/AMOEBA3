@@ -85,7 +85,7 @@ public class RobotController {
 
     private double gaussianRandom(double mean, double dispersion){
         //java.util.Random r = RAND_REPETABLE.getGeneratorWithoutSeed();
-        return  (RAND_REPEATABLE.generator.nextGaussian() * dispersion) + mean;
+        return  (RAND_REPEATABLE.randomGauss() * dispersion) + mean;
     }
 
     private double addConstrains(double angleValue, int indice){
