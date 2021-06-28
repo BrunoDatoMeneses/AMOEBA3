@@ -210,8 +210,7 @@ public class LaunchExampleXPWithXML {
 
 
         xpCSV = new CSVWriter(""+System.currentTimeMillis());
-        WRITER.writeParams(xpCSV);
-        xpCSV.close();
+
         Pair<ArrayList<List<String>>, HashMap<String, ArrayList<Double>>> dataPair = WRITER.getData();
         ArrayList<List<String>> dataStrings = dataPair.getA();
         HashMap<String, ArrayList<Double>> data = dataPair.getB();
@@ -393,10 +392,10 @@ public class LaunchExampleXPWithXML {
         double averageExploitationCycleTimeDouble = averageExploitationCycleTime.getAsDouble();
         double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion / allExploitationCycleTimes.size());
 
-        /*System.out.println(mappingScores);
+        System.out.println(mappingScores);
         System.out.println(requestCounts);
         System.out.println(predictionError*100 + " [+-" + predictionDispersion*100 + "]");
-        System.out.println(ellsa.getContexts().size() + " Agents");*/
+        System.out.println(ellsa.getContexts().size() + " Agents");
 
         WRITER.setData(data, ellsa, mappingScores, requestCounts, situationsCounts, executionTimes, predictionError, predictionDispersion, averageLearningCycleTimeDouble, learningcycleTimeDispersionDouble, averageExploitationCycleTimeDouble, ExploitationcycleTimeDispersionDouble);
 
