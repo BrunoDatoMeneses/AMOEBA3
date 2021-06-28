@@ -152,7 +152,7 @@ public class WRITER {
         xpCSV.close();
     }
 
-    private static void writeParams(CSVWriter xpCSV) {
+    public static void writeParams(CSVWriter xpCSV) {
         xpCSV.write(new ArrayList<>(Arrays.asList("PARAMS")));
         xpCSV.write(new ArrayList<>(Arrays.asList(" ")));
         xpCSV.write(new ArrayList<>(Arrays.asList("SET")));
