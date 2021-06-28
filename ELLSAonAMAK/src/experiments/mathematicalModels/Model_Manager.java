@@ -61,23 +61,14 @@ public class Model_Manager implements StudiedSystem{
 		return activeRequestCounts;
 	}
 
-
-
-
 	public Double getSelfRequestCounts() {
 		return selfRequestCounts;
 	}
 
-
-
-
 	public Double getRandomRequestCounts() {
 		return randomRequestCounts;
 	}
-
-
-
-
+	
 	/* Parameters */
 	private static final double gaussianCoef = 10000;
 	private static final double gaussianVariance = 15;

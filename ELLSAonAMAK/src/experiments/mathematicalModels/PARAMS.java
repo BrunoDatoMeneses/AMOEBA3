@@ -23,7 +23,7 @@ public class PARAMS {
 //    public static String model = "squareSplitTriangle";
 //    public static String model = "squareSplitFixed";
 
-    public static String extension = "";
+    public static String extension;
     public static ArrayList subPercepts;
     public static String configFile;
     public static int dimension;
@@ -40,6 +40,10 @@ public class PARAMS {
     public static double LEARNING_WEIGHT_PROXIMITY;
     public static double LEARNING_WEIGHT_EXPERIENCE;
     public static double LEARNING_WEIGHT_GENERALIZATION;
+
+    public static boolean setActiveLearning;
+    public static boolean setSelfLearning;
+    public static boolean setCooperativeNeighborhoodLearning;
     /* EXPLOITATION */
     public static double EXPLOITATION_WEIGHT_PROXIMITY;
     public static double EXPLOITATION_WEIGHT_EXPERIENCE;
@@ -69,10 +73,7 @@ public class PARAMS {
     public static double explorationIncrement;
     public static double explorationWidht;
     public static int setbootstrapCycle;
-    /* LEARNING */
-    public static boolean setActiveLearning;
-    public static boolean setSelfLearning;
-    public static boolean setCooperativeNeighborhoodLearning;
+
     /*NCS*/
     public static boolean setModelAmbiguityDetection;
     public static boolean setConflictDetection;
