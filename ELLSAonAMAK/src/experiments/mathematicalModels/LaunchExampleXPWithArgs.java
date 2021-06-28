@@ -39,8 +39,9 @@ public class LaunchExampleXPWithArgs {
 
         //On crée des NodeList pour chaque tag name du fichier xml qui nous permettra par la suite de récupérer les différents attributs
         NodeList nodeListGeneral = setting_file.getElementsByTagName("General");
-        NodeList nodeListLearning = setting_file.getElementsByTagName("Learning");
-        NodeList nodeListExploitation = setting_file.getElementsByTagName("Exploitation");
+        NodeList nodeListLearningWeights = setting_file.getElementsByTagName("LearningWeights");
+        NodeList nodeListStrategies= setting_file.getElementsByTagName("Strategies");
+        NodeList nodeListExploitationWeights = setting_file.getElementsByTagName("ExploitationWeights");
         NodeList nodeListNeighborhood = setting_file.getElementsByTagName("Neighborhood");
         NodeList nodeListPrediction = setting_file.getElementsByTagName("Prediction");
         NodeList nodeListRegression = setting_file.getElementsByTagName("Regression");
@@ -71,22 +72,28 @@ public class LaunchExampleXPWithArgs {
             PARAMS.configFile = element.getAttribute("configfile");
         }
 
-        //LEARNING SETTINGS
-        for (int i = 0; i < nodeListLearning.getLength(); i++) {
-            Node node = nodeListLearning.item(i);
+        //LEARNING_WEIGHTS SETTINGS
+        for (int i = 0; i < nodeListLearningWeights.getLength(); i++) {
+            Node node = nodeListLearningWeights.item(i);
             Element element = (Element) node;
             PARAMS.LEARNING_WEIGHT_ACCURACY = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_ACCURACY"));
             PARAMS.LEARNING_WEIGHT_PROXIMITY = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_PROXIMITY"));
             PARAMS.LEARNING_WEIGHT_EXPERIENCE = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_EXPERIENCE"));
             PARAMS.LEARNING_WEIGHT_GENERALIZATION = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_GENERALIZATION"));
+        }
+
+        //STRATEGIES SETTINGS
+        for (int i = 0; i < nodeListStrategies.getLength(); i++) {
+            Node node = nodeListStrategies.item(i);
+            Element element = (Element) node;
             PARAMS.setActiveLearning = Boolean.parseBoolean(element.getAttribute("setActiveLearning"));
             PARAMS.setSelfLearning = Boolean.parseBoolean(element.getAttribute("setSelfLearning"));
             PARAMS.setCooperativeNeighborhoodLearning = Boolean.parseBoolean(element.getAttribute("setCooperativeNeighborhoodLearning"));
         }
 
-        //EXPLOITATION SETTINGS
-        for (int i = 0; i < nodeListExploitation.getLength(); i++) {
-            Node node = nodeListExploitation.item(i);
+        //EXPLOITATION_WEIGHTS SETTINGS
+        for (int i = 0; i < nodeListExploitationWeights.getLength(); i++) {
+            Node node = nodeListExploitationWeights.item(i);
             Element element = (Element) node;
             PARAMS.EXPLOITATION_WEIGHT_PROXIMITY = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_PROXIMITY"));
             PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_EXPERIENCE"));
@@ -97,9 +104,11 @@ public class LaunchExampleXPWithArgs {
         for (int i = 0; i < nodeListNeighborhood.getLength(); i++) {
             Node node = nodeListNeighborhood.item(i);
             Element element = (Element) node;
-            PARAMS.EXPLOITATION_WEIGHT_PROXIMITY = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_PROXIMITY"));
-            PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_EXPERIENCE"));
-            PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_GENERALIZATION"));
+            PARAMS.neighborhoodRadiusCoefficient = Double.parseDouble(element.getAttribute("neighborhoodRadiusCoefficient"));
+            PARAMS.influenceRadiusCoefficient = Double.parseDouble(element.getAttribute("influenceRadiusCoefficient"));
+            PARAMS.maxRangeRadiusCoefficient = Double.parseDouble(element.getAttribute("maxRangeRadiusCoefficient"));
+            PARAMS.rangeSimilarityCoefficient = Double.parseDouble(element.getAttribute("rangeSimilarityCoefficient"));
+            PARAMS.minimumRangeCoefficient = Double.parseDouble(element.getAttribute("minimumRangeCoefficient"));
         }
 
         //PREDICTION SETTINGS
