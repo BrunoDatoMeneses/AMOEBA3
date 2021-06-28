@@ -24,7 +24,7 @@ public class PARAMS {
 //    public static String model = "squareSplitFixed";
 
     public static String extension;
-    public static ArrayList subPercepts;
+    public static ArrayList subPercepts = new ArrayList<>();
     public static String configFile;
     public static int dimension;
     public static int nbLearningCycle;
