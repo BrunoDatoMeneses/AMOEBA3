@@ -12,10 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import utils.CSVWriter;
-import utils.Pair;
-import utils.TRACE;
-import utils.TRACE_LEVEL;
+import utils.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +56,7 @@ public class LaunchExampleXPWithArgs {
             Element element = (Element) node;
             PARAMS.model = element.getAttribute("model");
             PARAMS.extension = element.getAttribute("extension");
-            PARAMS.subPercepts = element.getAttribute("subPercepts");
+            PARAMS.subPercepts = PARSER.convertStringToArraylist(element.getAttribute("subPercepts"));
             PARAMS.dimension = Integer.parseInt(element.getAttribute("dimension"));
             PARAMS.nbLearningCycle = Integer.parseInt(element.getAttribute("nbLearningCycle"));
             PARAMS.nbEndoExploitationCycle = Integer.parseInt(element.getAttribute("nbEndoExploitationCycle"));
@@ -69,7 +66,6 @@ public class LaunchExampleXPWithArgs {
             PARAMS.transferCyclesRatio = Double.parseDouble(element.getAttribute("transferCyclesRatio"));
             PARAMS.spaceSize = Double.parseDouble(element.getAttribute("spaceSize"));
             PARAMS.validityRangesPrecision = Double.parseDouble(element.getAttribute("validityRangesPrecision"));
-            PARAMS.configFile = element.getAttribute("configfile");
         }
 
         //LEARNING_WEIGHTS SETTINGS
@@ -127,7 +123,7 @@ public class LaunchExampleXPWithArgs {
             PARAMS.endogenousLearningWeight = Double.parseDouble(element.getAttribute("endogenousLearningWeight"));
             PARAMS.perceptionsGenerationCoefficient = Double.parseDouble(element.getAttribute("perceptionsGenerationCoefficient"));
             PARAMS.modelSimilarityThreshold = Double.parseDouble(element.getAttribute("modelSimilarityThreshold"));
-            PARAMS.regressionPoints = Integer.parseInt(element.getAttribute("regressionPoints"));
+            PARAMS.regressionPoints = (int)(1/PARAMS.exogenousLearningWeight);
         }
 
         //XP SETTINGS
@@ -234,7 +230,7 @@ public class LaunchExampleXPWithArgs {
         StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
-        File file = new File("resources/" + PARAMS.configFile);
+        File file = new File("resources/" + SETTING_FILE_NAME);
         backupSystem.load(file);
 
 
