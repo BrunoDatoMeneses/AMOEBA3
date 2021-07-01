@@ -105,7 +105,7 @@ public class PARAMS {
     public static  int normType = 2	;
 
     /* EXPLORATION */
-    public static  boolean continousExploration = true;
+    public static  boolean continousExploration = false;
     public static  boolean randomExploration = !continousExploration;
     public static  boolean limitedToSpaceZone = true;
     public static  double explorationIncrement = 2.0	;
