@@ -7,6 +7,7 @@ import agents.percept.Percept;
 import fr.irit.smac.amak.Configuration;
 import kernel.ELLSA;
 import utils.Pair;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -459,19 +460,19 @@ public class RobotArmManager {
                 //System.out.println("NEW GOAL");
                 newGoal = false;
                 wavesNumber = 0;
-                double randomAngle = Math.random()*Math.PI*2;
+                double randomAngle = RAND_REPEATABLE.random()*Math.PI*2;
                 double randomRadius;
 
                 if(jointsNb ==1){
                     randomRadius = PARAMS.armBaseSize;
                 }else{
-                    randomRadius = Math.random()*(maxError/2);
+                    randomRadius = RAND_REPEATABLE.random()*(maxError/2);
                 }
 
 
                 poseGoal[0] = randomRadius*Math.cos(randomAngle);
                 poseGoal[1] = randomRadius*Math.sin(randomAngle);
-                angleGoal = Math.random()*Math.PI*2;
+                angleGoal = RAND_REPEATABLE.random()*Math.PI*2;
 
 
                 xPos = 0.0;
@@ -731,7 +732,7 @@ public class RobotArmManager {
     }
 
     // Implementing Fisher–Yates shuffle
-    static void shuffleArray(int[] ar)
+    static void shuffleArray(int[] ar) //TODO for repeatability
     {
         // If running on Java 6 or older, use `new Random()` on RHS here
         Random rnd = ThreadLocalRandom.current();

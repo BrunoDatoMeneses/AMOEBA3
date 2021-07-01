@@ -1,26 +1,24 @@
 package experiments.mathematicalModels;
 
 import java.util.HashMap;
-import java.util.Random;
+
 
 import agents.percept.Percept;
 import kernel.ELLSA;
 import kernel.StudiedSystem;
+import utils.RAND_REPEATABLE;
 
 
-/**
- * The Class BadContextManager.
- */
 public class Model_Manager implements StudiedSystem{
 
-	/** The x. */
+
 	Double[] x ;
 	Double[] xEploration ;
 
 	public int cycle;
 	public String model;
 	
-	/** The result. */
+
 	double result = 0;
 	
 	int[] modelCoefs1;
@@ -29,10 +27,9 @@ public class Model_Manager implements StudiedSystem{
 	int[][] modelCoefs;
 	double[][] modelCenterZones;
 	
-	/** The first step. */
-	boolean firstStep = true;
-	boolean randomExploration = false;
-	boolean spaceLimited = true;
+
+	boolean randomExploration;
+	boolean spaceLimited;
 	public double spaceSize;
 	
 	public int dimension;
@@ -46,30 +43,23 @@ public class Model_Manager implements StudiedSystem{
 	public boolean selfLearning = false;
 	
 	double noiseRange;
-	
-	/** The world. */
-	Random generator;
-	
 	double explorationIncrement;
 	double explorationMaxVariation;
-	
 	private Double activeRequestCounts = 0.0;
 	private Double selfRequestCounts = 0.0;
 	private Double randomRequestCounts = 0.0;
-	
 	public Double getActiveRequestCounts() {
 		return activeRequestCounts;
 	}
-
 	public Double getSelfRequestCounts() {
 		return selfRequestCounts;
 	}
-
 	public Double getRandomRequestCounts() {
 		return randomRequestCounts;
 	}
-	
-	/* Parameters */
+
+
+	/* Gaussian model setting */
 	private static final double gaussianCoef = 10000;
 	private static final double gaussianVariance = 15;
 	
@@ -84,8 +74,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		noiseRange = noise;
 		spaceLimited = limiteToSpace;
-		
-		//gaussianCoef = Math.random()*2000;
+
 		
 		modelCoefs = new int[nbOfModels][dim+1];
 		modelCenterZones = new double[nbOfModels][dim];
@@ -96,11 +85,10 @@ public class Model_Manager implements StudiedSystem{
 				x[i] = 0.0;
 				xEploration[i] = 0.0;
 				
-				modelCoefs[nb][i] = (int) (Math.random() * 500 - 255);
-//				modelCenterZones[nb][i] = spaceSize +  (Math.random() - 0.5) * spaceSize * 2;
+				modelCoefs[nb][i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 				modelCenterZones[nb][i] = 75;
 			}
-			modelCoefs[nb][dimension] = (int) (Math.random() * 500 - 255);
+			modelCoefs[nb][dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 
 
 		}
@@ -111,22 +99,17 @@ public class Model_Manager implements StudiedSystem{
 			x[i] = 0.0;
 			xEploration[i] = 0.0;
 			
-			modelCoefs1[i] = (int) (Math.random() * 500 - 255);
-			modelCoefs2[i] = (int) (Math.random() * 500 - 255);
+			modelCoefs1[i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
+			modelCoefs2[i] = (int) (RAND_REPEATABLE.random() * 500 - 255);
 		}
-		modelCoefs1[dimension] = (int) (Math.random() * 500 - 255);
-		modelCoefs2[dimension] = (int) (Math.random() * 500 - 255);
-		
-		
-		//printModels(nbOfModels);
-		
-		
-		
+		modelCoefs1[dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
+		modelCoefs2[dimension] = (int) (RAND_REPEATABLE.random() * 500 - 255);
+
 		randomExploration= rndExploration;
 		
 		explorationVector = new double[dimension];	
 		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] = Math.random() - 0.5;
+			explorationVector[i] = RAND_REPEATABLE.random() - 0.5;
 		}
 		double vectorNorm = normeP(explorationVector, 2);
 		for(int i = 0 ; i < dimension ; i++) {
@@ -139,39 +122,7 @@ public class Model_Manager implements StudiedSystem{
 	}
 
 
-	private void printModels(int nbOfModels) {
-		System.out.println("ZONE 1 DISKS");
-		for(int nb = 0; nb<nbOfModels; nb++) {
-			System.out.print(modelCoefs[nb][dimension] + "\t");
-			for(int i =0;i<dimension;i++) {
-				System.out.print(modelCoefs[nb][i] + "\t");
-			}
-			System.out.println("");
-		}
-		System.out.println("");
-		
-		System.out.println("ZONE 2 MULTIDIM GAUSSIAN");
-		System.out.println(gaussianCoef + " * exp( - ( x +" + spaceSize + ")² / 2 *" + gaussianVariance + "² )");
-		System.out.println("");
-		
-		System.out.println("ZONE 3 SQUARE");
-		System.out.print(modelCoefs1[dimension] + "\t");
-		for(int i =0;i<dimension;i++) {
-			System.out.print(modelCoefs1[i] + "\t");
-		}
-		System.out.println("");
-		System.out.print(modelCoefs2[dimension] + "\t");
-		for(int i =0;i<dimension;i++) {
-			System.out.print(modelCoefs2[i] + "\t");
-		}
-		System.out.println("");
-		System.out.println("");
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see kernel.StudiedSystem#playOneStep(double)
-	 */
+
 	@Override
 	public HashMap<String, Double> playOneStep() {
 
@@ -194,25 +145,20 @@ public class Model_Manager implements StudiedSystem{
 		else if(!randomExploration) {
 
 			nonRandomExplorationStep();
-			//nonRandomExplorationStep2D();
 
 		}
 
 		else {
-			//if (generator == null)	generator = new Random(29);
-			if (generator == null)	generator = new Random();
+
 			
 			for(int i = 0 ; i < dimension ; i++) {
-				x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+				x[i] = (RAND_REPEATABLE.random() - 0.5) * spaceSize * 4;
 			}
 			randomRequestCounts++;
 
 
 		}
 
-
-
-		//System.out.println("[PLAY ONE STEP] " + "selfLearning " + selfLearning + " activeLearning " + activeLearning);
 		
 		return null;
 	}
@@ -222,8 +168,7 @@ public class Model_Manager implements StudiedSystem{
 		
 		
 		for(int i = 0 ; i < dimension ; i++) {
-			//explorationVector[i] += explorationMaxVariation;
-			explorationVector[i] += Math.random()*explorationMaxVariation - (explorationMaxVariation/2);
+			explorationVector[i] += RAND_REPEATABLE.random()*explorationMaxVariation - (explorationMaxVariation/2);
 		}
 		double vectorNorm = normeP(explorationVector, 2);
 		for(int i = 0 ; i < dimension ; i++) {
@@ -242,90 +187,7 @@ public class Model_Manager implements StudiedSystem{
 
 	}
 
-	private void nonRandomExplorationStep2D() {
 
-
-
-		explorationVector[0] = Math.cos(cycle * explorationMaxVariation * 0.05);
-		explorationVector[1] = Math.sin(cycle * explorationMaxVariation * 0.05);
-
-
-		double vectorNorm = normeP(explorationVector, 2);
-		for(int i = 0 ; i < dimension ; i++) {
-			explorationVector[i] /= vectorNorm;
-		}
-
-		for(int i = 0 ; i < dimension ; i++) {
-			xEploration[i] += explorationIncrement*explorationVector[i];
-			if(spaceLimited) {
-				if(xEploration[i]>2*spaceSize) xEploration[i]= -2*spaceSize;
-				if(xEploration[i]<-2*spaceSize) xEploration[i]= 2*spaceSize;
-			}
-			x[i] = xEploration[i];
-
-		}
-
-
-	}
-
-
-	
-	public void playOneStepConstrained(double[][] constrains) {		
-		
-		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = constrains[i][0] + (Math.random()*(constrains[i][1] - constrains[i][0]));
-		}
-	}
-	
-	public void playOneStepConstrainedWithNoise(double[][] constrains, double noiseRange) {
-		
-		
-		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = constrains[i][0] + (Math.random()*(constrains[i][1] - constrains[i][0])) - noiseRange/2 + Math.random()*noiseRange;
-		}
-
-	}
-
-	
-//	public double model() {
-//		
-//		
-//		
-//		/* Disc */
-//		//return (x[1]*x[1] + x[0]*x[0] < spaceSize*spaceSize ) ? model1() :  model2();
-//		
-//		/* Square */
-//		//return (x[1] > -spaceSize && x[1] < spaceSize && x[0] < spaceSize && x[0] > -spaceSize) ? model1() : model2() ;
-//		//return model1();
-//		
-//		/* Triangle */
-//		//return (x[1] > x[0]) ? model1() : model2();
-//		
-//		/* Split */
-//		//return ( x <= 0 ) ? 2*x + y : 5*x - 8*y;
-//		
-//		/* Exp */
-//		//return (x[1] > 100*Math.exp(-(Math.pow(x[0]/25, 2))/2) -50) ? model1() : model2();
-//		
-//		
-//		/* Cercle */
-////		double rho = Math.sqrt(x[1]*x[1] + x[0]*x[0]);
-////		double start = 50.0;
-////		double width = 25.0;
-////		return ( (start  < rho) && (rho < start + width)) ? model1() : model2();
-//		
-//		
-//		/* Disques */
-//		return modelN();
-//		
-//		
-//		/* Gaussian model */
-//		//return gaussianModel();
-//	}
-
-
-	
-	
 
 	
 	public double model(Double[] situation) {
@@ -339,14 +201,11 @@ public class Model_Manager implements StudiedSystem{
 	}
 
 	public double addGaussianNoise() {
-		java.util.Random r = new java.util.Random();
-		return ((r.nextGaussian() * Math.pow(PARAMS.noiseRange/2, 1)));
+		return ((RAND_REPEATABLE.randomGauss() * Math.pow(PARAMS.noiseRange/2, 1)));
 	}
 
 	public double modelWithoutNoise(Double[] situation) {
-
 			return getModelOutput(situation);
-
 	}
 
 	private double getModelOutput(Double[] situation) {
@@ -365,8 +224,7 @@ public class Model_Manager implements StudiedSystem{
 		double[] center =  new double[dimension];
 		center[0]=0.0;
 		center[1]=0.0;
-		//return gaussianModel(xRequest, center,gaussianCoef, gaussianVariance);
-		//return squareSimpleModel(xRequest);
+
 
 		int subzone = subzone2D(xRequest);
 
@@ -530,7 +388,6 @@ public class Model_Manager implements StudiedSystem{
 	}
 
 
-
 	private double diagModel(Double[] xRequest) {
 		return (xRequest[0] > xRequest[1]) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
 	}
@@ -541,31 +398,6 @@ public class Model_Manager implements StudiedSystem{
 
 	private double squareModel(Double[] xRequest) {
 		return (xRequest[0] > -spaceSize && xRequest[0] < spaceSize && xRequest[1] < spaceSize && xRequest[1] > -spaceSize) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
-	}
-
-	private double discFixedModel(Double[] xRequest) {
-		return (xRequest[0]*xRequest[0] + xRequest[1]*xRequest[1] < spaceSize*spaceSize ) ? model2JFSMA2020(xRequest[0],xRequest[1]) : model1JFSMA2020(xRequest[0],xRequest[1]);
-	}
-
-
-	private double multiModel(Double[] xRequest, int subzone) {
-		if(subzone == 1) {
-			/* Disques */
-			return 20000 + modelN(xRequest) ;
-		}else if (subzone == 2) {
-			/* Gaussian model */
-			return 20000 +gaussianModel(xRequest, subZoneCenter3D(2), gaussianCoef, gaussianVariance);
-			
-		}else if (subzone == 3) {
-			/* Square */
-			return 20000 +square2DModel(xRequest, subZoneCenter3D(3));
-			
-		}else if (subzone == 4) {
-			/* Exp */
-			return 20000 +gaussianMapping2D(xRequest);
-		}
-		
-		return 20000 +model1();
 	}
 
 	private double multiModelFixed(Double[] xRequest, int subzone) {
@@ -585,7 +417,7 @@ public class Model_Manager implements StudiedSystem{
 			return 20000 +gaussianMapping2DFixed(xRequest);
 		}
 
-		return 20000 +model1();
+		return 20000 +model1(xRequest[0],xRequest[1]);
 	}
 	
 	
@@ -609,31 +441,11 @@ public class Model_Manager implements StudiedSystem{
 		}else {
 			return 0;
 		}
-	}
-	
-	private double[] subZoneCenter2D(int nb) {
+			
 		
-		double[] center =  new double[2];
-		
-		if(nb == 1) {
-			center[0] = spaceSize;
-			center[1] = spaceSize;
-		}else if(nb == 2) {
-			center[0] = -spaceSize;
-			center[1] = -spaceSize;
-		}
-		else if(nb == 3) {
-			center[0] = -spaceSize;
-			center[1] = spaceSize;
-		}
-		else if(nb == 4) {
-			center[0] = spaceSize;
-			center[1] = -spaceSize;
-		}
-		
-		return center;
 		
 	}
+
 	
 private double[] subZoneCenter3D(int nb) {
 		
@@ -662,23 +474,12 @@ private double[] subZoneCenter3D(int nb) {
 		return center;
 		
 	}
-	
-	private double gaussianMapping2D(Double[] xRequest) {
-		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/7, 2))/2) -50) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]);
-	}
 
 	private double gaussianMapping2DFixed(Double[] xRequest) {
 		return (xRequest[1] > 30*Math.exp(-(Math.pow((xRequest[0]-spaceSize)/7, 2))/2) -50) ? model1JFSMA2020(xRequest[0],xRequest[1]) : model2JFSMA2020(xRequest[0],xRequest[1]);
 	}
 
 
-	
-	private double square2DModel(Double[] xRequest, double[] center) {
-		return ((center[0]-spaceSize/2)  < xRequest[0]  && 
-				xRequest[0] < (center[0]+spaceSize/2) &&
-				(center[1]-spaceSize/2)  < xRequest[1]  && 
-				xRequest[1] < (center[1]+spaceSize/2)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
-	}
 
 	private double square2DModelFixed(Double[] xRequest, double[] center) {
 		return ((center[0]-spaceSize/2)  < xRequest[0]  &&
@@ -686,21 +487,7 @@ private double[] subZoneCenter3D(int nb) {
 				(center[1]-spaceSize/2)  < xRequest[1]  &&
 				xRequest[1] < (center[1]+spaceSize/2)) ? model2JFSMA2020(xRequest[0],xRequest[1]) : model1JFSMA2020(xRequest[0],xRequest[1]) ;
 	}
-	
-	private double squareSimpleModel(Double[] xRequest) {
-		return ((-spaceSize)  < xRequest[0]  && 
-				xRequest[0] < (spaceSize) &&
-				(-spaceSize)  < xRequest[1]  && 
-				xRequest[1] < (+spaceSize)) ? model1(xRequest[0],xRequest[1]) : model2(xRequest[0],xRequest[1]) ;
-	}
-	
-	private double gaussianModel() {
-		double result = 1.0;
-		for(int i=0;i<dimension;i++) {
-			result *= Math.exp(-(Math.pow(x[i]/gaussianVariance, 2))/2);
-		}
-		return gaussianCoef*result;
-	}
+
 	
 	private double gaussianModel(Double[] xRequest, double[] center, double factor, double variance) {
 		double result = 1.0;
@@ -709,7 +496,6 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		return factor*result;
 	}
-
 
 	private double polynomialModel(Double[] xRequest, double power, double division) {
 		double result = 0.0;
@@ -746,32 +532,6 @@ private double[] subZoneCenter3D(int nb) {
 		return  scale*(part1 + part2) + 200;
 	}
 
-	
-	private double modelN() {
-		
-		for(int nb = 0; nb<numberOfModels-1; nb++) {
-			
-			if(distance(x,modelCenterZones[nb]) < spaceSize) {
-				return modeli(nb);
-			}
-			
-		}
-		return modeli(numberOfModels-1);
-		
-	}
-	
-	private double modelN(Double[] xRequest) {
-		
-		for(int nb = 0; nb<numberOfModels-1; nb++) {
-			
-			if(distance(xRequest,modelCenterZones[nb]) < spaceSize*0.75) {
-				return modeli(nb, xRequest);
-			}
-			
-		}
-		return modeli(numberOfModels-1, xRequest);
-		
-	}
 
 	private double modelNFixed(Double[] xRequest) {
 
@@ -798,16 +558,7 @@ private double[] subZoneCenter3D(int nb) {
 	private double distanceToCenterByNorm(Double[] x1, int normIndice) {
 		return normePToCenter(x1,normIndice);
 	}
-	
-	private double norme1(double[] x1, double[] x2) {
-		double distance = 0;
-		for(int i = 0; i < x1.length; i ++) {
-			distance += Math.abs(x2[i] - x1[i]) ;
-		}
-		return distance;
-	}
-	
-	
+
 	
 	private double normeP(Double[] x1, double[] x2, int p) {
 		double distance = 0;
@@ -832,50 +583,7 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		return Math.pow(distance, 1.0/p);
 	}
-	
-	private double norme2(double[] x1, double[] x2) {
-		double distance = 0;
-		for(int i = 0; i < x1.length; i ++) {
-			distance += Math.pow(x2[i] - x1[i], 2) ;
-		}
-		return Math.sqrt(distance);
-	}
-	
-	private double modeli(int modelNb) {
-		double result = 0.0;
-		for(int i = 0; i<dimension;i++) {
-			result += x[i]*modelCoefs[modelNb][i];
-		}
-		result += modelCoefs[modelNb][dimension];
-		return result;		
-	}
-	
-	private double modeli(int modelNb, Double[] xRequest) {
-		double result = 0.0;
-		for(int i = 0; i<dimension;i++) {
-			result += xRequest[i]*modelCoefs[modelNb][i];
-		}
-		result += modelCoefs[modelNb][dimension];
-		return result;		
-	}
-	
-	public double model1() {
-		double result = 0.0;
-		for(int i = 0; i<dimension;i++) {
-			result += x[i]*modelCoefs1[i];
-		}
-		result += modelCoefs1[dimension];
-		return result;		
-	}
-	
-	public double model2() {
-		double result = 0.0;
-		for(int i = 0; i<dimension;i++) {
-			result += x[i]*modelCoefs2[i];
-		}
-		result += modelCoefs2[dimension];
-		return result;		
-	}
+
 	
 	public double model1(double x0, double x1) {
 		double result = 0.0;
@@ -942,8 +650,7 @@ private double[] subZoneCenter3D(int nb) {
 		if(activeLearning) {
 			activeLearning=false;
 		}
-		//out.put("oracle",result);
-		//System.out.println("[GET OUTPUT] " +out);
+
 		
 		return out;
 	}
@@ -963,7 +670,7 @@ private double[] subZoneCenter3D(int nb) {
 	public HashMap<String, Double> getOutputWithNoise(double noiseRange) {
 		HashMap<String, Double> out = new HashMap<String, Double>();
 
-		result = model(null) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model(null) - noiseRange/2 + RAND_REPEATABLE.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -983,7 +690,7 @@ private double[] subZoneCenter3D(int nb) {
 			
 		}
 		
-		result = model(null) - noiseRange/2 + Math.random()*noiseRange ;
+		result = model(null) - noiseRange/2 + RAND_REPEATABLE.random()*noiseRange ;
 		
 		for(int i = 0; i<dimension; i++) {
 			
@@ -992,51 +699,6 @@ private double[] subZoneCenter3D(int nb) {
 		}
 		out.put("oracle",result);
 		return out;
-	}
-	
-	public HashMap<String, Double> getOriginOutput() {
-		HashMap<String, Double> out = new HashMap<String, Double>();
-
-		for(int i = 0; i<dimension; i++) {
-			x[i] = 0.0;
-			
-		}
-		
-		result = model(null);
-		
-		for(int i = 0; i<dimension; i++) {
-			
-			out.put("px" + i,x[i]);
-			
-		}
-		out.put("oracle",result);
-		return out;
-	}
-	
-	
-	
-	
-	public HashMap<String, Double> getOutputRequest2D(HashMap<String, Double> values) {
-		HashMap<String, Double> out = new HashMap<String, Double>();
-
-		x[0] = values.get("px0");
-		x[1] = values.get("px1");
-		
-		
-		result =  model(null);
-		
-		out.put("px0",x[0]);
-		out.put("px1",x[1]);
-		out.put("oracle",result);
-		return out;
-	}
-
-	/* (non-Javadoc)
-	 * @see kernel.StudiedSystem#switchControlMode()
-	 */
-
-	public void switchControlMode() {
-		
 	}
 	
 
@@ -1044,9 +706,6 @@ private double[] subZoneCenter3D(int nb) {
 		return spaceSize;
 	}
 
-
-	
-	
 
 
 	@Override
@@ -1110,9 +769,9 @@ private double[] subZoneCenter3D(int nb) {
 	@Override
 	public double getErrorOnRequest(ELLSA ellsa){
 
-		if (generator == null)	generator = new Random(29);
+
 		for(int i = 0 ; i < dimension ; i++) {
-			x[i] = (generator.nextDouble() - 0.5) * spaceSize * 4;
+			x[i] = (RAND_REPEATABLE.random() - 0.5) * spaceSize * 4;
 		}
 		HashMap<String, Double> out = new HashMap<String, Double>();
 		double oracleValue = modelWithoutNoise(null);
@@ -1125,7 +784,7 @@ private double[] subZoneCenter3D(int nb) {
 
 		double prediction = ellsa.request(out);
 		double error = Math.abs(oracleValue-prediction)/Math.abs(ellsa.data.maxPrediction- ellsa.data.minPrediction);
-		//System.out.println("M" + cycle + "\t\t\t" + oracleValue + "\t\t\t" + prediction + "\t\t\t" + error);
+
 
 		return error;
 

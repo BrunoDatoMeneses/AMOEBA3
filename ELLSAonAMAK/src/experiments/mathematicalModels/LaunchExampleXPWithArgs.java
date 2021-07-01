@@ -1,5 +1,9 @@
 package experiments.mathematicalModels;
 
+
+
+
+
 import agents.head.REQUEST;
 import agents.head.SITUATION;
 import fr.irit.smac.amak.Configuration;
@@ -7,203 +11,121 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import utils.*;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class LaunchExampleXPWithArgs {
 
     private static CSVWriter xpCSV;
-    private static String SETTING_FILE_NAME;
 
-    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+    public static void main (String[] args)  {
 
-        //On fournit le fichier de parametrage en argument sous la forme d'un fichier xml
-        SETTING_FILE_NAME = args[0];
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document setting_file = db.parse(new File(SETTING_FILE_NAME));
+        TRACE.minLevel = TRACE_LEVEL.OFF;
 
-        //On crée des NodeList pour chaque tag name du fichier xml qui nous permettra par la suite de récupérer les différents attributs
-        NodeList nodeListGeneral = setting_file.getElementsByTagName("General");
-        NodeList nodeListLearningWeights = setting_file.getElementsByTagName("LearningWeights");
-        NodeList nodeListStrategies= setting_file.getElementsByTagName("Strategies");
-        NodeList nodeListExploitationWeights = setting_file.getElementsByTagName("ExploitationWeights");
-        NodeList nodeListNeighborhood = setting_file.getElementsByTagName("Neighborhood");
-        NodeList nodeListPrediction = setting_file.getElementsByTagName("Prediction");
-        NodeList nodeListRegression = setting_file.getElementsByTagName("Regression");
-        NodeList nodeListXp = setting_file.getElementsByTagName("Xp");
-        NodeList nodeListExploration = setting_file.getElementsByTagName("Exploration");
-        NodeList nodeListNCS = setting_file.getElementsByTagName("NCS");
-        NodeList nodeListUi = setting_file.getElementsByTagName("Ui");
-        NodeList nodeListConfiguration = setting_file.getElementsByTagName("Configuration");
+        PARAMS.dimension = Integer.parseInt(args[0]);
+        PARAMS.configFile = args[1] +".xml";
 
-        //On affecte les champs de PARAMS avec les valeur des attribut de chaque tag name du fichier xml
+        PARAMS.nbLearningCycle = Integer.parseInt(args[2]);
+        PARAMS.nbExploitationCycle = Integer.parseInt(args[3]);
+        PARAMS.nbEpisodes = Integer.parseInt(args[4]);
 
-        //GENERAL SETTINGS
-        for (int i = 0; i < nodeListGeneral.getLength(); i++) {
-            Node node = nodeListGeneral.item(i);
-            Element element = (Element) node;
-            PARAMS.model = element.getAttribute("model");
-            PARAMS.extension = element.getAttribute("extension");
-            PARAMS.subPercepts = PARSER.convertStringToArraylist(element.getAttribute("subPercepts"));
-            PARAMS.dimension = Integer.parseInt(element.getAttribute("dimension"));
-            PARAMS.nbLearningCycle = Integer.parseInt(element.getAttribute("nbLearningCycle"));
-            PARAMS.nbEndoExploitationCycle = Integer.parseInt(element.getAttribute("nbEndoExploitationCycle"));
-            PARAMS.nbExploitationCycle = Integer.parseInt(element.getAttribute("nbExploitationCycle"));
-            PARAMS.setActiveExploitation = Boolean.parseBoolean(element.getAttribute("setActiveExploitation"));
-            PARAMS.nbEpisodes = Integer.parseInt(element.getAttribute("nbEpisodes"));
-            PARAMS.transferCyclesRatio = Double.parseDouble(element.getAttribute("transferCyclesRatio"));
-            PARAMS.spaceSize = Double.parseDouble(element.getAttribute("spaceSize"));
-            PARAMS.validityRangesPrecision = Double.parseDouble(element.getAttribute("validityRangesPrecision"));
-        }
+        // Neighborhood
+        PARAMS.validityRangesPrecision =  Double.parseDouble(args[5]);
+        PARAMS.neighborhoodRadiusCoefficient = Double.parseDouble(args[6]);
+        PARAMS.influenceRadiusCoefficient = Double.parseDouble(args[7]);
+        PARAMS.modelErrorMargin = Double.parseDouble(args[8]);
 
-        //LEARNING_WEIGHTS SETTINGS
-        for (int i = 0; i < nodeListLearningWeights.getLength(); i++) {
-            Node node = nodeListLearningWeights.item(i);
-            Element element = (Element) node;
-            PARAMS.LEARNING_WEIGHT_ACCURACY = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_ACCURACY"));
-            PARAMS.LEARNING_WEIGHT_PROXIMITY = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_PROXIMITY"));
-            PARAMS.LEARNING_WEIGHT_EXPERIENCE = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_EXPERIENCE"));
-            PARAMS.LEARNING_WEIGHT_GENERALIZATION = Double.parseDouble(element.getAttribute("LEARNING_WEIGHT_GENERALIZATION"));
-        }
+        // Learning
+        PARAMS.setActiveLearning = Boolean.parseBoolean(args[9]);
+        PARAMS.setSelfLearning = Boolean.parseBoolean(args[10]);
 
-        //STRATEGIES SETTINGS
-        for (int i = 0; i < nodeListStrategies.getLength(); i++) {
-            Node node = nodeListStrategies.item(i);
-            Element element = (Element) node;
-            PARAMS.setActiveLearning = Boolean.parseBoolean(element.getAttribute("setActiveLearning"));
-            PARAMS.setSelfLearning = Boolean.parseBoolean(element.getAttribute("setSelfLearning"));
-            PARAMS.setCooperativeNeighborhoodLearning = Boolean.parseBoolean(element.getAttribute("setCooperativeNeighborhoodLearning"));
-        }
+        //NCS
+        PARAMS.setConflictDetection = Boolean.parseBoolean(args[11]);
+        PARAMS.setConcurrenceDetection = Boolean.parseBoolean(args[12]);
+        PARAMS.setIncompetenceDetection = Boolean.parseBoolean(args[13]);
+        PARAMS.setSubIncompetencedDetection = Boolean.parseBoolean(args[14]);
+        PARAMS.setRangeAmbiguityDetection = Boolean.parseBoolean(args[15]);
+        PARAMS.setModelAmbiguityDetection = Boolean.parseBoolean(args[16]);
+        PARAMS.setCompleteRedundancyDetection = Boolean.parseBoolean(args[17]);
+        PARAMS.setPartialRedundancyDetection = Boolean.parseBoolean(args[18]);
 
-        //EXPLOITATION_WEIGHTS SETTINGS
-        for (int i = 0; i < nodeListExploitationWeights.getLength(); i++) {
-            Node node = nodeListExploitationWeights.item(i);
-            Element element = (Element) node;
-            PARAMS.EXPLOITATION_WEIGHT_PROXIMITY = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_PROXIMITY"));
-            PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_EXPERIENCE"));
-            PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = Double.parseDouble(element.getAttribute("EXPLOITATION_WEIGHT_GENERALIZATION"));
-        }
+        PARAMS.setDream = Boolean.parseBoolean(args[19]);
+        PARAMS.setDreamCycleLaunch = Integer.parseInt(args[20]);
 
-        //NEIGHBORHOOD SETTINGS
-        for (int i = 0; i < nodeListNeighborhood.getLength(); i++) {
-            Node node = nodeListNeighborhood.item(i);
-            Element element = (Element) node;
-            PARAMS.neighborhoodRadiusCoefficient = Double.parseDouble(element.getAttribute("neighborhoodRadiusCoefficient"));
-            PARAMS.influenceRadiusCoefficient = Double.parseDouble(element.getAttribute("influenceRadiusCoefficient"));
-            PARAMS.maxRangeRadiusCoefficient = Double.parseDouble(element.getAttribute("maxRangeRadiusCoefficient"));
-            PARAMS.rangeSimilarityCoefficient = Double.parseDouble(element.getAttribute("rangeSimilarityCoefficient"));
-            PARAMS.minimumRangeCoefficient = Double.parseDouble(element.getAttribute("minimumRangeCoefficient"));
-        }
+        PARAMS.setCooperativeNeighborhoodLearning = Boolean.parseBoolean(args[21]);
+        PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(args[22]);
+        PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(args[23]);
+        PARAMS.nbOfNeighborForVoidDetectionInSelfLearning =  PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        //PREDICTION SETTINGS
-        for (int i = 0; i < nodeListPrediction.getLength(); i++) {
-            Node node = nodeListPrediction.item(i);
-            Element element = (Element) node;
-            PARAMS.modelErrorMargin = Double.parseDouble(element.getAttribute("modelErrorMargin"));
-        }
+        PARAMS.setisCreationWithNeighbor = Boolean.parseBoolean(args[24]);
 
-        //REGRESSION SETTINGS
-        for (int i = 0; i < nodeListRegression.getLength(); i++) {
-            Node node = nodeListRegression.item(i);
-            Element element = (Element) node;
-            PARAMS.noiseRange = Double.parseDouble(element.getAttribute("noiseRange"));
-            PARAMS.exogenousLearningWeight = Double.parseDouble(element.getAttribute("exogenousLearningWeight"));
-            PARAMS.endogenousLearningWeight = Double.parseDouble(element.getAttribute("endogenousLearningWeight"));
-            PARAMS.perceptionsGenerationCoefficient = Double.parseDouble(element.getAttribute("perceptionsGenerationCoefficient"));
-            PARAMS.modelSimilarityThreshold = Double.parseDouble(element.getAttribute("modelSimilarityThreshold"));
-            PARAMS.regressionPoints = (int)(1/PARAMS.exogenousLearningWeight);
-        }
 
-        //XP SETTINGS
-        for (int i = 0; i < nodeListXp.getLength(); i++) {
-            Node node = nodeListXp.item(i);
-            Element element = (Element) node;
-            PARAMS.nbOfModels = Integer.parseInt(element.getAttribute("nbOfModels"));
-            PARAMS.normType = Integer.parseInt(element.getAttribute("normType"));
-        }
 
-        //EXPLORATION SETTINGS
-        for (int i = 0; i < nodeListExploration.getLength(); i++) {
-            Node node = nodeListExploration.item(i);
-            Element element = (Element) node;
-            PARAMS.continousExploration = Boolean.parseBoolean(element.getAttribute("continousExploration"));
-            PARAMS.randomExploration = Boolean.parseBoolean(element.getAttribute("randomExploration"));
-            PARAMS.limitedToSpaceZone = Boolean.parseBoolean(element.getAttribute("limitedToSpaceZone"));
-            PARAMS.explorationIncrement = Integer.parseInt(element.getAttribute("explorationIncrement"));
-            PARAMS.explorationWidht = Integer.parseInt(element.getAttribute("explorationWidht"));
-            PARAMS.setbootstrapCycle = Integer.parseInt(element.getAttribute("setbootstrapCycle"));
-        }
 
-        //NCS SETTINGS
-        for (int i = 0; i < nodeListNCS.getLength(); i++) {
-            Node node = nodeListNCS.item(i);
-            Element element = (Element) node;
-            PARAMS.setModelAmbiguityDetection = Boolean.parseBoolean(element.getAttribute("setModelAmbiguityDetection"));
-            PARAMS.setConflictDetection = Boolean.parseBoolean(element.getAttribute("setConflictDetection"));
-            PARAMS.setConcurrenceDetection = Boolean.parseBoolean(element.getAttribute("setConcurrenceDetection"));
-            PARAMS.setIncompetenceDetection = Boolean.parseBoolean(element.getAttribute("setIncompetenceDetection"));
-            PARAMS.setCompleteRedundancyDetection = Boolean.parseBoolean(element.getAttribute("setCompleteRedundancyDetection"));
-            PARAMS.setPartialRedundancyDetection = Boolean.parseBoolean(element.getAttribute("setPartialRedundancyDetection"));
-            PARAMS.setRangeAmbiguityDetection = Boolean.parseBoolean(element.getAttribute("setRangeAmbiguityDetection"));
-            PARAMS.setisCreationWithNeighbor = Boolean.parseBoolean(element.getAttribute("setisCreationWithNeighbor"));
-            PARAMS.isAllContextSearchAllowedForLearning = Boolean.parseBoolean(element.getAttribute("isAllContextSearchAllowedForLearning"));
-            PARAMS.setConflictResolution = Boolean.parseBoolean(element.getAttribute("setConflictResolution"));
-            PARAMS.setConcurrenceResolution = Boolean.parseBoolean(element.getAttribute("setConcurrenceResolution"));
-            PARAMS.setSubIncompetencedDetection = Boolean.parseBoolean(element.getAttribute("setSubIncompetencedDetection"));
-            PARAMS.setDream = Boolean.parseBoolean(element.getAttribute("setDream"));
-            PARAMS.setDreamCycleLaunch = Integer.parseInt(element.getAttribute("setDreamCycleLaunch"));
-            PARAMS.nbOfNeighborForLearningFromNeighbors = Integer.parseInt(element.getAttribute("nbOfNeighborForLearningFromNeighbors"));
-            PARAMS.nbOfNeighborForContexCreationWithouOracle = Integer.parseInt(element.getAttribute("nbOfNeighborForContexCreationWithouOracle"));
-            PARAMS.nbOfNeighborForVoidDetectionInSelfLearning = Integer.parseInt(element.getAttribute("nbOfNeighborForVoidDetectionInSelfLearning"));
-            PARAMS.probabilityOfRangeAmbiguity = Double.parseDouble(element.getAttribute("probabilityOfRangeAmbiguity"));
-            PARAMS.setAutonomousMode = Boolean.parseBoolean(element.getAttribute("setAutonomousMode"));
-            PARAMS.traceLevel = TRACE.convertFromString(element.getAttribute("traceLevel"));
-        }
+        PARAMS.model = args[25];
+        PARAMS.setbootstrapCycle = Integer.parseInt(args[26]);
 
-        //UI SETTINGS
-        for (int i = 0; i < nodeListUi.getLength(); i++) {
-            Node node = nodeListUi.item(i);
-            Element element = (Element) node;
-            PARAMS.STOP_UI = Boolean.parseBoolean(element.getAttribute("STOP_UI"));
-            PARAMS.STOP_UI_cycle = Integer.parseInt(element.getAttribute("STOP_UI_cycle"));
-        }
 
-        //On affecte les champs de Configuration avec les valeur des attribut de chaque tag name du fichier xml
-        //CONFIGURATION SETTINGS
-        // Set AMAK configuration before creating an AMOEBA
-        for (int i = 0; i < nodeListConfiguration.getLength(); i++) {
-            Node node = nodeListConfiguration.item(i);
-            Element element = (Element) node;
-            Configuration.multiUI = Boolean.parseBoolean(element.getAttribute("multiUI"));
-            Configuration.commandLineMode = Boolean.parseBoolean(element.getAttribute("commandLineMode"));
-            Configuration.allowedSimultaneousAgentsExecution = Integer.parseInt(element.getAttribute("allowedSimultaneousAgentsExecution"));
-            Configuration.waitForGUI = Boolean.parseBoolean(element.getAttribute("waitForGUI"));
-            Configuration.plotMilliSecondsUpdate = Integer.parseInt(element.getAttribute("plotMilliSecondsUpdate"));
-        }
+
+        PARAMS.exogenousLearningWeight = Double.parseDouble(args[27]);
+        PARAMS.endogenousLearningWeight = Double.parseDouble(args[28]);
+
+        PARAMS.LEARNING_WEIGHT_ACCURACY = Double.parseDouble(args[29]);
+        PARAMS.LEARNING_WEIGHT_PROXIMITY = Double.parseDouble(args[30]);
+        PARAMS.LEARNING_WEIGHT_EXPERIENCE = Double.parseDouble(args[31]);
+        PARAMS.LEARNING_WEIGHT_GENERALIZATION = Double.parseDouble(args[32]);
+
+        PARAMS.EXPLOITATION_WEIGHT_PROXIMITY = Double.parseDouble(args[33]);
+        PARAMS.EXPLOITATION_WEIGHT_EXPERIENCE = Double.parseDouble(args[34]);
+        PARAMS.EXPLOITATION_WEIGHT_GENERALIZATION = Double.parseDouble(args[35]);
+
+        PARAMS.perceptionsGenerationCoefficient = Double.parseDouble(args[36]);
+
+        PARAMS.modelSimilarityThreshold = Double.parseDouble(args[37]);
+
+        PARAMS.maxRangeRadiusCoefficient = Double.parseDouble(args[38]);
+        PARAMS.rangeSimilarityCoefficient = Double.parseDouble(args[39]);
+        PARAMS.minimumRangeCoefficient = Double.parseDouble(args[40]);
+
+        PARAMS.isAllContextSearchAllowedForLearning = Boolean.parseBoolean(args[41]);
+        PARAMS.isAllContextSearchAllowedForExploitation = Boolean.parseBoolean(args[42]);
+
+        PARAMS.probabilityOfRangeAmbiguity = Double.parseDouble(args[43]);
+
+        PARAMS.transferCyclesRatio = Double.parseDouble(args[44]);
+
+        PARAMS.nbEndoExploitationCycle = Integer.parseInt(args[45]);
+        PARAMS.setActiveExploitation = Boolean.parseBoolean(args[46]);
+
+        PARAMS.noiseRange = Double.parseDouble(args[47]);
+
+        PARAMS.extension = args[48];
+
+
+
 
         experimentation();
+
         System.out.print(" DONE");
+
         System.exit(1);
     }
 
 
     public static void experimentation() {
 
-        xpCSV = new CSVWriter(PARAMS.extension);
+        xpCSV = new CSVWriter( PARAMS.extension );
 
-        Pair<ArrayList<List<String>>, HashMap<String, ArrayList<Double>>> dataPair = WRITER.getData();
+        // Set AMAK configuration before creating an AMOEBA
+        Configuration.multiUI=true;
+        Configuration.commandLineMode = true;
+        Configuration.allowedSimultaneousAgentsExecution = 1;
+        Configuration.waitForGUI = false;
+        Configuration.plotMilliSecondsUpdate = 20000;
+
+        Pair<ArrayList<List<String>>,HashMap<String, ArrayList<Double>>> dataPair = WRITER.getData();
         ArrayList<List<String>> dataStrings = dataPair.getA();
         HashMap<String, ArrayList<Double>> data = dataPair.getB();
 
@@ -214,8 +136,8 @@ public class LaunchExampleXPWithArgs {
             learningEpisode(data);
         }
         //System.out.println(" ");
-        double total = (System.nanoTime() - start) / 1000;
-        double mean = total / PARAMS.nbEpisodes;
+        double total = (System.nanoTime()- start)/1000;
+        double mean = total/ PARAMS.nbEpisodes;
         System.out.println("[TIME MEAN] " + mean + " s");
         System.out.println("[TIME TOTAL] " + total + " s");
 
@@ -225,13 +147,16 @@ public class LaunchExampleXPWithArgs {
     }
 
 
+
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
-        ELLSA ellsa = new ELLSA(null, null);
-        StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
+        RAND_REPEATABLE.setSeed(0);
+        ELLSA ellsa = new ELLSA(null,  null);
+        StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement,PARAMS.explorationWidht,PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
-        File file = new File("resources/" + SETTING_FILE_NAME);
+        File file = new File("resources/"+PARAMS.configFile);
         backupSystem.load(file);
+        ellsa.getEnvironment().setSeed(0);
 
 
         ellsa.allowGraphicalScheduler(false);
@@ -253,7 +178,8 @@ public class LaunchExampleXPWithArgs {
         ellsa.data.PARAM_creationNeighborNumberForVoidDetectionInSelfLearning = PARAMS.nbOfNeighborForVoidDetectionInSelfLearning;
         ellsa.data.PARAM_creationNeighborNumberForContexCreationWithouOracle = PARAMS.nbOfNeighborForContexCreationWithouOracle;
 
-        ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient;
+        ellsa.data.PARAM_perceptionsGenerationCoefficient = PARAMS.perceptionsGenerationCoefficient
+        ;
         ellsa.data.PARAM_modelSimilarityThreshold = PARAMS.modelSimilarityThreshold;
 
         ellsa.data.PARAM_LEARNING_WEIGHT_ACCURACY = PARAMS.LEARNING_WEIGHT_ACCURACY;
@@ -297,7 +223,9 @@ public class LaunchExampleXPWithArgs {
         ellsa.data.PARAM_probabilityOfRangeAmbiguity = PARAMS.probabilityOfRangeAmbiguity;
 
 
+
         ellsa.getEnvironment().PARAM_minTraceLevel = PARAMS.traceLevel;
+
 
 
         ellsa.setSubPercepts(experiments.roboticArmDistributedControl.PARAMS.subPercepts);
@@ -309,7 +237,7 @@ public class LaunchExampleXPWithArgs {
         for (int i = 0; i < PARAMS.nbLearningCycle; ++i) {
             double start = System.nanoTime();
             ellsa.cycle();
-            allLearningCycleTimes.add((System.nanoTime() - start) / 1000000);
+            allLearningCycleTimes.add((System.nanoTime()- start)/1000000);
 
         }
 		/*while(ellsa.getContexts().size()>5 || ellsa.getCycle()<50){
@@ -328,7 +256,7 @@ public class LaunchExampleXPWithArgs {
 
         ArrayList<Double> allPredictionErrors;
 
-        if (PARAMS.setActiveExploitation) {
+        if(PARAMS.setActiveExploitation){
 
             ellsa.data.PARAM_isExploitationActive = true;
 
@@ -348,11 +276,11 @@ public class LaunchExampleXPWithArgs {
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add((System.nanoTime() - start) / 1000000);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
 
-        } else {
+        }else{
 
             mappingScores = ellsa.getHeadAgent().getMappingScores();
             requestCounts = ellsa.data.requestCounts;
@@ -363,26 +291,27 @@ public class LaunchExampleXPWithArgs {
             for (int i = 0; i < PARAMS.nbExploitationCycle; ++i) {
                 double start = System.nanoTime();
                 allPredictionErrors.add(new Double(studiedSystem.getErrorOnRequest(ellsa)));
-                allExploitationCycleTimes.add((System.nanoTime() - start) / 1000000);
+                allExploitationCycleTimes.add((System.nanoTime()- start)/1000000);
 
             }
         }
 
 
-        OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a -> a).average();
-        Double errorDispersion = allPredictionErrors.stream().mapToDouble(a -> Math.pow((a - averageError.getAsDouble()), 2)).sum();
+
+        OptionalDouble averageError = allPredictionErrors.stream().mapToDouble(a->a).average();
+        Double errorDispersion = allPredictionErrors.stream().mapToDouble(a->Math.pow((a- averageError.getAsDouble()),2)).sum();
         double predictionError = averageError.getAsDouble();
-        double predictionDispersion = Math.sqrt(errorDispersion / allPredictionErrors.size());
+        double predictionDispersion = Math.sqrt(errorDispersion /allPredictionErrors.size());
 
-        OptionalDouble averageLearningCycleTime = allLearningCycleTimes.stream().mapToDouble(a -> a).average();
-        Double learningcycleTimeDispersion = allLearningCycleTimes.stream().mapToDouble(a -> Math.pow((a - averageLearningCycleTime.getAsDouble()), 2)).sum();
+        OptionalDouble averageLearningCycleTime = allLearningCycleTimes.stream().mapToDouble(a->a).average();
+        Double learningcycleTimeDispersion = allLearningCycleTimes.stream().mapToDouble(a->Math.pow((a- averageLearningCycleTime.getAsDouble()),2)).sum();
         double averageLearningCycleTimeDouble = averageLearningCycleTime.getAsDouble();
-        double learningcycleTimeDispersionDouble = Math.sqrt(learningcycleTimeDispersion / allLearningCycleTimes.size());
+        double learningcycleTimeDispersionDouble = Math.sqrt(learningcycleTimeDispersion /allLearningCycleTimes.size());
 
-        OptionalDouble averageExploitationCycleTime = allExploitationCycleTimes.stream().mapToDouble(a -> a).average();
-        Double ExploitationcycleTimeDispersion = allExploitationCycleTimes.stream().mapToDouble(a -> Math.pow((a - averageExploitationCycleTime.getAsDouble()), 2)).sum();
+        OptionalDouble averageExploitationCycleTime = allExploitationCycleTimes.stream().mapToDouble(a->a).average();
+        Double ExploitationcycleTimeDispersion = allExploitationCycleTimes.stream().mapToDouble(a->Math.pow((a- averageExploitationCycleTime.getAsDouble()),2)).sum();
         double averageExploitationCycleTimeDouble = averageExploitationCycleTime.getAsDouble();
-        double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion / allExploitationCycleTimes.size());
+        double ExploitationcycleTimeDispersionDouble = Math.sqrt(ExploitationcycleTimeDispersion /allExploitationCycleTimes.size());
 
         /*System.out.println(mappingScores);
         System.out.println(requestCounts);
@@ -396,6 +325,8 @@ public class LaunchExampleXPWithArgs {
         studiedSystem = null;
 
     }
+
+
 
 
 }

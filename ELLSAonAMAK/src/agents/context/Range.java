@@ -3,14 +3,11 @@ package agents.context;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
 
 import agents.percept.Percept;
 import kernel.ELLSA;
 import kernel.World;
-import ncs.NCS;
-import utils.Pair;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 /**
@@ -740,7 +737,7 @@ public class Range implements Serializable, Comparable, Cloneable {
 	}
 
 	public double getRandom() {
-		return start + getLenght()*Math.random();
+		return start + getLenght()* RAND_REPEATABLE.random();
 	}
 
 	public double getRadius() {

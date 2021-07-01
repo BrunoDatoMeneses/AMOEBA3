@@ -7,6 +7,7 @@ import java.util.HashSet;
 import agents.EllsaAgent;
 import agents.context.Context;
 import kernel.ELLSA;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 /**
@@ -52,7 +53,7 @@ public class Percept extends EllsaAgent {
 
 		if(getAmas().getPerceptions(this.name) == null){
 			getEnvironment().print(TRACE_LEVEL.ERROR,this.getName(),"is missing","-> random value is given");
-			value = this.min + Math.random()*(this.max - this.min);
+			value = this.min + RAND_REPEATABLE.random()*(this.max - this.min);
 		}else{
 			value = getAmas().getPerceptions(this.name);
 		}

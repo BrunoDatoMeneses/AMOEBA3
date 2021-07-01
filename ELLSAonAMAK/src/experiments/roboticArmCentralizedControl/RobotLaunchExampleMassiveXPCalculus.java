@@ -10,6 +10,7 @@ import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
 import utils.CSVWriter;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -297,6 +298,9 @@ public class RobotLaunchExampleMassiveXPCalculus {
                 StudiedSystem studiedSystemTheta0 = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
                 ELLSA ellsaTheta0 = new ELLSA(null,  null);
                 ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
+
+                RAND_REPEATABLE.setSeed(0);
+                ellsaTheta0.getEnvironment().setSeed(0);
                 IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
                 File file = new File("resources/"+ PARAMS.configFile);
                 backupSystem.load(file);

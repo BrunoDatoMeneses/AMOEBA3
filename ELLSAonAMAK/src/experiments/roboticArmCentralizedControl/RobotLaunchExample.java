@@ -8,6 +8,7 @@ import kernel.ELLSA;
 import kernel.StudiedSystem;
 import kernel.backup.BackupSystem;
 import kernel.backup.IBackupSystem;
+import utils.RAND_REPEATABLE;
 import utils.TRACE;
 import utils.TRACE_LEVEL;
 
@@ -36,15 +37,17 @@ public class RobotLaunchExample{
         Configuration.allowedSimultaneousAgentsExecution = 1;
         Configuration.waitForGUI = false;
         Configuration.plotMilliSecondsUpdate = 20000;
-
+        RAND_REPEATABLE.setSeed(0);
 
 
         StudiedSystem studiedSystemTheta0 = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ELLSA ellsaTheta0 = new ELLSA(null,  null);
+        ellsaTheta0.getEnvironment().setSeed(0);
         ellsaTheta0.setStudiedSystem(studiedSystemTheta0);
         IBackupSystem backupSystem = new BackupSystem(ellsaTheta0);
         File file = new File("resources/"+ PARAMS.configFile);
         backupSystem.load(file);
+
 
         //amoeba.saver = new SaveHelperImpl(amoeba, amoebaUI);
 
@@ -53,6 +56,7 @@ public class RobotLaunchExample{
 
         StudiedSystem studiedSystemTheta1 = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ELLSA ellsaTheta1 = new ELLSA(null,  null);
+        ellsaTheta1.getEnvironment().setSeed(0);
         ellsaTheta1.setStudiedSystem(studiedSystemTheta1);
         IBackupSystem backupSystem1 = new BackupSystem(ellsaTheta1);
         File file1 = new File("resources/"+ PARAMS.configFile);

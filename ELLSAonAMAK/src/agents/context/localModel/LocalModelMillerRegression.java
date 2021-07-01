@@ -5,6 +5,7 @@ import java.util.*;
 import agents.context.Context;
 import agents.context.Experiment;
 import agents.percept.Percept;
+import utils.RAND_REPEATABLE;
 import utils.TRACE_LEVEL;
 
 /**
@@ -453,8 +454,8 @@ public class LocalModelMillerRegression extends LocalModel{
 
 				double rangeCenter = this.context.getRanges().get(pct).getCenter();
 				double rangeRadius = this.context.getRanges().get(pct).getRadius();
-				java.util.Random r = new java.util.Random();
-				double ramdomGaussianPosition = (r.nextGaussian() * Math.pow((getContext().getAmas().data.PARAM_perceptionsGenerationCoefficient *rangeRadius/(getContext().getAmas().data.PARAM_quantileForGenerationOfArtificialPerceptions)),1)) + rangeCenter;
+
+				double ramdomGaussianPosition = (RAND_REPEATABLE.randomGauss() * Math.pow((getContext().getAmas().data.PARAM_perceptionsGenerationCoefficient *rangeRadius/(getContext().getAmas().data.PARAM_quantileForGenerationOfArtificialPerceptions)),1)) + rangeCenter;
 				exp.addDimension(pct,ramdomGaussianPosition);
 			}
 			exp.setProposition(this.getProposition(exp));
