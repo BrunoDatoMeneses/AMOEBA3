@@ -12,10 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import utils.CSVWriter;
-import utils.PARSER;
-import utils.Pair;
-import utils.TRACE;
+import utils.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -234,9 +231,11 @@ public class LaunchExampleXPWithXML {
 
 
     private static void learningEpisode(HashMap<String, ArrayList<Double>> data) {
+        RAND_REPEATABLE.setSeed(0);
         ELLSA ellsa = new ELLSA(null, null);
         StudiedSystem studiedSystem = new Model_Manager(PARAMS.spaceSize, PARAMS.dimension, PARAMS.nbOfModels, PARAMS.normType, PARAMS.randomExploration, PARAMS.explorationIncrement, PARAMS.explorationWidht, PARAMS.limitedToSpaceZone, PARAMS.noiseRange);
         ellsa.setStudiedSystem(studiedSystem);
+        ellsa.getEnvironment().setSeed(0);
         IBackupSystem backupSystem = new BackupSystem(ellsa);
         File file = new File(SETTING_FILE_NAME);
         backupSystem.load(file);
