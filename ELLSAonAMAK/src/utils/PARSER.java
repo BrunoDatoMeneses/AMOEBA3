@@ -9,8 +9,4 @@ public class PARSER {
         ArrayList<String> endList = new ArrayList<>(Arrays.asList(listOfPercepts.split(" ")));
     return endList;
     }
-
-    public static void main(String[] args) {
-        System.out.println(convertStringToArraylist("px py pz"));
-    }
 }
