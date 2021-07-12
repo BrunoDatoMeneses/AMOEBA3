@@ -9,3 +9,9 @@ Elle est décomposée en plusieurs sections dépendant de la partie de l'expéri
 .xml. À noter que certains paramètres sont définis par rapport à d'autres.
 Pour récupérer les attributs de chaque namespaces xml on passe par une NodeList et ensuite on vient parser si besoin
 la valeur des attributs récupérer par la lecture.
+
+PROTOCOL EXPERIMENTAL
+
+- Définir les valeurs des paramètres au travers d'un fichier .xml placer dans /resources et suivant le model de test.xml
+- Passer le fichier .xml en paramètre de la classe LaunchExampleXPWithXML.java
+- Lancer le launcher.
